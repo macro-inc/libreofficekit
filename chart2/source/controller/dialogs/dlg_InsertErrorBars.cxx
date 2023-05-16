@@ -22,12 +22,15 @@
 #include <chartview/ExplicitScaleValues.hxx>
 #include <chartview/ExplicitValueProvider.hxx>
 #include <ChartModelHelper.hxx>
+#include <ChartModel.hxx>
 #include <ObjectIdentifier.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <ObjectNameProvider.hxx>
+#include <DataSeries.hxx>
 
-#include <com/sun/star/frame/XModel.hpp>
 #include <comphelper/servicehelper.hxx>
 
 using ::com::sun::star::uno::Reference;
@@ -39,7 +42,7 @@ namespace chart
 
 InsertErrorBarsDialog::InsertErrorBarsDialog(
     weld::Window* pParent, const SfxItemSet& rMyAttrs,
-    const uno::Reference< chart2::XChartDocument > & xChartDocument,
+    const rtl::Reference<::chart::ChartModel> & xChartDocument,
     ErrorBarResources::tErrorBarType eType /* = ErrorBarResources::ERROR_BAR_Y */ )
         : GenericDialogController(pParent, "modules/schart/ui/dlg_InsertErrorBars.ui", "dlg_InsertErrorBars")
         , m_apErrorBarResources( new ErrorBarResources(
@@ -64,19 +67,18 @@ void InsertErrorBarsDialog::SetAxisMinorStepWidthForErrorBarDecimals( double fMi
 }
 
 double InsertErrorBarsDialog::getAxisMinorStepWidthForErrorBarDecimals(
-    const Reference< frame::XModel >& xChartModel,
+    const rtl::Reference<::chart::ChartModel>& xChartModel,
     const Reference< uno::XInterface >& xChartView,
-    const OUString& rSelectedObjectCID )
+    std::u16string_view rSelectedObjectCID )
 {
     double fStepWidth = 0.001;
 
     ExplicitValueProvider* pExplicitValueProvider( comphelper::getFromUnoTunnel<ExplicitValueProvider>(xChartView) );
     if( pExplicitValueProvider )
     {
-        Reference< XAxis > xAxis;
-        Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
-        Reference< XDataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( rSelectedObjectCID, xChartModel );
-        xAxis = DiagramHelper::getAttachedAxis( xSeries, xDiagram );
+        rtl::Reference< Diagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
+        rtl::Reference< DataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( rSelectedObjectCID, xChartModel );
+        rtl::Reference< Axis > xAxis = DiagramHelper::getAttachedAxis( xSeries, xDiagram );
         if(!xAxis.is())
             xAxis = AxisHelper::getAxis( 1/*nDimensionIndex*/, true/*bMainAxis*/, xDiagram );
         if(xAxis.is())

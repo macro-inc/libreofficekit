@@ -21,6 +21,7 @@
 #include <dbexchange.hxx>
 #include <callbacks.hxx>
 
+#include <com/sun/star/awt/PopupMenuDirection.hpp>
 #include <com/sun/star/ui/XContextMenuInterceptor.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/frame/XController.hpp>
@@ -35,9 +36,9 @@
 #include <toolkit/awt/vclxmenu.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <svx/dbaobjectex.hxx>
+#include <utility>
 #include <vcl/commandevent.hxx>
 #include <vcl/event.hxx>
-#include <vcl/menu.hxx>
 #include <vcl/svapp.hxx>
 
 #include <memory>
@@ -201,7 +202,7 @@ std::unique_ptr<weld::TreeIter> TreeListBox::GetEntryPosByName(std::u16string_vi
     {
         if (m_xTreeView->get_text(*xEntry) == aName)
         {
-            if (!_pFilter || _pFilter->includeEntry(reinterpret_cast<void*>(m_xTreeView->get_id(*xEntry).toUInt64())))
+            if (!_pFilter || _pFilter->includeEntry(weld::fromId<void*>(m_xTreeView->get_id(*xEntry))))
             {
                 // found
                 return xEntry;
@@ -293,7 +294,7 @@ IMPL_LINK(TreeListBox, QueryTooltipHdl, const weld::TreeIter&, rIter, OUString)
 {
     OUString sQuickHelpText;
     if (m_pActionListener &&
-        m_pActionListener->requestQuickHelp(reinterpret_cast<void*>(m_xTreeView->get_id(rIter).toUInt64()), sQuickHelpText))
+        m_pActionListener->requestQuickHelp(weld::fromId<void*>(m_xTreeView->get_id(rIter)), sQuickHelpText))
     {
         return sQuickHelpText;
     }
@@ -308,8 +309,8 @@ namespace
     class SelectionSupplier : public SelectionSupplier_Base
     {
     public:
-        explicit SelectionSupplier( const Any& _rSelection )
-            :m_aSelection( _rSelection )
+        explicit SelectionSupplier( Any _aSelection )
+            :m_aSelection(std::move( _aSelection ))
         {
         }
 
@@ -390,9 +391,10 @@ IMPL_LINK(TreeListBox, CommandHdl, const CommandEvent&, rCEvt, bool)
 
     VclPtr<vcl::Window> xMenuParent = m_pContextMenuProvider->getMenuParent();
 
+    css::uno::Reference< css::awt::XWindow> xSourceWindow = VCLUnoHelper::GetInterface(xMenuParent);
+
     rtl::Reference xPopupMenu( new VCLXPopupMenu );
     xMenuController->setPopupMenu( xPopupMenu );
-    VclPtr<PopupMenu> pContextMenu( static_cast< PopupMenu* >( xPopupMenu->GetMenu() ) );
 
     // allow context menu interception
     ::comphelper::OInterfaceContainerHelper2* pInterceptors = m_pContextMenuProvider->getContextMenuInterceptors();
@@ -401,11 +403,11 @@ IMPL_LINK(TreeListBox, CommandHdl, const CommandEvent&, rCEvt, bool)
         OUString aMenuIdentifier( "private:resource/popupmenu/" + aResourceName );
 
         ContextMenuExecuteEvent aEvent;
-        aEvent.SourceWindow = VCLUnoHelper::GetInterface(xMenuParent);
+        aEvent.SourceWindow = xSourceWindow;
         aEvent.ExecutePosition.X = -1;
         aEvent.ExecutePosition.Y = -1;
         aEvent.ActionTriggerContainer = ::framework::ActionTriggerHelper::CreateActionTriggerContainerFromMenu(
-            pContextMenu.get(), &aMenuIdentifier );
+            xPopupMenu, &aMenuIdentifier );
         aEvent.Selection = new SelectionSupplier(m_pContextMenuProvider->getCurrentSelection(*m_xTreeView));
 
         ::comphelper::OInterfaceIteratorHelper2 aIter( *pInterceptors );
@@ -451,9 +453,9 @@ IMPL_LINK(TreeListBox, CommandHdl, const CommandEvent&, rCEvt, bool)
 
         if ( bModifiedMenu )
         {
-            pContextMenu->Clear();
+            xPopupMenu->clear();
             ::framework::ActionTriggerHelper::CreateMenuFromActionTriggerContainer(
-                pContextMenu, aEvent.ActionTriggerContainer );
+                xPopupMenu, aEvent.ActionTriggerContainer );
             aEvent.ActionTriggerContainer.clear();
         }
     }
@@ -462,8 +464,8 @@ IMPL_LINK(TreeListBox, CommandHdl, const CommandEvent&, rCEvt, bool)
     m_pContextMenuProvider->adjustMenuPosition(*m_xTreeView, aPos);
 
     // do action for selected entry in popup menu
-    pContextMenu->Execute(xMenuParent, aPos);
-    pContextMenu.disposeAndClear();
+    css::uno::Reference<css::awt::XWindowPeer> xParent(xSourceWindow, css::uno::UNO_QUERY);
+    xPopupMenu->execute(xParent, css::awt::Rectangle(aPos.X(), aPos.Y(), 1, 1), css::awt::PopupMenuDirection::EXECUTE_DOWN);
 
     css::uno::Reference<css::lang::XComponent> xComponent(xMenuController, css::uno::UNO_QUERY);
     if (xComponent.is())

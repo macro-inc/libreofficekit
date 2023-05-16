@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/beans/xpropertyset.hxx>
 #include <test/container/xnamed.hxx>
 #include <test/lang/xserviceinfo.hxx>
@@ -29,7 +29,7 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScDataPilotFieldObj : public CalcUnoApiTest,
+class ScDataPilotFieldObj : public UnoApiTest,
                             public apitest::DataPilotField,
                             public apitest::XDataPilotField,
                             public apitest::XDataPilotFieldGrouping,
@@ -39,7 +39,6 @@ class ScDataPilotFieldObj : public CalcUnoApiTest,
 {
 public:
     virtual void setUp() override;
-    virtual void tearDown() override;
     virtual uno::Reference<uno::XInterface> init() override;
 
     ScDataPilotFieldObj();
@@ -78,13 +77,10 @@ public:
     CPPUNIT_TEST(testSupportsService);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScDataPilotFieldObj::ScDataPilotFieldObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XNamed("Col1")
     , XPropertySet({ "Function", "HasAutoShowInfo", "HasLayoutInfo", "HasSortInfo", "Subtotals",
                      "Subtotals2" })
@@ -112,17 +108,9 @@ uno::Reference<uno::XInterface> ScDataPilotFieldObj::init()
 
 void ScDataPilotFieldObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
 
-    OUString aFileURL;
-    createFileURL(u"scdatapilotfieldobj.ods", aFileURL);
-    mxComponent = loadFromDesktop(aFileURL, "com.sun.star.sheet.SpreadsheetDocument");
-}
-
-void ScDataPilotFieldObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
+    loadFromURL(u"scdatapilotfieldobj.ods");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScDataPilotFieldObj);

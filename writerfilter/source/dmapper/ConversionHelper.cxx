@@ -27,6 +27,7 @@
 #include <tools/color.hxx>
 #include <tools/mapunit.hxx>
 #include <tools/UnitConversion.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace com::sun::star;
 
@@ -285,23 +286,23 @@ void lcl_SwapQuotesInField(OUString &rFmt)
     }
     rFmt = aBuffer.makeStringAndClear();
 }
-bool lcl_IsNotAM(OUString const & rFmt, sal_Int32 nPos)
+bool lcl_IsNotAM(std::u16string_view rFmt, sal_Int32 nPos)
 {
     return (
-            (nPos == rFmt.getLength() - 1) ||
+            (nPos == static_cast<sal_Int32>(rFmt.size()) - 1) ||
             (
             (rFmt[nPos+1] != 'M') &&
             (rFmt[nPos+1] != 'm')
             )
         );
 }
-bool IsPreviousAM(OUString const& rParams, sal_Int32 nPos)
+bool IsPreviousAM(std::u16string_view rParams, sal_Int32 nPos)
 {
-    return nPos >= 2 && rParams.matchIgnoreAsciiCase("am", nPos - 2);
+    return nPos >= 2 && o3tl::matchIgnoreAsciiCase(rParams, u"am", nPos - 2);
 }
-bool IsNextPM(OUString const& rParams, sal_Int32 nPos)
+bool IsNextPM(std::u16string_view rParams, sal_Int32 nPos)
 {
-    return nPos + 2 < rParams.getLength() && rParams.matchIgnoreAsciiCase("pm", nPos + 1);
+    return o3tl::make_unsigned(nPos + 2) < rParams.size() && o3tl::matchIgnoreAsciiCase(rParams, u"pm", nPos + 1);
 }
 }
 
@@ -659,27 +660,27 @@ sal_Int16 ConvertCustomNumberFormat(std::u16string_view rFormat)
     return nRet;
 }
 
-util::DateTime ConvertDateStringToDateTime( const OUString& rDateTime )
+util::DateTime ConvertDateStringToDateTime( std::u16string_view rDateTime )
 {
     util::DateTime aDateTime;
     //xsd::DateTime in the format [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] example: 2008-01-21T10:42:00Z
     //OUString getToken( sal_Int32 token, sal_Unicode cTok, sal_Int32& index ) const
     sal_Int32 nIndex = 0;
-    OUString sDate = rDateTime.getToken( 0, 'T', nIndex );
+    std::u16string_view sDate = o3tl::getToken(rDateTime, 0, 'T', nIndex );
     // HACK: this is broken according to the spec, but MSOffice always treats the time as local,
     // and writes it as Z (=UTC+0)
-    OUString sTime = rDateTime.getToken( 0, 'Z', nIndex );
+    std::u16string_view sTime = o3tl::getToken(rDateTime, 0, 'Z', nIndex );
     nIndex = 0;
-    aDateTime.Year = sal_uInt16( sDate.getToken( 0, '-', nIndex ).toInt32() );
-    aDateTime.Month = sal_uInt16( sDate.getToken( 0, '-', nIndex ).toInt32() );
+    aDateTime.Year = sal_uInt16( o3tl::toInt32(o3tl::getToken(sDate, 0, '-', nIndex )) );
+    aDateTime.Month = sal_uInt16( o3tl::toInt32(o3tl::getToken(sDate, 0, '-', nIndex )) );
     if (nIndex != -1)
-        aDateTime.Day = sal_uInt16( sDate.copy( nIndex ).toInt32() );
+        aDateTime.Day = sal_uInt16( o3tl::toInt32(sDate.substr( nIndex )) );
 
     nIndex = 0;
-    aDateTime.Hours = sal_uInt16( sTime.getToken( 0, ':', nIndex ).toInt32() );
-    aDateTime.Minutes = sal_uInt16( sTime.getToken( 0, ':', nIndex ).toInt32() );
+    aDateTime.Hours = sal_uInt16( o3tl::toInt32(o3tl::getToken(sTime, 0, ':', nIndex )) );
+    aDateTime.Minutes = sal_uInt16( o3tl::toInt32(o3tl::getToken(sTime, 0, ':', nIndex )) );
     if (nIndex != -1)
-        aDateTime.Seconds = sal_uInt16( sTime.copy( nIndex ).toInt32() );
+        aDateTime.Seconds = sal_uInt16( o3tl::toInt32(sTime.substr( nIndex )) );
 
     return aDateTime;
 }

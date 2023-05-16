@@ -17,10 +17,12 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <utility>
 #include <vcl/settings.hxx>
 #include <vcl/weld.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <i18nlangtag/mslangid.hxx>
+#include <o3tl/safeint.hxx>
 #include <officecfg/Office/Security.hxx>
 #include <unotools/lingucfg.hxx>
 #include <unotools/linguprops.hxx>
@@ -29,7 +31,7 @@
 #include <sfx2/sfxsids.hrc>
 #include <tools/debug.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/dispatchcommand.hxx>
 #include <comphelper/processfactory.hxx>
 #include <com/sun/star/linguistic2/LinguServiceManager.hpp>
@@ -127,12 +129,12 @@ class ModuleUserData_Impl
     OUString  sImplName;
 
 public:
-    ModuleUserData_Impl( const OUString& sImpName, bool bIsParent, bool bChecked, sal_uInt8 nSetType, sal_uInt8 nSetIndex ) :
+    ModuleUserData_Impl( OUString sImpName, bool bIsParent, bool bChecked, sal_uInt8 nSetType, sal_uInt8 nSetIndex ) :
         bParent(bIsParent),
         bIsChecked(bChecked),
         nType(nSetType),
         nIndex(nSetIndex),
-        sImplName(sImpName)
+        sImplName(std::move(sImpName))
         {
         }
     bool IsParent() const {return bParent;}
@@ -413,12 +415,12 @@ Sequence< OUString > SvxLinguData_Impl::GetSortedImplNames( LanguageType nLang, 
     if (pTable->count( nLang ))
         aRes = (*pTable)[ nLang ];      // add configured services
     sal_Int32 nIdx = aRes.getLength();
-    DBG_ASSERT( static_cast<sal_Int32>(nDisplayServices) >= nIdx, "size mismatch" );
+    DBG_ASSERT( nDisplayServices >= o3tl::make_unsigned(nIdx), "size mismatch" );
     aRes.realloc( nDisplayServices );
     OUString *pRes = aRes.getArray();
 
     // add not configured services
-    for (sal_Int32 i = 0;  i < static_cast<sal_Int32>(nDisplayServices);  ++i)
+    for (sal_uInt32 i = 0;  i < nDisplayServices;  ++i)
     {
         const ServiceInfo_Impl &rInfo = aDisplayServiceArr[ i ];
         OUString aImplName;
@@ -821,16 +823,16 @@ void SvxLinguData_Impl::Reconfigure( std::u16string_view rDisplayName, bool bEna
 
 SvxLinguTabPage::SvxLinguTabPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rSet)
     : SfxTabPage(pPage, pController, "cui/ui/optlingupage.ui", "OptLinguPage", &rSet)
-    , sCapitalWords   (CuiResId(RID_SVXSTR_CAPITAL_WORDS))
-    , sWordsWithDigits(CuiResId(RID_SVXSTR_WORDS_WITH_DIGITS))
-    , sSpellSpecial   (CuiResId(RID_SVXSTR_SPELL_SPECIAL))
-    , sSpellAuto      (CuiResId(RID_SVXSTR_SPELL_AUTO))
-    , sGrammarAuto    (CuiResId(RID_SVXSTR_GRAMMAR_AUTO))
-    , sNumMinWordlen  (CuiResId(RID_SVXSTR_NUM_MIN_WORDLEN))
-    , sNumPreBreak    (CuiResId(RID_SVXSTR_NUM_PRE_BREAK))
-    , sNumPostBreak   (CuiResId(RID_SVXSTR_NUM_POST_BREAK))
-    , sHyphAuto       (CuiResId(RID_SVXSTR_HYPH_AUTO))
-    , sHyphSpecial    (CuiResId(RID_SVXSTR_HYPH_SPECIAL))
+    , sCapitalWords   (CuiResId(RID_CUISTR_CAPITAL_WORDS))
+    , sWordsWithDigits(CuiResId(RID_CUISTR_WORDS_WITH_DIGITS))
+    , sSpellSpecial   (CuiResId(RID_CUISTR_SPELL_SPECIAL))
+    , sSpellAuto      (CuiResId(RID_CUISTR_SPELL_AUTO))
+    , sGrammarAuto    (CuiResId(RID_CUISTR_GRAMMAR_AUTO))
+    , sNumMinWordlen  (CuiResId(RID_CUISTR_NUM_MIN_WORDLEN))
+    , sNumPreBreak    (CuiResId(RID_CUISTR_NUM_PRE_BREAK))
+    , sNumPostBreak   (CuiResId(RID_CUISTR_NUM_POST_BREAK))
+    , sHyphAuto       (CuiResId(RID_CUISTR_HYPH_AUTO))
+    , sHyphSpecial    (CuiResId(RID_CUISTR_HYPH_SPECIAL))
     , nUPN_HYPH_MIN_WORD_LENGTH(-1)
     , nUPN_HYPH_MIN_LEADING(-1)
     , nUPN_HYPH_MIN_TRAILING(-1)
@@ -1041,7 +1043,7 @@ bool SvxLinguTabPage::FillItemSet( SfxItemSet* rCoreSet )
     OptionsUserData aPostBreakData(m_xLinguOptionsCLB->get_id(EID_NUM_POST_BREAK).toUInt32());
     if ( aPreBreakData.IsModified() || aPostBreakData.IsModified() )
     {
-        SfxHyphenRegionItem aHyp( GetWhich( SID_ATTR_HYPHENREGION ) );
+        SfxHyphenRegionItem aHyp( SID_ATTR_HYPHENREGION );
         aHyp.GetMinLead()  = static_cast<sal_uInt8>(aPreBreakData.GetNumericValue());
         aHyp.GetMinTrail() = static_cast<sal_uInt8>(aPostBreakData.GetNumericValue());
         rCoreSet->Put( aHyp );
@@ -1052,8 +1054,7 @@ bool SvxLinguTabPage::FillItemSet( SfxItemSet* rCoreSet )
     const SfxPoolItem* pOld = GetOldItem( *rCoreSet, SID_AUTOSPELL_CHECK );
     if ( !pOld || static_cast<const SfxBoolItem*>(pOld)->GetValue() != bNewAutoCheck )
     {
-        rCoreSet->Put( SfxBoolItem( GetWhich( SID_AUTOSPELL_CHECK ),
-                                bNewAutoCheck ) );
+        rCoreSet->Put( SfxBoolItem( SID_AUTOSPELL_CHECK, bNewAutoCheck ) );
         bModified = true;
     }
 
@@ -1134,7 +1135,7 @@ void SvxLinguTabPage::UpdateModulesBox_Impl()
     {
         const ServiceInfo_Impl &rInfo = rAllDispSrvcArr[i];
         m_xLinguModulesCLB->append();
-        m_xLinguModulesCLB->set_id(i, OUString::number(reinterpret_cast<sal_Int64>(&rInfo)));
+        m_xLinguModulesCLB->set_id(i, weld::toId(&rInfo));
         m_xLinguModulesCLB->set_toggle(i, rInfo.bConfigured ? TRISTATE_TRUE : TRISTATE_FALSE);
         m_xLinguModulesCLB->set_text(i, rInfo.sDisplayName, 0);
     }
@@ -1225,9 +1226,8 @@ void SvxLinguTabPage::Reset( const SfxItemSet* rSet )
     nUPN_HYPH_MIN_WORD_LENGTH = nEntry;
 
     const SfxHyphenRegionItem *pHyp = nullptr;
-    sal_uInt16 nWhich = GetWhich( SID_ATTR_HYPHENREGION );
-    if ( rSet->GetItemState( nWhich, false ) == SfxItemState::SET )
-        pHyp = &static_cast<const SfxHyphenRegionItem &>( rSet->Get( nWhich ) );
+    if ( rSet->GetItemState( SID_ATTR_HYPHENREGION, false ) == SfxItemState::SET )
+        pHyp = & rSet->Get( SID_ATTR_HYPHENREGION );
 
     m_xLinguOptionsCLB->append();
     ++nEntry;
@@ -1541,10 +1541,10 @@ IMPL_STATIC_LINK_NOARG(SvxLinguTabPage, OnLinkClick, weld::LinkButton&, bool)
 
 SvxEditModulesDlg::SvxEditModulesDlg(weld::Window* pParent, SvxLinguData_Impl& rData)
     : GenericDialogController(pParent, "cui/ui/editmodulesdialog.ui", "EditModulesDialog")
-    , sSpell(CuiResId(RID_SVXSTR_SPELL))
-    , sHyph(CuiResId(RID_SVXSTR_HYPH))
-    , sThes(CuiResId(RID_SVXSTR_THES))
-    , sGrammar(CuiResId(RID_SVXSTR_GRAMMAR))
+    , sSpell(CuiResId(RID_CUISTR_SPELL))
+    , sHyph(CuiResId(RID_CUISTR_HYPH))
+    , sThes(CuiResId(RID_CUISTR_THES))
+    , sGrammar(CuiResId(RID_CUISTR_GRAMMAR))
     , rLinguData(rData)
     , m_xModulesCLB(m_xBuilder->weld_tree_view("lingudicts"))
     , m_xPrioUpPB(m_xBuilder->weld_button("up"))
@@ -1598,7 +1598,7 @@ SvxEditModulesDlg::SvxEditModulesDlg(weld::Window* pParent, SvxLinguData_Impl& r
 SvxEditModulesDlg::~SvxEditModulesDlg()
 {
     for (int i = 0, nEntryCount = m_xModulesCLB->n_children(); i < nEntryCount; ++i)
-        delete reinterpret_cast<ModuleUserData_Impl*>(m_xModulesCLB->get_id(i).toInt64());
+        delete weld::fromId<ModuleUserData_Impl*>(m_xModulesCLB->get_id(i));
 }
 
 IMPL_LINK( SvxEditModulesDlg, SelectHdl_Impl, weld::TreeView&, rBox, void )
@@ -1609,16 +1609,16 @@ IMPL_LINK( SvxEditModulesDlg, SelectHdl_Impl, weld::TreeView&, rBox, void )
 
     bool bDisableUp = true;
     bool bDisableDown = true;
-    ModuleUserData_Impl* pData = reinterpret_cast<ModuleUserData_Impl*>(rBox.get_id(nCurPos).toInt64());
+    ModuleUserData_Impl* pData = weld::fromId<ModuleUserData_Impl*>(rBox.get_id(nCurPos));
     if (!pData->IsParent() && pData->GetType() != TYPE_HYPH)
     {
         if (nCurPos < rBox.n_children() - 1)
         {
-            bDisableDown = reinterpret_cast<ModuleUserData_Impl*>(rBox.get_id(nCurPos + 1).toInt64())->IsParent();
+            bDisableDown = weld::fromId<ModuleUserData_Impl*>(rBox.get_id(nCurPos + 1))->IsParent();
         }
         if (nCurPos > 1)
         {
-            bDisableUp = reinterpret_cast<ModuleUserData_Impl*>(rBox.get_id(nCurPos - 1).toInt64())->IsParent();
+            bDisableUp = weld::fromId<ModuleUserData_Impl*>(rBox.get_id(nCurPos - 1))->IsParent();
         }
     }
     m_xPrioUpPB->set_sensitive(!bDisableUp);
@@ -1627,7 +1627,7 @@ IMPL_LINK( SvxEditModulesDlg, SelectHdl_Impl, weld::TreeView&, rBox, void )
 
 IMPL_LINK( SvxEditModulesDlg, BoxCheckButtonHdl_Impl, const weld::TreeView::iter_col&, rRowCol, void )
 {
-    ModuleUserData_Impl* pData = reinterpret_cast<ModuleUserData_Impl*>(m_xModulesCLB->get_id(rRowCol.first).toInt64());
+    ModuleUserData_Impl* pData = weld::fromId<ModuleUserData_Impl*>(m_xModulesCLB->get_id(rRowCol.first));
     if (pData->IsParent() || pData->GetType() != TYPE_HYPH)
         return;
 
@@ -1636,7 +1636,7 @@ IMPL_LINK( SvxEditModulesDlg, BoxCheckButtonHdl_Impl, const weld::TreeView::iter
     auto nPos = m_xModulesCLB->get_iter_index_in_parent(rRowCol.first);
     for (int i = 0, nEntryCount = m_xModulesCLB->n_children(); i < nEntryCount; ++i)
     {
-        pData = reinterpret_cast<ModuleUserData_Impl*>(m_xModulesCLB->get_id(i).toInt64());
+        pData = weld::fromId<ModuleUserData_Impl*>(m_xModulesCLB->get_id(i));
         if (!pData->IsParent() && pData->GetType() == TYPE_HYPH && i != nPos)
         {
             m_xModulesCLB->set_toggle(i, TRISTATE_FALSE);
@@ -1667,7 +1667,7 @@ void SvxEditModulesDlg::LangSelectHdl_Impl(const SvxLanguageBox* pBox)
         bool bChanged = false;
         for (int i = 0, nEntryCount = m_xModulesCLB->n_children(); i < nEntryCount; ++i)
         {
-            ModuleUserData_Impl* pData = reinterpret_cast<ModuleUserData_Impl*>(m_xModulesCLB->get_id(i).toInt64());
+            ModuleUserData_Impl* pData = weld::fromId<ModuleUserData_Impl*>(m_xModulesCLB->get_id(i));
             if (pData->IsParent())
             {
                 if (bChanged)
@@ -1710,7 +1710,7 @@ void SvxEditModulesDlg::LangSelectHdl_Impl(const SvxLanguageBox* pBox)
     }
 
     for (int i = 0, nEntryCount = m_xModulesCLB->n_children(); i < nEntryCount; ++i)
-        delete reinterpret_cast<ModuleUserData_Impl*>(m_xModulesCLB->get_id(i).toInt64());
+        delete weld::fromId<ModuleUserData_Impl*>(m_xModulesCLB->get_id(i));
     m_xModulesCLB->clear();
 
     // display entries for new selected language
@@ -1725,7 +1725,7 @@ void SvxEditModulesDlg::LangSelectHdl_Impl(const SvxLanguageBox* pBox)
 
         ModuleUserData_Impl* pUserData = new ModuleUserData_Impl(
                                          OUString(), true, false, TYPE_SPELL, 0 );
-        OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pUserData)));
+        OUString sId(weld::toId(pUserData));
         m_xModulesCLB->append(nullptr);
         m_xModulesCLB->set_id(nRow, sId);
         m_xModulesCLB->set_text(nRow, sSpell, 0);
@@ -1761,7 +1761,7 @@ void SvxEditModulesDlg::LangSelectHdl_Impl(const SvxLanguageBox* pBox)
                 const bool bCheck = bHasLang && lcl_SeqGetEntryPos( rTable[ eCurLanguage ], aImplName ) >= 0;
                 pUserData = new ModuleUserData_Impl( aImplName, false,
                                         bCheck, TYPE_SPELL, static_cast<sal_uInt8>(nLocalIndex++) );
-                sId = OUString::number(reinterpret_cast<sal_Int64>(pUserData));
+                sId = weld::toId(pUserData);
 
                 m_xModulesCLB->append(nullptr);
                 m_xModulesCLB->set_id(nRow, sId);
@@ -1775,7 +1775,7 @@ void SvxEditModulesDlg::LangSelectHdl_Impl(const SvxLanguageBox* pBox)
         // grammar checker entries
 
         pUserData = new ModuleUserData_Impl( OUString(), true, false, TYPE_GRAMMAR, 0 );
-        sId = OUString::number(reinterpret_cast<sal_Int64>(pUserData));
+        sId = weld::toId(pUserData);
         m_xModulesCLB->append(nullptr);
         m_xModulesCLB->set_id(nRow, sId);
         m_xModulesCLB->set_text(nRow, sGrammar, 0);
@@ -1812,7 +1812,7 @@ void SvxEditModulesDlg::LangSelectHdl_Impl(const SvxLanguageBox* pBox)
                 pUserData = new ModuleUserData_Impl( aImplName, false,
                                         bCheck, TYPE_GRAMMAR, static_cast<sal_uInt8>(nLocalIndex++) );
 
-                sId = OUString::number(reinterpret_cast<sal_Int64>(pUserData));
+                sId = weld::toId(pUserData);
 
                 m_xModulesCLB->append(nullptr);
                 m_xModulesCLB->set_id(nRow, sId);
@@ -1826,7 +1826,7 @@ void SvxEditModulesDlg::LangSelectHdl_Impl(const SvxLanguageBox* pBox)
         // hyphenator entries
 
         pUserData = new ModuleUserData_Impl( OUString(), true, false, TYPE_HYPH, 0 );
-        sId = OUString::number(reinterpret_cast<sal_Int64>(pUserData));
+        sId = weld::toId(pUserData);
         m_xModulesCLB->append(nullptr);
         m_xModulesCLB->set_id(nRow, sId);
         m_xModulesCLB->set_text(nRow, sHyph, 0);
@@ -1862,7 +1862,7 @@ void SvxEditModulesDlg::LangSelectHdl_Impl(const SvxLanguageBox* pBox)
                 const bool bCheck = bHasLang && lcl_SeqGetEntryPos( rTable[ eCurLanguage ], aImplName ) >= 0;
                 pUserData = new ModuleUserData_Impl( aImplName, false,
                                         bCheck, TYPE_HYPH, static_cast<sal_uInt8>(nLocalIndex++) );
-                sId = OUString::number(reinterpret_cast<sal_Int64>(pUserData));
+                sId = weld::toId(pUserData);
 
                 m_xModulesCLB->append(nullptr);
                 m_xModulesCLB->set_id(nRow, sId);
@@ -1876,7 +1876,7 @@ void SvxEditModulesDlg::LangSelectHdl_Impl(const SvxLanguageBox* pBox)
         // thesaurus entries
 
         pUserData = new ModuleUserData_Impl( OUString(), true, false, TYPE_THES, 0 );
-        sId = OUString::number(reinterpret_cast<sal_Int64>(pUserData));
+        sId = weld::toId(pUserData);
         m_xModulesCLB->append(nullptr);
         m_xModulesCLB->set_id(nRow, sId);
         m_xModulesCLB->set_text(nRow, sThes, 0);
@@ -1912,7 +1912,7 @@ void SvxEditModulesDlg::LangSelectHdl_Impl(const SvxLanguageBox* pBox)
                 const bool bCheck = bHasLang && lcl_SeqGetEntryPos( rTable[ eCurLanguage ], aImplName ) >= 0;
                 pUserData = new ModuleUserData_Impl( aImplName, false,
                                         bCheck, TYPE_THES, static_cast<sal_uInt8>(nLocalIndex++) );
-                sId = OUString::number(reinterpret_cast<sal_Int64>(pUserData));
+                sId = weld::toId(pUserData);
 
                 m_xModulesCLB->append(nullptr);
                 m_xModulesCLB->set_id(nRow, sId);

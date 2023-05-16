@@ -22,6 +22,7 @@
 
 #include <services.h>
 
+#include <com/sun/star/awt/MenuItemType.hpp>
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/ui/theModuleUIConfigurationManagerSupplier.hpp>
 #include <com/sun/star/ui/XUIConfigurationManagerSupplier.hpp>
@@ -39,7 +40,6 @@
 #include <toolkit/awt/vclxmenu.hxx>
 #include <tools/urlobj.hxx>
 #include <unotools/dynamicmenuoptions.hxx>
-#include <unotools/moduleoptions.hxx>
 #include <osl/mutex.hxx>
 #include <cppuhelper/supportsservice.hxx>
 
@@ -106,11 +106,10 @@ void NewMenuController::setMenuImages( PopupMenu* pPopupMenu, bool bSetImages )
     }
 }
 
-void NewMenuController::determineAndSetNewDocAccel( PopupMenu* pPopupMenu, const vcl::KeyCode& rKeyCode )
+void NewMenuController::determineAndSetNewDocAccel(const css::awt::KeyEvent& rKeyCode)
 {
-    sal_uInt16        nCount( pPopupMenu->GetItemCount() );
-    sal_uInt16        nId( 0 );
-    bool      bFound( false );
+    sal_uInt16 nCount(m_xPopupMenu->getItemCount());
+    sal_uInt16 nId( 0 );
     OUString aCommand;
 
     if ( !m_aEmptyDocURL.isEmpty() )
@@ -119,44 +118,21 @@ void NewMenuController::determineAndSetNewDocAccel( PopupMenu* pPopupMenu, const
 
         for ( sal_uInt16 i = 0; i < nCount; i++ )
         {
-            if ( pPopupMenu->GetItemType( i ) != MenuItemType::SEPARATOR )
+            if (m_xPopupMenu->getItemType(i) != css::awt::MenuItemType_SEPARATOR)
             {
-                nId = pPopupMenu->GetItemId( i );
-                aCommand = pPopupMenu->GetItemCommand( nId );
+                nId = m_xPopupMenu->getItemId(i);
+                aCommand = m_xPopupMenu->getCommand(nId);
                 if ( aCommand.startsWith( m_aEmptyDocURL ) )
                 {
-                    pPopupMenu->SetAccelKey( nId, rKeyCode );
-                    bFound = true;
+                    m_xPopupMenu->setAcceleratorKeyEvent(nId, rKeyCode);
                     break;
                 }
             }
         }
     }
-
-    if ( bFound )
-        return;
-
-    // Search for the default module name
-    OUString aDefaultModuleName( SvtModuleOptions().GetDefaultModuleName() );
-    if ( aDefaultModuleName.isEmpty() )
-        return;
-
-    for ( sal_uInt16 i = 0; i < nCount; i++ )
-    {
-        if ( pPopupMenu->GetItemType( i ) != MenuItemType::SEPARATOR )
-        {
-            nId = pPopupMenu->GetItemId( i );
-            aCommand = pPopupMenu->GetItemCommand( nId );
-            if ( aCommand.indexOf( aDefaultModuleName ) >= 0 )
-            {
-                pPopupMenu->SetAccelKey( nId, rKeyCode );
-                break;
-            }
-        }
-    }
 }
 
-void NewMenuController::setAccelerators( PopupMenu* pPopupMenu )
+void NewMenuController::setAccelerators()
 {
     if ( !m_bModuleIdentified )
         return;
@@ -212,18 +188,18 @@ void NewMenuController::setAccelerators( PopupMenu* pPopupMenu )
     }
 
     vcl::KeyCode                    aEmptyKeyCode;
-    sal_uInt16                      nItemCount( pPopupMenu->GetItemCount() );
+    sal_uInt16                      nItemCount(m_xPopupMenu->getItemCount());
     std::vector< vcl::KeyCode >     aMenuShortCuts;
     std::vector< OUString >    aCmds;
     std::vector< sal_uInt16 >       aIds;
     for ( sal_uInt16 i = 0; i < nItemCount; i++ )
     {
-        if ( pPopupMenu->GetItemType( i ) != MenuItemType::SEPARATOR )
+        if (m_xPopupMenu->getItemType(i) != css::awt::MenuItemType_SEPARATOR)
         {
-            sal_uInt16 nId( pPopupMenu->GetItemId( i ));
+            sal_uInt16 nId(m_xPopupMenu->getItemId(i));
             aIds.push_back( nId );
             aMenuShortCuts.push_back( aEmptyKeyCode );
-            aCmds.push_back( pPopupMenu->GetItemCommand( nId ));
+            aCmds.push_back(m_xPopupMenu->getCommand(nId));
         }
     }
 
@@ -255,14 +231,14 @@ void NewMenuController::setAccelerators( PopupMenu* pPopupMenu )
 
     const sal_uInt32 nCount2 = aIds.size();
     for ( sal_uInt32 i = 0; i < nCount2; i++ )
-        pPopupMenu->SetAccelKey( aIds[i], aMenuShortCuts[i] );
+        m_xPopupMenu->setAcceleratorKeyEvent(aIds[i], svt::AcceleratorExecute::st_VCLKey2AWTKey(aMenuShortCuts[i]));
 
     // Special handling for "New" menu short-cut should be set at the
     // document which will be opened using it.
     if ( m_bNewMenu )
     {
         if ( aMenuShortCuts[nSeqCount-1] != aEmptyKeyCode )
-            determineAndSetNewDocAccel( pPopupMenu, aMenuShortCuts[nSeqCount-1] );
+            determineAndSetNewDocAccel(svt::AcceleratorExecute::st_VCLKey2AWTKey(aMenuShortCuts[nSeqCount-1]));
     }
 }
 
@@ -338,14 +314,14 @@ void NewMenuController::fillPopupMenu( Reference< css::awt::XPopupMenu > const &
             continue;
 
         if ( aDynamicMenuEntry.sURL == "private:separator" )
-            pVCLPopupMenu->InsertSeparator();
+            rPopupMenu->insertSeparator(-1);
         else
         {
-            pVCLPopupMenu->InsertItem( nItemId, aDynamicMenuEntry.sTitle );
-            pVCLPopupMenu->SetItemCommand( nItemId, aDynamicMenuEntry.sURL );
+            rPopupMenu->insertItem(nItemId, aDynamicMenuEntry.sTitle, 0, -1);
+            rPopupMenu->setCommand(nItemId, aDynamicMenuEntry.sURL);
 
             void* nAttributePtr = MenuAttributes::CreateAttribute( aDynamicMenuEntry.sTargetName, aDynamicMenuEntry.sImageIdentifier );
-            pVCLPopupMenu->SetUserValue( nItemId, nAttributePtr, MenuAttributes::ReleaseAttribute );
+            pPopupMenu->setUserValue(nItemId, nAttributePtr, MenuAttributes::ReleaseAttribute);
 
             nItemId++;
         }
@@ -371,8 +347,9 @@ void SAL_CALL NewMenuController::disposing( const EventObject& )
 }
 
 // XStatusListener
-void SAL_CALL NewMenuController::statusChanged( const FeatureStateEvent& )
+void SAL_CALL NewMenuController::statusChanged( const FeatureStateEvent& Event )
 {
+    Event.State >>= m_aEmptyDocURL;
 }
 
 // XMenuListener
@@ -399,9 +376,8 @@ void SAL_CALL NewMenuController::itemSelected( const css::awt::MenuEvent& rEvent
 
     {
         SolarMutexGuard aSolarMutexGuard;
-        PopupMenu* pVCLPopupMenu = static_cast<PopupMenu *>(pPopupMenu->GetMenu());
-        aURL = pVCLPopupMenu->GetItemCommand(rEvent.MenuId);
-        void* nAttributePtr = pVCLPopupMenu->GetUserValue(rEvent.MenuId);
+        aURL = pPopupMenu->getCommand(rEvent.MenuId);
+        void* nAttributePtr = pPopupMenu->getUserValue(rEvent.MenuId);
         MenuAttributes* pAttributes = static_cast<MenuAttributes *>(nAttributePtr);
         if (pAttributes)
             aTargetFrame = pAttributes->aTargetFrame;
@@ -436,7 +412,7 @@ void SAL_CALL NewMenuController::itemActivated( const css::awt::MenuEvent& )
         setMenuImages( pVCLPopupMenu, m_bShowImages );
     }
 
-    setAccelerators( pVCLPopupMenu );
+    setAccelerators();
 }
 
 // XPopupMenuController
@@ -452,23 +428,6 @@ void NewMenuController::impl_setPopupMenu()
     {
         m_aModuleIdentifier = xModuleManager->identify( m_xFrame );
         m_bModuleIdentified = true;
-
-        if ( !m_aModuleIdentifier.isEmpty() )
-        {
-            Sequence< PropertyValue > aSeq;
-
-            if ( xModuleManager->getByName( m_aModuleIdentifier ) >>= aSeq )
-            {
-                for ( PropertyValue const & prop : std::as_const(aSeq) )
-                {
-                    if ( prop.Name == "ooSetupFactoryEmptyDocumentURL" )
-                    {
-                        prop.Value >>= m_aEmptyDocURL;
-                        break;
-                    }
-                }
-            }
-        }
     }
     catch ( const RuntimeException& )
     {

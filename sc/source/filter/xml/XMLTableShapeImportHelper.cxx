@@ -25,11 +25,10 @@
 #include <userdat.hxx>
 #include <docuno.hxx>
 #include <sheetdata.hxx>
-#include <xmloff/namespacemap.hxx>
+#include <comphelper/servicehelper.hxx>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/xmluconv.hxx>
 #include <xmloff/xmltoken.hxx>
-#include <svx/unoshape.hxx>
 #include <com/sun/star/drawing/XShape.hpp>
 #include <com/sun/star/drawing/XShapes.hpp>
 
@@ -57,7 +56,7 @@ void XMLTableShapeImportHelper::SetLayer(const uno::Reference<drawing::XShape>& 
     {
         uno::Reference< beans::XPropertySet > xShapeProp( rShape, uno::UNO_QUERY );
         if( xShapeProp.is() )
-            xShapeProp->setPropertyValue( SC_LAYERID, uno::makeAny<sal_uInt16>(sal_uInt8(nLayerID)) );
+            xShapeProp->setPropertyValue( SC_LAYERID, uno::Any(nLayerID.get()) );
     }
 }
 

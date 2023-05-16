@@ -302,11 +302,6 @@ interface DrawView
         ExecMethod = FuTemporary ;
         StateMethod = GetMenuState ;
     ]
-    SID_EMOJI_CONTROL // ole : no, status : ?
-    [
-        ExecMethod = FuTemporary ;
-        StateMethod = GetMenuState ;
-    ]
     SID_CHARMAP_CONTROL // ole : no, status : ?
     [
         ExecMethod = FuTemporary ;
@@ -1398,6 +1393,11 @@ interface DrawView
         StateMethod = GetAttrState ;
     ]
     SID_ATTR_FILL_BITMAP // ole : no, status : ?
+    [
+        ExecMethod = FuTemporary ;
+        StateMethod = GetAttrState ;
+    ]
+    SID_ATTR_FILL_USE_SLIDE_BACKGROUND // ole : no, status : ?
     [
         ExecMethod = FuTemporary ;
         StateMethod = GetAttrState ;

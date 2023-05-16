@@ -30,19 +30,18 @@
 // See i#1526# for full explanation
 #define SMALL_CAPS_PERCENTAGE 80
 
+class KernArray;
 class SvxDoCapitals;
 class OutputDevice;
 class Printer;
 class Point;
 namespace tools { class Rectangle; }
 class Size;
-
 class EDITENG_DLLPUBLIC SvxFont : public vcl::Font
 {
     SvxCaseMap   eCaseMap;      // Text Markup
     short nEsc;                 // Degree of Superscript/Subscript
     sal_uInt8  nPropr;          // Degree of reduction of the font height
-    short nKern;                // Kerning in Pt
 
 public:
     SvxFont();
@@ -60,17 +59,12 @@ public:
     void SetProprRel( const sal_uInt8 nNewPropr )
         { SetPropr( static_cast<sal_uInt8>( static_cast<tools::Long>(nNewPropr) * static_cast<tools::Long>(nPropr) / 100 ) ); }
 
-    // Kerning
-    short GetFixKerning() const { return nKern; }
-    void  SetFixKerning( const short nNewKern ) { nKern = nNewKern; }
-
     SvxCaseMap GetCaseMap() const { return eCaseMap; }
     void    SetCaseMap( const SvxCaseMap eNew ) { eCaseMap = eNew; }
 
     // Is-Methods:
     bool IsCaseMap() const { return SvxCaseMap::NotMapped != eCaseMap; }
     bool IsCapital() const { return SvxCaseMap::SmallCaps == eCaseMap; }
-    bool IsKern() const { return 0 != nKern; }
     bool IsEsc() const { return 0 != nEsc; }
 
     // Consider Upper case, Lower case letters etc.
@@ -96,10 +90,13 @@ public:
                      const sal_Int32 nIdx = 0, const sal_Int32 nLen = SAL_MAX_INT32) const;
 
     void QuickDrawText( OutputDevice *pOut, const Point &rPos, const OUString &rTxt,
-                        const sal_Int32 nIdx = 0, const sal_Int32 nLen = SAL_MAX_INT32, o3tl::span<const sal_Int32> pDXArray = {} ) const;
+                        const sal_Int32 nIdx = 0, const sal_Int32 nLen = SAL_MAX_INT32,
+                        o3tl::span<const sal_Int32> pDXArray = {},
+                        o3tl::span<const sal_Bool> pKashidaArray = {} ) const;
 
     Size QuickGetTextSize( const OutputDevice *pOut, const OUString &rTxt,
-                         const sal_Int32 nIdx, const sal_Int32 nLen, std::vector<sal_Int32>* pDXArray = nullptr ) const;
+                           const sal_Int32 nIdx, const sal_Int32 nLen,
+                           KernArray* pDXArray = nullptr ) const;
 
     void DrawPrev( OutputDevice* pOut, Printer* pPrinter,
                    const Point &rPos, const OUString &rTxt,

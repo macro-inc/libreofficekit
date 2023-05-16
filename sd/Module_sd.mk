@@ -15,7 +15,6 @@ $(eval $(call gb_Module_Module,sd))
 $(eval $(call gb_Module_add_targets,sd,\
     Library_sd \
     Library_sdd \
-    Library_sdfilt \
     Library_sdui \
     Package_opengl \
     Package_web \
@@ -46,8 +45,11 @@ $(eval $(call gb_Module_add_slowcheck_targets,sd,\
     CppunitTest_sd_html_export_tests \
     CppunitTest_sd_activex_controls_tests \
     CppunitTest_sd_pdf_import_test \
+    CppunitTest_sd_png_export_tests \
     CppunitTest_sd_filter_eppt \
     CppunitTest_sd_shape_import_export_tests \
+    CppunitTest_sd_a11y \
+    CppunitTest_sd_textfitting_tests \
 ))
 endif
 
@@ -71,6 +73,7 @@ $(eval $(call gb_Module_add_subsequentcheck_targets,sd,\
 
 $(eval $(call gb_Module_add_uicheck_targets,sd,\
 	UITest_impress_tests \
+	UITest_impress_tests2 \
 	UITest_sd_findReplace \
 ))
 # vim: set noet sw=4 ts=4:

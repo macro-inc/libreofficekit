@@ -265,7 +265,7 @@ ScXMLExternalRefCellContext::ScXMLExternalRefCellContext(
             {
                 if ( !it.isEmpty() && mrScImport.SetNullDateOnUnitConverter() )
                 {
-                    mrScImport.GetMM100UnitConverter().convertDateTime( mfCellValue, it.toString() );
+                    mrScImport.GetMM100UnitConverter().convertDateTime( mfCellValue, it.toView() );
                     mbIsNumeric = true;
                     mbIsEmpty = false;
                 }
@@ -275,7 +275,7 @@ ScXMLExternalRefCellContext::ScXMLExternalRefCellContext(
             {
                 if ( !it.isEmpty() )
                 {
-                    ::sax::Converter::convertDuration( mfCellValue, it.toString() );
+                    ::sax::Converter::convertDuration( mfCellValue, it.toView() );
                     mbIsNumeric = true;
                     mbIsEmpty = false;
                 }
@@ -337,7 +337,7 @@ void SAL_CALL ScXMLExternalRefCellContext::endFastElement( sal_Int32 /*nElement*
         {
             ScDocument& rDoc = mrScImport.GetDoc().getDoc();
             svl::SharedString aSS = rDoc.GetSharedStringPool().intern(maCellString);
-            aToken.reset(new formula::FormulaStringToken(aSS));
+            aToken.reset(new formula::FormulaStringToken(std::move(aSS)));
         }
 
         sal_uInt32 nNumFmt = mnNumberFormat >= 0 ? static_cast<sal_uInt32>(mnNumberFormat) : 0;

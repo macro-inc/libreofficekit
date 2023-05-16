@@ -26,14 +26,18 @@ namespace
 /// Covers sw/source/core/fields/ fixes.
 class Test : public SwModelTestBase
 {
+public:
+    Test()
+        : SwModelTestBase("/sw/qa/core/fields/data/")
+    {
+    }
 };
-
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/core/fields/data/";
 
 CPPUNIT_TEST_FIXTURE(Test, testAuthorityTooltip)
 {
     // Create a document with a bibliography reference in it.
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xField(
         xFactory->createInstance("com.sun.star.text.TextField.Bibliography"), uno::UNO_QUERY);
@@ -43,7 +47,7 @@ CPPUNIT_TEST_FIXTURE(Test, testAuthorityTooltip)
         comphelper::makePropertyValue("Title", OUString("mytitle")),
         comphelper::makePropertyValue("Year", OUString("2020")),
     };
-    xField->setPropertyValue("Fields", uno::makeAny(aFields));
+    xField->setPropertyValue("Fields", uno::Any(aFields));
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
@@ -52,12 +56,12 @@ CPPUNIT_TEST_FIXTURE(Test, testAuthorityTooltip)
 
     // Get the tooltip of the field.
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
-    pWrtShell->Left(CRSR_SKIP_CHARS, /*bSelect=*/false, 1, /*bBasicCall=*/false);
+    pWrtShell->Left(SwCursorSkipMode::Chars, /*bSelect=*/false, 1, /*bBasicCall=*/false);
     SwPaM* pCursor = pWrtShell->GetCursor();
     auto pField = dynamic_cast<SwAuthorityField*>(
         SwCursorShell::GetFieldAtCursor(pCursor, /*bIncludeInputFieldAtStart=*/true));
     CPPUNIT_ASSERT(pField);
-    SwTextNode* pTextNode = pCursor->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pCursor->GetPointNode().GetTextNode();
     const SwTextAttr* pTextAttr = pTextNode->GetSwpHints().Get(0);
     const SwRootFrame* pLayout = pWrtShell->GetLayout();
     OUString aTooltip = pField->GetAuthority(pTextAttr, pLayout);
@@ -69,7 +73,7 @@ CPPUNIT_TEST_FIXTURE(Test, testAuthorityTooltip)
 
 CPPUNIT_TEST_FIXTURE(Test, testTdf143424)
 {
-    createSwDoc(DATA_DIRECTORY, "tdf143424.odt");
+    createSwDoc("tdf143424.odt");
 
     uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xFieldsAccess(
@@ -97,7 +101,7 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf143424)
 
 CPPUNIT_TEST_FIXTURE(Test, testChapterFieldsFollowedBy)
 {
-    createSwDoc(DATA_DIRECTORY, "chapter_field_followedby.odt");
+    createSwDoc("chapter_field_followedby.odt");
 
     uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xFieldsAccess(

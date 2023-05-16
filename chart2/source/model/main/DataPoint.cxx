@@ -26,7 +26,7 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/uno/Sequence.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 
@@ -86,9 +86,8 @@ namespace chart
 {
 
 DataPoint::DataPoint( const uno::Reference< beans::XPropertySet > & rParentProperties ) :
-        ::property::OPropertySet( m_aMutex ),
         m_xParentProperties( rParentProperties ),
-        m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder()),
+        m_xModifyEventForwarder( new ModifyEventForwarder() ),
         m_bNoParentPropAllowed( false )
 {
     SetNewValuesExplicitlyEvenIfTheyEqualDefault();
@@ -96,8 +95,8 @@ DataPoint::DataPoint( const uno::Reference< beans::XPropertySet > & rParentPrope
 
 DataPoint::DataPoint( const DataPoint & rOther ) :
         impl::DataPoint_Base(rOther),
-        ::property::OPropertySet( rOther, m_aMutex ),
-        m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder()),
+        ::property::OPropertySet( rOther ),
+        m_xModifyEventForwarder( new ModifyEventForwarder() ),
         m_bNoParentPropAllowed( true )
 {
     SetNewValuesExplicitlyEvenIfTheyEqualDefault();
@@ -165,17 +164,18 @@ void SAL_CALL DataPoint::setParent(
 }
 
 // ____ OPropertySet ____
-uno::Any DataPoint::GetDefaultValue( sal_Int32 nHandle ) const
+void DataPoint::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     // the value set at the data series is the default
     uno::Reference< beans::XFastPropertySet > xFast( m_xParentProperties.get(), uno::UNO_QUERY );
     if( !xFast.is())
     {
         OSL_ENSURE( m_bNoParentPropAllowed, "data point needs a parent property set to provide values correctly" );
-        return uno::Any();
+        rAny.clear();
+        return;
     }
 
-    return xFast->getFastPropertyValue( nHandle );
+    rAny = xFast->getFastPropertyValue( nHandle );
 }
 
 void SAL_CALL DataPoint::setFastPropertyValue_NoBroadcast(
@@ -220,28 +220,12 @@ Reference< beans::XPropertySetInfo > SAL_CALL DataPoint::getPropertySetInfo()
 // ____ XModifyBroadcaster ____
 void SAL_CALL DataPoint::addModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL DataPoint::removeModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 // ____ XModifyListener ____

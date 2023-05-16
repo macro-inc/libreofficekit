@@ -18,11 +18,11 @@
  */
 
 #include <QtAccessibleWidget.hxx>
-#include <QtAccessibleWidget.moc>
 
 #include <QtGui/QAccessibleInterface>
 
 #include <QtAccessibleEventListener.hxx>
+#include <QtAccessibleRegistry.hxx>
 #include <QtFrame.hxx>
 #include <QtTools.hxx>
 #include <QtWidget.hxx>
@@ -41,11 +41,13 @@
 #include <com/sun/star/accessibility/XAccessibleEventListener.hpp>
 #include <com/sun/star/accessibility/XAccessibleKeyBinding.hpp>
 #include <com/sun/star/accessibility/XAccessibleRelationSet.hpp>
-#include <com/sun/star/accessibility/XAccessibleStateSet.hpp>
+#include <com/sun/star/accessibility/XAccessibleSelection.hpp>
 #include <com/sun/star/accessibility/XAccessibleTable.hpp>
 #include <com/sun/star/accessibility/XAccessibleTableSelection.hpp>
 #include <com/sun/star/accessibility/XAccessibleText.hpp>
 #include <com/sun/star/accessibility/XAccessibleValue.hpp>
+#include <com/sun/star/awt/FontSlant.hpp>
+#include <com/sun/star/awt/FontUnderline.hpp>
 #include <com/sun/star/awt/FontWeight.hpp>
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/lang/DisposedException.hpp>
@@ -68,10 +70,15 @@ QtAccessibleWidget::QtAccessibleWidget(const Reference<XAccessible> xAccessible,
     Reference<XAccessibleEventBroadcaster> xBroadcaster(xContext, UNO_QUERY);
     if (xBroadcaster.is())
     {
-        Reference<XAccessibleEventListener> xListener(
-            new QtAccessibleEventListener(xAccessible, this));
+        Reference<XAccessibleEventListener> xListener(new QtAccessibleEventListener(this));
         xBroadcaster->addAccessibleEventListener(xListener);
     }
+}
+
+void QtAccessibleWidget::invalidate()
+{
+    QtAccessibleRegistry::remove(m_xAccessible);
+    m_xAccessible.clear();
 }
 
 Reference<XAccessibleContext> QtAccessibleWidget::getAccessibleContextImpl() const
@@ -118,7 +125,23 @@ QtAccessibleWidget::getAccessibleTableForParent() const
     return Reference<XAccessibleTable>(xParentContext, UNO_QUERY);
 }
 
-QWindow* QtAccessibleWidget::window() const { return nullptr; }
+QWindow* QtAccessibleWidget::window() const
+{
+    assert(m_pObject);
+    if (m_pObject->isWidgetType())
+    {
+        QWidget* pWidget = static_cast<QWidget*>(m_pObject);
+        QWidget* pWindow = pWidget->window();
+        if (pWindow)
+            return pWindow->windowHandle();
+    }
+
+    QAccessibleInterface* pParent = parent();
+    if (pParent)
+        return pParent->window();
+
+    return nullptr;
+}
 
 int QtAccessibleWidget::childCount() const
 {
@@ -126,10 +149,45 @@ int QtAccessibleWidget::childCount() const
     if (!xAc.is())
         return 0;
 
-    return xAc->getAccessibleChildCount();
+    sal_Int64 nChildCount = xAc->getAccessibleChildCount();
+    if (nChildCount > std::numeric_limits<int>::max())
+    {
+        SAL_WARN("vcl.qt", "QtAccessibleWidget::childCount: Child count exceeds maximum int value, "
+                           "returning max int.");
+        nChildCount = std::numeric_limits<int>::max();
+    }
+
+    return nChildCount;
 }
 
-int QtAccessibleWidget::indexOfChild(const QAccessibleInterface* /* child */) const { return 0; }
+int QtAccessibleWidget::indexOfChild(const QAccessibleInterface* pChild) const
+{
+    const QtAccessibleWidget* pAccessibleWidget = dynamic_cast<const QtAccessibleWidget*>(pChild);
+    if (!pAccessibleWidget)
+    {
+        SAL_WARN(
+            "vcl.qt",
+            "QtAccessibleWidget::indexOfChild called with child that is no QtAccessibleWidget");
+        return -1;
+    }
+
+    Reference<XAccessibleContext> xContext = pAccessibleWidget->getAccessibleContextImpl();
+    if (!xContext.is())
+        return -1;
+
+    sal_Int64 nChildIndex = xContext->getAccessibleIndexInParent();
+    if (nChildIndex > std::numeric_limits<int>::max())
+    {
+        // use -2 when the child index is too large to fit into 32 bit to neither use the
+        // valid index of another child nor -1, which would e.g. make the Orca screen reader
+        // interpret the object as being a zombie
+        SAL_WARN("vcl.qt",
+                 "QtAccessibleWidget::indexOfChild: Child index exceeds maximum int value, "
+                 "returning -2.");
+        nChildIndex = -2;
+    }
+    return nChildIndex;
+}
 
 namespace
 {
@@ -207,13 +265,18 @@ void lcl_appendRelation(QVector<QPair<QAccessibleInterface*, QAccessible::Relati
                         AccessibleRelation aRelation)
 {
     QAccessible::Relation aQRelation = lcl_matchUnoRelation(aRelation.RelationType);
+    // skip in case there's no matching Qt relation
+    if (!(aQRelation & QAccessible::AllRelations))
+        return;
+
     sal_uInt32 nTargetCount = aRelation.TargetSet.getLength();
 
     for (sal_uInt32 i = 0; i < nTargetCount; i++)
     {
         Reference<XAccessible> xAccessible(aRelation.TargetSet[i], uno::UNO_QUERY);
         relations->append(
-            { QAccessible::queryAccessibleInterface(new QtXAccessible(xAccessible)), aQRelation });
+            { QAccessible::queryAccessibleInterface(QtAccessibleRegistry::getQObject(xAccessible)),
+              aQRelation });
     }
 }
 }
@@ -264,7 +327,7 @@ QRect QtAccessibleWidget::rect() const
         return QRect();
 
     Reference<XAccessibleComponent> xAccessibleComponent(xAc, UNO_QUERY);
-    awt::Point aPoint = xAccessibleComponent->getLocation();
+    awt::Point aPoint = xAccessibleComponent->getLocationOnScreen();
     awt::Size aSize = xAccessibleComponent->getSize();
 
     return QRect(aPoint.X, aPoint.Y, aSize.Width, aSize.Height);
@@ -276,15 +339,27 @@ QAccessibleInterface* QtAccessibleWidget::parent() const
     if (!xAc.is())
         return nullptr;
 
-    return QAccessible::queryAccessibleInterface(new QtXAccessible(xAc->getAccessibleParent()));
+    if (xAc->getAccessibleParent().is())
+        return QAccessible::queryAccessibleInterface(
+            QtAccessibleRegistry::getQObject(xAc->getAccessibleParent()));
+
+    // go via the QObject hierarchy; some a11y objects like the application
+    // (at the root of the a11y hierarchy) are handled solely by Qt and have
+    // no LO-internal a11y objects associated with them
+    QObject* pObj = object();
+    if (pObj && pObj->parent())
+        return QAccessible::queryAccessibleInterface(pObj->parent());
+
+    return nullptr;
 }
+
 QAccessibleInterface* QtAccessibleWidget::child(int index) const
 {
     Reference<XAccessibleContext> xAc = getAccessibleContextImpl();
     if (!xAc.is())
         return nullptr;
-
-    return QAccessible::queryAccessibleInterface(new QtXAccessible(xAc->getAccessibleChild(index)));
+    return QAccessible::queryAccessibleInterface(
+        QtAccessibleRegistry::getQObject(xAc->getAccessibleChild(index)));
 }
 
 QString QtAccessibleWidget::text(QAccessible::Text text) const
@@ -318,259 +393,180 @@ QAccessible::Role QtAccessibleWidget::role() const
     {
         case AccessibleRole::UNKNOWN:
             return QAccessible::NoRole;
-
         case AccessibleRole::ALERT:
             return QAccessible::AlertMessage;
-
         case AccessibleRole::COLUMN_HEADER:
             return QAccessible::ColumnHeader;
-
         case AccessibleRole::CANVAS:
             return QAccessible::Canvas;
-
         case AccessibleRole::CHECK_BOX:
             return QAccessible::CheckBox;
-
         case AccessibleRole::CHECK_MENU_ITEM:
             return QAccessible::MenuItem;
-
         case AccessibleRole::COLOR_CHOOSER:
             return QAccessible::ColorChooser;
-
         case AccessibleRole::COMBO_BOX:
             return QAccessible::ComboBox;
-
         case AccessibleRole::DATE_EDITOR:
             return QAccessible::EditableText;
-
         case AccessibleRole::DESKTOP_ICON:
             return QAccessible::Graphic;
-
         case AccessibleRole::DESKTOP_PANE:
         case AccessibleRole::DIRECTORY_PANE:
             return QAccessible::Pane;
-
         case AccessibleRole::DIALOG:
             return QAccessible::Dialog;
-
         case AccessibleRole::DOCUMENT:
             return QAccessible::Document;
-
         case AccessibleRole::EMBEDDED_OBJECT:
             return QAccessible::UserRole;
-
         case AccessibleRole::END_NOTE:
             return QAccessible::Note;
-
+        case AccessibleRole::FILE_CHOOSER:
+            return QAccessible::Dialog;
         case AccessibleRole::FILLER:
             return QAccessible::Whitespace;
-
         case AccessibleRole::FONT_CHOOSER:
             return QAccessible::UserRole;
-
         case AccessibleRole::FOOTER:
             return QAccessible::Footer;
-
         case AccessibleRole::FOOTNOTE:
             return QAccessible::Note;
-
         case AccessibleRole::FRAME: // top-level window with title bar
             return QAccessible::Window;
-
         case AccessibleRole::GLASS_PANE:
             return QAccessible::UserRole;
-
         case AccessibleRole::GRAPHIC:
             return QAccessible::Graphic;
-
         case AccessibleRole::GROUP_BOX:
             return QAccessible::Grouping;
-
         case AccessibleRole::HEADER:
             return QAccessible::UserRole;
-
         case AccessibleRole::HEADING:
             return QAccessible::Heading;
-
         case AccessibleRole::HYPER_LINK:
             return QAccessible::Link;
-
         case AccessibleRole::ICON:
             return QAccessible::Graphic;
-
         case AccessibleRole::INTERNAL_FRAME:
             return QAccessible::UserRole;
-
         case AccessibleRole::LABEL:
             return QAccessible::StaticText;
-
         case AccessibleRole::LAYERED_PANE:
             return QAccessible::Pane;
-
         case AccessibleRole::LIST:
             return QAccessible::List;
-
         case AccessibleRole::LIST_ITEM:
             return QAccessible::ListItem;
-
         case AccessibleRole::MENU:
         case AccessibleRole::MENU_BAR:
             return QAccessible::MenuBar;
-
         case AccessibleRole::MENU_ITEM:
             return QAccessible::MenuItem;
-
+        case AccessibleRole::NOTIFICATION:
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 5)
+            return QAccessible::Notification;
+#else
+            return QAccessible::StaticText;
+#endif
         case AccessibleRole::OPTION_PANE:
             return QAccessible::Pane;
-
         case AccessibleRole::PAGE_TAB:
             return QAccessible::PageTab;
-
         case AccessibleRole::PAGE_TAB_LIST:
             return QAccessible::PageTabList;
-
         case AccessibleRole::PANEL:
             return QAccessible::Pane;
-
         case AccessibleRole::PARAGRAPH:
             return QAccessible::Paragraph;
-
         case AccessibleRole::PASSWORD_TEXT:
             return QAccessible::EditableText;
-
         case AccessibleRole::POPUP_MENU:
             return QAccessible::PopupMenu;
-
         case AccessibleRole::PUSH_BUTTON:
             return QAccessible::Button;
-
         case AccessibleRole::PROGRESS_BAR:
             return QAccessible::ProgressBar;
-
         case AccessibleRole::RADIO_BUTTON:
             return QAccessible::RadioButton;
-
         case AccessibleRole::RADIO_MENU_ITEM:
             return QAccessible::MenuItem;
-
         case AccessibleRole::ROW_HEADER:
             return QAccessible::RowHeader;
-
         case AccessibleRole::ROOT_PANE:
             return QAccessible::Pane;
-
         case AccessibleRole::SCROLL_BAR:
             return QAccessible::ScrollBar;
-
         case AccessibleRole::SCROLL_PANE:
             return QAccessible::Pane;
-
         case AccessibleRole::SHAPE:
             return QAccessible::Graphic;
-
         case AccessibleRole::SEPARATOR:
             return QAccessible::Separator;
-
         case AccessibleRole::SLIDER:
             return QAccessible::Slider;
-
         case AccessibleRole::SPIN_BOX:
             return QAccessible::SpinBox;
-
         case AccessibleRole::SPLIT_PANE:
             return QAccessible::Pane;
-
         case AccessibleRole::STATUS_BAR:
             return QAccessible::StatusBar;
-
         case AccessibleRole::TABLE:
             return QAccessible::Table;
-
         case AccessibleRole::TABLE_CELL:
             return QAccessible::Cell;
-
         case AccessibleRole::TEXT:
             return QAccessible::EditableText;
-
         case AccessibleRole::TEXT_FRAME:
             return QAccessible::UserRole;
-
         case AccessibleRole::TOGGLE_BUTTON:
             return QAccessible::Button;
-
         case AccessibleRole::TOOL_BAR:
             return QAccessible::ToolBar;
-
         case AccessibleRole::TOOL_TIP:
             return QAccessible::ToolTip;
-
         case AccessibleRole::TREE:
             return QAccessible::Tree;
-
         case AccessibleRole::VIEW_PORT:
             return QAccessible::UserRole;
-
         case AccessibleRole::BUTTON_DROPDOWN:
-            return QAccessible::Button;
-
+            return QAccessible::ButtonDropDown;
         case AccessibleRole::BUTTON_MENU:
-            return QAccessible::Button;
-
+            return QAccessible::ButtonMenu;
         case AccessibleRole::CAPTION:
             return QAccessible::StaticText;
-
         case AccessibleRole::CHART:
             return QAccessible::Chart;
-
         case AccessibleRole::EDIT_BAR:
             return QAccessible::Equation;
-
         case AccessibleRole::FORM:
             return QAccessible::Form;
-
         case AccessibleRole::IMAGE_MAP:
             return QAccessible::Graphic;
-
         case AccessibleRole::NOTE:
             return QAccessible::Note;
-
         case AccessibleRole::RULER:
             return QAccessible::UserRole;
-
         case AccessibleRole::SECTION:
             return QAccessible::Section;
-
         case AccessibleRole::TREE_ITEM:
             return QAccessible::TreeItem;
-
         case AccessibleRole::TREE_TABLE:
             return QAccessible::Tree;
-
         case AccessibleRole::COMMENT:
             return QAccessible::Note;
-
         case AccessibleRole::COMMENT_END:
             return QAccessible::UserRole;
-
         case AccessibleRole::DOCUMENT_PRESENTATION:
             return QAccessible::Document;
-
         case AccessibleRole::DOCUMENT_SPREADSHEET:
             return QAccessible::Document;
-
         case AccessibleRole::DOCUMENT_TEXT:
             return QAccessible::Document;
-
         case AccessibleRole::STATIC:
             return QAccessible::StaticText;
-
-        /* Ignore window objects for sub-menus, combo- and list boxes,
-         *  which are exposed as children of their parents.
-         */
         case AccessibleRole::WINDOW: // top-level window without title bar
-        {
             return QAccessible::Window;
-        }
     }
 
     SAL_WARN("vcl.qt", "Unmapped role: " << getAccessibleContextImpl()->getAccessibleRole());
@@ -579,7 +575,7 @@ QAccessible::Role QtAccessibleWidget::role() const
 
 namespace
 {
-void lcl_addState(QAccessible::State* state, sal_Int16 nState)
+void lcl_addState(QAccessible::State* state, sal_Int64 nState)
 {
     switch (nState)
     {
@@ -697,16 +693,13 @@ QAccessible::State QtAccessibleWidget::state() const
     if (!xAc.is())
         return state;
 
-    Reference<XAccessibleStateSet> xStateSet(xAc->getAccessibleStateSet());
+    sal_Int64 nStateSet(xAc->getAccessibleStateSet());
 
-    if (!xStateSet.is())
-        return state;
-
-    const Sequence<sal_Int16> aStates = xStateSet->getStates();
-
-    for (const sal_Int16 nState : aStates)
+    for (int i = 0; i < 63; ++i)
     {
-        lcl_addState(&state, nState);
+        sal_Int64 nState = sal_Int64(1) << i;
+        if (nStateSet & nState)
+            lcl_addState(&state, nState);
     }
 
     return state;
@@ -734,17 +727,23 @@ QColor QtAccessibleWidget::backgroundColor() const
 
 void* QtAccessibleWidget::interface_cast(QAccessible::InterfaceType t)
 {
-    if (t == QAccessible::ActionInterface)
+    if (t == QAccessible::ActionInterface && accessibleProvidesInterface<XAccessibleAction>())
         return static_cast<QAccessibleActionInterface*>(this);
-    if (t == QAccessible::TextInterface)
+    if (t == QAccessible::TextInterface && accessibleProvidesInterface<XAccessibleText>())
         return static_cast<QAccessibleTextInterface*>(this);
-    if (t == QAccessible::EditableTextInterface)
+    if (t == QAccessible::EditableTextInterface
+        && accessibleProvidesInterface<XAccessibleEditableText>())
         return static_cast<QAccessibleEditableTextInterface*>(this);
-    if (t == QAccessible::ValueInterface)
+    if (t == QAccessible::ValueInterface && accessibleProvidesInterface<XAccessibleValue>())
         return static_cast<QAccessibleValueInterface*>(this);
     if (t == QAccessible::TableCellInterface)
-        return static_cast<QAccessibleTableCellInterface*>(this);
-    if (t == QAccessible::TableInterface)
+    {
+        // parent must be a table
+        Reference<XAccessibleTable> xTable = getAccessibleTableForParent();
+        if (xTable.is())
+            return static_cast<QAccessibleTableCellInterface*>(this);
+    }
+    if (t == QAccessible::TableInterface && accessibleProvidesInterface<XAccessibleTable>())
         return static_cast<QAccessibleTableInterface*>(this);
     return nullptr;
 }
@@ -766,8 +765,11 @@ QAccessibleInterface* QtAccessibleWidget::childAt(int x, int y) const
         return nullptr;
 
     Reference<XAccessibleComponent> xAccessibleComponent(xAc, UNO_QUERY);
+    // convert from screen to local coordinates
+    QPoint aLocalCoords = QPoint(x, y) - rect().topLeft();
     return QAccessible::queryAccessibleInterface(
-        new QtXAccessible(xAccessibleComponent->getAccessibleAtPoint(awt::Point(x, y))));
+        QtAccessibleRegistry::getQObject(xAccessibleComponent->getAccessibleAtPoint(
+            awt::Point(aLocalCoords.x(), aLocalCoords.y()))));
 }
 
 QAccessibleInterface* QtAccessibleWidget::customFactory(const QString& classname, QObject* object)
@@ -778,13 +780,24 @@ QAccessibleInterface* QtAccessibleWidget::customFactory(const QString& classname
         vcl::Window* pWindow = pWidget->frame().GetWindow();
 
         if (pWindow)
-            return new QtAccessibleWidget(pWindow->GetAccessible(), object);
+        {
+            css::uno::Reference<XAccessible> xAcc = pWindow->GetAccessible();
+            // insert into registry so the association between the XAccessible and the QtWidget
+            // is remembered rather than creating a different QtXAccessible when a QObject is needed later
+            QtAccessibleRegistry::insert(xAcc, object);
+            return new QtAccessibleWidget(xAcc, object);
+        }
     }
     if (classname == QLatin1String("QtXAccessible") && object)
     {
-        QtXAccessible* pXAccessible = dynamic_cast<QtXAccessible*>(object);
-        if (pXAccessible && pXAccessible->m_xAccessible.is())
-            return new QtAccessibleWidget(pXAccessible->m_xAccessible, object);
+        QtXAccessible* pXAccessible = static_cast<QtXAccessible*>(object);
+        if (pXAccessible->m_xAccessible.is())
+        {
+            QtAccessibleWidget* pRet = new QtAccessibleWidget(pXAccessible->m_xAccessible, object);
+            // clear the reference in the QtXAccessible, no longer needed now that the QtAccessibleWidget holds one
+            pXAccessible->m_xAccessible.clear();
+            return pRet;
+        }
     }
 
     return nullptr;
@@ -875,8 +888,119 @@ OUString lcl_convertFontWeight(double fontWeight)
     // awt::FontWeight::DONTKNOW || fontWeight == awt::FontWeight::NORMAL
     return "normal";
 }
+
+OUString lcl_ConvertFontSlant(awt::FontSlant eFontSlant)
+{
+    switch (eFontSlant)
+    {
+        case awt::FontSlant::FontSlant_NONE:
+            return "normal";
+        case awt::FontSlant::FontSlant_OBLIQUE:
+        case awt::FontSlant::FontSlant_REVERSE_OBLIQUE:
+            return "oblique";
+        case awt::FontSlant::FontSlant_ITALIC:
+        case awt::FontSlant::FontSlant_REVERSE_ITALIC:
+            return "italic";
+        case awt::FontSlant::FontSlant_DONTKNOW:
+        case awt::FontSlant::FontSlant_MAKE_FIXED_SIZE:
+        default:
+            return "";
+    }
 }
 
+// s. https://wiki.linuxfoundation.org/accessibility/iaccessible2/textattributes
+// for values
+void lcl_ConvertFontUnderline(sal_Int16 nFontUnderline, OUString& rUnderlineStyle,
+                              OUString& rUnderlineType, OUString& rUnderlineWidth)
+{
+    rUnderlineStyle = u"";
+    rUnderlineType = u"single";
+    rUnderlineWidth = u"auto";
+
+    switch (nFontUnderline)
+    {
+        case awt::FontUnderline::BOLD:
+            rUnderlineWidth = u"bold";
+            return;
+        case awt::FontUnderline::BOLDDASH:
+            rUnderlineWidth = u"bold";
+            rUnderlineStyle = u"dash";
+            return;
+        case awt::FontUnderline::BOLDDASHDOT:
+            rUnderlineWidth = u"bold";
+            rUnderlineStyle = u"dot-dash";
+            return;
+        case awt::FontUnderline::BOLDDASHDOTDOT:
+            rUnderlineWidth = u"bold";
+            rUnderlineStyle = u"dot-dot-dash";
+            return;
+        case awt::FontUnderline::BOLDDOTTED:
+            rUnderlineWidth = u"bold";
+            rUnderlineStyle = u"dotted";
+            return;
+        case awt::FontUnderline::BOLDLONGDASH:
+            rUnderlineWidth = u"bold";
+            rUnderlineStyle = u"long-dash";
+            return;
+        case awt::FontUnderline::BOLDWAVE:
+            rUnderlineWidth = u"bold";
+            rUnderlineStyle = u"wave";
+            return;
+        case awt::FontUnderline::DASH:
+            rUnderlineStyle = u"dash";
+            return;
+        case awt::FontUnderline::DASHDOT:
+            rUnderlineStyle = u"dot-dash";
+            return;
+        case awt::FontUnderline::DASHDOTDOT:
+            rUnderlineStyle = u"dot-dot-dash";
+            return;
+        case awt::FontUnderline::DONTKNOW:
+            rUnderlineWidth = u"";
+            rUnderlineStyle = u"";
+            rUnderlineType = u"";
+            return;
+        case awt::FontUnderline::DOTTED:
+            rUnderlineStyle = u"dotted";
+            return;
+        case awt::FontUnderline::DOUBLE:
+            rUnderlineType = u"double";
+            return;
+        case awt::FontUnderline::DOUBLEWAVE:
+            rUnderlineStyle = u"wave";
+            rUnderlineType = u"double";
+            return;
+        case awt::FontUnderline::LONGDASH:
+            rUnderlineStyle = u"long-dash";
+            return;
+        case awt::FontUnderline::NONE:
+            rUnderlineWidth = u"none";
+            rUnderlineStyle = u"none";
+            rUnderlineType = u"none";
+            return;
+        case awt::FontUnderline::SINGLE:
+            rUnderlineType = u"single";
+            return;
+        case awt::FontUnderline::SMALLWAVE:
+        case awt::FontUnderline::WAVE:
+            rUnderlineStyle = u"wave";
+            return;
+        default:
+            assert(false && "Unhandled font underline type");
+    }
+}
+
+/** Converts Color to "rgb(r,g,b)" as specified in https://wiki.linuxfoundation.org/accessibility/iaccessible2/textattributes. */
+OUString lcl_ConvertColor(Color aColor)
+{
+    return u"rgb(" + OUString::number(aColor.GetRed()) + u"," + OUString::number(aColor.GetGreen())
+           + u"," + OUString::number(aColor.GetBlue()) + u")";
+}
+}
+
+// Text attributes are returned in format specified in IAccessible2 spec, since that
+// is what Qt handles:
+// https://wiki.linuxfoundation.org/accessibility/iaccessible2/textattributes
 QString QtAccessibleWidget::attributes(int offset, int* startOffset, int* endOffset) const
 {
     if (startOffset == nullptr || endOffset == nullptr)
@@ -899,7 +1023,10 @@ QString QtAccessibleWidget::attributes(int offset, int* startOffset, int* endOff
         offset = nTextLength - 1;
 
     if (offset < 0 || offset > nTextLength)
+    {
+        SAL_WARN("vcl.qt", "QtAccessibleWidget::attributes called with invalid offset: " << offset);
         return QString();
+    }
 
     const Sequence<PropertyValue> attribs
         = xText->getCharacterAttributes(offset, Sequence<OUString>());
@@ -908,7 +1035,19 @@ QString QtAccessibleWidget::attributes(int offset, int* startOffset, int* endOff
     {
         OUString sAttribute;
         OUString sValue;
-        if (prop.Name == "CharFontName")
+        if (prop.Name == "CharBackColor")
+        {
+            sAttribute = "background-color";
+            sValue = lcl_ConvertColor(
+                Color(ColorTransparency, *o3tl::doAccess<sal_Int32>(prop.Value)));
+        }
+        else if (prop.Name == "CharColor")
+        {
+            sAttribute = "color";
+            sValue = lcl_ConvertColor(
+                Color(ColorTransparency, *o3tl::doAccess<sal_Int32>(prop.Value)));
+        }
+        else if (prop.Name == "CharFontName")
         {
             sAttribute = "font-family";
             sValue = *o3tl::doAccess<OUString>(prop.Value);
@@ -917,6 +1056,28 @@ QString QtAccessibleWidget::attributes(int offset, int* startOffset, int* endOff
         {
             sAttribute = "font-size";
             sValue = OUString::number(*o3tl::doAccess<double>(prop.Value)) + "pt";
+        }
+        else if (prop.Name == "CharPosture")
+        {
+            sAttribute = "font-style";
+            const awt::FontSlant eFontSlant = *o3tl::doAccess<awt::FontSlant>(prop.Value);
+            sValue = lcl_ConvertFontSlant(eFontSlant);
+        }
+        else if (prop.Name == "CharUnderline")
+        {
+            OUString sUnderlineStyle;
+            OUString sUnderlineType;
+            OUString sUnderlineWidth;
+            const sal_Int16 nUnderline = *o3tl::doAccess<sal_Int16>(prop.Value);
+            lcl_ConvertFontUnderline(nUnderline, sUnderlineStyle, sUnderlineType, sUnderlineWidth);
+
+            // leave 'sAttribute' and 'sName' empty, set all attributes here
+            if (!sUnderlineStyle.isEmpty())
+                aRet += u"text-underline-style:" + sUnderlineStyle + ";";
+            if (!sUnderlineType.isEmpty())
+                aRet += u"text-underline-type:" + sUnderlineType + ";";
+            if (!sUnderlineWidth.isEmpty())
+                aRet += u"text-underline-width:" + sUnderlineWidth + ";";
         }
         else if (prop.Name == "CharWeight")
         {
@@ -927,8 +1088,11 @@ QString QtAccessibleWidget::attributes(int offset, int* startOffset, int* endOff
         if (!sAttribute.isEmpty() && !sValue.isEmpty())
             aRet += sAttribute + ":" + sValue + ";";
     }
-    *startOffset = offset;
-    *endOffset = offset + 1;
+
+    accessibility::TextSegment aAttributeRun
+        = xText->getTextAtIndex(offset, accessibility::AccessibleTextType::ATTRIBUTE_RUN);
+    *startOffset = aAttributeRun.SegmentStart;
+    *endOffset = aAttributeRun.SegmentEnd;
     return toQString(aRet);
 }
 
@@ -939,10 +1103,25 @@ int QtAccessibleWidget::characterCount() const
         return xText->getCharacterCount();
     return 0;
 }
-QRect QtAccessibleWidget::characterRect(int /* offset */) const
+
+QRect QtAccessibleWidget::characterRect(int nOffset) const
 {
-    SAL_INFO("vcl.qt", "Unsupported QAccessibleTextInterface::characterRect");
-    return QRect();
+    Reference<XAccessibleText> xText(getAccessibleContextImpl(), UNO_QUERY);
+    if (!xText.is())
+        return QRect();
+
+    if (nOffset < 0 || nOffset > xText->getCharacterCount())
+    {
+        SAL_WARN("vcl.qt",
+                 "QtAccessibleWidget::characterRect called with invalid offset: " << nOffset);
+        return QRect();
+    }
+
+    const awt::Rectangle aBounds = xText->getCharacterBounds(nOffset);
+    const QRect aRect(aBounds.X, aBounds.Y, aBounds.Width, aBounds.Height);
+    // convert to screen coordinates
+    const QRect aScreenPos = rect();
+    return aRect.translated(aScreenPos.x(), aScreenPos.y());
 }
 
 int QtAccessibleWidget::cursorPosition() const
@@ -953,20 +1132,37 @@ int QtAccessibleWidget::cursorPosition() const
     return 0;
 }
 
-int QtAccessibleWidget::offsetAtPoint(const QPoint& /* point */) const
+int QtAccessibleWidget::offsetAtPoint(const QPoint& rPoint) const
 {
-    SAL_INFO("vcl.qt", "Unsupported QAccessibleTextInterface::offsetAtPoint");
-    return 0;
+    Reference<XAccessibleText> xText(getAccessibleContextImpl(), UNO_QUERY);
+    if (!xText.is())
+        return -1;
+
+    // convert from screen to local coordinates
+    QPoint aLocalCoords = rPoint - rect().topLeft();
+    awt::Point aPoint(aLocalCoords.x(), aLocalCoords.y());
+    return xText->getIndexAtPoint(aPoint);
 }
+
 void QtAccessibleWidget::removeSelection(int /* selectionIndex */)
 {
     SAL_INFO("vcl.qt", "Unsupported QAccessibleTextInterface::removeSelection");
 }
+
 void QtAccessibleWidget::scrollToSubstring(int startIndex, int endIndex)
 {
     Reference<XAccessibleText> xText(getAccessibleContextImpl(), UNO_QUERY);
-    if (xText.is())
-        xText->scrollSubstringTo(startIndex, endIndex, AccessibleScrollType_SCROLL_ANYWHERE);
+    if (!xText.is())
+        return;
+
+    sal_Int32 nTextLength = xText->getCharacterCount();
+    if (startIndex < 0 || startIndex > nTextLength || endIndex < 0 || endIndex > nTextLength)
+    {
+        SAL_WARN("vcl.qt", "QtAccessibleWidget::scrollToSubstring called with invalid offset.");
+        return;
+    }
+
+    xText->scrollSubstringTo(startIndex, endIndex, AccessibleScrollType_SCROLL_ANYWHERE);
 }
 
 void QtAccessibleWidget::selection(int selectionIndex, int* startOffset, int* endOffset) const
@@ -991,31 +1187,95 @@ int QtAccessibleWidget::selectionCount() const
         return 1; // Only 1 selection supported atm
     return 0;
 }
+
 void QtAccessibleWidget::setCursorPosition(int position)
 {
     Reference<XAccessibleText> xText(getAccessibleContextImpl(), UNO_QUERY);
-    if (xText.is())
-        xText->setCaretPosition(position);
+    if (!xText.is())
+        return;
+
+    if (position < 0 || position > xText->getCharacterCount())
+    {
+        SAL_WARN("vcl.qt",
+                 "QtAccessibleWidget::setCursorPosition called with invalid offset: " << position);
+        return;
+    }
+
+    xText->setCaretPosition(position);
 }
+
 void QtAccessibleWidget::setSelection(int /* selectionIndex */, int startOffset, int endOffset)
 {
     Reference<XAccessibleText> xText(getAccessibleContextImpl(), UNO_QUERY);
-    if (xText.is())
-        xText->setSelection(startOffset, endOffset);
+    if (!xText.is())
+        return;
+
+    sal_Int32 nTextLength = xText->getCharacterCount();
+    if (startOffset < 0 || startOffset > nTextLength || endOffset < 0 || endOffset > nTextLength)
+    {
+        SAL_WARN("vcl.qt", "QtAccessibleWidget::setSelection called with invalid offset.");
+        return;
+    }
+
+    xText->setSelection(startOffset, endOffset);
 }
+
 QString QtAccessibleWidget::text(int startOffset, int endOffset) const
 {
     Reference<XAccessibleText> xText(getAccessibleContextImpl(), UNO_QUERY);
-    if (xText.is())
-        return toQString(xText->getTextRange(startOffset, endOffset));
-    return QString();
+    if (!xText.is())
+        return QString();
+
+    sal_Int32 nTextLength = xText->getCharacterCount();
+    if (startOffset < 0 || startOffset > nTextLength || endOffset < 0 || endOffset > nTextLength)
+    {
+        SAL_WARN("vcl.qt", "QtAccessibleWidget::text called with invalid offset.");
+        return QString();
+    }
+
+    return toQString(xText->getTextRange(startOffset, endOffset));
 }
-QString QtAccessibleWidget::textAfterOffset(int /* offset */,
-                                            QAccessible::TextBoundaryType /* boundaryType */,
-                                            int* /* startOffset */, int* /* endOffset */) const
+
+QString QtAccessibleWidget::textAfterOffset(int nOffset,
+                                            QAccessible::TextBoundaryType eBoundaryType,
+                                            int* pStartOffset, int* pEndOffset) const
 {
-    SAL_INFO("vcl.qt", "Unsupported QAccessibleTextInterface::textAfterOffset");
-    return QString();
+    if (pStartOffset == nullptr || pEndOffset == nullptr)
+        return QString();
+
+    *pStartOffset = -1;
+    *pEndOffset = -1;
+
+    Reference<XAccessibleText> xText(getAccessibleContextImpl(), UNO_QUERY);
+    if (!xText.is())
+        return QString();
+
+    const int nCharCount = characterCount();
+    // -1 is special value for text length
+    if (nOffset == -1)
+        nOffset = nCharCount;
+    else if (nOffset < -1 || nOffset > nCharCount)
+    {
+        SAL_WARN("vcl.qt",
+                 "QtAccessibleWidget::textAfterOffset called with invalid offset: " << nOffset);
+        return QString();
+    }
+
+    if (eBoundaryType == QAccessible::NoBoundary)
+    {
+        if (nOffset == nCharCount)
+            return QString();
+        *pStartOffset = nOffset + 1;
+        *pEndOffset = nCharCount;
+        return text(nOffset + 1, nCharCount);
+    }
+
+    sal_Int16 nUnoBoundaryType = lcl_matchQtTextBoundaryType(eBoundaryType);
+    assert(nUnoBoundaryType > 0);
+    const TextSegment aSegment = xText->getTextBehindIndex(nOffset, nUnoBoundaryType);
+    *pStartOffset = aSegment.SegmentStart;
+    *pEndOffset = aSegment.SegmentEnd;
+    return toQString(aSegment.SegmentText);
 }
 
 QString QtAccessibleWidget::textAtOffset(int offset, QAccessible::TextBoundaryType boundaryType,
@@ -1024,9 +1284,9 @@ QString QtAccessibleWidget::textAtOffset(int offset, QAccessible::TextBoundaryTy
     if (startOffset == nullptr || endOffset == nullptr)
         return QString();
 
+    const int nCharCount = characterCount();
     if (boundaryType == QAccessible::NoBoundary)
     {
-        const int nCharCount = characterCount();
         *startOffset = 0;
         *endOffset = nCharCount;
         return text(0, nCharCount);
@@ -1039,18 +1299,61 @@ QString QtAccessibleWidget::textAtOffset(int offset, QAccessible::TextBoundaryTy
     sal_Int16 nUnoBoundaryType = lcl_matchQtTextBoundaryType(boundaryType);
     assert(nUnoBoundaryType > 0);
 
+    // special value of -1 for offset means text length
+    if (offset == -1)
+        offset = nCharCount;
+
+    if (offset < 0 || offset > nCharCount)
+    {
+        SAL_WARN("vcl.qt",
+                 "QtAccessibleWidget::textAtOffset called with invalid offset: " << offset);
+        return QString();
+    }
+
     const TextSegment segment = xText->getTextAtIndex(offset, nUnoBoundaryType);
     *startOffset = segment.SegmentStart;
     *endOffset = segment.SegmentEnd;
     return toQString(segment.SegmentText);
 }
 
-QString QtAccessibleWidget::textBeforeOffset(int /* offset */,
-                                             QAccessible::TextBoundaryType /* boundaryType */,
-                                             int* /* startOffset */, int* /* endOffset */) const
+QString QtAccessibleWidget::textBeforeOffset(int nOffset,
+                                             QAccessible::TextBoundaryType eBoundaryType,
+                                             int* pStartOffset, int* pEndOffset) const
 {
-    SAL_INFO("vcl.qt", "Unsupported QAccessibleTextInterface::textBeforeOffset");
-    return QString();
+    if (pStartOffset == nullptr || pEndOffset == nullptr)
+        return QString();
+
+    *pStartOffset = -1;
+    *pEndOffset = -1;
+
+    Reference<XAccessibleText> xText(getAccessibleContextImpl(), UNO_QUERY);
+    if (!xText.is())
+        return QString();
+
+    const int nCharCount = characterCount();
+    // -1 is special value for text length
+    if (nOffset == -1)
+        nOffset = nCharCount;
+    else if (nOffset < -1 || nOffset > nCharCount)
+    {
+        SAL_WARN("vcl.qt",
+                 "QtAccessibleWidget::textBeforeOffset called with invalid offset: " << nOffset);
+        return QString();
+    }
+
+    if (eBoundaryType == QAccessible::NoBoundary)
+    {
+        *pStartOffset = 0;
+        *pEndOffset = nOffset;
+        return text(0, nOffset);
+    }
+
+    sal_Int16 nUnoBoundaryType = lcl_matchQtTextBoundaryType(eBoundaryType);
+    assert(nUnoBoundaryType > 0);
+    const TextSegment aSegment = xText->getTextBeforeIndex(nOffset, nUnoBoundaryType);
+    *pStartOffset = aSegment.SegmentStart;
+    *pEndOffset = aSegment.SegmentEnd;
+    return toQString(aSegment.SegmentText);
 }
 
 // QAccessibleEditableTextInterface
@@ -1064,6 +1367,14 @@ void QtAccessibleWidget::deleteText(int startOffset, int endOffset)
     Reference<XAccessibleEditableText> xEditableText(xAc, UNO_QUERY);
     if (!xEditableText.is())
         return;
+
+    sal_Int32 nTextLength = xEditableText->getCharacterCount();
+    if (startOffset < 0 || startOffset > nTextLength || endOffset < 0 || endOffset > nTextLength)
+    {
+        SAL_WARN("vcl.qt", "QtAccessibleWidget::deleteText called with invalid offset.");
+        return;
+    }
+
     xEditableText->deleteText(startOffset, endOffset);
 }
 
@@ -1076,6 +1387,13 @@ void QtAccessibleWidget::insertText(int offset, const QString& text)
     Reference<XAccessibleEditableText> xEditableText(xAc, UNO_QUERY);
     if (!xEditableText.is())
         return;
+
+    if (offset < 0 || offset > xEditableText->getCharacterCount())
+    {
+        SAL_WARN("vcl.qt", "QtAccessibleWidget::insertText called with invalid offset: " << offset);
+        return;
+    }
+
     xEditableText->insertText(toOUString(text), offset);
 }
 
@@ -1088,6 +1406,14 @@ void QtAccessibleWidget::replaceText(int startOffset, int endOffset, const QStri
     Reference<XAccessibleEditableText> xEditableText(xAc, UNO_QUERY);
     if (!xEditableText.is())
         return;
+
+    sal_Int32 nTextLength = xEditableText->getCharacterCount();
+    if (startOffset < 0 || startOffset > nTextLength || endOffset < 0 || endOffset > nTextLength)
+    {
+        SAL_WARN("vcl.qt", "QtAccessibleWidget::replaceText called with invalid offset.");
+        return;
+    }
+
     xEditableText->replaceText(startOffset, endOffset, toOUString(text));
 }
 
@@ -1160,7 +1486,7 @@ void QtAccessibleWidget::setCurrentValue(const QVariant& value)
     xValue->setCurrentValue(Any(value.toDouble()));
 }
 
-// QAccessibleTable
+// QAccessibleTableInterface
 QAccessibleInterface* QtAccessibleWidget::caption() const
 {
     Reference<XAccessibleContext> xAc = getAccessibleContextImpl();
@@ -1170,7 +1496,8 @@ QAccessibleInterface* QtAccessibleWidget::caption() const
     Reference<XAccessibleTable> xTable(xAc, UNO_QUERY);
     if (!xTable.is())
         return nullptr;
-    return QAccessible::queryAccessibleInterface(new QtXAccessible(xTable->getAccessibleCaption()));
+    return QAccessible::queryAccessibleInterface(
+        QtAccessibleRegistry::getQObject(xTable->getAccessibleCaption()));
 }
 
 QAccessibleInterface* QtAccessibleWidget::cellAt(int row, int column) const
@@ -1182,8 +1509,17 @@ QAccessibleInterface* QtAccessibleWidget::cellAt(int row, int column) const
     Reference<XAccessibleTable> xTable(xAc, UNO_QUERY);
     if (!xTable.is())
         return nullptr;
+
+    if (row < 0 || row >= xTable->getAccessibleRowCount() || column < 0
+        || column >= xTable->getAccessibleColumnCount())
+    {
+        SAL_WARN("vcl.qt", "QtAccessibleWidget::cellAt called with invalid row/column index ("
+                               << row << ", " << column << ")");
+        return nullptr;
+    }
+
     return QAccessible::queryAccessibleInterface(
-        new QtXAccessible(xTable->getAccessibleCellAt(row, column)));
+        QtAccessibleRegistry::getQObject(xTable->getAccessibleCellAt(row, column)));
 }
 
 int QtAccessibleWidget::columnCount() const
@@ -1220,6 +1556,13 @@ bool QtAccessibleWidget::isColumnSelected(int nColumn) const
     if (!xTable.is())
         return false;
 
+    if (nColumn < 0 || nColumn >= xTable->getAccessibleColumnCount())
+    {
+        SAL_WARN("vcl.qt", "QtAccessibleWidget::isColumnSelected called with invalid column index "
+                               << nColumn);
+        return false;
+    }
+
     return xTable->isAccessibleColumnSelected(nColumn);
 }
 
@@ -1232,6 +1575,13 @@ bool QtAccessibleWidget::isRowSelected(int nRow) const
     Reference<XAccessibleTable> xTable(xAc, UNO_QUERY);
     if (!xTable.is())
         return false;
+
+    if (nRow < 0 || nRow >= xTable->getAccessibleRowCount())
+    {
+        SAL_WARN("vcl.qt",
+                 "QtAccessibleWidget::isRowSelected called with invalid row index " << nRow);
+        return false;
+    }
 
     return xTable->isAccessibleRowSelected(nRow);
 }
@@ -1268,6 +1618,13 @@ bool QtAccessibleWidget::selectColumn(int column)
     if (!xAc.is())
         return false;
 
+    if (column < 0 || column >= columnCount())
+    {
+        SAL_WARN("vcl.qt",
+                 "QtAccessibleWidget::selectColumn called with invalid column index " << column);
+        return false;
+    }
+
     Reference<XAccessibleTableSelection> xTableSelection(xAc, UNO_QUERY);
     if (!xTableSelection.is())
         return false;
@@ -1280,6 +1637,12 @@ bool QtAccessibleWidget::selectRow(int row)
     if (!xAc.is())
         return false;
 
+    if (row < 0 || row >= rowCount())
+    {
+        SAL_WARN("vcl.qt", "QtAccessibleWidget::selectRow called with invalid row index " << row);
+        return false;
+    }
+
     Reference<XAccessibleTableSelection> xTableSelection(xAc, UNO_QUERY);
     if (!xTableSelection.is())
         return false;
@@ -1288,14 +1651,52 @@ bool QtAccessibleWidget::selectRow(int row)
 
 int QtAccessibleWidget::selectedCellCount() const
 {
-    SAL_INFO("vcl.qt", "Unsupported QAccessibleTableInterface::selectedCellCount");
-    return 0;
+    Reference<XAccessibleContext> xAcc = getAccessibleContextImpl();
+    if (!xAcc.is())
+        return 0;
+
+    Reference<XAccessibleSelection> xSelection(xAcc, UNO_QUERY);
+    if (!xSelection.is())
+        return 0;
+
+    sal_Int64 nSelected = xSelection->getSelectedAccessibleChildCount();
+    if (nSelected > std::numeric_limits<int>::max())
+    {
+        SAL_WARN("vcl.qt",
+                 "QtAccessibleWidget::selectedCellCount: Cell count exceeds maximum int value, "
+                 "using max int.");
+        nSelected = std::numeric_limits<int>::max();
+    }
+    return nSelected;
 }
 
 QList<QAccessibleInterface*> QtAccessibleWidget::selectedCells() const
 {
-    SAL_INFO("vcl.qt", "Unsupported QAccessibleTableInterface::selectedCells");
-    return QList<QAccessibleInterface*>();
+    Reference<XAccessibleContext> xAcc = getAccessibleContextImpl();
+    if (!xAcc.is())
+        return QList<QAccessibleInterface*>();
+
+    Reference<XAccessibleSelection> xSelection(xAcc, UNO_QUERY);
+    if (!xSelection.is())
+        return QList<QAccessibleInterface*>();
+
+    QList<QAccessibleInterface*> aSelectedCells;
+    sal_Int64 nSelected = xSelection->getSelectedAccessibleChildCount();
+    if (nSelected > std::numeric_limits<int>::max())
+    {
+        SAL_WARN("vcl.qt",
+                 "QtAccessibleWidget::selectedCells: Cell count exceeds maximum int value, "
+                 "using max int.");
+        nSelected = std::numeric_limits<int>::max();
+    }
+    for (sal_Int64 i = 0; i < nSelected; i++)
+    {
+        Reference<XAccessible> xChild = xSelection->getSelectedAccessibleChild(i);
+        QAccessibleInterface* pInterface
+            = QAccessible::queryAccessibleInterface(QtAccessibleRegistry::getQObject(xChild));
+        aSelectedCells.push_back(pInterface);
+    }
+    return aSelectedCells;
 }
 
 int QtAccessibleWidget::selectedColumnCount() const
@@ -1355,7 +1756,8 @@ QAccessibleInterface* QtAccessibleWidget::summary() const
     Reference<XAccessibleTable> xTable(xAc, UNO_QUERY);
     if (!xTable.is())
         return nullptr;
-    return QAccessible::queryAccessibleInterface(new QtXAccessible(xTable->getAccessibleSummary()));
+    return QAccessible::queryAccessibleInterface(
+        QtAccessibleRegistry::getQObject(xTable->getAccessibleSummary()));
 }
 
 bool QtAccessibleWidget::unselectColumn(int column)
@@ -1382,10 +1784,27 @@ bool QtAccessibleWidget::unselectRow(int row)
     return xTableSelection->unselectRow(row);
 }
 
+// QAccessibleTableCellInterface
 QList<QAccessibleInterface*> QtAccessibleWidget::columnHeaderCells() const
 {
-    SAL_WARN("vcl.qt", "Unsupported QAccessibleTableCellInterface::columnHeaderCells");
-    return QList<QAccessibleInterface*>();
+    Reference<XAccessibleTable> xTable = getAccessibleTableForParent();
+    if (!xTable.is())
+        return QList<QAccessibleInterface*>();
+
+    Reference<XAccessibleTable> xHeaders = xTable->getAccessibleColumnHeaders();
+    if (!xHeaders.is())
+        return QList<QAccessibleInterface*>();
+
+    const sal_Int32 nCol = columnIndex();
+    QList<QAccessibleInterface*> aHeaderCells;
+    for (sal_Int32 nRow = 0; nRow < xHeaders->getAccessibleRowCount(); nRow++)
+    {
+        Reference<XAccessible> xCell = xHeaders->getAccessibleCellAt(nRow, nCol);
+        QAccessibleInterface* pInterface
+            = QAccessible::queryAccessibleInterface(QtAccessibleRegistry::getQObject(xCell));
+        aHeaderCells.push_back(pInterface);
+    }
+    return aHeaderCells;
 }
 
 int QtAccessibleWidget::columnIndex() const
@@ -1398,7 +1817,7 @@ int QtAccessibleWidget::columnIndex() const
     if (!xTable.is())
         return -1;
 
-    const sal_Int32 nIndexInParent = xAcc->getAccessibleIndexInParent();
+    const sal_Int64 nIndexInParent = xAcc->getAccessibleIndexInParent();
     return xTable->getAccessibleColumn(nIndexInParent);
 }
 
@@ -1434,8 +1853,24 @@ int QtAccessibleWidget::columnExtent() const
 
 QList<QAccessibleInterface*> QtAccessibleWidget::rowHeaderCells() const
 {
-    SAL_WARN("vcl.qt", "Unsupported QAccessibleTableCellInterface::rowHeaderCells");
-    return QList<QAccessibleInterface*>();
+    Reference<XAccessibleTable> xTable = getAccessibleTableForParent();
+    if (!xTable.is())
+        return QList<QAccessibleInterface*>();
+
+    Reference<XAccessibleTable> xHeaders = xTable->getAccessibleRowHeaders();
+    if (!xHeaders.is())
+        return QList<QAccessibleInterface*>();
+
+    const sal_Int32 nRow = rowIndex();
+    QList<QAccessibleInterface*> aHeaderCells;
+    for (sal_Int32 nCol = 0; nCol < xHeaders->getAccessibleColumnCount(); nCol++)
+    {
+        Reference<XAccessible> xCell = xHeaders->getAccessibleCellAt(nRow, nCol);
+        QAccessibleInterface* pInterface
+            = QAccessible::queryAccessibleInterface(QtAccessibleRegistry::getQObject(xCell));
+        aHeaderCells.push_back(pInterface);
+    }
+    return aHeaderCells;
 }
 
 int QtAccessibleWidget::rowExtent() const
@@ -1463,14 +1898,21 @@ int QtAccessibleWidget::rowIndex() const
     if (!xTable.is())
         return -1;
 
-    const sal_Int32 nIndexInParent = xAcc->getAccessibleIndexInParent();
+    const sal_Int64 nIndexInParent = xAcc->getAccessibleIndexInParent();
     return xTable->getAccessibleRow(nIndexInParent);
 }
 
 QAccessibleInterface* QtAccessibleWidget::table() const
 {
-    SAL_WARN("vcl.qt", "Unsupported QAccessibleTableCellInterface::table");
-    return nullptr;
+    Reference<XAccessibleTable> xTable = getAccessibleTableForParent();
+    if (!xTable.is())
+        return nullptr;
+
+    Reference<XAccessible> xTableAcc(xTable, UNO_QUERY);
+    if (!xTableAcc.is())
+        return nullptr;
+
+    return QAccessible::queryAccessibleInterface(QtAccessibleRegistry::getQObject(xTableAcc));
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

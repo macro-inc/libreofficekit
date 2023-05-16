@@ -9,6 +9,8 @@
 
 $(eval $(call gb_Library_Library,localedata_others))
 
+$(eval $(call gb_Library_set_plugin_for_nodep,localedata_others,i18npool))
+
 $(eval $(call gb_Library_use_libraries,localedata_others,\
 	localedata_en \
 ))
@@ -47,6 +49,7 @@ $(eval $(call gb_Library_add_generated_exception_objects,localedata_others,\
 	CustomTarget/i18npool/localedata/localedata_bo_IN \
 	CustomTarget/i18npool/localedata/localedata_bvx_CG \
 	CustomTarget/i18npool/localedata/localedata_dde_CG \
+	CustomTarget/i18npool/localedata/localedata_dv_MV \
 	CustomTarget/i18npool/localedata/localedata_dz_BT \
 	CustomTarget/i18npool/localedata/localedata_ebo_CG \
 	CustomTarget/i18npool/localedata/localedata_ee_GH \
@@ -110,6 +113,7 @@ $(eval $(call gb_Library_add_generated_exception_objects,localedata_others,\
 	CustomTarget/i18npool/localedata/localedata_pa_IN \
 	CustomTarget/i18npool/localedata/localedata_pap_BQ \
 	CustomTarget/i18npool/localedata/localedata_pap_CW \
+	CustomTarget/i18npool/localedata/localedata_pdc_US \
 	CustomTarget/i18npool/localedata/localedata_plt_MG \
 	CustomTarget/i18npool/localedata/localedata_pjt_AU \
 	CustomTarget/i18npool/localedata/localedata_pt_AO \

@@ -10,7 +10,7 @@
 $(eval $(call gb_ExternalProject_ExternalProject,fontconfig))
 
 $(eval $(call gb_ExternalProject_use_externals,fontconfig,\
-	expat \
+	$(if $(filter EMSCRIPTEN,$(OS)),libxml2,expat) \
 	freetype \
 ))
 
@@ -24,25 +24,37 @@ fontconfig_add_fonts=/usr/share/X11/fonts/Type1,/usr/share/X11/fonts/TTF,/usr/lo
 $(call gb_ExternalProject_get_state_target,fontconfig,build) :
 	$(call gb_Trace_StartRange,fontconfig,EXTERNAL)
 	$(call gb_ExternalProject_run,build,\
-		CFLAGS="$(CFLAGS) $(if $(debug),-g) $(gb_VISIBILITY_FLAGS) $(if $(filter EMSCRIPTEN,$(OS)),-pthread)" $(if $(filter ANDROID,$(OS)),LIBS="-lm") \
+		CFLAGS="$(CFLAGS) \
+			$(call gb_ExternalProject_get_build_flags,fontconfig) \
+			$(gb_VISIBILITY_FLAGS) \
+			$(if $(filter EMSCRIPTEN,$(OS)),-pthread)" \
+			$(if $(filter ANDROID,$(OS)),LIBS="-lm") \
+		$(if $(filter EMSCRIPTEN,$(OS)),LIBXML2_CFLAGS="$(LIBXML_CFLAGS)" LIBXML2_LIBS="$(LIBXML_LIBS)") \
 		$(gb_RUN_CONFIGURE) ./configure \
 			--disable-silent-rules \
 			--with-pic \
 			$(if $(filter ANDROID,$(OS)),--with-arch=arm) \
 			--with-expat-includes=$(call gb_UnpackedTarball_get_dir,expat)/lib \
 			--with-expat-lib=$(gb_StaticLibrary_WORKDIR) \
-			--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) \
-			$(if $(filter ANDROID EMSCRIPTEN,$(OS)), \
+			$(gb_CONFIGURE_PLATFORMS) \
+			$(if $(filter ANDROID,$(OS)), \
 				--disable-shared \
-				ac_cv_func_fstatfs=no ac_cv_func_fstatvfs=no \
+			) \
+			$(if $(filter EMSCRIPTEN,$(OS)), \
+				--disable-shared \
+			    --with-baseconfigdir=/instdir/share/fontconfig \
+			    --with-cache-dir=/instdir/share/fontconfig/cache \
+			    --with-add-fonts=/instdir/share/fonts \
+			    --enable-libxml2 \
+			    ac_cv_func_fstatfs=no ac_cv_func_fstatvfs=no \
 			) \
 			$(if $(filter LINUX,$(OS)), \
 				--disable-static \
+				--prefix=/ \
+				--with-add-fonts=$(fontconfig_add_fonts) \
+				--with-cache-dir=/usr/lib/fontconfig/cache \
 			) \
-			--prefix=/ \
-			--with-add-fonts=$(fontconfig_add_fonts) \
-			--with-cache-dir=/usr/lib/fontconfig/cache \
-		&& $(MAKE) -C src \
+		&& $(MAKE) -C src && $(MAKE) fonts.conf \
 	)
 	$(call gb_Trace_EndRange,fontconfig,EXTERNAL)
 

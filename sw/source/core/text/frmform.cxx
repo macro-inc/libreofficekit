@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <sal/config.h>
 #include <sal/log.hxx>
 
@@ -47,6 +49,7 @@
 #include <editeng/tstpitem.hxx>
 #include <redline.hxx>
 #include <comphelper/lok.hxx>
+#include <flyfrms.hxx>
 
 // Tolerance in formatting and text output
 #define SLOPPY_TWIPS    5
@@ -212,7 +215,7 @@ bool SwTextFrame::CalcFollow(TextFrameIndex const nTextOfst)
             if( pPara )
             {
                 pPara->GetReformat() = SwCharRange();
-                pPara->GetDelta() = 0;
+                pPara->SetDelta(0);
             }
         }
 
@@ -310,7 +313,7 @@ bool SwTextFrame::CalcFollow(TextFrameIndex const nTextOfst)
             if( pPara )
             {
                 pPara->GetReformat() = SwCharRange();
-                pPara->GetDelta() = 0;
+                pPara->SetDelta(0);
             }
         }
 
@@ -337,7 +340,33 @@ bool SwTextFrame::CalcFollow(TextFrameIndex const nTextOfst)
 
 void SwTextFrame::MakePos()
 {
+    Point aOldPos = getFrameArea().Pos();
     SwFrame::MakePos();
+
+    // Recalc split flys if our position changed.
+    if (aOldPos != getFrameArea().Pos())
+    {
+        // Find the master frame.
+        const SwTextFrame* pMaster = this;
+        while (pMaster->IsFollow())
+        {
+            pMaster = pMaster->FindMaster();
+        }
+        // Find which flys are effectively anchored to this frame.
+        for (const auto& pFly : pMaster->GetSplitFlyDrawObjs())
+        {
+            SwTextFrame* pFlyAnchor = pFly->FindAnchorCharFrame();
+            if (pFlyAnchor != this)
+            {
+                continue;
+            }
+            // Possibly this fly was positioned relative to us, invalidate its position now that our
+            // position is changed.
+            pFly->UnlockPosition();
+            pFly->InvalidatePos();
+        }
+    }
+
     // Inform LOK clients about change in position of redlines (if any)
     if(!comphelper::LibreOfficeKit::isActive())
         return;
@@ -347,14 +376,14 @@ void SwTextFrame::MakePos()
     for (SwRedlineTable::size_type nRedlnPos = 0; nRedlnPos < rTable.size(); ++nRedlnPos)
     {
         SwRangeRedline* pRedln = rTable[nRedlnPos];
-        if (pTextNode->GetIndex() == pRedln->GetPoint()->nNode.GetNode().GetIndex())
+        if (pTextNode->GetIndex() == pRedln->GetPoint()->GetNode().GetIndex())
         {
             pRedln->MaybeNotifyRedlinePositionModification(getFrameArea().Top());
             if (GetMergedPara()
                 && pRedln->GetType() == RedlineType::Delete
-                && pRedln->GetPoint()->nNode != pRedln->GetMark()->nNode)
+                && pRedln->GetPoint()->GetNode() != pRedln->GetMark()->GetNode())
             {
-                pTextNode = pRedln->End()->nNode.GetNode().GetTextNode();
+                pTextNode = pRedln->End()->GetNode().GetTextNode();
             }
         }
     }
@@ -571,11 +600,20 @@ void SwTextFrame::AdjustFollow_( SwTextFormatter &rLine,
         {
             if( GetFollow()->IsLocked() )
             {
-                OSL_FAIL( "+SwTextFrame::JoinFrame: Follow is locked." );
+                // this can happen when follow calls pMaster->GetFormatted()
+                SAL_INFO("sw.core", "+SwTextFrame::JoinFrame: Follow is locked." );
                 return;
             }
             if (GetFollow()->IsDeleteForbidden())
                 return;
+
+            if (HasNonLastSplitFlyDrawObj())
+            {
+                // If a fly frame is anchored to us that has a follow, then don't join the anchor.
+                // First those fly frames have to be joined.
+                return;
+            }
+
             JoinFrame();
         }
 
@@ -595,6 +633,13 @@ void SwTextFrame::AdjustFollow_( SwTextFormatter &rLine,
         while( GetFollow() && GetFollow()->GetFollow() &&
                nNewOfst >= GetFollow()->GetFollow()->GetOffset() )
         {
+            if (HasNonLastSplitFlyDrawObj())
+            {
+                // A non-last split fly is anchored to us, don't move content from the last frame to
+                // this one and don't join.
+                return;
+            }
+
             JoinFrame();
         }
     }
@@ -663,6 +708,7 @@ SwContentFrame *SwTextFrame::JoinFrame()
     // Relation CONTENT_FLOWS_FROM for current next paragraph will change
     // and relation CONTENT_FLOWS_TO for current previous paragraph, which
     // is <this>, will change.
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     {
         SwViewShell* pViewShell( pFoll->getRootFrame()->GetCurrShell() );
         if ( pViewShell && pViewShell->GetLayout() &&
@@ -674,6 +720,8 @@ SwContentFrame *SwTextFrame::JoinFrame()
                             this );
         }
     }
+#endif
+
     pFoll->Cut();
     SetFollow(pNxt);
     SwFrame::DestroyFrame(pFoll);
@@ -698,6 +746,7 @@ void SwTextFrame::SplitFrame(TextFrameIndex const nTextPos)
     // Relation CONTENT_FLOWS_FROM for current next paragraph will change
     // and relation CONTENT_FLOWS_TO for current previous paragraph, which
     // is <this>, will change.
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     {
         SwViewShell* pViewShell( pNew->getRootFrame()->GetCurrShell() );
         if ( pViewShell && pViewShell->GetLayout() &&
@@ -709,6 +758,7 @@ void SwTextFrame::SplitFrame(TextFrameIndex const nTextPos)
                             this );
         }
     }
+#endif
 
     // If footnotes end up in pNew bz our actions, we need
     // to re-register them
@@ -757,7 +807,7 @@ void SwTextFrame::SplitFrame(TextFrameIndex const nTextPos)
 
 void SwTextFrame::SetOffset_(TextFrameIndex const nNewOfst)
 {
-    // We do not need to invalidate out Follow.
+    // We do not need to invalidate our Follow.
     // We are a Follow, get formatted right away and call
     // SetOffset() from there
     mnOffset = nNewOfst;
@@ -767,7 +817,7 @@ void SwTextFrame::SetOffset_(TextFrameIndex const nNewOfst)
         SwCharRange &rReformat = pPara->GetReformat();
         rReformat.Start() = TextFrameIndex(0);
         rReformat.Len() = TextFrameIndex(GetText().getLength());
-        pPara->GetDelta() = sal_Int32(rReformat.Len());
+        pPara->SetDelta(sal_Int32(rReformat.Len()));
     }
     InvalidateSize();
 }
@@ -1051,7 +1101,7 @@ void SwTextFrame::FormatAdjust( SwTextFormatter &rLine,
     // are valid now
     pPara->GetReformat() = SwCharRange();
     bool bDelta = pPara->GetDelta() != 0;
-    pPara->GetDelta() = 0;
+    pPara->SetDelta(0);
 
     if( rLine.IsStop() )
     {
@@ -1066,7 +1116,11 @@ void SwTextFrame::FormatAdjust( SwTextFormatter &rLine,
         // AdjustFollow might execute JoinFrame() because of this.
         // Else, nEnd is the end of the last line in the Master.
         TextFrameIndex nOld = nEnd;
-        nEnd = rLine.GetEnd();
+        // Make sure content from the last floating table anchor is not shifted to previous anchors.
+        if (!HasNonLastSplitFlyDrawObj())
+        {
+            nEnd = rLine.GetEnd();
+        }
         if( GetFollow() )
         {
             if( nNew && nOld < nEnd )
@@ -1292,7 +1346,8 @@ bool SwTextFrame::FormatLine( SwTextFormatter &rLine, const bool bPrev )
     }
 
     // Calculating the good ol' nDelta
-    pPara->GetDelta() -= sal_Int32(pNew->GetLen()) - sal_Int32(nOldLen);
+    const sal_Int32 nDiff = sal_Int32(pNew->GetLen()) - sal_Int32(nOldLen);
+    pPara->SetDelta(pPara->GetDelta() - nDiff);
 
     // Stop!
     if( rLine.IsStop() )
@@ -1826,7 +1881,14 @@ void SwTextFrame::Format( vcl::RenderContext* pRenderContext, const SwBorderAttr
         return;
     }
 
-    const TextFrameIndex nStrLen(GetText().getLength());
+    TextFrameIndex nStrLen(GetText().getLength());
+
+    if (HasNonLastSplitFlyDrawObj())
+    {
+        // Non-last part of split fly anchor: consider this empty.
+        nStrLen = TextFrameIndex(0);
+    }
+
     if ( nStrLen || !FormatEmpty() )
     {
 
@@ -2087,7 +2149,7 @@ bool SwTextFrame::FormatQuick( bool bForceQuickFormat )
 
     // Delete reformat
     pPara->GetReformat() = SwCharRange();
-    pPara->GetDelta() = 0;
+    pPara->SetDelta(0);
 
     return true;
 }

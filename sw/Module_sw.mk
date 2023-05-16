@@ -100,6 +100,7 @@ $(eval $(call gb_Module_add_slowcheck_targets,sw,\
     CppunitTest_sw_ww8export \
     CppunitTest_sw_ww8export2 \
     CppunitTest_sw_ww8export3 \
+    CppunitTest_sw_ww8export4 \
     CppunitTest_sw_ww8import \
     CppunitTest_sw_rtfimport \
     CppunitTest_sw_odfexport \
@@ -112,9 +113,14 @@ $(eval $(call gb_Module_add_slowcheck_targets,sw,\
     CppunitTest_sw_uiwriter2 \
     CppunitTest_sw_uiwriter3 \
     CppunitTest_sw_uiwriter4 \
+    CppunitTest_sw_uiwriter5 \
+    CppunitTest_sw_uiwriter6 \
+    CppunitTest_sw_uiwriter7 \
+    CppunitTest_sw_uiwriter8 \
     CppunitTest_sw_layoutwriter \
     CppunitTest_sw_layoutwriter2 \
     CppunitTest_sw_mailmerge \
+    CppunitTest_sw_mailmerge2 \
     CppunitTest_sw_globalfilter \
     CppunitTest_sw_accessible_relation_set \
     CppunitTest_sw_apiterminate \
@@ -125,8 +131,10 @@ $(eval $(call gb_Module_add_slowcheck_targets,sw,\
     CppunitTest_sw_core_docnode \
     CppunitTest_sw_uibase_shells \
     CppunitTest_sw_uibase_dochdl \
+    CppunitTest_sw_uibase_docvw \
     CppunitTest_sw_uibase_frmdlg \
     CppunitTest_sw_uibase_uno \
+    CppunitTest_sw_uibase_dialog \
     CppunitTest_sw_uibase_wrtsh \
     CppunitTest_sw_core_accessibilitycheck \
     CppunitTest_sw_core_layout \
@@ -142,8 +150,12 @@ $(eval $(call gb_Module_add_slowcheck_targets,sw,\
     CppunitTest_sw_core_draw \
     CppunitTest_sw_core_edit \
     CppunitTest_sw_uibase_fldui \
+    CppunitTest_sw_core_view \
     CppunitTest_sw_core_attr \
     CppunitTest_sw_filter_ww8 \
+    CppunitTest_sw_filter_html \
+    CppunitTest_sw_a11y \
+    CppunitTest_sw_core_theme \
 ))
 
 ifneq ($(DISABLE_GUI),TRUE)
@@ -157,7 +169,6 @@ endif
 ifneq ($(DISABLE_CVE_TESTS),TRUE)
 $(eval $(call gb_Module_add_slowcheck_targets,sw,\
     CppunitTest_sw_filters_test \
-    CppunitTest_sw_filters_test2 \
 ))
 endif
 
@@ -179,6 +190,11 @@ $(eval $(call gb_Module_add_screenshot_targets,sw,\
     CppunitTest_sw_dialogs_test_2 \
 ))
 
+# feature coverage
+$(eval $(call gb_Module_add_coverage_targets,sw,\
+    CppunitTest_sw_odffeatures \
+))
+
 $(eval $(call gb_Module_add_uicheck_targets,sw,\
 	$(call gb_Helper_optional,LIBRELOGO,UITest_librelogo) \
 	UITest_writer_tests \
@@ -190,6 +206,7 @@ $(eval $(call gb_Module_add_uicheck_targets,sw,\
 	UITest_writer_tests7 \
 	UITest_sw_table \
 	UITest_sw_chart \
+	UITest_sw_fieldDialog \
 	UITest_sw_findBar \
 	UITest_sw_findReplace \
 	UITest_chapterNumbering \
@@ -198,9 +215,10 @@ $(eval $(call gb_Module_add_uicheck_targets,sw,\
 	UITest_sw_sidebar \
 	UITest_sw_styleInspector \
 	UITest_sw_ui_fmtui \
+	UITest_sw_ui_frmdlg \
 	UITest_sw_ui_index \
-	UITest_sw_uibase_docvw \
 	UITest_sw_ui_misc \
+	UITest_sw_uibase_docvw \
 	UITest_sw_uibase_shells \
 	UITest_classification \
 	UITest_writer_macro_tests \

@@ -24,16 +24,22 @@
 #include <ObjectNameProvider.hxx>
 #include <ResId.hxx>
 #include <strings.hrc>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <ChartModel.hxx>
 #include <ChartModelHelper.hxx>
+#include <ChartType.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
+#include <DataSeries.hxx>
 #include <DataSeriesHelper.hxx>
 #include <TitleHelper.hxx>
 #include <ExplicitCategoriesProvider.hxx>
 #include <CommonConverters.hxx>
 #include <NumberFormatterWrapper.hxx>
 #include <RegressionCurveHelper.hxx>
+#include <BaseCoordinateSystem.hxx>
+#include <RegressionCurveModel.hxx>
 #include <rtl/math.hxx>
 #include <rtl/ustring.hxx>
 #include <vcl/settings.hxx>
@@ -42,8 +48,8 @@
 
 #include <com/sun/star/chart2/XTitle.hpp>
 #include <com/sun/star/chart2/MovingAverageType.hpp>
-#include <com/sun/star/chart2/XRegressionCurveContainer.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace chart
 {
@@ -56,15 +62,15 @@ using ::com::sun::star::uno::Any;
 namespace
 {
 
-OUString lcl_getDataSeriesName( const OUString& rObjectCID, const Reference< frame::XModel >& xChartModel )
+OUString lcl_getDataSeriesName( std::u16string_view rObjectCID, const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
     OUString aRet;
 
-    Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
-    Reference< XDataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( rObjectCID , xChartModel );
+    rtl::Reference< Diagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
+    rtl::Reference< DataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( rObjectCID , xChartModel );
     if( xDiagram.is() && xSeries.is() )
     {
-        Reference< XChartType > xChartType( DiagramHelper::getChartTypeOfSeries( xDiagram, xSeries ) );
+        rtl::Reference< ChartType > xChartType( DiagramHelper::getChartTypeOfSeries( xDiagram, xSeries ) );
         if( xChartType.is() )
         {
             aRet = ::chart::DataSeriesHelper::getDataSeriesLabel(
@@ -75,7 +81,7 @@ OUString lcl_getDataSeriesName( const OUString& rObjectCID, const Reference< fra
     return aRet;
 }
 
-OUString lcl_getFullSeriesName( const OUString& rObjectCID, const Reference< frame::XModel >& xChartModel )
+OUString lcl_getFullSeriesName( std::u16string_view rObjectCID, const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
     OUString aRet(SchResId(STR_TIP_DATASERIES));
     OUString aWildcard( "%SERIESNAME" );
@@ -93,19 +99,17 @@ void lcl_addText( OUString& rOut, std::u16string_view rSeparator, std::u16string
         rOut+=rNext;
 }
 
-OUString lcl_getDataPointValueText( const Reference< XDataSeries >& xSeries, sal_Int32 nPointIndex,
-                                    const Reference< XCoordinateSystem >& xCooSys,
+OUString lcl_getDataPointValueText( const rtl::Reference< DataSeries >& xSeries, sal_Int32 nPointIndex,
+                                    const rtl::Reference< BaseCoordinateSystem >& xCooSys,
                                     const Reference< frame::XModel >& xChartModel )
 {
 
     OUString aRet;
 
-    Reference<data::XDataSource> xDataSource(
-            uno::Reference<data::XDataSource>( xSeries, uno::UNO_QUERY ) );
-    if(!xDataSource.is())
+    if(!xSeries.is())
         return aRet;
 
-    Sequence< Reference< data::XLabeledDataSequence > > aDataSequences( xDataSource->getDataSequences() );
+    const std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > & aDataSequences = xSeries->getDataSequences2();
 
     OUString aX, aY, aY_Min, aY_Max, aY_First, aY_Last, a_Size;
     double fValue = 0;
@@ -115,18 +119,20 @@ OUString lcl_getDataPointValueText( const Reference< XDataSeries >& xSeries, sal
     Color nLabelColor;//dummy
     bool bColorChanged;//dummy
 
-    for(sal_Int32 nN = aDataSequences.getLength();nN--;)
+    for(sal_Int32 nN = aDataSequences.size();nN--;)
     {
         uno::Reference<data::XDataSequence>  xDataSequence( aDataSequences[nN]->getValues());
         if( !xDataSequence.is() )
             continue;
-        Sequence< Any > aData( xDataSequence->getData() );
-        if( nPointIndex >= aData.getLength() )
-            continue;
-        uno::Reference<beans::XPropertySet> xProp(xDataSequence, uno::UNO_QUERY );
-        if( xProp.is())
+
+        try
         {
-            try
+            Sequence< Any > aData( xDataSequence->getData() );
+
+            if( nPointIndex >= aData.getLength() )
+                continue;
+            uno::Reference<beans::XPropertySet> xProp(xDataSequence, uno::UNO_QUERY );
+            if( xProp.is())
             {
                 uno::Any aARole = xProp->getPropertyValue( "Role" );
                 OUString aRole;
@@ -175,10 +181,14 @@ OUString lcl_getDataPointValueText( const Reference< XDataSeries >& xSeries, sal
                     a_Size = aNumberFormatterWrapper.getFormattedString( nNumberFormatKey, fValue, nLabelColor, bColorChanged );
                 }
             }
-            catch( const uno::Exception& )
-            {
-                TOOLS_WARN_EXCEPTION("chart2", "" );
-            }
+        }
+        catch (const lang::DisposedException&)
+        {
+            TOOLS_WARN_EXCEPTION( "chart2", "unexpected exception caught" );
+        }
+        catch( const uno::Exception& )
+        {
+            TOOLS_WARN_EXCEPTION("chart2", "" );
         }
     }
 
@@ -319,8 +329,8 @@ OUString ObjectNameProvider::getName( ObjectType eObjectType, bool bPlural )
     return aRet;
 }
 
-OUString ObjectNameProvider::getAxisName( const OUString& rObjectCID
-                        , const uno::Reference< frame::XModel >& xChartModel  )
+OUString ObjectNameProvider::getAxisName( std::u16string_view rObjectCID
+                        , const rtl::Reference<::chart::ChartModel>& xChartModel  )
 {
     OUString aRet;
 
@@ -395,8 +405,8 @@ OUString ObjectNameProvider::getTitleNameByType( TitleHelper::eTitleType eType )
     return aRet;
 }
 
-OUString ObjectNameProvider::getTitleName( const OUString& rObjectCID
-                        , const Reference< frame::XModel >& xChartModel )
+OUString ObjectNameProvider::getTitleName( std::u16string_view rObjectCID
+                        , const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
     OUString aRet;
 
@@ -414,15 +424,15 @@ OUString ObjectNameProvider::getTitleName( const OUString& rObjectCID
     return aRet;
 }
 
-OUString ObjectNameProvider::getGridName( const OUString& rObjectCID
-                        , const uno::Reference< frame::XModel >& xChartModel )
+OUString ObjectNameProvider::getGridName( std::u16string_view rObjectCID
+                        , const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
     OUString aRet;
 
     sal_Int32 nCooSysIndex = -1;
     sal_Int32 nDimensionIndex = -1;
     sal_Int32 nAxisIndex = -1;
-    Reference< XAxis > xAxis( ObjectIdentifier::getAxisForCID( rObjectCID , xChartModel ) );
+    rtl::Reference< Axis > xAxis = ObjectIdentifier::getAxisForCID( rObjectCID , xChartModel );
     AxisHelper::getIndicesForAxis( xAxis, ChartModelHelper::findDiagram( xChartModel )
               , nCooSysIndex , nDimensionIndex, nAxisIndex );
 
@@ -467,12 +477,7 @@ OUString ObjectNameProvider::getGridName( const OUString& rObjectCID
     return aRet;
 }
 
-OUString ObjectNameProvider::getHelpText( const OUString& rObjectCID, const Reference< chart2::XChartDocument >& xChartDocument )
-{
-    return getHelpText( rObjectCID, Reference< frame::XModel >( xChartDocument ) );
-}
-
-OUString ObjectNameProvider::getHelpText( const OUString& rObjectCID, const Reference< frame::XModel >& xChartModel, bool bVerbose )
+OUString ObjectNameProvider::getHelpText( std::u16string_view rObjectCID, const rtl::Reference<::chart::ChartModel>& xChartModel, bool bVerbose )
 {
     OUString aRet;
     ObjectType eObjectType( ObjectIdentifier::getObjectType(rObjectCID) );
@@ -504,11 +509,11 @@ OUString ObjectNameProvider::getHelpText( const OUString& rObjectCID, const Refe
         else
             aRet=SchResId(STR_TIP_DATAPOINT);
 
-        Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
-        Reference< XDataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( rObjectCID , xChartModel );
+        rtl::Reference< Diagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
+        rtl::Reference< DataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( rObjectCID , xChartModel );
         if( xDiagram.is() && xSeries.is() )
         {
-            sal_Int32 nPointIndex( ObjectIdentifier::getParticleID(rObjectCID).toInt32() );
+            sal_Int32 nPointIndex = o3tl::toInt32(ObjectIdentifier::getParticleID(rObjectCID));
 
             //replace data point index
             OUString aWildcard(  "%POINTNUMBER" );
@@ -523,8 +528,8 @@ OUString ObjectNameProvider::getHelpText( const OUString& rObjectCID, const Refe
             nIndex = aRet.indexOf( aWildcard );
             if( nIndex != -1 )
             {
-                std::vector< Reference< chart2::XDataSeries > > aSeriesVector(
-                    DiagramHelper::getDataSeriesFromDiagram( xDiagram ) );
+                std::vector< rtl::Reference< DataSeries > > aSeriesVector =
+                    DiagramHelper::getDataSeriesFromDiagram( xDiagram );
                 sal_Int32 nSeriesIndex = -1;
                 for( nSeriesIndex=aSeriesVector.size();nSeriesIndex--;)
                 {
@@ -557,13 +562,12 @@ OUString ObjectNameProvider::getHelpText( const OUString& rObjectCID, const Refe
         if( bVerbose )
         {
             aRet = SchResId( STR_OBJECT_CURVE_WITH_PARAMETERS );
-            Reference< chart2::XDataSeries > xSeries( ObjectIdentifier::getDataSeriesForCID( rObjectCID , xChartModel ));
-            Reference< chart2::XRegressionCurveContainer > xCurveCnt( xSeries, uno::UNO_QUERY );
+            rtl::Reference< DataSeries > xSeries( ObjectIdentifier::getDataSeriesForCID( rObjectCID , xChartModel ));
 
-            if( xCurveCnt.is())
+            if( xSeries.is())
             {
                 sal_Int32 nCurveIndex = ObjectIdentifier::getIndexFromParticleOrCID( rObjectCID );
-                Reference< chart2::XRegressionCurve > xCurve( RegressionCurveHelper::getRegressionCurveAtIndex(xCurveCnt, nCurveIndex) );
+                rtl::Reference< RegressionCurveModel > xCurve = RegressionCurveHelper::getRegressionCurveAtIndex(xSeries, nCurveIndex);
                 if( xCurve.is())
                 {
                     try
@@ -579,23 +583,19 @@ OUString ObjectNameProvider::getHelpText( const OUString& rObjectCID, const Refe
                         const OUString& aNumDecimalSep = rLocaleDataWrapper.getNumDecimalSep();
                         sal_Unicode cDecSeparator = aNumDecimalSep[0];
 
-                        uno::Reference< beans::XPropertySet > xProperties( xCurve, uno::UNO_QUERY );
-                        if ( xProperties.is())
+                        xCurve->getPropertyValue( "PolynomialDegree") >>= aDegree;
+                        xCurve->getPropertyValue( "MovingAveragePeriod") >>= aPeriod;
+                        xCurve->getPropertyValue( "MovingAverageType") >>= aMovingType;
+                        xCurve->getPropertyValue( "ForceIntercept") >>= bForceIntercept;
+                        if (bForceIntercept)
+                                xCurve->getPropertyValue( "InterceptValue") >>= aInterceptValue;
+                        uno::Reference< beans::XPropertySet > xEqProp( xCurve->getEquationProperties());
+                        if( xEqProp.is())
                         {
-                                xProperties->getPropertyValue( "PolynomialDegree") >>= aDegree;
-                                xProperties->getPropertyValue( "MovingAveragePeriod") >>= aPeriod;
-                                xProperties->getPropertyValue( "MovingAverageType") >>= aMovingType;
-                                xProperties->getPropertyValue( "ForceIntercept") >>= bForceIntercept;
-                                if (bForceIntercept)
-                                        xProperties->getPropertyValue( "InterceptValue") >>= aInterceptValue;
-                                uno::Reference< beans::XPropertySet > xEqProp( xCurve->getEquationProperties());
-                                if( xEqProp.is())
-                                {
-                                    if ( !(xEqProp->getPropertyValue( "XName") >>= aXName) )
-                                        aXName = "x";
-                                    if ( !(xEqProp->getPropertyValue( "YName") >>= aYName) )
-                                        aYName = "f(x)";
-                                }
+                            if ( !(xEqProp->getPropertyValue( "XName") >>= aXName) )
+                                aXName = "x";
+                            if ( !(xEqProp->getPropertyValue( "YName") >>= aYName) )
+                                aYName = "f(x)";
                         }
                         xCalculator->setRegressionProperties(aDegree, bForceIntercept, aInterceptValue, 2, aMovingType);
                         xCalculator->setXYNames ( aXName, aYName );
@@ -644,14 +644,13 @@ OUString ObjectNameProvider::getHelpText( const OUString& rObjectCID, const Refe
         }
         else
         {
-            Reference< chart2::XDataSeries > xSeries( ObjectIdentifier::getDataSeriesForCID(rObjectCID , xChartModel));
-            Reference< chart2::XRegressionCurveContainer > xCurveCnt( xSeries, uno::UNO_QUERY );
+            rtl::Reference< DataSeries > xSeries( ObjectIdentifier::getDataSeriesForCID(rObjectCID , xChartModel));
             aRet += getName(eObjectType);
 
-            if( xCurveCnt.is())
+            if( xSeries.is())
             {
                 sal_Int32 nCurveIndex = ObjectIdentifier::getIndexFromParticleOrCID( rObjectCID );
-                Reference< chart2::XRegressionCurve > xCurve( RegressionCurveHelper::getRegressionCurveAtIndex(xCurveCnt, nCurveIndex) );
+                rtl::Reference< RegressionCurveModel > xCurve( RegressionCurveHelper::getRegressionCurveAtIndex(xSeries, nCurveIndex) );
                 if( xCurve.is())
                 {
                     aRet += " (" + RegressionCurveHelper::getRegressionCurveName(xCurve) + " )";
@@ -664,11 +663,10 @@ OUString ObjectNameProvider::getHelpText( const OUString& rObjectCID, const Refe
         if( bVerbose )
         {
             aRet = SchResId(STR_OBJECT_AVERAGE_LINE_WITH_PARAMETERS);
-            Reference< chart2::XDataSeries > xSeries( ObjectIdentifier::getDataSeriesForCID( rObjectCID , xChartModel ));
-            Reference< chart2::XRegressionCurveContainer > xCurveCnt( xSeries, uno::UNO_QUERY );
-            if( xCurveCnt.is())
+            rtl::Reference< DataSeries > xSeries( ObjectIdentifier::getDataSeriesForCID( rObjectCID , xChartModel ));
+            if( xSeries.is())
             {
-                Reference< chart2::XRegressionCurve > xCurve( RegressionCurveHelper::getMeanValueLine( xCurveCnt ));
+                rtl::Reference< RegressionCurveModel > xCurve( RegressionCurveHelper::getMeanValueLine( xSeries ));
                 if( xCurve.is())
                 {
                     try
@@ -724,28 +722,27 @@ OUString ObjectNameProvider::getHelpText( const OUString& rObjectCID, const Refe
     return aRet;
 }
 
-OUString ObjectNameProvider::getSelectedObjectText( const OUString & rObjectCID, const css::uno::Reference< css::chart2::XChartDocument >& xChartDocument )
+OUString ObjectNameProvider::getSelectedObjectText( std::u16string_view rObjectCID, const rtl::Reference<::chart::ChartModel>& xChartDocument )
 {
     OUString aRet;
     ObjectType eObjectType( ObjectIdentifier::getObjectType(rObjectCID) );
-    Reference< frame::XModel > xChartModel = xChartDocument;
 
     if( eObjectType == OBJECTTYPE_DATA_POINT )
     {
         aRet = SchResId( STR_STATUS_DATAPOINT_MARKED );
 
-        Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
-        Reference< XDataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( rObjectCID , xChartModel );
+        rtl::Reference< Diagram > xDiagram( ChartModelHelper::findDiagram( xChartDocument ) );
+        rtl::Reference< DataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( rObjectCID , xChartDocument );
         if( xDiagram.is() && xSeries.is() )
         {
-            sal_Int32 nPointIndex( ObjectIdentifier::getParticleID(rObjectCID).toInt32() );
+            sal_Int32 nPointIndex = o3tl::toInt32( ObjectIdentifier::getParticleID(rObjectCID) );
 
             // replace data point index
-            replaceParamterInString( aRet, "%POINTNUMBER", OUString::number( nPointIndex + 1 ));
+            replaceParamterInString( aRet, u"%POINTNUMBER", OUString::number( nPointIndex + 1 ));
 
             // replace data series index
             {
-                std::vector< Reference< chart2::XDataSeries > > aSeriesVector(
+                std::vector< rtl::Reference< DataSeries > > aSeriesVector(
                     DiagramHelper::getDataSeriesFromDiagram( xDiagram ) );
                 sal_Int32 nSeriesIndex = -1;
                 for( nSeriesIndex=aSeriesVector.size();nSeriesIndex--;)
@@ -753,23 +750,23 @@ OUString ObjectNameProvider::getSelectedObjectText( const OUString & rObjectCID,
                     if( aSeriesVector[nSeriesIndex] == xSeries )
                         break;
                 }
-                replaceParamterInString( aRet, "%SERIESNUMBER", OUString::number( nSeriesIndex + 1 ) );
+                replaceParamterInString( aRet, u"%SERIESNUMBER", OUString::number( nSeriesIndex + 1 ) );
             }
 
             // replace point value
-            replaceParamterInString( aRet, "%POINTVALUES", lcl_getDataPointValueText(
-                xSeries, nPointIndex, DataSeriesHelper::getCoordinateSystemOfSeries(xSeries, xDiagram), xChartModel ) );
+            replaceParamterInString( aRet, u"%POINTVALUES", lcl_getDataPointValueText(
+                xSeries, nPointIndex, DataSeriesHelper::getCoordinateSystemOfSeries(xSeries, xDiagram), xChartDocument ) );
         }
     }
     else
     {
         // use the verbose text including the formula for trend lines
         const bool bVerbose( eObjectType == OBJECTTYPE_DATA_CURVE || eObjectType == OBJECTTYPE_DATA_AVERAGE_LINE );
-        const OUString aHelpText( getHelpText( rObjectCID, xChartModel, bVerbose ));
+        const OUString aHelpText( getHelpText( rObjectCID, xChartDocument, bVerbose ));
         if( !aHelpText.isEmpty())
         {
             aRet = SchResId( STR_STATUS_OBJECT_MARKED );
-            replaceParamterInString( aRet, "%OBJECTNAME", aHelpText );
+            replaceParamterInString( aRet, u"%OBJECTNAME", aHelpText );
         }
     }
 
@@ -777,23 +774,22 @@ OUString ObjectNameProvider::getSelectedObjectText( const OUString & rObjectCID,
 }
 
 OUString ObjectNameProvider::getNameForCID(
-    const OUString& rObjectCID,
-    const uno::Reference< chart2::XChartDocument >& xChartDocument )
+    std::u16string_view rObjectCID,
+    const rtl::Reference<::chart::ChartModel>& xChartDocument )
 {
     ObjectType eType( ObjectIdentifier::getObjectType( rObjectCID ));
-    Reference< frame::XModel > xModel = xChartDocument;
 
     switch( eType )
     {
         case OBJECTTYPE_AXIS:
-            return getAxisName( rObjectCID, xModel );
+            return getAxisName( rObjectCID, xChartDocument );
         case OBJECTTYPE_TITLE:
-            return getTitleName( rObjectCID, xModel );
+            return getTitleName( rObjectCID, xChartDocument );
         case OBJECTTYPE_GRID:
         case OBJECTTYPE_SUBGRID:
-            return getGridName( rObjectCID, xModel );
+            return getGridName( rObjectCID, xChartDocument );
         case OBJECTTYPE_DATA_SERIES:
-            return lcl_getFullSeriesName( rObjectCID, xModel );
+            return lcl_getFullSeriesName( rObjectCID, xChartDocument );
         case OBJECTTYPE_DATA_POINT:
         case OBJECTTYPE_DATA_LABELS:
         case OBJECTTYPE_DATA_LABEL:
@@ -804,7 +800,7 @@ OUString ObjectNameProvider::getNameForCID(
         case OBJECTTYPE_DATA_CURVE:
         case OBJECTTYPE_DATA_CURVE_EQUATION:
             {
-                OUString aRet = lcl_getFullSeriesName( rObjectCID, xModel ) + " ";
+                OUString aRet = lcl_getFullSeriesName( rObjectCID, xChartDocument ) + " ";
                 if( eType == OBJECTTYPE_DATA_POINT || eType == OBJECTTYPE_DATA_LABEL )
                 {
                     aRet += getName( OBJECTTYPE_DATA_POINT  );
@@ -817,15 +813,14 @@ OUString ObjectNameProvider::getNameForCID(
                 }
                 else if (eType == OBJECTTYPE_DATA_CURVE || eType == OBJECTTYPE_DATA_CURVE_EQUATION)
                 {
-                    Reference< chart2::XDataSeries > xSeries( ObjectIdentifier::getDataSeriesForCID( rObjectCID , xModel ));
-                    Reference< chart2::XRegressionCurveContainer > xCurveCnt( xSeries, uno::UNO_QUERY );
+                    rtl::Reference< DataSeries > xSeries( ObjectIdentifier::getDataSeriesForCID( rObjectCID , xChartDocument ));
 
                     aRet += " " + getName(eType);
 
-                    if( xCurveCnt.is())
+                    if( xSeries.is())
                     {
                         sal_Int32 nCurveIndex = ObjectIdentifier::getIndexFromParticleOrCID( rObjectCID );
-                        Reference< chart2::XRegressionCurve > xCurve( RegressionCurveHelper::getRegressionCurveAtIndex(xCurveCnt, nCurveIndex) );
+                        rtl::Reference< RegressionCurveModel > xCurve( RegressionCurveHelper::getRegressionCurveAtIndex(xSeries, nCurveIndex) );
                         if( xCurve.is())
                         {
                            aRet += " (" + RegressionCurveHelper::getRegressionCurveName(xCurve) + ")";
@@ -847,16 +842,15 @@ OUString ObjectNameProvider::getNameForCID(
 
 OUString ObjectNameProvider::getName_ObjectForSeries(
         ObjectType eObjectType,
-        const OUString& rSeriesCID,
-        const uno::Reference< chart2::XChartDocument >& xChartDocument )
+        std::u16string_view rSeriesCID,
+        const rtl::Reference<::chart::ChartModel>& xChartDocument )
 {
-    uno::Reference< frame::XModel> xChartModel = xChartDocument;
-    Reference< XDataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( rSeriesCID , xChartModel );
+    rtl::Reference< DataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( rSeriesCID , xChartDocument );
     if( xSeries.is() )
     {
         OUString aRet = SchResId(STR_OBJECT_FOR_SERIES);
-        replaceParamterInString( aRet, "%OBJECTNAME", getName( eObjectType ) );
-        replaceParamterInString( aRet, "%SERIESNAME", lcl_getDataSeriesName( rSeriesCID, xChartModel ) );
+        replaceParamterInString( aRet, u"%OBJECTNAME", getName( eObjectType ) );
+        replaceParamterInString( aRet, u"%SERIESNAME", lcl_getDataSeriesName( rSeriesCID, xChartDocument ) );
         return aRet;
     }
     else
@@ -866,7 +860,7 @@ OUString ObjectNameProvider::getName_ObjectForSeries(
 OUString ObjectNameProvider::getName_ObjectForAllSeries( ObjectType eObjectType )
 {
     OUString aRet = SchResId(STR_OBJECT_FOR_ALL_SERIES);
-    replaceParamterInString( aRet, "%OBJECTNAME", getName( eObjectType, true /*bPlural*/ ) );
+    replaceParamterInString( aRet, u"%OBJECTNAME", getName( eObjectType, true /*bPlural*/ ) );
     return aRet;
 }
 

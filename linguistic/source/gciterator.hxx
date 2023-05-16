@@ -36,10 +36,12 @@
 #include <osl/thread.h>
 
 #include <com/sun/star/uno/Any.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <i18nlangtag/lang.h>
 
 #include <map>
+#include <optional>
+#include <utility>
 #include <deque>
 
 #include "defs.hxx"
@@ -97,8 +99,8 @@ class GrammarCheckingIterator:
     DocMap_t        m_aDocIdMap;
 
 
-    // language -> implname mapping
-    typedef std::map< LanguageType, OUString > GCImplNames_t;
+    // BCP-47 language tag -> implname mapping
+    typedef std::map< OUString, OUString > GCImplNames_t;
     GCImplNames_t   m_aGCImplNamesByLang;
 
     // implname -> UNO reference mapping
@@ -113,8 +115,8 @@ class GrammarCheckingIterator:
 
     //! beware of initialization order!
     static osl::Mutex& MyMutex();
-    comphelper::OInterfaceContainerHelper2     m_aEventListeners;
-    comphelper::OInterfaceContainerHelper2     m_aNotifyListeners;
+    comphelper::OInterfaceContainerHelper3<css::lang::XEventListener>  m_aEventListeners;
+    comphelper::OInterfaceContainerHelper3<css::linguistic2::XLinguServiceEventListener>  m_aNotifyListeners;
 
     css::uno::Reference< css::i18n::XBreakIterator > m_xBreakIterator;
     mutable css::uno::Reference< css::util::XChangesBatch >  m_xUpdateAccess;
@@ -136,12 +138,18 @@ class GrammarCheckingIterator:
     sal_Int32 GetSuggestedEndOfSentence( const OUString &rText, sal_Int32 nSentenceStartPos, const css::lang::Locale &rLocale );
 
     void GetConfiguredGCSvcs_Impl();
-    css::uno::Reference< css::linguistic2::XProofreader > GetGrammarChecker( const css::lang::Locale & rLocale );
+    css::uno::Reference< css::linguistic2::XProofreader > GetGrammarChecker( css::lang::Locale & rLocale );
 
     css::uno::Reference< css::util::XChangesBatch > const & GetUpdateAccess() const;
 
     GrammarCheckingIterator( const GrammarCheckingIterator & ) = delete;
     GrammarCheckingIterator & operator = ( const GrammarCheckingIterator & ) = delete;
+
+    // Gets the grammar checker service, using fallback locales if necessary,
+    // and the BCP-47 tag for the updated locale, if the fallback was used.
+    // Precondition: MyMutex() is locked.
+    std::pair<OUString, std::optional<OUString>>
+    getServiceForLocale(const css::lang::Locale& rLocale) const;
 
 public:
 

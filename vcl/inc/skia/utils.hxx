@@ -27,6 +27,8 @@
 #include <vcl/bitmap.hxx>
 #include <vcl/salgtype.hxx>
 
+#include <test/GraphicsRenderTests.hxx>
+
 #include <premac.h>
 #include <SkRegion.h>
 #include <SkSurface.h>
@@ -103,8 +105,10 @@ enum DirectImage
     No
 };
 
-// Do 'paint->setBlendMode(SkBlendMode::kDifference)' (workaround for buggy drivers).
-void setBlendModeDifference(SkPaint* paint);
+// Sets SkBlender that will do an invert operation.
+void setBlenderInvert(SkPaint* paint);
+// Sets SkBlender that will do a xor operation.
+void setBlenderXor(SkPaint* paint);
 
 // Must be called in any VCL backend before any Skia functionality is used.
 // If not set, Skia will be disabled.
@@ -117,6 +121,10 @@ sk_sp<SkImage> findCachedImage(const OString& key);
 void removeCachedImage(sk_sp<SkImage> image);
 tools::Long maxImageCacheSize();
 
+// Get checksum of the image content, only for raster images. Is cached,
+// but may still be somewhat expensive.
+uint32_t getSkImageChecksum(sk_sp<SkImage> image);
+
 // SkSurfaceProps to be used by all Skia surfaces.
 VCL_DLLPUBLIC const SkSurfaceProps* surfaceProps();
 // Set pixel geometry to be used by SkSurfaceProps.
@@ -127,10 +135,14 @@ inline bool isUnitTestRunning(const char* name = nullptr)
     if (name == nullptr)
     {
         static const char* const testname = getenv("LO_TESTNAME");
-        return testname != nullptr;
+        if (testname != nullptr)
+            return true;
+        return !vcl::test::activeGraphicsRenderTest().isEmpty();
     }
     const char* const testname = getenv("LO_TESTNAME");
-    return testname != nullptr && std::string_view(name) == testname;
+    if (testname != nullptr && std::string_view(name) == testname)
+        return true;
+    return vcl::test::activeGraphicsRenderTest().equalsAscii(name);
 }
 
 // Scaling done on the GPU is fast, but bicubic done in raster mode can be slow

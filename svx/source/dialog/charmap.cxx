@@ -17,6 +17,9 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
+#include <utility>
 #include <vcl/event.hxx>
 #include <vcl/fontcharmap.hxx>
 #include <vcl/svapp.hxx>
@@ -62,7 +65,6 @@ FactoryFunction SvxShowCharSet::GetUITestFactory() const
 SvxShowCharSet::SvxShowCharSet(std::unique_ptr<weld::ScrolledWindow> pScrolledWindow, const VclPtr<VirtualDevice>& rVirDev)
     : mxVirDev(rVirDev)
     , mxScrollArea(std::move(pScrolledWindow))
-    , mxContext(comphelper::getProcessComponentContext())
     , nX(0)
     , nY(0)
     , maFontSize(0, 0)
@@ -300,7 +302,7 @@ void SvxShowCharSet::updateFavCharacterList(const OUString& sTitle, const OUStri
             aFavCharFontListRange[i] = maFavCharFontList[i];
         }
 
-        std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create(mxContext));
+        std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
         officecfg::Office::Common::FavoriteCharacters::FavoriteCharacterList::set(aFavCharList, batch);
         officecfg::Office::Common::FavoriteCharacters::FavoriteCharacterFontList::set(aFavCharFontList, batch);
         batch->commit();
@@ -337,7 +339,7 @@ void SvxShowCharSet::updateFavCharacterList(const OUString& sTitle, const OUStri
         aFavCharFontListRange[i] = maFavCharFontList[i];
     }
 
-    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create(mxContext));
+    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
     officecfg::Office::Common::FavoriteCharacters::FavoriteCharacterList::set(aFavCharList, batch);
     officecfg::Office::Common::FavoriteCharacters::FavoriteCharacterFontList::set(aFavCharFontList, batch);
     batch->commit();
@@ -375,7 +377,9 @@ Point SvxShowCharSet::MapIndexToPixel( int nIndex ) const
 int SvxShowCharSet::PixelToMapIndex( const Point& point) const
 {
     int nBase = FirstInView();
+    assert(nX != 0);
     int x = nX == 0 ? 0 : (point.X() - m_nXGap)/nX;
+    assert(nY != 0);
     int y = nY == 0 ? 0 : (point.Y() - m_nYGap)/nY;
     return (nBase + x + y * COLUMN_COUNT);
 }
@@ -468,7 +472,7 @@ void SvxShowCharSet::DeSelect()
     Invalidate();
 }
 
-// stretch a grid rectangle if its at the edge to fill unused space
+// stretch a grid rectangle if it's at the edge to fill unused space
 tools::Rectangle SvxShowCharSet::getGridRectangle(const Point &rPointUL, const Size &rOutputSize) const
 {
     tools::Long x = rPointUL.X() - 1;
@@ -506,7 +510,16 @@ void SvxShowCharSet::DrawChars_Impl(vcl::RenderContext& rRenderContext, int n1, 
 
     Size aOutputSize(GetOutputSizePixel());
 
+    const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
+    const Color aWindowTextColor(rStyleSettings.GetFieldTextColor());
+    Color aHighlightColor(rStyleSettings.GetHighlightColor());
+    Color aHighlightTextColor(rStyleSettings.GetHighlightTextColor());
+    Color aFaceColor(rStyleSettings.GetFaceColor());
+    Color aLightColor(rStyleSettings.GetLightColor());
+    Color aShadowColor(rStyleSettings.GetShadowColor());
+
     int i;
+    rRenderContext.SetLineColor(aShadowColor);
     for (i = 1; i < COLUMN_COUNT; ++i)
     {
         rRenderContext.DrawLine(Point(nX * i + m_nXGap, 0),
@@ -517,13 +530,6 @@ void SvxShowCharSet::DrawChars_Impl(vcl::RenderContext& rRenderContext, int n1, 
         rRenderContext.DrawLine(Point(0, nY * i + m_nYGap),
                                 Point(aOutputSize.Width(), nY * i + m_nYGap));
     }
-    const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
-    const Color aWindowTextColor(rStyleSettings.GetFieldTextColor());
-    Color aHighlightColor(rStyleSettings.GetHighlightColor());
-    Color aHighlightTextColor(rStyleSettings.GetHighlightTextColor());
-    Color aFaceColor(rStyleSettings.GetFaceColor());
-    Color aLightColor(rStyleSettings.GetLightColor());
-    Color aShadowColor(rStyleSettings.GetShadowColor());
 
     int nTextHeight = rRenderContext.GetTextHeight();
     tools::Rectangle aBoundRect;
@@ -566,6 +572,19 @@ void SvxShowCharSet::DrawChars_Impl(vcl::RenderContext& rRenderContext, int n1, 
                 aPointTxTy.AdjustX( -(nXLDelta - 1) );
             else if (nXHDelta <= 0)
                 aPointTxTy.AdjustX(nXHDelta - 1 );
+        }
+
+        // tdf#109214 - highlight the favorite characters
+        if (isFavChar(aCharStr, mxVirDev->GetFont().GetFamilyName()))
+        {
+            const Color aLineCol = rRenderContext.GetLineColor();
+            rRenderContext.SetLineColor(aHighlightColor);
+            rRenderContext.SetFillColor(COL_TRANSPARENT);
+            // Outer border
+            rRenderContext.DrawRect(tools::Rectangle(Point(x - 1, y - 1), Size(nX + 3, nY + 3)));
+            // Inner border
+            rRenderContext.DrawRect(tools::Rectangle(Point(x, y), Size(nX + 1, nY + 1)));
+            rRenderContext.SetLineColor(aLineCol);
         }
 
         Color aTextCol = rRenderContext.GetTextColor();
@@ -734,14 +753,15 @@ void SvxShowCharSet::SelectIndex(int nNewIndex, bool bFocus)
     if( nSelectedIndex >= 0 )
     {
         getSelectedChar() = mxFontCharMap->GetCharFromIndex( nSelectedIndex );
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
         if( m_xAccessible.is() )
         {
             svx::SvxShowCharSetItem* pItem = ImplGetItem(nSelectedIndex);
             // Don't fire the focus event.
             if ( bFocus )
-                m_xAccessible->fireEvent( AccessibleEventId::ACTIVE_DESCENDANT_CHANGED, Any(), makeAny(pItem->GetAccessible()) ); // this call assures that m_pItem is set
+                m_xAccessible->fireEvent( AccessibleEventId::ACTIVE_DESCENDANT_CHANGED, Any(), Any(pItem->GetAccessible()) ); // this call assures that m_pItem is set
             else
-                m_xAccessible->fireEvent( AccessibleEventId::ACTIVE_DESCENDANT_CHANGED_NOFOCUS, Any(), makeAny(pItem->GetAccessible()) ); // this call assures that m_pItem is set
+                m_xAccessible->fireEvent( AccessibleEventId::ACTIVE_DESCENDANT_CHANGED_NOFOCUS, Any(), Any(pItem->GetAccessible()) ); // this call assures that m_pItem is set
 
             assert(pItem->m_xItem.is() && "No accessible created!");
             Any aOldAny, aNewAny;
@@ -753,6 +773,7 @@ void SvxShowCharSet::SelectIndex(int nNewIndex, bool bFocus)
             aNewAny <<= AccessibleStateType::SELECTED;
             pItem->m_xItem->fireEvent( AccessibleEventId::STATE_CHANGED, aOldAny, aNewAny );
         }
+#endif
     }
     aHighHdl.Call( this );
 }
@@ -787,6 +808,7 @@ IMPL_LINK_NOARG(SvxShowCharSet, VscrollHdl, weld::ScrolledWindow&, void)
     }
     else if( nSelectedIndex > LastInView() )
     {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
         if( m_xAccessible.is() )
         {
             css::uno::Any aOldAny, aNewAny;
@@ -797,6 +819,7 @@ IMPL_LINK_NOARG(SvxShowCharSet, VscrollHdl, weld::ScrolledWindow&, void)
                 m_xAccessible ->fireEvent( AccessibleEventId::CHILD, aOldAny, aNewAny );
             }
         }
+#endif
         SelectIndex( (LastInView() - COLUMN_COUNT + 1) + (nSelectedIndex % COLUMN_COUNT) );
     }
 
@@ -805,18 +828,22 @@ IMPL_LINK_NOARG(SvxShowCharSet, VscrollHdl, weld::ScrolledWindow&, void)
 
 SvxShowCharSet::~SvxShowCharSet()
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if (m_xAccessible.is())
     {
         m_aItems.clear();
         m_xAccessible->clearCharSetControl();
         m_xAccessible.clear();
     }
+#endif
 }
 
 css::uno::Reference< XAccessible > SvxShowCharSet::CreateAccessible()
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     OSL_ENSURE(!m_xAccessible.is(),"Accessible already created!");
     m_xAccessible = new svx::SvxShowCharSetAcc(this);
+#endif
     return m_xAccessible;
 }
 
@@ -825,7 +852,9 @@ svx::SvxShowCharSetItem* SvxShowCharSet::ImplGetItem( int _nPos )
     ItemsMap::iterator aFind = m_aItems.find(_nPos);
     if ( aFind == m_aItems.end() )
     {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
         OSL_ENSURE(m_xAccessible.is(), "Who wants to create a child of my table without a parent?");
+#endif
         auto xItem = std::make_shared<svx::SvxShowCharSetItem>(*this,
             m_xAccessible.get(), sal::static_int_cast< sal_uInt16 >(_nPos));
         aFind = m_aItems.emplace(_nPos, xItem).first;
@@ -872,8 +901,8 @@ const Subset* SubsetMap::GetSubsetByUnicode( sal_UCS4 cChar ) const
     return nullptr;
 }
 
-inline Subset::Subset(sal_UCS4 nMin, sal_UCS4 nMax, const OUString& rName)
-:   mnRangeMin(nMin), mnRangeMax(nMax), maRangeName(rName)
+inline Subset::Subset(sal_UCS4 nMin, sal_UCS4 nMax, OUString aName)
+:   mnRangeMin(nMin), mnRangeMax(nMax), maRangeName(std::move(aName))
 {
 }
 
@@ -1865,7 +1894,29 @@ void SubsetMap::InitList()
                     aAllSubsets.emplace_back( 0x1CF00, 0x1CFCF, SvxResId(RID_SUBSETSTR_ZNAMENNY_MUSICAL_NOTATION) );
                     break;
 #endif
-
+#if (U_ICU_VERSION_MAJOR_NUM >= 72)
+                case UBLOCK_ARABIC_EXTENDED_C:
+                    aAllSubsets.emplace_back( 0x10EC0, 0x10EFF, SvxResId(RID_SUBSETSTR_ARABIC_EXTENDED_C) );
+                    break;
+                case UBLOCK_CJK_UNIFIED_IDEOGRAPHS_EXTENSION_H:
+                    aAllSubsets.emplace_back( 0x31350, 0x323AF, SvxResId(RID_SUBSETSTR_CJK_UNIFIED_IDEOGRAPHS_EXTENSION_H) );
+                    break;
+                case UBLOCK_CYRILLIC_EXTENDED_D:
+                    aAllSubsets.emplace_back( 0x1E030, 0x1E08F, SvxResId(RID_SUBSETSTR_CYRILLIC_EXTENDED_D) );
+                    break;
+                case UBLOCK_DEVANAGARI_EXTENDED_A:
+                    aAllSubsets.emplace_back( 0x11B00, 0x11B5F, SvxResId(RID_SUBSETSTR_DEVANAGARI_EXTENDED_A) );
+                    break;
+                case UBLOCK_KAKTOVIK_NUMERALS:
+                    aAllSubsets.emplace_back( 0x1D2C0, 0x1D2DF, SvxResId(RID_SUBSETSTR_KAKTOVIK_NUMERALS) );
+                    break;
+                case UBLOCK_KAWI:
+                    aAllSubsets.emplace_back( 0x11F00, 0x11F5F, SvxResId(RID_SUBSETSTR_KAWI) );
+                    break;
+                case UBLOCK_NAG_MUNDARI:
+                    aAllSubsets.emplace_back( 0x1E4D0, 0x1E4FF, SvxResId(RID_SUBSETSTR_NAG_MUNDARI) );
+                    break;
+#endif
             }
 
 #if OSL_DEBUG_LEVEL > 0 && !defined NDEBUG

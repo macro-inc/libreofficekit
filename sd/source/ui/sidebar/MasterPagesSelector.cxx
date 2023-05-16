@@ -35,9 +35,7 @@
 #include "PreviewValueSet.hxx"
 #include <ViewShellBase.hxx>
 #include <o3tl/safeint.hxx>
-#include <vcl/commandevent.hxx>
 #include <vcl/image.hxx>
-#include <vcl/weldutils.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/sidebar/Theme.hxx>
@@ -56,17 +54,17 @@ MasterPagesSelector::MasterPagesSelector (
     weld::Widget* pParent,
     SdDrawDocument& rDocument,
     ViewShellBase& rBase,
-    const std::shared_ptr<MasterPageContainer>& rpContainer,
-    const css::uno::Reference<css::ui::XSidebar>& rxSidebar,
+    std::shared_ptr<MasterPageContainer> pContainer,
+    css::uno::Reference<css::ui::XSidebar> xSidebar,
     const OUString& rUIFileName,
     const OString& rValueSetName)
     : PanelLayout( pParent, "MasterPagePanel", rUIFileName ),
-      mpContainer(rpContainer),
+      mpContainer(std::move(pContainer)),
       mxPreviewValueSet(new PreviewValueSet),
       mxPreviewValueSetWin(new weld::CustomWeld(*m_xBuilder, rValueSetName, *mxPreviewValueSet)),
       mrDocument(rDocument),
       mrBase(rBase),
-      mxSidebar(rxSidebar)
+      mxSidebar(std::move(xSidebar))
 {
     mxPreviewValueSet->SetSelectHdl (
         LINK(this, MasterPagesSelector, ClickHandler));

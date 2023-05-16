@@ -17,7 +17,7 @@
 #include <sfx2/docfile.hxx>
 #include <unotools/mediadescriptor.hxx>
 #include <sot/storage.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace com::sun::star;
 using utl::MediaDescriptor;
@@ -120,9 +120,9 @@ bool isExcel40(const uno::Reference<io::XInputStream>& xInStream)
     return true;
 }
 
-bool isTemplate(const OUString& rType)
+bool isTemplate(std::u16string_view rType)
 {
-    return rType.indexOf("_VorlageTemplate") != -1;
+    return rType.find(u"_VorlageTemplate") != std::u16string_view::npos;
 }
 
 }

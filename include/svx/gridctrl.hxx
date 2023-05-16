@@ -292,7 +292,6 @@ private:
 
     bool                m_bDesignMode : 1;      // default = sal_False
     bool                m_bRecordCountFinal : 1;
-    bool                m_bNavigationBar      : 1;
 
     bool                m_bSynchDisplay : 1;
     bool                m_bHandle : 1;
@@ -517,7 +516,6 @@ public:
     {
         friend class DbCellControl;
         friend class RowSetEventListener;
-        GrantControlAccess() { }
     };
 
     /// called when a controller needs to be re-initialized

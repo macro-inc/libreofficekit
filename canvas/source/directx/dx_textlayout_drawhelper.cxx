@@ -21,6 +21,7 @@
 
 #include <memory>
 
+#include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/polygon/b2dpolypolygon.hxx>
 #include <basegfx/utils/canvastools.hxx>
 #include <com/sun/star/rendering/FontRequest.hpp>
@@ -30,9 +31,10 @@
 #include <i18nlangtag/languagetag.hxx>
 #include <rtl/math.hxx>
 #include <tools/color.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/poly.hxx>
 #include <vcl/canvastools.hxx>
+#include <vcl/kernarray.hxx>
 #include <vcl/metric.hxx>
 #include <vcl/sysdata.hxx>
 #include <vcl/virdev.hxx>
@@ -206,14 +208,16 @@ namespace dxcanvas
             {
                 // create the DXArray
                 const sal_Int32 nLen( rLogicalAdvancements.getLength() );
-                std::vector<sal_Int32> DXArray( nLen );
+                KernArray DXArray;
+                DXArray.reserve(nLen);
                 for( sal_Int32 i=0; i<nLen; ++i )
-                    DXArray[i] = basegfx::fround( rLogicalAdvancements[i] );
+                    DXArray.push_back(basegfx::fround(rLogicalAdvancements[i]));
 
                 // draw the String
                 xVirtualDevice->DrawTextArray( aEmptyPoint,
                                               aText,
                                               DXArray,
+                                              {},
                                               rText.StartPosition,
                                               rText.Length,
                                               bIsRTL ? SalLayoutFlags::BiDiRtl : SalLayoutFlags::NONE);

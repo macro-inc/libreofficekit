@@ -35,11 +35,12 @@ endif
 endif
 
 $(eval $(call gb_CppunitTest_use_libraries,oox_tokenmap,\
-    avmedia \
+    $(call gb_Helper_optional,AVMEDIA,avmedia) \
     basegfx \
     comphelper \
     cppu \
     cppuhelper \
+    docmodel \
     editeng \
     expwrap \
     drawinglayer \

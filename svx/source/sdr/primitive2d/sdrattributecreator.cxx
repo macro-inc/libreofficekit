@@ -40,6 +40,7 @@
 #include <svx/xlnedcit.hxx>
 #include <svx/xdash.hxx>
 #include <svx/xlndsit.hxx>
+#include <svx/xfilluseslidebackgrounditem.hxx>
 #include <svx/xfltrit.hxx>
 #include <svx/xflftrit.hxx>
 #include <svx/xflclit.hxx>
@@ -52,6 +53,7 @@
 #include <svx/xflbmtit.hxx>
 #include <svx/xflbstit.hxx>
 #include <svx/xtextit0.hxx>
+#include <svx/RectangleAlignmentItem.hxx>
 #include <drawinglayer/attribute/sdrfillgraphicattribute.hxx>
 #include <svx/svdotext.hxx>
 #include <sdr/attribute/sdrtextattribute.hxx>
@@ -60,6 +62,7 @@
 #include <vcl/svapp.hxx>
 #include <vcl/GraphicLoader.hxx>
 #include <basegfx/range/b2drange.hxx>
+#include <basegfx/utils/gradienttools.hxx>
 #include <svx/svx3ditems.hxx>
 #include <com/sun/star/drawing/ProjectionMode.hpp>
 #include <com/sun/star/drawing/ShadeMode.hpp>
@@ -90,37 +93,6 @@ namespace drawinglayer
 {
     namespace
     {
-        attribute::GradientStyle XGradientStyleToGradientStyle(css::awt::GradientStyle eStyle)
-        {
-            switch(eStyle)
-            {
-                case css::awt::GradientStyle_LINEAR :
-                {
-                    return attribute::GradientStyle::Linear;
-                }
-                case css::awt::GradientStyle_AXIAL :
-                {
-                    return attribute::GradientStyle::Axial;
-                }
-                case css::awt::GradientStyle_RADIAL :
-                {
-                    return attribute::GradientStyle::Radial;
-                }
-                case css::awt::GradientStyle_ELLIPTICAL :
-                {
-                    return attribute::GradientStyle::Elliptical;
-                }
-                case css::awt::GradientStyle_SQUARE :
-                {
-                    return attribute::GradientStyle::Square;
-                }
-                default :
-                {
-                    return attribute::GradientStyle::Rect; // css::awt::GradientStyle_RECT
-                }
-            }
-        }
-
         attribute::HatchStyle XHatchStyleToHatchStyle(css::drawing::HatchStyle eStyle)
         {
             switch(eStyle)
@@ -400,7 +372,9 @@ namespace drawinglayer::primitive2d
 
                     sal_Int32 nBlur(rSet.Get(SDRATTR_SHADOWBLUR).GetValue());
 
-                    return attribute::SdrShadowAttribute(aOffset, aSize, static_cast<double>(nTransparence) * 0.01,nBlur, aColor.getBColor());
+                    model::RectangleAlignment eAlignment{rSet.Get(SDRATTR_SHADOWALIGNMENT).GetValue()};
+
+                    return attribute::SdrShadowAttribute(aOffset, aSize, static_cast<double>(nTransparence) * 0.01, nBlur, eAlignment, aColor.getBColor());
                 }
             }
 
@@ -418,20 +392,33 @@ namespace drawinglayer::primitive2d
                 nTransparence = 100;
             }
 
+            if(drawing::FillStyle_NONE == eStyle)
+            {
+                XFillUseSlideBackgroundItem aBckItem(rSet.Get(XATTR_FILLUSESLIDEBACKGROUND));
+                const bool bSlideBackgroundFill(aBckItem.GetValue());
+
+                if(bSlideBackgroundFill)
+                {
+                    // we have SlideBackgroundFill mode, create a
+                    // SdrFillAttribute accordingly
+                    return attribute::SdrFillAttribute(true);
+                }
+            }
+
             if(drawing::FillStyle_NONE != eStyle)
             {
                 if(100 != nTransparence)
                 {
                     // need to check XFillFloatTransparence, object fill may still be completely transparent
-                    const SfxPoolItem* pGradientItem;
+                    const XFillFloatTransparenceItem* pGradientItem;
 
-                    if(SfxItemState::SET == rSet.GetItemState(XATTR_FILLFLOATTRANSPARENCE, true, &pGradientItem)
-                        && static_cast<const XFillFloatTransparenceItem*>(pGradientItem)->IsEnabled())
+                    if((pGradientItem = rSet.GetItemIfSet(XATTR_FILLFLOATTRANSPARENCE, true))
+                        && pGradientItem->IsEnabled())
                     {
-                        const XGradient& rGradient = static_cast<const XFillFloatTransparenceItem*>(pGradientItem)->GetGradientValue();
-                        const sal_uInt8 nStartLuminance(rGradient.GetStartColor().GetLuminance());
-                        const sal_uInt8 nEndLuminance(rGradient.GetEndColor().GetLuminance());
-                        const bool bCompletelyTransparent(0xff == nStartLuminance && 0xff == nEndLuminance);
+                        const XGradient& rGradient = pGradientItem->GetGradientValue();
+                        basegfx::BColor aSingleColor;
+                        const bool bSingleColor(basegfx::utils::isSingleColor(rGradient.GetColorStops(), aSingleColor));
+                        const bool bCompletelyTransparent(bSingleColor && basegfx::fTools::equal(aSingleColor.luminance(), 1.0));
 
                         if(bCompletelyTransparent)
                         {
@@ -457,35 +444,309 @@ namespace drawinglayer::primitive2d
                         case drawing::FillStyle_GRADIENT :
                         {
                             XGradient aXGradient(rSet.Get(XATTR_FILLGRADIENT).GetGradientValue());
+                            basegfx::ColorStops aColorStops(aXGradient.GetColorStops());
 
-                            const Color aStartColor(aXGradient.GetStartColor());
-                            const sal_uInt16 nStartIntens(aXGradient.GetStartIntens());
-                            basegfx::BColor aStart(aStartColor.getBColor());
+                            // test code here, can/will be removed later
+                            static const char* pUseGradientSteps(std::getenv("MCGR_TEST"));
+                            static int nUseGradientSteps(pUseGradientSteps ? std::atoi(pUseGradientSteps) : 0);
 
-                            if(nStartIntens != 100)
+                            switch(nUseGradientSteps)
                             {
-                                const basegfx::BColor aBlack;
-                                aStart = interpolate(aBlack, aStart, static_cast<double>(nStartIntens) * 0.01);
+                                case 1:
+                                {
+                                    // just test a nice valid gradient
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.0, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.25, COL_LIGHTGREEN.getBColor()); // green@25%
+                                    aColorStops.emplace_back(0.50, COL_YELLOW.getBColor()); // yellow@50%
+                                    aColorStops.emplace_back(0.75, COL_LIGHTMAGENTA.getBColor()); // pink@75%
+                                    aColorStops.emplace_back(1.0, COL_LIGHTBLUE.getBColor()); // blue
+                                    break;
+                                }
+
+                                case 2:
+                                {
+                                    // single added in-between, no change of start/end
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.0, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.5, COL_YELLOW.getBColor()); // yellow@50%
+                                    aColorStops.emplace_back(1.0, COL_LIGHTBLUE.getBColor()); // blue
+                                    break;
+                                }
+
+                                case 3:
+                                {
+                                    // check additional StartColor, the second one has to win
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.0, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.0, COL_YELLOW.getBColor()); // yellow@50%
+                                    aColorStops.emplace_back(1.0, COL_LIGHTBLUE.getBColor()); // blue
+                                    break;
+                                }
+
+                                case 4:
+                                {
+                                    // check additional EndColor, the first one has to win
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.0, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(1.0, COL_YELLOW.getBColor()); // yellow@50%
+                                    aColorStops.emplace_back(1.0, COL_LIGHTBLUE.getBColor()); // blue
+                                    break;
+                                }
+
+                                case 5:
+                                {
+                                    // check invalid color (too low index), has to be ignored
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.0, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(1.0, COL_LIGHTBLUE.getBColor()); // blue
+                                    aColorStops.emplace_back(-1.0, COL_YELLOW.getBColor()); // yellow@50%
+                                    break;
+                                }
+
+                                case 6:
+                                {
+                                    // check invalid color (too high index), has to be ignored
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.0, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(1.0, COL_LIGHTBLUE.getBColor()); // blue
+                                    aColorStops.emplace_back(2.0, COL_YELLOW.getBColor()); // yellow@50%
+                                    break;
+                                }
+
+                                case 7:
+                                {
+                                    // check in-between single-color section
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.0, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.3, COL_YELLOW.getBColor()); // yellow@50%
+                                    aColorStops.emplace_back(0.7, COL_YELLOW.getBColor()); // yellow@50%
+                                    aColorStops.emplace_back(1.0, COL_LIGHTBLUE.getBColor()); // blue
+                                    break;
+                                }
+
+                                case 8:
+                                {
+                                    // check in-between single-color sections
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.0, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.2, COL_YELLOW.getBColor()); // yellow@50%
+                                    aColorStops.emplace_back(0.4, COL_YELLOW.getBColor()); // yellow@50%
+                                    aColorStops.emplace_back(0.5, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.6, COL_YELLOW.getBColor()); // yellow@50%
+                                    aColorStops.emplace_back(0.8, COL_YELLOW.getBColor()); // yellow@50%
+                                    aColorStops.emplace_back(1.0, COL_LIGHTBLUE.getBColor()); // blue
+                                    break;
+                                }
+
+                                case 9:
+                                {
+                                    // check single-color start area
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.0, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.6, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(1.0, COL_LIGHTBLUE.getBColor()); // blue
+                                    break;
+                                }
+
+                                case 10:
+                                {
+                                    // check single-color end area
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.0, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.4, COL_LIGHTBLUE.getBColor()); // blue
+                                    aColorStops.emplace_back(1.0, COL_LIGHTBLUE.getBColor()); // blue
+                                    break;
+                                }
+
+                                case 11:
+                                {
+                                    // check case without direct Start/EndColor
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.4, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.6, COL_LIGHTBLUE.getBColor()); // blue
+                                    break;
+                                }
+
+                                case 12:
+                                {
+                                    // check case without colors at all
+                                    aColorStops.clear();
+                                    break;
+                                }
+
+                                case 13:
+                                {
+                                    // check case with single stop
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.5, COL_LIGHTRED.getBColor()); // red
+                                    break;
+                                }
+
+                                case 14:
+                                {
+                                    // check case with single-double stop
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.5, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.5, COL_LIGHTRED.getBColor()); // red
+                                    break;
+                                }
+
+                                case 15:
+                                {
+                                    // check case with single stop diff colors
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.5, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.5, COL_LIGHTBLUE.getBColor()); // blue
+                                    break;
+                                }
+
+                                case 16:
+                                {
+                                    // check case with gradient, hard change, gradient
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.0, COL_LIGHTGREEN.getBColor()); // green
+                                    aColorStops.emplace_back(0.2, COL_LIGHTGREEN.getBColor()); // green
+                                    aColorStops.emplace_back(0.2, COL_LIGHTBLUE.getBColor()); // blue
+                                    aColorStops.emplace_back(0.5, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.5, COL_LIGHTBLUE.getBColor()); // blue
+                                    aColorStops.emplace_back(0.8, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.8, COL_LIGHTGREEN.getBColor()); // green
+                                    aColorStops.emplace_back(1.0, COL_LIGHTGREEN.getBColor()); // green
+                                    break;
+                                }
+
+                                case 17:
+                                {
+                                    // check case with single stop < 0.0
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(-0.5, COL_LIGHTRED.getBColor()); // red
+                                    break;
+                                }
+
+                                case 18:
+                                {
+                                    // check case with single stop > 1.0
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(1.5, COL_LIGHTRED.getBColor()); // red
+                                    break;
+                                }
+
+                                case 19:
+                                {
+                                    // check case with stops overlapping 0.0
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(-0.5, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.5, COL_LIGHTBLUE.getBColor()); // blue
+                                    break;
+                                }
+
+                                case 20:
+                                {
+                                    // check case with stops overlapping 1.0
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(0.5, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(1.5, COL_LIGHTBLUE.getBColor()); // blue
+                                    break;
+                                }
+
+                                case 21:
+                                {
+                                    // check case with multiple stops < 0.0
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(-0.5, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(-0.4, COL_LIGHTBLUE.getBColor()); // blue
+                                    aColorStops.emplace_back(-0.3, COL_LIGHTGREEN.getBColor()); // green
+                                    break;
+                                }
+
+                                case 22:
+                                {
+                                    // check case with multiple stops > 1.0
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(1.3, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(1.4, COL_LIGHTBLUE.getBColor()); // blue
+                                    aColorStops.emplace_back(1.5, COL_LIGHTGREEN.getBColor()); // green
+                                    break;
+                                }
+
+                                case 23:
+                                {
+                                    // check case with stops overlapping 0.0 and 1.0
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(-0.5, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.5, COL_LIGHTBLUE.getBColor()); // blue
+                                    aColorStops.emplace_back(0.5, COL_LIGHTGREEN.getBColor()); // green
+                                    aColorStops.emplace_back(1.5, COL_LIGHTRED.getBColor()); // red
+                                    break;
+                                }
+
+                                case 24:
+                                {
+                                    // check case with stops overlapping 0.0 and 1.0 and multiple entries
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(-0.5, COL_LIGHTGREEN.getBColor()); // green
+                                    aColorStops.emplace_back(-0.5, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(0.4, COL_LIGHTBLUE.getBColor()); // blue
+                                    aColorStops.emplace_back(0.5, COL_YELLOW.getBColor()); // yellow
+                                    aColorStops.emplace_back(0.6, COL_LIGHTGREEN.getBColor()); // green
+                                    aColorStops.emplace_back(1.5, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(1.5, COL_LIGHTGREEN.getBColor()); // green
+                                    break;
+                                }
+
+                                case 25:
+                                {
+                                    // check case with just two stops overlapping 0.0 and 1.0
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(-0.5, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(1.5, COL_LIGHTGREEN.getBColor()); // green
+                                    break;
+                                }
+
+                                case 26:
+                                {
+                                    // check case with just two stops overlapping 0.0 and 1.0 faaaar out
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(-5.5, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(5.5, COL_LIGHTGREEN.getBColor()); // green
+                                    break;
+                                }
+
+                                case 27:
+                                {
+                                    // check case with just two stops overlapping 0.0 and 1.0 faaaar out but closer to one
+                                    aColorStops.clear();
+                                    aColorStops.emplace_back(-1.5, COL_LIGHTRED.getBColor()); // red
+                                    aColorStops.emplace_back(5.5, COL_LIGHTGREEN.getBColor()); // green
+                                    break;
+                                }
+
+                                default:
+                                {
+                                    break;
+                                }
                             }
 
-                            const Color aEndColor(aXGradient.GetEndColor());
-                            const sal_uInt16 nEndIntens(aXGradient.GetEndIntens());
-                            basegfx::BColor aEnd(aEndColor.getBColor());
-
-                            if(nEndIntens != 100)
+                            if (aXGradient.GetStartIntens() != 100 || aXGradient.GetEndIntens() != 100)
                             {
-                                const basegfx::BColor aBlack;
-                                aEnd = interpolate(aBlack, aEnd, static_cast<double>(nEndIntens) * 0.01);
+                                // Need to do the (old, crazy) blend against black for a
+                                // used intensity, but now for all ColorStops relative to their
+                                // offsets, where 0 means black and 100 means original color
+                                basegfx::utils::blendColorStopsToIntensity(
+                                    aColorStops,
+                                    aXGradient.GetStartIntens() * 0.01,
+                                    aXGradient.GetEndIntens() * 0.01,
+                                    basegfx::BColor()); // COL_BLACK
                             }
 
                             aGradient = attribute::FillGradientAttribute(
-                                XGradientStyleToGradientStyle(aXGradient.GetGradientStyle()),
+                                aXGradient.GetGradientStyle(),
                                 static_cast<double>(aXGradient.GetBorder()) * 0.01,
                                 static_cast<double>(aXGradient.GetXOffset()) * 0.01,
                                 static_cast<double>(aXGradient.GetYOffset()) * 0.01,
                                 toRadians(aXGradient.GetAngle()),
-                                aStart,
-                                aEnd,
+                                aColorStops,
                                 rSet.Get(XATTR_GRADIENTSTEPCOUNT).GetValue());
 
                             break;
@@ -618,35 +879,49 @@ namespace drawinglayer::primitive2d
 
         attribute::FillGradientAttribute createNewTransparenceGradientAttribute(const SfxItemSet& rSet)
         {
-            const SfxPoolItem* pGradientItem;
+            const XFillFloatTransparenceItem* pGradientItem;
 
-            if(SfxItemState::SET == rSet.GetItemState(XATTR_FILLFLOATTRANSPARENCE, true, &pGradientItem)
-                && static_cast<const XFillFloatTransparenceItem*>(pGradientItem)->IsEnabled())
+            if((pGradientItem = rSet.GetItemIfSet(XATTR_FILLFLOATTRANSPARENCE))
+                && pGradientItem->IsEnabled())
             {
-                // test if float transparence is completely transparent
-                const XGradient& rGradient = static_cast<const XFillFloatTransparenceItem*>(pGradientItem)->GetGradientValue();
-                const sal_uInt8 nStartLuminance(rGradient.GetStartColor().GetLuminance());
-                const sal_uInt8 nEndLuminance(rGradient.GetEndColor().GetLuminance());
-                const bool bCompletelyTransparent(0xff == nStartLuminance && 0xff == nEndLuminance);
-                const bool bNotTransparent(0x00 == nStartLuminance && 0x00 == nEndLuminance);
+                // test if float transparency is completely transparent
+                const XGradient& rGradient(pGradientItem->GetGradientValue());
+                basegfx::BColor aSingleColor;
+                const bool bSingleColor(basegfx::utils::isSingleColor(rGradient.GetColorStops(), aSingleColor));
+                const bool bCompletelyTransparent(bSingleColor && basegfx::fTools::equal(aSingleColor.luminance(), 1.0));
+                const bool bNotTransparent(bSingleColor && basegfx::fTools::equalZero(aSingleColor.luminance()));
 
                 // create nothing when completely transparent: This case is already checked for the
                 // normal fill attributes, XFILL_NONE will be used.
                 // create nothing when not transparent: use normal fill, no need t create a FillGradientAttribute.
                 // Both cases are optimizations, always creating FillGradientAttribute will work, too
-                if(!bNotTransparent && !bCompletelyTransparent)
+                if (!bNotTransparent && !bCompletelyTransparent)
                 {
-                    const double fStartLum(nStartLuminance / 255.0);
-                    const double fEndLum(nEndLuminance / 255.0);
+                    basegfx::ColorStops aColorStops(rGradient.GetColorStops());
+
+                    if (rGradient.GetStartIntens() != 100 || rGradient.GetEndIntens() != 100)
+                    {
+                        // this may also be set for transparence, so need to take care of it
+                        basegfx::utils::blendColorStopsToIntensity(
+                            aColorStops,
+                            rGradient.GetStartIntens() * 0.01,
+                            rGradient.GetEndIntens() * 0.01,
+                            basegfx::BColor()); // COL_BLACK
+                    }
 
                     return attribute::FillGradientAttribute(
-                        XGradientStyleToGradientStyle(rGradient.GetGradientStyle()),
+                        rGradient.GetGradientStyle(),
                         static_cast<double>(rGradient.GetBorder()) * 0.01,
                         static_cast<double>(rGradient.GetXOffset()) * 0.01,
                         static_cast<double>(rGradient.GetYOffset()) * 0.01,
                         toRadians(rGradient.GetAngle()),
-                        basegfx::BColor(fStartLum, fStartLum, fStartLum),
-                        basegfx::BColor(fEndLum, fEndLum, fEndLum));
+                        aColorStops,
+                        // oops - the gradientStepCount was missing here. If we want to use
+                        // a combination of gradient & transparencyGradient to represent
+                        // imported gradients of formats which do originally support transparency
+                        // in gradients, then the gradient has to be exactly defined the same,
+                        // including the (evtl. used) gradientStepCount
+                        rSet.Get(XATTR_GRADIENTSTEPCOUNT).GetValue());
                 }
             }
 

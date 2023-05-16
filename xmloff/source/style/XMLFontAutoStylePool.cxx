@@ -19,6 +19,7 @@
 
 #include <o3tl/sorted_vector.hxx>
 #include <tools/fontenum.hxx>
+#include <utility>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/xmluconv.hxx>
@@ -28,7 +29,7 @@
 #include <vcl/embeddedfontshelper.hxx>
 #include <osl/file.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/embed/ElementModes.hpp>
@@ -62,16 +63,16 @@ class XMLFontAutoStylePoolEntry_Impl
 public:
 
     inline XMLFontAutoStylePoolEntry_Impl(
-            const OUString& rName,
-            const OUString& rFamilyName,
-            const OUString& rStyleName,
+            OUString aName,
+            OUString aFamilyName,
+            OUString aStyleName,
             FontFamily nFamily,
             FontPitch nPitch,
             rtl_TextEncoding eEnc );
 
     inline XMLFontAutoStylePoolEntry_Impl(
-            const OUString& rFamilyName,
-            const OUString& rStyleName,
+            OUString aFamilyName,
+            OUString aStyleName,
             FontFamily nFamily,
             FontPitch nPitch,
             rtl_TextEncoding eEnc );
@@ -87,15 +88,15 @@ public:
 }
 
 inline XMLFontAutoStylePoolEntry_Impl::XMLFontAutoStylePoolEntry_Impl(
-        const OUString& rName,
-        const OUString& rFamilyName,
-        const OUString& rStyleName,
+        OUString aName,
+        OUString aFamilyName,
+        OUString aStyleName,
         FontFamily nFam,
         FontPitch nP,
         rtl_TextEncoding eE ) :
-    sName( rName ),
-    sFamilyName( rFamilyName ),
-    sStyleName( rStyleName ),
+    sName(std::move( aName )),
+    sFamilyName(std::move( aFamilyName )),
+    sStyleName(std::move( aStyleName )),
     nFamily( nFam ),
     nPitch( nP ),
     eEnc( eE )
@@ -103,13 +104,13 @@ inline XMLFontAutoStylePoolEntry_Impl::XMLFontAutoStylePoolEntry_Impl(
 }
 
 inline XMLFontAutoStylePoolEntry_Impl::XMLFontAutoStylePoolEntry_Impl(
-        const OUString& rFamilyName,
-        const OUString& rStyleName,
+        OUString  rFamilyName,
+        OUString  rStyleName,
         FontFamily nFam,
         FontPitch nP,
         rtl_TextEncoding eE ) :
-    sFamilyName( rFamilyName ),
-    sStyleName( rStyleName ),
+    sFamilyName(std::move( rFamilyName )),
+    sStyleName(std::move( rStyleName )),
     nFamily( nFam ),
     nPitch( nP ),
     eEnc( eE )
@@ -327,9 +328,9 @@ std::unordered_set<OUString> XMLFontAutoStylePool::getUsedFontList()
                     if (xStyle->isInUse())
                     {
                         uno::Reference<beans::XPropertySet> xPropertySet(xStyle, UNO_QUERY);
-                        if (xPropertySet.is())
+                        uno::Reference<beans::XPropertySetInfo> xInfo(xPropertySet ? xPropertySet->getPropertySetInfo() : nullptr);
+                        if (xInfo)
                         {
-                            uno::Reference<beans::XPropertySetInfo> xInfo(xPropertySet->getPropertySetInfo());
                             if (m_bEmbedLatinScript && xInfo->hasPropertyByName("CharFontName"))
                             {
                                 OUString sCharFontName;
@@ -632,7 +633,7 @@ OUString XMLFontAutoStylePool::embedFontFile(OUString const & fileUrl, OUString 
         outputStream.set( storage->openStreamElement( name, ::embed::ElementModes::WRITE ), UNO_QUERY_THROW );
         uno::Reference < beans::XPropertySet > propertySet( outputStream, uno::UNO_QUERY );
         assert( propertySet.is());
-        propertySet->setPropertyValue( "MediaType", uno::makeAny( OUString( "application/x-font-ttf" ))); // TODO
+        propertySet->setPropertyValue( "MediaType", uno::Any( OUString( "application/x-font-ttf" ))); // TODO
         for(;;)
         {
             sal_Int8 buffer[ 4096 ];

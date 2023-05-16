@@ -53,6 +53,10 @@ gb_COMPILERDEFS := \
 ifeq ($(gb_ENABLE_DBGUTIL),$(true))
 ifneq ($(HAVE_LIBSTDCPP),)
 gb_COMPILERDEFS_STDLIB_DEBUG = -D_GLIBCXX_DEBUG
+else
+ifneq ($(LIBCPP_DEBUG),)
+gb_COMPILERDEFS_STDLIB_DEBUG = $(LIBCPP_DEBUG)
+endif
 endif
 gb_COMPILERDEFS += $(gb_COMPILERDEFS_STDLIB_DEBUG)
 endif
@@ -66,17 +70,16 @@ gb_CFLAGS_COMMON := \
 	-Wunreachable-code \
 	$(if $(or $(and $(COM_IS_CLANG),$(or $(findstring icecc,$(CC)),$(findstring icecc,$(CCACHE_PREFIX)))),$(findstring sccache,$(CC))),,-Wunused-macros) \
 	$(if $(COM_IS_CLANG),-Wembedded-directive) \
+	$(if $(COM_IS_CLANG),-Wshadow-all) \
 	-finput-charset=UTF-8 \
 	-fmessage-length=0 \
 	-fno-common \
 	-pipe \
 	$(if $(filter EMSCRIPTEN,$(OS)),-fno-stack-protector,-fstack-protector-strong) \
-	$(if $(gb_COLOR),-fdiagnostics-color=always) \
 
 gb_CXXFLAGS_COMMON := \
 	-Wall \
 	-Wno-missing-braces \
-	-Wnon-virtual-dtor \
 	-Wendif-labels \
 	-Wextra \
 	-Wundef \
@@ -89,7 +92,6 @@ gb_CXXFLAGS_COMMON := \
 	-fno-common \
 	-pipe \
 	$(if $(filter EMSCRIPTEN,$(OS)),-fno-stack-protector,-fstack-protector-strong) \
-	$(if $(gb_COLOR),-fdiagnostics-color=always) \
 
 ifeq ($(HAVE_WDEPRECATED_COPY_DTOR),TRUE)
 gb_CXXFLAGS_COMMON += -Wdeprecated-copy-dtor
@@ -106,6 +108,8 @@ gb_CXXFLAGS_COMMON += -Wno-stringop-overflow
 endif
 
 gb_CXXFLAGS_Wundef = -Wno-undef
+
+gb_CXXFLAGS_include := -include$(gb_SPACE)
 
 ifeq ($(strip $(gb_GCOV)),YES)
 gb_CFLAGS_COMMON += -fprofile-arcs -ftest-coverage
@@ -179,7 +183,7 @@ gb_CXX03FLAGS := -std=gnu++98 -Werror=c++11-extensions -Wno-c++11-long-long \
     -Wno-deprecated-declarations
 else
 gb_CXX03FLAGS := -std=gnu++98 -Wno-long-long \
-    -Wno-variadic-macros -Wno-non-virtual-dtor -Wno-deprecated-declarations
+    -Wno-variadic-macros -Wno-deprecated-declarations
 endif
 
 # On Windows MSVC only supports C90 so force gnu89 (especially in clang) to
@@ -193,15 +197,14 @@ ifeq (,$(index,iOS MACOSX,$(OS)))
 gb_LTOPLUGINFLAGS := --plugin $(if $(LD_PLUGIN),$(LD_PLUGIN),LLVMgold.so)
 endif
 else
-# use first element of the PARALLELISM, to allow values like "12 -l 14" to specify load limits
-gb_LTOFLAGS := -flto=$(if $(filter-out 0,$(PARALLELISM)),$(firstword $(PARALLELISM)),auto) -fuse-linker-plugin -O2
+# use parallelism based on make's job handling
+gb_LTOFLAGS := -flto=jobserver -fuse-linker-plugin -O2
 # clang does not support -flto=<number>
 gb_CLANG_LTOFLAGS := -flto=thin
 endif
 endif
 
 gb_LinkTarget_EXCEPTIONFLAGS := \
-	-DEXCEPTIONS_ON \
 	-fexceptions
 
 ifeq ($(gb_ENABLE_DBGUTIL),$(false))
@@ -234,7 +237,7 @@ gb_DEBUGINFO_FLAGS=-g2
 endif
 gb_LINKER_DEBUGINFO_FLAGS=
 
-ifeq ($(HAVE_GCC_SPLIT_DWARF),TRUE)
+ifeq ($(HAVE_EXTERNAL_DWARF),TRUE)
 gb_DEBUGINFO_FLAGS+=-gsplit-dwarf
 # GCC 11 defaults to -gdwarf-5, which GDB 10 doesn't support in split debug info
 ifeq ($(COM_IS_CLANG),)
@@ -272,8 +275,16 @@ endif
 ifeq ($(COMPILER_PLUGINS_DEBUG),TRUE)
 gb_COMPILER_PLUGINS += -Xclang -plugin-arg-loplugin -Xclang --debug
 endif
-# set CCACHE_CPP2=1 to prevent clang generating spurious warnings
-gb_COMPILER_SETUP += CCACHE_CPP2=1
+
+# Set CCACHE_CPP2=1 to prevent Clang generating spurious warnings.
+
+# For Emscripten, the emcc command is a Python script that outputs annoying warnings like
+# .../emscripten/tools/building.py:638: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/emscripten_temp_0fvvg__1/conftest.js.jso.js' mode='w' encoding='utf-8'>
+# into stderr, which makes a configure script think that there is a problem in
+# compiling even a microscopic test program with an option like -Werror which
+# surely *is* supported. Avoid this by setting PYTHONWARNINGS=ignore.
+
+gb_COMPILER_SETUP += CCACHE_CPP2=1 $(if $(filter EMSCRIPTEN,$(OS)),PYTHONWARNINGS=ignore)
 gb_COMPILER_PLUGINS_SETUP := ICECC_EXTRAFILES=$(SRCDIR)/include/sal/log-areas.dox CCACHE_EXTRAFILES=$(SRCDIR)/include/sal/log-areas.dox SCCACHE_EXTRAFILES=$(SRCDIR)/include/sal/log-areas.dox
 gb_COMPILER_PLUGINS_WARNINGS_AS_ERRORS := \
     -Xclang -plugin-arg-loplugin -Xclang --warnings-as-errors

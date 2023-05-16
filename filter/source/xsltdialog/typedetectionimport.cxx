@@ -20,8 +20,9 @@
 #include <com/sun/star/xml/sax/InputSource.hpp>
 #include <com/sun/star/xml/sax/Parser.hpp>
 #include <com/sun/star/xml/sax/XAttributeList.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/ref.hxx>
+#include <o3tl/string_view.hxx>
 
 #include "typedetectionimport.hxx"
 #include "xmlfiltercommon.hxx"
@@ -80,18 +81,18 @@ void TypeDetectionImporter::fillFilterVector(  std::vector< std::unique_ptr<filt
     maTypeNodes.clear();
 }
 
-static OUString getSubdata( int index, sal_Unicode delimiter, const OUString& rData )
+static std::u16string_view getSubdata( int index, sal_Unicode delimiter, std::u16string_view rData )
 {
     sal_Int32 nLastIndex = 0;
 
-    sal_Int32 nNextIndex = rData.indexOf( delimiter );
+    size_t nNextIndex = rData.find( delimiter );
 
-    OUString aSubdata;
+    std::u16string_view aSubdata;
 
     while( index )
     {
-        nLastIndex = nNextIndex + 1;
-        nNextIndex = rData.indexOf( delimiter, nLastIndex );
+        nLastIndex = nNextIndex == std::u16string_view::npos ? 0 : nNextIndex + 1;
+        nNextIndex = rData.find( delimiter, nLastIndex );
 
         index--;
 
@@ -99,13 +100,13 @@ static OUString getSubdata( int index, sal_Unicode delimiter, const OUString& rD
             return aSubdata;
     }
 
-    if( nNextIndex == -1 )
+    if( nNextIndex == std::u16string_view::npos )
     {
-        aSubdata = rData.copy( nLastIndex );
+        aSubdata = rData.substr( nLastIndex );
     }
     else
     {
-        aSubdata = rData.copy( nLastIndex, nNextIndex - nLastIndex );
+        aSubdata = rData.substr( nLastIndex, nNextIndex - nLastIndex );
     }
 
     return aSubdata;
@@ -135,16 +136,16 @@ std::unique_ptr<filter_info_impl> TypeDetectionImporter::createFilterForNode( No
     pFilter->maType = getSubdata( 1, aComma, aData  );
     pFilter->maDocumentService = getSubdata( 2, aComma, aData );
 
-    OUString aFilterService( getSubdata( 3, aComma, aData ) );
-    pFilter->maFlags = getSubdata( 4, aComma, aData ).toInt32();
+    std::u16string_view aFilterService( getSubdata( 3, aComma, aData ) );
+    pFilter->maFlags = o3tl::toInt32(getSubdata( 4, aComma, aData ));
 
     // parse filter user data
     sal_Unicode aDelim(';');
-    OUString aFilterUserData( getSubdata( 5, aComma, aData ) );
+    std::u16string_view aFilterUserData( getSubdata( 5, aComma, aData ) );
 
-    OUString aAdapterService( getSubdata( 0, aDelim, aFilterUserData ) );
+    std::u16string_view aAdapterService( getSubdata( 0, aDelim, aFilterUserData ) );
     //Import/ExportService
-    pFilter->mbNeedsXSLT2 = getSubdata( 1, aDelim, aFilterUserData ).toBoolean();
+    pFilter->mbNeedsXSLT2 = OUString(getSubdata( 1, aDelim, aFilterUserData )).toBoolean();
     pFilter->maImportService = getSubdata( 2, aDelim, aFilterUserData );
     pFilter->maExportService = getSubdata( 3, aDelim, aFilterUserData );
     pFilter->maImportXSLT = getSubdata( 4, aDelim, aFilterUserData );
@@ -161,7 +162,7 @@ std::unique_ptr<filter_info_impl> TypeDetectionImporter::createFilterForNode( No
 
         pFilter->maDocType = getSubdata( 2, aComma, aTypeUserData );
         pFilter->maExtension = getSubdata( 4, aComma, aTypeUserData );
-        pFilter->mnDocumentIconID = getSubdata( 5, aComma, aTypeUserData ).toInt32();
+        pFilter->mnDocumentIconID = o3tl::toInt32(getSubdata( 5, aComma, aTypeUserData ));
     }
 
     bool bOk = true;
@@ -181,10 +182,10 @@ std::unique_ptr<filter_info_impl> TypeDetectionImporter::createFilterForNode( No
     if( pFilter->maFlags == 0 )
         bOk = false;
 
-    if( aFilterService != "com.sun.star.comp.Writer.XmlFilterAdaptor" )
+    if( aFilterService != u"com.sun.star.comp.Writer.XmlFilterAdaptor" )
         bOk = false;
 
-    if( aAdapterService != "com.sun.star.documentconversion.XSLTFilter" )
+    if( aAdapterService != u"com.sun.star.documentconversion.XSLTFilter" )
         bOk = false;
 
     if( pFilter->maExtension.isEmpty() )

@@ -23,6 +23,7 @@
 #include "layoutnodecontext.hxx"
 #include <oox/helper/attributelist.hxx>
 #include <oox/token/namespaces.hxx>
+#include <utility>
 
 using namespace ::oox::core;
 using namespace ::com::sun::star::uno;
@@ -33,18 +34,18 @@ namespace oox::drawingml {
 // CT_DiagramDefinition
 DiagramDefinitionContext::DiagramDefinitionContext( ContextHandler2Helper const & rParent,
                                                     const AttributeList& rAttributes,
-                                                    const DiagramLayoutPtr &pLayout )
+                                                    DiagramLayoutPtr pLayout )
     : ContextHandler2( rParent )
-    , mpLayout( pLayout )
+    , mpLayout(std::move( pLayout ))
 {
-    mpLayout->setDefStyle( rAttributes.getString( XML_defStyle ).get() );
-    OUString sValue = rAttributes.getString( XML_minVer ).get();
+    mpLayout->setDefStyle( rAttributes.getStringDefaulted( XML_defStyle ) );
+    OUString sValue = rAttributes.getStringDefaulted( XML_minVer );
     if( sValue.isEmpty() )
     {
         sValue = "http://schemas.openxmlformats.org/drawingml/2006/diagram";
     }
     mpLayout->setMinVer( sValue );
-    mpLayout->setUniqueId( rAttributes.getString( XML_uniqueId ).get() );
+    mpLayout->setUniqueId( rAttributes.getStringDefaulted( XML_uniqueId ) );
 }
 
 DiagramDefinitionContext::~DiagramDefinitionContext()
@@ -61,18 +62,18 @@ DiagramDefinitionContext::onCreateContext( ::sal_Int32 aElement,
     switch( aElement )
     {
     case DGM_TOKEN( title ):
-        mpLayout->setTitle( rAttribs.getString( XML_val ).get() );
+        mpLayout->setTitle( rAttribs.getStringDefaulted( XML_val ) );
         break;
     case DGM_TOKEN( desc ):
-        mpLayout->setDesc( rAttribs.getString( XML_val ).get() );
+        mpLayout->setDesc( rAttribs.getStringDefaulted( XML_val ) );
         break;
     case DGM_TOKEN( layoutNode ):
     {
         LayoutNodePtr pNode = std::make_shared<LayoutNode>(mpLayout->getDiagram());
         mpLayout->getNode() = pNode;
         pNode->setChildOrder( rAttribs.getToken( XML_chOrder, XML_b ) );
-        pNode->setMoveWith( rAttribs.getString( XML_moveWith ).get() );
-        pNode->setStyleLabel( rAttribs.getString( XML_styleLbl ).get() );
+        pNode->setMoveWith( rAttribs.getStringDefaulted( XML_moveWith ) );
+        pNode->setStyleLabel( rAttribs.getStringDefaulted( XML_styleLbl ) );
         return new LayoutNodeContext( *this, rAttribs, pNode );
     }
      case DGM_TOKEN( clrData ):

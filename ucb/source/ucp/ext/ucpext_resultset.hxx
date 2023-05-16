@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "ucpext_content.hxx"
+
 #include <rtl/ref.hxx>
 #include <ucbhelper/resultsethelper.hxx>
 #include <com/sun/star/ucb/XCommandEnvironment.hpp>
@@ -38,7 +40,7 @@ namespace ucb::ucp::ext
     public:
         ResultSet(
             const css::uno::Reference< css::uno::XComponentContext >& rxContext,
-            const rtl::Reference< Content >& i_rContent,
+            rtl::Reference< Content > i_xContent,
             const css::ucb::OpenCommandArgument2& i_rCommand,
             const css::uno::Reference< css::ucb::XCommandEnvironment >& i_rEnv
         );

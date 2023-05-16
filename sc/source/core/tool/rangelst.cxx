@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <unotools/collatorwrapper.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <rangelst.hxx>
 #include <document.hxx>
@@ -42,20 +43,7 @@ public:
     explicit FindEnclosingRange(const T& rTest) : mrTest(rTest) {}
     bool operator() (const ScRange & rRange) const
     {
-        return rRange.In(mrTest);
-    }
-private:
-    const T& mrTest;
-};
-
-template<typename T>
-class FindRangeIn
-{
-public:
-    FindRangeIn(const T& rTest) : mrTest(rTest) {}
-    bool operator() (const ScRange& rRange) const
-    {
-        return mrTest.In(rRange);
+        return rRange.Contains(mrTest);
     }
 private:
     const T& mrTest;
@@ -101,11 +89,11 @@ ScRangeList::~ScRangeList()
 {
 }
 
-ScRefFlags ScRangeList::Parse( const OUString& rStr, const ScDocument& rDoc,
+ScRefFlags ScRangeList::Parse( std::u16string_view rStr, const ScDocument& rDoc,
                            formula::FormulaGrammar::AddressConvention eConv,
                            SCTAB nDefaultTab, sal_Unicode cDelimiter )
 {
-    if ( !rStr.isEmpty() )
+    if ( !rStr.empty() )
     {
         if (!cDelimiter)
             cDelimiter = ScCompiler::GetNativeSymbolChar(ocSep);
@@ -117,7 +105,7 @@ ScRefFlags ScRangeList::Parse( const OUString& rStr, const ScDocument& rDoc,
         sal_Int32 nPos = 0;
         do
         {
-            const OUString aOne = rStr.getToken( 0, cDelimiter, nPos );
+            const OUString aOne( o3tl::getToken(rStr, 0, cDelimiter, nPos ) );
             aRange.aStart.SetTab( nTab );   // default tab if not specified
             ScRefFlags nRes = aRange.ParseAny( aOne, rDoc, eConv );
             ScRefFlags nEndRangeBits = ScRefFlags::COL2_VALID | ScRefFlags::ROW2_VALID | ScRefFlags::TAB2_VALID;
@@ -225,7 +213,7 @@ Label_Range_Join:
             continue;           // the same one, continue with the next
         }
         bool bJoined = false;
-        if ( rRange.In( *pOver ) )
+        if ( rRange.Contains( *pOver ) )
         {   // range pOver included in or identical to range p
             // XXX if we never used Append() before Join() we could remove
             // pOver and end processing, but it is not guaranteed and there can
@@ -238,7 +226,7 @@ Label_Range_Join:
                 break;  // for
             }
         }
-        else if ( pOver->In( rRange ) )
+        else if ( pOver->Contains( rRange ) )
         {   // range rRange included in range pOver, make pOver the new range
             rRange = *pOver;
             bJoined = true;
@@ -967,7 +955,7 @@ bool ScRangeList::DeleteArea( SCCOL nCol1, SCROW nRow1, SCTAB nTab1,
     ScRange aRange( nCol1, nRow1, nTab1, nCol2, nRow2, nTab2 );
     for(size_t i = 0; i < maRanges.size();)
     {
-        if(FindRangeIn< ScRange >(aRange)(maRanges[i]))
+        if(aRange.Contains(maRanges[i]))
         {
             Remove(i);
             bChanged = true;
@@ -1091,7 +1079,7 @@ bool ScRangeList::Intersects( const ScRange& rRange ) const
     return std::any_of(maRanges.begin(), maRanges.end(), FindIntersectingRange<ScRange>(rRange));
 }
 
-bool ScRangeList::In( const ScRange& rRange ) const
+bool ScRangeList::Contains( const ScRange& rRange ) const
 {
     return std::any_of(maRanges.begin(), maRanges.end(), FindEnclosingRange<ScRange>(rRange));
 }
@@ -1292,7 +1280,7 @@ ScRangePair* ScRangePairList::Find( const ScAddress& rAdr )
 {
     for (ScRangePair & rR : maPairs)
     {
-        if ( rR.GetRange(0).In( rAdr ) )
+        if ( rR.GetRange(0).Contains( rAdr ) )
             return &rR;
     }
     return nullptr;
@@ -1435,7 +1423,7 @@ Label_RangePair_Join:
         ScRange& rp2 = rPair.GetRange(1);
         if ( rp2 == r2 )
         {   // only if Range2 is equal
-            if ( rp1.In( r1 ) )
+            if ( rp1.Contains( r1 ) )
             {   // RangePair pOver included in or identical to RangePair p
                 if ( bIsInList )
                     bJoined = true;     // do away with RangePair pOver
@@ -1445,7 +1433,7 @@ Label_RangePair_Join:
                     break;  // for
                 }
             }
-            else if ( r1.In( rp1 ) )
+            else if ( r1.Contains( rp1 ) )
             {   // RangePair p included in RangePair pOver, make pOver the new RangePair
                 rPair = *pOver;
                 bJoined = true;

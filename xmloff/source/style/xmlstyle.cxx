@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <sal/config.h>
 
 #include <com/sun/star/frame/XModel.hpp>
@@ -25,9 +27,11 @@
 #include <com/sun/star/style/XStyleFamiliesSupplier.hpp>
 #include <com/sun/star/style/XAutoStylesSupplier.hpp>
 #include <com/sun/star/style/XAutoStyleFamily.hpp>
+#include <com/sun/star/drawing/XDrawPageSupplier.hpp>
 #include <PageMasterPropMapper.hxx>
 #include <sal/log.hxx>
 #include <svl/style.hxx>
+#include <utility>
 #include <xmloff/namespacemap.hxx>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/xmltoken.hxx>
@@ -41,6 +45,7 @@
 #include <xmloff/xmlnumfi.hxx>
 #include <XMLChartStyleContext.hxx>
 #include <XMLChartPropertySetMapper.hxx>
+#include <XMLThemeContext.hxx>
 #include <xmloff/XMLShapeStyleContext.hxx>
 #include "FillStyleContext.hxx"
 #include <XMLFootnoteConfigurationImportContext.hxx>
@@ -157,8 +162,8 @@ class SvXMLStyleIndex_Impl
 
 public:
 
-    SvXMLStyleIndex_Impl( XmlStyleFamily nFam, const OUString& rName ) :
-        sName( rName ),
+    SvXMLStyleIndex_Impl( XmlStyleFamily nFam, OUString aName ) :
+        sName(std::move( aName )),
         nFamily( nFam ),
         mpStyle(nullptr)
     {
@@ -426,10 +431,12 @@ SvXMLStyleContext *SvXMLStylesContext::CreateStyleStyleChildContext(
         case XmlStyleFamily::TEXT_RUBY:
             pStyle = new XMLPropStyleContext( GetImport(), *this, nFamily );
             break;
+#if !ENABLE_WASM_STRIP_CHART
+        // WASM_CHART change
         case XmlStyleFamily::SCH_CHART_ID:
             pStyle = new XMLChartStyleContext( GetImport(), *this, nFamily );
             break;
-
+#endif
         case XmlStyleFamily::SD_GRAPHICS_ID:
         case XmlStyleFamily::SD_PRESENTATION_ID:
         case XmlStyleFamily::SD_POOL_ID:
@@ -565,6 +572,8 @@ rtl::Reference < SvXMLImportPropertyMapper > SvXMLStylesContext::GetImportProper
         }
         xMapper = mxShapeImpPropMapper;
         break;
+#if !ENABLE_WASM_STRIP_CHART
+    // WASM_CHART change
     case XmlStyleFamily::SCH_CHART_ID:
         if( ! mxChartImpPropMapper.is() )
         {
@@ -573,6 +582,7 @@ rtl::Reference < SvXMLImportPropertyMapper > SvXMLStylesContext::GetImportProper
         }
         xMapper = mxChartImpPropMapper;
         break;
+#endif
     case XmlStyleFamily::PAGE_MASTER:
         if( ! mxPageImpPropMapper.is() )
         {
@@ -700,13 +710,22 @@ SvXMLStylesContext::~SvXMLStylesContext()
 css::uno::Reference< css::xml::sax::XFastContextHandler > SvXMLStylesContext::createFastChildContext(
         sal_Int32 nElement, const css::uno::Reference< css::xml::sax::XFastAttributeList >& xAttrList )
 {
-    SvXMLStyleContext *pStyle =
-        CreateStyleChildContext( nElement, xAttrList );
-    if( pStyle )
+    SvXMLStyleContext* pStyle = CreateStyleChildContext( nElement, xAttrList );
+    if (pStyle)
     {
-        if( !pStyle->IsTransient() )
-            mpImpl->AddStyle( pStyle );
+        if (!pStyle->IsTransient())
+            mpImpl->AddStyle(pStyle);
         return pStyle;
+    }
+    else if (nElement ==  XML_ELEMENT(LO_EXT, XML_THEME))
+    {
+        uno::Reference<drawing::XDrawPageSupplier> const xDrawPageSupplier(GetImport().GetModel(), uno::UNO_QUERY);
+        if (xDrawPageSupplier.is())
+        {
+            uno::Reference<drawing::XDrawPage> xPage = xDrawPageSupplier->getDrawPage();
+            if (xPage.is())
+                return new XMLThemeContext(GetImport(), xAttrList, xPage);
+        }
     }
 
     return nullptr;

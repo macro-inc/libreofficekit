@@ -25,7 +25,8 @@
 #include <com/sun/star/uno/XNamingService.hpp>
 #include <cppuhelper/supportsservice.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace css::bridge;
 using namespace css::connection;
@@ -62,7 +63,7 @@ Acceptor::~Acceptor()
     m_rAcceptor->stopAccepting();
     oslThread t;
     {
-        osl::MutexGuard g(m_aMutex);
+        std::unique_lock g(m_aMutex);
         t = m_thread;
     }
     //prevent locking if the thread is still waiting
@@ -74,7 +75,7 @@ Acceptor::~Acceptor()
         // Make the final state of m_bridges visible to this thread (since
         // m_thread is joined, the code that follows is the only one left
         // accessing m_bridges):
-        osl::MutexGuard g(m_aMutex);
+        std::unique_lock g(m_aMutex);
     }
     for (;;) {
         css::uno::Reference< css::bridge::XBridge > b(m_bridges.remove());
@@ -117,7 +118,7 @@ void Acceptor::run()
             // the bridge, it will be destructed.
             Reference< XBridge > rBridge = m_rBridgeFactory->createBridge(
                 "", m_aProtocol, rConnection, rInstanceProvider);
-            osl::MutexGuard g(m_aMutex);
+            std::unique_lock g(m_aMutex);
             m_bridges.add(rBridge);
         } catch (const Exception&) {
             TOOLS_WARN_EXCEPTION("desktop.offacc", "");
@@ -132,7 +133,7 @@ void Acceptor::run()
 void Acceptor::initialize( const Sequence<Any>& aArguments )
 {
     // prevent multiple initialization
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
     SAL_INFO( "desktop.offacc", "Acceptor::initialize()" );
 
     bool bOk = false;
@@ -151,7 +152,7 @@ void Acceptor::initialize( const Sequence<Any>& aArguments )
         if (nIndex1 < 0)
             throw IllegalArgumentException(
                     "Invalid accept-string format", m_rContext, 1);
-        m_aConnectString = m_aAcceptString.copy( 0 , nIndex1 ).trim();
+        m_aConnectString = o3tl::trim(m_aAcceptString.subView( 0 , nIndex1 ));
         nIndex1++;
         sal_Int32 nIndex2 = m_aAcceptString.indexOf( ';' , nIndex1 );
         if (nIndex2 < 0) nIndex2 = m_aAcceptString.getLength();

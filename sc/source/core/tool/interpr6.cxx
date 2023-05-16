@@ -629,7 +629,7 @@ void ScInterpreter::IterateParameters( ScIterFunc eFunc, bool bTextAsZero )
                 {
                     if( eFunc == ifCOUNT2 )
                     {
-                        CellType eCellType = aCell.meType;
+                        CellType eCellType = aCell.getType();
                         if ( eCellType != CELLTYPE_NONE )
                             nCount++;
                         if ( nGlobalError != FormulaError::NONE )
@@ -783,13 +783,12 @@ void ScInterpreter::IterateParameters( ScIterFunc eFunc, bool bTextAsZero )
                 }
                 else
                 {
-                    ScValueIterator aValIter( mrDoc, aRange, mnSubTotalFlags, bTextAsZero );
-                    aValIter.SetInterpreterContext( &mrContext );
+                    ScValueIterator aValIter( mrContext, aRange, mnSubTotalFlags, bTextAsZero );
                     FormulaError nErr = FormulaError::NONE;
                     if (aValIter.GetFirst(fVal, nErr))
                     {
                         // placed the loop on the inside for performance reasons:
-                        aValIter.GetCurNumFmtInfo( mrContext, nFuncFmtType, nFuncFmtIndex );
+                        aValIter.GetCurNumFmtInfo( nFuncFmtType, nFuncFmtIndex );
                         switch( eFunc )
                         {
                             case ifAVERAGE:

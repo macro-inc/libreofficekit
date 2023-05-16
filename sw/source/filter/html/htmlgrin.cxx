@@ -40,6 +40,7 @@
 #include <unotools/eventcfg.hxx>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 
 #include <fmtornt.hxx>
 #include <fmturl.hxx>
@@ -92,7 +93,7 @@ HTMLOptionEnum<sal_Int16> const aHTMLImgVAlignTable[] =
     { nullptr,                                0                   }
 };
 
-ImageMap *SwHTMLParser::FindImageMap( const OUString& rName ) const
+ImageMap *SwHTMLParser::FindImageMap( std::u16string_view rName ) const
 {
     OSL_ENSURE( rName[0] != '#', "FindImageMap: name begins with '#'!" );
 
@@ -100,7 +101,7 @@ ImageMap *SwHTMLParser::FindImageMap( const OUString& rName ) const
     {
         for (const auto &rpIMap : *m_pImageMaps)
         {
-            if (rName.equalsIgnoreAsciiCase(rpIMap->GetName()))
+            if (o3tl::equalsIgnoreAsciiCase(rName, rpIMap->GetName()))
             {
                 return rpIMap.get();
             }
@@ -236,7 +237,7 @@ void SwHTMLParser::SetAnchorAndAdjustment( sal_Int16 eVertOri,
         }
 
         // determine vertical alignment and anchoring
-        const sal_Int32 nContent = m_pPam->GetPoint()->nContent.GetIndex();
+        const sal_Int32 nContent = m_pPam->GetPoint()->GetContentIndex();
         if( nContent )
         {
             aAnchor.SetType( RndStdIds::FLY_AT_CHAR );
@@ -260,7 +261,7 @@ void SwHTMLParser::SetAnchorAndAdjustment( sal_Int16 eVertOri,
     if( bMoveBackward )
         m_pPam->Move( fnMoveBackward );
 
-    if (aAnchor.GetAnchorId() == RndStdIds::FLY_AS_CHAR && !m_pPam->GetNode().GetTextNode())
+    if (aAnchor.GetAnchorId() == RndStdIds::FLY_AS_CHAR && !m_pPam->GetPointNode().GetTextNode())
     {
         eState = SvParserState::Error;
         return;
@@ -282,7 +283,7 @@ void SwHTMLParser::RegisterFlyFrame( SwFrameFormat *pFlyFormat )
         css::text::WrapTextMode_THROUGH == pFlyFormat->GetSurround().GetSurround() )
     {
         m_aMoveFlyFrames.emplace_back(std::make_unique<SwHTMLFrameFormatListener>(pFlyFormat));
-        m_aMoveFlyCnts.push_back( m_pPam->GetPoint()->nContent.GetIndex() );
+        m_aMoveFlyCnts.push_back( m_pPam->GetPoint()->GetContentIndex() );
     }
 }
 
@@ -461,12 +462,12 @@ IMAGE_SETEVENT:
 
     // When we are in an ordered list and the paragraph is still empty and not
     // numbered, it may be a graphic for a bullet list.
-    if( !m_pPam->GetPoint()->nContent.GetIndex() &&
+    if( !m_pPam->GetPoint()->GetContentIndex() &&
         GetNumInfo().GetDepth() > 0 && GetNumInfo().GetDepth() <= MAXLEVEL &&
         !m_aBulletGrfs[GetNumInfo().GetDepth()-1].isEmpty() &&
         m_aBulletGrfs[GetNumInfo().GetDepth()-1]==sGrfNm )
     {
-        SwTextNode* pTextNode = m_pPam->GetNode().GetTextNode();
+        SwTextNode* pTextNode = m_pPam->GetPointNode().GetTextNode();
 
         if( pTextNode && ! pTextNode->IsCountedInList())
         {
@@ -500,7 +501,7 @@ IMAGE_SETEVENT:
 
             if (!sGrfNm.isEmpty())
             {
-                if (ERRCODE_NONE == rFilter.ImportGraphic(aGraphic, "", *pStream))
+                if (ERRCODE_NONE == rFilter.ImportGraphic(aGraphic, u"", *pStream))
                     sGrfNm.clear();
             }
         }
@@ -526,10 +527,30 @@ IMAGE_SETEVENT:
         if (!bHeightProvided)
             nHeight = aPixelSize.Height();
         // tdf#142781 - calculate the width/height keeping the aspect ratio
-        if (!bPercentWidth && bWidthProvided && !bHeightProvided && aPixelSize.Width())
-            nHeight = nWidth * aPixelSize.Height() / aPixelSize.Width();
-        else if (!bPercentHeight && !bWidthProvided && bHeightProvided && aPixelSize.Height())
-            nWidth = nHeight * aPixelSize.Width() / aPixelSize.Height();
+        if (bWidthProvided && !bHeightProvided && aPixelSize.Width())
+        {
+            if (bPercentWidth)
+            {
+                nHeight = SwFormatFrameSize::SYNCED;
+                bPercentHeight = true;
+            }
+            else
+            {
+                nHeight = nWidth * aPixelSize.Height() / aPixelSize.Width();
+            }
+        }
+        else if (!bWidthProvided && bHeightProvided && aPixelSize.Height())
+        {
+            if (bPercentHeight)
+            {
+                nWidth = SwFormatFrameSize::SYNCED;
+                bPercentWidth = true;
+            }
+            else
+            {
+                nWidth = nHeight * aPixelSize.Width() / aPixelSize.Height();
+            }
+        }
     }
 
     SfxItemSet aItemSet( m_xDoc->GetAttrPool(), m_pCSS1Parser->GetWhichMap() );
@@ -647,7 +668,11 @@ IMAGE_SETEVENT:
 
     // bPercentWidth / bPercentHeight means we have a percent size.  If that's not the case and we have no
     // size from nWidth / nHeight either, then inspect the image header.
-    if ((!bPercentWidth && !nWidth) && (!bPercentHeight && !nHeight) && !m_bFuzzing && allowAccessLink(*m_xDoc))
+    bool bRelWidthScale = bPercentWidth && nWidth == SwFormatFrameSize::SYNCED;
+    bool bNeedWidth = (!bPercentWidth && !nWidth) || bRelWidthScale;
+    bool bRelHeightScale = bPercentHeight && nHeight == SwFormatFrameSize::SYNCED;
+    bool bNeedHeight = (!bPercentHeight && !nHeight) || bRelHeightScale;
+    if ((bNeedWidth || bNeedHeight) && !m_bFuzzing && allowAccessLink(*m_xDoc))
     {
         GraphicDescriptor aDescriptor(aGraphicURL);
         if (aDescriptor.Detect(/*bExtendedInfo=*/true))
@@ -656,12 +681,18 @@ IMAGE_SETEVENT:
             // HTML_DFLT_IMG_WIDTH/HEIGHT.
             aTwipSz = Application::GetDefaultDevice()->PixelToLogic(aDescriptor.GetSizePixel(),
                                                                     MapMode(MapUnit::MapTwip));
-            nWidth = aTwipSz.getWidth();
-            nHeight = aTwipSz.getHeight();
+            if (!bPercentWidth && !nWidth)
+            {
+                nWidth = aTwipSz.getWidth();
+            }
+            if (!bPercentHeight && !nHeight)
+            {
+                nHeight = aTwipSz.getHeight();
+            }
         }
     }
 
-    if( !nWidth || !nHeight )
+    if( !(nWidth && !bRelWidthScale) || !(nHeight && !bRelHeightScale) )
     {
         // When the graphic is in a table, it will be requested immediately,
         // so that it is available before the table is layouted.
@@ -752,9 +783,10 @@ IMAGE_SETEVENT:
     }
 
     // observe minimum values !!
+    bool bRelSizeScale = bRelWidthScale || bRelHeightScale;
     if( nPercentWidth )
     {
-        OSL_ENSURE( !aTwipSz.Width(),
+        OSL_ENSURE( !aTwipSz.Width() || bRelSizeScale,
                 "Why is a width set if we already have percentage value?" );
         aTwipSz.setWidth( aGrfSz.Width() ? aGrfSz.Width()
                                          : HTML_DFLT_IMG_WIDTH );
@@ -767,7 +799,7 @@ IMAGE_SETEVENT:
     }
     if( nPercentHeight )
     {
-        OSL_ENSURE( !aTwipSz.Height(),
+        OSL_ENSURE( !aTwipSz.Height() || bRelSizeScale,
                 "Why is a height set if we already have percentage value?" );
         aTwipSz.setHeight( aGrfSz.Height() ? aGrfSz.Height()
                                            : HTML_DFLT_IMG_HEIGHT );
@@ -784,7 +816,7 @@ IMAGE_SETEVENT:
     aFrameSize.SetHeightPercent( nPercentHeight );
     aFrameSet.Put( aFrameSize );
 
-    const SwNodeType eNodeType = m_pPam->GetNode().GetNodeType();
+    const SwNodeType eNodeType = m_pPam->GetPointNode().GetNodeType();
     if (eNodeType != SwNodeType::Text && eNodeType != SwNodeType::Table)
         return;
 
@@ -798,7 +830,7 @@ IMAGE_SETEVENT:
 
     if( !sHTMLGrfName.isEmpty() )
     {
-        pFlyFormat->SetName( sHTMLGrfName );
+        pFlyFormat->SetFormatName( sHTMLGrfName );
 
         // maybe jump to graphic
         if( JumpToMarks::Graphic == m_eJumpTo && sHTMLGrfName == m_sJmpMark )
@@ -850,9 +882,9 @@ IMAGE_SETEVENT:
 
         if ((RndStdIds::FLY_AS_CHAR == pFlyFormat->GetAnchor().GetAnchorId()) &&
             m_xAttrTab->pINetFormat->GetStartParagraph() ==
-                        m_pPam->GetPoint()->nNode &&
+                        m_pPam->GetPoint()->GetNode() &&
             m_xAttrTab->pINetFormat->GetStartContent() ==
-                        m_pPam->GetPoint()->nContent.GetIndex() - 1 )
+                        m_pPam->GetPoint()->GetContentIndex() - 1 )
         {
             // the attribute was insert right before as-character anchored
             // graphic, therefore we move it
@@ -869,6 +901,15 @@ IMAGE_SETEVENT:
             }
         }
 
+    }
+    else if (!m_aEmbedURL.isEmpty())
+    {
+        // This is an inner <object> image and the outer <object> has a URL for us. Set that on the
+        // image.
+        SwFormatURL aURL(pFlyFormat->GetURL());
+        aURL.SetURL(m_aEmbedURL, bIsMap);
+        m_aEmbedURL.clear();
+        pFlyFormat->SetFormatAttr(aURL);
     }
 
     if( !aMacroItem.GetMacroTable().empty() )
@@ -1052,19 +1093,16 @@ void SwHTMLParser::InsertBodyOptions()
         m_pCSS1Parser->SetPageDescAttrs( bSetBrush ? aBrushItem.get() : nullptr,
                                        &aItemSet );
 
-        const SfxPoolItem *pItem;
-        static const sal_uInt16 aWhichIds[3] = { RES_CHRATR_FONTSIZE,
+        static const TypedWhichId<SvxFontHeightItem> aWhichIds[3] = { RES_CHRATR_FONTSIZE,
                                        RES_CHRATR_CJK_FONTSIZE,
                                        RES_CHRATR_CTL_FONTSIZE };
-        for(sal_uInt16 i : aWhichIds)
+        for(auto const & i : aWhichIds)
         {
-            if( SfxItemState::SET == aItemSet.GetItemState( i, false,
-                                                       &pItem ) &&
-                static_cast <const SvxFontHeightItem * >(pItem)->GetProp() != 100)
+            const SvxFontHeightItem *pItem = aItemSet.GetItemIfSet( i, false );
+            if( pItem && pItem->GetProp() != 100)
             {
                 sal_uInt32 nHeight =
-                    ( m_aFontHeights[2] *
-                     static_cast <const SvxFontHeightItem * >(pItem)->GetProp() ) / 100;
+                    ( m_aFontHeights[2] * pItem->GetProp() ) / 100;
                 SvxFontHeightItem aNewItem( nHeight, 100, i );
                 aItemSet.Put( aNewItem );
             }
@@ -1362,7 +1400,7 @@ void SwHTMLParser::InsertBookmark( const OUString& rName )
 bool SwHTMLParser::HasCurrentParaBookmarks( bool bIgnoreStack ) const
 {
     bool bHasMarks = false;
-    SwNodeOffset nNodeIdx = m_pPam->GetPoint()->nNode.GetIndex();
+    SwNodeOffset nNodeIdx = m_pPam->GetPoint()->GetNodeIndex();
 
     // first step: are there still bookmark in the attribute-stack?
     // bookmarks are added to the end of the stack - thus we only have
@@ -1391,7 +1429,7 @@ bool SwHTMLParser::HasCurrentParaBookmarks( bool bIgnoreStack ) const
         {
             const ::sw::mark::IMark* pBookmark = *ppMark;
 
-            const SwNodeOffset nBookNdIdx = pBookmark->GetMarkPos().nNode.GetIndex();
+            const SwNodeOffset nBookNdIdx = pBookmark->GetMarkPos().GetNodeIndex();
             if( nBookNdIdx==nNodeIdx )
             {
                 bHasMarks = true;
@@ -1411,9 +1449,9 @@ void SwHTMLParser::StripTrailingPara()
 {
     bool bSetSmallFont = false;
 
-    SwContentNode* pCNd = m_pPam->GetContentNode();
-    SwNodeOffset nNodeIdx = m_pPam->GetPoint()->nNode.GetIndex();
-    if( !m_pPam->GetPoint()->nContent.GetIndex() )
+    SwContentNode* pCNd = m_pPam->GetPointContentNode();
+    SwNodeOffset nNodeIdx = m_pPam->GetPoint()->GetNodeIndex();
+    if( !m_pPam->GetPoint()->GetContentIndex() )
     {
         if( pCNd && pCNd->StartOfSectionIndex() + 2 <
             pCNd->EndOfSectionIndex() && CanRemoveNode(nNodeIdx))
@@ -1423,11 +1461,11 @@ void SwHTMLParser::StripTrailingPara()
             for( auto pFormat : rFrameFormatTable )
             {
                 SwFormatAnchor const*const pAnchor = &pFormat->GetAnchor();
-                SwPosition const*const pAPos = pAnchor->GetContentAnchor();
-                if (pAPos &&
+                SwNode const*const pAnchorNode = pAnchor->GetAnchorNode();
+                if (pAnchorNode &&
                     ((RndStdIds::FLY_AT_PARA == pAnchor->GetAnchorId()) ||
                      (RndStdIds::FLY_AT_CHAR == pAnchor->GetAnchorId())) &&
-                    pAPos->nNode == nNodeIdx )
+                    pAnchorNode->GetIndex() == nNodeIdx )
 
                     return;     // we can't delete the node
             }
@@ -1443,7 +1481,7 @@ void SwHTMLParser::StripTrailingPara()
                 SwTextNode *pPrvNd = m_xDoc->GetNodes()[nNodeIdx-1]->GetTextNode();
                 if( pPrvNd )
                 {
-                    SwIndex aSrc( pCNd, 0 );
+                    SwContentIndex aSrc( pCNd, 0 );
                     pCNd->GetTextNode()->CutText( pPrvNd, aSrc, pCNd->Len() );
                 }
             }
@@ -1456,10 +1494,10 @@ void SwHTMLParser::StripTrailingPara()
             {
                 ::sw::mark::IMark* pMark = *ppMark;
 
-                SwNodeOffset nBookNdIdx = pMark->GetMarkPos().nNode.GetIndex();
+                SwNodeOffset nBookNdIdx = pMark->GetMarkPos().GetNodeIndex();
                 if(nBookNdIdx==nNodeIdx)
                 {
-                    SwNodeIndex nNewNdIdx(m_pPam->GetPoint()->nNode);
+                    SwNodeIndex nNewNdIdx(m_pPam->GetPoint()->GetNode());
                     SwContentNode* pNd = SwNodes::GoPrevious(&nNewNdIdx);
                     if(!pNd)
                     {
@@ -1469,9 +1507,7 @@ void SwHTMLParser::StripTrailingPara()
                     // #i81002# - refactoring
                     // Do not directly manipulate member of <SwBookmark>
                     {
-                        SwPosition aNewPos(*pNd);
-                        aNewPos.nContent.Assign(pNd, pNd->Len());
-                        const SwPaM aPaM(aNewPos);
+                        const SwPaM aPaM(*pNd, pNd->Len());
                         pMarkAccess->repositionMark(*ppMark, aPaM);
                     }
                 }
@@ -1479,11 +1515,11 @@ void SwHTMLParser::StripTrailingPara()
                     break;
             }
 
-            m_pPam->GetPoint()->nContent.Assign( nullptr, 0 );
+            SwNode& rDelNode = m_pPam->GetPoint()->GetNode();
+            m_pPam->Move( fnMoveBackward, GoInNode );
             m_pPam->SetMark();
             m_pPam->DeleteMark();
-            m_xDoc->GetNodes().Delete( m_pPam->GetPoint()->nNode );
-            m_pPam->Move( fnMoveBackward, GoInNode );
+            m_xDoc->GetNodes().Delete( rDelNode );
         }
         else if (pCNd && pCNd->IsTextNode() && m_xTable)
         {
@@ -1501,7 +1537,7 @@ void SwHTMLParser::StripTrailingPara()
         bSetSmallFont = true;
         SwTextNode* pTextNd = pCNd->GetTextNode();
 
-        sal_Int32 nPos = m_pPam->GetPoint()->nContent.GetIndex();
+        sal_Int32 nPos = m_pPam->GetPoint()->GetContentIndex();
         while( bSetSmallFont && nPos>0 )
         {
             --nPos;

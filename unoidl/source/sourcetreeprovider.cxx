@@ -11,6 +11,7 @@
 #include <sal/log.hxx>
 
 #include <map>
+#include <utility>
 #include <vector>
 
 #include <osl/file.h>
@@ -111,7 +112,7 @@ private:
 
 class SourceModuleEntity: public ModuleEntity {
 public:
-    SourceModuleEntity(Manager& manager, OUString const & uri): manager_(manager), uri_(uri) {}
+    SourceModuleEntity(Manager& manager, OUString uri): manager_(manager), uri_(std::move(uri)) {}
 
 private:
     virtual ~SourceModuleEntity() noexcept override {}
@@ -126,9 +127,9 @@ private:
     OUString uri_;
 };
 
-bool isValidFileName(OUString const & name, bool directory) {
-    for (sal_Int32 i = 0;; ++i) {
-        if (i == name.getLength()) {
+bool isValidFileName(std::u16string_view name, bool directory) {
+    for (size_t i = 0;; ++i) {
+        if (i == name.size()) {
             if (i == 0) {
                 return false;
             }
@@ -139,7 +140,7 @@ bool isValidFileName(OUString const & name, bool directory) {
             if (i == 0 || name[i - 1] == '_') {
                 return false;
             }
-            return !directory && name.subView(i + 1) == u"idl";
+            return !directory && name.substr(i + 1) == u"idl";
         } else if (c == '_') {
             //TODO: Ignore case of name[0] only for case-insensitive file systems:
             if (i == 0 || name[i - 1] == '_') {
@@ -283,7 +284,7 @@ rtl::Reference<Entity> SourceTreeProvider::findEntity(OUString const & name)
         throw FileFormatException( //TODO
             "", "Illegal UNOIDL identifier \"" + name + "\"");
     }
-    OUString uri(uri_ + buf.makeStringAndClear());
+    OUString uri(uri_ + buf);
     rtl::Reference<Entity> ent;
     // Prevent conflicts between foo/ and Foo.idl on case-preserving file
     // systems:

@@ -59,6 +59,7 @@
 #include <svl/numformat.hxx>
 #include <svl/zforlist.hxx>
 #include <svl/broadcast.hxx>
+#include <utility>
 #include <vcl/outdev.hxx>
 #include <formula/errorcodes.hxx>
 #include <formula/vectortoken.hxx>
@@ -138,7 +139,7 @@ tools::Long ScColumn::GetNeededSize(
     const SfxItemSet* pCondSet = rDocument.GetCondResult( nCol, nRow, nTab );
 
     //The pPattern may change in GetCondResult
-    if (aCell.meType == CELLTYPE_FORMULA)
+    if (aCell.getType() == CELLTYPE_FORMULA)
     {
         pPattern = pAttrArray->GetPattern( nRow );
         if (ppPatternChange)
@@ -146,19 +147,18 @@ tools::Long ScColumn::GetNeededSize(
     }
     //  line break?
 
-    const SfxPoolItem* pCondItem;
+    const SvxHorJustifyItem* pCondItem;
     SvxCellHorJustify eHorJust;
-    if (pCondSet &&
-            pCondSet->GetItemState(ATTR_HOR_JUSTIFY, true, &pCondItem) == SfxItemState::SET)
-        eHorJust = static_cast<const SvxHorJustifyItem*>(pCondItem)->GetValue();
+    if (pCondSet && (pCondItem = pCondSet->GetItemIfSet(ATTR_HOR_JUSTIFY)) )
+        eHorJust = pCondItem->GetValue();
     else
         eHorJust = pPattern->GetItem( ATTR_HOR_JUSTIFY ).GetValue();
     bool bBreak;
+    const ScLineBreakCell* pLineBreakCell;
     if ( eHorJust == SvxCellHorJustify::Block )
         bBreak = true;
-    else if ( pCondSet &&
-                pCondSet->GetItemState(ATTR_LINEBREAK, true, &pCondItem) == SfxItemState::SET)
-        bBreak = static_cast<const ScLineBreakCell*>(pCondItem)->GetValue();
+    else if ( pCondSet && (pLineBreakCell = pCondSet->GetItemIfSet(ATTR_LINEBREAK)) )
+        bBreak = pLineBreakCell->GetValue();
     else
         bBreak = pPattern->GetItem(ATTR_LINEBREAK).GetValue();
 
@@ -167,11 +167,22 @@ tools::Long ScColumn::GetNeededSize(
 
     // get "cell is value" flag
     // Must be synchronized with ScOutputData::LayoutStrings()
-    bool bCellIsValue = (aCell.meType == CELLTYPE_VALUE);
-    if (aCell.meType == CELLTYPE_FORMULA)
+    bool bCellIsValue = (aCell.getType() == CELLTYPE_VALUE);
+    if (aCell.getType() == CELLTYPE_FORMULA)
     {
-        ScFormulaCell* pFCell = aCell.mpFormula;
-        bCellIsValue = pFCell->IsRunning() || pFCell->IsValue();
+        ScFormulaCell* pFCell = aCell.getFormula();
+        bCellIsValue = pFCell->IsRunning();
+        if (!bCellIsValue)
+        {
+            bCellIsValue = pFCell->IsValue();
+            if (bCellIsValue)
+            {
+                // the pattern may change in IsValue()
+                pPattern = pAttrArray->GetPattern( nRow );
+                if (ppPatternChange)
+                    *ppPatternChange = pPattern;
+            }
+        }
     }
 
     // #i111387#, tdf#121040: disable automatic line breaks for all number formats
@@ -181,7 +192,7 @@ tools::Long ScColumn::GetNeededSize(
         // to determine the type, the pattern may get invalidated because the
         // result may set a number format. In which case there's also the
         // General format not set anymore...
-        bool bMayInvalidatePattern = (aCell.meType == CELLTYPE_FORMULA);
+        bool bMayInvalidatePattern = (aCell.getType() == CELLTYPE_FORMULA);
         const ScPatternAttr* pOldPattern = pPattern;
         bool bNumeric = aCell.hasNumeric();
         if (bMayInvalidatePattern)
@@ -218,16 +229,18 @@ tools::Long ScColumn::GetNeededSize(
     SvxRotateMode eRotMode = SVX_ROTATE_MODE_STANDARD;
     if ( eOrient == SvxCellOrientation::Standard )
     {
+        const ScRotateValueItem* pRotateValueItem;
         if (pCondSet &&
-                pCondSet->GetItemState(ATTR_ROTATE_VALUE, true, &pCondItem) == SfxItemState::SET)
-            nRotate = static_cast<const ScRotateValueItem*>(pCondItem)->GetValue();
+                (pRotateValueItem = pCondSet->GetItemIfSet(ATTR_ROTATE_VALUE)) )
+            nRotate = pRotateValueItem->GetValue();
         else
             nRotate = pPattern->GetItem(ATTR_ROTATE_VALUE).GetValue();
         if ( nRotate )
         {
+            const SvxRotateModeItem* pRotateModeItem;
             if (pCondSet &&
-                    pCondSet->GetItemState(ATTR_ROTATE_MODE, true, &pCondItem) == SfxItemState::SET)
-                eRotMode = static_cast<const SvxRotateModeItem*>(pCondItem)->GetValue();
+                    (pRotateModeItem = pCondSet->GetItemIfSet(ATTR_ROTATE_MODE)) )
+                eRotMode = pRotateModeItem->GetValue();
             else
                 eRotMode = pPattern->GetItem(ATTR_ROTATE_MODE).GetValue();
 
@@ -246,16 +259,17 @@ tools::Long ScColumn::GetNeededSize(
 
     const SvxMarginItem* pMargin;
     if (pCondSet &&
-            pCondSet->GetItemState(ATTR_MARGIN, true, &pCondItem) == SfxItemState::SET)
-        pMargin = static_cast<const SvxMarginItem*>(pCondItem);
+            (pMargin = pCondSet->GetItemIfSet(ATTR_MARGIN)) )
+        ;
     else
         pMargin = &pPattern->GetItem(ATTR_MARGIN);
     sal_uInt16 nIndent = 0;
     if ( eHorJust == SvxCellHorJustify::Left )
     {
+        const ScIndentItem* pIndentItem;
         if (pCondSet &&
-                pCondSet->GetItemState(ATTR_INDENT, true, &pCondItem) == SfxItemState::SET)
-            nIndent = static_cast<const ScIndentItem*>(pCondItem)->GetValue();
+                (pIndentItem = pCondSet->GetItemIfSet(ATTR_INDENT)) )
+            nIndent = pIndentItem->GetValue();
         else
             nIndent = pPattern->GetItem(ATTR_INDENT).GetValue();
     }
@@ -275,12 +289,12 @@ tools::Long ScColumn::GetNeededSize(
     }
 
     bool bAddMargin = true;
-    CellType eCellType = aCell.meType;
+    CellType eCellType = aCell.getType();
 
     bool bEditEngine = (eCellType == CELLTYPE_EDIT ||
                         eOrient == SvxCellOrientation::Stacked ||
                         IsAmbiguousScript(nScript) ||
-                        ((eCellType == CELLTYPE_FORMULA) && aCell.mpFormula->IsMultilineResult()));
+                        ((eCellType == CELLTYPE_FORMULA) && aCell.getFormula()->IsMultilineResult()));
 
     if (!bEditEngine)                                   // direct output
     {
@@ -372,7 +386,6 @@ tools::Long ScColumn::GetNeededSize(
         vcl::Font aOldFont = pDev->GetFont();
 
         MapMode aHMMMode( MapUnit::Map100thMM, Point(), rZoomX, rZoomY );
-        MapMode aTwipMode(MapUnit::MapTwip, Point(), rZoomX, rZoomY);
 
         // save in document ?
         std::unique_ptr<ScFieldEditEngine> pEngine = rDocument.CreateFieldEditEngine();
@@ -449,15 +462,15 @@ tools::Long ScColumn::GetNeededSize(
             if ( !bTextWysiwyg )
             {
                 aPaper = bInPrintTwips ?
-                        OutputDevice::LogicToLogic(aPaper, aTwipMode, aHMMMode) :
+                        o3tl::convert(aPaper, o3tl::Length::twip, o3tl::Length::mm100) :
                         pDev->PixelToLogic(aPaper, aHMMMode);
             }
         }
         pEngine->SetPaperSize(aPaper);
 
-        if (aCell.meType == CELLTYPE_EDIT)
+        if (aCell.getType() == CELLTYPE_EDIT)
         {
-            pEngine->SetTextNewDefaults(*aCell.mpEditText, std::move(aSet));
+            pEngine->SetTextNewDefaults(*aCell.getEditText(), std::move(aSet));
         }
         else
         {
@@ -504,7 +517,7 @@ tools::Long ScColumn::GetNeededSize(
             aSize = Size( nWidth, nHeight );
 
             Size aTextSize = bInPrintTwips ?
-                    OutputDevice::LogicToLogic(aSize, aHMMMode, aTwipMode) :
+                    o3tl::toTwips(aSize, o3tl::Length::mm100) :
                     pDev->LogicToPixel(aSize, aHMMMode);
 
             if ( bEdWidth )
@@ -528,18 +541,18 @@ tools::Long ScColumn::GetNeededSize(
                 nValue = 0;
             else
             {
-                Size aTextSize(pEngine->CalcTextWidth(), 0);
+                sal_uInt32 aTextSize(pEngine->CalcTextWidth());
                 nValue = bInPrintTwips ?
-                        OutputDevice::LogicToLogic(aTextSize, aHMMMode, aTwipMode).Width() :
-                        pDev->LogicToPixel(aTextSize, aHMMMode).Width();
+                        o3tl::toTwips(aTextSize, o3tl::Length::mm100) :
+                        pDev->LogicToPixel(Size(aTextSize, 0), aHMMMode).Width();
             }
         }
         else            // height
         {
-            Size aTextSize(0, pEngine->GetTextHeight());
+            sal_uInt32 aTextSize(pEngine->GetTextHeight());
             nValue = bInPrintTwips ?
-                    OutputDevice::LogicToLogic(aTextSize, aHMMMode, aTwipMode).Height() :
-                    pDev->LogicToPixel(aTextSize, aHMMMode).Height();
+                    o3tl::toTwips(aTextSize, o3tl::Length::mm100) :
+                    pDev->LogicToPixel(Size(0, aTextSize), aHMMMode).Height();
 
             // With non-100% zoom and several lines or paragraphs, don't shrink below the result with FORMAT100 set
             if ( !bTextWysiwyg && ( rZoomY.GetNumerator() != 1 || rZoomY.GetDenominator() != 1 ) &&
@@ -547,10 +560,10 @@ tools::Long ScColumn::GetNeededSize(
             {
                 pEngine->SetControlWord( nCtrl | EEControlBits::FORMAT100 );
                 pEngine->QuickFormatDoc( true );
-                aTextSize = Size(0, pEngine->GetTextHeight());
+                aTextSize = pEngine->GetTextHeight();
                 tools::Long nSecondValue = bInPrintTwips ?
-                        OutputDevice::LogicToLogic(aTextSize, aHMMMode, aTwipMode).Height() :
-                        pDev->LogicToPixel(aTextSize, aHMMMode).Height();
+                        o3tl::toTwips(aTextSize, o3tl::Length::mm100) :
+                        pDev->LogicToPixel(Size(0, aTextSize), aHMMMode).Height();
                 if ( nSecondValue > nValue )
                     nValue = nSecondValue;
             }
@@ -663,7 +676,7 @@ class MaxStrLenFinder
         if (aValStr.getLength() <= mnMaxLen)
             return;
 
-        switch (rCell.meType)
+        switch (rCell.getType())
         {
             case CELLTYPE_NONE:
             case CELLTYPE_VALUE:
@@ -738,7 +751,8 @@ sal_uInt16 ScColumn::GetOptimalColWidth(
 
     if ( pParam && pParam->mbSimpleText )
     {   // all the same except for number format
-        const ScPatternAttr* pPattern = GetPattern( 0 );
+        SCROW nRow = 0;
+        const ScPatternAttr* pPattern = GetPattern( nRow );
         vcl::Font aFont;
         // font color doesn't matter here
         pPattern->GetFont( aFont, SC_AUTOCOL_BLACK, pDev, &rZoomX );
@@ -750,6 +764,17 @@ sal_uInt16 ScColumn::GetOptimalColWidth(
         // Try to find the row that has the longest string, and measure the width of that string.
         SvNumberFormatter* pFormatter = rDocument.GetFormatTable();
         sal_uInt32 nFormat = pPattern->GetNumberFormat( pFormatter );
+        while ((nFormat % SV_COUNTRY_LANGUAGE_OFFSET) == 0 && nRow <= 2)
+        {
+            // This is often used with CSV import or other data having a header
+            // row; if there is no specific format set try next row for actual
+            // data format.
+            // Or again in case there was a leading sep=";" row or two header
+            // rows..
+            const ScPatternAttr* pNextPattern = GetPattern( ++nRow );
+            if (pNextPattern != pPattern)
+                nFormat = pNextPattern->GetNumberFormat( pFormatter );
+        }
         OUString aLongStr;
         const Color* pColor;
         if (pParam->mnMaxTextRow >= 0)
@@ -783,22 +808,21 @@ sal_uInt16 ScColumn::GetOptimalColWidth(
 
         // Go though all non-empty cells within selection.
         sc::CellStoreType::const_iterator itPos = maCells.begin();
-        for (const auto& rMarkedSpan : aMarkedSpans)
+        for (const auto& [ nRow1, nRow2 ] : aMarkedSpans)
         {
-            SCROW nRow1 = rMarkedSpan.mnRow1, nRow2 = rMarkedSpan.mnRow2;
             SCROW nRow = nRow1;
             while (nRow <= nRow2)
             {
-                std::pair<sc::CellStoreType::const_iterator,size_t> aPos = maCells.position(itPos, nRow);
-                itPos = aPos.first;
+                size_t nOffset;
+                std::tie(itPos, nOffset) = maCells.position(itPos, nRow);
                 if (itPos->type == sc::element_type_empty)
                 {
                     // Skip empty cells.
-                    nRow += itPos->size - aPos.second;
+                    nRow += itPos->size - nOffset;
                     continue;
                 }
 
-                for (size_t nOffset = aPos.second; nOffset < itPos->size; ++nOffset, ++nRow)
+                for (; nOffset < itPos->size && nRow <= nRow2; ++nOffset, ++nRow)
                 {
                     SvtScriptType nScript = rDocument.GetScriptType(nCol, nRow, nTab);
                     if (nScript == SvtScriptType::NONE)
@@ -824,7 +848,7 @@ sal_uInt16 ScColumn::GetOptimalColWidth(
     {
         nWidth += 2;
         sal_uInt16 nTwips = static_cast<sal_uInt16>(
-            std::min(nWidth / nPPTX, double(std::numeric_limits<sal_uInt16>::max() / 2)));
+            std::min(nWidth / nPPTX, std::numeric_limits<sal_uInt16>::max() / 2.0));
         return nTwips;
     }
     else
@@ -1133,7 +1157,7 @@ protected:
         SCROW mnRow;
         OUString maStr;
 
-        StrEntry(SCROW nRow, const OUString& rStr) : mnRow(nRow), maStr(rStr) {}
+        StrEntry(SCROW nRow, OUString aStr) : mnRow(nRow), maStr(std::move(aStr)) {}
     };
 
     std::vector<StrEntry> maStrEntries;
@@ -1292,7 +1316,7 @@ bool ScColumn::HasVisibleDataAt(SCROW nRow) const
     return it->type != sc::element_type_empty;
 }
 
-bool ScColumn::IsEmptyBlock(SCROW nStartRow, SCROW nEndRow) const
+bool ScColumn::IsEmptyData(SCROW nStartRow, SCROW nEndRow) const
 {
     std::pair<sc::CellStoreType::const_iterator,size_t> aPos = maCells.position(nStartRow);
     sc::CellStoreType::const_iterator it = aPos.first;
@@ -1972,6 +1996,28 @@ void ScColumn::PrepareBroadcastersForDestruction()
     }
 }
 
+namespace
+{
+struct BroadcasterNoListenersPredicate
+{
+    bool operator()( size_t, const SvtBroadcaster* broadcaster )
+    {
+        return !broadcaster->HasListeners();
+    }
+};
+
+}
+
+void ScColumn::DeleteEmptyBroadcasters()
+{
+    if(!mbEmptyBroadcastersPending)
+        return;
+    // Clean up after ScDocument::EnableDelayDeletingBroadcasters().
+    BroadcasterNoListenersPredicate predicate;
+    sc::SetElementsToEmpty1<sc::broadcaster_block>( maBroadcasters, predicate );
+    mbEmptyBroadcastersPending = false;
+}
+
 // Sparklines
 
 namespace
@@ -2380,7 +2426,7 @@ formula::FormulaTokenRef ScColumn::ResolveStaticReference( SCROW nRow )
             const EditTextObject* pText = sc::edittext_block::at(*it->data, aPos.second);
             OUString aStr = ScEditUtil::GetString(*pText, &GetDoc());
             svl::SharedString aSS( GetDoc().GetSharedStringPool().intern(aStr));
-            return formula::FormulaTokenRef(new formula::FormulaStringToken(aSS));
+            return formula::FormulaTokenRef(new formula::FormulaStringToken(std::move(aSS)));
         }
         case sc::element_type_empty:
         default:
@@ -3139,8 +3185,11 @@ void ScColumn::SetFormulaResults( SCROW nRow, const double* pResults, size_t nLe
 
     size_t nBlockLen = it->size - aPos.second;
     if (nBlockLen < nLen)
+    {
         // Result array is longer than the length of formula cells. Not good.
+        assert( false );
         return;
+    }
 
     sc::formula_block::iterator itCell = sc::formula_block::begin(*it->data);
     std::advance(itCell, aPos.second);
@@ -3175,8 +3224,11 @@ void ScColumn::CalculateInThread( ScInterpreterContext& rContext, SCROW nRow, si
 
     size_t nBlockLen = it->size - aPos.second;
     if (nBlockLen < nLen)
+    {
         // Length is longer than the length of formula cells. Not good.
+        assert( false );
         return;
+    }
 
     sc::formula_block::iterator itCell = sc::formula_block::begin(*it->data);
     std::advance(itCell, aPos.second);
@@ -3208,8 +3260,11 @@ void ScColumn::HandleStuffAfterParallelCalculation( SCROW nRow, size_t nLen, ScI
 
     size_t nBlockLen = it->size - aPos.second;
     if (nBlockLen < nLen)
+    {
         // Length is longer than the length of formula cells. Not good.
+        assert( false );
         return;
+    }
 
     sc::formula_block::iterator itCell = sc::formula_block::begin(*it->data);
     std::advance(itCell, aPos.second);
@@ -3432,8 +3487,12 @@ void ScColumn::EndListening( SvtListener& rLst, SCROW nRow )
 
     rLst.EndListening(*pBC);
     if (!pBC->HasListeners())
-        // There is no more listeners for this cell. Remove the broadcaster.
-        maBroadcasters.set_empty(nRow, nRow);
+    {   // There is no more listeners for this cell. Remove the broadcaster.
+        if(GetDoc().IsDelayedDeletingBroadcasters())
+            mbEmptyBroadcastersPending = true;
+        else
+            maBroadcasters.set_empty(nRow, nRow);
+    }
 }
 
 void ScColumn::StartListening( sc::StartListeningContext& rCxt, const ScAddress& rAddress, SvtListener& rLst )

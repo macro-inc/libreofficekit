@@ -18,8 +18,8 @@
  */
 
 typedef union {
-    char *dval;
-    char *str;
+    const char *dval;
+    const char *str;
     Node *ptr;
 } YYSTYPE;
 #define ACCENT  257

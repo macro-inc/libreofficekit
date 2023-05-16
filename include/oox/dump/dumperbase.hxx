@@ -61,13 +61,13 @@ namespace oox::core {
 namespace oox::dump {
 
 
-#define OOX_DUMP_UNUSED                     "unused"
-#define OOX_DUMP_UNKNOWN                    "?unknown"
+inline constexpr OUStringLiteral OOX_DUMP_UNUSED = u"unused";
+inline constexpr OUStringLiteral OOX_DUMP_UNKNOWN = u"?unknown";
 
 #define OOX_DUMP_ERRASCII( ascii )          "?err:" ascii
 
 #define OOX_DUMP_ERR_NOMAP                  "no-map"
-#define OOX_DUMP_ERR_NONAME                 "no-name"
+inline constexpr OUStringLiteral OOX_DUMP_ERR_NONAME = u"no-name";
 #define OOX_DUMP_ERR_STREAM                 "stream-error"
 
 #define OOX_DUMP_DUMPEXT                    ".dump"
@@ -102,8 +102,8 @@ public:
     // file names -------------------------------------------------------------
 
     static OUString convertFileNameToUrl( const OUString& rFileName );
-    static sal_Int32    getFileNamePos( const OUString& rFileUrl );
-    static OUString getFileNameExtension( const OUString& rFileUrl );
+    static sal_Int32    getFileNamePos( std::u16string_view rFileUrl );
+    static std::u16string_view getFileNameExtension( std::u16string_view rFileUrl );
 
     // input streams ----------------------------------------------------------
 
@@ -236,7 +236,7 @@ struct ItemFormat
 
         @return  List containing remaining unhandled format strings.
      */
-    OUStringVector      parse( const OUString& rFormatStr );
+    OUStringVector      parse( std::u16string_view rFormatStr );
 };
 
 
@@ -247,7 +247,7 @@ public:
     // append string to string ------------------------------------------------
 
     static void         appendChar( OUStringBuffer& rStr, sal_Unicode cChar, sal_Int32 nCount );
-    static void         appendString( OUStringBuffer& rStr, const OUString& rData, sal_Int32 nWidth, sal_Unicode cFill = ' ' );
+    static void         appendString( OUStringBuffer& rStr, std::u16string_view rData, sal_Int32 nWidth, sal_Unicode cFill = ' ' );
 
     // append decimal ---------------------------------------------------------
 
@@ -312,7 +312,7 @@ public:
 
     static void         appendCChar( OUStringBuffer& rStr, sal_Unicode cChar, bool bPrefix = true );
     static void         appendEncChar( OUStringBuffer& rStr, sal_Unicode cChar, sal_Int32 nCount, bool bPrefix = true );
-    static void         appendEncString( OUStringBuffer& rStr, const OUString& rData, bool bPrefix = true );
+    static void         appendEncString( OUStringBuffer& rStr, std::u16string_view rData, bool bPrefix = true );
 
     // token list -------------------------------------------------------------
 
@@ -320,33 +320,33 @@ public:
 
     static void         appendIndex( OUStringBuffer& rStr, sal_Int64 nIdx );
 
-    static OUString getToken( const OUString& rData, sal_Int32& rnPos, sal_Unicode cSep = OOX_DUMP_LISTSEP );
+    static std::u16string_view getToken( std::u16string_view rData, sal_Int32& rnPos, sal_Unicode cSep = OOX_DUMP_LISTSEP );
 
     /** Encloses the passed string with the passed characters. Uses cOpen, if cClose is NUL. */
     static void         enclose( OUStringBuffer& rStr, sal_Unicode cOpen, sal_Unicode cClose = '\0' );
 
     // string conversion ------------------------------------------------------
 
-    static OUString trimSpaces( const OUString& rStr );
+    static std::u16string_view trimSpaces( std::u16string_view rStr );
     static OUString trimTrailingNul( const OUString& rStr );
 
     static OString convertToUtf8( std::u16string_view rStr );
     static DataType     convertToDataType( std::u16string_view rStr );
     static FormatType   convertToFormatType( std::u16string_view rStr );
 
-    static bool         convertFromDec( sal_Int64& ornData, const OUString& rData );
-    static bool         convertFromHex( sal_Int64& ornData, const OUString& rData );
+    static bool         convertFromDec( sal_Int64& ornData, std::u16string_view rData );
+    static bool         convertFromHex( sal_Int64& ornData, std::u16string_view rData );
 
-    static bool         convertStringToInt( sal_Int64& ornData, const OUString& rData );
-    static bool         convertStringToDouble( double& orfData, const OUString& rData );
-    static bool         convertStringToBool( const OUString& rData );
+    static bool         convertStringToInt( sal_Int64& ornData, std::u16string_view rData );
+    static bool         convertStringToDouble( double& orfData, std::u16string_view rData );
+    static bool         convertStringToBool( std::u16string_view rData );
 
     static OUStringPair convertStringToPair( const OUString& rString, sal_Unicode cSep = '=' );
 
     // string to list conversion ----------------------------------------------
 
-    static void         convertStringToStringList( OUStringVector& orVec, const OUString& rData, bool bIgnoreEmpty );
-    static void         convertStringToIntList( Int64Vector& orVec, const OUString& rData, bool bIgnoreEmpty );
+    static void         convertStringToStringList( OUStringVector& orVec, std::u16string_view rData, bool bIgnoreEmpty );
+    static void         convertStringToIntList( Int64Vector& orVec, std::u16string_view rData, bool bIgnoreEmpty );
 };
 
 
@@ -572,9 +572,9 @@ protected:
 
 private:
     /** Includes name lists, given in a comma separated list of names of the lists. */
-    void                include( const OUString& rListKeys );
+    void                include( std::u16string_view rListKeys );
     /** Excludes names from the list, given in a comma separated list of their keys. */
-    void                exclude( const OUString& rKeys );
+    void                exclude( std::u16string_view rKeys );
 
 private:
     OUStringMap         maMap;
@@ -723,7 +723,7 @@ public:
                  NameListWrapper() {}
     /*implicit*/ NameListWrapper( const OUString& rListName ) : maName( rListName ) {}
     /*implicit*/ NameListWrapper( const char* pcListName ) : maName( pcListName ) {}
-    /*implicit*/ NameListWrapper( const NameListRef& rxList ) : mxList( rxList ) {}
+    /*implicit*/ NameListWrapper( NameListRef xList ) : mxList(std::move( xList )) {}
 
     bool         isEmpty() const { return !mxList && !maName.has(); }
     const NameListRef &  getNameList( const Config& rCfg ) const;
@@ -761,8 +761,8 @@ public:
     explicit            SharedConfigData(
                             const OUString& rFileName,
                             const css::uno::Reference< css::uno::XComponentContext >& rxContext,
-                            const StorageRef& rxRootStrg,
-                            const OUString& rSysFileName );
+                            StorageRef xRootStrg,
+                            OUString aSysFileName );
 
     virtual             ~SharedConfigData() override;
 
@@ -789,8 +789,8 @@ private:
     bool                readConfigFile( const OUString& rFileUrl );
     template< typename ListType >
     void                readNameList( TextInputStream& rStrm, const OUString& rListName );
-    void                createShortList( const OUString& rData );
-    void                createUnitConverter( const OUString& rData );
+    void                createShortList( std::u16string_view rData );
+    void                createUnitConverter( std::u16string_view rData );
 
 private:
     typedef ::std::set< OUString >                   ConfigFileSet;
@@ -955,7 +955,7 @@ public:
 
     void                writeChar( sal_Unicode cChar, sal_Int32 nCount = 1 );
     void                writeAscii( const char* pcStr );
-    void                writeString( const OUString& rStr );
+    void                writeString( std::u16string_view rStr );
     void                writeArray( const sal_uInt8* pnData, std::size_t nSize, sal_Unicode cSep = OOX_DUMP_LISTSEP );
     void                writeBool( bool bData );
     void                writeDateTime( const css::util::DateTime& rDateTime );
@@ -1072,7 +1072,7 @@ private:
 class StorageIterator : public Base
 {
 public:
-    explicit            StorageIterator( const StorageRef& rxStrg );
+    explicit            StorageIterator( StorageRef xStrg );
     virtual             ~StorageIterator() override;
 
     StorageIterator&    operator++();
@@ -1159,7 +1159,7 @@ protected:
 
 private:
     static OUString     getSysFileName(
-                            const OUString& rStrmName,
+                            std::u16string_view rStrmName,
                             std::u16string_view rSysOutPath );
 
     void                extractStream(
@@ -1185,8 +1185,8 @@ private:
         OUString     maName;
         bool                mbStorage;
 
-        explicit     PreferredItem( const OUString& rName, bool bStorage ) :
-                                maName( rName ), mbStorage( bStorage ) {}
+        explicit     PreferredItem( OUString aName, bool bStorage ) :
+                                maName(std::move( aName )), mbStorage( bStorage ) {}
     };
     typedef ::std::vector< PreferredItem > PreferredItemVector;
 
@@ -1219,7 +1219,7 @@ protected:
     void                writeEmptyItem( const String& rName );
     void                writeInfoItem( const String& rName, const String& rData );
     void                writeCharItem( const String& rName, sal_Unicode cData );
-    void                writeStringItem( const String& rName, const OUString& rData );
+    void                writeStringItem( const String& rName, std::u16string_view rData );
     void                writeArrayItem( const String& rName, const sal_uInt8* pnData, std::size_t nSize, sal_Unicode cSep = OOX_DUMP_LISTSEP );
     void                writeDateTimeItem( const String& rName, const css::util::DateTime& rDateTime );
     void                writeGuidItem( const String& rName, const OUString& rGuid );
@@ -1393,8 +1393,8 @@ protected:
     void                dumpRemainingStream();
 
     void                dumpArray( const String& rName, sal_Int32 nBytes, sal_Unicode cSep = OOX_DUMP_LISTSEP );
-    void                dumpUnused( sal_Int32 nBytes ) { dumpArray( OOX_DUMP_UNUSED, nBytes ); }
-    void                dumpUnknown( sal_Int32 nBytes ) { dumpArray( OOX_DUMP_UNKNOWN, nBytes ); }
+    void                dumpUnused( sal_Int32 nBytes ) { dumpArray( OUString(OOX_DUMP_UNUSED), nBytes ); }
+    void                dumpUnknown( sal_Int32 nBytes ) { dumpArray( OUString(OOX_DUMP_UNKNOWN), nBytes ); }
 
     sal_Unicode         dumpUnicode( const String& rName );
 
@@ -1620,7 +1620,7 @@ public:
 
 private:
     virtual void        implDumpText( TextInputStream& rTextStrm ) override;
-    void        implDumpLine( const OUString& rLine, sal_uInt32 nLine );
+    void        implDumpLine( std::u16string_view rLine, sal_uInt32 nLine );
 };
 
 

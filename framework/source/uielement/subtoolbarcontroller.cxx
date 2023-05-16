@@ -168,7 +168,7 @@ void SubToolBarController::statusChanged( const css::frame::FeatureStateEvent& E
         {
             // Enum command, such as the current custom shape,
             // toggle checked state.
-            if ( m_aLastCommand == OUStringConcatenation( m_aCommandURL + "." + aStrValue ) )
+            if ( m_aLastCommand == Concat2View( m_aCommandURL + "." + aStrValue ) )
             {
                 eTri = TRISTATE_TRUE;
                 nItemBits |= ToolBoxItemBits::CHECKABLE;
@@ -200,7 +200,7 @@ void SubToolBarController::execute( sal_Int16 nKeyModifier )
     if ( !m_aLastCommand.isEmpty() )
     {
         auto aArgs( comphelper::InitPropertySequence( {
-            { "KeyModifier", css::uno::makeAny( nKeyModifier ) }
+            { "KeyModifier", css::uno::Any( nKeyModifier ) }
         } ) );
         dispatchCommand( m_aLastCommand, aArgs );
     }
@@ -261,10 +261,10 @@ std::unique_ptr<WeldToolbarPopup> SubToolBarController::weldPopupWindow()
     css::uno::Reference< css::awt::XWindow > xParent = new weld::TransportAsXWindow(pPopup->GetContainer());
 
     auto aPropSeq( comphelper::InitPropertySequence( {
-        { "Frame", css::uno::makeAny( xFrame ) },
-        { "ParentWindow", css::uno::makeAny( xParent ) },
-        { "Persistent", css::uno::makeAny( false ) },
-        { "PopupMode", css::uno::makeAny( true ) }
+        { "Frame", css::uno::Any( xFrame ) },
+        { "ParentWindow", css::uno::Any( xParent ) },
+        { "Persistent", css::uno::Any( false ) },
+        { "PopupMode", css::uno::Any( true ) }
     } ) );
 
     try
@@ -300,10 +300,10 @@ VclPtr<vcl::Window> SubToolBarController::createVclPopupWindow(vcl::Window* /*pP
         }
 
         auto aPropSeq( comphelper::InitPropertySequence( {
-            { "Frame", css::uno::makeAny( xFrame ) },
-            { "ParentWindow", css::uno::makeAny( m_xParentWindow ) },
-            { "Persistent", css::uno::makeAny( false ) },
-            { "PopupMode", css::uno::makeAny( true ) }
+            { "Frame", css::uno::Any( xFrame ) },
+            { "ParentWindow", css::uno::Any( m_xParentWindow ) },
+            { "Persistent", css::uno::Any( false ) },
+            { "PopupMode", css::uno::Any( true ) }
         } ) );
 
         try
@@ -458,7 +458,7 @@ void SubToolBarController::endPopupMode( const css::awt::EndPopupModeEvent& e )
         {
             OUString aPersistentString( "Persistent" );
             css::uno::Any a = xProp->getPropertyValue( aPersistentString );
-            xProp->setPropertyValue( aPersistentString, css::uno::makeAny( false ) );
+            xProp->setPropertyValue( aPersistentString, css::uno::Any( false ) );
 
             xLayoutManager->hideElement( aSubToolBarResName );
             xLayoutManager->floatWindow( aSubToolBarResName );

@@ -30,10 +30,12 @@ $(eval $(call gb_CppunitTest_use_library_objects,svgio,\
 $(eval $(call gb_CppunitTest_use_libraries,svgio,\
     basegfx \
     drawinglayer \
+    drawinglayercore \
     cppu \
     cppuhelper \
     comphelper \
     sal \
+    salhelper \
     sax \
     svt \
     test \

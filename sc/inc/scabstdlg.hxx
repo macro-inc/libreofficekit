@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include <tools/solar.h>
 #include <com/sun/star/sheet/DataPilotFieldOrientation.hpp>
 #include <sfx2/tabdlg.hxx>
 #include <tools/fldunit.hxx>
@@ -233,12 +232,12 @@ protected:
 public:
     virtual void            InitFromOldLink( const OUString& rFile, const OUString& rFilter,
                                         const OUString& rOptions, const OUString& rSource,
-                                        sal_uLong nRefresh ) = 0;
+                                        sal_Int32 nRefreshDelaySeconds ) = 0;
     virtual OUString        GetURL() = 0;
     virtual OUString        GetFilter() = 0;        // may be empty
     virtual OUString        GetOptions() = 0;       // filter options
     virtual OUString        GetSource() = 0;        // separated by ";"
-    virtual sal_uLong       GetRefresh() = 0;       // 0 if disabled
+    virtual sal_Int32       GetRefreshDelaySeconds() = 0;       // 0 if disabled
 };
 
 class AbstractScMetricInputDlg : public VclAbstractDialog
@@ -397,6 +396,17 @@ public:
     virtual bool IsKeepAskingSet() const = 0;
 };
 
+class AbstractScGoToTabDlg : public VclAbstractDialog
+{
+protected:
+    virtual             ~AbstractScGoToTabDlg() override = default;
+public:
+    virtual void Insert( const OUString& rString, bool bSelected ) = 0;
+    virtual void SetDescription(const OUString& rTitle, const OUString& rEntryLabel, const OUString& rListLabel,
+                                const OString& rDlgHelpId, const OString& rEnHelpId, const OString& rLbHelpId) = 0;
+    virtual OUString GetSelectedEntry() const = 0;
+};
+
 class ScAbstractDialogFactory
 {
 public:
@@ -526,6 +536,8 @@ public:
                                                                         const OUString*         pStrTitle,
                                                                         bool                    bOnlyDbtoolsEncodings,
                                                                         bool                    bImport = true ) = 0;
+
+    virtual VclPtr<AbstractScGoToTabDlg> CreateScGoToTabDlg(weld::Window* pParent) = 0;
 
     virtual VclPtr<SfxAbstractTabDialog> CreateScAttrDlg(weld::Window* pParent,
                                                     const SfxItemSet* pCellAttrs) = 0;

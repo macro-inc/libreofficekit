@@ -35,7 +35,7 @@
 #include <vcl/ptrstyle.hxx>
 #include <salhelper/thread.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <tools/stream.hxx>
 #include <vcl/svapp.hxx>
@@ -45,9 +45,9 @@
 #include <vcl/toolkit/button.hxx>
 #include <vcl/toolkit/combobox.hxx>
 #include <vcl/toolbox.hxx>
-#include <vcl/pngwrite.hxx>
 #include <vcl/toolkit/floatwin.hxx>
 #include <vcl/help.hxx>
+#include <vcl/kernarray.hxx>
 #include <vcl/menu.hxx>
 #include <vcl/ImageTree.hxx>
 #include <vcl/BitmapEmbossGreyFilter.hxx>
@@ -56,6 +56,10 @@
 
 #include <basegfx/numeric/ftools.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
+
+#include <framework/desktop.hxx>
+#include <i18nlangtag/languagetag.hxx>
+#include <i18nlangtag/mslangid.hxx>
 
 #define FIXME_SELF_INTERSECTING_WORKING 0
 #define FIXME_BOUNCE_BUTTON 0
@@ -138,7 +142,7 @@ public:
                    , mnBounceY(1)
 #endif
     {
-        if (!Application::LoadBrandBitmap("intro", maIntro))
+        if (!Application::LoadBrandBitmap(u"intro", maIntro))
             Application::Abort("Failed to load intro image");
 
         maIntroBW = maIntro.GetBitmap();
@@ -239,7 +243,7 @@ public:
         Gradient aGradient;
         aGradient.SetStartColor(COL_BLUE);
         aGradient.SetEndColor(COL_GREEN);
-        aGradient.SetStyle(GradientStyle::Linear);
+        aGradient.SetStyle(css::awt::GradientStyle_LINEAR);
         rDev.DrawGradient(r, aGradient);
     }
 
@@ -297,10 +301,10 @@ public:
                     rDev.SetLineColor(COL_BLACK);
                     basegfx::B2DPolygon aPoly;
                     tools::Rectangle aSub(aRegions[i]);
-                    for (size_t j = 0; j < SAL_N_ELEMENTS(aPoints); j++)
+                    for (const auto& rPoint : aPoints)
                     {
-                        aPoly.append(basegfx::B2DPoint(aSub.Left() + aSub.GetWidth() * aPoints[j].nX,
-                                                       aSub.Top()  + aSub.GetHeight() * aPoints[j].nY));
+                        aPoly.append(basegfx::B2DPoint(aSub.Left() + aSub.GetWidth() * rPoint.nX,
+                                                       aSub.Top()  + aSub.GetHeight() * rPoint.nY));
                     }
                     rDev.DrawPolyLine(aPoly, aLineWidths[i], eJoins[i], eLineCaps[i]);
                 }
@@ -366,7 +370,7 @@ public:
                 {
                     for (int x = 0; x < 4; x++)
                     {
-                        assert(i < SAL_N_ELEMENTS(aRenderData));
+                        assert(i < std::size(aRenderData));
                         drawText(rDev, aSubRegions[i], aRenderData[i].mbClip,
                                  aRenderData[i].mbArabicText, aRenderData[i].mbRotate);
                         i++;
@@ -547,7 +551,7 @@ public:
             Point aPos(r.Left(), r.Top()+20);
 
             tools::Long nMaxTextHeight = 0;
-            for (size_t i = 0; i < SAL_N_ELEMENTS(aRuns); ++i)
+            for (size_t i = 0; i < std::size(aRuns); ++i)
             {
                 // Legend
                 vcl::Font aIndexFont("sans", Size(0,20));
@@ -570,7 +574,7 @@ public:
                                     aRuns[i].mpFont),
                                 Size(0,42));
                 aFont.SetColor(COL_BLACK);
-                for (size_t j = 0; j < SAL_N_ELEMENTS(aWeights); ++j)
+                for (size_t j = 0; j < std::size(aWeights); ++j)
                 {
                     aFont.SetItalic(aItalics[j]);
                     aFont.SetWeight(aWeights[j]);
@@ -630,7 +634,7 @@ public:
                 }
 
                 // DX array rendering
-                std::vector<sal_Int32> aItems;
+                KernArray aItems;
                 rDev.GetTextArray(aText, &aItems);
                 for (tools::Long j = 0; j < aText.getLength(); ++j)
                 {
@@ -666,8 +670,8 @@ public:
                     tools::Rectangle aSub(aRegions[i]);
                     tools::Rectangle aSmaller(aSub);
                     aSmaller.Move(10,10);
-                    aSmaller.setWidth(aSmaller.getWidth()-20);
-                    aSmaller.setHeight(aSmaller.getHeight()-24);
+                    aSmaller.setWidth(aSmaller.getOpenWidth()-20);
+                    aSmaller.setHeight(aSmaller.getOpenHeight()-24);
                     switch (i) {
                     case 0:
                         aRegion = vcl::Region(aSub);
@@ -790,11 +794,11 @@ public:
                     COL_GRAY, COL_GRAY, COL_LIGHTGRAY, COL_LIGHTBLUE, COL_LIGHTCYAN,
                     COL_BLUE, COL_BLUE, COL_BLUE, COL_CYAN, COL_CYAN
                 };
-                GradientStyle eStyles[] = {
-                    GradientStyle::Linear, GradientStyle::Axial, GradientStyle::Radial, GradientStyle::Elliptical, GradientStyle::Square,
-                    GradientStyle::Rect, GradientStyle::FORCE_EQUAL_SIZE, GradientStyle::Linear, GradientStyle::Radial, GradientStyle::Linear,
-                    GradientStyle::Linear, GradientStyle::Axial, GradientStyle::Radial, GradientStyle::Elliptical, GradientStyle::Square,
-                    GradientStyle::Rect, GradientStyle::FORCE_EQUAL_SIZE, GradientStyle::Linear, GradientStyle::Radial, GradientStyle::Linear
+                css::awt::GradientStyle eStyles[] = {
+                    css::awt::GradientStyle_LINEAR, css::awt::GradientStyle_AXIAL, css::awt::GradientStyle_RADIAL, css::awt::GradientStyle_ELLIPTICAL, css::awt::GradientStyle_SQUARE,
+                    css::awt::GradientStyle_RECT, css::awt::GradientStyle::GradientStyle_MAKE_FIXED_SIZE, css::awt::GradientStyle_LINEAR, css::awt::GradientStyle_RADIAL, css::awt::GradientStyle_LINEAR,
+                    css::awt::GradientStyle_LINEAR, css::awt::GradientStyle_AXIAL, css::awt::GradientStyle_RADIAL, css::awt::GradientStyle_ELLIPTICAL, css::awt::GradientStyle_SQUARE,
+                    css::awt::GradientStyle_RECT, css::awt::GradientStyle::GradientStyle_MAKE_FIXED_SIZE, css::awt::GradientStyle_LINEAR, css::awt::GradientStyle_RADIAL, css::awt::GradientStyle_LINEAR
                 };
                 sal_uInt16 nAngles[] = {
                     0, 0, 0, 0, 0,
@@ -832,7 +836,7 @@ public:
                 Gradient aGradient;
                 aGradient.SetStartColor(COL_YELLOW);
                 aGradient.SetEndColor(COL_RED);
-                aGradient.SetStyle(GradientStyle::Rect);
+                aGradient.SetStyle(css::awt::GradientStyle_RECT);
                 aGradient.SetBorder(r.GetSize().Width()/20);
                 rDev.DrawGradient(r, aGradient);
             }
@@ -864,9 +868,9 @@ public:
             tools::Long aSizes[] = { 200, 100, 200, 100, 50, 5, 2 };
 
             // and yes - we really do this in the page border rendering code ...
-            for (size_t i = 0; i < SAL_N_ELEMENTS(aSizes); i++)
+            for (const auto& rSize : aSizes)
             {
-                aShadowStretch.Scale(Size(aShadowStretch.GetSizePixel().Width(), aSizes[i]),
+                aShadowStretch.Scale(Size(aShadowStretch.GetSizePixel().Width(), rSize),
                                      BmpScaleFlag::Fast);
 
                 rDev.DrawBitmapEx(aRenderPt, aShadowStretch);
@@ -944,8 +948,8 @@ public:
                     tools::Rectangle aSubRect(r);
                     aSubRect.Move(x * r.GetWidth()/3, y * r.GetHeight()/3);
                     aSubRect.SetSize(Size(r.GetWidth()/2, r.GetHeight()/4));
-                    tools::Polygon aPoly(SAL_N_ELEMENTS(aPoints));
-                    for (size_t v = 0; v < SAL_N_ELEMENTS(aPoints); v++)
+                    tools::Polygon aPoly(std::size(aPoints));
+                    for (size_t v = 0; v < std::size(aPoints); v++)
                     {
                         aPoly.SetPoint(Point(aSubRect.Left() +
                                              aSubRect.GetWidth() * aPoints[v].nX,
@@ -1023,7 +1027,7 @@ public:
                 tools::Rectangle aOuter = aRegions[3];
                 std::vector<tools::Rectangle> aPieces(DemoRenderer::partition(aOuter, 2, 2));
                 bool bDone = false;
-                for (int j = 0; !bDone; ++j)
+                while (!bDone)
                 {
                     rDev.Push(vcl::PushFlags::CLIPREGION);
 
@@ -1782,7 +1786,7 @@ public:
     virtual void Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle& rRect) override
     {
         mrRenderer.SetSizePixel(GetSizePixel());
-        fprintf(stderr, "DemoWin::Paint(%" SAL_PRIdINT64 ",%" SAL_PRIdINT64 ",%" SAL_PRIdINT64 ",%" SAL_PRIdINT64 ")\n", sal_Int64(rRect.Left()), sal_Int64(rRect.Top()), sal_Int64(rRect.getWidth()), sal_Int64(rRect.getHeight()));
+        fprintf(stderr, "DemoWin::Paint(%" SAL_PRIdINT64 ",%" SAL_PRIdINT64 ",%" SAL_PRIdINT64 ",%" SAL_PRIdINT64 ")\n", sal_Int64(rRect.Left()), sal_Int64(rRect.Top()), sal_Int64(rRect.getOpenWidth()), sal_Int64(rRect.getOpenHeight()));
         if (mrRenderer.getIterCount() == 0)
             mrRenderer.drawToDevice(rRenderContext, GetSizePixel(), false);
         else
@@ -1919,7 +1923,7 @@ public:
 
         Help::EnableBalloonHelp();
         mpToolbox->SetHelpText("Help text");
-        mpToolbox->InsertItem(ToolBoxItemId(0), "Toolbar item");
+        mpToolbox->InsertItem(ToolBoxItemId(0), "Toolbar item", OUString());
         mpToolbox->SetQuickHelpText(ToolBoxItemId(0), "This is a tooltip popup");
         mpToolbox->InsertSeparator();
         mpToolbox->Show();
@@ -2222,6 +2226,8 @@ public:
 protected:
     void Init() override
     {
+        LanguageTag::setConfiguredSystemLanguage(MsLangId::getSystemLanguage());
+
         try
         {
             uno::Reference<uno::XComponentContext> xComponentContext
@@ -2240,6 +2246,9 @@ protected:
     }
     void DeInit() override
     {
+        framework::getDesktop(::comphelper::getProcessComponentContext())->terminate();
+        framework::getDesktop(::comphelper::getProcessComponentContext())->disposing();
+
         uno::Reference< lang::XComponent >(
             comphelper::getProcessComponentContext(),
         uno::UNO_QUERY_THROW)-> dispose();

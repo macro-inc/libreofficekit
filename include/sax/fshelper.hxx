@@ -50,6 +50,9 @@ public:
 
     ~FastSerializerHelper();
 
+    void startDocument();
+    void endDocument();
+
     /// Start an element. After the first argument there can be a number of (attribute, value) pairs.
     template<typename... Args>
     void startElement(sal_Int32 elementTokenId, sal_Int32 attribute, const char* value, Args &&... args)
@@ -156,7 +159,7 @@ private:
     void pushAttributeValue( sal_Int32 attribute, const char* value );
     void pushAttributeValue( sal_Int32 attribute, const OString& value );
 
-    FastSaxSerializer* mpSerializer;
+    std::unique_ptr<FastSaxSerializer> mpSerializer;
 };
 
 typedef std::shared_ptr< FastSerializerHelper > FSHelperPtr;

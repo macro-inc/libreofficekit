@@ -20,6 +20,7 @@
 #include "xmlExport.hxx"
 #include "xmlAutoStyle.hxx"
 #include <sax/tools/converter.hxx>
+#include <utility>
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/namespacemap.hxx>
@@ -44,7 +45,7 @@
 #include <com/sun/star/awt/FontDescriptor.hpp>
 #include <svl/filenotation.hxx>
 #include <unotools/pathoptions.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <connectivity/DriversConfig.hxx>
 #include <connectivity/dbtools.hxx>
 
@@ -281,15 +282,15 @@ void ODBExport::exportDataSource()
                 const XMLTokenEnum                          eAttributeToken;
                 const ::std::optional< OUString >  aXMLDefault;
 
-                PropertyMap( const OUString& _rPropertyName, const XMLTokenEnum _eToken )
-                    :sPropertyName( _rPropertyName )
+                PropertyMap( OUString _sPropertyName, const XMLTokenEnum _eToken )
+                    :sPropertyName(std::move( _sPropertyName ))
                     ,eAttributeToken( _eToken )
                     ,aXMLDefault()
                 {
                 }
 
-                PropertyMap( const OUString& _rPropertyName, const XMLTokenEnum _eToken, const OUString& _rDefault )
-                    :sPropertyName( _rPropertyName )
+                PropertyMap( OUString _sPropertyName, const XMLTokenEnum _eToken, const OUString& _rDefault )
+                    :sPropertyName(std::move( _sPropertyName ))
                     ,eAttributeToken( _eToken )
                     ,aXMLDefault( _rDefault )
                 {

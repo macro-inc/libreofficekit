@@ -21,13 +21,12 @@
 #include <memory>
 #include <awt/vclxgraphics.hxx>
 #include <toolkit/awt/vclxdevice.hxx>
-#include <toolkit/helper/macros.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <cppuhelper/queryinterface.hxx>
 
 #include <vcl/svapp.hxx>
 #include <vcl/outdev.hxx>
 #include <vcl/image.hxx>
+#include <vcl/kernarray.hxx>
 #include <vcl/gradient.hxx>
 #include <vcl/metric.hxx>
 #include <tools/debug.hxx>
@@ -436,7 +435,7 @@ void VCLXGraphics::drawGradient( sal_Int32 x, sal_Int32 y, sal_Int32 width, sal_
         return;
 
     InitOutputDevice( InitOutDevFlags::COLORS );
-    Gradient aGradient(static_cast<GradientStyle>(rGradient.Style), Color(ColorTransparency, rGradient.StartColor), Color(ColorTransparency, rGradient.EndColor));
+    Gradient aGradient(rGradient.Style, Color(ColorTransparency, rGradient.StartColor), Color(ColorTransparency, rGradient.EndColor));
     aGradient.SetAngle(Degree10(rGradient.Angle));
     aGradient.SetBorder(rGradient.Border);
     aGradient.SetOfsX(rGradient.XOffset);
@@ -465,12 +464,11 @@ void VCLXGraphics::drawTextArray( sal_Int32 x, sal_Int32 y, const OUString& rTex
     if( mpOutputDevice )
     {
         InitOutputDevice( InitOutDevFlags::COLORS|InitOutDevFlags::FONT );
-        std::vector<sal_Int32> aDXA(rText.getLength());
-        for(int i = 0; i < rText.getLength(); i++)
-        {
-            aDXA[i] = rLongs[i];
-        }
-        mpOutputDevice->DrawTextArray( Point( x, y ), rText, aDXA );
+        KernArray aDXA;
+        aDXA.reserve(rText.getLength());
+        for(int i = 0; i < rText.getLength(); ++i)
+            aDXA.push_back(rLongs[i]);
+        mpOutputDevice->DrawTextArray( Point( x, y ), rText, aDXA, {}, 0, rText.getLength());
     }
 }
 

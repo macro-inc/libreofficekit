@@ -23,6 +23,7 @@
 #include <sal/config.h>
 
 #include <hintids.hxx>
+#include <comphelper/servicehelper.hxx>
 #include <svl/languageoptions.hxx>
 #include <sfx2/linkmgr.hxx>
 #include <sfx2/htmlmode.hxx>
@@ -79,8 +80,11 @@
 #include <strings.hrc>
 #include <unotxdoc.hxx>
 #include <doc.hxx>
+#include <drawdoc.hxx>
 #include <IDocumentSettingAccess.hxx>
+#include <IDocumentDrawModelAccess.hxx>
 #include <IDocumentUndoRedo.hxx>
+#include <ThemeColorChanger.hxx>
 #include <swabstdlg.hxx>
 #include <modcfg.hxx>
 #include <svx/fmshell.hxx>
@@ -89,22 +93,28 @@
 #include <svx/galleryitem.hxx>
 #include <sfx2/devtools/DevelopmentToolChildWindow.hxx>
 #include <com/sun/star/gallery/GalleryItemType.hpp>
+#include <com/sun/star/beans/PropertyValues.hpp>
 #include <memory>
 
 #include <svx/unobrushitemhelper.hxx>
+#include <svx/dialog/ThemeDialog.hxx>
 #include <comphelper/scopeguard.hxx>
 #include <comphelper/lok.hxx>
 #include <osl/diagnose.h>
 
 #include <svx/svxdlg.hxx>
+#include <comphelper/sequenceashashmap.hxx>
 
 #include <shellres.hxx>
 #include <UndoTable.hxx>
 
 #include <ndtxt.hxx>
 #include <UndoManager.hxx>
+#include <fmtrfmrk.hxx>
+#include <txtrfmrk.hxx>
+#include <translatehelper.hxx>
 
-FlyMode SwBaseShell::eFrameMode = FLY_DRAG_END;
+FlyMode SwBaseShell::s_eFrameMode = FLY_DRAG_END;
 
 // These variables keep the state of Gallery (slot SID_GALLERY_BG_BRUSH)
 // detected by GetGalleryState() for the subsequent ExecuteGallery() call.
@@ -207,7 +217,7 @@ void SwBaseShell::ExecDelete(SfxRequest &rReq)
                 // is an outline node with folded content.
                 if (rSh.IsEndPara())
                 {
-                    SwNodeIndex aIdx(rSh.GetCursor()->GetNode());
+                    SwNodeIndex aIdx(rSh.GetCursor()->GetPointNode());
                     if (aIdx.GetNode().IsTextNode())
                     {
                         bool bVisible = true;
@@ -236,7 +246,7 @@ void SwBaseShell::ExecDelete(SfxRequest &rReq)
                 // node is a content node without a layout frame.
                 if (rSh.IsSttPara())
                 {
-                    SwNodeIndex aIdx(rSh.GetCursor()->GetNode());
+                    SwNodeIndex aIdx(rSh.GetCursor()->GetPointNode());
                     if (aIdx.GetNode().IsTextNode())
                     {
                         bool bVisible = true;
@@ -253,7 +263,7 @@ void SwBaseShell::ExecDelete(SfxRequest &rReq)
             if( rSh.IsNoNum() )
             {
                 rSh.SttCursorMove();
-                bool bLeft = rSh.Left( CRSR_SKIP_CHARS, true, 1, false  );
+                bool bLeft = rSh.Left( SwCursorSkipMode::Chars, true, 1, false  );
                 if( bLeft )
                 {
                     rSh.DelLeft();
@@ -571,7 +581,7 @@ void SwBaseShell::StateClpbrd(SfxItemSet &rSet)
                     TransferableDataHelper::CreateFromSystemClipboard(
                                             &rSh.GetView().GetEditWin()) );
 
-                SvxClipboardFormatItem aFormatItem( nWhich );
+                SvxClipboardFormatItem aFormatItem( SID_CLIPBOARD_FORMAT_ITEMS );
                 SwTransferable::FillClipFormatItem( rSh, aDataHelper, aFormatItem );
                 rSet.Put( aFormatItem );
             }
@@ -585,7 +595,7 @@ void SwBaseShell::StateClpbrd(SfxItemSet &rSet)
 
 void SwBaseShell::ExecUndo(SfxRequest &rReq)
 {
-    MakeAllOutlineContentTemporarilyVisible a(GetShell().GetDoc());
+    MakeAllOutlineContentTemporarilyVisible a(GetShell().GetDoc(), true);
 
     SwWrtShell &rWrtShell = GetShell();
 
@@ -599,8 +609,9 @@ void SwBaseShell::ExecUndo(SfxRequest &rReq)
     // Repair mode: allow undo/redo of all undo actions, even if access would
     // be limited based on the view shell ID.
     bool bRepair = false;
-    if (pArgs && pArgs->GetItemState(SID_REPAIRPACKAGE, false, &pItem) == SfxItemState::SET)
-        bRepair = static_cast<const SfxBoolItem*>(pItem)->GetValue();
+    const SfxBoolItem* pRepairItem;
+    if (pArgs && (pRepairItem = pArgs->GetItemIfSet(SID_REPAIRPACKAGE, false)))
+        bRepair = pRepairItem->GetValue();
 
     // #i106349#: save pointer: undo/redo may delete the shell, i.e., this!
     SfxViewFrame *const pViewFrame( GetView().GetViewFrame() );
@@ -763,6 +774,219 @@ void SwBaseShell::StateUndo(SfxItemSet &rSet)
     }
 }
 
+namespace
+{
+/// Searches for the specified field type and field name prefix and update the matching fields to
+/// have the provided new name and content.
+bool UpdateFieldConents(SfxRequest& rReq, SwWrtShell& rWrtSh)
+{
+    const SfxStringItem* pTypeName = rReq.GetArg<SfxStringItem>(FN_PARAM_1);
+    if (!pTypeName || pTypeName->GetValue() != "SetRef")
+    {
+        // This is implemented so far only for reference marks.
+        return false;
+    }
+
+    const SfxStringItem* pNamePrefix = rReq.GetArg<SfxStringItem>(FN_PARAM_2);
+    if (!pNamePrefix)
+    {
+        return false;
+    }
+    const OUString& rNamePrefix = pNamePrefix->GetValue();
+
+    const SfxUnoAnyItem* pFields = rReq.GetArg<SfxUnoAnyItem>(FN_PARAM_3);
+    if (!pFields)
+    {
+        return false;
+    }
+    uno::Sequence<beans::PropertyValues> aFields;
+    pFields->GetValue() >>= aFields;
+
+    SwDoc* pDoc = rWrtSh.GetDoc();
+    pDoc->GetIDocumentUndoRedo().StartUndo(SwUndoId::INSBOOKMARK, nullptr);
+    rWrtSh.StartAction();
+
+    std::vector<const SwFormatRefMark*> aRefMarks;
+
+    for (sal_uInt16 i = 0; i < pDoc->GetRefMarks(); ++i)
+    {
+        aRefMarks.push_back(pDoc->GetRefMark(i));
+    }
+
+    std::sort(aRefMarks.begin(), aRefMarks.end(),
+              [](const SwFormatRefMark* pMark1, const SwFormatRefMark* pMark2) -> bool {
+                  const SwTextRefMark* pTextRefMark1 = pMark1->GetTextRefMark();
+                  const SwTextRefMark* pTextRefMark2 = pMark2->GetTextRefMark();
+                  SwPosition aPos1(pTextRefMark1->GetTextNode(), pTextRefMark1->GetStart());
+                  SwPosition aPos2(pTextRefMark2->GetTextNode(), pTextRefMark2->GetStart());
+                  return aPos1 < aPos2;
+              });
+
+    sal_uInt16 nFieldIndex = 0;
+    for (auto& pIntermediateRefMark : aRefMarks)
+    {
+        auto pRefMark = const_cast<SwFormatRefMark*>(pIntermediateRefMark);
+        if (!pRefMark->GetRefName().startsWith(rNamePrefix))
+        {
+            continue;
+        }
+
+        if (nFieldIndex >= aFields.getLength())
+        {
+            continue;
+        }
+        comphelper::SequenceAsHashMap aMap(aFields[nFieldIndex++]);
+        auto aName = aMap["Name"].get<OUString>();
+        pRefMark->GetRefName() = aName;
+
+        OUString aContent = aMap["Content"].get<OUString>();
+        auto pTextRefMark = const_cast<SwTextRefMark*>(pRefMark->GetTextRefMark());
+        if (!pTextRefMark->End())
+        {
+            continue;
+        }
+
+        // Insert markers to remember where the paste positions are.
+        const SwTextNode& rTextNode = pTextRefMark->GetTextNode();
+        SwPaM aMarkers(SwPosition(rTextNode, *pTextRefMark->End()));
+        IDocumentContentOperations& rIDCO = pDoc->getIDocumentContentOperations();
+        pTextRefMark->SetDontExpand(false);
+        bool bSuccess = rIDCO.InsertString(aMarkers, "XY");
+        if (bSuccess)
+        {
+            SwPaM aPasteEnd(SwPosition(rTextNode, *pTextRefMark->End()));
+            aPasteEnd.Move(fnMoveBackward, GoInContent);
+
+            // Paste HTML content.
+            SwPaM* pCursorPos = rWrtSh.GetCursor();
+            *pCursorPos = aPasteEnd;
+            SwTranslateHelper::PasteHTMLToPaM(rWrtSh, pCursorPos, aContent.toUtf8(), true);
+
+            // Update the refmark to point to the new content.
+            sal_Int32 nOldStart = pTextRefMark->GetStart();
+            sal_Int32 nNewStart = *pTextRefMark->End();
+            // First grow it to include text till the end of the paste position.
+            pTextRefMark->SetEnd(aPasteEnd.GetPoint()->GetContentIndex());
+            // Then shrink it to only start at the paste start: we know that the refmark was
+            // truncated to the paste start, as the refmark has to stay inside a single text node
+            pTextRefMark->SetStart(nNewStart);
+            rTextNode.GetSwpHints().SortIfNeedBe();
+            SwPaM aEndMarker(*aPasteEnd.GetPoint());
+            aEndMarker.SetMark();
+            aEndMarker.GetMark()->AdjustContent(1);
+            SwPaM aStartMarker(SwPosition(rTextNode, nOldStart), SwPosition(rTextNode, nNewStart));
+
+            // Remove markers. The start marker includes the old content as well.
+            rIDCO.DeleteAndJoin(aStartMarker);
+            rIDCO.DeleteAndJoin(aEndMarker);
+        }
+    }
+
+    rWrtSh.EndAction();
+    pDoc->GetIDocumentUndoRedo().EndUndo(SwUndoId::INSBOOKMARK, nullptr);
+    return true;
+}
+
+/// Searches for the specified field type and field name prefix under cursor and update the matching
+/// field to have the provided new name and content.
+void UpdateFieldContent(SfxRequest& rReq, SwWrtShell& rWrtSh)
+{
+    const SfxStringItem* pTypeName = rReq.GetArg<SfxStringItem>(FN_PARAM_1);
+    if (!pTypeName || pTypeName->GetValue() != "SetRef")
+    {
+        // This is implemented so far only for reference marks.
+        return;
+    }
+
+    const SfxStringItem* pNamePrefix = rReq.GetArg<SfxStringItem>(FN_PARAM_2);
+    if (!pNamePrefix)
+    {
+        return;
+    }
+    const OUString& rNamePrefix = pNamePrefix->GetValue();
+
+    const SfxUnoAnyItem* pField = rReq.GetArg<SfxUnoAnyItem>(FN_PARAM_3);
+    if (!pField)
+    {
+        return;
+    }
+    uno::Sequence<beans::PropertyValue> aField;
+    pField->GetValue() >>= aField;
+
+    SwDoc* pDoc = rWrtSh.GetDoc();
+    pDoc->GetIDocumentUndoRedo().StartUndo(SwUndoId::INSBOOKMARK, nullptr);
+    rWrtSh.StartAction();
+    comphelper::ScopeGuard g(
+        [&rWrtSh]
+        {
+            rWrtSh.EndAction();
+            rWrtSh.GetDoc()->GetIDocumentUndoRedo().EndUndo(SwUndoId::INSBOOKMARK, nullptr);
+        });
+
+    SwPosition& rCursor = *rWrtSh.GetCursor()->GetPoint();
+    SwTextNode* pTextNode = rCursor.GetNode().GetTextNode();
+    std::vector<SwTextAttr*> aAttrs
+        = pTextNode->GetTextAttrsAt(rCursor.GetContentIndex(), RES_TXTATR_REFMARK);
+    if (aAttrs.empty())
+    {
+        return;
+    }
+
+    auto& rRefmark = const_cast<SwFormatRefMark&>(aAttrs[0]->GetRefMark());
+    if (!rRefmark.GetRefName().startsWith(rNamePrefix))
+    {
+        return;
+    }
+
+    comphelper::SequenceAsHashMap aMap(aField);
+    auto aName = aMap["Name"].get<OUString>();
+    rRefmark.GetRefName() = aName;
+
+    OUString aContent = aMap["Content"].get<OUString>();
+    auto pTextRefMark = const_cast<SwTextRefMark*>(rRefmark.GetTextRefMark());
+    if (!pTextRefMark->End())
+    {
+        return;
+    }
+
+    // Insert markers to remember where the paste positions are.
+    const SwTextNode& rTextNode = pTextRefMark->GetTextNode();
+    SwPaM aMarkers(SwPosition(rTextNode, *pTextRefMark->End()));
+    IDocumentContentOperations& rIDCO = pDoc->getIDocumentContentOperations();
+    pTextRefMark->SetDontExpand(false);
+    if (!rIDCO.InsertString(aMarkers, "XY"))
+    {
+        return;
+    }
+
+    SwPaM aPasteEnd(SwPosition(rTextNode, *pTextRefMark->End()));
+    aPasteEnd.Move(fnMoveBackward, GoInContent);
+
+    // Paste HTML content.
+    SwPaM* pCursorPos = rWrtSh.GetCursor();
+    *pCursorPos = aPasteEnd;
+    SwTranslateHelper::PasteHTMLToPaM(rWrtSh, pCursorPos, aContent.toUtf8(), true);
+
+    // Update the refmark to point to the new content.
+    sal_Int32 nOldStart = pTextRefMark->GetStart();
+    sal_Int32 nNewStart = *pTextRefMark->End();
+    // First grow it to include text till the end of the paste position.
+    pTextRefMark->SetEnd(aPasteEnd.GetPoint()->GetContentIndex());
+    // Then shrink it to only start at the paste start: we know that the refmark was
+    // truncated to the paste start, as the refmark has to stay inside a single text node
+    pTextRefMark->SetStart(nNewStart);
+    rTextNode.GetSwpHints().SortIfNeedBe();
+    SwPaM aEndMarker(*aPasteEnd.GetPoint());
+    aEndMarker.SetMark();
+    aEndMarker.GetMark()->AdjustContent(1);
+    SwPaM aStartMarker(SwPosition(rTextNode, nOldStart), SwPosition(rTextNode, nNewStart));
+
+    // Remove markers. The start marker includes the old content as well.
+    rIDCO.DeleteAndJoin(aStartMarker);
+    rIDCO.DeleteAndJoin(aEndMarker);
+}
+}
+
 // Evaluate respectively dispatching the slot Id
 
 void SwBaseShell::Execute(SfxRequest &rReq)
@@ -785,6 +1009,13 @@ void SwBaseShell::Execute(SfxRequest &rReq)
             break;
         case FN_UPDATE_FIELDS:
             {
+                if (UpdateFieldConents(rReq, rSh))
+                {
+                    // Parameters indicated that the name / content of fields has to be updated to
+                    // the provided values, don't do an actual fields update.
+                    break;
+                }
+
                 rSh.UpdateDocStat();
                 rSh.EndAllTableBoxEdit();
                 rSh.SwViewShell::UpdateFields(true);
@@ -796,6 +1027,11 @@ void SwBaseShell::Execute(SfxRequest &rReq)
                     rSh.ClearTableBoxContent();
                     rSh.SaveTableBoxContent();
                 }
+            }
+            break;
+        case FN_UPDATE_FIELD:
+            {
+                UpdateFieldContent(rReq, rSh);
             }
             break;
         case FN_UPDATE_CHARTS:
@@ -824,6 +1060,7 @@ void SwBaseShell::Execute(SfxRequest &rReq)
                 rDis.Execute( FN_UPDATE_TOX );
                 rDis.Execute( FN_UPDATE_CHARTS );
                 rSh.Reformat();
+                rSh.UpdateOleObjectPreviews();
             }
             break;
 
@@ -1900,7 +2137,7 @@ void SwBaseShell::GetState( SfxItemSet &rSet )
                         break;
                         case FN_FRAME_WRAP_CONTOUR:
                             bDisable |= bHtmlMode;
-                            //no contour available whenn no wrap or wrap through is set
+                            //no contour available when no wrap or wrap through is set
                             bDisable |= (nSurround == css::text::WrapTextMode_NONE || nSurround == css::text::WrapTextMode_THROUGH);
                             if( !bDisable )
                             {
@@ -1967,6 +2204,25 @@ void SwBaseShell::GetState( SfxItemSet &rSet )
             {
                 sal_Int32 nDPI = rSh.GetDoc()->getIDocumentSettingAccess().getImagePreferredDPI();
                 if (nDPI <= 0)
+                    rSet.DisableItem(nWhich);
+            }
+            break;
+            case SID_THEME_DIALOG:
+            {
+                bool bDisable = true;
+                auto* pDocument = rSh.GetDoc();
+                auto* pDocumentShell = pDocument->GetDocShell();
+                if (pDocumentShell)
+                {
+                    SdrPage* pPage = pDocument->getIDocumentDrawModelAccess().GetDrawModel()->GetPage(0);
+                    if (pPage)
+                    {
+                        auto const& pTheme = pPage->getSdrPageProperties().GetTheme();
+                        if (pTheme)
+                            bDisable = false;
+                    }
+                }
+                if (bDisable)
                     rSet.DisableItem(nWhich);
             }
             break;
@@ -2126,7 +2382,7 @@ void SwBaseShell::SetWrapMode( sal_uInt16 nSlot )
 
 void SwBaseShell::SetFrameMode(FlyMode eMode, SwWrtShell *pSh )
 {
-    eFrameMode = eMode;
+    s_eFrameMode = eMode;
     SfxBindings &rBnd = pSh->GetView().GetViewFrame()->GetBindings();
 
     if( eMode == FLY_DRAG || pSh->IsFrameSelected() || pSh->IsObjSelected() )
@@ -2171,12 +2427,12 @@ SwBaseShell::~SwBaseShell()
 void SwBaseShell::ExecTextCtrl( SfxRequest& rReq )
 {
     const SfxItemSet *pArgs = rReq.GetArgs();
+    const sal_uInt16 nSlot = rReq.GetSlot();
 
     if( pArgs)
     {
         SwWrtShell &rSh = GetShell();
         std::unique_ptr<SvxScriptSetItem> pSSetItem;
-        sal_uInt16 nSlot = rReq.GetSlot();
         SfxItemPool& rPool = rSh.GetAttrPool();
         sal_uInt16 nWhich = rPool.GetWhich( nSlot );
         SvtScriptType nScripts = SvtScriptType::LATIN | SvtScriptType::ASIAN | SvtScriptType::COMPLEX;
@@ -2290,7 +2546,14 @@ void SwBaseShell::ExecTextCtrl( SfxRequest& rReq )
         }
     }
     else
-        GetView().GetViewFrame()->GetDispatcher()->Execute( SID_CHAR_DLG );
+    {
+        if (nSlot == SID_ATTR_CHAR_KERNING)
+            GetView().GetViewFrame()->GetDispatcher()->Execute(SID_CHAR_DLG_POSITION);
+        else if (nSlot == SID_ATTR_CHAR_COLOR)
+            GetView().GetViewFrame()->GetDispatcher()->Execute(SID_CHAR_DLG_EFFECT);
+        else
+            GetView().GetViewFrame()->GetDispatcher()->Execute(SID_CHAR_DLG);
+    }
     rReq.Done();
 }
 
@@ -2745,7 +3008,7 @@ void SwBaseShell::ExecDlg(SfxRequest &rReq)
                 std::unique_ptr<SvxBrushItem> aBrush(std::make_unique<SvxBrushItem>(RES_BACKGROUND));
                 rSh.GetBoxBackground( aBrush );
                 pDlg.disposeAndReset(pFact->CreateSwBackgroundDialog(pMDI, aSet));
-                aSet.Put( *aBrush );
+                aSet.Put( std::move(aBrush) );
                 if ( pDlg->Execute() == RET_OK )
                 {
 
@@ -2788,7 +3051,14 @@ void SwBaseShell::ExecDlg(SfxRequest &rReq)
         {
             sw::AccessibilityCheck aCheck(rSh.GetDoc());
             aCheck.check();
-            std::shared_ptr<svx::AccessibilityCheckDialog> aDialog = std::make_shared<svx::AccessibilityCheckDialog>(pMDI, aCheck.getIssueCollection());
+            std::shared_ptr<svx::AccessibilityCheckDialog> aDialog
+                = std::make_shared<svx::AccessibilityCheckDialog>(
+                    pMDI, aCheck.getIssueCollection(),
+                    [&rSh]() -> sfx::AccessibilityIssueCollection {
+                        sw::AccessibilityCheck aA11yCheck(rSh.GetDoc());
+                        aA11yCheck.check();
+                        return aA11yCheck.getIssueCollection();
+                    });
             weld::DialogController::runAsync(aDialog, [](int){});
         }
         break;
@@ -2798,6 +3068,34 @@ void SwBaseShell::ExecDlg(SfxRequest &rReq)
             sw::GraphicSizeCheckGUIResult aResult(rSh.GetDoc());
             svx::GenericCheckDialog aDialog(pMDI, aResult);
             aDialog.run();
+        }
+        break;
+
+        case SID_THEME_DIALOG:
+        {
+            auto* pDocument = rSh.GetDoc();
+            auto* pDocumentShell = pDocument->GetDocShell();
+            if (pDocumentShell)
+            {
+                SdrPage* pPage = pDocument->getIDocumentDrawModelAccess().GetDrawModel()->GetPage(0);
+                auto const& pTheme = pPage->getSdrPageProperties().GetTheme();
+                if (pTheme)
+                {
+                    std::shared_ptr<svx::IThemeColorChanger> pChanger(new sw::ThemeColorChanger(pDocumentShell));
+                    auto pDialog = std::make_shared<svx::ThemeDialog>(pMDI, pTheme.get());
+                    weld::DialogController::runAsync(pDialog, [pDialog, pChanger](sal_uInt32 nResult) {
+                        if (RET_OK != nResult)
+                            return;
+
+                        auto oColorSet = pDialog->getCurrentColorSet();
+                        if (oColorSet)
+                        {
+                            auto& rColorSet = (*oColorSet).get();
+                            pChanger->apply(rColorSet);
+                        }
+                    });
+                }
+            }
         }
         break;
 
@@ -2850,7 +3148,7 @@ static void InsertTableImpl(SwWrtShell& rSh,
     rSh.MoveTable( GotoPrevTable, fnTableStart );
 
     if( !aTableName.isEmpty() && !rSh.GetTableStyle( aTableName ) )
-        rSh.GetTableFormat()->SetName( aTableName );
+        rSh.GetTableFormat()->SetFormatName( aTableName );
 
     if( pTAFormat != nullptr && !aAutoName.isEmpty()
                         && aAutoName != SwViewShell::GetShellRes()->aStrNone )

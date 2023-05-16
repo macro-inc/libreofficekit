@@ -26,11 +26,13 @@
 
 using namespace ::oox::core;
 
-namespace oox::drawingml {
+namespace oox::drawingml
+{
 
-ThemeFragmentHandler::ThemeFragmentHandler( XmlFilterBase& rFilter, const OUString& rFragmentPath, Theme& rTheme ) :
-    FragmentHandler2( rFilter, rFragmentPath ),
-    mrTheme( rTheme )
+ThemeFragmentHandler::ThemeFragmentHandler(XmlFilterBase& rFilter, const OUString& rFragmentPath, Theme& rOoxTheme, model::Theme& rTheme)
+    : FragmentHandler2(rFilter, rFragmentPath)
+    , mrOoxTheme(rOoxTheme)
+    , mrTheme(rTheme)
 {
 }
 
@@ -38,39 +40,41 @@ ThemeFragmentHandler::~ThemeFragmentHandler()
 {
 }
 
-ContextHandlerRef ThemeFragmentHandler::onCreateContext( sal_Int32 nElement, const AttributeList& rAttribs)
+ContextHandlerRef ThemeFragmentHandler::onCreateContext( sal_Int32 nElement, const AttributeList& /*rAttribs*/)
 {
     // CT_OfficeStyleSheet
-    switch( getCurrentElement() )
+    if (getCurrentElement() == A_TOKEN(theme))
     {
-        case XML_ROOT_CONTEXT:
-            switch( nElement )
-            {
-                case A_TOKEN( theme ):
-                {
-                    mrTheme.setThemeName(rAttribs.getString(XML_name).get());
-                    return this;
-                }
-            }
-        break;
-
-        case A_TOKEN( theme ):
-            switch( nElement )
-            {
-                case A_TOKEN( themeElements ):              // CT_BaseStyles
-                    return new ThemeElementsContext( *this, mrTheme );
-                case A_TOKEN( objectDefaults ):             // CT_ObjectStyleDefaults
-                    return new objectDefaultContext( *this, mrTheme );
-                case A_TOKEN( extraClrSchemeLst ):          // CT_ColorSchemeList
-                    return nullptr;
-                case A_TOKEN( custClrLst ):                 // CustomColorList
-                    return nullptr;
-                case A_TOKEN( ext ):                        // CT_OfficeArtExtension
-                    return nullptr;
-            }
-        break;
+        switch (nElement)
+        {
+            case A_TOKEN( themeElements ):              // CT_BaseStyles
+                return new ThemeElementsContext(*this, mrOoxTheme, mrTheme);
+            case A_TOKEN( objectDefaults ):             // CT_ObjectStyleDefaults
+                return new objectDefaultContext(*this, mrOoxTheme);
+            case A_TOKEN( extraClrSchemeLst ):          // CT_ColorSchemeList
+                return nullptr;
+            case A_TOKEN( custClrLst ):                 // CustomColorList
+                return nullptr;
+            case A_TOKEN( ext ):                        // CT_OfficeArtExtension
+                return nullptr;
+        }
     }
+    else if (getCurrentElement() == XML_ROOT_CONTEXT)
+    {
+        return this;
+    }
+
     return nullptr;
+}
+
+void ThemeFragmentHandler::onStartElement(const AttributeList& rAttribs)
+{
+    if (getCurrentElement() == A_TOKEN(theme))
+    {
+        OUString aName = rAttribs.getStringDefaulted(XML_name);
+        mrOoxTheme.setThemeName(aName);
+        mrTheme.SetName(aName);
+    }
 }
 
 } // namespace oox::drawingml

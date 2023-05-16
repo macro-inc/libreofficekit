@@ -19,6 +19,7 @@
 
 #include <vcl/mapmod.hxx>
 
+#include <o3tl/hash_combine.hxx>
 #include <tools/gen.hxx>
 #include <tools/fract.hxx>
 #include <tools/stream.hxx>
@@ -89,8 +90,6 @@ MapMode::MapMode( MapUnit eUnit, const Point& rLogicOrg,
     mpImplMapMode->maOrigin = rLogicOrg;
     mpImplMapMode->maScaleX = rScaleX;
     mpImplMapMode->maScaleY = rScaleY;
-    mpImplMapMode->maScaleX.ReduceInaccurate(32);
-    mpImplMapMode->maScaleY.ReduceInaccurate(32);
     mpImplMapMode->mbSimple = false;
 }
 
@@ -110,14 +109,12 @@ void MapMode::SetOrigin( const Point& rLogicOrg )
 void MapMode::SetScaleX( const Fraction& rScaleX )
 {
     mpImplMapMode->maScaleX = rScaleX;
-    mpImplMapMode->maScaleX.ReduceInaccurate(32);
     mpImplMapMode->mbSimple = false;
 }
 
 void MapMode::SetScaleY( const Fraction& rScaleY )
 {
     mpImplMapMode->maScaleY = rScaleY;
-    mpImplMapMode->maScaleY.ReduceInaccurate(32);
     mpImplMapMode->mbSimple = false;
 }
 
@@ -133,6 +130,17 @@ bool MapMode::operator==( const MapMode& rMapMode ) const
 bool MapMode::IsDefault() const
 {
     return mpImplMapMode.same_object(GetGlobalDefault());
+}
+
+size_t MapMode::GetHashValue() const
+{
+    size_t hash = 0;
+    o3tl::hash_combine( hash, mpImplMapMode->meUnit );
+    o3tl::hash_combine( hash, mpImplMapMode->maOrigin.GetHashValue());
+    o3tl::hash_combine( hash, mpImplMapMode->maScaleX.GetHashValue());
+    o3tl::hash_combine( hash, mpImplMapMode->maScaleY.GetHashValue());
+    o3tl::hash_combine( hash, mpImplMapMode->mbSimple );
+    return hash;
 }
 
 MapUnit MapMode::GetMapUnit() const { return mpImplMapMode->meUnit; }

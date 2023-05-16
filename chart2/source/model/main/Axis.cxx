@@ -17,7 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include "Axis.hxx"
+#include <Axis.hxx>
 #include "GridProperties.hxx"
 #include <CharacterProperties.hxx>
 #include <LinePropertiesHelper.hxx>
@@ -36,7 +36,7 @@
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/awt/Size.hpp>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/ref.hxx>
 
 #include <vector>
@@ -322,8 +322,7 @@ namespace chart
 {
 
 Axis::Axis() :
-        ::property::OPropertySet( m_aMutex ),
-        m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder()),
+        m_xModifyEventForwarder( new ModifyEventForwarder() ),
         m_aScaleData( AxisHelper::createDefaultScale() ),
         m_xGrid( new GridProperties() )
 {
@@ -342,8 +341,8 @@ Axis::Axis() :
 
 Axis::Axis( const Axis & rOther ) :
         impl::Axis_Base(rOther),
-        ::property::OPropertySet( rOther, m_aMutex ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder()),
+        ::property::OPropertySet( rOther ),
+    m_xModifyEventForwarder( new ModifyEventForwarder() ),
     m_aScaleData( rOther.m_aScaleData )
 {
     m_xGrid.set( CloneHelper::CreateRefClone< beans::XPropertySet >()( rOther.m_xGrid ));
@@ -526,28 +525,12 @@ Reference< util::XCloneable > SAL_CALL Axis::createClone()
 // ____ XModifyBroadcaster ____
 void SAL_CALL Axis::addModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception &)
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL Axis::removeModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 // ____ XModifyListener ____
@@ -575,13 +558,14 @@ void Axis::fireModifyEvent()
 }
 
 // ____ OPropertySet ____
-uno::Any Axis::GetDefaultValue( sal_Int32 nHandle ) const
+void Axis::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = *StaticAxisDefaults::get();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 ::cppu::IPropertyArrayHelper & SAL_CALL Axis::getInfoHelper()

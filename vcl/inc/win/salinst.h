@@ -43,6 +43,7 @@ public:
     WinSalInstance();
     virtual ~WinSalInstance() override;
 
+    virtual void AfterAppInit() override;
     virtual SalFrame*       CreateChildFrame( SystemParentData* pParent, SalFrameStyleFlags nStyle ) override;
     virtual SalFrame*       CreateFrame( SalFrame* pParent, SalFrameStyleFlags nStyle ) override;
     virtual void            DestroyFrame( SalFrame* pFrame ) override;
@@ -76,6 +77,9 @@ public:
     virtual void BeforeAbort(const OUString&, bool) override;
 
     static int WorkaroundExceptionHandlingInUSER32Lib(int nExcept, LPEXCEPTION_POINTERS pExceptionInfo);
+
+    virtual css::uno::Reference<css::uno::XInterface> ImplCreateDragSource(const SystemEnvData*) override;
+    virtual css::uno::Reference<css::uno::XInterface> ImplCreateDropTarget(const SystemEnvData*) override;
 };
 
 SalFrame* ImplSalCreateFrame( WinSalInstance* pInst, HWND hWndParent, SalFrameStyleFlags nSalFrameStyle );

@@ -36,6 +36,7 @@ namespace basegfx
     class B2DRange;
     class B2DHomMatrix;
     class B2DCubicBezier;
+    class B2DVector;
     class SystemDependentData;
     class SystemDependentDataManager;
     typedef std::shared_ptr<SystemDependentData> SystemDependentData_SharedPtr;
@@ -236,9 +237,9 @@ namespace basegfx
         }
 
         template<class T, class... Args>
-        std::shared_ptr<T> addOrReplaceSystemDependentData(SystemDependentDataManager& manager, Args&&... args) const
+        std::shared_ptr<T> addOrReplaceSystemDependentData(Args&&... args) const
         {
-            std::shared_ptr<T> r = std::make_shared<T>(manager, std::forward<Args>(args)...);
+            std::shared_ptr<T> r = std::make_shared<T>(std::forward<Args>(args)...);
 
             // tdf#129845 only add to buffer if a relevant buffer time is estimated
             if(r->calculateCombinedHoldCyclesInSeconds() > 0)
@@ -253,6 +254,8 @@ namespace basegfx
     private:
         void addOrReplaceSystemDependentDataInternal(SystemDependentData_SharedPtr& rData) const;
         SystemDependentData_SharedPtr getSystemDependantDataInternal(size_t hash_code) const;
+        const basegfx::B2DVector& getPrevControlVector(sal_uInt32 nIndex) const;
+        const basegfx::B2DVector& getNextControlVector(sal_uInt32 nIndex) const;
     };
 
     // typedef for a vector of B2DPolygons

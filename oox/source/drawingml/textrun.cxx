@@ -33,7 +33,7 @@
 #include <oox/core/xmlfilterbase.hxx>
 #include <oox/token/properties.hxx>
 #include <oox/token/tokens.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star::text;
@@ -76,8 +76,8 @@ sal_Int32 TextRun::insertAt(
             aTextCharacterProps.maFillProperties.moFillType = XML_solidFill;
 
         aTextCharacterProps.assignUsed(maTextCharacterProperties);
-        if ( aTextCharacterProps.moHeight.has() )
-            nCharHeight = aTextCharacterProps.moHeight.get();
+        if ( aTextCharacterProps.moHeight.has_value() )
+            nCharHeight = aTextCharacterProps.moHeight.value();
         else
             // UNO API has the character height as float, DML has it as int, but in hundreds.
             aTextCharacterProps.moHeight = static_cast<sal_Int32>(nDefaultCharHeight * 100);
@@ -157,18 +157,12 @@ sal_Int32 TextRun::insertAt(
                 if (!maTextCharacterProperties.maHyperlinkPropertyMap.hasProperty(PROP_CharColor))
                     aTextCharacterProps.maFillProperties.maFillColor.setSchemeClr(XML_hlink);
 
-                aTextCharacterProps.maFillProperties.moFillType.set(XML_solidFill);
-                if ( !maTextCharacterProperties.moUnderline.has() )
-                    aTextCharacterProps.moUnderline.set( XML_sng );
+                aTextCharacterProps.maFillProperties.moFillType = XML_solidFill;
+                if ( !maTextCharacterProperties.moUnderline.has_value() )
+                    aTextCharacterProps.moUnderline = XML_sng;
 
                 PropertySet aFieldTextPropSet( xTextFieldCursor );
                 aTextCharacterProps.pushToPropSet( aFieldTextPropSet, rFilterBase );
-
-                oox::core::TextField aTextField;
-                aTextField.xText = xText;
-                aTextField.xTextCursor = xTextFieldCursor;
-                aTextField.xTextField = xField;
-                rFilterBase.getTextFieldStack().push_back( aTextField );
             }
             else
             {

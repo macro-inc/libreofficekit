@@ -13,6 +13,7 @@
 #include <document.hxx>
 #include <tokenarray.hxx>
 
+#include <utility>
 #include <vcl/weld.hxx>
 #include <ucbhelper/content.hxx>
 #include <sal/log.hxx>
@@ -42,7 +43,7 @@ ScOrcusXMLTreeParam::EntryData& setUserDataToEntry(weld::TreeView& rControl,
     const weld::TreeIter& rEntry, ScOrcusXMLTreeParam::UserDataStoreType& rStore, ScOrcusXMLTreeParam::EntryType eType)
 {
     rStore.push_back(std::make_unique<ScOrcusXMLTreeParam::EntryData>(eType));
-    rControl.set_id(rEntry, OUString::number(reinterpret_cast<sal_Int64>(rStore.back().get())));
+    rControl.set_id(rEntry, weld::toId(rStore.back().get()));
     return *rStore.back();
 }
 
@@ -156,8 +157,8 @@ void loadContentFromURL(const OUString& rURL, std::string& rStrm)
 
 }
 
-ScOrcusXMLContextImpl::ScOrcusXMLContextImpl(ScDocument& rDoc, const OUString& rPath) :
-    ScOrcusXMLContext(), mrDoc(rDoc), maPath(rPath) {}
+ScOrcusXMLContextImpl::ScOrcusXMLContextImpl(ScDocument& rDoc, OUString aPath) :
+    ScOrcusXMLContext(), mrDoc(rDoc), maPath(std::move(aPath)) {}
 
 ScOrcusXMLContextImpl::~ScOrcusXMLContextImpl() {}
 

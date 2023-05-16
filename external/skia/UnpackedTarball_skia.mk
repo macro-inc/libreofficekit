@@ -17,7 +17,6 @@ skia_patches := \
     make-api-visible.patch.1 \
     no-trace-resources-on-exit.patch.1 \
     fix-alpha-difference-copy.patch.1 \
-    libvulkan-name.patch.1 \
     share-grcontext.patch.1 \
     clang11-flax-vector-conversion.patch.0 \
     clang-attributes-warning.patch.1 \
@@ -30,14 +29,18 @@ skia_patches := \
     windows-raster-surface-no-copies.patch.1 \
     fix-windows-dwrite.patch.1 \
     swap-buffers-rect.patch.1 \
-    ubsan.patch.0 \
+    ubsan.patch.1 \
     fast-png-write.patch.1 \
     skia_sk_cpu_sse_level_0_by_default.patch.1 \
     fix-warnings.patch.1 \
-    disable-freetype-colrv1.1 \
     windows-libraries-system32.patch.1 \
     fix-graphite-ifdef.patch.1 \
+    allow-no-es2restrictions.patch.1 \
+    vk_mem_alloc.patch.1 \
     tdf148624.patch.1 \
+    constexpr-template.patch.0 \
+    missing-include.patch.0 \
+    tdf147342.patch.0 \
 
 $(eval $(call gb_UnpackedTarball_set_patchlevel,skia,1))
 

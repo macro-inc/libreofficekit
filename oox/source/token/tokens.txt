@@ -480,6 +480,7 @@ additive
 addlxml
 addressBook
 addressFieldName
+adec
 adj
 adjLst
 adjust
@@ -599,6 +600,7 @@ anyType
 anyURI
 appName
 appWorkspace
+appearance
 apples
 applyAlignment
 applyAlignmentFormats
@@ -2226,6 +2228,7 @@ fileType
 fileVersion
 filetime
 fill
+fillColor
 fillClrLst
 fillFormulas
 fillId
@@ -3882,6 +3885,7 @@ parTransId
 parTxLTRAlign
 parTxRTLAlign
 paraId
+paraIdParent
 paragraph
 parallel
 parallelogram
@@ -5122,6 +5126,7 @@ tOff
 tR
 tab
 tabColor
+tabIndex
 tabLst
 tabRatio
 tabSelected

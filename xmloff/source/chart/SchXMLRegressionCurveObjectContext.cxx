@@ -24,6 +24,7 @@
 #include <sax/tools/converter.hxx>
 #include <sal/log.hxx>
 
+#include <utility>
 #include <xmloff/namespacemap.hxx>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/xmluconv.hxx>
@@ -44,12 +45,12 @@ SchXMLRegressionCurveObjectContext::SchXMLRegressionCurveObjectContext(
                                         SchXMLImportHelper& rImpHelper,
                                         SvXMLImport& rImport,
                                         std::vector< RegressionStyle >& rRegressionStyleVector,
-                                        const css::uno::Reference<
-                                                    css::chart2::XDataSeries >& xSeries,
+                                        css::uno::Reference<
+                                                    css::chart2::XDataSeries > xSeries,
                                         const awt::Size & rChartSize) :
     SvXMLImportContext( rImport ),
     mrImportHelper( rImpHelper ),
-    mxSeries( xSeries ),
+    mxSeries(std::move( xSeries )),
     maChartSize( rChartSize ),
     mrRegressionStyleVector( rRegressionStyleVector )
 {
@@ -165,15 +166,15 @@ void SchXMLEquationContext::startFastElement (sal_Int32 /*nElement*/,
                 pPropStyleContext->FillPropertySet( xEquationProperties );
         }
     }
-    xEquationProperties->setPropertyValue( "ShowEquation", uno::makeAny( bShowEquation ));
-    xEquationProperties->setPropertyValue( "ShowCorrelationCoefficient", uno::makeAny( bShowRSquare ));
+    xEquationProperties->setPropertyValue( "ShowEquation", uno::Any( bShowEquation ));
+    xEquationProperties->setPropertyValue( "ShowCorrelationCoefficient", uno::Any( bShowRSquare ));
 
     if( bHasXPos && bHasYPos )
     {
         chart2::RelativePosition aRelPos;
         aRelPos.Primary = static_cast< double >( aPosition.X ) / static_cast< double >( maChartSize.Width );
         aRelPos.Secondary = static_cast< double >( aPosition.Y ) / static_cast< double >( maChartSize.Height );
-        xEquationProperties->setPropertyValue( "RelativePosition", uno::makeAny( aRelPos ));
+        xEquationProperties->setPropertyValue( "RelativePosition", uno::Any( aRelPos ));
     }
     mrRegressionStyle.m_xEquationProperties.set( xEquationProperties );
 }

@@ -19,7 +19,13 @@
 
 #include <vcl/dndhelp.hxx>
 
+#include <vcl/svapp.hxx>
+#include <dndhelper.hxx>
+
 #include <cppuhelper/queryinterface.hxx>
+
+#include <com/sun/star/awt/XDisplayConnection.hpp>
+#include <com/sun/star/lang/XInitialization.hpp>
 
 using namespace ::com::sun::star;
 
@@ -134,6 +140,28 @@ void vcl::unohelper::DragAndDropWrapper::dragOver( const css::datatransfer::dnd:
 
 void vcl::unohelper::DragAndDropWrapper::dropActionChanged( const css::datatransfer::dnd::DropTargetDragEvent& )
 {
+}
+
+css::uno::Reference<css::uno::XInterface>
+vcl::OleDnDHelper(const css::uno::Reference<css::lang::XInitialization>& xDnD, const sal_IntPtr pWin, DragOrDrop eDoD)
+{
+    if (pWin && xDnD)
+    {
+        if (eDoD == vcl::DragOrDrop::Drag)
+            xDnD->initialize({ uno::Any(), uno::Any(static_cast<sal_uInt64>(pWin)) });
+        else
+            xDnD->initialize({ uno::Any(static_cast<sal_uInt64>(pWin)), uno::Any() });
+    }
+    return xDnD;
+}
+
+css::uno::Reference<css::uno::XInterface>
+vcl::X11DnDHelper(const css::uno::Reference<css::lang::XInitialization>& xDnD, const sal_IntPtr pWin)
+{
+    if (pWin && xDnD)
+        xDnD->initialize({ uno::Any(Application::GetDisplayConnection()),
+                           uno::Any(static_cast<sal_uInt64>(pWin)) });
+    return xDnD;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

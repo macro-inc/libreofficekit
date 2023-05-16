@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xenumerationaccess.hxx>
 #include <test/sheet/sheetcellranges.hxx>
 #include <test/sheet/xformulaquery.hxx>
@@ -30,7 +30,7 @@ using namespace css::uno;
 
 namespace sc_apitest
 {
-class ScCellRangesObj : public CalcUnoApiTest,
+class ScCellRangesObj : public UnoApiTest,
                         public apitest::SheetCellRanges,
                         public apitest::XEnumerationAccess,
                         public apitest::XFormulaQuery,
@@ -43,7 +43,6 @@ public:
     ScCellRangesObj();
 
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     virtual uno::Reference<uno::XInterface> getXSpreadsheet() override;
     virtual uno::Reference<uno::XInterface> init() override;
@@ -78,13 +77,10 @@ public:
     CPPUNIT_TEST(testClearContents);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScCellRangesObj::ScCellRangesObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , apitest::XFormulaQuery(table::CellRangeAddress(0, 4, 1, 5, 4),
                              table::CellRangeAddress(0, 4, 1, 5, 4))
 {
@@ -136,15 +132,9 @@ uno::Reference<uno::XInterface> ScCellRangesObj::getXSpreadsheet()
 
 void ScCellRangesObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
     mxComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScCellRangesObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScCellRangesObj);

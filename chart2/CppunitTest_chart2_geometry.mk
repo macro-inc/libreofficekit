@@ -42,6 +42,7 @@ $(eval $(call gb_CppunitTest_use_libraries,chart2_geometry, \
     sd \
     sfx \
     sot \
+    subsequenttest \
     svl \
     svt \
     svx \
@@ -99,7 +100,6 @@ $(eval $(call gb_CppunitTest_use_components,chart2_geometry,\
     sw/util/swd \
     sw/util/msword \
     sd/util/sd \
-    sd/util/sdfilt \
     sd/util/sdd \
     $(call gb_Helper_optional,SCRIPTING, \
 	    sc/util/vbaobj) \
@@ -133,6 +133,10 @@ $(eval $(call gb_CppunitTest_use_uiconfigs,chart2_geometry, \
 ))
 
 $(eval $(call gb_CppunitTest_use_configuration,chart2_geometry))
+
+$(eval $(call gb_CppunitTest_add_arguments,chart2_geometry, \
+    -env:arg-env=$(gb_Helper_LIBRARY_PATH_VAR)"$$$${$(gb_Helper_LIBRARY_PATH_VAR)+=$$$$$(gb_Helper_LIBRARY_PATH_VAR)}" \
+))
 
 $(call gb_CppunitTest_get_target,chart2_geometry): $(call gb_Package_get_target,postprocess_images)
 

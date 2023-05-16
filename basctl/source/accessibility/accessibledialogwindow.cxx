@@ -32,7 +32,6 @@
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <cppuhelper/supportsservice.hxx>
 #include <tools/debug.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
 #include <toolkit/awt/vclxfont.hxx>
 #include <toolkit/helper/convert.hxx>
@@ -395,27 +394,27 @@ void AccessibleDialogWindow::ProcessWindowEvent( const VclWindowEvent& rVclWindo
 }
 
 
-void AccessibleDialogWindow::FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet )
+void AccessibleDialogWindow::FillAccessibleStateSet( sal_Int64& rStateSet )
 {
     if ( !m_pDialogWindow )
         return;
 
     if ( m_pDialogWindow->IsEnabled() )
-        rStateSet.AddState( AccessibleStateType::ENABLED );
+        rStateSet |= AccessibleStateType::ENABLED;
 
-    rStateSet.AddState( AccessibleStateType::FOCUSABLE );
+    rStateSet |= AccessibleStateType::FOCUSABLE;
 
     if ( m_pDialogWindow->HasFocus() )
-        rStateSet.AddState( AccessibleStateType::FOCUSED );
+        rStateSet |= AccessibleStateType::FOCUSED;
 
-    rStateSet.AddState( AccessibleStateType::VISIBLE );
+    rStateSet |= AccessibleStateType::VISIBLE;
 
     if ( m_pDialogWindow->IsVisible() )
-        rStateSet.AddState( AccessibleStateType::SHOWING );
+        rStateSet |= AccessibleStateType::SHOWING;
 
-    rStateSet.AddState( AccessibleStateType::OPAQUE );
+    rStateSet |= AccessibleStateType::OPAQUE;
 
-    rStateSet.AddState( AccessibleStateType::RESIZABLE );
+    rStateSet |= AccessibleStateType::RESIZABLE;
 }
 
 
@@ -555,7 +554,7 @@ Reference< XAccessibleContext > AccessibleDialogWindow::getAccessibleContext(  )
 }
 
 // XAccessibleContext
-sal_Int32 AccessibleDialogWindow::getAccessibleChildCount()
+sal_Int64 AccessibleDialogWindow::getAccessibleChildCount()
 {
     OExternalLockGuard aGuard( this );
 
@@ -563,7 +562,7 @@ sal_Int32 AccessibleDialogWindow::getAccessibleChildCount()
 }
 
 
-Reference< XAccessible > AccessibleDialogWindow::getAccessibleChild( sal_Int32 i )
+Reference< XAccessible > AccessibleDialogWindow::getAccessibleChild( sal_Int64 i )
 {
     OExternalLockGuard aGuard( this );
 
@@ -606,11 +605,11 @@ Reference< XAccessible > AccessibleDialogWindow::getAccessibleParent(  )
 }
 
 
-sal_Int32 AccessibleDialogWindow::getAccessibleIndexInParent(  )
+sal_Int64 AccessibleDialogWindow::getAccessibleIndexInParent(  )
 {
     OExternalLockGuard aGuard( this );
 
-    sal_Int32 nIndexInParent = -1;
+    sal_Int64 nIndexInParent = -1;
     if ( m_pDialogWindow )
     {
         vcl::Window* pParent = m_pDialogWindow->GetAccessibleParentWindow();
@@ -672,22 +671,22 @@ Reference< XAccessibleRelationSet > AccessibleDialogWindow::getAccessibleRelatio
 }
 
 
-Reference< XAccessibleStateSet > AccessibleDialogWindow::getAccessibleStateSet(  )
+sal_Int64 AccessibleDialogWindow::getAccessibleStateSet(  )
 {
     OExternalLockGuard aGuard( this );
 
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSetHelper = new utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if ( !rBHelper.bDisposed && !rBHelper.bInDispose )
     {
-        FillAccessibleStateSet( *pStateSetHelper );
+        FillAccessibleStateSet( nStateSet );
     }
     else
     {
-        pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+        nStateSet |= AccessibleStateType::DEFUNC;
     }
 
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 
@@ -831,7 +830,7 @@ OUString AccessibleDialogWindow::getToolTipText(  )
 // XAccessibleSelection
 
 
-void AccessibleDialogWindow::selectAccessibleChild( sal_Int32 nChildIndex )
+void AccessibleDialogWindow::selectAccessibleChild( sal_Int64 nChildIndex )
 {
     OExternalLockGuard aGuard( this );
 
@@ -850,7 +849,7 @@ void AccessibleDialogWindow::selectAccessibleChild( sal_Int32 nChildIndex )
 }
 
 
-sal_Bool AccessibleDialogWindow::isAccessibleChildSelected( sal_Int32 nChildIndex )
+sal_Bool AccessibleDialogWindow::isAccessibleChildSelected( sal_Int64 nChildIndex )
 {
     OExternalLockGuard aGuard( this );
 
@@ -882,13 +881,13 @@ void AccessibleDialogWindow::selectAllAccessibleChildren(  )
 }
 
 
-sal_Int32 AccessibleDialogWindow::getSelectedAccessibleChildCount(  )
+sal_Int64 AccessibleDialogWindow::getSelectedAccessibleChildCount(  )
 {
     OExternalLockGuard aGuard( this );
 
-    sal_Int32 nRet = 0;
+    sal_Int64 nRet = 0;
 
-    for ( sal_Int32 i = 0, nCount = getAccessibleChildCount(); i < nCount; ++i )
+    for ( sal_Int64 i = 0, nCount = getAccessibleChildCount(); i < nCount; ++i )
     {
         if ( isAccessibleChildSelected( i ) )
             ++nRet;
@@ -898,7 +897,7 @@ sal_Int32 AccessibleDialogWindow::getSelectedAccessibleChildCount(  )
 }
 
 
-Reference< XAccessible > AccessibleDialogWindow::getSelectedAccessibleChild( sal_Int32 nSelectedChildIndex )
+Reference< XAccessible > AccessibleDialogWindow::getSelectedAccessibleChild( sal_Int64 nSelectedChildIndex )
 {
     OExternalLockGuard aGuard( this );
 
@@ -907,7 +906,7 @@ Reference< XAccessible > AccessibleDialogWindow::getSelectedAccessibleChild( sal
 
     Reference< XAccessible > xChild;
 
-    for ( sal_Int32 i = 0, j = 0, nCount = getAccessibleChildCount(); i < nCount; ++i )
+    for ( sal_Int64 i = 0, j = 0, nCount = getAccessibleChildCount(); i < nCount; ++i )
     {
         if ( isAccessibleChildSelected( i ) && ( j++ == nSelectedChildIndex ) )
         {
@@ -920,7 +919,7 @@ Reference< XAccessible > AccessibleDialogWindow::getSelectedAccessibleChild( sal
 }
 
 
-void AccessibleDialogWindow::deselectAccessibleChild( sal_Int32 nChildIndex )
+void AccessibleDialogWindow::deselectAccessibleChild( sal_Int64 nChildIndex )
 {
     OExternalLockGuard aGuard( this );
 

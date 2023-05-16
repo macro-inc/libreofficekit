@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -23,8 +25,6 @@ class formatCell(UITestCase):
             with self.ui_test.execute_dialog_through_command(".uno:FormatCellDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
                 select_pos(xTabs, "0")  #tab Numbers
-                xliststore1 = xDialog.getChild("categorylb")  #1st list / Category
-                xliststore2 = xDialog.getChild("formatlb")  #2nd list / Format
                 xdecimalsed = xDialog.getChild("decimalsed")
                 xleadzerosed = xDialog.getChild("leadzerosed")
                 xnegnumred = xDialog.getChild("negnumred")
@@ -48,7 +48,6 @@ class formatCell(UITestCase):
                 xTabs = xDialog.getChild("tabcontrol")
                 select_pos(xTabs, "0")  #tab Numbers
                 xliststore1 = xDialog.getChild("categorylb")  #1st list / Category
-                xliststore2 = xDialog.getChild("formatlb")  #2nd list / Format
                 xdecimalsed = xDialog.getChild("decimalsed")
                 xleadzerosed = xDialog.getChild("leadzerosed")
                 xnegnumred = xDialog.getChild("negnumred")
@@ -76,21 +75,27 @@ class formatCell(UITestCase):
             with self.ui_test.execute_dialog_through_command(".uno:FormatCellDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
                 select_pos(xTabs, "1")  #tab Font
-                xSizeFont = xDialog.getChild("westsizelb-cjk")
-                xSizeFontEast = xDialog.getChild("eastsizelb")
-                xSizeFontCTL = xDialog.getChild("ctlsizelb")
-                xLangFont = xDialog.getChild("westlanglb-cjk")
-                xLangFontEast = xDialog.getChild("eastlanglb")
-                xLangFontCTL = xDialog.getChild("ctllanglb")
 
+                # xNoteBook = xDialog.getChild("nbWestern") //western notebook is always active
+                xSizeFont = xDialog.getChild("cbWestSize")
                 xSizeFont.executeAction("TYPE", mkPropertyValues({"KEYCODE":"CTRL+A"}))
                 xSizeFont.executeAction("TYPE", mkPropertyValues({"TEXT":"18"}))    #set font size 18
+                xLangFont = xDialog.getChild("cbWestLanguage")
+                select_pos(xLangFont, "0")
+
+                xNoteBook = xDialog.getChild("nbCJKCTL")
+                select_pos(xNoteBook, "0")
+                xSizeFontEast = xDialog.getChild("cbCJKSize")
                 xSizeFontEast.executeAction("TYPE", mkPropertyValues({"KEYCODE":"CTRL+A"}))
                 xSizeFontEast.executeAction("TYPE", mkPropertyValues({"TEXT":"18"}))    #set font size 18
+                xLangFontEast = xDialog.getChild("cbCJKLanguage")
+                select_pos(xLangFontEast, "0")
+
+                select_pos(xNoteBook, "1")
+                xSizeFontCTL = xDialog.getChild("cbCTLSize")
                 xSizeFontCTL.executeAction("TYPE", mkPropertyValues({"KEYCODE":"CTRL+A"}))
                 xSizeFontCTL.executeAction("TYPE", mkPropertyValues({"TEXT":"18"}))    #set font size 18
-                select_pos(xLangFont, "0")
-                select_pos(xLangFontEast, "0")
+                xLangFontCTL = xDialog.getChild("cbCTLLanguage")
                 select_pos(xLangFontCTL, "0")
 
             #Verify - select cell A1
@@ -99,19 +104,23 @@ class formatCell(UITestCase):
             with self.ui_test.execute_dialog_through_command(".uno:FormatCellDialog", close_button="cancel") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
                 select_pos(xTabs, "1")  #tab Font
-                xSizeFont = xDialog.getChild("westsizelb-cjk")
-                xSizeFontEast = xDialog.getChild("eastsizelb")
-                xSizeFontCTL = xDialog.getChild("ctlsizelb")
-                xLangFont = xDialog.getChild("westlanglb-cjk")
-                xLangFontEast = xDialog.getChild("eastlanglb")
-                xLangFontCTL = xDialog.getChild("ctllanglb")
-
+                xSizeFont = xDialog.getChild("cbWestSize")
                 self.assertEqual(get_state_as_dict(xSizeFont)["Text"], "18 pt")
-                self.assertEqual(get_state_as_dict(xSizeFontEast)["Text"], "18 pt")
-                self.assertEqual(get_state_as_dict(xSizeFontCTL)["Text"], "18 pt") #check font size
+                xLangFont = xDialog.getChild("cbWestLanguage")
                 self.assertEqual(get_state_as_dict(xLangFont)["Text"], "[None]")
-                self.assertEqual(get_state_as_dict(xLangFontEast)["SelectEntryText"], "[None]")
-                self.assertEqual(get_state_as_dict(xLangFontCTL)["SelectEntryText"], "[None]")
+
+                xNoteBook = xDialog.getChild("nbCJKCTL")
+                select_pos(xNoteBook, "0")
+                xSizeFontEast = xDialog.getChild("cbCJKSize")
+                self.assertEqual(get_state_as_dict(xSizeFontEast)["Text"], "18 pt")
+                xLangFontEast = xDialog.getChild("cbCJKLanguage")
+                self.assertEqual(get_state_as_dict(xLangFontEast)["Text"], "[None]")
+
+                select_pos(xNoteBook, "1")
+                xSizeFontCTL = xDialog.getChild("cbCTLSize")
+                self.assertEqual(get_state_as_dict(xSizeFontCTL)["Text"], "18 pt") #check font size
+                xLangFontCTL = xDialog.getChild("cbCTLLanguage")
+                self.assertEqual(get_state_as_dict(xLangFontCTL)["Text"], "[None]")
 
 
 
@@ -261,24 +270,25 @@ class formatCell(UITestCase):
                 # set line style to "double" (minimal width is taken)
                 xLineSet.executeAction("CHOOSE", mkPropertyValues({"POS": '16'}))
                 widthVal = get_state_as_dict(linewidthmf)["Text"]
-                self.assertEqual(widthVal, '0.75 pt')
+                # minimum predefined width is Medium (1.50 pt)
+                self.assertEqual(widthVal, '1.50 pt')
 
                 # set line style to "solid"
                 xLineSet.executeAction("CHOOSE", mkPropertyValues({"POS": "1"}))
                 widthVal = get_state_as_dict(linewidthmf)["Text"]
-                self.assertEqual(widthVal, '0.75 pt')
+                self.assertEqual(widthVal, '1.50 pt')
 
                 # make custom line width
                 linewidthmf.executeAction("UP", tuple())
                 linewidthmf.executeAction("UP", tuple())
                 linewidthmf.executeAction("UP", tuple())
                 widthVal = get_state_as_dict(linewidthmf)["Text"]
-                self.assertEqual(widthVal, '1.50 pt')
+                self.assertEqual(widthVal, '2.25 pt')
 
                 # set line style to "double" (minimal width is not taken)
                 xLineSet.executeAction("CHOOSE", mkPropertyValues({"POS": "8"}))
                 widthVal = get_state_as_dict(linewidthmf)["Text"]
-                self.assertEqual(widthVal, '1.50 pt')
+                self.assertEqual(widthVal, '2.25 pt')
 
 
 
@@ -393,6 +403,65 @@ class formatCell(UITestCase):
                 xspinDegrees.executeAction("UP", tuple())
                 self.assertEqual(get_state_as_dict(xspinDegrees)["Text"].replace('°', ''), "0")
 
+    def test_format_cell_spell_out_numbering(self):
+        #numberingformatpage.ui
+        with self.ui_test.create_doc_in_start_center("calc"):
+            xCalcDoc = self.xUITest.getTopFocusWindow()
+            gridwin = xCalcDoc.getChild("grid_window")
+            #select cell A1
+            gridwin.executeAction("SELECT", mkPropertyValues({"CELL": "A1"}))
+            #format - cell
+            with self.ui_test.execute_dialog_through_command(".uno:FormatCellDialog") as xDialog:
+                xTabs = xDialog.getChild("tabcontrol")
+                select_pos(xTabs, "0")  #tab Numbers
 
+                formatlb = xDialog.getChild("formatlb")
+                xformatted = xDialog.getChild("formatted")
+
+                # NatNum12 number formats
+
+                entry = formatlb.getChild("11")
+                self.assertEqual(get_state_as_dict(entry)["Text"], "ONE HUNDRED")
+                entry.executeAction("SELECT", tuple())
+                self.assertEqual(get_state_as_dict(xformatted)["Text"], "[NatNum12 upper cardinal]0")
+
+                entry = formatlb.getChild("10")
+                self.assertEqual(get_state_as_dict(entry)["Text"], "One Hundred")
+                entry.executeAction("SELECT", tuple())
+                self.assertEqual(get_state_as_dict(xformatted)["Text"], "[NatNum12 title cardinal]0")
+
+                entry = formatlb.getChild("9")
+                self.assertEqual(get_state_as_dict(entry)["Text"], "One hundred")
+                entry.executeAction("SELECT", tuple())
+                self.assertEqual(get_state_as_dict(xformatted)["Text"], "[NatNum12 capitalize cardinal]0")
+
+                entry = formatlb.getChild("8")
+                self.assertEqual(get_state_as_dict(entry)["Text"], "one hundred")
+                entry.executeAction("SELECT", tuple())
+                self.assertEqual(get_state_as_dict(xformatted)["Text"], "[NatNum12 cardinal]0")
+
+                # NatNum12 en_US currency formats
+
+                categorylb = xDialog.getChild("categorylb")
+                entry = categorylb.getChild("4") # Currency
+                entry.executeAction("SELECT", tuple())
+
+                currencies = ["ONE U.S. DOLLAR AND TWENTY CENTS", "ONE U.S. DOLLAR", "One U.S. Dollar and Twenty Cents", "One U.S. Dollar"]
+                formats = ["[NatNum12 upper USD]0.00", "[NatNum12 upper USD]0", "[NatNum12 title USD]0.00", "[NatNum12 title USD]0"]
+
+                # handle different order of the items
+                numCurrency = 0
+                numFormat = 0
+                for i in formatlb.getChildren():
+                    entry = formatlb.getChild(i)
+                    if get_state_as_dict(entry)["Text"] in currencies:
+                        numCurrency = numCurrency + 1
+                    entry.executeAction("SELECT", tuple())
+                    xformatted = xDialog.getChild("formatted")
+                    if get_state_as_dict(xformatted)["Text"] in formats:
+                        numFormat = numFormat + 1
+
+                self.assertEqual(4, numCurrency)
+                self.assertEqual(4, numFormat)
 
 # vim: set shiftwidth=4 softtabstop=4 expandtab:

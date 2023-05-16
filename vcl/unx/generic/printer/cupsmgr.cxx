@@ -26,6 +26,7 @@
 
 #include <unx/cupsmgr.hxx>
 
+#include <o3tl/string_view.hxx>
 #include <osl/thread.h>
 #include <osl/file.h>
 #include <osl/conditn.hxx>
@@ -208,9 +209,7 @@ CUPSManager::~CUPSManager()
 {
     if( m_aDestThread )
     {
-        // if the thread is still running here, then
-        // cupsGetDests is hung; terminate the thread instead of joining
-        osl_terminateThread( m_aDestThread );
+        osl_joinWithThread( m_aDestThread );
         osl_destroyThread( m_aDestThread );
     }
 
@@ -253,6 +252,45 @@ void CUPSManager::runDests()
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
+}
+
+static void SetIfCustomOption(PPDContext& rContext, const cups_option_t& rOption, rtl_TextEncoding aEncoding)
+{
+    if (strncmp(rOption.value, RTL_CONSTASCII_STRINGPARAM("Custom.")) == 0)
+    {
+        const PPDParser* pParser = rContext.getParser();
+        if (!pParser)
+        {
+            // normal for first sight of this printer
+            return;
+        }
+
+        const PPDKey* pKey = pParser->getKey(OStringToOUString(rOption.name, aEncoding));
+        if (!pKey)
+        {
+            SAL_WARN("vcl.unx.print", "Custom key " << rOption.name << " not found");
+            return;
+        }
+
+        const PPDValue* pCustomValue = rContext.getValue(pKey);
+        if (!pCustomValue)
+        {
+            SAL_WARN("vcl.unx.print", "Value for " << rOption.name << " not found");
+            return;
+        }
+
+        if (!pCustomValue->m_bCustomOption)
+        {
+            SAL_WARN("vcl.unx.print", "Value for " << rOption.name << " not set to custom option");
+            return;
+        }
+
+        // seems sensible to keep a value the user explicitly set even if lpoptions was used to set
+        // another default
+        if (pCustomValue->m_bCustomOptionSetViaApp)
+            return;
+        pCustomValue->m_aCustomOption = OStringToOUString(rOption.value, aEncoding);
+    }
 }
 
 void CUPSManager::initialize()
@@ -333,16 +371,6 @@ void CUPSManager::initialize()
         if( pDest->is_default )
             m_aDefaultPrinter = aPrinterName;
 
-        for( int k = 0; k < pDest->num_options; k++ )
-        {
-            if(!strcmp(pDest->options[k].name, "printer-info"))
-                aPrinter.m_aInfo.m_aComment=OStringToOUString(pDest->options[k].value, aEncoding);
-            if(!strcmp(pDest->options[k].name, "printer-location"))
-                aPrinter.m_aInfo.m_aLocation=OStringToOUString(pDest->options[k].value, aEncoding);
-            if(!strcmp(pDest->options[k].name, "auth-info-required"))
-                aPrinter.m_aInfo.m_aAuthInfoRequired=OStringToOUString(pDest->options[k].value, aEncoding);
-        }
-
         // note: the parser that goes with the PrinterInfo
         // is created implicitly by the JobData::operator=()
         // when it detects the NULL ptr m_pParser.
@@ -360,6 +388,18 @@ void CUPSManager::initialize()
         }
         aPrinter.m_aInfo.setDefaultBackend(bUsePDF);
         aPrinter.m_aInfo.m_aDriverName = "CUPS:" + aPrinterName;
+
+        for( int k = 0; k < pDest->num_options; k++ )
+        {
+            if(!strcmp(pDest->options[k].name, "printer-info"))
+                aPrinter.m_aInfo.m_aComment=OStringToOUString(pDest->options[k].value, aEncoding);
+            if(!strcmp(pDest->options[k].name, "printer-location"))
+                aPrinter.m_aInfo.m_aLocation=OStringToOUString(pDest->options[k].value, aEncoding);
+            if(!strcmp(pDest->options[k].name, "auth-info-required"))
+                aPrinter.m_aInfo.m_aAuthInfoRequired=OStringToOUString(pDest->options[k].value, aEncoding);
+            // tdf#149439 Update Custom values that may have changed if this is not a newly discovered printer
+            SetIfCustomOption(aPrinter.m_aInfo.m_aContext, pDest->options[k], aEncoding);
+        }
 
         m_aPrinters[ aPrinter.m_aInfo.m_aPrinterName ] = aPrinter;
         m_aCUPSDestMap[ aPrinter.m_aInfo.m_aPrinterName ] = nPrinter;
@@ -494,6 +534,10 @@ const PPDParser* CUPSManager::createCUPSParser( const OUString& rPrinter )
                         setDefaultPaper( rContext );
                         for( int i = 0; i < pPPD->num_groups; i++ )
                             updatePrinterContextInfo( pPPD->groups + i, rContext );
+
+                        // tdf#149439 Set Custom values.
+                        for (int k = 0; k < pDest->num_options; ++k)
+                            SetIfCustomOption(rContext, pDest->options[k], aEncoding);
 
                         rInfo.m_pParser = pNewParser;
                         rInfo.m_aContext = rContext;
@@ -813,12 +857,12 @@ bool CUPSManager::endSpool( const OUString& rPrintername, const OUString& rJobTi
             sal_Int32 nIndex = 0;
             do
             {
-                OUString aToken = aInfo.m_aAuthInfoRequired.getToken(0, ',', nIndex);
-                if (aToken == "domain")
+                std::u16string_view aToken = o3tl::getToken(aInfo.m_aAuthInfoRequired, 0, ',', nIndex);
+                if (aToken == u"domain")
                     bDomain = true;
-                else if (aToken == "username")
+                else if (aToken == u"username")
                     bUser = true;
-                else if (aToken == "password")
+                else if (aToken == u"password")
                     bPass = true;
             }
             while (nIndex >= 0);

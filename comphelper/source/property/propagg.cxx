@@ -27,6 +27,7 @@
 #include <o3tl/sorted_vector.hxx>
 #include <typeinfo>
 #include <algorithm>
+#include <cstddef>
 #include <unordered_set>
 #include <memory>
 
@@ -83,12 +84,13 @@ OPropertyArrayAggregationHelper::OPropertyArrayAggregationHelper(
     std::unordered_set< sal_Int32 > existingHandles;
     existingHandles.reserve( m_aProperties.size() );
     sal_Int32 nAggregateHandle = _nFirstAggregateId;
-    for ( sal_Int32 nMPLoop = 0; nMPLoop < static_cast< sal_Int32 >( m_aProperties.size() ); ++nMPLoop )
+    for ( std::size_t nMPLoop = 0; nMPLoop < m_aProperties.size(); ++nMPLoop )
     {
         auto &prop = m_aProperties[ nMPLoop ];
         if ( aDelegatorProps.find( prop.Name ) != aDelegatorProps.end() )
         {
-            m_aPropertyAccessors[ prop.Handle ] = OPropertyAccessor( -1, nMPLoop, false );
+            m_aPropertyAccessors.insert_or_assign(
+                prop.Handle, OPropertyAccessor( -1, nMPLoop, false ));
             existingHandles.insert( prop.Handle );
         }
         else
@@ -111,7 +113,8 @@ OPropertyArrayAggregationHelper::OPropertyArrayAggregationHelper(
             }
 
             // remember the accessor for this property
-            m_aPropertyAccessors[ nHandle ] = OPropertyAccessor( prop.Handle, nMPLoop, true );
+            m_aPropertyAccessors.insert_or_assign(
+                nHandle, OPropertyAccessor( prop.Handle, nMPLoop, true ));
             prop.Handle = nHandle;
         }
     }
@@ -126,7 +129,7 @@ OPropertyArrayAggregationHelper::PropertyOrigin OPropertyArrayAggregationHelper:
     if ( pPropertyDescriptor )
     {
         // look up the handle for this name
-        ConstPropertyAccessorMapIterator aPos = m_aPropertyAccessors.find( pPropertyDescriptor->Handle );
+        auto aPos = m_aPropertyAccessors.find( pPropertyDescriptor->Handle );
         OSL_ENSURE( m_aPropertyAccessors.end() != aPos, "OPropertyArrayAggregationHelper::classifyProperty: should have this handle in my map!" );
         if ( m_aPropertyAccessors.end() != aPos )
         {
@@ -170,7 +173,7 @@ sal_Int32 OPropertyArrayAggregationHelper::getHandleByName(const OUString& _rPro
 sal_Bool OPropertyArrayAggregationHelper::fillPropertyMembersByHandle(
             OUString* _pPropName, sal_Int16* _pAttributes, sal_Int32 _nHandle)
 {
-    ConstPropertyAccessorMapIterator i = m_aPropertyAccessors.find(_nHandle);
+    auto i = m_aPropertyAccessors.find(_nHandle);
     bool bRet = i != m_aPropertyAccessors.end();
     if (bRet)
     {
@@ -186,7 +189,7 @@ sal_Bool OPropertyArrayAggregationHelper::fillPropertyMembersByHandle(
 
 bool OPropertyArrayAggregationHelper::getPropertyByHandle( sal_Int32 _nHandle, Property& _rProperty ) const
 {
-    ConstPropertyAccessorMapIterator pos = m_aPropertyAccessors.find(_nHandle);
+    auto pos = m_aPropertyAccessors.find(_nHandle);
     if ( pos != m_aPropertyAccessors.end() )
     {
         _rProperty = m_aProperties[ pos->second.nPos ];
@@ -199,7 +202,7 @@ bool OPropertyArrayAggregationHelper::getPropertyByHandle( sal_Int32 _nHandle, P
 bool OPropertyArrayAggregationHelper::fillAggregatePropertyInfoByHandle(
             OUString* _pPropName, sal_Int32* _pOriginalHandle, sal_Int32 _nHandle) const
 {
-    ConstPropertyAccessorMapIterator i = m_aPropertyAccessors.find(_nHandle);
+    auto i = m_aPropertyAccessors.find(_nHandle);
     bool bRet = i != m_aPropertyAccessors.end() && (*i).second.bAggregate;
     if (bRet)
     {
@@ -207,7 +210,7 @@ bool OPropertyArrayAggregationHelper::fillAggregatePropertyInfoByHandle(
             *_pOriginalHandle = (*i).second.nOriginalHandle;
         if (_pPropName)
         {
-            OSL_ENSURE((*i).second.nPos < static_cast<sal_Int32>(m_aProperties.size()),"Invalid index for sequence!");
+            OSL_ENSURE((*i).second.nPos < m_aProperties.size(),"Invalid index for sequence!");
             const css::beans::Property& rProperty = m_aProperties[(*i).second.nPos];
             *_pPropName = rProperty.Name;
         }
@@ -586,6 +589,9 @@ void SAL_CALL OPropertySetAggregationHelper::setPropertyValues(
         OPropertySetHelper::setPropertyValues(_rPropertyNames, _rValues);
     else if (_rPropertyNames.getLength() == 1) // use the more efficient way
     {
+        if (_rValues.getLength() != 1)
+            throw IllegalArgumentException("lengths do not match", static_cast<XPropertySet*>(this),
+                                           -1);
         try
         {
             setPropertyValue( _rPropertyNames[0], _rValues[0] );
@@ -628,6 +634,9 @@ void SAL_CALL OPropertySetAggregationHelper::setPropertyValues(
         // mixed
         else
         {
+            if (_rValues.getLength() != nLen)
+                throw IllegalArgumentException("lengths do not match",
+                                               static_cast<XPropertySet*>(this), -1);
             const  css::uno::Any* pValues = _rValues.getConstArray();
 
             // dividing the Names and _rValues

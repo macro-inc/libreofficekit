@@ -62,21 +62,21 @@ namespace o3tl {
 // the same, but in complex text cell skip over ligatures and char skip
 // into it.
 // These defines exist only to cut off the dependencies to I18N project.
-const sal_uInt16 CRSR_SKIP_CHARS  = 0;
-const sal_uInt16 CRSR_SKIP_CELLS  = 1;
-const sal_uInt16 CRSR_SKIP_HIDDEN = 2;
-
+enum class SwCursorSkipMode { Chars = 0, Cells = 1, Hidden = 2 };
+namespace o3tl {
+    template<> struct typed_flags<SwCursorSkipMode> : is_typed_flags<SwCursorSkipMode, 0x3> {};
+}
 
 class SW_DLLPUBLIC SwCursor : public SwPaM
 {
     friend class SwCursorSaveState;
 
     std::vector<SwCursor_SavePos> m_vSavePos; // the current entry is the last element
-    tools::Long m_nRowSpanOffset;        // required for travelling in tabs with rowspans
+    sal_Int32 m_nRowSpanOffset;        // required for travelling in tabs with rowspans
     sal_uInt8 m_nCursorBidiLevel; // bidi level of the cursor
     bool m_bColumnSelection;      // true: cursor is aprt of a column selection
 
-    sal_uLong FindAll( SwFindParas& , SwDocPositions, SwDocPositions, FindRanges, bool& bCancel );
+    sal_Int32 FindAll( SwFindParas& , SwDocPositions, SwDocPositions, FindRanges, bool& bCancel );
 
     SwCursor(SwCursor const& rPaM) = delete;
 
@@ -114,20 +114,20 @@ public:
                                         SwPaM* ) const;
 
     // note: DO NOT call it FindText because windows.h
-    sal_uLong Find_Text( const i18nutil::SearchOptions2& rSearchOpt,
+    sal_Int32 Find_Text( const i18nutil::SearchOptions2& rSearchOpt,
                 bool bSearchInNotes,
                 SwDocPositions nStart, SwDocPositions nEnd,
                 bool& bCancel,
                 FindRanges,
                 bool bReplace = false,
                 SwRootFrame const*const pLayout = nullptr);
-    sal_uLong FindFormat( const SwTextFormatColl& rFormatColl,
+    sal_Int32 FindFormat( const SwTextFormatColl& rFormatColl,
                 SwDocPositions nStart, SwDocPositions nEnd,
                 bool& bCancel,
                 FindRanges,
                 const SwTextFormatColl* pReplFormat,
                 SwRootFrame const*const pLayout = nullptr);
-    sal_uLong FindAttrs( const SfxItemSet& rSet, bool bNoCollections,
+    sal_Int32 FindAttrs( const SfxItemSet& rSet, bool bNoCollections,
                 SwDocPositions nStart, SwDocPositions nEnd,
                 bool& bCancel,
                 FindRanges,
@@ -160,7 +160,7 @@ public:
     bool GoSentence(SentenceMoveType eMoveType, SwRootFrame const*pLayout = nullptr);
     void ExpandToSentenceBorders(SwRootFrame const* pLayout);
 
-    virtual bool LeftRight( bool bLeft, sal_uInt16 nCnt, sal_uInt16 nMode,
+    virtual bool LeftRight( bool bLeft, sal_uInt16 nCnt, SwCursorSkipMode nMode,
         bool bAllowVisual, bool bSkipHidden, bool bInsertCursor,
         SwRootFrame const* pLayout, bool isFieldNames);
     bool UpDown(bool bUp, sal_uInt16 nCnt, Point const * pPt, tools::Long nUpDownX, SwRootFrame & rLayout);
@@ -169,8 +169,8 @@ public:
     bool SttEndDoc( bool bSttDoc );
     bool GoPrevNextCell( bool bNext, sal_uInt16 nCnt );
 
-    bool Left( sal_uInt16 nCnt )   { return LeftRight(true, nCnt, CRSR_SKIP_CHARS, false/*bAllowVisual*/, false/*bSkipHidden*/, false, nullptr, false); }
-    bool Right( sal_uInt16 nCnt )  { return LeftRight(false, nCnt, CRSR_SKIP_CHARS, false/*bAllowVisual*/, false/*bSkipHidden*/, false, nullptr, false); }
+    bool Left( sal_uInt16 nCnt )   { return LeftRight(true, nCnt, SwCursorSkipMode::Chars, false/*bAllowVisual*/, false/*bSkipHidden*/, false, nullptr, false); }
+    bool Right( sal_uInt16 nCnt )  { return LeftRight(false, nCnt, SwCursorSkipMode::Chars, false/*bAllowVisual*/, false/*bSkipHidden*/, false, nullptr, false); }
     bool GoNextCell( sal_uInt16 nCnt = 1 )  { return GoPrevNextCell( true, nCnt ); }
     bool GoPrevCell( sal_uInt16 nCnt = 1 )  { return GoPrevNextCell( false, nCnt ); }
     virtual bool GotoTable( const OUString& rName );
@@ -214,7 +214,7 @@ public:
     bool IsColumnSelection() const { return m_bColumnSelection; }
     void SetColumnSelection( bool bNew ) { m_bColumnSelection = bNew; }
 
-    tools::Long GetCursorRowSpanOffset() const { return m_nRowSpanOffset; }
+    sal_Int32 GetCursorRowSpanOffset() const { return m_nRowSpanOffset; }
 
     SwCursor* GetNext()             { return dynamic_cast<SwCursor *>(GetNextInRing()); }
     const SwCursor* GetNext() const { return dynamic_cast<SwCursor const *>(GetNextInRing()); }
@@ -245,8 +245,8 @@ struct SwCursor_SavePos final
     sal_Int32 nContent;
 
     SwCursor_SavePos( const SwCursor& rCursor )
-        : nNode( rCursor.GetPoint()->nNode.GetIndex() ),
-          nContent( rCursor.GetPoint()->nContent.GetIndex() )
+        : nNode( rCursor.GetPoint()->GetNodeIndex() ),
+          nContent( rCursor.GetPoint()->GetContentIndex() )
     {}
 };
 
@@ -269,7 +269,7 @@ public:
     SwTableCursor( SwTableCursor& );
     virtual ~SwTableCursor() override;
 
-    virtual bool LeftRight( bool bLeft, sal_uInt16 nCnt, sal_uInt16 nMode,
+    virtual bool LeftRight( bool bLeft, sal_uInt16 nCnt, SwCursorSkipMode nMode,
         bool bAllowVisual, bool bSkipHidden, bool bInsertCursor,
         SwRootFrame const*, bool) override;
     virtual bool GotoTable( const OUString& rName ) override;
@@ -289,10 +289,10 @@ public:
     // Has table cursor been changed?
     bool IsCursorMoved() const
     {
-        return  m_nTableMkNd != GetMark()->nNode.GetIndex() ||
-                m_nTablePtNd != GetPoint()->nNode.GetIndex() ||
-                m_nTableMkCnt != GetMark()->nContent.GetIndex() ||
-                m_nTablePtCnt != GetPoint()->nContent.GetIndex();
+        return  m_nTableMkNd != GetMark()->GetNodeIndex() ||
+                m_nTablePtNd != GetPoint()->GetNodeIndex() ||
+                m_nTableMkCnt != GetMark()->GetContentIndex() ||
+                m_nTablePtCnt != GetPoint()->GetContentIndex();
     }
 
     bool IsChgd() const { return m_bChanged; }

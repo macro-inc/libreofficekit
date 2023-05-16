@@ -19,10 +19,14 @@
 
 #include <TextLabelItemConverter.hxx>
 #include <CharacterPropertyItemConverter.hxx>
+#include <ChartModel.hxx>
 #include <ChartModelHelper.hxx>
+#include <ChartType.hxx>
 #include <ChartTypeHelper.hxx>
+#include <DataSeries.hxx>
 #include <DataSeriesHelper.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
 #include <ItemPropertyMap.hxx>
 #include "SchWhichPairs.hxx"
 #include <unonames.hxx>
@@ -35,7 +39,7 @@
 #include <svl/stritem.hxx>
 #include <svx/tabline.hxx>
 #include <svx/sdangitm.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/graph.hxx>
 #include <rtl/math.hxx>
 
@@ -44,7 +48,7 @@
 #include <com/sun/star/chart2/DataPointLabel.hpp>
 #include <com/sun/star/chart2/Symbol.hpp>
 #include <com/sun/star/chart2/RelativePosition.hpp>
-#include <com/sun/star/frame/XModel.hpp>
+#include <com/sun/star/chart2/XDataSeries.hpp>
 #include <memory>
 
 using namespace com::sun::star;
@@ -193,9 +197,9 @@ bool useSourceFormatFromItemToPropertySet(
 } // anonymous namespace
 
 TextLabelItemConverter::TextLabelItemConverter(
-    const uno::Reference<frame::XModel>& xChartModel,
+    const rtl::Reference<::chart::ChartModel>& xChartModel,
     const uno::Reference<beans::XPropertySet>& rPropertySet,
-    const uno::Reference<XDataSeries>& xSeries,
+    const rtl::Reference<DataSeries>& xSeries,
     SfxItemPool& rItemPool, const awt::Size* pRefSize,
     bool bDataSeries, sal_Int32 nNumberFormat, sal_Int32 nPercentNumberFormat ) :
     ItemConverter(rPropertySet, rItemPool),
@@ -207,8 +211,8 @@ TextLabelItemConverter::TextLabelItemConverter(
 {
     maConverters.emplace_back(new CharacterPropertyItemConverter(rPropertySet, rItemPool, pRefSize, "ReferencePageSize"));
 
-    uno::Reference<XDiagram> xDiagram(ChartModelHelper::findDiagram(xChartModel));
-    uno::Reference<XChartType> xChartType(DiagramHelper::getChartTypeOfSeries(xDiagram, xSeries));
+    rtl::Reference< Diagram > xDiagram(ChartModelHelper::findDiagram(xChartModel));
+    rtl::Reference< ChartType > xChartType(DiagramHelper::getChartTypeOfSeries(xDiagram, xSeries));
     bool bFound = false;
     bool bAmbiguous = false;
     bool bSwapXAndY = DiagramHelper::getVertical(xDiagram, bFound, bAmbiguous);
@@ -509,10 +513,9 @@ bool TextLabelItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const SfxIte
             {
                 bool bNew = static_cast<const SfxBoolItem&>(rItemSet.Get(nWhichId)).GetValue();
                 bool bOld = true;
-                Reference<beans::XPropertySet> xSeriesProp(m_xSeries, uno::UNO_QUERY);
-                if( (xSeriesProp->getPropertyValue("ShowCustomLeaderLines") >>= bOld) && bOld != bNew )
+                if( (m_xSeries->getPropertyValue("ShowCustomLeaderLines") >>= bOld) && bOld != bNew )
                 {
-                    xSeriesProp->setPropertyValue("ShowCustomLeaderLines", uno::Any(bNew));
+                    m_xSeries->setPropertyValue("ShowCustomLeaderLines", uno::Any(bNew));
                     bChanged = true;
                 }
             }
@@ -666,8 +669,7 @@ void TextLabelItemConverter::FillSpecialItem( sal_uInt16 nWhichId, SfxItemSet& r
             try
             {
                 bool bValue = true;
-                Reference<beans::XPropertySet> xSeriesProp(m_xSeries, uno::UNO_QUERY);
-                if( xSeriesProp->getPropertyValue( "ShowCustomLeaderLines" ) >>= bValue )
+                if( m_xSeries->getPropertyValue( "ShowCustomLeaderLines" ) >>= bValue )
                     rOutItemSet.Put(SfxBoolItem(nWhichId, bValue));
             }
             catch (const uno::Exception&)
@@ -709,7 +711,7 @@ void TextLabelItemConverter::FillSpecialItem( sal_uInt16 nWhichId, SfxItemSet& r
             if (GetPropertySet()->getPropertyValue("TextRotation") >>= fValue)
             {
                 rOutItemSet.Put(
-                    SdrAngleItem(nWhichId, Degree100(static_cast<sal_Int32>(rtl::math::round(fValue * 100.0)))));
+                    SdrAngleItem(SCHATTR_TEXT_DEGREES, Degree100(static_cast<sal_Int32>(rtl::math::round(fValue * 100.0)))));
             }
         }
         break;

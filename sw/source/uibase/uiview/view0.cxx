@@ -18,20 +18,24 @@
  */
 
 #include <config_features.h>
+#include <config_wasm_strip.h>
 
 #include <SwSpellDialogChildWindow.hxx>
 #include <svl/eitem.hxx>
 #include <unotools/configmgr.hxx>
 #include <unotools/linguprops.hxx>
 #include <unotools/lingucfg.hxx>
+#include <officecfg/Office/Common.hxx>
 #include <viewopt.hxx>
 #include <globals.h>
 #include <sfx2/infobar.hxx>
 #include <sfx2/request.hxx>
 #include <svl/whiter.hxx>
+#include <svl/visitem.hxx>
 #include <svx/srchdlg.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/bindings.hxx>
+#include <sfx2/dispatch.hxx>
 #include <sfx2/sidebar/SidebarChildWindow.hxx>
 #include <uivwimp.hxx>
 #include <avmedia/mediaplayer.hxx>
@@ -49,6 +53,7 @@
 #include <cmdid.h>
 #include <globdoc.hxx>
 #include <wview.hxx>
+#include <OnlineAccessibilityCheck.hxx>
 
 #define ShellClass_SwView
 #define ShellClass_Text
@@ -57,8 +62,6 @@
 #include <sfx2/msg.hxx>
 #include <swslots.hxx>
 #include <PostItMgr.hxx>
-
-#include <ndtxt.hxx>
 
 using namespace ::com::sun::star;
 
@@ -115,11 +118,14 @@ view::XSelectionSupplier* SwView::GetUNOObject()
 
 void SwView::ApplyAccessibilityOptions(SvtAccessibilityOptions const & rAccessibilityOptions)
 {
+#if ENABLE_WASM_STRIP_ACCESSIBILITY
+    (void)rAccessibilityOptions;
+#else
     m_pWrtShell->ApplyAccessibilityOptions(rAccessibilityOptions);
     //to enable the right state of the selection cursor in readonly documents
     if(GetDocShell()->IsReadOnly())
         m_pWrtShell->ShowCursor();
-
+#endif
 }
 
 void SwView::SetMailMergeConfigItem(std::shared_ptr<SwMailMergeConfigItem> const & rConfigItem)
@@ -137,13 +143,13 @@ static bool lcl_IsViewMarks( const SwViewOption& rVOpt )
 {
     return  rVOpt.IsHardBlank() &&
             rVOpt.IsSoftHyph() &&
-            SwViewOption::IsFieldShadings();
+            rVOpt.IsFieldShadings();
 }
 static void lcl_SetViewMarks(SwViewOption& rVOpt, bool bOn )
 {
     rVOpt.SetHardBlank(bOn);
     rVOpt.SetSoftHyph(bOn);
-    SwViewOption::SetAppearanceFlag(
+    rVOpt.SetAppearanceFlag(
             ViewOptFlags::FieldShadings, bOn, true);
 }
 
@@ -187,6 +193,7 @@ void SwView::RecheckBrowseMode()
             FN_VLINEAL,             /*20216*/
             FN_VSCROLLBAR,      /*20217*/
             FN_HSCROLLBAR,      /*20218*/
+            FN_VIEW_SECTION_BOUNDARIES, /*20219*/
             FN_VIEW_META_CHARS, /**/
             FN_VIEW_MARKS,      /**/
             //FN_VIEW_FIELDNAME,    /**/
@@ -247,11 +254,13 @@ void SwView::StateViewOptions(SfxItemSet &rSet)
             }
             break;
             case FN_VIEW_BOUNDS:
-                aBool.SetValue( SwViewOption::IsDocBoundaries()); break;
+                aBool.SetValue( pOpt->IsDocBoundaries()); break;
+            case FN_VIEW_SECTION_BOUNDARIES:
+                aBool.SetValue(pOpt->IsSectionBoundaries()); break;
             case FN_VIEW_GRAPHIC:
                 aBool.SetValue( pOpt->IsGraphic() ); break;
             case FN_VIEW_FIELDS:
-                aBool.SetValue( SwViewOption::IsFieldShadings() ); break;
+                aBool.SetValue( pOpt->IsFieldShadings() ); break;
             case FN_VIEW_FIELDNAME:
                 aBool.SetValue( pOpt->IsFieldName() ); break;
             case FN_VIEW_MARKS:
@@ -259,7 +268,7 @@ void SwView::StateViewOptions(SfxItemSet &rSet)
             case FN_VIEW_META_CHARS:
                 aBool.SetValue( pOpt->IsViewMetaChars() ); break;
             case FN_VIEW_TABLEGRID:
-                aBool.SetValue( SwViewOption::IsTableBoundaries() ); break;
+                aBool.SetValue( pOpt->IsTableBoundaries() ); break;
             case SID_TOGGLE_NOTES:
             {
                 if (!GetPostItMgr()->HasNotes())
@@ -323,6 +332,21 @@ void SwView::StateViewOptions(SfxItemSet &rSet)
                 aBool.SetValue( IsVScrollbarVisible() ); break;
             case SID_AUTOSPELL_CHECK:
                 aBool.SetValue( pOpt->IsOnlineSpell() );
+            break;
+            case SID_ACCESSIBILITY_CHECK_ONLINE:
+            {
+                // visible only when experimental mode is enabled
+                if (!officecfg::Office::Common::Misc::ExperimentalMode::get())
+                {
+                    rSet.Put(SfxVisibilityItem(nWhich, false));
+                    nWhich = 0;
+                }
+                else
+                {
+                    bool bOnlineAccessibilityCheck = officecfg::Office::Common::Accessibility::OnlineAccessibilityCheck::get();
+                    aBool.SetValue(bOnlineAccessibilityCheck);
+                }
+            }
             break;
             case FN_SHADOWCURSOR:
                 if ( pOpt->getBrowseMode() )
@@ -390,14 +414,20 @@ void SwView::ExecViewOptions(SfxRequest &rReq)
 
     case FN_VIEW_FIELDS:
         if( STATE_TOGGLE == eState )
-            bFlag = !SwViewOption::IsFieldShadings() ;
-        SwViewOption::SetAppearanceFlag(ViewOptFlags::FieldShadings, bFlag, true );
+            bFlag = !pOpt->IsFieldShadings() ;
+        pOpt->SetAppearanceFlag(ViewOptFlags::FieldShadings, bFlag, true );
         break;
 
     case FN_VIEW_BOUNDS:
         if( STATE_TOGGLE == eState )
-            bFlag = !SwViewOption::IsDocBoundaries();
-        SwViewOption::SetAppearanceFlag(ViewOptFlags::DocBoundaries, bFlag, true );
+            bFlag = !pOpt->IsDocBoundaries();
+        pOpt->SetAppearanceFlag(ViewOptFlags::DocBoundaries, bFlag, true );
+        break;
+
+    case FN_VIEW_SECTION_BOUNDARIES:
+        if( STATE_TOGGLE == eState )
+            bFlag = !pOpt->IsSectionBoundaries();
+        pOpt->SetAppearanceFlag(ViewOptFlags::SectionBoundaries, bFlag, true );
         break;
 
     case SID_GRID_VISIBLE:
@@ -511,8 +541,8 @@ void SwView::ExecViewOptions(SfxRequest &rReq)
 
     case FN_VIEW_TABLEGRID:
         if( STATE_TOGGLE == eState )
-            bFlag = !SwViewOption::IsTableBoundaries();
-        SwViewOption::SetAppearanceFlag(ViewOptFlags::TableBoundaries, bFlag, true );
+            bFlag = !pOpt->IsTableBoundaries();
+        pOpt->SetAppearanceFlag(ViewOptFlags::TableBoundaries, bFlag, true );
         break;
 
     case FN_VIEW_FIELDNAME:
@@ -550,7 +580,7 @@ void SwView::ExecViewOptions(SfxRequest &rReq)
         pOpt->SetOnlineSpell(bSet);
         {
             SvtLinguConfig  aCfg;
-            aCfg.SetProperty( UPN_IS_SPELL_AUTO, uno::makeAny( bSet ) );
+            aCfg.SetProperty( UPN_IS_SPELL_AUTO, uno::Any( bSet ) );
 
             if (xLngProp.is())
                 xLngProp->setIsSpellAuto( bSet );
@@ -571,6 +601,28 @@ void SwView::ExecViewOptions(SfxRequest &rReq)
             }
         }
         break;
+
+    case SID_ACCESSIBILITY_CHECK_ONLINE:
+    {
+        if (pArgs && pArgs->HasItem(FN_PARAM_1, &pItem))
+        {
+            bSet = static_cast<const SfxBoolItem*>(pItem)->GetValue();
+        }
+        else if (STATE_TOGGLE == eState)
+        {
+            bool bOnlineCheck = officecfg::Office::Common::Accessibility::OnlineAccessibilityCheck::get();
+            bSet = !bOnlineCheck;
+        }
+        std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
+        officecfg::Office::Common::Accessibility::OnlineAccessibilityCheck::set(bSet, batch);
+        batch->commit();
+
+        SwDocShell *pDocSh = GetDocShell();
+        SwDoc* pDocument = pDocSh? pDocSh->GetDoc() : nullptr;
+        if (pDocument)
+            pDocument->getOnlineAccessibilityCheck()->updateCheckerActivity();
+    }
+    break;
 
     case FN_SHADOWCURSOR:
         if( STATE_TOGGLE == eState )

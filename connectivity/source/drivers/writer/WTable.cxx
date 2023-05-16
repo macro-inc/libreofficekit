@@ -171,9 +171,6 @@ OWriterTable::OWriterTable(sdbcx::OCollection* _pTables, OWriterConnection* _pCo
     : OWriterTable_BASE(_pTables, _pConnection, Name, Type, OUString() /*Description*/,
                         OUString() /*SchemaName*/, OUString() /*CatalogName*/)
     , m_pWriterConnection(_pConnection)
-    , m_nStartCol(0)
-    , m_nDataCols(0)
-    , m_bHasHeaders(false)
 {
 }
 
@@ -210,7 +207,7 @@ void SAL_CALL OWriterTable::disposing()
     m_pWriterConnection = nullptr;
 }
 
-uno::Sequence<sal_Int8> OWriterTable::getUnoTunnelId()
+const uno::Sequence<sal_Int8>& OWriterTable::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit implId;
     return implId.getSeq();

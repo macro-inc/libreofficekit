@@ -22,6 +22,7 @@
 #include <o3tl/safeint.hxx>
 #include <svx/svdpool.hxx>
 
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <svx/algitem.hxx>
 #include <editeng/borderline.hxx>
@@ -44,7 +45,7 @@
 #include <svl/zformat.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <float.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/UnitConversion.hxx>
 
 #include <com/sun/star/awt/XBitmap.hpp>
@@ -150,104 +151,103 @@ static const SfxItemPropertySet* lcl_GetCellsPropertySet()
 {
     static const SfxItemPropertyMapEntry aCellsPropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_ABSNAME,  SC_WID_UNO_ABSNAME, cppu::UnoType<OUString>::get(),        0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_ASIANVERT,ATTR_VERTICAL_ASIAN,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_BOTTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_BOTTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CELLBACK, ATTR_BACKGROUND,    cppu::UnoType<sal_Int32>::get(),            0, MID_BACK_COLOR },
-        {u"" SC_UNONAME_CELLPRO,  ATTR_PROTECTION,    cppu::UnoType<util::CellProtection>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLSTYL, SC_WID_UNO_CELLSTYL,cppu::UnoType<OUString>::get(),        0, 0 },
-        {u"" SC_UNONAME_CCOLOR,   ATTR_FONT_COLOR,    cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_COUTL,    ATTR_FONT_CONTOUR,  cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CCROSS,   ATTR_FONT_CROSSEDOUT,cppu::UnoType<bool>::get(),                 0, MID_CROSSED_OUT },
-        {u"" SC_UNONAME_CEMPHAS,  ATTR_FONT_EMPHASISMARK,cppu::UnoType<sal_Int16>::get(),         0, MID_EMPHASIS },
-        {u"" SC_UNONAME_CFONT,    ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNONAME_CFCHARS,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNO_CJK_CFCHARS,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNO_CTL_CFCHARS,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNONAME_CFFAMIL,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNO_CJK_CFFAMIL,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNO_CTL_CFFAMIL,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNONAME_CFNAME,   ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNO_CJK_CFNAME,   ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNO_CTL_CFNAME,   ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNONAME_CFPITCH,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNO_CJK_CFPITCH,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNO_CTL_CFPITCH,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNONAME_CFSTYLE,  ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNO_CJK_CFSTYLE,  ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNO_CTL_CFSTYLE,  ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNONAME_CHEIGHT,  ATTR_FONT_HEIGHT,   cppu::UnoType<float>::get(),                0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNO_CJK_CHEIGHT,  ATTR_CJK_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNO_CTL_CHEIGHT,  ATTR_CTL_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CLOCAL,   ATTR_FONT_LANGUAGE, cppu::UnoType<lang::Locale>::get(),         0, MID_LANG_LOCALE },
-        {u"" SC_UNO_CJK_CLOCAL,   ATTR_CJK_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
-        {u"" SC_UNO_CTL_CLOCAL,   ATTR_CTL_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
-        {u"" SC_UNONAME_COVER,    ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
-        {u"" SC_UNONAME_COVRLCOL, ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
-        {u"" SC_UNONAME_COVRLHAS, ATTR_FONT_OVERLINE, cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
-        {u"" SC_UNONAME_CPOST,    ATTR_FONT_POSTURE,  cppu::UnoType<awt::FontSlant>::get(),       0, MID_POSTURE },
-        {u"" SC_UNO_CJK_CPOST,    ATTR_CJK_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
-        {u"" SC_UNO_CTL_CPOST,    ATTR_CTL_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
-        {u"" SC_UNONAME_CRELIEF,  ATTR_FONT_RELIEF,   cppu::UnoType<sal_Int16>::get(),            0, MID_RELIEF },
-        {u"" SC_UNONAME_CSHADD,   ATTR_FONT_SHADOWED, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CSTRIKE,  ATTR_FONT_CROSSEDOUT,cppu::UnoType<sal_Int16>::get(),           0, MID_CROSS_OUT },
-        {u"" SC_UNONAME_CUNDER,   ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
-        {u"" SC_UNONAME_CUNDLCOL, ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
-        {u"" SC_UNONAME_CUNDLHAS, ATTR_FONT_UNDERLINE,cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
-        {u"" SC_UNONAME_CWEIGHT,  ATTR_FONT_WEIGHT,   cppu::UnoType<float>::get(),                0, MID_WEIGHT },
-        {u"" SC_UNO_CJK_CWEIGHT,  ATTR_CJK_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
-        {u"" SC_UNO_CTL_CWEIGHT,  ATTR_CTL_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
-        {u"" SC_UNONAME_CWORDMOD, ATTR_FONT_WORDLINE, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CHCOLHDR, SC_WID_UNO_CHCOLHDR,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CHROWHDR, SC_WID_UNO_CHROWHDR,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CONDFMT,  SC_WID_UNO_CONDFMT, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_CONDLOC,  SC_WID_UNO_CONDLOC, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_CONDXML,  SC_WID_UNO_CONDXML, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_DIAGONAL_BLTR, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_BLTR2, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_TLBR, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_TLBR2, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CELLHJUS, ATTR_HOR_JUSTIFY,   cppu::UnoType<table::CellHoriJustify>::get(), 0, MID_HORJUST_HORJUST },
-        {u"" SC_UNONAME_CELLHJUS_METHOD, ATTR_HOR_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
-        {u"" SC_UNONAME_CELLTRAN, ATTR_BACKGROUND,    cppu::UnoType<bool>::get(),                  0, MID_GRAPHIC_TRANSPARENT },
-        {u"" SC_UNONAME_WRAP,     ATTR_LINEBREAK,     cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_LEFTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_LEFTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_NUMFMT,   ATTR_VALUE_FORMAT,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_NUMRULES, SC_WID_UNO_NUMRULES,cppu::UnoType<container::XIndexReplace>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLORI,  ATTR_STACKED,       cppu::UnoType<table::CellOrientation>::get(), 0, 0 },
-        {u"" SC_UNONAME_PADJUST,  ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
-        {u"" SC_UNONAME_PBMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_LO_MARGIN | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PINDENT,  ATTR_INDENT,        cppu::UnoType<sal_Int16>::get(),            0, 0 }, //! CONVERT_TWIPS
-        {u"" SC_UNONAME_PISCHDIST,ATTR_SCRIPTSPACE,   cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_PISFORBID,ATTR_FORBIDDEN_RULES,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_PISHANG,  ATTR_HANGPUNCTUATION,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_PISHYPHEN,ATTR_HYPHENATE,     cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_PLASTADJ, ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
-        {u"" SC_UNONAME_PLMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_L_MARGIN  | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PRMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_R_MARGIN  | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PTMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_UP_MARGIN | CONVERT_TWIPS },
-        {u"" SC_UNONAME_RIGHTBORDER,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_RIGHTBORDER2,ATTR_BORDER,     ::cppu::UnoType<table::BorderLine2>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_ROTANG,   ATTR_ROTATE_VALUE,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_ROTREF,   ATTR_ROTATE_MODE,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_SHADOW,   ATTR_SHADOW,        cppu::UnoType<table::ShadowFormat>::get(),  0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_SHRINK_TO_FIT, ATTR_SHRINKTOFIT, cppu::UnoType<bool>::get(),               0, 0 },
-        {u"" SC_UNONAME_TBLBORD,  SC_WID_UNO_TBLBORD, cppu::UnoType<table::TableBorder>::get(),   0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TBLBORD2,  SC_WID_UNO_TBLBORD2, cppu::UnoType<table::TableBorder2>::get(),   0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TOPBORDER,ATTR_BORDER,        ::cppu::UnoType<table::BorderLine>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TOPBORDER2,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine2>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_USERDEF,  ATTR_USERDEF,       cppu::UnoType<container::XNameContainer>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALIDAT,  SC_WID_UNO_VALIDAT, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALILOC,  SC_WID_UNO_VALILOC, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALIXML,  SC_WID_UNO_VALIXML, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLVJUS, ATTR_VER_JUSTIFY,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLVJUS_METHOD, ATTR_VER_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
-        {u"" SC_UNONAME_WRITING,  ATTR_WRITINGDIR,    cppu::UnoType<sal_Int16>::get(),            0, 0 },
-        {u"" SC_UNONAME_HYPERLINK,  ATTR_HYPERLINK, cppu::UnoType<OUString>::get(),        0, 0 },
-        {u"" SC_UNONAME_FORMATID,  SC_WID_UNO_FORMATID, cppu::UnoType<sal_uInt64>::get(),        0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_ABSNAME,  SC_WID_UNO_ABSNAME, cppu::UnoType<OUString>::get(),        0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_ASIANVERT,ATTR_VERTICAL_ASIAN,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_BOTTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_BOTTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_CELLBACK, ATTR_BACKGROUND,    cppu::UnoType<sal_Int32>::get(),            0, MID_BACK_COLOR },
+        { SC_UNONAME_CELLPRO,  ATTR_PROTECTION,    cppu::UnoType<util::CellProtection>::get(), 0, 0 },
+        { SC_UNONAME_CELLSTYL, SC_WID_UNO_CELLSTYL,cppu::UnoType<OUString>::get(),        0, 0 },
+        { SC_UNONAME_CCOLOR,   ATTR_FONT_COLOR,    cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_COUTL,    ATTR_FONT_CONTOUR,  cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CCROSS,   ATTR_FONT_CROSSEDOUT,cppu::UnoType<bool>::get(),                 0, MID_CROSSED_OUT },
+        { SC_UNONAME_CEMPHAS,  ATTR_FONT_EMPHASISMARK,cppu::UnoType<sal_Int16>::get(),         0, MID_EMPHASIS },
+        { SC_UNONAME_CFONT,    ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNONAME_CFCHARS,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNO_CJK_CFCHARS,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNO_CTL_CFCHARS,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNONAME_CFFAMIL,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNO_CJK_CFFAMIL,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNO_CTL_CFFAMIL,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNONAME_CFNAME,   ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNO_CJK_CFNAME,   ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNO_CTL_CFNAME,   ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNONAME_CFPITCH,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNO_CJK_CFPITCH,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNO_CTL_CFPITCH,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNONAME_CFSTYLE,  ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNO_CJK_CFSTYLE,  ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNO_CTL_CFSTYLE,  ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNONAME_CHEIGHT,  ATTR_FONT_HEIGHT,   cppu::UnoType<float>::get(),                0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNO_CJK_CHEIGHT,  ATTR_CJK_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNO_CTL_CHEIGHT,  ATTR_CTL_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNONAME_CLOCAL,   ATTR_FONT_LANGUAGE, cppu::UnoType<lang::Locale>::get(),         0, MID_LANG_LOCALE },
+        { SC_UNO_CJK_CLOCAL,   ATTR_CJK_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
+        { SC_UNO_CTL_CLOCAL,   ATTR_CTL_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
+        { SC_UNONAME_COVER,    ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
+        { SC_UNONAME_COVRLCOL, ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
+        { SC_UNONAME_COVRLHAS, ATTR_FONT_OVERLINE, cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
+        { SC_UNONAME_CPOST,    ATTR_FONT_POSTURE,  cppu::UnoType<awt::FontSlant>::get(),       0, MID_POSTURE },
+        { SC_UNO_CJK_CPOST,    ATTR_CJK_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
+        { SC_UNO_CTL_CPOST,    ATTR_CTL_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
+        { SC_UNONAME_CRELIEF,  ATTR_FONT_RELIEF,   cppu::UnoType<sal_Int16>::get(),            0, MID_RELIEF },
+        { SC_UNONAME_CSHADD,   ATTR_FONT_SHADOWED, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CSTRIKE,  ATTR_FONT_CROSSEDOUT,cppu::UnoType<sal_Int16>::get(),           0, MID_CROSS_OUT },
+        { SC_UNONAME_CUNDER,   ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
+        { SC_UNONAME_CUNDLCOL, ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
+        { SC_UNONAME_CUNDLHAS, ATTR_FONT_UNDERLINE,cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
+        { SC_UNONAME_CWEIGHT,  ATTR_FONT_WEIGHT,   cppu::UnoType<float>::get(),                0, MID_WEIGHT },
+        { SC_UNO_CJK_CWEIGHT,  ATTR_CJK_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
+        { SC_UNO_CTL_CWEIGHT,  ATTR_CTL_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
+        { SC_UNONAME_CWORDMOD, ATTR_FONT_WORDLINE, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CHCOLHDR, SC_WID_UNO_CHCOLHDR,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CHROWHDR, SC_WID_UNO_CHROWHDR,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CONDFMT,  SC_WID_UNO_CONDFMT, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_CONDLOC,  SC_WID_UNO_CONDLOC, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_CONDXML,  SC_WID_UNO_CONDXML, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_DIAGONAL_BLTR, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_BLTR2, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_TLBR, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_TLBR2, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_CELLHJUS, ATTR_HOR_JUSTIFY,   cppu::UnoType<table::CellHoriJustify>::get(), 0, MID_HORJUST_HORJUST },
+        { SC_UNONAME_CELLHJUS_METHOD, ATTR_HOR_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
+        { SC_UNONAME_CELLTRAN, ATTR_BACKGROUND,    cppu::UnoType<bool>::get(),                  0, MID_GRAPHIC_TRANSPARENT },
+        { SC_UNONAME_WRAP,     ATTR_LINEBREAK,     cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_LEFTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_LEFTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_NUMFMT,   ATTR_VALUE_FORMAT,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_NUMRULES, SC_WID_UNO_NUMRULES,cppu::UnoType<container::XIndexReplace>::get(), 0, 0 },
+        { SC_UNONAME_CELLORI,  ATTR_STACKED,       cppu::UnoType<table::CellOrientation>::get(), 0, 0 },
+        { SC_UNONAME_PADJUST,  ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
+        { SC_UNONAME_PBMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_LO_MARGIN | CONVERT_TWIPS },
+        { SC_UNONAME_PINDENT,  ATTR_INDENT,        cppu::UnoType<sal_Int16>::get(),            0, 0 }, //! CONVERT_TWIPS
+        { SC_UNONAME_PISCHDIST,ATTR_SCRIPTSPACE,   cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_PISFORBID,ATTR_FORBIDDEN_RULES,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_PISHANG,  ATTR_HANGPUNCTUATION,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_PISHYPHEN,ATTR_HYPHENATE,     cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_PLASTADJ, ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
+        { SC_UNONAME_PLMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_L_MARGIN  | CONVERT_TWIPS },
+        { SC_UNONAME_PRMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_R_MARGIN  | CONVERT_TWIPS },
+        { SC_UNONAME_PTMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_UP_MARGIN | CONVERT_TWIPS },
+        { SC_UNONAME_RIGHTBORDER,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_RIGHTBORDER2,ATTR_BORDER,     ::cppu::UnoType<table::BorderLine2>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_ROTANG,   ATTR_ROTATE_VALUE,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_ROTREF,   ATTR_ROTATE_MODE,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_SHADOW,   ATTR_SHADOW,        cppu::UnoType<table::ShadowFormat>::get(),  0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_SHRINK_TO_FIT, ATTR_SHRINKTOFIT, cppu::UnoType<bool>::get(),               0, 0 },
+        { SC_UNONAME_TBLBORD,  SC_WID_UNO_TBLBORD, cppu::UnoType<table::TableBorder>::get(),   0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_TBLBORD2,  SC_WID_UNO_TBLBORD2, cppu::UnoType<table::TableBorder2>::get(),   0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_TOPBORDER,ATTR_BORDER,        ::cppu::UnoType<table::BorderLine>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_TOPBORDER2,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine2>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_USERDEF,  ATTR_USERDEF,       cppu::UnoType<container::XNameContainer>::get(), 0, 0 },
+        { SC_UNONAME_VALIDAT,  SC_WID_UNO_VALIDAT, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_VALILOC,  SC_WID_UNO_VALILOC, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_VALIXML,  SC_WID_UNO_VALIXML, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_CELLVJUS, ATTR_VER_JUSTIFY,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_CELLVJUS_METHOD, ATTR_VER_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
+        { SC_UNONAME_WRITING,  ATTR_WRITINGDIR,    cppu::UnoType<sal_Int16>::get(),            0, 0 },
+        { SC_UNONAME_HYPERLINK,  ATTR_HYPERLINK, cppu::UnoType<OUString>::get(),        0, 0 },
+        { SC_UNONAME_FORMATID,  SC_WID_UNO_FORMATID, cppu::UnoType<sal_uInt64>::get(),        0, 0 },
     };
     static SfxItemPropertySet aCellsPropertySet( aCellsPropertyMap_Impl );
     return &aCellsPropertySet;
@@ -260,105 +260,104 @@ static const SfxItemPropertySet* lcl_GetRangePropertySet()
 {
     static const SfxItemPropertyMapEntry aRangePropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_ABSNAME,  SC_WID_UNO_ABSNAME, cppu::UnoType<OUString>::get(),        0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_ASIANVERT,ATTR_VERTICAL_ASIAN,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_BOTTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_BOTTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CELLBACK, ATTR_BACKGROUND,    cppu::UnoType<sal_Int32>::get(),            0, MID_BACK_COLOR },
-        {u"" SC_UNONAME_CELLPRO,  ATTR_PROTECTION,    cppu::UnoType<util::CellProtection>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLSTYL, SC_WID_UNO_CELLSTYL,cppu::UnoType<OUString>::get(),        0, 0 },
-        {u"" SC_UNONAME_CCOLOR,   ATTR_FONT_COLOR,    cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_COUTL,    ATTR_FONT_CONTOUR,  cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CCROSS,   ATTR_FONT_CROSSEDOUT,cppu::UnoType<bool>::get(),                 0, MID_CROSSED_OUT },
-        {u"" SC_UNONAME_CEMPHAS,  ATTR_FONT_EMPHASISMARK,cppu::UnoType<sal_Int16>::get(),         0, MID_EMPHASIS },
-        {u"" SC_UNONAME_CFONT,    ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNONAME_CFCHARS,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNO_CJK_CFCHARS,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNO_CTL_CFCHARS,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNONAME_CFFAMIL,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNO_CJK_CFFAMIL,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNO_CTL_CFFAMIL,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNONAME_CFNAME,   ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNO_CJK_CFNAME,   ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNO_CTL_CFNAME,   ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNONAME_CFPITCH,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNO_CJK_CFPITCH,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNO_CTL_CFPITCH,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNONAME_CFSTYLE,  ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNO_CJK_CFSTYLE,  ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNO_CTL_CFSTYLE,  ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNONAME_CHEIGHT,  ATTR_FONT_HEIGHT,   cppu::UnoType<float>::get(),                0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNO_CJK_CHEIGHT,  ATTR_CJK_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNO_CTL_CHEIGHT,  ATTR_CTL_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CLOCAL,   ATTR_FONT_LANGUAGE, cppu::UnoType<lang::Locale>::get(),         0, MID_LANG_LOCALE },
-        {u"" SC_UNO_CJK_CLOCAL,   ATTR_CJK_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
-        {u"" SC_UNO_CTL_CLOCAL,   ATTR_CTL_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
-        {u"" SC_UNONAME_COVER,    ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
-        {u"" SC_UNONAME_COVRLCOL, ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
-        {u"" SC_UNONAME_COVRLHAS, ATTR_FONT_OVERLINE, cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
-        {u"" SC_UNONAME_CPOST,    ATTR_FONT_POSTURE,  cppu::UnoType<awt::FontSlant>::get(),       0, MID_POSTURE },
-        {u"" SC_UNO_CJK_CPOST,    ATTR_CJK_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
-        {u"" SC_UNO_CTL_CPOST,    ATTR_CTL_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
-        {u"" SC_UNONAME_CRELIEF,  ATTR_FONT_RELIEF,   cppu::UnoType<sal_Int16>::get(),            0, MID_RELIEF },
-        {u"" SC_UNONAME_CSHADD,   ATTR_FONT_SHADOWED, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CSTRIKE,  ATTR_FONT_CROSSEDOUT,cppu::UnoType<sal_Int16>::get(),           0, MID_CROSS_OUT },
-        {u"" SC_UNONAME_CUNDER,   ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
-        {u"" SC_UNONAME_CUNDLCOL, ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
-        {u"" SC_UNONAME_CUNDLHAS, ATTR_FONT_UNDERLINE,cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
-        {u"" SC_UNONAME_CWEIGHT,  ATTR_FONT_WEIGHT,   cppu::UnoType<float>::get(),                0, MID_WEIGHT },
-        {u"" SC_UNO_CJK_CWEIGHT,  ATTR_CJK_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
-        {u"" SC_UNO_CTL_CWEIGHT,  ATTR_CTL_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
-        {u"" SC_UNONAME_CWORDMOD, ATTR_FONT_WORDLINE, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CHCOLHDR, SC_WID_UNO_CHCOLHDR,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CHROWHDR, SC_WID_UNO_CHROWHDR,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CONDFMT,  SC_WID_UNO_CONDFMT, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_CONDLOC,  SC_WID_UNO_CONDLOC, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_CONDXML,  SC_WID_UNO_CONDXML, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_DIAGONAL_BLTR, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_BLTR2, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_TLBR, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_TLBR2, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CELLHJUS, ATTR_HOR_JUSTIFY,   cppu::UnoType<table::CellHoriJustify>::get(),   0, MID_HORJUST_HORJUST },
-        {u"" SC_UNONAME_CELLHJUS_METHOD, ATTR_HOR_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
-        {u"" SC_UNONAME_CELLTRAN, ATTR_BACKGROUND,    cppu::UnoType<bool>::get(),                  0, MID_GRAPHIC_TRANSPARENT },
-        {u"" SC_UNONAME_WRAP,     ATTR_LINEBREAK,     cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_LEFTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_LEFTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_NUMFMT,   ATTR_VALUE_FORMAT,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_NUMRULES, SC_WID_UNO_NUMRULES,cppu::UnoType<container::XIndexReplace>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLORI,  ATTR_STACKED,       cppu::UnoType<table::CellOrientation>::get(), 0, 0 },
-        {u"" SC_UNONAME_PADJUST,  ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
-        {u"" SC_UNONAME_PBMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_LO_MARGIN | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PINDENT,  ATTR_INDENT,        cppu::UnoType<sal_Int16>::get(),            0, 0 }, //! CONVERT_TWIPS
-        {u"" SC_UNONAME_PISCHDIST,ATTR_SCRIPTSPACE,   cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_PISFORBID,ATTR_FORBIDDEN_RULES,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_PISHANG,  ATTR_HANGPUNCTUATION,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_PISHYPHEN,ATTR_HYPHENATE,     cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_PLASTADJ, ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
-        {u"" SC_UNONAME_PLMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_L_MARGIN  | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PRMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_R_MARGIN  | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PTMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_UP_MARGIN | CONVERT_TWIPS },
-        {u"" SC_UNONAME_POS,      SC_WID_UNO_POS,     cppu::UnoType<awt::Point>::get(),           0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_RIGHTBORDER,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_RIGHTBORDER2,ATTR_BORDER,     ::cppu::UnoType<table::BorderLine2>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_ROTANG,   ATTR_ROTATE_VALUE,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_ROTREF,   ATTR_ROTATE_MODE,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_SHADOW,   ATTR_SHADOW,        cppu::UnoType<table::ShadowFormat>::get(),  0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_SHRINK_TO_FIT, ATTR_SHRINKTOFIT, cppu::UnoType<bool>::get(),               0, 0 },
-        {u"" SC_UNONAME_SIZE,     SC_WID_UNO_SIZE,    cppu::UnoType<awt::Size>::get(),            0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_TBLBORD,  SC_WID_UNO_TBLBORD, cppu::UnoType<table::TableBorder>::get(),   0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TBLBORD2,  SC_WID_UNO_TBLBORD2, cppu::UnoType<table::TableBorder2>::get(),   0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TOPBORDER,ATTR_BORDER,        ::cppu::UnoType<table::BorderLine>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TOPBORDER2,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine2>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_USERDEF,  ATTR_USERDEF,       cppu::UnoType<container::XNameContainer>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALIDAT,  SC_WID_UNO_VALIDAT, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALILOC,  SC_WID_UNO_VALILOC, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALIXML,  SC_WID_UNO_VALIXML, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLVJUS, ATTR_VER_JUSTIFY,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLVJUS_METHOD, ATTR_VER_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
-        {u"" SC_UNONAME_WRITING,  ATTR_WRITINGDIR,    cppu::UnoType<sal_Int16>::get(),            0, 0 },
-        {u"" SC_UNONAME_FORMATID,  SC_WID_UNO_FORMATID, cppu::UnoType<sal_uInt64>::get(),        0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_ABSNAME,  SC_WID_UNO_ABSNAME, cppu::UnoType<OUString>::get(),        0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_ASIANVERT,ATTR_VERTICAL_ASIAN,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_BOTTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_BOTTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_CELLBACK, ATTR_BACKGROUND,    cppu::UnoType<sal_Int32>::get(),            0, MID_BACK_COLOR },
+        { SC_UNONAME_CELLPRO,  ATTR_PROTECTION,    cppu::UnoType<util::CellProtection>::get(), 0, 0 },
+        { SC_UNONAME_CELLSTYL, SC_WID_UNO_CELLSTYL,cppu::UnoType<OUString>::get(),        0, 0 },
+        { SC_UNONAME_CCOLOR,   ATTR_FONT_COLOR,    cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_COUTL,    ATTR_FONT_CONTOUR,  cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CCROSS,   ATTR_FONT_CROSSEDOUT,cppu::UnoType<bool>::get(),                 0, MID_CROSSED_OUT },
+        { SC_UNONAME_CEMPHAS,  ATTR_FONT_EMPHASISMARK,cppu::UnoType<sal_Int16>::get(),         0, MID_EMPHASIS },
+        { SC_UNONAME_CFONT,    ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNONAME_CFCHARS,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNO_CJK_CFCHARS,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNO_CTL_CFCHARS,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNONAME_CFFAMIL,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNO_CJK_CFFAMIL,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNO_CTL_CFFAMIL,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNONAME_CFNAME,   ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNO_CJK_CFNAME,   ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNO_CTL_CFNAME,   ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNONAME_CFPITCH,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNO_CJK_CFPITCH,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNO_CTL_CFPITCH,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNONAME_CFSTYLE,  ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNO_CJK_CFSTYLE,  ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNO_CTL_CFSTYLE,  ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNONAME_CHEIGHT,  ATTR_FONT_HEIGHT,   cppu::UnoType<float>::get(),                0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNO_CJK_CHEIGHT,  ATTR_CJK_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNO_CTL_CHEIGHT,  ATTR_CTL_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNONAME_CLOCAL,   ATTR_FONT_LANGUAGE, cppu::UnoType<lang::Locale>::get(),         0, MID_LANG_LOCALE },
+        { SC_UNO_CJK_CLOCAL,   ATTR_CJK_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
+        { SC_UNO_CTL_CLOCAL,   ATTR_CTL_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
+        { SC_UNONAME_COVER,    ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
+        { SC_UNONAME_COVRLCOL, ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
+        { SC_UNONAME_COVRLHAS, ATTR_FONT_OVERLINE, cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
+        { SC_UNONAME_CPOST,    ATTR_FONT_POSTURE,  cppu::UnoType<awt::FontSlant>::get(),       0, MID_POSTURE },
+        { SC_UNO_CJK_CPOST,    ATTR_CJK_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
+        { SC_UNO_CTL_CPOST,    ATTR_CTL_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
+        { SC_UNONAME_CRELIEF,  ATTR_FONT_RELIEF,   cppu::UnoType<sal_Int16>::get(),            0, MID_RELIEF },
+        { SC_UNONAME_CSHADD,   ATTR_FONT_SHADOWED, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CSTRIKE,  ATTR_FONT_CROSSEDOUT,cppu::UnoType<sal_Int16>::get(),           0, MID_CROSS_OUT },
+        { SC_UNONAME_CUNDER,   ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
+        { SC_UNONAME_CUNDLCOL, ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
+        { SC_UNONAME_CUNDLHAS, ATTR_FONT_UNDERLINE,cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
+        { SC_UNONAME_CWEIGHT,  ATTR_FONT_WEIGHT,   cppu::UnoType<float>::get(),                0, MID_WEIGHT },
+        { SC_UNO_CJK_CWEIGHT,  ATTR_CJK_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
+        { SC_UNO_CTL_CWEIGHT,  ATTR_CTL_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
+        { SC_UNONAME_CWORDMOD, ATTR_FONT_WORDLINE, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CHCOLHDR, SC_WID_UNO_CHCOLHDR,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CHROWHDR, SC_WID_UNO_CHROWHDR,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CONDFMT,  SC_WID_UNO_CONDFMT, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_CONDLOC,  SC_WID_UNO_CONDLOC, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_CONDXML,  SC_WID_UNO_CONDXML, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_DIAGONAL_BLTR, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_BLTR2, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_TLBR, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_TLBR2, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_CELLHJUS, ATTR_HOR_JUSTIFY,   cppu::UnoType<table::CellHoriJustify>::get(),   0, MID_HORJUST_HORJUST },
+        { SC_UNONAME_CELLHJUS_METHOD, ATTR_HOR_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
+        { SC_UNONAME_CELLTRAN, ATTR_BACKGROUND,    cppu::UnoType<bool>::get(),                  0, MID_GRAPHIC_TRANSPARENT },
+        { SC_UNONAME_WRAP,     ATTR_LINEBREAK,     cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_LEFTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_LEFTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_NUMFMT,   ATTR_VALUE_FORMAT,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_NUMRULES, SC_WID_UNO_NUMRULES,cppu::UnoType<container::XIndexReplace>::get(), 0, 0 },
+        { SC_UNONAME_CELLORI,  ATTR_STACKED,       cppu::UnoType<table::CellOrientation>::get(), 0, 0 },
+        { SC_UNONAME_PADJUST,  ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
+        { SC_UNONAME_PBMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_LO_MARGIN | CONVERT_TWIPS },
+        { SC_UNONAME_PINDENT,  ATTR_INDENT,        cppu::UnoType<sal_Int16>::get(),            0, 0 }, //! CONVERT_TWIPS
+        { SC_UNONAME_PISCHDIST,ATTR_SCRIPTSPACE,   cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_PISFORBID,ATTR_FORBIDDEN_RULES,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_PISHANG,  ATTR_HANGPUNCTUATION,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_PISHYPHEN,ATTR_HYPHENATE,     cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_PLASTADJ, ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
+        { SC_UNONAME_PLMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_L_MARGIN  | CONVERT_TWIPS },
+        { SC_UNONAME_PRMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_R_MARGIN  | CONVERT_TWIPS },
+        { SC_UNONAME_PTMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_UP_MARGIN | CONVERT_TWIPS },
+        { SC_UNONAME_POS,      SC_WID_UNO_POS,     cppu::UnoType<awt::Point>::get(),           0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_RIGHTBORDER,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_RIGHTBORDER2,ATTR_BORDER,     ::cppu::UnoType<table::BorderLine2>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_ROTANG,   ATTR_ROTATE_VALUE,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_ROTREF,   ATTR_ROTATE_MODE,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_SHADOW,   ATTR_SHADOW,        cppu::UnoType<table::ShadowFormat>::get(),  0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_SHRINK_TO_FIT, ATTR_SHRINKTOFIT, cppu::UnoType<bool>::get(),               0, 0 },
+        { SC_UNONAME_SIZE,     SC_WID_UNO_SIZE,    cppu::UnoType<awt::Size>::get(),            0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_TBLBORD,  SC_WID_UNO_TBLBORD, cppu::UnoType<table::TableBorder>::get(),   0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_TBLBORD2,  SC_WID_UNO_TBLBORD2, cppu::UnoType<table::TableBorder2>::get(),   0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_TOPBORDER,ATTR_BORDER,        ::cppu::UnoType<table::BorderLine>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_TOPBORDER2,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine2>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_USERDEF,  ATTR_USERDEF,       cppu::UnoType<container::XNameContainer>::get(), 0, 0 },
+        { SC_UNONAME_VALIDAT,  SC_WID_UNO_VALIDAT, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_VALILOC,  SC_WID_UNO_VALILOC, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_VALIXML,  SC_WID_UNO_VALIXML, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_CELLVJUS, ATTR_VER_JUSTIFY,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_CELLVJUS_METHOD, ATTR_VER_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
+        { SC_UNONAME_WRITING,  ATTR_WRITINGDIR,    cppu::UnoType<sal_Int16>::get(),            0, 0 },
+        { SC_UNONAME_FORMATID,  SC_WID_UNO_FORMATID, cppu::UnoType<sal_uInt64>::get(),        0, 0 },
     };
     static SfxItemPropertySet aRangePropertySet( aRangePropertyMap_Impl );
     return &aRangePropertySet;
@@ -371,111 +370,110 @@ static const SfxItemPropertySet* lcl_GetCellPropertySet()
 {
     static const SfxItemPropertyMapEntry aCellPropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_ABSNAME,  SC_WID_UNO_ABSNAME, cppu::UnoType<OUString>::get(),        0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_ASIANVERT,ATTR_VERTICAL_ASIAN,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_BOTTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_BOTTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CELLBACK, ATTR_BACKGROUND,    cppu::UnoType<sal_Int32>::get(),            0, MID_BACK_COLOR },
-        {u"" SC_UNONAME_CELLPRO,  ATTR_PROTECTION,    cppu::UnoType<util::CellProtection>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLSTYL, SC_WID_UNO_CELLSTYL,cppu::UnoType<OUString>::get(),        0, 0 },
-        {u"" SC_UNONAME_CCOLOR,   ATTR_FONT_COLOR,    cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_COUTL,    ATTR_FONT_CONTOUR,  cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CCROSS,   ATTR_FONT_CROSSEDOUT,cppu::UnoType<bool>::get(),                 0, MID_CROSSED_OUT },
-        {u"" SC_UNONAME_CEMPHAS,  ATTR_FONT_EMPHASISMARK,cppu::UnoType<sal_Int16>::get(),         0, MID_EMPHASIS },
-        {u"" SC_UNONAME_CFONT,    ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNONAME_CFCHARS,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNO_CJK_CFCHARS,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNO_CTL_CFCHARS,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNONAME_CFFAMIL,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNO_CJK_CFFAMIL,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNO_CTL_CFFAMIL,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNONAME_CFNAME,   ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNO_CJK_CFNAME,   ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNO_CTL_CFNAME,   ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNONAME_CFPITCH,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNO_CJK_CFPITCH,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNO_CTL_CFPITCH,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNONAME_CFSTYLE,  ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNO_CJK_CFSTYLE,  ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNO_CTL_CFSTYLE,  ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNONAME_CHEIGHT,  ATTR_FONT_HEIGHT,   cppu::UnoType<float>::get(),                0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNO_CJK_CHEIGHT,  ATTR_CJK_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNO_CTL_CHEIGHT,  ATTR_CTL_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CLOCAL,   ATTR_FONT_LANGUAGE, cppu::UnoType<lang::Locale>::get(),         0, MID_LANG_LOCALE },
-        {u"" SC_UNO_CJK_CLOCAL,   ATTR_CJK_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
-        {u"" SC_UNO_CTL_CLOCAL,   ATTR_CTL_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
-        {u"" SC_UNONAME_COVER,    ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
-        {u"" SC_UNONAME_COVRLCOL, ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
-        {u"" SC_UNONAME_COVRLHAS, ATTR_FONT_OVERLINE, cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
-        {u"" SC_UNONAME_CPOST,    ATTR_FONT_POSTURE,  cppu::UnoType<awt::FontSlant>::get(),       0, MID_POSTURE },
-        {u"" SC_UNO_CJK_CPOST,    ATTR_CJK_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
-        {u"" SC_UNO_CTL_CPOST,    ATTR_CTL_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
-        {u"" SC_UNONAME_CRELIEF,  ATTR_FONT_RELIEF,   cppu::UnoType<sal_Int16>::get(),            0, MID_RELIEF },
-        {u"" SC_UNONAME_CSHADD,   ATTR_FONT_SHADOWED, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CSTRIKE,  ATTR_FONT_CROSSEDOUT,cppu::UnoType<sal_Int16>::get(),           0, MID_CROSS_OUT },
-        {u"" SC_UNONAME_CUNDER,   ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
-        {u"" SC_UNONAME_CUNDLCOL, ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
-        {u"" SC_UNONAME_CUNDLHAS, ATTR_FONT_UNDERLINE,cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
-        {u"" SC_UNONAME_CWEIGHT,  ATTR_FONT_WEIGHT,   cppu::UnoType<float>::get(),                0, MID_WEIGHT },
-        {u"" SC_UNO_CJK_CWEIGHT,  ATTR_CJK_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
-        {u"" SC_UNO_CTL_CWEIGHT,  ATTR_CTL_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
-        {u"" SC_UNONAME_CWORDMOD, ATTR_FONT_WORDLINE, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CHCOLHDR, SC_WID_UNO_CHCOLHDR,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CHROWHDR, SC_WID_UNO_CHROWHDR,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CONDFMT,  SC_WID_UNO_CONDFMT, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_CONDLOC,  SC_WID_UNO_CONDLOC, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_CONDXML,  SC_WID_UNO_CONDXML, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_DIAGONAL_BLTR, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_BLTR2, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_TLBR, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_TLBR2, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_FORMLOC,  SC_WID_UNO_FORMLOC, cppu::UnoType<OUString>::get(),        0, 0 },
-        {u"" SC_UNONAME_FORMRT,   SC_WID_UNO_FORMRT,  cppu::UnoType<table::CellContentType>::get(), 0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_CELLCONTENTTYPE,   SC_WID_UNO_CELLCONTENTTYPE,  cppu::UnoType<table::CellContentType>::get(), 0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_FORMRT2,  SC_WID_UNO_FORMRT2, cppu::UnoType<sal_Int32>::get(), 0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_CELLHJUS, ATTR_HOR_JUSTIFY,   cppu::UnoType<table::CellHoriJustify>::get(), 0, MID_HORJUST_HORJUST },
-        {u"" SC_UNONAME_CELLHJUS_METHOD, ATTR_HOR_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
-        {u"" SC_UNONAME_CELLTRAN, ATTR_BACKGROUND,    cppu::UnoType<bool>::get(),                  0, MID_GRAPHIC_TRANSPARENT },
-        {u"" SC_UNONAME_WRAP,     ATTR_LINEBREAK,     cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_LEFTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_LEFTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_NUMFMT,   ATTR_VALUE_FORMAT,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_NUMRULES, SC_WID_UNO_NUMRULES,cppu::UnoType<container::XIndexReplace>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLORI,  ATTR_STACKED,       cppu::UnoType<table::CellOrientation>::get(), 0, 0 },
-        {u"" SC_UNONAME_PADJUST,  ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
-        {u"" SC_UNONAME_PBMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_LO_MARGIN | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PINDENT,  ATTR_INDENT,        cppu::UnoType<sal_Int16>::get(),            0, 0 }, //! CONVERT_TWIPS
-        {u"" SC_UNONAME_PISCHDIST,ATTR_SCRIPTSPACE,   cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_PISFORBID,ATTR_FORBIDDEN_RULES,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_PISHANG,  ATTR_HANGPUNCTUATION,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_PISHYPHEN,ATTR_HYPHENATE,     cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_PLASTADJ, ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
-        {u"" SC_UNONAME_PLMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_L_MARGIN  | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PRMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_R_MARGIN  | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PTMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_UP_MARGIN | CONVERT_TWIPS },
-        {u"" SC_UNONAME_POS,      SC_WID_UNO_POS,     cppu::UnoType<awt::Point>::get(),           0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_RIGHTBORDER,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_RIGHTBORDER2,ATTR_BORDER,     ::cppu::UnoType<table::BorderLine2>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_ROTANG,   ATTR_ROTATE_VALUE,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_ROTREF,   ATTR_ROTATE_MODE,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_SHADOW,   ATTR_SHADOW,        cppu::UnoType<table::ShadowFormat>::get(),  0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_SHRINK_TO_FIT, ATTR_SHRINKTOFIT, cppu::UnoType<bool>::get(),               0, 0 },
-        {u"" SC_UNONAME_SIZE,     SC_WID_UNO_SIZE,    cppu::UnoType<awt::Size>::get(),            0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_TBLBORD,  SC_WID_UNO_TBLBORD, cppu::UnoType<table::TableBorder>::get(),   0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TBLBORD2,  SC_WID_UNO_TBLBORD2, cppu::UnoType<table::TableBorder2>::get(),   0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TOPBORDER,ATTR_BORDER,        ::cppu::UnoType<table::BorderLine>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TOPBORDER2,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine2>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_USERDEF,  ATTR_USERDEF,       cppu::UnoType<container::XNameContainer>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALIDAT,  SC_WID_UNO_VALIDAT, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALILOC,  SC_WID_UNO_VALILOC, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALIXML,  SC_WID_UNO_VALIXML, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLVJUS, ATTR_VER_JUSTIFY,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLVJUS_METHOD, ATTR_VER_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
-        {u"" SC_UNONAME_WRITING,  ATTR_WRITINGDIR,    cppu::UnoType<sal_Int16>::get(),            0, 0 },
-        {u"" UNO_NAME_EDIT_CHAR_ESCAPEMENT,   EE_CHAR_ESCAPEMENT, cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_HYPERLINK,  ATTR_HYPERLINK, cppu::UnoType<OUString>::get(),        0, 0 },
-        {u"" SC_UNONAME_FORMATID,  SC_WID_UNO_FORMATID, cppu::UnoType<sal_uInt64>::get(),        0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_ABSNAME,  SC_WID_UNO_ABSNAME, cppu::UnoType<OUString>::get(),        0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_ASIANVERT,ATTR_VERTICAL_ASIAN,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_BOTTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_BOTTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_CELLBACK, ATTR_BACKGROUND,    cppu::UnoType<sal_Int32>::get(),            0, MID_BACK_COLOR },
+        { SC_UNONAME_CELLPRO,  ATTR_PROTECTION,    cppu::UnoType<util::CellProtection>::get(), 0, 0 },
+        { SC_UNONAME_CELLSTYL, SC_WID_UNO_CELLSTYL,cppu::UnoType<OUString>::get(),        0, 0 },
+        { SC_UNONAME_CCOLOR,   ATTR_FONT_COLOR,    cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_COUTL,    ATTR_FONT_CONTOUR,  cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CCROSS,   ATTR_FONT_CROSSEDOUT,cppu::UnoType<bool>::get(),                 0, MID_CROSSED_OUT },
+        { SC_UNONAME_CEMPHAS,  ATTR_FONT_EMPHASISMARK,cppu::UnoType<sal_Int16>::get(),         0, MID_EMPHASIS },
+        { SC_UNONAME_CFONT,    ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNONAME_CFCHARS,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNO_CJK_CFCHARS,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNO_CTL_CFCHARS,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNONAME_CFFAMIL,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNO_CJK_CFFAMIL,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNO_CTL_CFFAMIL,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNONAME_CFNAME,   ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNO_CJK_CFNAME,   ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNO_CTL_CFNAME,   ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNONAME_CFPITCH,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNO_CJK_CFPITCH,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNO_CTL_CFPITCH,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNONAME_CFSTYLE,  ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNO_CJK_CFSTYLE,  ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNO_CTL_CFSTYLE,  ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNONAME_CHEIGHT,  ATTR_FONT_HEIGHT,   cppu::UnoType<float>::get(),                0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNO_CJK_CHEIGHT,  ATTR_CJK_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNO_CTL_CHEIGHT,  ATTR_CTL_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNONAME_CLOCAL,   ATTR_FONT_LANGUAGE, cppu::UnoType<lang::Locale>::get(),         0, MID_LANG_LOCALE },
+        { SC_UNO_CJK_CLOCAL,   ATTR_CJK_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
+        { SC_UNO_CTL_CLOCAL,   ATTR_CTL_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
+        { SC_UNONAME_COVER,    ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
+        { SC_UNONAME_COVRLCOL, ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
+        { SC_UNONAME_COVRLHAS, ATTR_FONT_OVERLINE, cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
+        { SC_UNONAME_CPOST,    ATTR_FONT_POSTURE,  cppu::UnoType<awt::FontSlant>::get(),       0, MID_POSTURE },
+        { SC_UNO_CJK_CPOST,    ATTR_CJK_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
+        { SC_UNO_CTL_CPOST,    ATTR_CTL_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
+        { SC_UNONAME_CRELIEF,  ATTR_FONT_RELIEF,   cppu::UnoType<sal_Int16>::get(),            0, MID_RELIEF },
+        { SC_UNONAME_CSHADD,   ATTR_FONT_SHADOWED, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CSTRIKE,  ATTR_FONT_CROSSEDOUT,cppu::UnoType<sal_Int16>::get(),           0, MID_CROSS_OUT },
+        { SC_UNONAME_CUNDER,   ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
+        { SC_UNONAME_CUNDLCOL, ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
+        { SC_UNONAME_CUNDLHAS, ATTR_FONT_UNDERLINE,cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
+        { SC_UNONAME_CWEIGHT,  ATTR_FONT_WEIGHT,   cppu::UnoType<float>::get(),                0, MID_WEIGHT },
+        { SC_UNO_CJK_CWEIGHT,  ATTR_CJK_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
+        { SC_UNO_CTL_CWEIGHT,  ATTR_CTL_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
+        { SC_UNONAME_CWORDMOD, ATTR_FONT_WORDLINE, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CHCOLHDR, SC_WID_UNO_CHCOLHDR,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CHROWHDR, SC_WID_UNO_CHROWHDR,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CONDFMT,  SC_WID_UNO_CONDFMT, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_CONDLOC,  SC_WID_UNO_CONDLOC, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_CONDXML,  SC_WID_UNO_CONDXML, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_DIAGONAL_BLTR, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_BLTR2, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_TLBR, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_TLBR2, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_FORMLOC,  SC_WID_UNO_FORMLOC, cppu::UnoType<OUString>::get(),        0, 0 },
+        { SC_UNONAME_FORMRT,   SC_WID_UNO_FORMRT,  cppu::UnoType<table::CellContentType>::get(), 0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_CELLCONTENTTYPE,   SC_WID_UNO_CELLCONTENTTYPE,  cppu::UnoType<table::CellContentType>::get(), 0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_FORMRT2,  SC_WID_UNO_FORMRT2, cppu::UnoType<sal_Int32>::get(), 0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_CELLHJUS, ATTR_HOR_JUSTIFY,   cppu::UnoType<table::CellHoriJustify>::get(), 0, MID_HORJUST_HORJUST },
+        { SC_UNONAME_CELLHJUS_METHOD, ATTR_HOR_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
+        { SC_UNONAME_CELLTRAN, ATTR_BACKGROUND,    cppu::UnoType<bool>::get(),                  0, MID_GRAPHIC_TRANSPARENT },
+        { SC_UNONAME_WRAP,     ATTR_LINEBREAK,     cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_LEFTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_LEFTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_NUMFMT,   ATTR_VALUE_FORMAT,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_NUMRULES, SC_WID_UNO_NUMRULES,cppu::UnoType<container::XIndexReplace>::get(), 0, 0 },
+        { SC_UNONAME_CELLORI,  ATTR_STACKED,       cppu::UnoType<table::CellOrientation>::get(), 0, 0 },
+        { SC_UNONAME_PADJUST,  ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
+        { SC_UNONAME_PBMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_LO_MARGIN | CONVERT_TWIPS },
+        { SC_UNONAME_PINDENT,  ATTR_INDENT,        cppu::UnoType<sal_Int16>::get(),            0, 0 }, //! CONVERT_TWIPS
+        { SC_UNONAME_PISCHDIST,ATTR_SCRIPTSPACE,   cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_PISFORBID,ATTR_FORBIDDEN_RULES,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_PISHANG,  ATTR_HANGPUNCTUATION,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_PISHYPHEN,ATTR_HYPHENATE,     cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_PLASTADJ, ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
+        { SC_UNONAME_PLMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_L_MARGIN  | CONVERT_TWIPS },
+        { SC_UNONAME_PRMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_R_MARGIN  | CONVERT_TWIPS },
+        { SC_UNONAME_PTMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_UP_MARGIN | CONVERT_TWIPS },
+        { SC_UNONAME_POS,      SC_WID_UNO_POS,     cppu::UnoType<awt::Point>::get(),           0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_RIGHTBORDER,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_RIGHTBORDER2,ATTR_BORDER,     ::cppu::UnoType<table::BorderLine2>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_ROTANG,   ATTR_ROTATE_VALUE,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_ROTREF,   ATTR_ROTATE_MODE,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_SHADOW,   ATTR_SHADOW,        cppu::UnoType<table::ShadowFormat>::get(),  0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_SHRINK_TO_FIT, ATTR_SHRINKTOFIT, cppu::UnoType<bool>::get(),               0, 0 },
+        { SC_UNONAME_SIZE,     SC_WID_UNO_SIZE,    cppu::UnoType<awt::Size>::get(),            0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_TBLBORD,  SC_WID_UNO_TBLBORD, cppu::UnoType<table::TableBorder>::get(),   0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_TBLBORD2,  SC_WID_UNO_TBLBORD2, cppu::UnoType<table::TableBorder2>::get(),   0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_TOPBORDER,ATTR_BORDER,        ::cppu::UnoType<table::BorderLine>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_TOPBORDER2,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine2>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_USERDEF,  ATTR_USERDEF,       cppu::UnoType<container::XNameContainer>::get(), 0, 0 },
+        { SC_UNONAME_VALIDAT,  SC_WID_UNO_VALIDAT, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_VALILOC,  SC_WID_UNO_VALILOC, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_VALIXML,  SC_WID_UNO_VALIXML, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_CELLVJUS, ATTR_VER_JUSTIFY,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_CELLVJUS_METHOD, ATTR_VER_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
+        { SC_UNONAME_WRITING,  ATTR_WRITINGDIR,    cppu::UnoType<sal_Int16>::get(),            0, 0 },
+        { UNO_NAME_EDIT_CHAR_ESCAPEMENT,   EE_CHAR_ESCAPEMENT, cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_HYPERLINK,  ATTR_HYPERLINK, cppu::UnoType<OUString>::get(),        0, 0 },
+        { SC_UNONAME_FORMATID,  SC_WID_UNO_FORMATID, cppu::UnoType<sal_uInt64>::get(),        0, 0 },
     };
     static SfxItemPropertySet aCellPropertySet( aCellPropertyMap_Impl );
     return &aCellPropertySet;
@@ -488,109 +486,108 @@ static const SfxItemPropertySet* lcl_GetColumnPropertySet()
 {
     static const SfxItemPropertyMapEntry aColumnPropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_ABSNAME,  SC_WID_UNO_ABSNAME, cppu::UnoType<OUString>::get(),        0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_ASIANVERT,ATTR_VERTICAL_ASIAN,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_BOTTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_BOTTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CELLBACK, ATTR_BACKGROUND,    cppu::UnoType<sal_Int32>::get(),            0, MID_BACK_COLOR },
-        {u"" SC_UNONAME_CELLPRO,  ATTR_PROTECTION,    cppu::UnoType<util::CellProtection>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLSTYL, SC_WID_UNO_CELLSTYL,cppu::UnoType<OUString>::get(),        0, 0 },
-        {u"" SC_UNONAME_CCOLOR,   ATTR_FONT_COLOR,    cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_COUTL,    ATTR_FONT_CONTOUR,  cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CCROSS,   ATTR_FONT_CROSSEDOUT,cppu::UnoType<bool>::get(),                 0, MID_CROSSED_OUT },
-        {u"" SC_UNONAME_CEMPHAS,  ATTR_FONT_EMPHASISMARK,cppu::UnoType<sal_Int16>::get(),         0, MID_EMPHASIS },
-        {u"" SC_UNONAME_CFONT,    ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNONAME_CFCHARS,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNO_CJK_CFCHARS,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNO_CTL_CFCHARS,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNONAME_CFFAMIL,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNO_CJK_CFFAMIL,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNO_CTL_CFFAMIL,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNONAME_CFNAME,   ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNO_CJK_CFNAME,   ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNO_CTL_CFNAME,   ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNONAME_CFPITCH,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNO_CJK_CFPITCH,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNO_CTL_CFPITCH,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNONAME_CFSTYLE,  ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNO_CJK_CFSTYLE,  ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNO_CTL_CFSTYLE,  ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNONAME_CHEIGHT,  ATTR_FONT_HEIGHT,   cppu::UnoType<float>::get(),                0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNO_CJK_CHEIGHT,  ATTR_CJK_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNO_CTL_CHEIGHT,  ATTR_CTL_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CLOCAL,   ATTR_FONT_LANGUAGE, cppu::UnoType<lang::Locale>::get(),         0, MID_LANG_LOCALE },
-        {u"" SC_UNO_CJK_CLOCAL,   ATTR_CJK_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
-        {u"" SC_UNO_CTL_CLOCAL,   ATTR_CTL_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
-        {u"" SC_UNONAME_COVER,    ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
-        {u"" SC_UNONAME_COVRLCOL, ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
-        {u"" SC_UNONAME_COVRLHAS, ATTR_FONT_OVERLINE, cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
-        {u"" SC_UNONAME_CPOST,    ATTR_FONT_POSTURE,  cppu::UnoType<awt::FontSlant>::get(),       0, MID_POSTURE },
-        {u"" SC_UNO_CJK_CPOST,    ATTR_CJK_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
-        {u"" SC_UNO_CTL_CPOST,    ATTR_CTL_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
-        {u"" SC_UNONAME_CRELIEF,  ATTR_FONT_RELIEF,   cppu::UnoType<sal_Int16>::get(),            0, MID_RELIEF },
-        {u"" SC_UNONAME_CSHADD,   ATTR_FONT_SHADOWED, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CSTRIKE,  ATTR_FONT_CROSSEDOUT,cppu::UnoType<sal_Int16>::get(),           0, MID_CROSS_OUT },
-        {u"" SC_UNONAME_CUNDER,   ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
-        {u"" SC_UNONAME_CUNDLCOL, ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
-        {u"" SC_UNONAME_CUNDLHAS, ATTR_FONT_UNDERLINE,cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
-        {u"" SC_UNONAME_CWEIGHT,  ATTR_FONT_WEIGHT,   cppu::UnoType<float>::get(),                0, MID_WEIGHT },
-        {u"" SC_UNO_CJK_CWEIGHT,  ATTR_CJK_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
-        {u"" SC_UNO_CTL_CWEIGHT,  ATTR_CTL_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
-        {u"" SC_UNONAME_CWORDMOD, ATTR_FONT_WORDLINE, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CHCOLHDR, SC_WID_UNO_CHCOLHDR,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CHROWHDR, SC_WID_UNO_CHROWHDR,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CONDFMT,  SC_WID_UNO_CONDFMT, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_CONDLOC,  SC_WID_UNO_CONDLOC, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_CONDXML,  SC_WID_UNO_CONDXML, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_DIAGONAL_BLTR, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_BLTR2, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_TLBR, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_TLBR2, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CELLHJUS, ATTR_HOR_JUSTIFY,   cppu::UnoType<table::CellHoriJustify>::get(), 0, MID_HORJUST_HORJUST },
-        {u"" SC_UNONAME_CELLHJUS_METHOD, ATTR_HOR_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
-        {u"" SC_UNONAME_CELLTRAN, ATTR_BACKGROUND,    cppu::UnoType<bool>::get(),                  0, MID_GRAPHIC_TRANSPARENT },
-        {u"" SC_UNONAME_MANPAGE,  SC_WID_UNO_MANPAGE, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_NEWPAGE,  SC_WID_UNO_NEWPAGE, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_WRAP,     ATTR_LINEBREAK,     cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CELLVIS,  SC_WID_UNO_CELLVIS, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_LEFTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_LEFTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_NUMFMT,   ATTR_VALUE_FORMAT,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_NUMRULES, SC_WID_UNO_NUMRULES,cppu::UnoType<container::XIndexReplace>::get(), 0, 0 },
-        {u"" SC_UNONAME_OWIDTH,   SC_WID_UNO_OWIDTH,  cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CELLORI,  ATTR_STACKED,       cppu::UnoType<table::CellOrientation>::get(), 0, 0 },
-        {u"" SC_UNONAME_PADJUST,  ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
-        {u"" SC_UNONAME_PBMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_LO_MARGIN | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PINDENT,  ATTR_INDENT,        cppu::UnoType<sal_Int16>::get(),            0, 0 }, //! CONVERT_TWIPS
-        {u"" SC_UNONAME_PISCHDIST,ATTR_SCRIPTSPACE,   cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_PISFORBID,ATTR_FORBIDDEN_RULES,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_PISHANG,  ATTR_HANGPUNCTUATION,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_PISHYPHEN,ATTR_HYPHENATE,     cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_PLASTADJ, ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
-        {u"" SC_UNONAME_PLMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_L_MARGIN  | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PRMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_R_MARGIN  | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PTMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_UP_MARGIN | CONVERT_TWIPS },
-        {u"" SC_UNONAME_POS,      SC_WID_UNO_POS,     cppu::UnoType<awt::Point>::get(),           0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_RIGHTBORDER,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_RIGHTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_ROTANG,   ATTR_ROTATE_VALUE,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_ROTREF,   ATTR_ROTATE_MODE,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_SHADOW,   ATTR_SHADOW,        cppu::UnoType<table::ShadowFormat>::get(),  0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_SHRINK_TO_FIT, ATTR_SHRINKTOFIT, cppu::UnoType<bool>::get(),               0, 0 },
-        {u"" SC_UNONAME_SIZE,     SC_WID_UNO_SIZE,    cppu::UnoType<awt::Size>::get(),            0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_TBLBORD,  SC_WID_UNO_TBLBORD, cppu::UnoType<table::TableBorder>::get(),   0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TBLBORD2,  SC_WID_UNO_TBLBORD2, cppu::UnoType<table::TableBorder2>::get(),   0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TOPBORDER,ATTR_BORDER,        ::cppu::UnoType<table::BorderLine>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TOPBORDER2,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine2>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_USERDEF,  ATTR_USERDEF,       cppu::UnoType<container::XNameContainer>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALIDAT,  SC_WID_UNO_VALIDAT, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALILOC,  SC_WID_UNO_VALILOC, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALIXML,  SC_WID_UNO_VALIXML, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLVJUS, ATTR_VER_JUSTIFY,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLVJUS_METHOD, ATTR_VER_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
-        {u"" SC_UNONAME_CELLWID,  SC_WID_UNO_CELLWID, cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_WRITING,  ATTR_WRITINGDIR,    cppu::UnoType<sal_Int16>::get(),            0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_ABSNAME,  SC_WID_UNO_ABSNAME, cppu::UnoType<OUString>::get(),        0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_ASIANVERT,ATTR_VERTICAL_ASIAN,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_BOTTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_BOTTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_CELLBACK, ATTR_BACKGROUND,    cppu::UnoType<sal_Int32>::get(),            0, MID_BACK_COLOR },
+        { SC_UNONAME_CELLPRO,  ATTR_PROTECTION,    cppu::UnoType<util::CellProtection>::get(), 0, 0 },
+        { SC_UNONAME_CELLSTYL, SC_WID_UNO_CELLSTYL,cppu::UnoType<OUString>::get(),        0, 0 },
+        { SC_UNONAME_CCOLOR,   ATTR_FONT_COLOR,    cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_COUTL,    ATTR_FONT_CONTOUR,  cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CCROSS,   ATTR_FONT_CROSSEDOUT,cppu::UnoType<bool>::get(),                 0, MID_CROSSED_OUT },
+        { SC_UNONAME_CEMPHAS,  ATTR_FONT_EMPHASISMARK,cppu::UnoType<sal_Int16>::get(),         0, MID_EMPHASIS },
+        { SC_UNONAME_CFONT,    ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNONAME_CFCHARS,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNO_CJK_CFCHARS,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNO_CTL_CFCHARS,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNONAME_CFFAMIL,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNO_CJK_CFFAMIL,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNO_CTL_CFFAMIL,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNONAME_CFNAME,   ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNO_CJK_CFNAME,   ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNO_CTL_CFNAME,   ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNONAME_CFPITCH,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNO_CJK_CFPITCH,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNO_CTL_CFPITCH,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNONAME_CFSTYLE,  ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNO_CJK_CFSTYLE,  ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNO_CTL_CFSTYLE,  ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNONAME_CHEIGHT,  ATTR_FONT_HEIGHT,   cppu::UnoType<float>::get(),                0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNO_CJK_CHEIGHT,  ATTR_CJK_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNO_CTL_CHEIGHT,  ATTR_CTL_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNONAME_CLOCAL,   ATTR_FONT_LANGUAGE, cppu::UnoType<lang::Locale>::get(),         0, MID_LANG_LOCALE },
+        { SC_UNO_CJK_CLOCAL,   ATTR_CJK_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
+        { SC_UNO_CTL_CLOCAL,   ATTR_CTL_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
+        { SC_UNONAME_COVER,    ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
+        { SC_UNONAME_COVRLCOL, ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
+        { SC_UNONAME_COVRLHAS, ATTR_FONT_OVERLINE, cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
+        { SC_UNONAME_CPOST,    ATTR_FONT_POSTURE,  cppu::UnoType<awt::FontSlant>::get(),       0, MID_POSTURE },
+        { SC_UNO_CJK_CPOST,    ATTR_CJK_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
+        { SC_UNO_CTL_CPOST,    ATTR_CTL_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
+        { SC_UNONAME_CRELIEF,  ATTR_FONT_RELIEF,   cppu::UnoType<sal_Int16>::get(),            0, MID_RELIEF },
+        { SC_UNONAME_CSHADD,   ATTR_FONT_SHADOWED, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CSTRIKE,  ATTR_FONT_CROSSEDOUT,cppu::UnoType<sal_Int16>::get(),           0, MID_CROSS_OUT },
+        { SC_UNONAME_CUNDER,   ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
+        { SC_UNONAME_CUNDLCOL, ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
+        { SC_UNONAME_CUNDLHAS, ATTR_FONT_UNDERLINE,cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
+        { SC_UNONAME_CWEIGHT,  ATTR_FONT_WEIGHT,   cppu::UnoType<float>::get(),                0, MID_WEIGHT },
+        { SC_UNO_CJK_CWEIGHT,  ATTR_CJK_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
+        { SC_UNO_CTL_CWEIGHT,  ATTR_CTL_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
+        { SC_UNONAME_CWORDMOD, ATTR_FONT_WORDLINE, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CHCOLHDR, SC_WID_UNO_CHCOLHDR,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CHROWHDR, SC_WID_UNO_CHROWHDR,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CONDFMT,  SC_WID_UNO_CONDFMT, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_CONDLOC,  SC_WID_UNO_CONDLOC, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_CONDXML,  SC_WID_UNO_CONDXML, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_DIAGONAL_BLTR, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_BLTR2, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_TLBR, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_TLBR2, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_CELLHJUS, ATTR_HOR_JUSTIFY,   cppu::UnoType<table::CellHoriJustify>::get(), 0, MID_HORJUST_HORJUST },
+        { SC_UNONAME_CELLHJUS_METHOD, ATTR_HOR_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
+        { SC_UNONAME_CELLTRAN, ATTR_BACKGROUND,    cppu::UnoType<bool>::get(),                  0, MID_GRAPHIC_TRANSPARENT },
+        { SC_UNONAME_MANPAGE,  SC_WID_UNO_MANPAGE, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_NEWPAGE,  SC_WID_UNO_NEWPAGE, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_WRAP,     ATTR_LINEBREAK,     cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CELLVIS,  SC_WID_UNO_CELLVIS, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_LEFTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_LEFTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_NUMFMT,   ATTR_VALUE_FORMAT,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_NUMRULES, SC_WID_UNO_NUMRULES,cppu::UnoType<container::XIndexReplace>::get(), 0, 0 },
+        { SC_UNONAME_OWIDTH,   SC_WID_UNO_OWIDTH,  cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CELLORI,  ATTR_STACKED,       cppu::UnoType<table::CellOrientation>::get(), 0, 0 },
+        { SC_UNONAME_PADJUST,  ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
+        { SC_UNONAME_PBMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_LO_MARGIN | CONVERT_TWIPS },
+        { SC_UNONAME_PINDENT,  ATTR_INDENT,        cppu::UnoType<sal_Int16>::get(),            0, 0 }, //! CONVERT_TWIPS
+        { SC_UNONAME_PISCHDIST,ATTR_SCRIPTSPACE,   cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_PISFORBID,ATTR_FORBIDDEN_RULES,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_PISHANG,  ATTR_HANGPUNCTUATION,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_PISHYPHEN,ATTR_HYPHENATE,     cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_PLASTADJ, ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
+        { SC_UNONAME_PLMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_L_MARGIN  | CONVERT_TWIPS },
+        { SC_UNONAME_PRMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_R_MARGIN  | CONVERT_TWIPS },
+        { SC_UNONAME_PTMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_UP_MARGIN | CONVERT_TWIPS },
+        { SC_UNONAME_POS,      SC_WID_UNO_POS,     cppu::UnoType<awt::Point>::get(),           0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_RIGHTBORDER,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_RIGHTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_ROTANG,   ATTR_ROTATE_VALUE,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_ROTREF,   ATTR_ROTATE_MODE,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_SHADOW,   ATTR_SHADOW,        cppu::UnoType<table::ShadowFormat>::get(),  0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_SHRINK_TO_FIT, ATTR_SHRINKTOFIT, cppu::UnoType<bool>::get(),               0, 0 },
+        { SC_UNONAME_SIZE,     SC_WID_UNO_SIZE,    cppu::UnoType<awt::Size>::get(),            0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_TBLBORD,  SC_WID_UNO_TBLBORD, cppu::UnoType<table::TableBorder>::get(),   0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_TBLBORD2,  SC_WID_UNO_TBLBORD2, cppu::UnoType<table::TableBorder2>::get(),   0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_TOPBORDER,ATTR_BORDER,        ::cppu::UnoType<table::BorderLine>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_TOPBORDER2,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine2>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_USERDEF,  ATTR_USERDEF,       cppu::UnoType<container::XNameContainer>::get(), 0, 0 },
+        { SC_UNONAME_VALIDAT,  SC_WID_UNO_VALIDAT, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_VALILOC,  SC_WID_UNO_VALILOC, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_VALIXML,  SC_WID_UNO_VALIXML, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_CELLVJUS, ATTR_VER_JUSTIFY,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_CELLVJUS_METHOD, ATTR_VER_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
+        { SC_UNONAME_CELLWID,  SC_WID_UNO_CELLWID, cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_WRITING,  ATTR_WRITINGDIR,    cppu::UnoType<sal_Int16>::get(),            0, 0 },
     };
     static SfxItemPropertySet aColumnPropertySet( aColumnPropertyMap_Impl );
     return &aColumnPropertySet;
@@ -600,110 +597,109 @@ static const SfxItemPropertySet* lcl_GetRowPropertySet()
 {
     static const SfxItemPropertyMapEntry aRowPropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_ABSNAME,  SC_WID_UNO_ABSNAME, cppu::UnoType<OUString>::get(),        0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_ASIANVERT,ATTR_VERTICAL_ASIAN,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_BOTTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_BOTTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CELLBACK, ATTR_BACKGROUND,    cppu::UnoType<sal_Int32>::get(),            0, MID_BACK_COLOR },
-        {u"" SC_UNONAME_CELLPRO,  ATTR_PROTECTION,    cppu::UnoType<util::CellProtection>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLSTYL, SC_WID_UNO_CELLSTYL,cppu::UnoType<OUString>::get(),        0, 0 },
-        {u"" SC_UNONAME_CCOLOR,   ATTR_FONT_COLOR,    cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_COUTL,    ATTR_FONT_CONTOUR,  cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CCROSS,   ATTR_FONT_CROSSEDOUT,cppu::UnoType<bool>::get(),                 0, MID_CROSSED_OUT },
-        {u"" SC_UNONAME_CEMPHAS,  ATTR_FONT_EMPHASISMARK,cppu::UnoType<sal_Int16>::get(),         0, MID_EMPHASIS },
-        {u"" SC_UNONAME_CFONT,    ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNONAME_CFCHARS,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNO_CJK_CFCHARS,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNO_CTL_CFCHARS,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNONAME_CFFAMIL,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNO_CJK_CFFAMIL,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNO_CTL_CFFAMIL,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNONAME_CFNAME,   ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNO_CJK_CFNAME,   ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNO_CTL_CFNAME,   ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNONAME_CFPITCH,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNO_CJK_CFPITCH,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNO_CTL_CFPITCH,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNONAME_CFSTYLE,  ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNO_CJK_CFSTYLE,  ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNO_CTL_CFSTYLE,  ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNONAME_CHEIGHT,  ATTR_FONT_HEIGHT,   cppu::UnoType<float>::get(),                0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNO_CJK_CHEIGHT,  ATTR_CJK_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNO_CTL_CHEIGHT,  ATTR_CTL_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CLOCAL,   ATTR_FONT_LANGUAGE, cppu::UnoType<lang::Locale>::get(),         0, MID_LANG_LOCALE },
-        {u"" SC_UNO_CJK_CLOCAL,   ATTR_CJK_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
-        {u"" SC_UNO_CTL_CLOCAL,   ATTR_CTL_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
-        {u"" SC_UNONAME_COVER,    ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
-        {u"" SC_UNONAME_COVRLCOL, ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
-        {u"" SC_UNONAME_COVRLHAS, ATTR_FONT_OVERLINE, cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
-        {u"" SC_UNONAME_CPOST,    ATTR_FONT_POSTURE,  cppu::UnoType<awt::FontSlant>::get(),       0, MID_POSTURE },
-        {u"" SC_UNO_CJK_CPOST,    ATTR_CJK_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
-        {u"" SC_UNO_CTL_CPOST,    ATTR_CTL_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
-        {u"" SC_UNONAME_CRELIEF,  ATTR_FONT_RELIEF,   cppu::UnoType<sal_Int16>::get(),            0, MID_RELIEF },
-        {u"" SC_UNONAME_CSHADD,   ATTR_FONT_SHADOWED, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CSTRIKE,  ATTR_FONT_CROSSEDOUT,cppu::UnoType<sal_Int16>::get(),           0, MID_CROSS_OUT },
-        {u"" SC_UNONAME_CUNDER,   ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
-        {u"" SC_UNONAME_CUNDLCOL, ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
-        {u"" SC_UNONAME_CUNDLHAS, ATTR_FONT_UNDERLINE,cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
-        {u"" SC_UNONAME_CWEIGHT,  ATTR_FONT_WEIGHT,   cppu::UnoType<float>::get(),                0, MID_WEIGHT },
-        {u"" SC_UNO_CJK_CWEIGHT,  ATTR_CJK_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
-        {u"" SC_UNO_CTL_CWEIGHT,  ATTR_CTL_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
-        {u"" SC_UNONAME_CWORDMOD, ATTR_FONT_WORDLINE, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CHCOLHDR, SC_WID_UNO_CHCOLHDR,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CHROWHDR, SC_WID_UNO_CHROWHDR,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CONDFMT,  SC_WID_UNO_CONDFMT, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_CONDLOC,  SC_WID_UNO_CONDLOC, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_CONDXML,  SC_WID_UNO_CONDXML, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_DIAGONAL_BLTR, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_BLTR2, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_TLBR, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_TLBR2, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CELLHGT,  SC_WID_UNO_CELLHGT, cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_CELLHJUS, ATTR_HOR_JUSTIFY,   cppu::UnoType<table::CellHoriJustify>::get(), 0, MID_HORJUST_HORJUST },
-        {u"" SC_UNONAME_CELLHJUS_METHOD, ATTR_HOR_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
-        {u"" SC_UNONAME_CELLTRAN, ATTR_BACKGROUND,    cppu::UnoType<bool>::get(),                  0, MID_GRAPHIC_TRANSPARENT },
-        {u"" SC_UNONAME_CELLFILT, SC_WID_UNO_CELLFILT,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_MANPAGE,  SC_WID_UNO_MANPAGE, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_NEWPAGE,  SC_WID_UNO_NEWPAGE, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_WRAP,     ATTR_LINEBREAK,     cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CELLVIS,  SC_WID_UNO_CELLVIS, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_LEFTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_LEFTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_NUMFMT,   ATTR_VALUE_FORMAT,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_NUMRULES, SC_WID_UNO_NUMRULES,cppu::UnoType<container::XIndexReplace>::get(), 0, 0 },
-        {u"" SC_UNONAME_OHEIGHT,  SC_WID_UNO_OHEIGHT, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CELLORI,  ATTR_STACKED,       cppu::UnoType<table::CellOrientation>::get(), 0, 0 },
-        {u"" SC_UNONAME_PADJUST,  ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
-        {u"" SC_UNONAME_PBMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_LO_MARGIN | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PINDENT,  ATTR_INDENT,        cppu::UnoType<sal_Int16>::get(),            0, 0 }, //! CONVERT_TWIPS
-        {u"" SC_UNONAME_PISCHDIST,ATTR_SCRIPTSPACE,   cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_PISFORBID,ATTR_FORBIDDEN_RULES,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_PISHANG,  ATTR_HANGPUNCTUATION,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_PISHYPHEN,ATTR_HYPHENATE,     cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_PLASTADJ, ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
-        {u"" SC_UNONAME_PLMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_L_MARGIN  | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PRMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_R_MARGIN  | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PTMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_UP_MARGIN | CONVERT_TWIPS },
-        {u"" SC_UNONAME_POS,      SC_WID_UNO_POS,     cppu::UnoType<awt::Point>::get(),           0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_RIGHTBORDER,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_RIGHTBORDER2,ATTR_BORDER,     ::cppu::UnoType<table::BorderLine2>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_ROTANG,   ATTR_ROTATE_VALUE,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_ROTREF,   ATTR_ROTATE_MODE,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_SHADOW,   ATTR_SHADOW,        cppu::UnoType<table::ShadowFormat>::get(),  0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_SHRINK_TO_FIT, ATTR_SHRINKTOFIT, cppu::UnoType<bool>::get(),               0, 0 },
-        {u"" SC_UNONAME_SIZE,     SC_WID_UNO_SIZE,    cppu::UnoType<awt::Size>::get(),            0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_TBLBORD,  SC_WID_UNO_TBLBORD, cppu::UnoType<table::TableBorder>::get(),   0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TBLBORD2,  SC_WID_UNO_TBLBORD2, cppu::UnoType<table::TableBorder2>::get(),   0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TOPBORDER,ATTR_BORDER,        ::cppu::UnoType<table::BorderLine>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TOPBORDER2,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine2>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_USERDEF,  ATTR_USERDEF,       cppu::UnoType<container::XNameContainer>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALIDAT,  SC_WID_UNO_VALIDAT, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALILOC,  SC_WID_UNO_VALILOC, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALIXML,  SC_WID_UNO_VALIXML, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLVJUS, ATTR_VER_JUSTIFY,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLVJUS_METHOD, ATTR_VER_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
-        {u"" SC_UNONAME_WRITING,  ATTR_WRITINGDIR,    cppu::UnoType<sal_Int16>::get(),            0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_ABSNAME,  SC_WID_UNO_ABSNAME, cppu::UnoType<OUString>::get(),        0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_ASIANVERT,ATTR_VERTICAL_ASIAN,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_BOTTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_BOTTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_CELLBACK, ATTR_BACKGROUND,    cppu::UnoType<sal_Int32>::get(),            0, MID_BACK_COLOR },
+        { SC_UNONAME_CELLPRO,  ATTR_PROTECTION,    cppu::UnoType<util::CellProtection>::get(), 0, 0 },
+        { SC_UNONAME_CELLSTYL, SC_WID_UNO_CELLSTYL,cppu::UnoType<OUString>::get(),        0, 0 },
+        { SC_UNONAME_CCOLOR,   ATTR_FONT_COLOR,    cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_COUTL,    ATTR_FONT_CONTOUR,  cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CCROSS,   ATTR_FONT_CROSSEDOUT,cppu::UnoType<bool>::get(),                 0, MID_CROSSED_OUT },
+        { SC_UNONAME_CEMPHAS,  ATTR_FONT_EMPHASISMARK,cppu::UnoType<sal_Int16>::get(),         0, MID_EMPHASIS },
+        { SC_UNONAME_CFONT,    ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNONAME_CFCHARS,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNO_CJK_CFCHARS,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNO_CTL_CFCHARS,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNONAME_CFFAMIL,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNO_CJK_CFFAMIL,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNO_CTL_CFFAMIL,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNONAME_CFNAME,   ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNO_CJK_CFNAME,   ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNO_CTL_CFNAME,   ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNONAME_CFPITCH,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNO_CJK_CFPITCH,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNO_CTL_CFPITCH,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNONAME_CFSTYLE,  ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNO_CJK_CFSTYLE,  ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNO_CTL_CFSTYLE,  ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNONAME_CHEIGHT,  ATTR_FONT_HEIGHT,   cppu::UnoType<float>::get(),                0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNO_CJK_CHEIGHT,  ATTR_CJK_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNO_CTL_CHEIGHT,  ATTR_CTL_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNONAME_CLOCAL,   ATTR_FONT_LANGUAGE, cppu::UnoType<lang::Locale>::get(),         0, MID_LANG_LOCALE },
+        { SC_UNO_CJK_CLOCAL,   ATTR_CJK_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
+        { SC_UNO_CTL_CLOCAL,   ATTR_CTL_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
+        { SC_UNONAME_COVER,    ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
+        { SC_UNONAME_COVRLCOL, ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
+        { SC_UNONAME_COVRLHAS, ATTR_FONT_OVERLINE, cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
+        { SC_UNONAME_CPOST,    ATTR_FONT_POSTURE,  cppu::UnoType<awt::FontSlant>::get(),       0, MID_POSTURE },
+        { SC_UNO_CJK_CPOST,    ATTR_CJK_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
+        { SC_UNO_CTL_CPOST,    ATTR_CTL_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
+        { SC_UNONAME_CRELIEF,  ATTR_FONT_RELIEF,   cppu::UnoType<sal_Int16>::get(),            0, MID_RELIEF },
+        { SC_UNONAME_CSHADD,   ATTR_FONT_SHADOWED, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CSTRIKE,  ATTR_FONT_CROSSEDOUT,cppu::UnoType<sal_Int16>::get(),           0, MID_CROSS_OUT },
+        { SC_UNONAME_CUNDER,   ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
+        { SC_UNONAME_CUNDLCOL, ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
+        { SC_UNONAME_CUNDLHAS, ATTR_FONT_UNDERLINE,cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
+        { SC_UNONAME_CWEIGHT,  ATTR_FONT_WEIGHT,   cppu::UnoType<float>::get(),                0, MID_WEIGHT },
+        { SC_UNO_CJK_CWEIGHT,  ATTR_CJK_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
+        { SC_UNO_CTL_CWEIGHT,  ATTR_CTL_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
+        { SC_UNONAME_CWORDMOD, ATTR_FONT_WORDLINE, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CHCOLHDR, SC_WID_UNO_CHCOLHDR,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CHROWHDR, SC_WID_UNO_CHROWHDR,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CONDFMT,  SC_WID_UNO_CONDFMT, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_CONDLOC,  SC_WID_UNO_CONDLOC, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_CONDXML,  SC_WID_UNO_CONDXML, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_DIAGONAL_BLTR, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_BLTR2, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_TLBR, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_TLBR2, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_CELLHGT,  SC_WID_UNO_CELLHGT, cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_CELLHJUS, ATTR_HOR_JUSTIFY,   cppu::UnoType<table::CellHoriJustify>::get(), 0, MID_HORJUST_HORJUST },
+        { SC_UNONAME_CELLHJUS_METHOD, ATTR_HOR_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
+        { SC_UNONAME_CELLTRAN, ATTR_BACKGROUND,    cppu::UnoType<bool>::get(),                  0, MID_GRAPHIC_TRANSPARENT },
+        { SC_UNONAME_CELLFILT, SC_WID_UNO_CELLFILT,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_MANPAGE,  SC_WID_UNO_MANPAGE, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_NEWPAGE,  SC_WID_UNO_NEWPAGE, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_WRAP,     ATTR_LINEBREAK,     cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CELLVIS,  SC_WID_UNO_CELLVIS, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_LEFTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_LEFTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_NUMFMT,   ATTR_VALUE_FORMAT,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_NUMRULES, SC_WID_UNO_NUMRULES,cppu::UnoType<container::XIndexReplace>::get(), 0, 0 },
+        { SC_UNONAME_OHEIGHT,  SC_WID_UNO_OHEIGHT, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CELLORI,  ATTR_STACKED,       cppu::UnoType<table::CellOrientation>::get(), 0, 0 },
+        { SC_UNONAME_PADJUST,  ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
+        { SC_UNONAME_PBMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_LO_MARGIN | CONVERT_TWIPS },
+        { SC_UNONAME_PINDENT,  ATTR_INDENT,        cppu::UnoType<sal_Int16>::get(),            0, 0 }, //! CONVERT_TWIPS
+        { SC_UNONAME_PISCHDIST,ATTR_SCRIPTSPACE,   cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_PISFORBID,ATTR_FORBIDDEN_RULES,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_PISHANG,  ATTR_HANGPUNCTUATION,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_PISHYPHEN,ATTR_HYPHENATE,     cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_PLASTADJ, ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
+        { SC_UNONAME_PLMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_L_MARGIN  | CONVERT_TWIPS },
+        { SC_UNONAME_PRMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_R_MARGIN  | CONVERT_TWIPS },
+        { SC_UNONAME_PTMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_UP_MARGIN | CONVERT_TWIPS },
+        { SC_UNONAME_POS,      SC_WID_UNO_POS,     cppu::UnoType<awt::Point>::get(),           0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_RIGHTBORDER,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_RIGHTBORDER2,ATTR_BORDER,     ::cppu::UnoType<table::BorderLine2>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_ROTANG,   ATTR_ROTATE_VALUE,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_ROTREF,   ATTR_ROTATE_MODE,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_SHADOW,   ATTR_SHADOW,        cppu::UnoType<table::ShadowFormat>::get(),  0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_SHRINK_TO_FIT, ATTR_SHRINKTOFIT, cppu::UnoType<bool>::get(),               0, 0 },
+        { SC_UNONAME_SIZE,     SC_WID_UNO_SIZE,    cppu::UnoType<awt::Size>::get(),            0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_TBLBORD,  SC_WID_UNO_TBLBORD, cppu::UnoType<table::TableBorder>::get(),   0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_TBLBORD2,  SC_WID_UNO_TBLBORD2, cppu::UnoType<table::TableBorder2>::get(),   0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_TOPBORDER,ATTR_BORDER,        ::cppu::UnoType<table::BorderLine>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_TOPBORDER2,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine2>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_USERDEF,  ATTR_USERDEF,       cppu::UnoType<container::XNameContainer>::get(), 0, 0 },
+        { SC_UNONAME_VALIDAT,  SC_WID_UNO_VALIDAT, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_VALILOC,  SC_WID_UNO_VALILOC, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_VALIXML,  SC_WID_UNO_VALIXML, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_CELLVJUS, ATTR_VER_JUSTIFY,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_CELLVJUS_METHOD, ATTR_VER_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
+        { SC_UNONAME_WRITING,  ATTR_WRITINGDIR,    cppu::UnoType<sal_Int16>::get(),            0, 0 },
     };
     static SfxItemPropertySet aRowPropertySet( aRowPropertyMap_Impl );
     return &aRowPropertySet;
@@ -713,128 +709,127 @@ static const SfxItemPropertySet* lcl_GetSheetPropertySet()
 {
     static const SfxItemPropertyMapEntry aSheetPropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_ABSNAME,  SC_WID_UNO_ABSNAME, cppu::UnoType<OUString>::get(),        0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_ASIANVERT,ATTR_VERTICAL_ASIAN,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_AUTOPRINT,SC_WID_UNO_AUTOPRINT,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_BORDCOL,  SC_WID_UNO_BORDCOL, cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_BOTTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_BOTTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CELLBACK, ATTR_BACKGROUND,    cppu::UnoType<sal_Int32>::get(),            0, MID_BACK_COLOR },
-        {u"" SC_UNONAME_CELLPRO,  ATTR_PROTECTION,    cppu::UnoType<util::CellProtection>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLSTYL, SC_WID_UNO_CELLSTYL,cppu::UnoType<OUString>::get(),        0, 0 },
-        {u"" SC_UNONAME_CCOLOR,   ATTR_FONT_COLOR,    cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_COUTL,    ATTR_FONT_CONTOUR,  cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CCROSS,   ATTR_FONT_CROSSEDOUT,cppu::UnoType<bool>::get(),                 0, MID_CROSSED_OUT },
-        {u"" SC_UNONAME_CEMPHAS,  ATTR_FONT_EMPHASISMARK,cppu::UnoType<sal_Int16>::get(),         0, MID_EMPHASIS },
-        {u"" SC_UNONAME_CFONT,    ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNONAME_CFCHARS,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNO_CJK_CFCHARS,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNO_CTL_CFCHARS,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
-        {u"" SC_UNONAME_CFFAMIL,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNO_CJK_CFFAMIL,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNO_CTL_CFFAMIL,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
-        {u"" SC_UNONAME_CFNAME,   ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNO_CJK_CFNAME,   ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNO_CTL_CFNAME,   ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
-        {u"" SC_UNONAME_CFPITCH,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNO_CJK_CFPITCH,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNO_CTL_CFPITCH,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
-        {u"" SC_UNONAME_CFSTYLE,  ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNO_CJK_CFSTYLE,  ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNO_CTL_CFSTYLE,  ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
-        {u"" SC_UNONAME_CHEIGHT,  ATTR_FONT_HEIGHT,   cppu::UnoType<float>::get(),                0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNO_CJK_CHEIGHT,  ATTR_CJK_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNO_CTL_CHEIGHT,  ATTR_CTL_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CLOCAL,   ATTR_FONT_LANGUAGE, cppu::UnoType<lang::Locale>::get(),         0, MID_LANG_LOCALE },
-        {u"" SC_UNO_CJK_CLOCAL,   ATTR_CJK_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
-        {u"" SC_UNO_CTL_CLOCAL,   ATTR_CTL_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
-        {u"" SC_UNONAME_COVER,    ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
-        {u"" SC_UNONAME_COVRLCOL, ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
-        {u"" SC_UNONAME_COVRLHAS, ATTR_FONT_OVERLINE, cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
-        {u"" SC_UNONAME_CPOST,    ATTR_FONT_POSTURE,  cppu::UnoType<awt::FontSlant>::get(),       0, MID_POSTURE },
-        {u"" SC_UNO_CJK_CPOST,    ATTR_CJK_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
-        {u"" SC_UNO_CTL_CPOST,    ATTR_CTL_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
-        {u"" SC_UNONAME_CRELIEF,  ATTR_FONT_RELIEF,   cppu::UnoType<sal_Int16>::get(),            0, MID_RELIEF },
-        {u"" SC_UNONAME_CSHADD,   ATTR_FONT_SHADOWED, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CSTRIKE,  ATTR_FONT_CROSSEDOUT,cppu::UnoType<sal_Int16>::get(),           0, MID_CROSS_OUT },
-        {u"" SC_UNONAME_CUNDER,   ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
-        {u"" SC_UNONAME_CUNDLCOL, ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
-        {u"" SC_UNONAME_CUNDLHAS, ATTR_FONT_UNDERLINE,cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
-        {u"" SC_UNONAME_CWEIGHT,  ATTR_FONT_WEIGHT,   cppu::UnoType<float>::get(),                0, MID_WEIGHT },
-        {u"" SC_UNO_CJK_CWEIGHT,  ATTR_CJK_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
-        {u"" SC_UNO_CTL_CWEIGHT,  ATTR_CTL_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
-        {u"" SC_UNONAME_CWORDMOD, ATTR_FONT_WORDLINE, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CHCOLHDR, SC_WID_UNO_CHCOLHDR,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CHROWHDR, SC_WID_UNO_CHROWHDR,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CONDFMT,  SC_WID_UNO_CONDFMT, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_CONDLOC,  SC_WID_UNO_CONDLOC, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_CONDXML,  SC_WID_UNO_CONDXML, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
-        {u"" SC_UNONAME_COPYBACK, SC_WID_UNO_COPYBACK,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_COPYFORM, SC_WID_UNO_COPYFORM,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_COPYSTYL, SC_WID_UNO_COPYSTYL,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_DIAGONAL_BLTR, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_BLTR2, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_TLBR, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_DIAGONAL_TLBR2, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_CELLHJUS, ATTR_HOR_JUSTIFY,   cppu::UnoType<table::CellHoriJustify>::get(), 0, MID_HORJUST_HORJUST },
-        {u"" SC_UNONAME_CELLHJUS_METHOD, ATTR_HOR_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
-        {u"" SC_UNONAME_ISACTIVE, SC_WID_UNO_ISACTIVE,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CELLTRAN, ATTR_BACKGROUND,    cppu::UnoType<bool>::get(),                  0, MID_GRAPHIC_TRANSPARENT },
-        {u"" SC_UNONAME_WRAP,     ATTR_LINEBREAK,     cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_CELLVIS,  SC_WID_UNO_CELLVIS, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_LEFTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_LEFTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNO_LINKDISPBIT,  SC_WID_UNO_LINKDISPBIT,cppu::UnoType<awt::XBitmap>::get(), 0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNO_LINKDISPNAME, SC_WID_UNO_LINKDISPNAME,cppu::UnoType<OUString>::get(),    0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_NUMFMT,   ATTR_VALUE_FORMAT,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_NUMRULES, SC_WID_UNO_NUMRULES,cppu::UnoType<container::XIndexReplace>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLORI,  ATTR_STACKED,       cppu::UnoType<table::CellOrientation>::get(), 0, 0 },
-        {u"" SC_UNONAME_PAGESTL,  SC_WID_UNO_PAGESTL, cppu::UnoType<OUString>::get(),        0, 0 },
-        {u"" SC_UNONAME_PADJUST,  ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
-        {u"" SC_UNONAME_PBMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_LO_MARGIN | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PINDENT,  ATTR_INDENT,        cppu::UnoType<sal_Int16>::get(),            0, 0 }, //! CONVERT_TWIPS
-        {u"" SC_UNONAME_PISCHDIST,ATTR_SCRIPTSPACE,   cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_PISFORBID,ATTR_FORBIDDEN_RULES,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_PISHANG,  ATTR_HANGPUNCTUATION,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_PISHYPHEN,ATTR_HYPHENATE,     cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_PLASTADJ, ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
-        {u"" SC_UNONAME_PLMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_L_MARGIN  | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PRMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_R_MARGIN  | CONVERT_TWIPS },
-        {u"" SC_UNONAME_PTMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_UP_MARGIN | CONVERT_TWIPS },
-        {u"" SC_UNONAME_POS,      SC_WID_UNO_POS,     cppu::UnoType<awt::Point>::get(),           0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_PRINTBORD,SC_WID_UNO_PRINTBORD,cppu::UnoType<bool>::get(),                 0, 0 },
-        {u"" SC_UNONAME_PROTECT,  SC_WID_UNO_PROTECT, cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_RIGHTBORDER,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_RIGHTBORDER2,ATTR_BORDER,     ::cppu::UnoType<table::BorderLine2>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_ROTANG,   ATTR_ROTATE_VALUE,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
-        {u"" SC_UNONAME_ROTREF,   ATTR_ROTATE_MODE,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_SHADOW,   ATTR_SHADOW,        cppu::UnoType<table::ShadowFormat>::get(),  0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_SHOWBORD, SC_WID_UNO_SHOWBORD,cppu::UnoType<bool>::get(),                  0, 0 },
-        {u"" SC_UNONAME_SHRINK_TO_FIT, ATTR_SHRINKTOFIT, cppu::UnoType<bool>::get(),               0, 0 },
-        {u"" SC_UNONAME_SIZE,     SC_WID_UNO_SIZE,    cppu::UnoType<awt::Size>::get(),            0 | beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_TBLBORD,  SC_WID_UNO_TBLBORD, cppu::UnoType<table::TableBorder>::get(),   0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TBLBORD2,  SC_WID_UNO_TBLBORD2, cppu::UnoType<table::TableBorder2>::get(),   0, 0 | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TABLAYOUT,SC_WID_UNO_TABLAYOUT,cppu::UnoType<sal_Int16>::get(),           0, 0 },
-        {u"" SC_UNONAME_CONDFORMAT, SC_WID_UNO_CONDFORMAT, cppu::UnoType<sheet::XConditionalFormats>::get(), 0, 0},
-        {u"" SC_UNONAME_TOPBORDER,ATTR_BORDER,        ::cppu::UnoType<table::BorderLine>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_TOPBORDER2,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine2>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
-        {u"" SC_UNONAME_USERDEF,  ATTR_USERDEF,       cppu::UnoType<container::XNameContainer>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALIDAT,  SC_WID_UNO_VALIDAT, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALILOC,  SC_WID_UNO_VALILOC, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_VALIXML,  SC_WID_UNO_VALIXML, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLVJUS, ATTR_VER_JUSTIFY,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_CELLVJUS_METHOD, ATTR_VER_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
-        {u"" SC_UNONAME_WRITING,  ATTR_WRITINGDIR,    cppu::UnoType<sal_Int16>::get(),            0, 0 },
-        {u"" SC_UNONAME_TABCOLOR, SC_WID_UNO_TABCOLOR, cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNO_CODENAME,        SC_WID_UNO_CODENAME, cppu::UnoType<OUString>::get(),    0, 0},
-        {u"" SC_UNO_NAMEDRANGES, SC_WID_UNO_NAMES, cppu::UnoType<sheet::XNamedRanges>::get(), 0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_ABSNAME,  SC_WID_UNO_ABSNAME, cppu::UnoType<OUString>::get(),        0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_ASIANVERT,ATTR_VERTICAL_ASIAN,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_AUTOPRINT,SC_WID_UNO_AUTOPRINT,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_BORDCOL,  SC_WID_UNO_BORDCOL, cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_BOTTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_BOTTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, BOTTOM_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_CELLBACK, ATTR_BACKGROUND,    cppu::UnoType<sal_Int32>::get(),            0, MID_BACK_COLOR },
+        { SC_UNONAME_CELLPRO,  ATTR_PROTECTION,    cppu::UnoType<util::CellProtection>::get(), 0, 0 },
+        { SC_UNONAME_CELLSTYL, SC_WID_UNO_CELLSTYL,cppu::UnoType<OUString>::get(),        0, 0 },
+        { SC_UNONAME_CCOLOR,   ATTR_FONT_COLOR,    cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_COUTL,    ATTR_FONT_CONTOUR,  cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CCROSS,   ATTR_FONT_CROSSEDOUT,cppu::UnoType<bool>::get(),                 0, MID_CROSSED_OUT },
+        { SC_UNONAME_CEMPHAS,  ATTR_FONT_EMPHASISMARK,cppu::UnoType<sal_Int16>::get(),         0, MID_EMPHASIS },
+        { SC_UNONAME_CFONT,    ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNONAME_CFCHARS,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNO_CJK_CFCHARS,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNO_CTL_CFCHARS,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_CHAR_SET },
+        { SC_UNONAME_CFFAMIL,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNO_CJK_CFFAMIL,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNO_CTL_CFFAMIL,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_FAMILY },
+        { SC_UNONAME_CFNAME,   ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNO_CJK_CFNAME,   ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNO_CTL_CFNAME,   ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_FAMILY_NAME },
+        { SC_UNONAME_CFPITCH,  ATTR_FONT,          cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNO_CJK_CFPITCH,  ATTR_CJK_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNO_CTL_CFPITCH,  ATTR_CTL_FONT,      cppu::UnoType<sal_Int16>::get(),            0, MID_FONT_PITCH },
+        { SC_UNONAME_CFSTYLE,  ATTR_FONT,          cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNO_CJK_CFSTYLE,  ATTR_CJK_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNO_CTL_CFSTYLE,  ATTR_CTL_FONT,      cppu::UnoType<OUString>::get(),        0, MID_FONT_STYLE_NAME },
+        { SC_UNONAME_CHEIGHT,  ATTR_FONT_HEIGHT,   cppu::UnoType<float>::get(),                0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNO_CJK_CHEIGHT,  ATTR_CJK_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNO_CTL_CHEIGHT,  ATTR_CTL_FONT_HEIGHT,cppu::UnoType<float>::get(),               0, MID_FONTHEIGHT | CONVERT_TWIPS },
+        { SC_UNONAME_CLOCAL,   ATTR_FONT_LANGUAGE, cppu::UnoType<lang::Locale>::get(),         0, MID_LANG_LOCALE },
+        { SC_UNO_CJK_CLOCAL,   ATTR_CJK_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
+        { SC_UNO_CTL_CLOCAL,   ATTR_CTL_FONT_LANGUAGE,cppu::UnoType<lang::Locale>::get(),          0, MID_LANG_LOCALE },
+        { SC_UNONAME_COVER,    ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
+        { SC_UNONAME_COVRLCOL, ATTR_FONT_OVERLINE, cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
+        { SC_UNONAME_COVRLHAS, ATTR_FONT_OVERLINE, cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
+        { SC_UNONAME_CPOST,    ATTR_FONT_POSTURE,  cppu::UnoType<awt::FontSlant>::get(),       0, MID_POSTURE },
+        { SC_UNO_CJK_CPOST,    ATTR_CJK_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
+        { SC_UNO_CTL_CPOST,    ATTR_CTL_FONT_POSTURE,cppu::UnoType<awt::FontSlant>::get(),     0, MID_POSTURE },
+        { SC_UNONAME_CRELIEF,  ATTR_FONT_RELIEF,   cppu::UnoType<sal_Int16>::get(),            0, MID_RELIEF },
+        { SC_UNONAME_CSHADD,   ATTR_FONT_SHADOWED, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CSTRIKE,  ATTR_FONT_CROSSEDOUT,cppu::UnoType<sal_Int16>::get(),           0, MID_CROSS_OUT },
+        { SC_UNONAME_CUNDER,   ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int16>::get(),            0, MID_TL_STYLE },
+        { SC_UNONAME_CUNDLCOL, ATTR_FONT_UNDERLINE,cppu::UnoType<sal_Int32>::get(),            0, MID_TL_COLOR },
+        { SC_UNONAME_CUNDLHAS, ATTR_FONT_UNDERLINE,cppu::UnoType<bool>::get(),                  0, MID_TL_HASCOLOR },
+        { SC_UNONAME_CWEIGHT,  ATTR_FONT_WEIGHT,   cppu::UnoType<float>::get(),                0, MID_WEIGHT },
+        { SC_UNO_CJK_CWEIGHT,  ATTR_CJK_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
+        { SC_UNO_CTL_CWEIGHT,  ATTR_CTL_FONT_WEIGHT,cppu::UnoType<float>::get(),               0, MID_WEIGHT },
+        { SC_UNONAME_CWORDMOD, ATTR_FONT_WORDLINE, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CHCOLHDR, SC_WID_UNO_CHCOLHDR,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CHROWHDR, SC_WID_UNO_CHROWHDR,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CONDFMT,  SC_WID_UNO_CONDFMT, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_CONDLOC,  SC_WID_UNO_CONDLOC, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_CONDXML,  SC_WID_UNO_CONDXML, cppu::UnoType<sheet::XSheetConditionalEntries>::get(), 0, 0 },
+        { SC_UNONAME_COPYBACK, SC_WID_UNO_COPYBACK,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_COPYFORM, SC_WID_UNO_COPYFORM,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_COPYSTYL, SC_WID_UNO_COPYSTYL,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_DIAGONAL_BLTR, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_BLTR2, ATTR_BORDER_BLTR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_TLBR, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_DIAGONAL_TLBR2, ATTR_BORDER_TLBR, ::cppu::UnoType<table::BorderLine2>::get(), 0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_CELLHJUS, ATTR_HOR_JUSTIFY,   cppu::UnoType<table::CellHoriJustify>::get(), 0, MID_HORJUST_HORJUST },
+        { SC_UNONAME_CELLHJUS_METHOD, ATTR_HOR_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
+        { SC_UNONAME_ISACTIVE, SC_WID_UNO_ISACTIVE,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CELLTRAN, ATTR_BACKGROUND,    cppu::UnoType<bool>::get(),                  0, MID_GRAPHIC_TRANSPARENT },
+        { SC_UNONAME_WRAP,     ATTR_LINEBREAK,     cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_CELLVIS,  SC_WID_UNO_CELLVIS, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_LEFTBORDER,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_LEFTBORDER2,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine2>::get(), 0, LEFT_BORDER | CONVERT_TWIPS },
+        { SC_UNO_LINKDISPBIT,  SC_WID_UNO_LINKDISPBIT,cppu::UnoType<awt::XBitmap>::get(), 0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNO_LINKDISPNAME, SC_WID_UNO_LINKDISPNAME,cppu::UnoType<OUString>::get(),    0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_NUMFMT,   ATTR_VALUE_FORMAT,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_NUMRULES, SC_WID_UNO_NUMRULES,cppu::UnoType<container::XIndexReplace>::get(), 0, 0 },
+        { SC_UNONAME_CELLORI,  ATTR_STACKED,       cppu::UnoType<table::CellOrientation>::get(), 0, 0 },
+        { SC_UNONAME_PAGESTL,  SC_WID_UNO_PAGESTL, cppu::UnoType<OUString>::get(),        0, 0 },
+        { SC_UNONAME_PADJUST,  ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
+        { SC_UNONAME_PBMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_LO_MARGIN | CONVERT_TWIPS },
+        { SC_UNONAME_PINDENT,  ATTR_INDENT,        cppu::UnoType<sal_Int16>::get(),            0, 0 }, //! CONVERT_TWIPS
+        { SC_UNONAME_PISCHDIST,ATTR_SCRIPTSPACE,   cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_PISFORBID,ATTR_FORBIDDEN_RULES,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_PISHANG,  ATTR_HANGPUNCTUATION,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_PISHYPHEN,ATTR_HYPHENATE,     cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_PLASTADJ, ATTR_HOR_JUSTIFY,   ::cppu::UnoType<sal_Int16>::get(),    0, MID_HORJUST_ADJUST },
+        { SC_UNONAME_PLMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_L_MARGIN  | CONVERT_TWIPS },
+        { SC_UNONAME_PRMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_R_MARGIN  | CONVERT_TWIPS },
+        { SC_UNONAME_PTMARGIN, ATTR_MARGIN,        cppu::UnoType<sal_Int32>::get(),            0, MID_MARGIN_UP_MARGIN | CONVERT_TWIPS },
+        { SC_UNONAME_POS,      SC_WID_UNO_POS,     cppu::UnoType<awt::Point>::get(),           0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_PRINTBORD,SC_WID_UNO_PRINTBORD,cppu::UnoType<bool>::get(),                 0, 0 },
+        { SC_UNONAME_PROTECT,  SC_WID_UNO_PROTECT, cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_RIGHTBORDER,ATTR_BORDER,      ::cppu::UnoType<table::BorderLine>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_RIGHTBORDER2,ATTR_BORDER,     ::cppu::UnoType<table::BorderLine2>::get(), 0, RIGHT_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_ROTANG,   ATTR_ROTATE_VALUE,  cppu::UnoType<sal_Int32>::get(),            0, 0 },
+        { SC_UNONAME_ROTREF,   ATTR_ROTATE_MODE,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_SHADOW,   ATTR_SHADOW,        cppu::UnoType<table::ShadowFormat>::get(),  0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_SHOWBORD, SC_WID_UNO_SHOWBORD,cppu::UnoType<bool>::get(),                  0, 0 },
+        { SC_UNONAME_SHRINK_TO_FIT, ATTR_SHRINKTOFIT, cppu::UnoType<bool>::get(),               0, 0 },
+        { SC_UNONAME_SIZE,     SC_WID_UNO_SIZE,    cppu::UnoType<awt::Size>::get(),            0 | beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_TBLBORD,  SC_WID_UNO_TBLBORD, cppu::UnoType<table::TableBorder>::get(),   0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_TBLBORD2,  SC_WID_UNO_TBLBORD2, cppu::UnoType<table::TableBorder2>::get(),   0, 0 | CONVERT_TWIPS },
+        { SC_UNONAME_TABLAYOUT,SC_WID_UNO_TABLAYOUT,cppu::UnoType<sal_Int16>::get(),           0, 0 },
+        { SC_UNONAME_CONDFORMAT, SC_WID_UNO_CONDFORMAT, cppu::UnoType<sheet::XConditionalFormats>::get(), 0, 0},
+        { SC_UNONAME_TOPBORDER,ATTR_BORDER,        ::cppu::UnoType<table::BorderLine>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_TOPBORDER2,ATTR_BORDER,       ::cppu::UnoType<table::BorderLine2>::get(), 0, TOP_BORDER | CONVERT_TWIPS },
+        { SC_UNONAME_USERDEF,  ATTR_USERDEF,       cppu::UnoType<container::XNameContainer>::get(), 0, 0 },
+        { SC_UNONAME_VALIDAT,  SC_WID_UNO_VALIDAT, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_VALILOC,  SC_WID_UNO_VALILOC, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_VALIXML,  SC_WID_UNO_VALIXML, cppu::UnoType<beans::XPropertySet>::get(), 0, 0 },
+        { SC_UNONAME_CELLVJUS, ATTR_VER_JUSTIFY,   cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_CELLVJUS_METHOD, ATTR_VER_JUSTIFY_METHOD, ::cppu::UnoType<sal_Int32>::get(),   0, 0 },
+        { SC_UNONAME_WRITING,  ATTR_WRITINGDIR,    cppu::UnoType<sal_Int16>::get(),            0, 0 },
+        { SC_UNONAME_TABCOLOR, SC_WID_UNO_TABCOLOR, cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNO_CODENAME,        SC_WID_UNO_CODENAME, cppu::UnoType<OUString>::get(),    0, 0},
+        { SC_UNO_NAMEDRANGES, SC_WID_UNO_NAMES, cppu::UnoType<sheet::XNamedRanges>::get(), 0, 0 },
     };
     static SfxItemPropertySet aSheetPropertySet( aSheetPropertyMap_Impl );
     return &aSheetPropertySet;
 }
 
-static const SfxItemPropertyMapEntry* lcl_GetEditPropertyMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetEditPropertyMap()
 {
     static const SfxItemPropertyMapEntry aEditPropertyMap_Impl[] =
     {
@@ -842,9 +837,8 @@ static const SfxItemPropertyMapEntry* lcl_GetEditPropertyMap()
         SVX_UNOEDIT_FONT_PROPERTIES,
         SVX_UNOEDIT_PARA_PROPERTIES,
         SVX_UNOEDIT_NUMBERING_PROPERTY,    // for completeness of service ParagraphProperties
-        {u"" SC_UNONAME_TEXTUSER, EE_CHAR_XMLATTRIBS, cppu::UnoType<container::XNameContainer>::get(), 0, 0},
-        {u"" SC_UNONAME_USERDEF,  EE_PARA_XMLATTRIBS, cppu::UnoType<container::XNameContainer>::get(), 0, 0},
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_TEXTUSER, EE_CHAR_XMLATTRIBS, cppu::UnoType<container::XNameContainer>::get(), 0, 0},
+        { SC_UNONAME_USERDEF,  EE_PARA_XMLATTRIBS, cppu::UnoType<container::XNameContainer>::get(), 0, 0},
     };
     return aEditPropertyMap_Impl;
 }
@@ -1329,10 +1323,10 @@ static OUString lcl_GetInputString( ScDocument& rDoc, const ScAddress& rPos, boo
 
     OUString aVal;
 
-    CellType eType = aCell.meType;
+    CellType eType = aCell.getType();
     if (eType == CELLTYPE_FORMULA)
     {
-        ScFormulaCell* pForm = aCell.mpFormula;
+        ScFormulaCell* pForm = aCell.getFormula();
         return pForm->GetFormula( formula::FormulaGrammar::mapAPItoGrammar( bEnglish, false));
     }
 
@@ -1347,7 +1341,7 @@ static OUString lcl_GetInputString( ScDocument& rDoc, const ScAddress& rPos, boo
     {
         //  GetString on EditCell turns breaks into spaces,
         //  but we need the breaks here
-        const EditTextObject* pData = aCell.mpEditText;
+        const EditTextObject* pData = aCell.getEditText();
         if (pData)
         {
             EditEngine& rEngine = rDoc.GetEditEngine();
@@ -1400,10 +1394,10 @@ ScCellRangesBase::ScCellRangesBase(ScDocShell* pDocSh, const ScRange& rR) :
     }
 }
 
-ScCellRangesBase::ScCellRangesBase(ScDocShell* pDocSh, const ScRangeList& rR) :
+ScCellRangesBase::ScCellRangesBase(ScDocShell* pDocSh, ScRangeList aR) :
     pPropSet(lcl_GetCellsPropertySet()),
     pDocShell( pDocSh ),
-    aRanges( rR ),
+    aRanges(std::move( aR )),
     nObjectId( 0 ),
     bChartColAsHdr( false ),
     bChartRowAsHdr( false ),
@@ -2320,7 +2314,7 @@ void ScCellRangesBase::SetOnePropertyValue( const SfxItemPropertyMapEntry* pEntr
 
                             std::unique_ptr<ScValidationData> pNewData(
                                     pValidObj->CreateValidationData( rDoc, eGrammar ));
-                            sal_uLong nIndex = rDoc.AddValidationEntry( *pNewData );
+                            sal_uInt32 nIndex = rDoc.AddValidationEntry( *pNewData );
                             pNewData.reset();
 
                             ScPatternAttr aPattern( rDoc.GetPool() );
@@ -2384,7 +2378,7 @@ void ScCellRangesBase::GetOnePropertyValue( const SfxItemPropertyMapEntry* pEntr
                     {
                         Degree100 nRot = pDataSet->Get(ATTR_ROTATE_VALUE).GetValue();
                         bool bStacked = static_cast<const ScVerticalStackCell&>(pDataSet->Get(pEntry->nWID)).GetValue();
-                        SvxOrientationItem( nRot, bStacked, 0 ).QueryValue( rAny );
+                        SvxOrientationItem( nRot, bStacked, TypedWhichId<SvxOrientationItem>(0) ).QueryValue( rAny );
                     }
                     break;
                 default:
@@ -3753,7 +3747,6 @@ uno::Reference<sheet::XSheetCellRanges> SAL_CALL ScCellRangesBase::queryDependen
 
 uno::Reference<util::XSearchDescriptor> SAL_CALL ScCellRangesBase::createSearchDescriptor()
 {
-    SolarMutexGuard aGuard;
     return new ScCellSearchObj;
 }
 
@@ -3876,7 +3869,6 @@ uno::Reference<uno::XInterface> SAL_CALL ScCellRangesBase::findNext(
 
 uno::Reference<util::XReplaceDescriptor> SAL_CALL ScCellRangesBase::createReplaceDescriptor()
 {
-    SolarMutexGuard aGuard;
     return new ScCellSearchObj;
 }
 
@@ -4485,13 +4477,12 @@ uno::Any SAL_CALL ScCellRangesObj::getByIndex( sal_Int32 nIndex )
     if (!xRange.is())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xRange);
+    return uno::Any(xRange);
 
 }
 
 uno::Type SAL_CALL ScCellRangesObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<table::XCellRange>::get();
 }
 
@@ -4725,7 +4716,7 @@ uno::Reference<table::XCellRange>  ScCellRangeObj::getCellRangeByName(
 
         if (bFound)         // valid only if within this object's range
         {
-            if (!aRange.In(aCellRange))
+            if (!aRange.Contains(aCellRange))
                 bFound = false;
         }
 
@@ -4806,10 +4797,10 @@ OUString SAL_CALL ScCellRangeObj::getArrayFormula()
     ScDocument& rDoc = pDocSh->GetDocument();
     ScRefCellValue aCell1(rDoc, aRange.aStart);
     ScRefCellValue aCell2(rDoc, aRange.aEnd);
-    if (aCell1.meType == CELLTYPE_FORMULA && aCell2.meType == CELLTYPE_FORMULA)
+    if (aCell1.getType() == CELLTYPE_FORMULA && aCell2.getType() == CELLTYPE_FORMULA)
     {
-        const ScFormulaCell* pFCell1 = aCell1.mpFormula;
-        const ScFormulaCell* pFCell2 = aCell2.mpFormula;
+        const ScFormulaCell* pFCell1 = aCell1.getFormula();
+        const ScFormulaCell* pFCell2 = aCell2.getFormula();
         ScAddress aStart1;
         ScAddress aStart2;
         if (pFCell1->GetMatrixOrigin(rDoc, aStart1) && pFCell2->GetMatrixOrigin(rDoc, aStart2))
@@ -4870,10 +4861,10 @@ uno::Sequence<sheet::FormulaToken> SAL_CALL ScCellRangeObj::getArrayTokens()
     ScDocument& rDoc = pDocSh->GetDocument();
     ScRefCellValue aCell1(rDoc, aRange.aStart);
     ScRefCellValue aCell2(rDoc, aRange.aEnd);
-    if (aCell1.meType == CELLTYPE_FORMULA && aCell2.meType == CELLTYPE_FORMULA)
+    if (aCell1.getType() == CELLTYPE_FORMULA && aCell2.getType() == CELLTYPE_FORMULA)
     {
-        const ScFormulaCell* pFCell1 = aCell1.mpFormula;
-        const ScFormulaCell* pFCell2 = aCell2.mpFormula;
+        const ScFormulaCell* pFCell1 = aCell1.getFormula();
+        const ScFormulaCell* pFCell2 = aCell2.getFormula();
         ScAddress aStart1;
         ScAddress aStart2;
         if (pFCell1->GetMatrixOrigin(rDoc, aStart1) && pFCell2->GetMatrixOrigin(rDoc, aStart2))
@@ -6042,7 +6033,7 @@ void SAL_CALL ScCellObj::insertTextContent( const uno::Reference<text::XTextRang
             }
 
             if (pCellField->GetFieldType() == text::textfield::Type::TABLE)
-                pCellField->setPropertyValue(SC_UNONAME_TABLEPOS, uno::makeAny<sal_Int32>(aCellPos.Tab()));
+                pCellField->setPropertyValue(SC_UNONAME_TABLEPOS, uno::Any(sal_Int32(aCellPos.Tab())));
 
             SvxFieldItem aItem = pCellField->CreateFieldItem();
             SvxTextForwarder* pForwarder = pEditSource->GetTextForwarder();
@@ -6165,9 +6156,9 @@ void SAL_CALL ScCellObj::setFormulaResult( double nValue )
     if (pDocSh)
     {
         ScRefCellValue aCell(pDocSh->GetDocument(), aCellPos);
-        if (aCell.meType == CELLTYPE_FORMULA)
+        if (aCell.getType() == CELLTYPE_FORMULA)
         {
-            ScFormulaCell* pCell = aCell.mpFormula;
+            ScFormulaCell* pCell = aCell.getFormula();
             pCell->SetHybridDouble( nValue );
             pCell->ResetDirty();
             pCell->SetChanged(false);
@@ -6249,9 +6240,9 @@ table::CellContentType ScCellObj::GetContentType_Impl()
     if ( pDocSh )
     {
         ScRefCellValue aCell(pDocSh->GetDocument(), aCellPos);
-        if (aCell.meType == CELLTYPE_FORMULA)
+        if (aCell.getType() == CELLTYPE_FORMULA)
         {
-            bool bValue = aCell.mpFormula->IsValue();
+            bool bValue = aCell.getFormula()->IsValue();
             return bValue ? table::CellContentType_VALUE : table::CellContentType_TEXT;
         }
     }
@@ -6270,8 +6261,8 @@ sal_Int32 SAL_CALL ScCellObj::getError()
 
     FormulaError nError = FormulaError::NONE;
     ScRefCellValue aCell(pDocSh->GetDocument(), aCellPos);
-    if (aCell.meType == CELLTYPE_FORMULA)
-        nError = aCell.mpFormula->GetErrCode();
+    if (aCell.getType() == CELLTYPE_FORMULA)
+        nError = aCell.getFormula()->GetErrCode();
 
     return static_cast<sal_Int32>(nError);
 }
@@ -6288,9 +6279,9 @@ uno::Sequence<sheet::FormulaToken> SAL_CALL ScCellObj::getTokens()
 
     ScDocument& rDoc = pDocSh->GetDocument();
     ScRefCellValue aCell(rDoc, aCellPos);
-    if (aCell.meType == CELLTYPE_FORMULA)
+    if (aCell.getType() == CELLTYPE_FORMULA)
     {
-        ScTokenArray* pTokenArray = aCell.mpFormula->GetCode();
+        ScTokenArray* pTokenArray = aCell.getFormula()->GetCode();
         if (pTokenArray)
             ScTokenConversion::ConvertToTokenSequence(rDoc, aSequence, *pTokenArray);
     }
@@ -6658,7 +6649,7 @@ uno::Reference<sheet::XDataPilotTables> SAL_CALL ScTableSheetObj::getDataPilotTa
     SolarMutexGuard aGuard;
     ScDocShell* pDocSh = GetDocShell();
     if ( pDocSh )
-        return new ScDataPilotTablesObj( pDocSh, GetTab_Impl() );
+        return new ScDataPilotTablesObj(*pDocSh, GetTab_Impl());
 
     OSL_FAIL("no document");
     return nullptr;
@@ -7091,7 +7082,7 @@ sal_Bool SAL_CALL ScTableSheetObj::getPrintTitleColumns()
     {
         ScDocument& rDoc = pDocSh->GetDocument();
         SCTAB nTab = GetTab_Impl();
-        return ( rDoc.GetRepeatColRange(nTab) != nullptr );
+        return rDoc.GetRepeatColRange(nTab).has_value();
     }
     return false;
 }
@@ -7112,11 +7103,11 @@ void SAL_CALL ScTableSheetObj::setPrintTitleColumns( sal_Bool bPrintTitleColumns
     {
         if ( !rDoc.GetRepeatColRange( nTab ) )         // do not change existing area
         {
-            rDoc.SetRepeatColRange( nTab, std::unique_ptr<ScRange>(new ScRange( 0, 0, nTab, 0, 0, nTab )) );     // enable
+            rDoc.SetRepeatColRange( nTab, ScRange( 0, 0, nTab, 0, 0, nTab ) );     // enable
         }
     }
     else
-        rDoc.SetRepeatColRange( nTab, nullptr );          // disable
+        rDoc.SetRepeatColRange( nTab, std::nullopt );          // disable
 
     PrintAreaUndo_Impl( std::move(pOldRanges) );   // undo, page break, modified etc.
 
@@ -7132,10 +7123,10 @@ table::CellRangeAddress SAL_CALL ScTableSheetObj::getTitleColumns()
     {
         ScDocument& rDoc = pDocSh->GetDocument();
         SCTAB nTab = GetTab_Impl();
-        const ScRange* pRange = rDoc.GetRepeatColRange(nTab);
-        if (pRange)
+        std::optional<ScRange> oRange = rDoc.GetRepeatColRange(nTab);
+        if (oRange)
         {
-            ScUnoConversion::FillApiRange( aRet, *pRange );
+            ScUnoConversion::FillApiRange( aRet, *oRange );
             aRet.Sheet = nTab; // core does not care about sheet index
         }
     }
@@ -7154,9 +7145,9 @@ void SAL_CALL ScTableSheetObj::setTitleColumns( const table::CellRangeAddress& a
 
     std::unique_ptr<ScPrintRangeSaver> pOldRanges = rDoc.CreatePrintRangeSaver();
 
-    std::unique_ptr<ScRange> pNew(new ScRange);
-    ScUnoConversion::FillScRange( *pNew, aTitleColumns );
-    rDoc.SetRepeatColRange( nTab, std::move(pNew) );     // also always enable
+    ScRange aNew;
+    ScUnoConversion::FillScRange( aNew, aTitleColumns );
+    rDoc.SetRepeatColRange( nTab, std::move(aNew) );     // also always enable
 
     PrintAreaUndo_Impl( std::move(pOldRanges) );           // undo, page breaks, modified etc.
 }
@@ -7169,7 +7160,7 @@ sal_Bool SAL_CALL ScTableSheetObj::getPrintTitleRows()
     {
         ScDocument& rDoc = pDocSh->GetDocument();
         SCTAB nTab = GetTab_Impl();
-        return ( rDoc.GetRepeatRowRange(nTab) != nullptr );
+        return rDoc.GetRepeatRowRange(nTab).has_value();
     }
     return false;
 }
@@ -7190,12 +7181,11 @@ void SAL_CALL ScTableSheetObj::setPrintTitleRows( sal_Bool bPrintTitleRows )
     {
         if ( !rDoc.GetRepeatRowRange( nTab ) )         // do not change existing area
         {
-            std::unique_ptr<ScRange> pNew( new ScRange(0, 0, nTab, 0, 0, nTab) );
-            rDoc.SetRepeatRowRange( nTab, std::move(pNew) );     // enable
+            rDoc.SetRepeatRowRange( nTab, ScRange(0, 0, nTab, 0, 0, nTab) );     // enable
         }
     }
     else
-        rDoc.SetRepeatRowRange( nTab, nullptr );          // disable
+        rDoc.SetRepeatRowRange( nTab, std::nullopt );          // disable
 
     PrintAreaUndo_Impl( std::move(pOldRanges) );   // undo, page breaks, modified etc.
 
@@ -7211,10 +7201,10 @@ table::CellRangeAddress SAL_CALL ScTableSheetObj::getTitleRows()
     {
         ScDocument& rDoc = pDocSh->GetDocument();
         SCTAB nTab = GetTab_Impl();
-        const ScRange* pRange = rDoc.GetRepeatRowRange(nTab);
-        if (pRange)
+        std::optional<ScRange> oRange = rDoc.GetRepeatRowRange(nTab);
+        if (oRange)
         {
-            ScUnoConversion::FillApiRange( aRet, *pRange );
+            ScUnoConversion::FillApiRange( aRet, *oRange );
             aRet.Sheet = nTab; // core does not care about sheet index
         }
     }
@@ -7233,9 +7223,9 @@ void SAL_CALL ScTableSheetObj::setTitleRows( const table::CellRangeAddress& aTit
 
     std::unique_ptr<ScPrintRangeSaver> pOldRanges = rDoc.CreatePrintRangeSaver();
 
-    std::unique_ptr<ScRange> pNew(new ScRange);
-    ScUnoConversion::FillScRange( *pNew, aTitleRows );
-    rDoc.SetRepeatRowRange( nTab, std::move(pNew) );     // also always enable
+    ScRange aNew;
+    ScUnoConversion::FillScRange( aNew, aTitleRows );
+    rDoc.SetRepeatRowRange( nTab, std::move(aNew) );     // also always enable
 
     PrintAreaUndo_Impl( std::move(pOldRanges) );           // Undo, page breaks, modified etc.
 }
@@ -8329,7 +8319,6 @@ OUString SAL_CALL ScTableColumnObj::getName()
 
 void SAL_CALL ScTableColumnObj::setName( const OUString& /* aNewName */ )
 {
-    SolarMutexGuard aGuard;
     throw uno::RuntimeException();      // read-only
 }
 
@@ -8609,9 +8598,9 @@ const SfxItemPropertyMap& ScTableRowObj::GetItemPropertyMap()
     return pRowPropSet->getPropertyMap();
 }
 
-ScCellsObj::ScCellsObj(ScDocShell* pDocSh, const ScRangeList& rR) :
+ScCellsObj::ScCellsObj(ScDocShell* pDocSh, ScRangeList aR) :
     pDocShell( pDocSh ),
-    aRanges( rR )
+    aRanges(std::move( aR ))
 {
     pDocShell->GetDocument().AddUnoObject(*this);
 }
@@ -8649,7 +8638,6 @@ uno::Reference<container::XEnumeration> SAL_CALL ScCellsObj::createEnumeration()
 
 uno::Type SAL_CALL ScCellsObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<table::XCell>::get();
 }
 
@@ -8667,9 +8655,9 @@ sal_Bool SAL_CALL ScCellsObj::hasElements()
     return bHas;
 }
 
-ScCellsEnumeration::ScCellsEnumeration(ScDocShell* pDocSh, const ScRangeList& rR) :
+ScCellsEnumeration::ScCellsEnumeration(ScDocShell* pDocSh, ScRangeList aR) :
     pDocShell( pDocSh ),
-    aRanges( rR ),
+    aRanges(std::move( aR )),
     bAtEnd( false )
 {
     ScDocument& rDoc = pDocShell->GetDocument();
@@ -8784,7 +8772,7 @@ uno::Any SAL_CALL ScCellsEnumeration::nextElement()
 
         ScAddress aTempPos(aPos);
         Advance_Impl();
-        return uno::makeAny(uno::Reference<table::XCell>(new ScCellObj( pDocShell, aTempPos )));
+        return uno::Any(uno::Reference<table::XCell>(new ScCellObj( pDocShell, aTempPos )));
     }
 
     throw container::NoSuchElementException();      // no more elements
@@ -8882,13 +8870,12 @@ uno::Any SAL_CALL ScCellFormatsObj::getByIndex( sal_Int32 nIndex )
     if (!xRange.is())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xRange);
+    return uno::Any(xRange);
 
 }
 
 uno::Type SAL_CALL ScCellFormatsObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<table::XCellRange>::get();
 }
 
@@ -9009,7 +8996,7 @@ uno::Any SAL_CALL ScCellFormatsEnumeration::nextElement()
 
     // interface must match ScCellFormatsObj::getElementType
 
-    return uno::makeAny(uno::Reference<table::XCellRange> (NextObject_Impl()));
+    return uno::Any(uno::Reference<table::XCellRange> (NextObject_Impl()));
 }
 
 ScUniqueCellFormatsObj::~ScUniqueCellFormatsObj()
@@ -9235,13 +9222,12 @@ uno::Any SAL_CALL ScUniqueCellFormatsObj::getByIndex( sal_Int32 nIndex )
     if(o3tl::make_unsigned(nIndex) >= aRangeLists.size())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(uno::Reference<sheet::XSheetCellRangeContainer>(new ScCellRangesObj(pDocShell, aRangeLists[nIndex])));
+    return uno::Any(uno::Reference<sheet::XSheetCellRangeContainer>(new ScCellRangesObj(pDocShell, aRangeLists[nIndex])));
 
 }
 
 uno::Type SAL_CALL ScUniqueCellFormatsObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<sheet::XSheetCellRangeContainer>::get();
 }
 
@@ -9307,7 +9293,7 @@ uno::Any SAL_CALL ScUniqueCellFormatsEnumeration::nextElement()
 
     // interface type must match ScCellFormatsObj::getElementType
 
-    return uno::makeAny(uno::Reference<sheet::XSheetCellRangeContainer>(new ScCellRangesObj(pDocShell, aRangeLists[nCurrentPosition++])));
+    return uno::Any(uno::Reference<sheet::XSheetCellRangeContainer>(new ScCellRangesObj(pDocShell, aRangeLists[nCurrentPosition++])));
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -18,6 +18,7 @@
  */
 
 #include <com/sun/star/sheet/TableValidationVisibility.hpp>
+#include <utility>
 #include <xicontent.hxx>
 #include <sfx2/objsh.hxx>
 #include <sfx2/docfile.hxx>
@@ -57,7 +58,6 @@
 #include <documentimport.hxx>
 
 #include <memory>
-#include <utility>
 #include <oox/helper/helper.hxx>
 #include <sal/log.hxx>
 
@@ -159,7 +159,7 @@ void lclInsertUrl( XclImpRoot& rRoot, const OUString& rUrl, SCCOL nScCol, SCROW 
     ScDocumentImport& rDoc = rRoot.GetDocImport();
     ScAddress aScPos( nScCol, nScRow, nScTab );
     ScRefCellValue aCell(rDoc.getDoc(), aScPos);
-    switch( aCell.meType )
+    switch( aCell.getType() )
     {
         // #i54261# hyperlinks in string cells
         case CELLTYPE_STRING:
@@ -175,9 +175,9 @@ void lclInsertUrl( XclImpRoot& rRoot, const OUString& rUrl, SCCOL nScCol, SCROW 
             ScEditEngineDefaulter& rEE = rRoot.GetEditEngine();
             SvxURLField aUrlField( rUrl, aDisplText, SvxURLFormat::AppDefault );
 
-            if( aCell.meType == CELLTYPE_EDIT )
+            if( aCell.getType() == CELLTYPE_EDIT )
             {
-                const EditTextObject* pEditObj = aCell.mpEditText;
+                const EditTextObject* pEditObj = aCell.getEditText();
                 rEE.SetTextCurrentDefaults( *pEditObj );
                 rEE.QuickInsertField( SvxFieldItem( aUrlField, EE_FEATURE_FIELD ), ESelection( 0, 0, EE_PARA_ALL, 0 ) );
             }
@@ -739,8 +739,8 @@ void XclImpCondFormatManager::Apply()
 
 // Data Validation ============================================================
 
-XclImpValidationManager::DVItem::DVItem( const ScRangeList& rRanges, const ScValidationData& rValidData ) :
-    maRanges(rRanges), maValidData(rValidData) {}
+XclImpValidationManager::DVItem::DVItem( ScRangeList aRanges, const ScValidationData& rValidData ) :
+    maRanges(std::move(aRanges)), maValidData(rValidData) {}
 
 XclImpValidationManager::XclImpValidationManager( const XclImpRoot& rRoot ) :
     XclImpRoot( rRoot )
@@ -932,21 +932,29 @@ void XclImpValidationManager::ReadDV( XclImpStream& rStrm )
 
 void XclImpValidationManager::Apply()
 {
+    const bool bFuzzing = utl::ConfigManager::IsFuzzing();
+    size_t nPatterns = 0;
+
     ScDocument& rDoc = GetRoot().GetDoc();
     for (const auto& rxDVItem : maDVItems)
     {
         DVItem& rItem = *rxDVItem;
         // set the handle ID
-        sal_uLong nHandle = rDoc.AddValidationEntry( rItem.maValidData );
+        sal_uInt32 nHandle = rDoc.AddValidationEntry( rItem.maValidData );
         ScPatternAttr aPattern( rDoc.GetPool() );
         aPattern.GetItemSet().Put( SfxUInt32Item( ATTR_VALIDDATA, nHandle ) );
 
         // apply all ranges
-        for ( size_t i = 0, nRanges = rItem.maRanges.size(); i < nRanges; ++i )
+        for ( size_t i = 0, nRanges = rItem.maRanges.size(); i < nRanges; ++i, ++nPatterns )
         {
             const ScRange & rScRange = rItem.maRanges[ i ];
             rDoc.ApplyPatternAreaTab( rScRange.aStart.Col(), rScRange.aStart.Row(),
                 rScRange.aEnd.Col(), rScRange.aEnd.Row(), rScRange.aStart.Tab(), aPattern );
+            if (bFuzzing && nPatterns >= 128)
+            {
+                SAL_WARN("sc.filter", "for fuzzing performance, abandoned pattern after " << nPatterns << " insertions");
+                break;
+            }
         }
     }
     maDVItems.clear();

@@ -20,23 +20,23 @@
 #include "tp_DataSource.hxx"
 #include <strings.hrc>
 #include <ResId.hxx>
+#include <ChartType.hxx>
 #include <ChartTypeTemplateProvider.hxx>
+#include <ChartTypeTemplate.hxx>
+#include <ChartModel.hxx>
 #include <RangeSelectionHelper.hxx>
+#include <DataSeries.hxx>
 #include <DataSeriesHelper.hxx>
 #include <ControllerLockGuard.hxx>
 #include <DataSourceHelper.hxx>
+#include <LabeledDataSequence.hxx>
 #include "DialogModel.hxx"
 #include <o3tl/safeint.hxx>
 #include <TabPageNotifiable.hxx>
-#include <com/sun/star/chart2/XChartType.hpp>
 #include <com/sun/star/chart2/XDataSeries.hpp>
-#include <com/sun/star/chart2/XDataSeriesContainer.hpp>
 #include <com/sun/star/chart2/data/XDataProvider.hpp>
-#include <com/sun/star/frame/XModel.hpp>
-#include <com/sun/star/util/XModifiable.hpp>
-#include <com/sun/star/chart2/data/XDataSink.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
@@ -57,7 +57,7 @@ void lcl_UpdateCurrentRange(weld::TreeView& rOutListBox, const OUString & rRole,
     {
         rOutListBox.set_text(nEntry, ::chart::DialogModel::ConvertRoleFromInternalToUI(rRole), 0);
         rOutListBox.set_text(nEntry, rRange, 1);
-        ::chart::SeriesEntry* pEntry = reinterpret_cast<::chart::SeriesEntry*>(rOutListBox.get_id(nEntry).toInt64());
+        ::chart::SeriesEntry* pEntry = weld::fromId<::chart::SeriesEntry*>(rOutListBox.get_id(nEntry));
         pEntry->m_sRole = rRole;
     }
 }
@@ -69,7 +69,7 @@ bool lcl_UpdateCurrentSeriesName(weld::TreeView& rOutListBox)
         return false;
 
     bool bResult = false;
-    ::chart::SeriesEntry * pEntry = reinterpret_cast<::chart::SeriesEntry*>(rOutListBox.get_id(nEntry).toInt64());
+    ::chart::SeriesEntry * pEntry = weld::fromId<::chart::SeriesEntry*>(rOutListBox.get_id(nEntry));
     if (pEntry->m_xDataSeries.is() && pEntry->m_xChartType.is())
     {
         OUString aLabel(::chart::DataSeriesHelper::getDataSeriesLabel(
@@ -91,7 +91,7 @@ OUString lcl_GetSelectedRole(const weld::TreeView& rRoleListBox, bool bUITransla
     {
         if (bUITranslated)
             return rRoleListBox.get_text(nEntry);
-        ::chart::SeriesEntry* pEntry = reinterpret_cast<::chart::SeriesEntry*>(rRoleListBox.get_id(nEntry).toInt64());
+        ::chart::SeriesEntry* pEntry = weld::fromId<::chart::SeriesEntry*>(rRoleListBox.get_id(nEntry));
         return pEntry->m_sRole;
     }
     return OUString();
@@ -124,32 +124,29 @@ void lcl_enableRangeChoosing(bool bEnable, weld::DialogController* pDialog)
 }
 
 void lcl_addLSequenceToDataSource(
-    const Reference< chart2::data::XLabeledDataSequence > & xLSequence,
-    const Reference< chart2::data::XDataSource > & xSource )
+    const uno::Reference< chart2::data::XLabeledDataSequence > & xLSequence,
+    const Reference< ::chart::DataSeries > & xSource )
 {
-    Reference< data::XDataSink > xSink( xSource, uno::UNO_QUERY );
-    if( xSink.is())
+    if( xSource.is())
     {
-        Sequence< Reference< chart2::data::XLabeledDataSequence > > aData( xSource->getDataSequences());
-        aData.realloc( aData.getLength() + 1 );
-        aData.getArray()[ aData.getLength() - 1 ] = xLSequence;
-        xSink->setData( aData );
+        std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > aData = xSource->getDataSequences2();
+        aData.push_back( xLSequence );
+        xSource->setData( aData );
     }
 }
 
-Reference< chart2::data::XLabeledDataSequence > lcl_findLSequenceWithOnlyLabel(
-    const Reference< chart2::data::XDataSource > & xDataSource )
+uno::Reference< chart2::data::XLabeledDataSequence > lcl_findLSequenceWithOnlyLabel(
+    const rtl::Reference< ::chart::DataSeries > & xDataSource )
 {
-    Reference< chart2::data::XLabeledDataSequence > xResult;
-    const Sequence< Reference< chart2::data::XLabeledDataSequence > > aSequences( xDataSource->getDataSequences());
+    uno::Reference< chart2::data::XLabeledDataSequence > xResult;
 
-    for( Reference< chart2::data::XLabeledDataSequence > const & labeledDataSeq : aSequences )
+    for( uno::Reference< chart2::data::XLabeledDataSequence > const & labeledDataSeq : xDataSource->getDataSequences2() )
     {
         // no values are set but a label exists
         if( ! labeledDataSeq->getValues().is() &&
             labeledDataSeq->getLabel().is())
         {
-            xResult.set( labeledDataSeq );
+            xResult = labeledDataSeq;
             break;
         }
     }
@@ -231,7 +228,7 @@ void DataSourceTabPage::InsertRoleLBEntry(const OUString& rRole, const OUString&
     m_aEntries.emplace_back(new SeriesEntry);
     SeriesEntry* pEntry = m_aEntries.back().get();
     pEntry->m_sRole = rRole;
-    m_xLB_ROLE->append(OUString::number(reinterpret_cast<sal_Int64>(pEntry)),
+    m_xLB_ROLE->append(weld::toId(pEntry),
                        ::chart::DialogModel::ConvertRoleFromInternalToUI(rRole));
     m_xLB_ROLE->set_text(m_xLB_ROLE->n_children() - 1, rRange, 1);
 }
@@ -325,13 +322,13 @@ void DataSourceTabPage::updateControlsFromDialogModel()
 
 void DataSourceTabPage::fillSeriesListBox()
 {
-    Reference< XDataSeries > xSelected;
+    rtl::Reference< DataSeries > xSelected;
     SeriesEntry* pEntry = nullptr;
     int nEntry = m_xLB_SERIES->get_selected_index();
     if (nEntry != -1)
     {
-        pEntry = reinterpret_cast<SeriesEntry*>(m_xLB_SERIES->get_id(nEntry).toInt64());
-        xSelected.set(pEntry->m_xDataSeries);
+        pEntry = weld::fromId<SeriesEntry*>(m_xLB_SERIES->get_id(nEntry));
+        xSelected = pEntry->m_xDataSeries;
     }
 
     bool bHasSelectedEntry = (pEntry != nullptr);
@@ -370,9 +367,9 @@ void DataSourceTabPage::fillSeriesListBox()
 
         m_aEntries.emplace_back(new SeriesEntry);
         pEntry = m_aEntries.back().get();
-        pEntry->m_xDataSeries.set(series.second.first);
-        pEntry->m_xChartType.set(series.second.second);
-        m_xLB_SERIES->append(OUString::number(reinterpret_cast<sal_Int64>(pEntry)), aLabel);
+        pEntry->m_xDataSeries = series.second.first;
+        pEntry->m_xChartType = series.second.second;
+        m_xLB_SERIES->append(weld::toId(pEntry), aLabel);
         if (bHasSelectedEntry && series.second.first == xSelected)
             nSelectedEntry = nEntry;
         ++nEntry;
@@ -389,7 +386,7 @@ void DataSourceTabPage::fillRoleListBox()
     int nSeriesEntry = m_xLB_SERIES->get_selected_index();
     SeriesEntry* pSeriesEntry = nullptr;
     if (nSeriesEntry != -1)
-        pSeriesEntry = reinterpret_cast<SeriesEntry*>(m_xLB_SERIES->get_id(nSeriesEntry).toInt64());
+        pSeriesEntry = weld::fromId<SeriesEntry*>(m_xLB_SERIES->get_id(nSeriesEntry));
     bool bHasSelectedEntry = (pSeriesEntry != nullptr);
 
     int nRoleIndex = m_xLB_ROLE->get_selected_index();
@@ -557,23 +554,23 @@ IMPL_LINK_NOARG(DataSourceTabPage, AddButtonClickedHdl, weld::Button&, void)
 {
     m_rDialogModel.startControllerLockTimer();
     int nEntry = m_xLB_SERIES->get_selected_index();
-    Reference< XDataSeries > xSeriesToInsertAfter;
-    Reference< XChartType > xChartTypeForNewSeries;
+    rtl::Reference< DataSeries > xSeriesToInsertAfter;
+    rtl::Reference< ChartType > xChartTypeForNewSeries;
     if( m_pTemplateProvider )
             m_rDialogModel.setTemplate( m_pTemplateProvider->getCurrentTemplate());
 
     if (nEntry != -1)
     {
-        ::chart::SeriesEntry* pEntry = reinterpret_cast<::chart::SeriesEntry*>(m_xLB_SERIES->get_id(nEntry).toInt64());
-        xSeriesToInsertAfter.set(pEntry->m_xDataSeries);
-        xChartTypeForNewSeries.set(pEntry->m_xChartType);
+        ::chart::SeriesEntry* pEntry = weld::fromId<::chart::SeriesEntry*>(m_xLB_SERIES->get_id(nEntry));
+        xSeriesToInsertAfter = pEntry->m_xDataSeries;
+        xChartTypeForNewSeries = pEntry->m_xChartType;
     }
     else
     {
-        std::vector< Reference< XDataSeriesContainer > > aCntVec(
+        std::vector< rtl::Reference< ChartType > > aCntVec(
             m_rDialogModel.getAllDataSeriesContainers());
         if( ! aCntVec.empty())
-            xChartTypeForNewSeries.set( aCntVec.front(), uno::UNO_QUERY );
+            xChartTypeForNewSeries = aCntVec.front();
     }
     OSL_ENSURE( xChartTypeForNewSeries.is(), "Cannot insert new series" );
 
@@ -600,15 +597,15 @@ IMPL_LINK_NOARG(DataSourceTabPage, RemoveButtonClickedHdl, weld::Button&, void)
     if (nEntry == -1)
         return;
 
-    SeriesEntry* pEntry = reinterpret_cast<::chart::SeriesEntry*>(m_xLB_SERIES->get_id(nEntry).toInt64());
-    Reference< XDataSeries > xNewSelSeries;
+    SeriesEntry* pEntry = weld::fromId<::chart::SeriesEntry*>(m_xLB_SERIES->get_id(nEntry));
+    rtl::Reference< DataSeries > xNewSelSeries;
     SeriesEntry * pNewSelEntry = nullptr;
     if (nEntry + 1 < m_xLB_SERIES->n_children())
-        pNewSelEntry = reinterpret_cast<::chart::SeriesEntry*>(m_xLB_SERIES->get_id(nEntry + 1).toInt64());
+        pNewSelEntry = weld::fromId<::chart::SeriesEntry*>(m_xLB_SERIES->get_id(nEntry + 1));
     else if (nEntry > 0)
-        pNewSelEntry = reinterpret_cast<::chart::SeriesEntry*>(m_xLB_SERIES->get_id(nEntry - 1).toInt64());
+        pNewSelEntry = weld::fromId<::chart::SeriesEntry*>(m_xLB_SERIES->get_id(nEntry - 1));
     if (pNewSelEntry)
-        xNewSelSeries.set(pNewSelEntry->m_xDataSeries);
+        xNewSelSeries = pNewSelEntry->m_xDataSeries;
 
     m_rDialogModel.deleteSeries( pEntry->m_xDataSeries, pEntry->m_xChartType );
     setDirty();
@@ -621,7 +618,7 @@ IMPL_LINK_NOARG(DataSourceTabPage, RemoveButtonClickedHdl, weld::Button&, void)
     {
         for (int i = 0; i < m_xLB_SERIES->n_children(); ++i)
         {
-            pEntry = reinterpret_cast<::chart::SeriesEntry*>(m_xLB_SERIES->get_id(i).toInt64());
+            pEntry = weld::fromId<::chart::SeriesEntry*>(m_xLB_SERIES->get_id(i));
             if (pEntry->m_xDataSeries == xNewSelSeries)
             {
                 m_xLB_SERIES->select(i);
@@ -639,7 +636,7 @@ IMPL_LINK_NOARG(DataSourceTabPage, UpButtonClickedHdl, weld::Button&, void)
     int nEntry = m_xLB_SERIES->get_selected_index();
     SeriesEntry* pEntry = nullptr;
     if (nEntry != -1)
-        pEntry = reinterpret_cast<SeriesEntry*>(m_xLB_SERIES->get_id(nEntry).toInt64());
+        pEntry = weld::fromId<SeriesEntry*>(m_xLB_SERIES->get_id(nEntry));
 
     bool bHasSelectedEntry = (pEntry != nullptr);
 
@@ -659,7 +656,7 @@ IMPL_LINK_NOARG(DataSourceTabPage, DownButtonClickedHdl, weld::Button&, void)
     int nEntry = m_xLB_SERIES->get_selected_index();
     SeriesEntry* pEntry = nullptr;
     if (nEntry != -1)
-        pEntry = reinterpret_cast<SeriesEntry*>(m_xLB_SERIES->get_id(nEntry).toInt64());
+        pEntry = weld::fromId<SeriesEntry*>(m_xLB_SERIES->get_id(nEntry));
 
     bool bHasSelectedEntry = (pEntry != nullptr);
 
@@ -748,7 +745,7 @@ bool DataSourceTabPage::updateModelFromControl(const weld::Entry* pField)
 
     if (bAll || (pField == m_xEDT_CATEGORIES.get()))
     {
-        Reference< data::XLabeledDataSequence > xLabeledSeq( m_rDialogModel.getCategories() );
+        uno::Reference< chart2::data::XLabeledDataSequence > xLabeledSeq( m_rDialogModel.getCategories() );
         if( xDataProvider.is())
         {
             OUString aRange(m_xEDT_CATEGORIES->get_text());
@@ -757,7 +754,7 @@ bool DataSourceTabPage::updateModelFromControl(const weld::Entry* pField)
                 // create or change categories
                 if( !xLabeledSeq.is())
                 {
-                    xLabeledSeq.set( DataSourceHelper::createLabeledDataSequence() );
+                    xLabeledSeq = DataSourceHelper::createLabeledDataSequence();
                     m_rDialogModel.setCategories( xLabeledSeq );
                 }
                 try
@@ -782,7 +779,7 @@ bool DataSourceTabPage::updateModelFromControl(const weld::Entry* pField)
     int nSeriesEntry = m_xLB_SERIES->get_selected_index();
     SeriesEntry* pSeriesEntry = nullptr;
     if (nSeriesEntry != -1)
-        pSeriesEntry = reinterpret_cast<SeriesEntry*>(m_xLB_SERIES->get_id(nSeriesEntry).toInt64());
+        pSeriesEntry = weld::fromId<SeriesEntry*>(m_xLB_SERIES->get_id(nSeriesEntry));
     bool bHasSelectedEntry = (pSeriesEntry != nullptr);
 
     if( bHasSelectedEntry )
@@ -800,9 +797,8 @@ bool DataSourceTabPage::updateModelFromControl(const weld::Entry* pField)
                 if( bIsLabel )
                     aSequenceRole = aSequenceNameForLabel;
 
-                Reference< data::XDataSource > xSource( pSeriesEntry->m_xDataSeries, uno::UNO_QUERY_THROW );
-                Reference< data::XLabeledDataSequence > xLabeledSeq(
-                    DataSeriesHelper::getDataSequenceByRole( xSource, aSequenceRole ));
+                uno::Reference< chart2::data::XLabeledDataSequence > xLabeledSeq =
+                    DataSeriesHelper::getDataSequenceByRole( pSeriesEntry->m_xDataSeries, aSequenceRole );
 
                 if( xDataProvider.is())
                 {
@@ -811,12 +807,12 @@ bool DataSourceTabPage::updateModelFromControl(const weld::Entry* pField)
                         if( ! xLabeledSeq.is())
                         {
                             // check if there is already an "orphan" label sequence
-                            xLabeledSeq.set( lcl_findLSequenceWithOnlyLabel( xSource ));
+                            xLabeledSeq = lcl_findLSequenceWithOnlyLabel( pSeriesEntry->m_xDataSeries );
                             if( ! xLabeledSeq.is())
                             {
                                 // no corresponding labeled data sequence for label found
-                                xLabeledSeq.set( DataSourceHelper::createLabeledDataSequence() );
-                                lcl_addLSequenceToDataSource( xLabeledSeq, xSource );
+                                xLabeledSeq = DataSourceHelper::createLabeledDataSequence();
+                                lcl_addLSequenceToDataSource( xLabeledSeq, pSeriesEntry->m_xDataSeries );
                             }
                         }
                         if( xLabeledSeq.is())
@@ -879,11 +875,11 @@ bool DataSourceTabPage::updateModelFromControl(const weld::Entry* pField)
                                 if( !xLabeledSeq.is())
                                 {
                                     if( aSelectedRole == aSequenceNameForLabel )
-                                        xLabeledSeq.set( lcl_findLSequenceWithOnlyLabel( xSource ));
+                                        xLabeledSeq = lcl_findLSequenceWithOnlyLabel( pSeriesEntry->m_xDataSeries );
                                     if( ! xLabeledSeq.is())
                                     {
-                                        xLabeledSeq.set( DataSourceHelper::createLabeledDataSequence() );
-                                        lcl_addLSequenceToDataSource( xLabeledSeq, xSource );
+                                        xLabeledSeq = DataSourceHelper::createLabeledDataSequence();
+                                        lcl_addLSequenceToDataSource( xLabeledSeq, pSeriesEntry->m_xDataSeries );
                                     }
                                 }
                                 xLabeledSeq->setValues( xNewSeq );
@@ -908,9 +904,8 @@ bool DataSourceTabPage::updateModelFromControl(const weld::Entry* pField)
     {
         try
         {
-            Reference< util::XModifiable > xModifiable( m_rDialogModel.getChartModel(), uno::UNO_QUERY );
-            if( xModifiable.is() )
-                xModifiable->setModified( true );
+            if( m_rDialogModel.getChartModel() )
+                m_rDialogModel.getChartModel()->setModified( true );
             const DialogModelTimeBasedInfo& rInfo = m_rDialogModel.getTimeBasedInfo();
             if(rInfo.bTimeBased)
             {

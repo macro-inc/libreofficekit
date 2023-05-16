@@ -41,9 +41,9 @@ namespace sw::mark {
             // getters
             virtual SwPosition& GetOtherMarkPos() const override;
             virtual SwPosition& GetMarkStart() const override
-                { return *m_pPos1; }
+                { return const_cast<SwPosition&>(*m_oPos1); }
             virtual SwPosition& GetMarkEnd() const override
-                { return *m_pPos1; }
+                { return const_cast<SwPosition&>(*m_oPos1); }
             virtual bool IsExpanded() const override
                 { return false; }
 
@@ -69,7 +69,7 @@ namespace sw::mark {
             CrossRefHeadingBookmark(const SwPaM& rPaM,
                 const vcl::KeyCode& rCode,
                 const OUString& rName);
-            static bool IsLegalName(const OUString& rName);
+            static bool IsLegalName(std::u16string_view rName);
         };
 
         class CrossRefNumItemBookmark final
@@ -79,7 +79,7 @@ namespace sw::mark {
             CrossRefNumItemBookmark(const SwPaM& rPaM,
                 const vcl::KeyCode& rCode,
                 const OUString& rName);
-            static bool IsLegalName(const OUString& rName);
+            static bool IsLegalName(std::u16string_view rName);
         };
 }
 

@@ -72,10 +72,11 @@
 #include <unotools/useroptions.hxx>
 #include <unotools/securityoptions.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/ucbhelper.hxx>
 #include <unotools/tempfile.hxx>
 #include <unotools/docinfohelper.hxx>
+#include <unotools/mediadescriptor.hxx>
 #include <ucbhelper/content.hxx>
 #include <sot/storage.hxx>
 #include <sot/exchange.hxx>
@@ -138,7 +139,7 @@ void impl_addToModelCollection(const css::uno::Reference< css::frame::XModel >& 
         css::frame::theGlobalEventBroadcaster::get(xContext);
     try
     {
-        xModelCollection->insert(css::uno::makeAny(xModel));
+        xModelCollection->insert(css::uno::Any(xModel));
     }
     catch ( uno::Exception& )
     {
@@ -247,7 +248,7 @@ bool SfxObjectShell::PutURLContentsToVersionStream_Impl(
 
 OUString SfxObjectShell::CreateTempCopyOfStorage_Impl( const uno::Reference< embed::XStorage >& xStorage )
 {
-    OUString aTempURL = ::utl::TempFile().GetURL();
+    OUString aTempURL = ::utl::CreateTempURL();
 
     DBG_ASSERT( !aTempURL.isEmpty(), "Can't create a temporary file!\n" );
     if ( !aTempURL.isEmpty() )
@@ -311,7 +312,7 @@ void SfxObjectShell::SetupStorage( const uno::Reference< embed::XStorage >& xSto
 
     try
     {
-        xProps->setPropertyValue("MediaType", uno::makeAny( aDataFlavor.MimeType ) );
+        xProps->setPropertyValue("MediaType", uno::Any( aDataFlavor.MimeType ) );
     }
     catch( uno::Exception& )
     {
@@ -327,9 +328,9 @@ void SfxObjectShell::SetupStorage( const uno::Reference< embed::XStorage >& xSto
     // the default values, that should be used for ODF1.1 and older formats
     uno::Sequence< beans::NamedValue > aEncryptionAlgs
     {
-        { "StartKeyGenerationAlgorithm", css::uno::makeAny(xml::crypto::DigestID::SHA1) },
-        { "EncryptionAlgorithm", css::uno::makeAny(xml::crypto::CipherID::BLOWFISH_CFB_8) },
-        { "ChecksumAlgorithm", css::uno::makeAny(xml::crypto::DigestID::SHA1_1K) }
+        { "StartKeyGenerationAlgorithm", css::uno::Any(xml::crypto::DigestID::SHA1) },
+        { "EncryptionAlgorithm", css::uno::Any(xml::crypto::CipherID::BLOWFISH_CFB_8) },
+        { "ChecksumAlgorithm", css::uno::Any(xml::crypto::DigestID::SHA1_1K) }
     };
 
     if (nDefVersion >= SvtSaveOptions::ODFSVER_012)
@@ -343,11 +344,11 @@ void SfxObjectShell::SetupStorage( const uno::Reference< embed::XStorage >& xSto
             SAL_INFO_IF(isBaseForm, "sfx.doc", "tdf#138209 force form export to ODF 1.2");
             if (!isBaseForm && SvtSaveOptions::ODFSVER_013 <= nDefVersion)
             {
-                xProps->setPropertyValue("Version", uno::makeAny<OUString>(ODFVER_013_TEXT));
+                xProps->setPropertyValue("Version", uno::Any(OUString(ODFVER_013_TEXT)));
             }
             else
             {
-                xProps->setPropertyValue("Version", uno::makeAny<OUString>(ODFVER_012_TEXT));
+                xProps->setPropertyValue("Version", uno::Any(OUString(ODFVER_012_TEXT)));
             }
         }
         catch( uno::Exception& )
@@ -431,7 +432,7 @@ bool SfxObjectShell::InitNew( const uno::Reference< embed::XStorage >& xStorage 
 
 bool SfxObjectShell::Load( SfxMedium& rMedium )
 {
-    return GeneralInit_Impl(rMedium.GetStorage(), !tools::isEmptyFileUrl(rMedium.GetName()));
+    return GeneralInit_Impl(rMedium.GetStorage(), true);
 }
 
 void SfxObjectShell::DoInitUnitTest()
@@ -439,7 +440,7 @@ void SfxObjectShell::DoInitUnitTest()
     pMedium = new SfxMedium;
 }
 
-bool SfxObjectShell::DoInitNew( SfxMedium* pMed )
+bool SfxObjectShell::DoInitNew()
 /*  [Description]
 
     This from SvPersist inherited virtual method is called to initialize
@@ -462,15 +463,11 @@ bool SfxObjectShell::DoInitNew( SfxMedium* pMed )
 
 {
     ModifyBlocker_Impl aBlock( this );
-    pMedium = pMed;
-    if ( !pMedium )
-    {
-        pMedium = new SfxMedium;
-    }
+    pMedium = new SfxMedium;
 
     pMedium->CanDisposeStorage_Impl( true );
 
-    if ( InitNew( pMed ? pMed->GetStorage() : uno::Reference < embed::XStorage >() ) )
+    if ( InitNew( nullptr ) )
     {
         // empty documents always get their macros from the user, so there is no reason to restrict access
         pImpl->aMacroMode.allowMacroExecution();
@@ -668,9 +665,7 @@ bool SfxObjectShell::DoLoad( SfxMedium *pMed )
                     bWarnMediaTypeFallback = false;
                 }
 
-                if (bWarnMediaTypeFallback
-                    || (!tools::isEmptyFileUrl(pMedium->GetName())
-                        && !xStorage->getElementNames().hasElements()))
+                if (bWarnMediaTypeFallback || !xStorage->getElementNames().hasElements())
                     SetError(ERRCODE_IO_BROKENPACKAGE);
             }
             catch( uno::Exception& )
@@ -735,7 +730,7 @@ bool SfxObjectShell::DoLoad( SfxMedium *pMed )
                 bool bSetProperty = true;
                 try
                 {
-                    xSet->setPropertyValue( sLockUpdates, makeAny( true ) );
+                    xSet->setPropertyValue( sLockUpdates, Any( true ) );
                 }
                 catch(const beans::UnknownPropertyException& )
                 {
@@ -746,7 +741,7 @@ bool SfxObjectShell::DoLoad( SfxMedium *pMed )
                 {
                     try
                     {
-                        xSet->setPropertyValue( sLockUpdates, makeAny( false ) );
+                        xSet->setPropertyValue( sLockUpdates, Any( false ) );
                     }
                     catch(const beans::UnknownPropertyException& )
                     {}
@@ -1002,11 +997,11 @@ bool SfxObjectShell::DoSave()
                     SAL_INFO_IF(isBaseForm, "sfx.doc", "tdf#138209 force form export to ODF 1.2");
                     if (!isBaseForm && SvtSaveOptions::ODFSVER_013 <= nDefVersion)
                     {
-                        xProps->setPropertyValue("Version", uno::makeAny<OUString>(ODFVER_013_TEXT));
+                        xProps->setPropertyValue("Version", uno::Any(OUString(ODFVER_013_TEXT)));
                     }
                     else
                     {
-                        xProps->setPropertyValue("Version", uno::makeAny<OUString>(ODFVER_012_TEXT));
+                        xProps->setPropertyValue("Version", uno::Any(OUString(ODFVER_012_TEXT)));
                     }
                 }
                 catch (uno::Exception&)
@@ -1236,7 +1231,15 @@ bool SfxObjectShell::SaveTo_Impl
         bStoreToSameLocation = true;
 
         if ( pMedium->DocNeedsFileDateCheck() )
+        {
             rMedium.CheckFileDate( pMedium->GetInitFileDate( false ) );
+            if (rMedium.GetErrorCode() == ERRCODE_ABORT)
+            {
+                // if user cancels the save, exit early to avoid resetting SfxMedium values that
+                // would cause an invalid subsequent filedate check
+                return false;
+            }
+        }
 
         // before we overwrite the original file, we will make a backup if there is a demand for that
         // if the backup is not created here it will be created internally and will be removed in case of successful saving
@@ -1374,7 +1377,7 @@ bool SfxObjectShell::SaveTo_Impl
                 {
                     uno::Reference< beans::XPropertySet > xProps( rMedium.GetStorage(), uno::UNO_QUERY_THROW );
                     xProps->setPropertyValue("MediaType",
-                                            uno::makeAny( aDataFlavor.MimeType ) );
+                                            uno::Any( aDataFlavor.MimeType ) );
                 }
                 catch( uno::Exception& )
                 {
@@ -2266,11 +2269,7 @@ bool SfxObjectShell::ImportFrom(SfxMedium& rMedium,
 
             // #i119492# During loading, some OLE objects like chart will be set
             // modified flag, so needs to reset the flag to false after loading
-            bool bRtn = true;
-            if (!tools::isEmptyFileUrl(rMedium.GetName()))
-            {
-                bRtn = xLoader->filter(aArgs);
-            }
+            bool bRtn = xLoader->filter(aArgs);
             const uno::Sequence < OUString > aNames = GetEmbeddedObjectContainer().GetObjectNames();
             for ( const auto& rName : aNames )
             {
@@ -2313,7 +2312,7 @@ bool SfxObjectShell::ImportFrom(SfxMedium& rMedium,
                         {
                             uno::Reference< lang::XMultiServiceFactory > xFactory(GetModel(), uno::UNO_QUERY);
                             uno::Reference< beans::XPropertySet > xSettings(xFactory->createInstance("com.sun.star.document.Settings"), uno::UNO_QUERY);
-                            xSettings->setPropertyValue("LoadReadonly", uno::makeAny(true));
+                            xSettings->setPropertyValue("LoadReadonly", uno::Any(true));
                         }
                         xPropertyContainer->removeProperty("_MarkAsFinal");
                     }
@@ -2344,6 +2343,7 @@ bool SfxObjectShell::ImportFrom(SfxMedium& rMedium,
         {
             const char *msg = e.what();
             const OUString sError(msg, strlen(msg), RTL_TEXTENCODING_ASCII_US);
+            SAL_WARN("sfx.doc", "exception importing " << sError);
             SetError(*new StringErrorInfo(ERRCODE_SFX_DOLOADFAILED,
                 sError, DialogMask::ButtonsOk | DialogMask::MessageError));
         }
@@ -2493,17 +2493,18 @@ bool SfxObjectShell::ExportTo( SfxMedium& rMedium )
 
         return xFilter->filter( aArgs );
         }
-        catch (const css::uno::RuntimeException & e)
+        catch (const css::uno::RuntimeException&)
         {
-            SAL_INFO("sfx.doc", "ExportTo: " << e);
+            css::uno::Any ex(cppu::getCaughtException());
+            TOOLS_INFO_EXCEPTION("sfx.doc", "exception: " << exceptionToString(ex));
         }
-        catch (const std::exception & e)
+        catch (const std::exception& e)
         {
-            SAL_INFO("sfx.doc", "ExportTo: " << e.what());
+            TOOLS_INFO_EXCEPTION("sfx.doc", "exception: " << e.what());
         }
         catch(...)
         {
-            SAL_INFO("sfx.doc", "ExportTo: Unknown exception!");
+            TOOLS_INFO_EXCEPTION("sfx.doc", "Unknown exception!");
         }
     }
 
@@ -2611,7 +2612,7 @@ bool SfxObjectShell::DoSave_Impl( const SfxItemSet* pArgs )
     css::uno::Reference< XInteractionHandler > xInteract;
     const SfxUnoAnyItem* pxInteractionItem = SfxItemSet::GetItem<SfxUnoAnyItem>(pArgs, SID_INTERACTIONHANDLER, false);
     if ( pxInteractionItem && ( pxInteractionItem->GetValue() >>= xInteract ) && xInteract.is() )
-        pMediumTmp->GetItemSet()->Put( SfxUnoAnyItem( SID_INTERACTIONHANDLER, makeAny( xInteract ) ) );
+        pMediumTmp->GetItemSet()->Put( SfxUnoAnyItem( SID_INTERACTIONHANDLER, Any( xInteract ) ) );
 
     const SfxBoolItem* pNoFileSync = pArgs->GetItem<SfxBoolItem>(SID_NO_FILE_SYNC, false);
     if (pNoFileSync && pNoFileSync->GetValue())
@@ -2637,7 +2638,16 @@ bool SfxObjectShell::DoSave_Impl( const SfxItemSet* pArgs )
     else
     {
         // transfer error code from medium to objectshell
-        SetError(pMediumTmp->GetError());
+        ErrCode errCode = pMediumTmp->GetError();
+        SetError(errCode);
+
+        if (errCode == ERRCODE_ABORT)
+        {
+            // avoid doing DoSaveCompleted() which updates the SfxMedium timestamp values
+            // and prevents subsequent filedate checks from being accurate
+            delete pMediumTmp;
+            return false;
+        }
 
         // reconnect to object storage
         DoSaveCompleted();
@@ -2702,7 +2712,7 @@ bool SfxObjectShell::CommonSaveAs_Impl(const INetURLObject& aURL, const OUString
         return false;
     }
 
-    if ( aURL != INetURLObject( OUString( "private:stream"  ) ) )
+    if ( aURL != INetURLObject( u"private:stream" ) )
     {
         // Is there already a Document with this name?
         SfxObjectShell* pDoc = nullptr;
@@ -2741,7 +2751,7 @@ bool SfxObjectShell::CommonSaveAs_Impl(const INetURLObject& aURL, const OUString
     }
 
 
-    const SfxBoolItem* pCopyStreamItem = rItemSet.GetItem<SfxBoolItem>(SID_COPY_STREAM_IF_POSSIBLE, false);
+    const SfxBoolItem* pCopyStreamItem = rItemSet.GetItem(SID_COPY_STREAM_IF_POSSIBLE, false);
     if ( bSaveTo && pCopyStreamItem && pCopyStreamItem->GetValue() && !IsModified() )
     {
         if (pMedium->TryDirectTransfer(aURL.GetMainURL(INetURLObject::DecodeMechanism::NONE), rItemSet))
@@ -2754,7 +2764,7 @@ bool SfxObjectShell::CommonSaveAs_Impl(const INetURLObject& aURL, const OUString
 
     bool bWasReadonly = IsReadOnly();
 
-    if ( aURL == aActName && aURL != INetURLObject( OUString("private:stream") )
+    if ( aURL == aActName && aURL != INetURLObject( u"private:stream" )
         && IsReadOnly() )
     {
         SetError(ERRCODE_SFX_DOCUMENTREADONLY);
@@ -2764,9 +2774,11 @@ bool SfxObjectShell::CommonSaveAs_Impl(const INetURLObject& aURL, const OUString
     if (SfxItemState::SET != rItemSet.GetItemState(SID_UNPACK) && officecfg::Office::Common::Save::Document::Unpacked::get())
         rItemSet.Put(SfxBoolItem(SID_UNPACK, false));
 
+#if HAVE_FEATURE_MULTIUSER_ENVIRONMENT
     OUString aTempFileURL;
     if ( IsDocShared() )
         aTempFileURL = pMedium->GetURLObject().GetMainURL( INetURLObject::DecodeMechanism::NONE );
+#endif
 
     if (PreDoSaveAs_Impl(aURL.GetMainURL(INetURLObject::DecodeMechanism::NONE), aFilterName,
                          rItemSet, rArgs))
@@ -2945,7 +2957,7 @@ bool SfxObjectShell::PreDoSaveAs_Impl(const OUString& rFileName, const OUString&
             }
 
             if( bRet )
-                pNewFile->GetItemSet()->Put( SfxUnoAnyItem(SID_FILTER_DATA, uno::makeAny(aSaveToFilterDataOptions)));
+                pNewFile->GetItemSet()->Put( SfxUnoAnyItem(SID_FILTER_DATA, uno::Any(aSaveToFilterDataOptions)));
         }
     }
     else
@@ -3217,7 +3229,7 @@ bool SfxObjectShell::SaveAsOwnFormat( SfxMedium& rMedium )
             // calls SwXTextFieldMasters::getByName, which in turn maps property names by
             // calling SwStyleNameMapper::GetTextUINameArray, which uses
             // SvtSysLocale().GetUILanguageTag() to do the mapping, saving indirectly depends
-            // on the UI language. This is an unfortunate depenency. Here we use the loader's language.
+            // on the UI language. This is an unfortunate dependency. Here we use the loader's language.
             const LanguageTag viewLanguage = comphelper::LibreOfficeKit::getLanguageTag();
             const LanguageTag loadLanguage = SfxLokHelper::getLoadLanguage();
 
@@ -3294,10 +3306,14 @@ bool SfxObjectShell::SaveAsChildren( SfxMedium& rMedium )
         return true;
     }
 
+    bool AutoSaveEvent = false;
+    utl::MediaDescriptor lArgs(rMedium.GetArgs());
+    lArgs[utl::MediaDescriptor::PROP_AUTOSAVEEVENT] >>= AutoSaveEvent;
+
     if ( pImpl->mxObjectContainer )
     {
         bool bOasis = ( SotStorage::GetVersion( xStorage ) > SOFFICE_FILEFORMAT_60 );
-        GetEmbeddedObjectContainer().StoreAsChildren(bOasis,SfxObjectCreateMode::EMBEDDED == eCreateMode,xStorage);
+        GetEmbeddedObjectContainer().StoreAsChildren(bOasis,SfxObjectCreateMode::EMBEDDED == eCreateMode,AutoSaveEvent,xStorage);
     }
 
     uno::Sequence<OUString> aExceptions;
@@ -3346,7 +3362,7 @@ bool SfxObjectShell::SaveCompletedChildren()
     return bResult;
 }
 
-bool SfxObjectShell::SwitchChildrenPersistance( const uno::Reference< embed::XStorage >& xStorage,
+bool SfxObjectShell::SwitchChildrenPersistence( const uno::Reference< embed::XStorage >& xStorage,
                                                     bool bForceNonModified )
 {
     if ( !xStorage.is() )
@@ -3381,7 +3397,7 @@ bool SfxObjectShell::SaveCompleted( const uno::Reference< embed::XStorage >& xSt
         if ( pImpl->mxObjectContainer )
             GetEmbeddedObjectContainer().SwitchPersistence( xStorage );
 
-        bResult = SwitchChildrenPersistance( xStorage, true );
+        bResult = SwitchChildrenPersistence( xStorage, true );
     }
 
     if ( bResult )
@@ -3405,7 +3421,7 @@ bool SfxObjectShell::SaveCompleted( const uno::Reference< embed::XStorage >& xSt
             GetEmbeddedObjectContainer().SwitchPersistence( pImpl->m_xDocStorage );
 
         // let already successfully connected objects be switched back
-        SwitchChildrenPersistance( pImpl->m_xDocStorage, true );
+        SwitchChildrenPersistence( pImpl->m_xDocStorage, true );
     }
 
     if ( bSendNotification )
@@ -3517,7 +3533,7 @@ bool SfxObjectShell::SwitchPersistence( const uno::Reference< embed::XStorage >&
     {
         if ( pImpl->mxObjectContainer )
             GetEmbeddedObjectContainer().SwitchPersistence( xStorage );
-        bResult = SwitchChildrenPersistance( xStorage );
+        bResult = SwitchChildrenPersistence( xStorage );
 
         // TODO/LATER: substorages that have unknown mimetypes probably should be copied to the target storage here
         OSL_ENSURE( StoragesOfUnknownMediaTypeAreCopied_Impl( pImpl->m_xDocStorage, xStorage ),
@@ -3542,6 +3558,12 @@ bool SfxObjectShell::CopyStoragesOfUnknownMediaType(const uno::Reference< embed:
                                                     const uno::Reference< embed::XStorage >& xTarget,
                                                     const uno::Sequence<OUString>& rExceptions)
 {
+    if (!xSource.is())
+    {
+        SAL_WARN( "sfx.doc", "SfxObjectShell::GetStorage() failed");
+        return false;
+    }
+
     // This method does not commit the target storage and should not do it
     bool bResult = true;
 
@@ -3705,7 +3727,7 @@ bool SfxObjectShell::WriteThumbnail(bool bEncrypted, const uno::Reference<io::XS
 
         uno::Reference <beans::XPropertySet> xSet(xStream, uno::UNO_QUERY);
         if (xSet.is())
-            xSet->setPropertyValue("MediaType", uno::makeAny(OUString("image/png")));
+            xSet->setPropertyValue("MediaType", uno::Any(OUString("image/png")));
         if (bEncrypted)
         {
             const OUString sResID = GraphicHelper::getThumbnailReplacementIDByFactoryName_Impl(
@@ -3715,10 +3737,10 @@ bool SfxObjectShell::WriteThumbnail(bool bEncrypted, const uno::Reference<io::XS
         }
         else
         {
-            std::shared_ptr<GDIMetaFile> xMetaFile = GetPreviewMetaFile();
-            if (xMetaFile)
+            BitmapEx bitmap = GetPreviewBitmap();
+            if (!bitmap.IsEmpty())
             {
-                bResult = GraphicHelper::getThumbnailFormatFromGDI_Impl(xMetaFile.get(), xStream);
+                bResult = GraphicHelper::getThumbnailFormatFromBitmap_Impl(bitmap, xStream);
             }
         }
     }

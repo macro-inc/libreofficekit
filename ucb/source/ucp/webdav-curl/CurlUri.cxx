@@ -221,7 +221,7 @@ void CurlUri::AppendPath(::std::u16string_view const rPath)
         path.append("/");
     }
     path.append(rPath);
-    OString const utf8Path(OUStringToOString(path.makeStringAndClear(), RTL_TEXTENCODING_UTF8));
+    OString const utf8Path(OUStringToOString(path, RTL_TEXTENCODING_UTF8));
     auto uc = curl_url_set(m_pUrl.get(), CURLUPART_PATH, utf8Path.getStr(), 0);
     if (uc != CURLUE_OK)
     {
@@ -236,17 +236,17 @@ void CurlUri::AppendPath(::std::u16string_view const rPath)
     m_Path = *oPath;
 }
 
-CurlUri CurlUri::CloneWithRelativeRefPathAbsolute(OUString const& rRelativeRef) const
+CurlUri CurlUri::CloneWithRelativeRefPathAbsolute(std::u16string_view rRelativeRef) const
 {
     ::std::unique_ptr<CURLU, deleter_from_fn<CURLU, curl_url_cleanup>> pUrl(
         curl_url_dup(m_pUrl.get()));
-    sal_Int32 indexEnd(rRelativeRef.getLength());
-    auto const indexQuery(rRelativeRef.indexOf('?'));
-    auto const indexFragment(rRelativeRef.indexOf('#'));
+    size_t indexEnd(rRelativeRef.size());
+    auto const indexQuery(rRelativeRef.find('?'));
+    auto const indexFragment(rRelativeRef.find('#'));
     CURLUcode uc;
-    if (indexFragment != -1)
+    if (indexFragment != std::u16string_view::npos)
     {
-        OUString const fragment(rRelativeRef.copy(indexFragment + 1));
+        std::u16string_view const fragment(rRelativeRef.substr(indexFragment + 1));
         indexEnd = indexFragment;
         OString const utf8Fragment(OUStringToOString(fragment, RTL_TEXTENCODING_UTF8));
         uc = curl_url_set(pUrl.get(), CURLUPART_FRAGMENT, utf8Fragment.getStr(), 0);
@@ -260,9 +260,11 @@ CurlUri CurlUri::CloneWithRelativeRefPathAbsolute(OUString const& rRelativeRef) 
         SAL_WARN("ucb.ucp.webdav.curl", "curl_url_set failed: " << uc);
         throw DAVException(DAVException::DAV_INVALID_ARG);
     }
-    if (indexQuery != -1 && (indexFragment == -1 || indexQuery < indexFragment))
+    if (indexQuery != std::u16string_view::npos
+        && (indexFragment == std::u16string_view::npos || indexQuery < indexFragment))
     {
-        OUString const query(rRelativeRef.copy(indexQuery + 1, indexEnd - indexQuery - 1));
+        std::u16string_view const query(
+            rRelativeRef.substr(indexQuery + 1, indexEnd - indexQuery - 1));
         indexEnd = indexQuery;
         OString const utf8Query(OUStringToOString(query, RTL_TEXTENCODING_UTF8));
         uc = curl_url_set(pUrl.get(), CURLUPART_QUERY, utf8Query.getStr(), 0);
@@ -276,7 +278,7 @@ CurlUri CurlUri::CloneWithRelativeRefPathAbsolute(OUString const& rRelativeRef) 
         SAL_WARN("ucb.ucp.webdav.curl", "curl_url_set failed: " << uc);
         throw DAVException(DAVException::DAV_INVALID_ARG);
     }
-    OUString const path(rRelativeRef.copy(0, indexEnd));
+    std::u16string_view const path(rRelativeRef.substr(0, indexEnd));
     OString const utf8Path(OUStringToOString(path, RTL_TEXTENCODING_UTF8));
     uc = curl_url_set(pUrl.get(), CURLUPART_PATH, utf8Path.getStr(), 0);
     if (uc != CURLUE_OK)
@@ -298,12 +300,12 @@ OUString DecodeURI(OUString const& rURI)
     return rtl::Uri::decode(rURI, rtl_UriDecodeWithCharset, RTL_TEXTENCODING_UTF8);
 }
 
-OUString ConnectionEndPointString(OUString const& rHostName, sal_uInt16 const nPort)
+OUString ConnectionEndPointString(std::u16string_view rHostName, sal_uInt16 const nPort)
 {
     OUStringBuffer aBuf;
 
     // Is host a numeric IPv6 address?
-    if ((rHostName.indexOf(':') != -1) && (rHostName[0] != '['))
+    if ((rHostName.find(':') != std::u16string_view::npos) && (rHostName[0] != '['))
     {
         aBuf.append("[");
         aBuf.append(rHostName);

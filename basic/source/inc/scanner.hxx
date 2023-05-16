@@ -20,7 +20,7 @@
 #pragma once
 
 #include <basic/sbxdef.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 
 // The scanner is stand-alone, i. e. it can be used from everywhere.
 // A BASIC-instance is necessary for error messages. Without BASIC
@@ -33,6 +33,7 @@ class SbiScanner
 {
     OUString   aBuf;             // input buffer
     OUString   aLine;
+    OUString   aSaveLine;
     sal_Int32 nLineIdx;
     sal_Int32 nSaveLineIdx;
     StarBASIC* pBasic;                  // instance for error callbacks
@@ -67,7 +68,7 @@ protected:
     bool   bInStatement;
     void   GenError( ErrCode );
 public:
-    SbiScanner( const OUString&, StarBASIC* = nullptr );
+    SbiScanner( OUString , StarBASIC* = nullptr );
 
     void  EnableErrors()            { bError = false; }
     bool  IsHash() const            { return bHash;   }
@@ -80,8 +81,8 @@ public:
     sal_Int32 GetCol1() const       { return nCol1;   }
     void  SetCol1( sal_Int32 n )    { nCol1 = n;      }
     StarBASIC* GetBasic()           { return pBasic;  }
-    void  SaveLine()                { nSaveLineIdx = nLineIdx; }
-    void  RestoreLine()             { nLineIdx = nSaveLineIdx; }
+    void  SaveLine()                { aSaveLine = aLine; nSaveLineIdx = nLineIdx; }
+    void  RestoreLine()             { nLineIdx = nSaveLineIdx; aLine = aSaveLine; }
     void  LockColumn();
     void  UnlockColumn();
     bool  DoesColonFollow();

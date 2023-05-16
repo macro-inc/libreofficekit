@@ -20,6 +20,7 @@
 #pragma once
 
 #include <rtl/ustring.hxx>
+#include <tools/solar.h>
 #include <sfx2/basedlgs.hxx>
 #include <sfx2/tabdlg.hxx>
 
@@ -88,7 +89,7 @@ namespace svx
         SfxItemSet  m_aRegistrationItems;
 
     protected:
-        RegistrationItemSetHolder( const SfxItemSet& _rMasterSet );
+        RegistrationItemSetHolder( SfxItemSet _aMasterSet );
         ~RegistrationItemSetHolder();
 
     protected:

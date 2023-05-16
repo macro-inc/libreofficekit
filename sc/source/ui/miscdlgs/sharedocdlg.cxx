@@ -23,7 +23,8 @@
 #include <sfx2/dialoghelper.hxx>
 #include <svl/sharecontrolfile.hxx>
 #include <unotools/useroptions.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <docsh.hxx>
 
@@ -138,15 +139,15 @@ void ScShareDocumentDlg::UpdateView()
                         // parse the edit time string of the format "DD.MM.YYYY hh:mm"
                         OUString aDateTimeStr = aUsersData[i][LockFileComponent::EDITTIME];
                         sal_Int32 nIndex = 0;
-                        OUString aDateStr = aDateTimeStr.getToken( 0, ' ', nIndex );
-                        OUString aTimeStr = aDateTimeStr.getToken( 0, ' ', nIndex );
+                        std::u16string_view aDateStr = o3tl::getToken(aDateTimeStr, 0, ' ', nIndex );
+                        std::u16string_view aTimeStr = o3tl::getToken(aDateTimeStr, 0, ' ', nIndex );
                         nIndex = 0;
-                        sal_uInt16 nDay = sal::static_int_cast< sal_uInt16 >( aDateStr.getToken( 0, '.', nIndex ).toInt32() );
-                        sal_uInt16 nMonth = sal::static_int_cast< sal_uInt16 >( aDateStr.getToken( 0, '.', nIndex ).toInt32() );
-                        sal_uInt16 nYear = sal::static_int_cast< sal_uInt16 >( aDateStr.getToken( 0, '.', nIndex ).toInt32() );
+                        sal_uInt16 nDay = sal::static_int_cast< sal_uInt16 >( o3tl::toInt32(o3tl::getToken(aDateStr, 0, '.', nIndex )) );
+                        sal_uInt16 nMonth = sal::static_int_cast< sal_uInt16 >( o3tl::toInt32(o3tl::getToken(aDateStr, 0, '.', nIndex )) );
+                        sal_uInt16 nYear = sal::static_int_cast< sal_uInt16 >( o3tl::toInt32(o3tl::getToken(aDateStr, 0, '.', nIndex )) );
                         nIndex = 0;
-                        sal_uInt16 nHours = sal::static_int_cast< sal_uInt16 >( aTimeStr.getToken( 0, ':', nIndex ).toInt32() );
-                        sal_uInt16 nMinutes = sal::static_int_cast< sal_uInt16 >( aTimeStr.getToken( 0, ':', nIndex ).toInt32() );
+                        sal_uInt16 nHours = sal::static_int_cast< sal_uInt16 >( o3tl::toInt32(o3tl::getToken(aTimeStr, 0, ':', nIndex )) );
+                        sal_uInt16 nMinutes = sal::static_int_cast< sal_uInt16 >( o3tl::toInt32(o3tl::getToken(aTimeStr, 0, ':', nIndex )) );
                         Date aDate( nDay, nMonth, nYear );
                         tools::Time aTime( nHours, nMinutes );
                         DateTime aDateTime( aDate, aTime );

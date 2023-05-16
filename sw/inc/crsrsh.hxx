@@ -42,6 +42,7 @@
 #include "node.hxx"
 #include "fldbas.hxx"
 #include "IDocumentMarkAccess.hxx"
+#include <optional>
 
 class SfxItemSet;
 class SfxPoolItem;
@@ -234,6 +235,10 @@ private:
     bool m_bSetCursorInReadOnly : 1;// true -> Cursor is allowed in ReadOnly-Areas
     bool m_bOverwriteCursor : 1;    // true -> show Overwrite Cursor
 
+    // true -> send accessible events when cursor changes
+    // (set to false when using internal-only helper cursor)
+    bool m_bSendAccessibleCursorEvents : 1;
+
     bool m_bMacroExecAllowed : 1;
 
     SwFrame* m_oldColFrame;
@@ -255,7 +260,7 @@ private:
                                       const int nLevel );
 
     // private method(s) accessed from public inline method(s) must be exported.
-                   bool LeftRight( bool, sal_uInt16, sal_uInt16, bool );
+                   bool LeftRight( bool, sal_uInt16, SwCursorSkipMode, bool );
     SAL_DLLPRIVATE bool UpDown( bool, sal_uInt16 );
     SAL_DLLPRIVATE bool LRMargin( bool, bool bAPI = false );
     SAL_DLLPRIVATE bool IsAtLRMargin( bool, bool bAPI = false ) const;
@@ -327,8 +332,9 @@ public:
     void ExtendedSelectAll(bool bFootnotes = true);
     /// If ExtendedSelectAll() was called and selection didn't change since then.
     bool ExtendedSelectedAll();
-    /// If document body starts with a table.
-    bool StartsWithTable();
+    enum class StartsWith { None, Table, HiddenPara };
+    /// If document body starts with a table or starts/ends with hidden paragraph.
+    StartsWith StartsWith_();
 
     SwCursor* GetCursor( bool bMakeTableCursor = true ) const;
     // return only the current cursor
@@ -339,7 +345,7 @@ public:
     void    SetSelection(const SwPaM& rCursor);
 
     // remove all cursors from ContentNodes and set to 0
-    void ParkCursor( const SwNodeIndex &rIdx );
+    void ParkCursor( const SwNode &rIdx );
 
     // return the current cursor stack
     // (required in EditShell when deleting contents)
@@ -353,9 +359,9 @@ public:
     // basic cursor travelling
     tools::Long GetUpDownX() const             { return m_nUpDownX; }
 
-    bool Left( sal_uInt16 nCnt, sal_uInt16 nMode, bool bAllowVisual = false )
+    bool Left( sal_uInt16 nCnt, SwCursorSkipMode nMode, bool bAllowVisual = false )
         { return LeftRight( true, nCnt, nMode, bAllowVisual ); }
-    bool Right( sal_uInt16 nCnt, sal_uInt16 nMode, bool bAllowVisual = false )
+    bool Right( sal_uInt16 nCnt, SwCursorSkipMode nMode, bool bAllowVisual = false )
         { return LeftRight( false, nCnt, nMode, bAllowVisual ); }
     bool Up( sal_uInt16 nCnt = 1 )      { return UpDown( true, nCnt ); }
     bool Down( sal_uInt16 nCnt = 1 )    { return UpDown( false, nCnt ); }
@@ -371,18 +377,18 @@ public:
     bool MoveRegion( SwWhichRegion, SwMoveFnCollection const & );
 
     // note: DO NOT call it FindText because windows.h
-    sal_uLong Find_Text( const i18nutil::SearchOptions2& rSearchOpt,
+    sal_Int32 Find_Text( const i18nutil::SearchOptions2& rSearchOpt,
                 bool bSearchInNotes,
                 SwDocPositions eStart, SwDocPositions eEnd,
                 bool& bCancel,
                 FindRanges eRng, bool bReplace = false );
 
-    sal_uLong FindFormat( const SwTextFormatColl& rFormatColl,
+    sal_Int32 FindFormat( const SwTextFormatColl& rFormatColl,
                 SwDocPositions eStart, SwDocPositions eEnd,
                 bool& bCancel,
                 FindRanges eRng, const SwTextFormatColl* pReplFormat );
 
-    sal_uLong FindAttrs( const SfxItemSet& rSet, bool bNoCollections,
+    sal_Int32 FindAttrs( const SfxItemSet& rSet, bool bNoCollections,
                 SwDocPositions eStart, SwDocPositions eEnd,
                 bool& bCancel,
                 FindRanges eRng,
@@ -437,7 +443,7 @@ public:
      *      stack
      *  @return <true> if there was one on the stack, <false> otherwise
      */
-    bool Pop(PopMode, ::std::unique_ptr<SwCallLink> pLink);
+    bool Pop(PopMode, ::std::optional<SwCallLink>& roLink);
     bool Pop(PopMode);
     /*
      * Combine 2 Cursors.
@@ -467,6 +473,9 @@ public:
     bool IsOverwriteCursor() const { return m_bOverwriteCursor; }
     void SetOverwriteCursor( bool bFlag ) { m_bOverwriteCursor = bFlag; }
 
+    bool IsSendAccessibleCursorEvents() const { return m_bSendAccessibleCursorEvents; };
+    void SetSendAccessibleCursorEvents(bool bEnable) { m_bSendAccessibleCursorEvents = bEnable; };
+
     // Return current frame in which the cursor is placed.
     SwContentFrame *GetCurrFrame( const bool bCalcFrame = true ) const;
 
@@ -476,7 +485,7 @@ public:
 
     // Cursor is placed in something that is protected or selection contains
     // something that is protected.
-    bool HasReadonlySel() const;
+    bool HasReadonlySel(bool isReplace = false) const;
 
     // Can the cursor be set to read only ranges?
     bool IsReadOnlyAvailable() const { return m_bSetCursorInReadOnly; }
@@ -571,8 +580,8 @@ public:
 
     bool IsFormProtected();
     ::sw::mark::IFieldmark* GetCurrentFieldmark();
-    ::sw::mark::IFieldmark* GetFieldmarkAfter();
-    ::sw::mark::IFieldmark* GetFieldmarkBefore();
+    sw::mark::IFieldmark* GetFieldmarkAfter(bool bLoop);
+    sw::mark::IFieldmark* GetFieldmarkBefore(bool bLoop);
     bool GotoFieldmark( const ::sw::mark::IFieldmark* const pMark );
 
     // update Cursr, i.e. reset it into content should only be called when the
@@ -709,12 +718,14 @@ public:
 
     bool GotoFormatContentControl(const SwFormatContentControl& rContentControl);
 
+    void GotoFormControl(bool bNext);
+
     static SwTextField* GetTextFieldAtPos(
         const SwPosition* pPos,
-        const bool bIncludeInputFieldAtStart );
+        ::sw::GetTextAttrMode eMode);
     static SwTextField* GetTextFieldAtCursor(
         const SwPaM* pCursor,
-        const bool bIncludeInputFieldAtStart );
+        ::sw::GetTextAttrMode eMode);
     static SwField* GetFieldAtCursor(
         const SwPaM* pCursor,
         const bool bIncludeInputFieldAtStart );
@@ -900,7 +911,7 @@ inline bool SwCursorShell::IsMultiSelection() const
 
 inline const SwTableNode* SwCursorShell::IsCursorInTable() const
 {
-    return m_pCurrentCursor->GetNode().FindTableNode();
+    return m_pCurrentCursor->GetPointNode().FindTableNode();
 }
 
 inline bool SwCursorShell::IsCursorPtAtEnd() const

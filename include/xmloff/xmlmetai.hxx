@@ -41,7 +41,7 @@ private:
 
 public:
     SvXMLMetaDocumentContext(SvXMLImport& rImport,
-        const css::uno::Reference< css::document::XDocumentProperties>& xDocProps);
+        css::uno::Reference< css::document::XDocumentProperties> xDocProps);
 
     virtual ~SvXMLMetaDocumentContext() override;
 
@@ -54,7 +54,7 @@ public:
 public:
     void FinishMetaElement();
 
-    static void setBuildId(const OUString & rGenerator,
+    static void setBuildId(std::u16string_view rGenerator,
         const css::uno::Reference< css::beans::XPropertySet>& xImportInfo );
 };
 

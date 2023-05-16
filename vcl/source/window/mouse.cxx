@@ -39,6 +39,7 @@
 #include <salobj.hxx>
 #include <salgdi.hxx>
 #include <salframe.hxx>
+#include <salinst.hxx>
 
 #include <dndlistenercontainer.hxx>
 #include <dndeventdispatcher.hxx>
@@ -150,7 +151,7 @@ void Window::ImplCallMouseMove( sal_uInt16 nMouseCode, bool bModChanged )
     nMode |= MouseEventModifiers::SYNTHETIC;
     if ( bModChanged )
         nMode |= MouseEventModifiers::MODIFIERCHANGED;
-    ImplHandleMouseEvent( mpWindowImpl->mpFrameWindow, MouseNotifyEvent::MOUSEMOVE, bLeave, nX, nY, nTime, nCode, nMode );
+    ImplHandleMouseEvent( mpWindowImpl->mpFrameWindow, NotifyEventType::MOUSEMOVE, bLeave, nX, nY, nTime, nCode, nMode );
 }
 
 void Window::ImplGenerateMouseMove()
@@ -350,7 +351,7 @@ void Window::ImplGrabFocus( GetFocusFlags nFlags )
     // call Get- and LoseFocus
     if ( pOldFocusWindow && ! pOldFocusWindow->isDisposed() )
     {
-        NotifyEvent aNEvt( MouseNotifyEvent::LOSEFOCUS, pOldFocusWindow );
+        NotifyEvent aNEvt( NotifyEventType::LOSEFOCUS, pOldFocusWindow );
         if ( !ImplCallPreNotify( aNEvt ) )
             pOldFocusWindow->CompatLoseFocus();
         pOldFocusWindow->ImplCallDeactivateListeners( this );
@@ -378,7 +379,7 @@ void Window::ImplGrabFocus( GetFocusFlags nFlags )
                 ! pOldFocusWindow->isDisposed() &&
                 ( pOldFocusWindow->GetDialogControlFlags() & DialogControlFlags::FloatWinPopupModeEndCancel ) )
                 mpWindowImpl->mnGetFocusFlags |= GetFocusFlags::FloatWinPopupModeEndCancel;
-            NotifyEvent aNEvt( MouseNotifyEvent::GETFOCUS, this );
+            NotifyEvent aNEvt( NotifyEventType::GETFOCUS, this );
             if ( !ImplCallPreNotify( aNEvt ) && !xWindow->isDisposed() )
                 CompatGetFocus();
             if( !xWindow->isDisposed() )
@@ -412,20 +413,20 @@ void Window::ImplGrabFocusToDocument( GetFocusFlags nFlags )
 
 void Window::MouseMove( const MouseEvent& rMEvt )
 {
-    NotifyEvent aNEvt( MouseNotifyEvent::MOUSEMOVE, this, &rMEvt );
+    NotifyEvent aNEvt( NotifyEventType::MOUSEMOVE, this, &rMEvt );
     EventNotify(aNEvt);
 }
 
 void Window::MouseButtonDown( const MouseEvent& rMEvt )
 {
-    NotifyEvent aNEvt( MouseNotifyEvent::MOUSEBUTTONDOWN, this, &rMEvt );
+    NotifyEvent aNEvt( NotifyEventType::MOUSEBUTTONDOWN, this, &rMEvt );
     if (!EventNotify(aNEvt))
         mpWindowImpl->mbMouseButtonDown = true;
 }
 
 void Window::MouseButtonUp( const MouseEvent& rMEvt )
 {
-    NotifyEvent aNEvt( MouseNotifyEvent::MOUSEBUTTONUP, this, &rMEvt );
+    NotifyEvent aNEvt( NotifyEventType::MOUSEBUTTONUP, this, &rMEvt );
     if (!EventNotify(aNEvt))
         mpWindowImpl->mbMouseButtonUp = true;
 }
@@ -492,30 +493,6 @@ void Window::SetPointer( PointerStyle nPointer )
     // possibly immediately move pointer
     if ( !mpWindowImpl->mpFrameData->mbInMouseMove && ImplTestMousePointerSet() )
         mpWindowImpl->mpFrame->SetPointer( ImplGetMousePointer() );
-
-    VclPtr<vcl::Window> pWin = GetParentWithLOKNotifier();
-    if (!pWin)
-        return;
-
-    PointerStyle aPointer = GetPointer();
-    // We don't map all possible pointers hence we need a default
-    OString aPointerString = "default";
-    auto aIt = vcl::gaLOKPointerMap.find(aPointer);
-    if (aIt != vcl::gaLOKPointerMap.end())
-    {
-        aPointerString = aIt->second;
-    }
-
-    // issue mouse pointer events only for document windows
-    // Doc windows' immediate parent SfxFrameViewWindow_Impl is the one with
-    // parent notifier set during initialization
-    if ((ImplGetFrameData()->mbDragging &&
-         ImplGetFrameData()->mpMouseDownWin == this) ||
-        (GetParent()->ImplGetWindowImpl()->mbLOKParentNotifier &&
-         GetParent()->ImplGetWindowImpl()->mnLOKWindowId == 0))
-    {
-        pWin->GetLOKNotifier()->libreOfficeKitViewCallback(LOK_CALLBACK_MOUSE_POINTER, aPointerString.getStr());
-    }
 }
 
 void Window::EnableChildPointerOverwrite( bool bOverwrite )
@@ -733,73 +710,28 @@ Reference< css::datatransfer::dnd::XDropTarget > Window::GetDropTarget()
 
 Reference< css::datatransfer::dnd::XDragSource > Window::GetDragSource()
 {
-
 #if HAVE_FEATURE_DESKTOP
-
-    if( mpWindowImpl->mpFrameData )
-    {
-        if( ! mpWindowImpl->mpFrameData->mxDragSource.is() )
-        {
-            try
-            {
-                Reference< XComponentContext > xContext( comphelper::getProcessComponentContext() );
-                const SystemEnvData * pEnvData = GetSystemData();
-
-                if( pEnvData )
-                {
-                    Sequence< Any > aDragSourceAL( 2 ), aDropTargetAL( 2 );
-                    auto pDragSourceAL = aDragSourceAL.getArray();
-                    auto pDropTargetAL = aDropTargetAL.getArray();
-                    OUString aDragSourceSN, aDropTargetSN;
-#if defined(_WIN32)
-                    aDragSourceSN = "com.sun.star.datatransfer.dnd.OleDragSource";
-                    aDropTargetSN = "com.sun.star.datatransfer.dnd.OleDropTarget";
-                    pDragSourceAL[ 1 ] <<= static_cast<sal_uInt64>( reinterpret_cast<sal_IntPtr>(pEnvData->hWnd) );
-                    pDropTargetAL[ 0 ] <<= static_cast<sal_uInt64>( reinterpret_cast<sal_IntPtr>(pEnvData->hWnd) );
-#elif defined MACOSX
-            /* FIXME: macOS specific dnd interface does not exist! *
-             * Using Windows based dnd as a temporary solution        */
-                    aDragSourceSN = "com.sun.star.datatransfer.dnd.OleDragSource";
-                    aDropTargetSN = "com.sun.star.datatransfer.dnd.OleDropTarget";
-                    pDragSourceAL[ 1 ] <<= static_cast<sal_uInt64>( reinterpret_cast<sal_IntPtr>(pEnvData->mpNSView) );
-                    pDropTargetAL[ 0 ] <<= static_cast<sal_uInt64>( reinterpret_cast<sal_IntPtr>(pEnvData->mpNSView) );
-#elif USING_X11
-                    aDragSourceSN = "com.sun.star.datatransfer.dnd.X11DragSource";
-                    aDropTargetSN = "com.sun.star.datatransfer.dnd.X11DropTarget";
-
-                    pDragSourceAL[ 0 ] <<= Application::GetDisplayConnection();
-                    pDragSourceAL[ 1 ] <<= pEnvData->aShellWindow;
-                    pDropTargetAL[ 0 ] <<= Application::GetDisplayConnection();
-                    pDropTargetAL[ 1 ] <<= pEnvData->aShellWindow;
-#else // LOKit
-                    (void)pDragSourceAL;
-                    (void)pDropTargetAL;
-#endif
-                    if( !aDragSourceSN.isEmpty() )
-                        mpWindowImpl->mpFrameData->mxDragSource.set(
-                            xContext->getServiceManager()->createInstanceWithArgumentsAndContext( aDragSourceSN, aDragSourceAL, xContext ),
-                            UNO_QUERY );
-
-                    if( !aDropTargetSN.isEmpty() )
-                        mpWindowImpl->mpFrameData->mxDropTarget.set(
-                           xContext->getServiceManager()->createInstanceWithArgumentsAndContext( aDropTargetSN, aDropTargetAL, xContext ),
-                           UNO_QUERY );
-                }
-            }
-
-            // createInstance can throw any exception
-            catch (const Exception&)
-            {
-                // release all instances
-                mpWindowImpl->mpFrameData->mxDropTarget.clear();
-                mpWindowImpl->mpFrameData->mxDragSource.clear();
-            }
-        }
-
+    const SystemEnvData* pEnvData = GetSystemData();
+    if (!mpWindowImpl->mpFrameData || !pEnvData)
+        return Reference<css::datatransfer::dnd::XDragSource>();
+    if (mpWindowImpl->mpFrameData->mxDragSource.is())
         return mpWindowImpl->mpFrameData->mxDragSource;
+
+    try
+    {
+        SalInstance* pInst = ImplGetSVData()->mpDefInst;
+        mpWindowImpl->mpFrameData->mxDragSource.set(pInst->CreateDragSource(pEnvData), UNO_QUERY);
+        mpWindowImpl->mpFrameData->mxDropTarget.set(pInst->CreateDropTarget(pEnvData), UNO_QUERY);
     }
-#endif
+    catch (const Exception&)
+    {
+        mpWindowImpl->mpFrameData->mxDropTarget.clear();
+        mpWindowImpl->mpFrameData->mxDragSource.clear();
+    }
+    return mpWindowImpl->mpFrameData->mxDragSource;
+#else
     return Reference< css::datatransfer::dnd::XDragSource > ();
+#endif
 }
 
 Reference< css::datatransfer::dnd::XDragGestureRecognizer > Window::GetDragGestureRecognizer()

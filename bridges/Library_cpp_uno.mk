@@ -15,9 +15,9 @@ ifneq ($(filter ANDROID DRAGONFLY FREEBSD LINUX NETBSD OPENBSD,$(OS)),)
 bridges_SELECTED_BRIDGE := gcc3_linux_arm
 bridge_noopt_objects := cpp2uno except uno2cpp
 # HACK
-$(call gb_LinkTarget_get_target,$(call gb_Library_get_linktarget,gcc3_uno)) : \
+$(call gb_Library_get_linktarget_target,gcc3_uno) : \
 	$(call gb_CustomTarget_get_workdir,bridges/source/cpp_uno/gcc3_linux_arm)/armhelper.objectlist
-$(call gb_LinkTarget_get_target,$(call gb_Library_get_linktarget,gcc3_uno)) : \
+$(call gb_Library_get_linktarget_target,gcc3_uno) : \
 	EXTRAOBJECTLISTS += $(call gb_CustomTarget_get_workdir,bridges/source/cpp_uno/gcc3_linux_arm)/armhelper.objectlist
 endif
 
@@ -85,6 +85,9 @@ else ifeq ($(COM),MSC)
 bridges_SELECTED_BRIDGE := msvc_win32_intel
 bridge_exception_objects := cpp2uno uno2cpp
 bridge_noopt_objects := except
+else ifeq ($(OS),EMSCRIPTEN)
+bridges_SELECTED_BRIDGE := gcc3_wasm
+bridge_noopt_objects := cpp2uno except uno2cpp
 endif
 
 else ifeq ($(CPUNAME),M68K)
@@ -94,7 +97,7 @@ bridges_SELECTED_BRIDGE := gcc3_linux_m68k
 bridge_noopt_objects := cpp2uno except uno2cpp
 endif
 
-else ifeq ($(CPUNAME),GODSON)
+else ifeq ($(CPUNAME),MIPS)
 
 ifneq ($(filter LINUX,$(OS)),)
 bridges_SELECTED_BRIDGE := gcc3_linux_mips
@@ -102,12 +105,30 @@ bridge_noopt_objects := cpp2uno uno2cpp
 bridge_exception_objects := except
 endif
 
-else ifeq ($(CPUNAME),GODSON64)
+else ifeq ($(CPUNAME),MIPS64)
 
 ifneq ($(filter LINUX,$(OS)),)
 bridges_SELECTED_BRIDGE := gcc3_linux_mips64
 bridge_asm_objects := call
 bridge_noopt_objects := cpp2uno uno2cpp
+bridge_exception_objects := except
+endif
+
+else ifeq ($(CPUNAME),LOONGARCH64)
+
+ifneq ($(filter LINUX,$(OS)),)
+bridges_SELECTED_BRIDGE := gcc3_linux_loongarch64
+bridge_asm_objects := call
+bridge_noopt_objects := abi cpp2uno uno2cpp
+bridge_exception_objects := except
+endif
+
+else ifeq ($(CPUNAME),RISCV64)
+
+ifneq ($(filter LINUX,$(OS)),)
+bridges_SELECTED_BRIDGE := gcc3_linux_riscv64
+bridge_asm_objects := call
+bridge_noopt_objects := abi cpp2uno uno2cpp
 bridge_exception_objects := except
 endif
 
@@ -288,5 +309,9 @@ $(eval $(call gb_Library_add_cxxobjects,$(CPPU_ENV)_uno,\
 			bridges/source/cpp_uno/shared/cppinterfaceproxy \
 			, $(gb_COMPILERNOOPTFLAGS) $(gb_LinkTarget_EXCEPTIONFLAGS) \
 	))
+
+ifeq ($(DISABLE_DYNLOADING),TRUE)
+$(eval $(call gb_Library_set_plugin_for_nodep,$(CPPU_ENV)_uno,cppu))
+endif
 
 # vim: set noet sw=4 ts=4:

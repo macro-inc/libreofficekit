@@ -40,6 +40,7 @@
 #include <com/sun/star/sdbc/XRow.hpp>
 #include <cppuhelper/exc_hlp.hxx>
 #include <rtl/ref.hxx>
+#include <utility>
 
 #include "pq_xcolumns.hxx"
 #include "pq_xkeycolumns.hxx"
@@ -52,7 +53,6 @@ using osl::MutexGuard;
 using com::sun::star::beans::XPropertySet;
 
 using com::sun::star::uno::Any;
-using com::sun::star::uno::makeAny;
 using com::sun::star::uno::UNO_QUERY;
 using com::sun::star::uno::Reference;
 using com::sun::star::uno::Sequence;
@@ -69,13 +69,13 @@ KeyColumns::KeyColumns(
         const ::rtl::Reference< comphelper::RefCountedMutex > & refMutex,
         const css::uno::Reference< css::sdbc::XConnection >  & origin,
         ConnectionSettings *pSettings,
-        const OUString &schemaName,
-        const OUString &tableName,
+        OUString schemaName,
+        OUString tableName,
         const Sequence< OUString > &columnNames,
         const Sequence< OUString > &foreignColumnNames )
     : Container( refMutex, origin, pSettings,  "KEY_COLUMN" ),
-      m_schemaName( schemaName ),
-      m_tableName( tableName ),
+      m_schemaName(std::move( schemaName )),
+      m_tableName(std::move( tableName )),
       m_columnNames( columnNames ),
       m_foreignColumnNames( foreignColumnNames )
 {}
@@ -126,11 +126,11 @@ void KeyColumns::refresh()
             if( keyindex < m_foreignColumnNames.getLength() )
             {
                 pKeyColumn->setPropertyValue_NoBroadcast_public(
-                    st.RELATED_COLUMN, makeAny( m_foreignColumnNames[keyindex]) );
+                    st.RELATED_COLUMN, Any( m_foreignColumnNames[keyindex]) );
             }
 
             {
-                m_values.push_back( makeAny( prop ) );
+                m_values.push_back( Any( prop ) );
                 map[ name ] = columnIndex;
                 ++columnIndex;
             }

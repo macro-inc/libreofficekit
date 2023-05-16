@@ -58,7 +58,8 @@
 #include <filter/msfilter/escherex.hxx>
 #include <osl/diagnose.h>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <algorithm>
 
@@ -137,7 +138,7 @@ static void ImplTranslateAttribute( OUString& rString, const TranslateMode eTran
     }
 }
 
-sal_uInt32 AnimationExporter::TranslatePresetSubType( const sal_uInt32 nPresetClass, const sal_uInt32 nPresetId, const OUString& rPresetSubType )
+sal_uInt32 AnimationExporter::TranslatePresetSubType( const sal_uInt32 nPresetClass, const sal_uInt32 nPresetId, std::u16string_view rPresetSubType )
 {
     sal_uInt32  nPresetSubType = 0;
     bool    bTranslated = false;
@@ -150,12 +151,12 @@ sal_uInt32 AnimationExporter::TranslatePresetSubType( const sal_uInt32 nPresetCl
             {
                 case 5 :
                 {
-                    if ( rPresetSubType == "downward" )
+                    if ( rPresetSubType == u"downward" )
                     {
                         nPresetSubType = 5;
                         bTranslated = true;
                     }
-                    else if ( rPresetSubType == "across" )
+                    else if ( rPresetSubType == u"across" )
                     {
                         nPresetSubType = 10;
                         bTranslated = true;
@@ -164,7 +165,7 @@ sal_uInt32 AnimationExporter::TranslatePresetSubType( const sal_uInt32 nPresetCl
                 break;
                 case 17 :
                 {
-                    if ( rPresetSubType == "across" )
+                    if ( rPresetSubType == u"across" )
                     {
                         nPresetSubType = 10;
                         bTranslated = true;
@@ -173,22 +174,22 @@ sal_uInt32 AnimationExporter::TranslatePresetSubType( const sal_uInt32 nPresetCl
                 break;
                 case 18 :
                 {
-                    if ( rPresetSubType == "right-to-top" )
+                    if ( rPresetSubType == u"right-to-top" )
                     {
                         nPresetSubType = 3;
                         bTranslated = true;
                     }
-                    else if ( rPresetSubType == "right-to-bottom" )
+                    else if ( rPresetSubType == u"right-to-bottom" )
                     {
                         nPresetSubType = 6;
                         bTranslated = true;
                     }
-                    else if ( rPresetSubType == "left-to-top" )
+                    else if ( rPresetSubType == u"left-to-top" )
                     {
                         nPresetSubType = 9;
                         bTranslated = true;
                     }
-                    else if ( rPresetSubType == "left-to-bottom" )
+                    else if ( rPresetSubType == u"left-to-bottom" )
                     {
                         nPresetSubType = 12;
                         bTranslated = true;
@@ -202,7 +203,7 @@ sal_uInt32 AnimationExporter::TranslatePresetSubType( const sal_uInt32 nPresetCl
             const oox::ppt::convert_subtype* p = oox::ppt::convert_subtype::getList();
             while( p->mpStrSubType )
             {
-                if ( rPresetSubType.equalsAscii( p->mpStrSubType ) )
+                if ( o3tl::equalsAscii( rPresetSubType, p->mpStrSubType ) )
                 {
                     nPresetSubType = p->mnID;
                     bTranslated = true;
@@ -213,7 +214,7 @@ sal_uInt32 AnimationExporter::TranslatePresetSubType( const sal_uInt32 nPresetCl
         }
     }
     if ( !bTranslated )
-        nPresetSubType = rPresetSubType.toUInt32();
+        nPresetSubType = o3tl::toUInt32(rPresetSubType);
     return nPresetSubType;
 }
 
@@ -880,25 +881,25 @@ void AnimationExporter::GetUserData( const Sequence< NamedValue >& rUserData, co
     }
 }
 
-sal_uInt32 AnimationExporter::GetPresetID( const OUString& rPreset, sal_uInt32 nAPIPresetClass, bool& bPresetId )
+sal_uInt32 AnimationExporter::GetPresetID( std::u16string_view aPreset, sal_uInt32 nAPIPresetClass, bool& bPresetId )
 {
     sal_uInt32 nPresetId = 0;
     bPresetId = false;
 
-    if ( rPreset.match("ppt_", 0) )
+    if ( o3tl::starts_with(aPreset, u"ppt_") )
     {
-        sal_Int32 nLast = rPreset.lastIndexOf( '_' );
-        if ( ( nLast != -1 ) && ( ( nLast + 1 ) < rPreset.getLength() ) )
+        size_t nLast = aPreset.rfind( '_' );
+        if ( ( nLast != std::u16string_view::npos ) && ( ( nLast + 1 ) < aPreset.size() ) )
         {
-            OUString aNumber( rPreset.copy( nLast + 1 ) );
-            nPresetId = aNumber.toUInt32();
+            std::u16string_view aNumber( aPreset.substr( nLast + 1 ) );
+            nPresetId = o3tl::toUInt32(aNumber);
             bPresetId = true;
         }
     }
     else
     {
         const oox::ppt::preset_mapping* p = oox::ppt::preset_mapping::getList();
-        while( p->mpStrPresetId && ((p->mnPresetClass != static_cast<sal_Int32>(nAPIPresetClass)) || !rPreset.equalsAscii( p->mpStrPresetId )) )
+        while( p->mpStrPresetId && ((p->mnPresetClass != static_cast<sal_Int32>(nAPIPresetClass)) || !o3tl::equalsAscii(aPreset, p->mpStrPresetId )) )
             p++;
 
         if( p->mpStrPresetId )
@@ -1185,11 +1186,10 @@ void AnimationExporter::exportAnimPropertyByte( SvStream& rStrm, const sal_uInt1
          .WriteUChar( nVal );
 }
 
-void AnimationExporter::writeZString( SvStream& rStrm, const OUString& rVal )
+void AnimationExporter::writeZString( SvStream& rStrm, std::u16string_view aVal )
 {
-    sal_Int32 i;
-    for ( i = 0; i < rVal.getLength(); i++ )
-        rStrm.WriteUInt16( rVal[ i ] );
+    for ( size_t i = 0; i < aVal.size(); i++ )
+        rStrm.WriteUInt16( aVal[ i ] );
     rStrm.WriteUInt16( 0 );
 }
 

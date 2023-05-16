@@ -23,6 +23,7 @@
 #include "iodlg.hxx"
 #include "RemoteFilesDialog.hxx"
 
+#include <utility>
 #include <vector>
 #include <algorithm>
 #include <sal/log.hxx>
@@ -56,13 +57,13 @@ protected:
     UnoFilterList       m_aSubFilters;
 
 public:
-    FilterEntry( const OUString& _rTitle, const OUString& _rFilter )
-        :m_sTitle( _rTitle )
-        ,m_sFilter( _rFilter )
+    FilterEntry( OUString _aTitle, OUString _aFilter )
+        :m_sTitle(std::move( _aTitle ))
+        ,m_sFilter(std::move( _aFilter ))
     {
     }
 
-    FilterEntry( const OUString& _rTitle, const UnoFilterList& _rSubFilters );
+    FilterEntry( OUString _aTitle, const UnoFilterList& _rSubFilters );
 
     const OUString& getTitle() const { return m_sTitle; }
     const OUString& getFilter() const { return m_sFilter; }
@@ -80,8 +81,8 @@ public:
 };
 
 
-FilterEntry::FilterEntry( const OUString& _rTitle, const UnoFilterList& _rSubFilters )
-    :m_sTitle( _rTitle )
+FilterEntry::FilterEntry( OUString _aTitle, const UnoFilterList& _rSubFilters )
+    :m_sTitle(std::move( _aTitle ))
     ,m_aSubFilters( _rSubFilters )
 {
 }
@@ -424,7 +425,7 @@ sal_Int16 SvtFilePicker::implExecutePicker( )
     // now we are ready to execute the dialog
     sal_Int16 nRet = m_xDlg->run();
 
-    // the execution of the dialog yields, so it is possible the at this point the window or the dialog is closed
+    // coverity[check_after_deref] - the execution of the dialog yields, so it is possible the at this point the window or the dialog is closed
     if (m_xDlg)
         m_xDlg->SetFileCallback( nullptr );
 
@@ -463,7 +464,15 @@ IMPLEMENT_FORWARD_XINTERFACE3( SvtRemoteFilePicker, SvtFilePicker, OCommonPicker
 
 // disambiguate XTypeProvider
 
-IMPLEMENT_FORWARD_XTYPEPROVIDER3( SvtRemoteFilePicker, SvtFilePicker, OCommonPicker, SvtFilePicker_Base )
+css::uno::Sequence< css::uno::Type > SAL_CALL SvtRemoteFilePicker::getTypes(  )
+{
+    return ::comphelper::concatSequences(
+        SvtFilePicker::getTypes(),
+        OCommonPicker::getTypes(),
+        SvtFilePicker_Base::getTypes()
+    );
+}
+IMPLEMENT_GET_IMPLEMENTATION_ID( SvtRemoteFilePicker )
 
 
 // XExecutableDialog functions

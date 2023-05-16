@@ -18,6 +18,7 @@
  */
 
 #include <drawinglayer/primitive2d/metafileprimitive2d.hxx>
+#include <utility>
 #include <wmfemfhelper.hxx>
 
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
@@ -69,8 +70,8 @@ namespace drawinglayer::primitive2d
 
                 aAdaptedTransform.translate(-aMtfTarget.Left(), -aMtfTarget.Top());
                 aAdaptedTransform.scale(
-                    aMtfTarget.getWidth() ? 1.0 / aMtfTarget.getWidth() : 1.0,
-                    aMtfTarget.getHeight() ? 1.0 / aMtfTarget.getHeight() : 1.0);
+                    aMtfTarget.getOpenWidth() ? 1.0 / aMtfTarget.getOpenWidth() : 1.0,
+                    aMtfTarget.getOpenHeight() ? 1.0 / aMtfTarget.getOpenHeight() : 1.0);
                 aAdaptedTransform = getTransform() * aAdaptedTransform;
 
                 // embed to target transformation
@@ -82,13 +83,13 @@ namespace drawinglayer::primitive2d
                 xRetval = Primitive2DContainer { aEmbeddedTransform };
             }
 
-            rContainer.insert(rContainer.end(), xRetval.begin(), xRetval.end());
+            rContainer.append(std::move(xRetval));
         }
 
         MetafilePrimitive2D::MetafilePrimitive2D(
-            const basegfx::B2DHomMatrix& rMetaFileTransform,
+            basegfx::B2DHomMatrix aMetaFileTransform,
             const GDIMetaFile& rMetaFile)
-        :   maMetaFileTransform(rMetaFileTransform),
+        :   maMetaFileTransform(std::move(aMetaFileTransform)),
             maMetaFile(rMetaFile)
         {
         }

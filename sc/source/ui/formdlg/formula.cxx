@@ -23,7 +23,6 @@
 #include <sfx2/docfile.hxx>
 #include <sfx2/objsh.hxx>
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <svl/stritem.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <tools/urlobj.hxx>
@@ -90,7 +89,7 @@ ScFormulaDlg::ScFormulaDlg(SfxBindings* pB, SfxChildWindow* pCW,
     m_xParser.set(ScServiceProvider::MakeInstance(ScServiceProvider::Type::FORMULAPARS,
                                                   static_cast<ScDocShell*>(m_pDoc->GetDocumentShell())),uno::UNO_QUERY);
     uno::Reference< beans::XPropertySet> xSet(m_xParser,uno::UNO_QUERY);
-    xSet->setPropertyValue(SC_UNO_COMPILEFAP, uno::makeAny(true));
+    xSet->setPropertyValue(SC_UNO_COMPILEFAP, uno::Any(true));
 
     m_xOpCodeMapper.set(ScServiceProvider::MakeInstance(ScServiceProvider::Type::OPCODEMAPPER,
                                                         static_cast<ScDocShell*>(m_pDoc->GetDocumentShell())),uno::UNO_QUERY);

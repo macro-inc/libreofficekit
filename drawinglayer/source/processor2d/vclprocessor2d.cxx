@@ -25,7 +25,11 @@
 #include <comphelper/string.hxx>
 #include <svtools/optionsdrawinglayer.hxx>
 #include <tools/debug.hxx>
+#include <tools/fract.hxx>
+#include <utility>
+#include <vcl/glyphitemcache.hxx>
 #include <vcl/graph.hxx>
+#include <vcl/kernarray.hxx>
 #include <vcl/outdev.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
@@ -38,9 +42,10 @@
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
 #include <drawinglayer/primitive2d/textprimitive2d.hxx>
 #include <drawinglayer/primitive2d/textdecoratedprimitive2d.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <drawinglayer/primitive2d/bitmapprimitive2d.hxx>
 #include <drawinglayer/primitive2d/fillgraphicprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonGraphicPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/maskprimitive2d.hxx>
 #include <drawinglayer/primitive2d/modifiedcolorprimitive2d.hxx>
@@ -89,6 +94,29 @@ sal_uInt32 calculateStepsForSvgGradient(const basegfx::BColor& rColorA,
 }
 }
 
+namespace
+{
+/** helper to convert a MapMode to a transformation */
+basegfx::B2DHomMatrix getTransformFromMapMode(const MapMode& rMapMode)
+{
+    basegfx::B2DHomMatrix aMapping;
+    const Fraction aNoScale(1, 1);
+    const Point& rOrigin(rMapMode.GetOrigin());
+
+    if (0 != rOrigin.X() || 0 != rOrigin.Y())
+    {
+        aMapping.translate(rOrigin.X(), rOrigin.Y());
+    }
+
+    if (rMapMode.GetScaleX() != aNoScale || rMapMode.GetScaleY() != aNoScale)
+    {
+        aMapping.scale(double(rMapMode.GetScaleX()), double(rMapMode.GetScaleY()));
+    }
+
+    return aMapping;
+}
+}
+
 namespace drawinglayer::processor2d
 {
 // rendering support
@@ -106,6 +134,7 @@ void VclProcessor2D::RenderTextSimpleOrDecoratedPortionPrimitive2D(
     basegfx::B2DVector aFontScaling, aTranslate;
     double fRotate, fShearX;
     aLocalTransform.decompose(aFontScaling, aTranslate, fRotate, fShearX);
+
     bool bPrimitiveAccepted(false);
 
     // tdf#95581: Assume tiny shears are rounding artefacts or whatever and can be ignored,
@@ -125,10 +154,30 @@ void VclProcessor2D::RenderTextSimpleOrDecoratedPortionPrimitive2D(
         if (basegfx::fTools::more(aFontScaling.getX(), 0.0)
             && basegfx::fTools::more(aFontScaling.getY(), 0.0))
         {
-            // Get the VCL font (use FontHeight as FontWidth)
-            vcl::Font aFont(primitive2d::getVclFontFromFontAttribute(
-                rTextCandidate.getFontAttribute(), aFontScaling.getX(), aFontScaling.getY(),
-                fRotate, rTextCandidate.getLocale()));
+            double fIgnoreRotate, fIgnoreShearX;
+
+            basegfx::B2DVector aFontSize, aTextTranslate;
+            rTextCandidate.getTextTransform().decompose(aFontSize, aTextTranslate, fIgnoreRotate,
+                                                        fIgnoreShearX);
+
+            // tdf#153092 Ideally we don't have to scale the font and dxarray, but we might have
+            // to nevertheless if dealing with non integer sizes
+            const bool bScaleFont(aFontSize.getY() != std::round(aFontSize.getY()));
+            vcl::Font aFont;
+
+            // Get the VCL font
+            if (!bScaleFont)
+            {
+                aFont = primitive2d::getVclFontFromFontAttribute(
+                    rTextCandidate.getFontAttribute(), aFontSize.getX(), aFontSize.getY(), fRotate,
+                    rTextCandidate.getLocale());
+            }
+            else
+            {
+                aFont = primitive2d::getVclFontFromFontAttribute(
+                    rTextCandidate.getFontAttribute(), aFontScaling.getX(), aFontScaling.getY(),
+                    fRotate, rTextCandidate.getLocale());
+            }
 
             // Don't draw fonts without height
             if (aFont.GetFontHeight() <= 0)
@@ -247,27 +296,27 @@ void VclProcessor2D::RenderTextSimpleOrDecoratedPortionPrimitive2D(
                     aFont.SetShadow(true);
             }
 
-            // create transformed integer DXArray in view coordinate system
-            std::vector<sal_Int32> aTransformedDXArray;
+            // create integer DXArray
+            KernArray aDXArray;
 
             if (!rTextCandidate.getDXArray().empty())
             {
-                aTransformedDXArray.reserve(rTextCandidate.getDXArray().size());
-                const basegfx::B2DVector aPixelVector(maCurrentTransformation
-                                                      * basegfx::B2DVector(1.0, 0.0));
-                const double fPixelVectorFactor(aPixelVector.getLength());
-
-                for (auto const& elem : rTextCandidate.getDXArray())
+                double fPixelVectorFactor(1.0);
+                if (bScaleFont)
                 {
-                    aTransformedDXArray.push_back(basegfx::fround(elem * fPixelVectorFactor));
+                    const basegfx::B2DVector aPixelVector(maCurrentTransformation
+                                                          * basegfx::B2DVector(1.0, 0.0));
+                    fPixelVectorFactor = aPixelVector.getLength();
                 }
+
+                aDXArray.reserve(rTextCandidate.getDXArray().size());
+                for (auto const& elem : rTextCandidate.getDXArray())
+                    aDXArray.push_back(basegfx::fround(elem * fPixelVectorFactor));
             }
 
             // set parameters and paint text snippet
             const basegfx::BColor aRGBFontColor(
                 maBColorModifierStack.getModifiedColor(rTextCandidate.getFontColor()));
-            const basegfx::B2DPoint aPoint(aLocalTransform * basegfx::B2DPoint(0.0, 0.0));
-            const Point aStartPoint(basegfx::fround(aPoint.getX()), basegfx::fround(aPoint.getY()));
             const vcl::text::ComplexTextLayoutFlags nOldLayoutMode(mpOutputDevice->GetLayoutMode());
 
             if (rTextCandidate.getFontAttribute().getRTL())
@@ -279,47 +328,87 @@ void VclProcessor2D::RenderTextSimpleOrDecoratedPortionPrimitive2D(
                 mpOutputDevice->SetLayoutMode(nRTLLayoutMode);
             }
 
-            mpOutputDevice->SetFont(aFont);
             mpOutputDevice->SetTextColor(Color(aRGBFontColor));
 
             OUString aText(rTextCandidate.getText());
             sal_Int32 nPos = rTextCandidate.getTextPosition();
             sal_Int32 nLen = rTextCandidate.getTextLength();
 
+            // this contraption is used in editeng, with format paragraph used to
+            // set a tab with a tab-fill character
             if (rTextCandidate.isFilled())
             {
-                basegfx::B2DVector aOldFontScaling, aOldTranslate;
-                double fOldRotate, fOldShearX;
-                rTextCandidate.getTextTransform().decompose(aOldFontScaling, aOldTranslate,
-                                                            fOldRotate, fOldShearX);
+                tools::Long nWidthToFill = rTextCandidate.getWidthToFill();
 
-                tools::Long nWidthToFill = static_cast<tools::Long>(
-                    rTextCandidate.getWidthToFill() * aFontScaling.getX() / aOldFontScaling.getX());
-
-                tools::Long nWidth = mpOutputDevice->GetTextArray(rTextCandidate.getText(),
-                                                                  &aTransformedDXArray, 0, 1);
-                tools::Long nChars = 2;
+                tools::Long nWidth
+                    = mpOutputDevice->GetTextArray(rTextCandidate.getText(), &aDXArray, 0, 1);
+                sal_Int32 nChars = 2;
                 if (nWidth)
                     nChars = nWidthToFill / nWidth;
 
-                OUStringBuffer aFilled;
+                OUStringBuffer aFilled(nChars);
                 comphelper::string::padToLength(aFilled, nChars, aText[0]);
                 aText = aFilled.makeStringAndClear();
                 nPos = 0;
                 nLen = nChars;
 
-                if (!aTransformedDXArray.empty())
+                if (!aDXArray.empty())
                 {
-                    sal_Int32 nDX = aTransformedDXArray[0];
-                    aTransformedDXArray.resize(nLen);
+                    sal_Int32 nDX = aDXArray[0];
+                    aDXArray.resize(nLen);
                     for (sal_Int32 i = 1; i < nLen; ++i)
-                        aTransformedDXArray[i] = aTransformedDXArray[i - 1] + nDX;
+                        aDXArray.set(i, aDXArray[i - 1] + nDX);
                 }
             }
 
-            if (!aTransformedDXArray.empty())
+            Point aStartPoint;
+            bool bChangeMapMode(false);
+            if (!bScaleFont)
             {
-                mpOutputDevice->DrawTextArray(aStartPoint, aText, aTransformedDXArray, nPos, nLen);
+                basegfx::B2DHomMatrix aCombinedTransform(
+                    getTransformFromMapMode(mpOutputDevice->GetMapMode())
+                    * maCurrentTransformation);
+
+                basegfx::B2DVector aCurrentScaling, aCurrentTranslate;
+                double fCurrentRotate;
+                aCombinedTransform.decompose(aCurrentScaling, aCurrentTranslate, fCurrentRotate,
+                                             fIgnoreShearX);
+
+                const Point aOrigin(
+                    basegfx::fround(aCurrentTranslate.getX() / aCurrentScaling.getX()),
+                    basegfx::fround(aCurrentTranslate.getY() / aCurrentScaling.getY()));
+                MapMode aMapMode(mpOutputDevice->GetMapMode().GetMapUnit(), aOrigin,
+                                 Fraction(aCurrentScaling.getX()),
+                                 Fraction(aCurrentScaling.getY()));
+
+                if (fCurrentRotate)
+                    aTextTranslate *= basegfx::utils::createRotateB2DHomMatrix(fCurrentRotate);
+                aStartPoint = Point(aTextTranslate.getX(), aTextTranslate.getY());
+
+                bChangeMapMode = aMapMode != mpOutputDevice->GetMapMode();
+                if (bChangeMapMode)
+                {
+                    mpOutputDevice->Push(vcl::PushFlags::MAPMODE);
+                    mpOutputDevice->SetRelativeMapMode(aMapMode);
+                }
+            }
+            else
+            {
+                const basegfx::B2DPoint aPoint(aLocalTransform * basegfx::B2DPoint(0.0, 0.0));
+                aStartPoint = Point(basegfx::fround(aPoint.getX()), basegfx::fround(aPoint.getY()));
+            }
+
+            // tdf#152990 set the font after the MapMode is (potentially) set so canvas uses the desired
+            // font size
+            mpOutputDevice->SetFont(aFont);
+
+            if (!aDXArray.empty())
+            {
+                const SalLayoutGlyphs* pGlyphs = SalLayoutGlyphsCache::self()->GetLayoutGlyphs(
+                    mpOutputDevice, aText, nPos, nLen);
+                mpOutputDevice->DrawTextArray(aStartPoint, aText, aDXArray,
+                                              rTextCandidate.getKashidaArray(), nPos, nLen,
+                                              SalLayoutFlags::NONE, pGlyphs);
             }
             else
             {
@@ -330,6 +419,9 @@ void VclProcessor2D::RenderTextSimpleOrDecoratedPortionPrimitive2D(
             {
                 mpOutputDevice->SetLayoutMode(nOldLayoutMode);
             }
+
+            if (bChangeMapMode)
+                mpOutputDevice->Pop();
 
             bPrimitiveAccepted = true;
         }
@@ -354,8 +446,7 @@ void VclProcessor2D::RenderPolygonHairlinePrimitive2D(
     basegfx::B2DPolygon aLocalPolygon(rPolygonCandidate.getB2DPolygon());
     aLocalPolygon.transform(maCurrentTransformation);
 
-    if (bPixelBased && SvtOptionsDrawinglayer::IsAntiAliasing()
-        && SvtOptionsDrawinglayer::IsSnapHorVerLinesToDiscrete())
+    if (bPixelBased && getViewInformation2D().getPixelSnapHairline())
     {
         // #i98289#
         // when a Hairline is painted and AntiAliasing is on the option SnapHorVerLinesToDiscrete
@@ -371,7 +462,7 @@ void VclProcessor2D::RenderPolygonHairlinePrimitive2D(
 // direct draw of transformed BitmapEx primitive
 void VclProcessor2D::RenderBitmapPrimitive2D(const primitive2d::BitmapPrimitive2D& rBitmapCandidate)
 {
-    BitmapEx aBitmapEx(VCLUnoHelper::GetBitmap(rBitmapCandidate.getXBitmap()));
+    BitmapEx aBitmapEx(rBitmapCandidate.getBitmap());
     const basegfx::B2DHomMatrix aLocalTransform(maCurrentTransformation
                                                 * rBitmapCandidate.getTransform());
 
@@ -405,243 +496,224 @@ void VclProcessor2D::RenderBitmapPrimitive2D(const primitive2d::BitmapPrimitive2
 void VclProcessor2D::RenderFillGraphicPrimitive2D(
     const primitive2d::FillGraphicPrimitive2D& rFillBitmapCandidate)
 {
-    const attribute::FillGraphicAttribute& rFillGraphicAttribute(
-        rFillBitmapCandidate.getFillGraphic());
-    bool bPrimitiveAccepted(false);
-
-    // #121194# when tiling is used and content is bitmap-based, do direct tiling in the
-    // renderer on pixel base to ensure tight fitting. Do not do this when
-    // the fill is rotated or sheared.
-    if (rFillGraphicAttribute.getTiling())
-    {
-        // content is bitmap(ex)
-        //
-        // for Vector Graphic Data (SVG, EMF+) support, force decomposition when present. This will lead to use
-        // the primitive representation of the vector data directly.
-        //
-        // when graphic is animated, force decomposition to use the correct graphic, else
-        // fill style will not be animated
-        if (GraphicType::Bitmap == rFillGraphicAttribute.getGraphic().GetType()
-            && !rFillGraphicAttribute.getGraphic().getVectorGraphicData()
-            && !rFillGraphicAttribute.getGraphic().IsAnimated())
-        {
-            // decompose matrix to check for shear, rotate and mirroring
-            basegfx::B2DHomMatrix aLocalTransform(maCurrentTransformation
-                                                  * rFillBitmapCandidate.getTransformation());
-            basegfx::B2DVector aScale, aTranslate;
-            double fRotate, fShearX;
-            aLocalTransform.decompose(aScale, aTranslate, fRotate, fShearX);
-
-            // when nopt rotated/sheared
-            if (basegfx::fTools::equalZero(fRotate) && basegfx::fTools::equalZero(fShearX))
-            {
-                // no shear or rotate, draw direct in pixel coordinates
-                bPrimitiveAccepted = true;
-
-                // transform object range to device coordinates (pixels). Use
-                // the device transformation for better accuracy
-                basegfx::B2DRange aObjectRange(aTranslate, aTranslate + aScale);
-                aObjectRange.transform(mpOutputDevice->GetViewTransformation());
-
-                // extract discrete size of object
-                const sal_Int32 nOWidth(basegfx::fround(aObjectRange.getWidth()));
-                const sal_Int32 nOHeight(basegfx::fround(aObjectRange.getHeight()));
-
-                // only do something when object has a size in discrete units
-                if (nOWidth > 0 && nOHeight > 0)
-                {
-                    // transform graphic range to device coordinates (pixels). Use
-                    // the device transformation for better accuracy
-                    basegfx::B2DRange aGraphicRange(rFillGraphicAttribute.getGraphicRange());
-                    aGraphicRange.transform(mpOutputDevice->GetViewTransformation()
-                                            * aLocalTransform);
-
-                    // extract discrete size of graphic
-                    // caution: when getting to zero, nothing would be painted; thus, do not allow this
-                    const sal_Int32 nBWidth(
-                        std::max(sal_Int32(1), basegfx::fround(aGraphicRange.getWidth())));
-                    const sal_Int32 nBHeight(
-                        std::max(sal_Int32(1), basegfx::fround(aGraphicRange.getHeight())));
-
-                    // only do something when bitmap fill has a size in discrete units
-                    if (nBWidth > 0 && nBHeight > 0)
-                    {
-                        // nBWidth, nBHeight is the pixel size of the needed bitmap. To not need to scale it
-                        // in vcl many times, create a size-optimized version
-                        const Size aNeededBitmapSizePixel(nBWidth, nBHeight);
-                        BitmapEx aBitmapEx(rFillGraphicAttribute.getGraphic().GetBitmapEx());
-                        const bool bPreScaled(nBWidth * nBHeight < (250 * 250));
-
-                        // ... but only up to a maximum size, else it gets too expensive
-                        if (bPreScaled)
-                        {
-                            // if color depth is below 24bit, expand before scaling for better quality.
-                            // This is even needed for low colors, else the scale will produce
-                            // a bitmap in gray or Black/White (!)
-                            if (isPalettePixelFormat(aBitmapEx.getPixelFormat()))
-                            {
-                                aBitmapEx.Convert(BmpConversion::N24Bit);
-                            }
-
-                            aBitmapEx.Scale(aNeededBitmapSizePixel, BmpScaleFlag::Interpolate);
-                        }
-
-                        bool bPainted(false);
-
-                        if (maBColorModifierStack.count())
-                        {
-                            // when color modifier, apply to bitmap
-                            aBitmapEx = aBitmapEx.ModifyBitmapEx(maBColorModifierStack);
-
-                            // impModifyBitmapEx uses empty bitmap as sign to return that
-                            // the content will be completely replaced to mono color, use shortcut
-                            if (aBitmapEx.IsEmpty())
-                            {
-                                // color gets completely replaced, get it
-                                const basegfx::BColor aModifiedColor(
-                                    maBColorModifierStack.getModifiedColor(basegfx::BColor()));
-                                basegfx::B2DPolygon aPolygon(basegfx::utils::createUnitPolygon());
-                                aPolygon.transform(aLocalTransform);
-
-                                mpOutputDevice->SetFillColor(Color(aModifiedColor));
-                                mpOutputDevice->SetLineColor();
-                                mpOutputDevice->DrawPolygon(aPolygon);
-
-                                bPainted = true;
-                            }
-                        }
-
-                        if (!bPainted)
-                        {
-                            sal_Int32 nBLeft(basegfx::fround(aGraphicRange.getMinX()));
-                            sal_Int32 nBTop(basegfx::fround(aGraphicRange.getMinY()));
-                            const sal_Int32 nOLeft(basegfx::fround(aObjectRange.getMinX()));
-                            const sal_Int32 nOTop(basegfx::fround(aObjectRange.getMinY()));
-                            sal_Int32 nPosX(0);
-                            sal_Int32 nPosY(0);
-
-                            if (nBLeft > nOLeft)
-                            {
-                                const sal_Int32 nDiff((nBLeft / nBWidth) + 1);
-
-                                nPosX -= nDiff;
-                                nBLeft -= nDiff * nBWidth;
-                            }
-
-                            if (nBLeft + nBWidth <= nOLeft)
-                            {
-                                const sal_Int32 nDiff(-nBLeft / nBWidth);
-
-                                nPosX += nDiff;
-                                nBLeft += nDiff * nBWidth;
-                            }
-
-                            if (nBTop > nOTop)
-                            {
-                                const sal_Int32 nDiff((nBTop / nBHeight) + 1);
-
-                                nPosY -= nDiff;
-                                nBTop -= nDiff * nBHeight;
-                            }
-
-                            if (nBTop + nBHeight <= nOTop)
-                            {
-                                const sal_Int32 nDiff(-nBTop / nBHeight);
-
-                                nPosY += nDiff;
-                                nBTop += nDiff * nBHeight;
-                            }
-
-                            // prepare OutDev
-                            const Point aEmptyPoint(0, 0);
-                            const ::tools::Rectangle aVisiblePixel(
-                                aEmptyPoint, mpOutputDevice->GetOutputSizePixel());
-                            const bool bWasEnabled(mpOutputDevice->IsMapModeEnabled());
-                            mpOutputDevice->EnableMapMode(false);
-
-                            // check if offset is used
-                            const sal_Int32 nOffsetX(
-                                basegfx::fround(rFillGraphicAttribute.getOffsetX() * nBWidth));
-
-                            if (nOffsetX)
-                            {
-                                // offset in X, so iterate over Y first and draw lines
-                                for (sal_Int32 nYPos(nBTop); nYPos < nOTop + nOHeight;
-                                     nYPos += nBHeight, nPosY++)
-                                {
-                                    for (sal_Int32 nXPos((nPosY % 2) ? nBLeft - nBWidth + nOffsetX
-                                                                     : nBLeft);
-                                         nXPos < nOLeft + nOWidth; nXPos += nBWidth)
-                                    {
-                                        const ::tools::Rectangle aOutRectPixel(
-                                            Point(nXPos, nYPos), aNeededBitmapSizePixel);
-
-                                        if (aOutRectPixel.Overlaps(aVisiblePixel))
-                                        {
-                                            if (bPreScaled)
-                                            {
-                                                mpOutputDevice->DrawBitmapEx(
-                                                    aOutRectPixel.TopLeft(), aBitmapEx);
-                                            }
-                                            else
-                                            {
-                                                mpOutputDevice->DrawBitmapEx(
-                                                    aOutRectPixel.TopLeft(), aNeededBitmapSizePixel,
-                                                    aBitmapEx);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                // check if offset is used
-                                const sal_Int32 nOffsetY(
-                                    basegfx::fround(rFillGraphicAttribute.getOffsetY() * nBHeight));
-
-                                // possible offset in Y, so iterate over X first and draw columns
-                                for (sal_Int32 nXPos(nBLeft); nXPos < nOLeft + nOWidth;
-                                     nXPos += nBWidth, nPosX++)
-                                {
-                                    for (sal_Int32 nYPos((nPosX % 2) ? nBTop - nBHeight + nOffsetY
-                                                                     : nBTop);
-                                         nYPos < nOTop + nOHeight; nYPos += nBHeight)
-                                    {
-                                        const ::tools::Rectangle aOutRectPixel(
-                                            Point(nXPos, nYPos), aNeededBitmapSizePixel);
-
-                                        if (aOutRectPixel.Overlaps(aVisiblePixel))
-                                        {
-                                            if (bPreScaled)
-                                            {
-                                                mpOutputDevice->DrawBitmapEx(
-                                                    aOutRectPixel.TopLeft(), aBitmapEx);
-                                            }
-                                            else
-                                            {
-                                                mpOutputDevice->DrawBitmapEx(
-                                                    aOutRectPixel.TopLeft(), aNeededBitmapSizePixel,
-                                                    aBitmapEx);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // restore OutDev
-                            mpOutputDevice->EnableMapMode(bWasEnabled);
-                        }
-                    }
-                }
-            }
-        }
-    }
+    bool bPrimitiveAccepted = RenderFillGraphicPrimitive2DImpl(rFillBitmapCandidate);
 
     if (!bPrimitiveAccepted)
     {
         // do not accept, use decomposition
         process(rFillBitmapCandidate);
     }
+}
+
+bool VclProcessor2D::RenderFillGraphicPrimitive2DImpl(
+    const primitive2d::FillGraphicPrimitive2D& rFillBitmapCandidate)
+{
+    const attribute::FillGraphicAttribute& rFillGraphicAttribute(
+        rFillBitmapCandidate.getFillGraphic());
+
+    // #121194# when tiling is used and content is bitmap-based, do direct tiling in the
+    // renderer on pixel base to ensure tight fitting. Do not do this when
+    // the fill is rotated or sheared.
+    if (!rFillGraphicAttribute.getTiling())
+        return false;
+
+    // content is bitmap(ex)
+    //
+    // for Vector Graphic Data (SVG, EMF+) support, force decomposition when present. This will lead to use
+    // the primitive representation of the vector data directly.
+    //
+    // when graphic is animated, force decomposition to use the correct graphic, else
+    // fill style will not be animated
+    if (GraphicType::Bitmap != rFillGraphicAttribute.getGraphic().GetType()
+        || rFillGraphicAttribute.getGraphic().getVectorGraphicData()
+        || rFillGraphicAttribute.getGraphic().IsAnimated())
+        return false;
+
+    // decompose matrix to check for shear, rotate and mirroring
+    basegfx::B2DHomMatrix aLocalTransform(maCurrentTransformation
+                                          * rFillBitmapCandidate.getTransformation());
+    basegfx::B2DVector aScale, aTranslate;
+    double fRotate, fShearX;
+    aLocalTransform.decompose(aScale, aTranslate, fRotate, fShearX);
+
+    // when nopt rotated/sheared
+    if (!basegfx::fTools::equalZero(fRotate) || !basegfx::fTools::equalZero(fShearX))
+        return false;
+
+    // no shear or rotate, draw direct in pixel coordinates
+
+    // transform object range to device coordinates (pixels). Use
+    // the device transformation for better accuracy
+    basegfx::B2DRange aObjectRange(aTranslate, aTranslate + aScale);
+    aObjectRange.transform(mpOutputDevice->GetViewTransformation());
+
+    // extract discrete size of object
+    const sal_Int32 nOWidth(basegfx::fround(aObjectRange.getWidth()));
+    const sal_Int32 nOHeight(basegfx::fround(aObjectRange.getHeight()));
+
+    // only do something when object has a size in discrete units
+    if (nOWidth <= 0 || nOHeight <= 0)
+        return true;
+
+    // transform graphic range to device coordinates (pixels). Use
+    // the device transformation for better accuracy
+    basegfx::B2DRange aGraphicRange(rFillGraphicAttribute.getGraphicRange());
+    aGraphicRange.transform(mpOutputDevice->GetViewTransformation() * aLocalTransform);
+
+    // extract discrete size of graphic
+    // caution: when getting to zero, nothing would be painted; thus, do not allow this
+    const sal_Int32 nBWidth(std::max(sal_Int32(1), basegfx::fround(aGraphicRange.getWidth())));
+    const sal_Int32 nBHeight(std::max(sal_Int32(1), basegfx::fround(aGraphicRange.getHeight())));
+
+    // nBWidth, nBHeight is the pixel size of the needed bitmap. To not need to scale it
+    // in vcl many times, create a size-optimized version
+    const Size aNeededBitmapSizePixel(nBWidth, nBHeight);
+    BitmapEx aBitmapEx(rFillGraphicAttribute.getGraphic().GetBitmapEx());
+    const bool bPreScaled(nBWidth * nBHeight < (250 * 250));
+
+    // ... but only up to a maximum size, else it gets too expensive
+    if (bPreScaled)
+    {
+        // if color depth is below 24bit, expand before scaling for better quality.
+        // This is even needed for low colors, else the scale will produce
+        // a bitmap in gray or Black/White (!)
+        if (isPalettePixelFormat(aBitmapEx.getPixelFormat()))
+        {
+            aBitmapEx.Convert(BmpConversion::N24Bit);
+        }
+
+        aBitmapEx.Scale(aNeededBitmapSizePixel, BmpScaleFlag::Interpolate);
+    }
+
+    if (maBColorModifierStack.count())
+    {
+        // when color modifier, apply to bitmap
+        aBitmapEx = aBitmapEx.ModifyBitmapEx(maBColorModifierStack);
+
+        // ModifyBitmapEx uses empty bitmap as sign to return that
+        // the content will be completely replaced to mono color, use shortcut
+        if (aBitmapEx.IsEmpty())
+        {
+            // color gets completely replaced, get it
+            const basegfx::BColor aModifiedColor(
+                maBColorModifierStack.getModifiedColor(basegfx::BColor()));
+            basegfx::B2DPolygon aPolygon(basegfx::utils::createUnitPolygon());
+            aPolygon.transform(aLocalTransform);
+
+            mpOutputDevice->SetFillColor(Color(aModifiedColor));
+            mpOutputDevice->SetLineColor();
+            mpOutputDevice->DrawPolygon(aPolygon);
+
+            return true;
+        }
+    }
+
+    sal_Int32 nBLeft(basegfx::fround(aGraphicRange.getMinX()));
+    sal_Int32 nBTop(basegfx::fround(aGraphicRange.getMinY()));
+    const sal_Int32 nOLeft(basegfx::fround(aObjectRange.getMinX()));
+    const sal_Int32 nOTop(basegfx::fround(aObjectRange.getMinY()));
+    sal_Int32 nPosX(0);
+    sal_Int32 nPosY(0);
+
+    if (nBLeft > nOLeft)
+    {
+        const sal_Int32 nDiff((nBLeft / nBWidth) + 1);
+
+        nPosX -= nDiff;
+        nBLeft -= nDiff * nBWidth;
+    }
+
+    if (nBLeft + nBWidth <= nOLeft)
+    {
+        const sal_Int32 nDiff(-nBLeft / nBWidth);
+
+        nPosX += nDiff;
+        nBLeft += nDiff * nBWidth;
+    }
+
+    if (nBTop > nOTop)
+    {
+        const sal_Int32 nDiff((nBTop / nBHeight) + 1);
+
+        nPosY -= nDiff;
+        nBTop -= nDiff * nBHeight;
+    }
+
+    if (nBTop + nBHeight <= nOTop)
+    {
+        const sal_Int32 nDiff(-nBTop / nBHeight);
+
+        nPosY += nDiff;
+        nBTop += nDiff * nBHeight;
+    }
+
+    // prepare OutDev
+    const Point aEmptyPoint(0, 0);
+    // the visible rect, in pixels
+    const ::tools::Rectangle aVisiblePixel(aEmptyPoint, mpOutputDevice->GetOutputSizePixel());
+    const bool bWasEnabled(mpOutputDevice->IsMapModeEnabled());
+    mpOutputDevice->EnableMapMode(false);
+
+    // check if offset is used
+    const sal_Int32 nOffsetX(basegfx::fround(rFillGraphicAttribute.getOffsetX() * nBWidth));
+
+    if (nOffsetX)
+    {
+        // offset in X, so iterate over Y first and draw lines
+        for (sal_Int32 nYPos(nBTop); nYPos < nOTop + nOHeight; nYPos += nBHeight, nPosY++)
+        {
+            for (sal_Int32 nXPos((nPosY % 2) ? nBLeft - nBWidth + nOffsetX : nBLeft);
+                 nXPos < nOLeft + nOWidth; nXPos += nBWidth)
+            {
+                const ::tools::Rectangle aOutRectPixel(Point(nXPos, nYPos), aNeededBitmapSizePixel);
+
+                if (aOutRectPixel.Overlaps(aVisiblePixel))
+                {
+                    if (bPreScaled)
+                    {
+                        mpOutputDevice->DrawBitmapEx(aOutRectPixel.TopLeft(), aBitmapEx);
+                    }
+                    else
+                    {
+                        mpOutputDevice->DrawBitmapEx(aOutRectPixel.TopLeft(),
+                                                     aNeededBitmapSizePixel, aBitmapEx);
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        // check if offset is used
+        const sal_Int32 nOffsetY(basegfx::fround(rFillGraphicAttribute.getOffsetY() * nBHeight));
+
+        // possible offset in Y, so iterate over X first and draw columns
+        for (sal_Int32 nXPos(nBLeft); nXPos < nOLeft + nOWidth; nXPos += nBWidth, nPosX++)
+        {
+            for (sal_Int32 nYPos((nPosX % 2) ? nBTop - nBHeight + nOffsetY : nBTop);
+                 nYPos < nOTop + nOHeight; nYPos += nBHeight)
+            {
+                const ::tools::Rectangle aOutRectPixel(Point(nXPos, nYPos), aNeededBitmapSizePixel);
+
+                if (aOutRectPixel.Overlaps(aVisiblePixel))
+                {
+                    if (bPreScaled)
+                    {
+                        mpOutputDevice->DrawBitmapEx(aOutRectPixel.TopLeft(), aBitmapEx);
+                    }
+                    else
+                    {
+                        mpOutputDevice->DrawBitmapEx(aOutRectPixel.TopLeft(),
+                                                     aNeededBitmapSizePixel, aBitmapEx);
+                    }
+                }
+            }
+        }
+    }
+
+    // restore OutDev
+    mpOutputDevice->EnableMapMode(bWasEnabled);
+    return true;
 }
 
 // direct draw of Graphic
@@ -773,7 +845,7 @@ void VclProcessor2D::RenderMaskPrimitive2DPixel(const primitive2d::MaskPrimitive
     aMask.transform(maCurrentTransformation);
 
     // Unless smooth edges are needed, simply use clipping.
-    if (basegfx::utils::isRectangle(aMask) || !SvtOptionsDrawinglayer::IsAntiAliasing())
+    if (basegfx::utils::isRectangle(aMask) || !getViewInformation2D().getUseAntiAliasing())
     {
         mpOutputDevice->Push(vcl::PushFlags::CLIPREGION);
         mpOutputDevice->IntersectClipRegion(vcl::Region(aMask));
@@ -909,10 +981,9 @@ void VclProcessor2D::RenderTransformPrimitive2D(
     // create new transformations for CurrentTransformation
     // and for local ViewInformation2D
     maCurrentTransformation = maCurrentTransformation * rTransformCandidate.getTransformation();
-    const geometry::ViewInformation2D aViewInformation2D(
-        getViewInformation2D().getObjectTransformation() * rTransformCandidate.getTransformation(),
-        getViewInformation2D().getViewTransformation(), getViewInformation2D().getViewport(),
-        getViewInformation2D().getVisualizedPage(), getViewInformation2D().getViewTime());
+    geometry::ViewInformation2D aViewInformation2D(getViewInformation2D());
+    aViewInformation2D.setObjectTransformation(getViewInformation2D().getObjectTransformation()
+                                               * rTransformCandidate.getTransformation());
     updateViewInformation(aViewInformation2D);
 
     // process content
@@ -931,10 +1002,8 @@ void VclProcessor2D::RenderPagePreviewPrimitive2D(
     const geometry::ViewInformation2D aLastViewInformation2D(getViewInformation2D());
 
     // create new local ViewInformation2D
-    const geometry::ViewInformation2D aViewInformation2D(
-        getViewInformation2D().getObjectTransformation(),
-        getViewInformation2D().getViewTransformation(), getViewInformation2D().getViewport(),
-        rPagePreviewCandidate.getXDrawPage(), getViewInformation2D().getViewTime());
+    geometry::ViewInformation2D aViewInformation2D(getViewInformation2D());
+    aViewInformation2D.setVisualizedPage(rPagePreviewCandidate.getXDrawPage());
     updateViewInformation(aViewInformation2D);
 
     // process decomposed content
@@ -1048,7 +1117,7 @@ void VclProcessor2D::RenderPolygonStrokePrimitive2D(
 
         if (nCount)
         {
-            const bool bAntiAliased(SvtOptionsDrawinglayer::IsAntiAliasing());
+            const bool bAntiAliased(getViewInformation2D().getUseAntiAliasing());
             aHairlinePolyPolygon.transform(maCurrentTransformation);
 
             if (bAntiAliased)
@@ -1261,20 +1330,6 @@ void VclProcessor2D::RenderEpsPrimitive2D(const primitive2d::EpsPrimitive2D& rEp
     }
 }
 
-void VclProcessor2D::RenderObjectInfoPrimitive2D(
-    const primitive2d::ObjectInfoPrimitive2D& rObjectInfoPrimitive2D)
-{
-    // remember current ObjectInfoPrimitive2D and set new current one (build a stack - push)
-    const primitive2d::ObjectInfoPrimitive2D* pLast(getObjectInfoPrimitive2D());
-    mpObjectInfoPrimitive2D = &rObjectInfoPrimitive2D;
-
-    // process content
-    process(rObjectInfoPrimitive2D.getChildren());
-
-    // restore current ObjectInfoPrimitive2D (pop)
-    mpObjectInfoPrimitive2D = pLast;
-}
-
 void VclProcessor2D::RenderSvgLinearAtomPrimitive2D(
     const primitive2d::SvgLinearAtomPrimitive2D& rCandidate)
 {
@@ -1290,7 +1345,7 @@ void VclProcessor2D::RenderSvgLinearAtomPrimitive2D(
     const basegfx::B2DVector aDiscreteVector(
         getViewInformation2D().getInverseObjectToViewTransformation()
         * basegfx::B2DVector(1.0, 1.0));
-    const double fDiscreteUnit(aDiscreteVector.getLength() * (1.0 / 1.414213562373));
+    const double fDiscreteUnit(aDiscreteVector.getLength() * (1.0 / M_SQRT2));
 
     // use color distance and discrete lengths to calculate step count
     const sal_uInt32 nSteps(calculateStepsForSvgGradient(aColorA, aColorB, fDelta, fDiscreteUnit));
@@ -1334,7 +1389,7 @@ void VclProcessor2D::RenderSvgRadialAtomPrimitive2D(
     const basegfx::B2DVector aDiscreteVector(
         getViewInformation2D().getInverseObjectToViewTransformation()
         * basegfx::B2DVector(1.0, 1.0));
-    const double fDiscreteUnit(aDiscreteVector.getLength() * (1.0 / 1.414213562373));
+    const double fDiscreteUnit(aDiscreteVector.getLength() * (1.0 / M_SQRT2));
 
     // use color distance and discrete lengths to calculate step count
     const sal_uInt32 nSteps(
@@ -1475,13 +1530,11 @@ void VclProcessor2D::adaptTextToFillDrawMode() const
 // process support
 
 VclProcessor2D::VclProcessor2D(const geometry::ViewInformation2D& rViewInformation,
-                               OutputDevice& rOutDev,
-                               const basegfx::BColorModifierStack& rInitStack)
+                               OutputDevice& rOutDev, basegfx::BColorModifierStack aInitStack)
     : BaseProcessor2D(rViewInformation)
     , mpOutputDevice(&rOutDev)
-    , maBColorModifierStack(rInitStack)
+    , maBColorModifierStack(std::move(aInitStack))
     , mnPolygonStrokePrimitive2D(0)
-    , mpObjectInfoPrimitive2D(nullptr)
 {
     // set digit language, derived from SvtCTLOptions to have the correct
     // number display for arabic/hindi numerals

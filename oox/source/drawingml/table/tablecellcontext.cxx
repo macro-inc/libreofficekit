@@ -36,9 +36,9 @@ TableCellContext::TableCellContext( ContextHandler2Helper const & rParent, const
 , mrTableCell( rTableCell )
 {
     if ( rAttribs.hasAttribute( XML_rowSpan ) )
-        mrTableCell.setRowSpan( rAttribs.getString( XML_rowSpan ).get().toInt32() );
+        mrTableCell.setRowSpan( rAttribs.getInteger( XML_rowSpan, 0 ) );
     if ( rAttribs.hasAttribute( XML_gridSpan ) )
-        mrTableCell.setGridSpan( rAttribs.getString( XML_gridSpan ).get().toInt32() );
+        mrTableCell.setGridSpan( rAttribs.getInteger( XML_gridSpan, 0 ) );
 
     mrTableCell.sethMerge( rAttribs.getBool( XML_hMerge, false ) );
     mrTableCell.setvMerge( rAttribs.getBool( XML_vMerge, false ) );
@@ -91,8 +91,7 @@ TableCellContext::onCreateContext( ::sal_Int32 aElementToken, const AttributeLis
     break;
 
     default:
-        return FillPropertiesContext::createFillContext( *this, aElementToken, rAttribs, mrTableCell.maFillProperties );
-
+        return FillPropertiesContext::createFillContext(*this, aElementToken, rAttribs, mrTableCell.maFillProperties, nullptr);
     }
 
     return this;

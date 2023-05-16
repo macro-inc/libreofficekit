@@ -21,6 +21,7 @@
 
 #include "svgpaint.hxx"
 #include "svgnode.hxx"
+#include "svgtools.hxx"
 #include <tools/fontenum.hxx>
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
 #include <drawinglayer/primitive2d/Primitive2DContainer.hxx>
@@ -276,8 +277,7 @@ namespace svgio::svgreader
 
         public:
             /// local attribute scanner
-            void parseStyleAttribute(SVGToken aSVGToken, const OUString& rContent,
-                                     bool bCaseIndependent);
+            void parseStyleAttribute(SVGToken aSVGToken, const OUString& rContent);
 
             /// helper which does the necessary with a given path
             void add_text(
@@ -297,7 +297,7 @@ namespace svgio::svgreader
             const SvgStyleAttributes* getCssStyleParent() const { return mpCssStyleParent; }
 
             /// scan helpers
-            void readCssStyle(const OUString& rCandidate);
+            void readCssStyle(std::u16string_view rCandidate);
             const SvgStyleAttributes* getParentStyle() const;
 
             SvgStyleAttributes(SvgNode& rOwner);

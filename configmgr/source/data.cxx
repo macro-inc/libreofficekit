@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 
 #include <com/sun/star/uno/RuntimeException.hpp>
 #include <rtl/ref.hxx>
@@ -30,6 +31,7 @@
 #include <rtl/ustring.hxx>
 #include <sal/log.hxx>
 #include <sal/types.h>
+#include <o3tl/string_view.hxx>
 
 #include "additions.hxx"
 #include "data.hxx"
@@ -43,23 +45,23 @@ namespace configmgr {
 namespace {
 
 bool decode(
-    OUString const & encoded, sal_Int32 begin, sal_Int32 end,
+    std::u16string_view encoded, std::size_t begin, std::size_t end,
     OUString * decoded)
 {
     assert(
-        begin >= 0 && begin <= end && end <= encoded.getLength() &&
+        begin <= end && end <= encoded.size() &&
         decoded != nullptr);
     OUStringBuffer buf(end - begin);
     while (begin != end) {
         sal_Unicode c = encoded[begin++];
         if (c == '&') {
-            if (encoded.match("amp;", begin)) {
+            if (o3tl::starts_with(encoded.substr(begin), u"amp;")) {
                 buf.append('&');
                 begin += RTL_CONSTASCII_LENGTH("amp;");
-            } else if (encoded.match("quot;", begin)) {
+            } else if (o3tl::starts_with(encoded.substr(begin), u"quot;")) {
                 buf.append('"');
                 begin += RTL_CONSTASCII_LENGTH("quot;");
-            } else if (encoded.match("apos;", begin)) {
+            } else if (o3tl::starts_with(encoded.substr(begin), u"apos;")) {
                 buf.append('\'');
                 begin += RTL_CONSTASCII_LENGTH("apos;");
             } else {
@@ -148,14 +150,14 @@ sal_Int32 Data::parseSegment(
 }
 
 OUString Data::fullTemplateName(
-    OUString const & component, OUString const & name)
+    std::u16string_view component, std::u16string_view name)
 {
-    if (component.indexOf(':') != -1 || name.indexOf(':') != -1) {
+    if (component.find(':') != std::u16string_view::npos || name.find(':') != std::u16string_view::npos) {
         throw css::uno::RuntimeException(
-            "bad component/name pair containing colon " + component + "/" +
+            OUString::Concat("bad component/name pair containing colon ") + component + "/" +
             name);
     }
-    return component + ":" + name;
+    return OUString::Concat(component) + ":" + name;
 }
 
 bool Data::equalTemplateNames(

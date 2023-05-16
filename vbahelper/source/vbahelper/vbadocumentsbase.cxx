@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <utility>
 #include <vbahelper/vbadocumentsbase.hxx>
 
 #include <unotools/mediadescriptor.hxx>
@@ -60,12 +61,12 @@ class DocumentsEnumImpl : public ::cppu::WeakImplHelper< container::XEnumeration
 
 public:
     /// @throws uno::RuntimeException
-    DocumentsEnumImpl( const uno::Reference< uno::XComponentContext >& xContext, Documents&& docs ) :  m_xContext( xContext ), m_documents( std::move(docs) )
+    DocumentsEnumImpl( uno::Reference< uno::XComponentContext > xContext, Documents&& docs ) :  m_xContext(std::move( xContext )), m_documents( std::move(docs) )
     {
         m_it = m_documents.begin();
     }
     /// @throws uno::RuntimeException
-    explicit DocumentsEnumImpl( const uno::Reference< uno::XComponentContext >& xContext ) :  m_xContext( xContext )
+    explicit DocumentsEnumImpl( uno::Reference< uno::XComponentContext > xContext ) :  m_xContext(std::move( xContext ))
     {
         uno::Reference< frame::XDesktop2 > xDesktop = frame::Desktop::create( m_xContext );
         uno::Reference< container::XEnumeration > xComponents = xDesktop->getComponents()->createEnumeration();
@@ -89,7 +90,7 @@ public:
         {
             throw container::NoSuchElementException();
         }
-        return makeAny( *(m_it++) );
+        return css::uno::Any( *(m_it++) );
     }
 };
 
@@ -115,7 +116,7 @@ class DocumentsAccessImpl : public DocumentsAccessImpl_BASE
     NameIndexHash namesToIndices;
 public:
     /// @throws uno::RuntimeException
-    DocumentsAccessImpl( const uno::Reference< uno::XComponentContext >& xContext, VbaDocumentsBase::DOCUMENT_TYPE eDocType ) :m_xContext( xContext )
+    DocumentsAccessImpl( uno::Reference< uno::XComponentContext > xContext, VbaDocumentsBase::DOCUMENT_TYPE eDocType ) :m_xContext(std::move( xContext ))
     {
         uno::Reference< container::XEnumeration > xEnum = new DocumentsEnumImpl( m_xContext );
         sal_Int32 nIndex=0;
@@ -150,7 +151,7 @@ public:
         if ( Index < 0
             || o3tl::make_unsigned(Index) >= m_documents.size() )
             throw lang::IndexOutOfBoundsException();
-        return makeAny( m_documents[ Index ] ); // returns xspreadsheetdoc
+        return css::uno::Any( m_documents[ Index ] ); // returns xspreadsheetdoc
     }
 
     //XElementAccess
@@ -170,7 +171,7 @@ public:
         NameIndexHash::const_iterator it = namesToIndices.find( aName );
         if ( it == namesToIndices.end() )
             throw container::NoSuchElementException();
-        return makeAny( m_documents[ it->second ] );
+        return css::uno::Any( m_documents[ it->second ] );
 
     }
 
@@ -256,7 +257,7 @@ uno::Any VbaDocumentsBase::createDocument()
     // #163808# lock document controllers and container window if specified by application
     lclSetupComponent( xComponent, bScreenUpdating, bInteractive );
 
-    return uno::makeAny( xComponent );
+    return uno::Any( xComponent );
 }
 
 // #TODO# #FIXME# can any of the unused params below be used?
@@ -313,7 +314,7 @@ uno::Any VbaDocumentsBase::openDocument( const OUString& rFileName, const uno::A
     // #163808# lock document controllers and container window if specified by application
     lclSetupComponent( xComponent, bScreenUpdating, bInteractive );
 
-    return uno::makeAny( xComponent );
+    return uno::Any( xComponent );
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

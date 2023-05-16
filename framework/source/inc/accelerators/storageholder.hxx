@@ -21,6 +21,7 @@
 
 #include <com/sun/star/embed/XStorage.hpp>
 
+#include <mutex>
 #include <unordered_map>
 #include <vector>
 
@@ -60,7 +61,7 @@ class StorageHolder final
 
     // member
     private:
-        mutable osl::Mutex m_mutex;
+        mutable std::mutex m_mutex;
 
         /** @short  TODO */
         css::uno::Reference< css::embed::XStorage > m_xRoot;
@@ -173,7 +174,7 @@ class StorageHolder final
 
             /** @short  TODO
              */
-            static std::vector<OUString> impl_st_parsePath(const OUString& sPath);
+            static std::vector<OUString> impl_st_parsePath(std::u16string_view sPath);
 };
 
 } // namespace framework

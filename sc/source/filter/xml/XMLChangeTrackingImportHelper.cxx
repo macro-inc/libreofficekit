@@ -26,18 +26,19 @@
 #include <svl/numformat.hxx>
 #include <svl/zforlist.hxx>
 #include <sax/tools/converter.hxx>
+#include <utility>
 
 constexpr OStringLiteral SC_CHANGE_ID_PREFIX = "ct";
 
 ScMyCellInfo::ScMyCellInfo(
-    const ScCellValue& rCell, const OUString& rFormulaAddress, const OUString& rFormula,
-    const formula::FormulaGrammar::Grammar eTempGrammar, const OUString& rInputString,
+    ScCellValue aCell, OUString aFormulaAddress, OUString aFormula,
+    const formula::FormulaGrammar::Grammar eTempGrammar, OUString aInputString,
     const double& rValue, const sal_uInt16 nTempType, const ScMatrixMode nTempMatrixFlag, const sal_Int32 nTempMatrixCols,
     const sal_Int32 nTempMatrixRows ) :
-    maCell(rCell),
-    sFormulaAddress(rFormulaAddress),
-    sFormula(rFormula),
-    sInputString(rInputString),
+    maCell(std::move(aCell)),
+    sFormulaAddress(std::move(aFormulaAddress)),
+    sFormula(std::move(aFormula)),
+    sInputString(std::move(aInputString)),
     fValue(rValue),
     nMatrixCols(nTempMatrixCols),
     nMatrixRows(nTempMatrixRows),
@@ -59,9 +60,8 @@ const ScCellValue& ScMyCellInfo::CreateCell(ScDocument& rDoc)
         ScAddress aPos;
         sal_Int32 nOffset(0);
         ScRangeStringConverter::GetAddressFromString(aPos, sFormulaAddress, rDoc, ::formula::FormulaGrammar::CONV_OOO, nOffset);
-        maCell.meType = CELLTYPE_FORMULA;
-        maCell.mpFormula = new ScFormulaCell(rDoc, aPos, sFormula, eGrammar, nMatrixFlag);
-        maCell.mpFormula->SetMatColsRows(static_cast<SCCOL>(nMatrixCols), static_cast<SCROW>(nMatrixRows));
+        maCell.set(new ScFormulaCell(rDoc, aPos, sFormula, eGrammar, nMatrixFlag));
+        maCell.getFormula()->SetMatColsRows(static_cast<SCCOL>(nMatrixCols), static_cast<SCROW>(nMatrixRows));
     }
 
     if ((nType == css::util::NumberFormat::DATE || nType == css::util::NumberFormat::TIME) && sInputString.isEmpty())
@@ -476,18 +476,15 @@ void ScXMLChangeTrackingImportHelper::CreateGeneratedActions(std::vector<ScMyGen
 {
     for (ScMyGenerated & rGenerated : rList)
     {
-        if (rGenerated.nID == 0)
-        {
-            ScCellValue aCell;
-            if (rGenerated.pCellInfo)
-                aCell = rGenerated.pCellInfo->CreateCell(rDoc);
-
-            if (!aCell.isEmpty())
-            {
-                rGenerated.nID = pTrack->AddLoadedGenerated(aCell, rGenerated.aBigRange, rGenerated.pCellInfo->sInputString);
-                OSL_ENSURE(rGenerated.nID, "could not insert generated action");
-            }
-        }
+        if (rGenerated.nID != 0)
+            continue;
+        if (!rGenerated.pCellInfo)
+            continue;
+        ScCellValue aCell = rGenerated.pCellInfo->CreateCell(rDoc);
+        if (aCell.isEmpty())
+            continue;
+        rGenerated.nID = pTrack->AddLoadedGenerated(aCell, rGenerated.aBigRange, rGenerated.pCellInfo->sInputString);
+        OSL_ENSURE(rGenerated.nID, "could not insert generated action");
     }
 }
 
@@ -664,7 +661,7 @@ void ScXMLChangeTrackingImportHelper::SetNewCell(const ScMyContentAction* pActio
         if (!aCell.isEmpty())
         {
             ScCellValue aNewCell;
-            if (aCell.meType != CELLTYPE_FORMULA)
+            if (aCell.getType() != CELLTYPE_FORMULA)
             {
                 aNewCell = aCell;
                 pChangeActionContent->SetNewCell(aNewCell, &rDoc, OUString());
@@ -672,12 +669,12 @@ void ScXMLChangeTrackingImportHelper::SetNewCell(const ScMyContentAction* pActio
             }
             else
             {
-                ScMatrixMode nMatrixFlag = aCell.mpFormula->GetMatrixFlag();
+                ScMatrixMode nMatrixFlag = aCell.getFormula()->GetMatrixFlag();
                 // With GRAM_ODFF reference detection is faster on compilation.
                 /* FIXME: new cell should be created with a clone
                  * of the token array instead. Any reason why this
                  * wasn't done? */
-                OUString sFormula = aCell.mpFormula->GetFormula(formula::FormulaGrammar::GRAM_ODFF);
+                OUString sFormula = aCell.getFormula()->GetFormula(formula::FormulaGrammar::GRAM_ODFF);
 
                 // #i87826# [Collaboration] Rejected move destroys formulas
                 // FIXME: adjust ScFormulaCell::GetFormula(), so that the right formula string
@@ -692,16 +689,15 @@ void ScXMLChangeTrackingImportHelper::SetNewCell(const ScMyContentAction* pActio
                     sFormula2 = sFormula.copy( 1 );
                 }
 
-                aNewCell.meType = CELLTYPE_FORMULA;
-                aNewCell.mpFormula = new ScFormulaCell(rDoc, aAddress, sFormula2,formula::FormulaGrammar::GRAM_ODFF, nMatrixFlag);
+                aNewCell.set(new ScFormulaCell(rDoc, aAddress, sFormula2,formula::FormulaGrammar::GRAM_ODFF, nMatrixFlag));
                 if (nMatrixFlag == ScMatrixMode::Formula)
                 {
                     SCCOL nCols;
                     SCROW nRows;
-                    aCell.mpFormula->GetMatColsRows(nCols, nRows);
-                    aNewCell.mpFormula->SetMatColsRows(nCols, nRows);
+                    aCell.getFormula()->GetMatColsRows(nCols, nRows);
+                    aNewCell.getFormula()->SetMatColsRows(nCols, nRows);
                 }
-                aNewCell.mpFormula->SetInChangeTrack(true);
+                aNewCell.getFormula()->SetInChangeTrack(true);
                 pChangeActionContent->SetNewCell(aNewCell, &rDoc, OUString());
                 // #i40704# don't overwrite the formula string via SetNewValue()
             }

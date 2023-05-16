@@ -17,7 +17,10 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <hintids.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <svl/itemiter.hxx>
 #include <svl/languageoptions.hxx>
@@ -72,7 +75,6 @@
 #include <com/sun/star/i18n/XBreakIterator.hpp>
 
 #include <vector>
-#include <utility>
 
 #include <unotextrange.hxx>
 
@@ -110,6 +112,54 @@ static bool lcl_HasComments(const SwTextNode& rNode)
     return false;
 }
 
+// possible delimiter characters within URLs for word breaking
+static bool lcl_IsDelim( const sal_Unicode c )
+{
+   return '#' == c || '$' == c || '%' == c || '&' == c || '+' == c ||
+          ',' == c || '-' == c || '.' == c || '/' == c || ':' == c ||
+          ';' == c || '=' == c || '?' == c || '@' == c || '_' == c;
+}
+
+// allow to check normal text with hyperlink by recognizing (parts of) URLs
+static bool lcl_IsURL(std::u16string_view rWord,
+    SwTextNode &rNode, sal_Int32 nBegin, sal_Int32 nLen)
+{
+    // not a text with hyperlink
+    if ( !rNode.GetTextAttrAt(nBegin, RES_TXTATR_INETFMT) )
+        return false;
+
+    // there is a dot in the word, wich is not a period ("example.org")
+    const size_t nPosAt = rWord.find('.');
+    if (nPosAt != std::u16string_view::npos && nPosAt < rWord.length() - 1)
+        return true;
+
+    // an e-mail address ("user@example")
+    if ( rWord.find('@') != std::u16string_view::npos )
+        return true;
+
+    const OUString& rText = rNode.GetText();
+
+    // scheme (e.g. "http" in "http://" or "mailto" in "mailto:address"):
+    // word is followed by 1) ':' + an alphanumeric character; 2) or ':' + a delimiter
+    if ( nBegin + nLen + 2 <= rText.getLength() && ':' == rText[nBegin + nLen] )
+    {
+         sal_Unicode c = rText[nBegin + nLen + 1];
+         if ( u_isalnum(c) || lcl_IsDelim(c) )
+             return true;
+    }
+
+    // path, query, fragment (e.g. "path" in "example.org/path"):
+    // word is preceded by 1) an alphanumeric character + a delimiter; 2) or two delimiters
+    if ( 2 <= nBegin && lcl_IsDelim(rText[nBegin - 1]) )
+    {
+        sal_Unicode c = rText[nBegin - 2];
+        if ( u_isalnum(c) || lcl_IsDelim(c) )
+            return true;
+    }
+
+    return false;
+}
+
 /*
  * This has basically the same function as SwScriptInfo::MaskHiddenRanges,
  * only for deleted redlines
@@ -128,7 +178,7 @@ lcl_MaskRedlines( const SwTextNode& rNode, OUStringBuffer& rText,
     {
         const SwRangeRedline* pRed = rDoc.getIDocumentRedlineAccess().GetRedlineTable()[ nAct ];
 
-        if ( pRed->Start()->nNode > rNode.GetIndex() )
+        if ( pRed->Start()->GetNode() > rNode )
             break;
 
         if( RedlineType::Delete == pRed->GetType() )
@@ -328,7 +378,7 @@ static bool lcl_HaveCommonAttributes( IStyleAccess& rStyleAccess,
  * 5) The attribute is outside the deletion range
  *    -> nothing to do
  *
- * @param rIdx starting position
+ * @param nStt starting position
  * @param nLen length of the deletion
  * @param nthat ???
  * @param pSet ???
@@ -336,7 +386,7 @@ static bool lcl_HaveCommonAttributes( IStyleAccess& rStyleAccess,
  */
 
 void SwTextNode::RstTextAttr(
-    const SwIndex &rIdx,
+    sal_Int32 nStt,
     const sal_Int32 nLen,
     const sal_uInt16 nWhich,
     const SfxItemSet* pSet,
@@ -346,14 +396,13 @@ void SwTextNode::RstTextAttr(
     if ( !GetpSwpHints() )
         return;
 
-    sal_Int32 nStt = rIdx.GetIndex();
     sal_Int32 nEnd = nStt + nLen;
     {
         // enlarge range for the reset of text attributes in case of an overlapping input field
-        const SwTextInputField* pTextInputField = dynamic_cast<const SwTextInputField*>(GetTextAttrAt( nStt, RES_TXTATR_INPUTFIELD, PARENT ));
+        const SwTextInputField* pTextInputField = dynamic_cast<const SwTextInputField*>(GetTextAttrAt(nStt, RES_TXTATR_INPUTFIELD, ::sw::GetTextAttrMode::Parent));
         if ( pTextInputField == nullptr )
         {
-            pTextInputField = dynamic_cast<const SwTextInputField*>(GetTextAttrAt(nEnd, RES_TXTATR_INPUTFIELD, PARENT ));
+            pTextInputField = dynamic_cast<const SwTextInputField*>(GetTextAttrAt(nEnd, RES_TXTATR_INPUTFIELD, ::sw::GetTextAttrMode::Parent));
         }
         if ( pTextInputField != nullptr )
         {
@@ -387,7 +436,8 @@ void SwTextNode::RstTextAttr(
     SwTextAttr *pHt = nullptr;
     while ( (i < m_pSwpHints->Count())
             && ( ( ( nAttrStart = m_pSwpHints->GetWithoutResorting(i)->GetStart()) < nEnd )
-                 || nLen==0 ) && !bExactRange)
+                 || nLen==0 || (nEnd == nAttrStart && nAttrStart == m_Text.getLength()))
+            && !bExactRange)
     {
         pHt = m_pSwpHints->GetWithoutResorting(i);
 
@@ -622,12 +672,12 @@ void SwTextNode::RstTextAttr(
     CallSwClientNotify(sw::LegacyModifyHint(nullptr, &aNew));
 }
 
-static sal_Int32 clipIndexBounds(const OUString &rStr, sal_Int32 nPos)
+static sal_Int32 clipIndexBounds(std::u16string_view aStr, sal_Int32 nPos)
 {
     if (nPos < 0)
         return 0;
-    if (nPos > rStr.getLength())
-        return rStr.getLength();
+    if (nPos > sal_Int32(aStr.size()))
+        return aStr.size();
     return nPos;
 }
 
@@ -638,7 +688,7 @@ static sal_Int32 clipIndexBounds(const OUString &rStr, sal_Int32 nPos)
 OUString SwTextFrame::GetCurWord(SwPosition const& rPos) const
 {
     TextFrameIndex const nPos(MapModelToViewPos(rPos));
-    SwTextNode *const pTextNode(rPos.nNode.GetNode().GetTextNode());
+    SwTextNode *const pTextNode(rPos.GetNode().GetTextNode());
     assert(pTextNode);
     OUString const& rText(GetText());
     assert(sal_Int32(nPos) <= rText.getLength()); // invalid index
@@ -649,7 +699,7 @@ OUString SwTextFrame::GetCurWord(SwPosition const& rPos) const
     assert(g_pBreakIt && g_pBreakIt->GetBreakIter().is());
     const uno::Reference< XBreakIterator > &rxBreak = g_pBreakIt->GetBreakIter();
     sal_Int16 nWordType = WordType::DICTIONARY_WORD;
-    lang::Locale aLocale( g_pBreakIt->GetLocale(pTextNode->GetLang(rPos.nContent.GetIndex())) );
+    lang::Locale aLocale( g_pBreakIt->GetLocale(pTextNode->GetLang(rPos.GetContentIndex())) );
     Boundary aBndry =
         rxBreak->getWordBoundary(rText, sal_Int32(nPos), aLocale, nWordType, true);
 
@@ -685,14 +735,14 @@ SwScanner::SwScanner( const SwTextNode& rNd, const OUString& rText,
 {
 }
 
-SwScanner::SwScanner(std::function<LanguageType(sal_Int32, sal_Int32, bool)> const& pGetLangOfChar,
-                     const OUString& rText, const LanguageType* pLang,
-                     const ModelToViewHelper& rConvMap, sal_uInt16 nType, sal_Int32 nStart,
+SwScanner::SwScanner(std::function<LanguageType(sal_Int32, sal_Int32, bool)> aGetLangOfChar,
+                     OUString aText, const LanguageType* pLang,
+                     ModelToViewHelper aConvMap, sal_uInt16 nType, sal_Int32 nStart,
                      sal_Int32 nEnd, bool bClp)
-    : m_pGetLangOfChar(pGetLangOfChar)
-    , m_aPreDashReplacementText(rText)
+    : m_pGetLangOfChar(std::move(aGetLangOfChar))
+    , m_aPreDashReplacementText(std::move(aText))
     , m_pLanguage(pLang)
-    , m_ModelToView(rConvMap)
+    , m_ModelToView(std::move(aConvMap))
     , m_nLength(0)
     , m_nOverriddenDashCount(0)
     , m_nWordType(nType)
@@ -932,13 +982,13 @@ bool SwTextNode::Spell(SwSpellArgs* pArgs)
         m_Text = buf.makeStringAndClear();
     }
 
-    sal_Int32 nBegin = ( pArgs->pStartNode != this )
+    sal_Int32 nBegin = ( &pArgs->pStartPos->GetNode() != this )
         ? 0
-        : pArgs->pStartIdx->GetIndex();
+        : pArgs->pStartPos->GetContentIndex();
 
-    sal_Int32 nEnd = ( pArgs->pEndNode != this )
+    sal_Int32 nEnd = ( &pArgs->pEndPos->GetNode() != this )
             ? m_Text.getLength()
-            : pArgs->pEndIdx->GetIndex();
+            : pArgs->pEndPos->GetContentIndex();
 
     pArgs->xSpellAlt = nullptr;
 
@@ -996,7 +1046,8 @@ bool SwTextNode::Spell(SwSpellArgs* pArgs)
             LanguageType eActLang = aScanner.GetCurrentLanguage();
             DetectAndMarkMissingDictionaries( GetTextNode()->GetDoc(), pArgs->xSpeller, eActLang );
 
-            if( rWord.getLength() > 0 && LANGUAGE_NONE != eActLang )
+            if( rWord.getLength() > 0 && LANGUAGE_NONE != eActLang &&
+                !lcl_IsURL(rWord, *this, aScanner.GetBegin(), aScanner.GetLen() ) )
             {
                 if (pArgs->xSpeller.is())
                 {
@@ -1031,10 +1082,8 @@ bool SwTextNode::Spell(SwSpellArgs* pArgs)
                         while (pChar && *pChar-- == CH_TXTATR_INWORD)
                             ++nRight;
 
-                        pArgs->pStartNode = this;
-                        pArgs->pEndNode = this;
-                        pArgs->pStartIdx->Assign(this, aScanner.GetEnd() - nRight );
-                        pArgs->pEndIdx->Assign(this, aScanner.GetBegin() + nLeft );
+                        pArgs->pStartPos->Assign(*this, aScanner.GetEnd() - nRight );
+                        pArgs->pEndPos->Assign(*this, aScanner.GetBegin() + nLeft );
                     }
                 }
             }
@@ -1055,6 +1104,8 @@ void SwTextNode::SetLanguageAndFont( const SwPaM &rPaM,
     const vcl::Font *pFont,  sal_uInt16 nFontWhichId )
 {
     SwEditShell *pEditShell = GetDoc().GetEditShell();
+    if (!pEditShell)
+        return;
     SfxItemSet aSet(pEditShell->GetAttrPool(), nLangWhichId, nLangWhichId );
     if (pFont)
         aSet.MergeRange(nFontWhichId, nFontWhichId); // Keep it sorted
@@ -1085,12 +1136,12 @@ bool SwTextNode::Convert( SwConversionArgs &rArgs )
     // get range of text within node to be converted
     // (either all the text or the text within the selection
     // when the conversion was started)
-    const sal_Int32 nTextBegin = ( rArgs.pStartNode == this )
-        ? std::min(rArgs.pStartIdx->GetIndex(), m_Text.getLength())
+    const sal_Int32 nTextBegin = ( &rArgs.pStartPos->GetNode() == this )
+        ? std::min(rArgs.pStartPos->GetContentIndex(), m_Text.getLength())
         : 0;
 
-    const sal_Int32 nTextEnd = ( rArgs.pEndNode == this )
-        ?  std::min(rArgs.pEndIdx->GetIndex(), m_Text.getLength())
+    const sal_Int32 nTextEnd = ( &rArgs.pEndPos->GetNode() == this )
+        ?  std::min(rArgs.pEndPos->GetContentIndex(), m_Text.getLength())
         :  m_Text.getLength();
 
     rArgs.aConvText.clear();
@@ -1156,19 +1207,21 @@ bool SwTextNode::Convert( SwConversionArgs &rArgs )
                 //SwPaM aCurPaM( *this, *this, nBegin, nBegin + nLen ); <-- wrong c-tor, does sth different
                 SwPaM aCurPaM( *this, nBegin );
                 aCurPaM.SetMark();
-                aCurPaM.GetPoint()->nContent = nBegin + nLen;
+                aCurPaM.GetPoint()->SetContent(nBegin + nLen);
 
                 // check script type of selected text
-                SwEditShell *pEditShell = GetDoc().GetEditShell();
-                pEditShell->Push();             // save current cursor on stack
-                pEditShell->SetSelection( aCurPaM );
-                bool bIsAsianScript = (SvtScriptType::ASIAN == pEditShell->GetScriptType());
-                pEditShell->Pop(SwCursorShell::PopMode::DeleteCurrent); // restore cursor from stack
-
-                if (!bIsAsianScript && rArgs.bAllowImplicitChangesForNotConvertibleText)
+                if (SwEditShell *pEditShell = GetDoc().GetEditShell())
                 {
-                    // Store for later use
-                    aImplicitChanges.emplace_back(nBegin, nBegin+nLen);
+                    pEditShell->Push();             // save current cursor on stack
+                    pEditShell->SetSelection( aCurPaM );
+                    bool bIsAsianScript = (SvtScriptType::ASIAN == pEditShell->GetScriptType());
+                    pEditShell->Pop(SwCursorShell::PopMode::DeleteCurrent); // restore cursor from stack
+
+                    if (!bIsAsianScript && rArgs.bAllowImplicitChangesForNotConvertibleText)
+                    {
+                        // Store for later use
+                        aImplicitChanges.emplace_back(nBegin, nBegin+nLen);
+                    }
                 }
                 nBegin = nChPos;    // start of next language portion
             }
@@ -1179,7 +1232,7 @@ bool SwTextNode::Convert( SwConversionArgs &rArgs )
         {
             SwPaM aPaM( *this, rImplicitChange.first );
             aPaM.SetMark();
-            aPaM.GetPoint()->nContent = rImplicitChange.second;
+            aPaM.GetPoint()->SetContent( rImplicitChange.second );
             SetLanguageAndFont( aPaM, rArgs.nConvTargetLang, RES_CHRATR_CJK_LANGUAGE, rArgs.pTargetFont, RES_CHRATR_CJK_FONT );
         }
 
@@ -1199,11 +1252,9 @@ bool SwTextNode::Convert( SwConversionArgs &rArgs )
         rArgs.nConvTextLang = nLangFound;
 
         // position where to start looking in next iteration (after current ends)
-        rArgs.pStartNode = this;
-        rArgs.pStartIdx->Assign(this, nBegin + nLen );
+        rArgs.pStartPos->Assign(*this, nBegin + nLen );
         // end position (when we have travelled over the whole document)
-        rArgs.pEndNode = this;
-        rArgs.pEndIdx->Assign(this, nBegin );
+        rArgs.pEndPos->Assign(*this, nBegin );
     }
 
     // restore original text
@@ -1305,7 +1356,7 @@ SwRect SwTextFrame::AutoSpell_(SwTextNode & rNode, sal_Int32 nActPos)
             DetectAndMarkMissingDictionaries( rDoc, xSpell, eActLang );
 
             bool bSpell = xSpell.is() && xSpell->hasLanguage( static_cast<sal_uInt16>(eActLang) );
-            if( bSpell && !rWord.isEmpty() )
+            if( bSpell && !rWord.isEmpty() && !lcl_IsURL(rWord, *pNode, nBegin, nLen) )
             {
                 // check for: bAlter => xHyphWord.is()
                 OSL_ENSURE(!bSpell || xSpell.is(), "NULL pointer");
@@ -1373,9 +1424,11 @@ SwRect SwTextFrame::AutoSpell_(SwTextNode & rNode, sal_Int32 nActPos)
             aRect = lcl_CalculateRepaintRect(*this, rNode, nChgStart, nChgEnd);
 
             // fdo#71558 notify misspelled word to accessibility
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
             SwViewShell* pViewSh = getRootFrame() ? getRootFrame()->GetCurrShell() : nullptr;
             if( pViewSh )
                 pViewSh->InvalidateAccessibleParaAttrs( *this );
+#endif
         }
 
         pNode->GetWrong()->SetInvalid( nInvStart, nInvEnd );
@@ -1469,7 +1522,7 @@ SwRect SwTextFrame::SmartTagScan(SwTextNode & rNode)
 
         SwPosition start(*pNode, nBegin);
         SwPosition end  (*pNode, nEnd);
-        Reference< css::text::XTextRange > xRange = SwXTextRange::CreateXTextRange(pNode->GetDoc(), start, &end);
+        rtl::Reference<SwXTextRange> xRange = SwXTextRange::CreateXTextRange(pNode->GetDoc(), start, &end);
 
         rSmartTagMgr.RecognizeTextRange(xRange, xTextMarkup, xController);
 
@@ -1672,6 +1725,9 @@ void SwTextNode::TransliterateText(
     if (nStt >= nEnd)
         return;
 
+    const sal_Int32 selStart = nStt;
+    const sal_Int32 selEnd = nEnd;
+
     // since we don't use Hiragana/Katakana or half-width/full-width transliterations here
     // it is fine to use ANYWORD_IGNOREWHITESPACES. (ANY_WORD btw is broken and will
     // occasionally miss words in consecutive sentences). Also with ANYWORD_IGNOREWHITESPACES
@@ -1722,6 +1778,17 @@ void SwTextNode::TransliterateText(
                     nWordType);
         }
 
+        /* Nothing to do if user selection lies entirely outside of word start and end boundary computed above.
+         * Skip this node, because otherwise the below logic for constraining to the selection will fail */
+        if (aSttBndry.startPos >= selEnd || aEndBndry.endPos <= selStart) {
+            return;
+        }
+
+        // prevent going outside of the user's selection, which may
+        // start in the middle of a word
+        aSttBndry.startPos = std::max(aSttBndry.startPos, selStart);
+        aEndBndry.startPos = std::max(aSttBndry.startPos, aEndBndry.startPos);
+
         Boundary aCurWordBndry( aSttBndry );
         while (aCurWordBndry.startPos <= aEndBndry.startPos)
         {
@@ -1754,8 +1821,9 @@ void SwTextNode::TransliterateText(
     }
     else if (rTrans.getType() == TransliterationFlags::SENTENCE_CASE)
     {
-        // for 'sentence case' we need to iterate sentence by sentence
-
+        // For 'sentence case' we need to iterate sentence by sentence.
+        // nLastStart and nLastEnd are the boundaries of the last sentence in
+        // the user's selection.
         sal_Int32 nLastStart = g_pBreakIt->GetBreakIter()->beginOfSentence(
                 GetText(), nEnd,
                 g_pBreakIt->GetLocale( GetLang( nEnd ) ) );
@@ -1763,10 +1831,10 @@ void SwTextNode::TransliterateText(
                 GetText(), nLastStart,
                 g_pBreakIt->GetLocale( GetLang( nLastStart ) ) );
 
-        // extend nStt, nEnd to the current sentence boundaries
-        sal_Int32 nCurrentStart = g_pBreakIt->GetBreakIter()->beginOfSentence(
-                GetText(), nStt,
-                g_pBreakIt->GetLocale( GetLang( nStt ) ) );
+        // Begin with the starting point of the user's selection (it may not be
+        // the beginning of a sentence)...
+        sal_Int32 nCurrentStart = nStt;
+        // ...And extend to the end of the first sentence
         sal_Int32 nCurrentEnd = g_pBreakIt->GetBreakIter()->endOfSentence(
                 GetText(), nCurrentStart,
                 g_pBreakIt->GetLocale( GetLang( nCurrentStart ) ) );
@@ -1808,6 +1876,11 @@ void SwTextNode::TransliterateText(
             if (nCurrentEnd > nLastEnd)
                 nCurrentEnd = nLastEnd;
         }
+
+        // Prevent going outside of the user's selection
+        nCurrentStart = std::max(selStart, nCurrentStart);
+        nCurrentEnd = std::min(selEnd, nCurrentEnd);
+        nLastEnd = std::min(selEnd, nLastEnd);
 
         while (nCurrentStart < nLastEnd)
         {
@@ -1897,6 +1970,7 @@ void SwTextNode::TransliterateText(
         // call to ReplaceTextOnly
         swTransliterationChgData & rData =
             aChanges[ aChanges.size() - 1 - i ];
+
         nSum += rData.sChanged.getLength() - rData.nLen;
         if (nSum > o3tl::make_unsigned(GetSpaceLeft()))
         {
@@ -1911,7 +1985,7 @@ void SwTextNode::TransliterateText(
             //SwPaM aCurPaM( *this, *this, nBegin, nBegin + nLen ); <-- wrong c-tor, does sth different
             SwPaM aCurPaM( *this, rData.nStart );
             aCurPaM.SetMark();
-            aCurPaM.GetPoint()->nContent = rData.nStart + rData.nLen;
+            aCurPaM.GetPoint()->SetContent( rData.nStart + rData.nLen );
             // replace the changed words
             if ( aCurPaM.GetText() != rData.sChanged )
                 GetDoc().getIDocumentContentOperations().ReplaceRange( aCurPaM, rData.sChanged, false );
@@ -1926,14 +2000,14 @@ void SwTextNode::TransliterateText(
 }
 
 void SwTextNode::ReplaceTextOnly( sal_Int32 nPos, sal_Int32 nLen,
-                                const OUString & rText,
+                                std::u16string_view aText,
                                 const Sequence<sal_Int32>& rOffsets )
 {
-    assert(rText.getLength() - nLen <= GetSpaceLeft());
+    assert(sal_Int32(aText.size()) - nLen <= GetSpaceLeft());
 
-    m_Text = m_Text.replaceAt(nPos, nLen, rText);
+    m_Text = m_Text.replaceAt(nPos, nLen, aText);
 
-    sal_Int32 nTLen = rText.getLength();
+    sal_Int32 nTLen = aText.size();
     const sal_Int32* pOffsets = rOffsets.getConstArray();
     // now look for no 1-1 mapping -> move the indices!
     sal_Int32 nMyOff = nPos;
@@ -1947,7 +2021,7 @@ void SwTextNode::ReplaceTextOnly( sal_Int32 nPos, sal_Int32 nLen,
             while( nI + nCnt < nTLen && nOff == pOffsets[ nI + nCnt ] )
                 ++nCnt;
 
-            Update( SwIndex( this, nMyOff ), nCnt );
+            Update(SwContentIndex(this, nMyOff), nCnt, UpdateMode::Default);
             nMyOff = nOff;
             //nMyOff -= nCnt;
             nI += nCnt - 1;
@@ -1955,21 +2029,21 @@ void SwTextNode::ReplaceTextOnly( sal_Int32 nPos, sal_Int32 nLen,
         else if( nOff > nMyOff )
         {
             // something is deleted
-            Update( SwIndex( this, nMyOff+1 ), nOff - nMyOff, true );
+            Update(SwContentIndex(this, nMyOff + 1), nOff - nMyOff, UpdateMode::Negative);
             nMyOff = nOff;
         }
         ++nMyOff;
     }
     if( nMyOff < nLen )
         // something is deleted at the end
-        Update( SwIndex( this, nMyOff ), nLen - nMyOff, true );
+        Update(SwContentIndex(this, nMyOff), nLen - nMyOff, UpdateMode::Negative);
 
     // notify the layout!
-    SwDelText aDelHint( nPos, nTLen );
-    CallSwClientNotify(sw::LegacyModifyHint(nullptr, &aDelHint));
+    const auto aDelHint = sw::DeleteText(nPos, nTLen);
+    CallSwClientNotify(aDelHint);
 
-    SwInsText const aHint(sw::MakeSwInsText(*this, nPos, nTLen));
-    CallSwClientNotify(sw::LegacyModifyHint(nullptr, &aHint));
+    const auto aInsHint = sw::MakeInsertText(*this, nPos, nTLen);
+    CallSwClientNotify(aInsHint);
 }
 
 // the return values allows us to see if we did the heavy-
@@ -2031,7 +2105,7 @@ bool SwTextNode::CountWords( SwDocStat& rStat,
     // ConversionMap to expand fields, remove invisible and redline deleted text for scanner
     const ModelToViewHelper aConversionMap(*this,
         getIDocumentLayoutAccess().GetCurrentLayout(),
-        ExpandMode::ExpandFields | ExpandMode::ExpandFootnote | ExpandMode::HideInvisible | ExpandMode::HideDeletions);
+        ExpandMode::ExpandFields | ExpandMode::ExpandFootnote | ExpandMode::HideInvisible | ExpandMode::HideDeletions | ExpandMode::HideFieldmarkCommands);
     const OUString& aExpandText = aConversionMap.getViewText();
 
     if (aExpandText.isEmpty() && !bCountNumbering)

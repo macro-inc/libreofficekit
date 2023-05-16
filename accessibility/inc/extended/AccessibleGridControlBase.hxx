@@ -27,7 +27,6 @@
 #include <cppuhelper/compbase4.hxx>
 #include <cppuhelper/implbase1.hxx>
 #include <cppuhelper/basemutex.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/accessibility/XAccessible.hpp>
 #include <com/sun/star/accessibility/XAccessibleContext.hpp>
@@ -38,10 +37,6 @@
 
 
 namespace vcl { class Window; }
-
-namespace utl {
-    class AccessibleStateSetHelper;
-}
 
 
 namespace accessibility {
@@ -61,12 +56,12 @@ class AccessibleGridControlBase :
     public AccessibleGridControlImplHelper
 {
 public:
-    /** Constructor sets specified name and description.
+    /** Constructor.
         @param rxParent  XAccessible interface of the parent object.
         @param rTable    The Table control.
         @param eObjType  Type of accessible table control. */
     AccessibleGridControlBase(
-        const css::uno::Reference< css::accessibility::XAccessible >& rxParent,
+        css::uno::Reference< css::accessibility::XAccessible > xParent,
         ::vcl::table::IAccessibleTable& rTable,
         ::vcl::table::AccessibleTableControlObjType  eObjType );
 
@@ -84,7 +79,7 @@ public:
     getAccessibleParent() override;
 
     /** @return  The index of this object among the parent's children. */
-    virtual sal_Int32 SAL_CALL getAccessibleIndexInParent() override;
+    virtual sal_Int64 SAL_CALL getAccessibleIndexInParent() override;
 
     /** @return
             The description of this object.
@@ -103,8 +98,7 @@ public:
         getAccessibleRelationSet() override;
 
     /** @return  The set of current states. */
-    virtual css::uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL
-        getAccessibleStateSet() override;
+    virtual sal_Int64 SAL_CALL getAccessibleStateSet() override;
 
     /** @return  The parent's locale. */
     virtual css::lang::Locale SAL_CALL getLocale() override;
@@ -188,10 +182,8 @@ public:
     inline ::vcl::table::AccessibleTableControlObjType getType() const;
 
     /** Commits an event to all listeners. */
-    void commitEvent(
-            sal_Int16 nEventId,
-            const css::uno::Any& rNewValue,
-            const css::uno::Any& rOldValue );
+    virtual void commitEvent(sal_Int16 nEventId, const css::uno::Any& rNewValue,
+                             const css::uno::Any& rOldValue);
     /** @return  TRUE, if the object is not disposed or disposing. */
     bool isAlive() const;
 
@@ -214,22 +206,18 @@ protected:
     //    @return  The bounding box (VCL rect.) in screen coordinates. */
     virtual tools::Rectangle implGetBoundingBoxOnScreen() = 0;
 
-    /** Creates a new AccessibleStateSetHelper and fills it with states of the
+    /** Creates a bitset of states of the
         current object. This method calls FillStateSet at the GridControl which
         fills it with more states depending on the object type. Derived classes
         may overwrite this method and add more states.
         @attention  This method requires locked mutex's.
-        @return  A filled AccessibleStateSetHelper. */
-    virtual rtl::Reference<::utl::AccessibleStateSetHelper> implCreateStateSetHelper();
+    */
+    virtual sal_Int64 implCreateStateSet();
 
     // internal helper methods
 
     /** @throws <type>DisposedException</type>  If the object is not alive. */
     void ensureIsAlive() const;
-
-    /** Changes the name of the object (flat assignment, no notify).
-        @attention  This method requires a locked mutex. */
-    inline void implSetName( const OUString& rName );
 
     /** Locks all mutex's and calculates the bounding box relative to the
         parent window.
@@ -257,10 +245,6 @@ protected:
     ::vcl::table::AccessibleTableControlObjType m_eObjType;
 
 private:
-    /** Localized name. */
-    OUString m_aName;
-    /** Localized description text. */
-    OUString m_aDescription;
     ::comphelper::AccessibleEventNotifier::TClientId    m_aClientId;
 };
 
@@ -313,12 +297,6 @@ private:
 inline ::vcl::table::AccessibleTableControlObjType AccessibleGridControlBase::getType() const
 {
     return m_eObjType;
-}
-
-inline void AccessibleGridControlBase::implSetName(
-        const OUString& rName )
-{
-    m_aName = rName;
 }
 
 

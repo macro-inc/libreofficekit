@@ -15,6 +15,7 @@
 #include <sfx2/lokhelper.hxx>
 
 #include <com/sun/star/frame/Desktop.hpp>
+#include <com/sun/star/ui/ContextChangeEventObject.hpp>
 
 #include <comphelper/processfactory.hxx>
 #include <rtl/strbuf.hxx>
@@ -23,7 +24,6 @@
 #include <vcl/commandevent.hxx>
 #include <vcl/window.hxx>
 #include <sal/log.hxx>
-#include <sfx2/app.hxx>
 #include <sfx2/msg.hxx>
 #include <sfx2/viewsh.hxx>
 #include <sfx2/request.hxx>
@@ -31,7 +31,6 @@
 #include <sfx2/viewfrm.hxx>
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
 #include <comphelper/lok.hxx>
-#include <editeng/outliner.hxx>
 #include <sfx2/msgpool.hxx>
 
 #include <boost/property_tree/json_parser.hpp>
@@ -76,6 +75,8 @@ namespace
 LanguageTag g_defaultLanguageTag("en-US", true);
 LanguageTag g_loadLanguageTag("en-US", true); //< The language used to load.
 LOKDeviceFormFactor g_deviceFormFactor = LOKDeviceFormFactor::UNKNOWN;
+bool g_isDefaultTimezoneSet = false;
+OUString g_DefaultTimezone;
 }
 
 int SfxLokHelper::createView(SfxViewFrame* pViewFrame, ViewShellDocId docId)
@@ -106,6 +107,11 @@ int SfxLokHelper::createView()
         return -1;
 
     return createView(pViewShell->GetViewFrame(), pViewShell->GetDocId());
+}
+
+std::unordered_map<OUString, css::uno::Reference<com::sun::star::ui::XAcceleratorConfiguration>>& SfxLokHelper::getAcceleratorConfs()
+{
+    return SfxApplication::GetOrCreate()->GetAcceleratorConfs_Impl();
 }
 
 int SfxLokHelper::createView(int nDocId)
@@ -141,10 +147,11 @@ void SfxLokHelper::destroyView(int nId)
     const ViewShellId nViewShellId(nId);
     std::vector<SfxViewShell*>& rViewArr = pApp->GetViewShells_Impl();
 
-    for (const SfxViewShell* pViewShell : rViewArr)
+    for (SfxViewShell* pViewShell : rViewArr)
     {
         if (pViewShell->GetViewShellId() == nViewShellId)
         {
+            pViewShell->SetLOKAccessibilityState(false);
             SfxViewFrame* pViewFrame = pViewShell->GetViewFrame();
             SfxRequest aRequest(pViewFrame, SID_CLOSEWIN);
             pViewFrame->Exec_Impl(aRequest);
@@ -168,12 +175,12 @@ void SfxLokHelper::setView(int nId)
         {
             DisableCallbacks dc;
 
+            if (pViewShell == SfxViewShell::Current())
+                return;
+
             // update the current LOK language and locale for the dialog tunneling
             comphelper::LibreOfficeKit::setLanguageTag(pViewShell->GetLOKLanguageTag());
             comphelper::LibreOfficeKit::setLocale(pViewShell->GetLOKLocale());
-
-            if (pViewShell == SfxViewShell::Current())
-                return;
 
             SfxViewFrame* pViewFrame = pViewShell->GetViewFrame();
             pViewFrame->MakeActive_Impl(false);
@@ -308,6 +315,20 @@ void SfxLokHelper::setViewLanguage(int nId, const OUString& rBcp47LanguageTag)
     }
 }
 
+void SfxLokHelper::setAccessibilityState(int nId, bool nEnabled)
+{
+    std::vector<SfxViewShell*>& rViewArr = SfxGetpApp()->GetViewShells_Impl();
+
+    for (SfxViewShell* pViewShell : rViewArr)
+    {
+        if (pViewShell->GetViewShellId() == ViewShellId(nId))
+        {
+            pViewShell->SetLOKAccessibilityState(nEnabled);
+            return;
+        }
+    }
+}
+
 void SfxLokHelper::setViewLocale(int nId, const OUString& rBcp47LanguageTag)
 {
     std::vector<SfxViewShell*>& rViewArr = SfxGetpApp()->GetViewShells_Impl();
@@ -337,6 +358,46 @@ void SfxLokHelper::setDeviceFormFactor(std::u16string_view rDeviceFormFactor)
         g_deviceFormFactor = LOKDeviceFormFactor::MOBILE;
     else
         g_deviceFormFactor = LOKDeviceFormFactor::UNKNOWN;
+}
+
+void SfxLokHelper::setDefaultTimezone(bool isSet, const OUString& rTimezone)
+{
+    g_isDefaultTimezoneSet = isSet;
+    g_DefaultTimezone = rTimezone;
+}
+
+std::pair<bool, OUString> SfxLokHelper::getDefaultTimezone()
+{
+    return { g_isDefaultTimezoneSet, g_DefaultTimezone };
+}
+
+void SfxLokHelper::setViewTimezone(int nId, bool isSet, const OUString& rTimezone)
+{
+    std::vector<SfxViewShell*>& rViewArr = SfxGetpApp()->GetViewShells_Impl();
+
+    for (SfxViewShell* pViewShell : rViewArr)
+    {
+        if (pViewShell->GetViewShellId() == ViewShellId(nId))
+        {
+            pViewShell->SetLOKTimezone(isSet, rTimezone);
+            return;
+        }
+    }
+}
+
+std::pair<bool, OUString> SfxLokHelper::getViewTimezone(int nId)
+{
+    std::vector<SfxViewShell*>& rViewArr = SfxGetpApp()->GetViewShells_Impl();
+
+    for (SfxViewShell* pViewShell : rViewArr)
+    {
+        if (pViewShell->GetViewShellId() == ViewShellId(nId))
+        {
+            return pViewShell->GetLOKTimezone();
+        }
+    }
+
+    return {};
 }
 
 /*
@@ -518,6 +579,11 @@ void SfxLokHelper::sendUnoStatus(const SfxViewShell* pShell, const SfxPoolItem* 
     }
 }
 
+void SfxLokHelper::notifyViewRenderState(const SfxViewShell* pShell, vcl::ITiledRenderable* pDoc)
+{
+    pShell->libreOfficeKitViewCallback(LOK_CALLBACK_VIEW_RENDER_STATE, pDoc->getViewRenderState().getStr());
+}
+
 void SfxLokHelper::notifyWindow(const SfxViewShell* pThisView,
                                 vcl::LOKWindowId nLOKWindowId,
                                 std::u16string_view rAction,
@@ -536,8 +602,10 @@ void SfxLokHelper::notifyWindow(const SfxViewShell* pThisView,
     {
         if (!rItem.first.isEmpty() && !rItem.second.isEmpty())
         {
-            aPayload.append(", \"" + rItem.first + "\": \"" +
-                    rItem.second).append('"');
+            auto aFirst = rItem.first.replaceAll("\"", "\\\"");
+            auto aSecond = rItem.second.replaceAll("\"", "\\\"");
+            aPayload.append(", \"" + aFirst + "\": \"" +
+                    aSecond).append('"');
         }
     }
     aPayload.append('}');
@@ -634,6 +702,8 @@ void SfxLokHelper::notifyAllViews(int nType, const OString& rPayload)
 
     const auto payload = rPayload.getStr();
     const SfxViewShell* const pCurrentViewShell = SfxViewShell::Current();
+    if (!pCurrentViewShell)
+        return;
     SfxViewShell* pViewShell = SfxViewShell::GetFirst();
     while (pViewShell)
     {
@@ -643,15 +713,19 @@ void SfxLokHelper::notifyAllViews(int nType, const OString& rPayload)
     }
 }
 
-void SfxLokHelper::notifyContextChange(SfxViewShell const* pViewShell, const OUString& aApplication, const OUString& aContext)
+void SfxLokHelper::notifyContextChange(const css::ui::ContextChangeEventObject& rEvent)
 {
     if (DisableCallbacks::disabled())
         return;
 
+    SfxViewShell* pViewShell = SfxViewShell::Get({ rEvent.Source, css::uno::UNO_QUERY });
+    if (!pViewShell)
+        return;
+
     OString aBuffer =
-        OUStringToOString(aApplication.replace(' ', '_'), RTL_TEXTENCODING_UTF8) +
+        OUStringToOString(rEvent.ApplicationName.replace(' ', '_'), RTL_TEXTENCODING_UTF8) +
         " " +
-        OUStringToOString(aContext.replace(' ', '_'), RTL_TEXTENCODING_UTF8);
+        OUStringToOString(rEvent.ContextName.replace(' ', '_'), RTL_TEXTENCODING_UTF8);
     pViewShell->libreOfficeKitViewCallback(LOK_CALLBACK_CONTEXT_CHANGED, aBuffer.getStr());
 }
 

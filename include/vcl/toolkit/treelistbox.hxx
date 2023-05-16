@@ -49,10 +49,6 @@ class SvLBoxButtonData;
 class Timer;
 class Edit;
 
-namespace utl {
-    class AccessibleStateSetHelper;
-}
-
 enum class SvButtonState { Unchecked, Checked, Tristate };
 
 // *********************************************************************
@@ -106,7 +102,6 @@ public:
             SvLBoxTab();
             SvLBoxTab( tools::Long nPos, SvLBoxTabFlags nFlags );
             SvLBoxTab( const SvLBoxTab& );
-            ~SvLBoxTab();
 
     SvLBoxTabFlags nFlags;
 
@@ -132,6 +127,7 @@ public:
     int GetHeight(const SvTreeListBox* pView, const SvTreeListEntry* pEntry) const;
     static int GetHeight(const SvViewDataEntry* pData, sal_uInt16 nItemPos);
     void Enable(bool bEnabled) { mbDisabled = !bEnabled; }
+    bool isEnable() const { return !mbDisabled; }
 
     virtual void Paint(const Point& rPos, SvTreeListBox& rOutDev, vcl::RenderContext& rRenderContext, const SvViewDataEntry* pView, const SvTreeListEntry& rEntry) = 0;
 
@@ -220,6 +216,7 @@ class VCL_DLLPUBLIC SvTreeListBox
     bool mbQuickSearch; // Enables type-ahead search in the check list box.
     bool mbActivateOnSingleClick; // Make single click "activate" a row like a double-click normally does
     bool mbHoverSelection; // Make mouse over a row "select" a row like a single-click normally does
+    bool mbSelectingByHover; // true during "Select" if it was due to hover
     sal_Int8        mnClicksToToggle; // 0 == Click on a row not toggle its checkbox.
                                       // 1 == Every click on row toggle its checkbox.
                                       // 2 == First click select, second click toggle.
@@ -397,6 +394,7 @@ public:
 
     OUString GetEntryTooltip(SvTreeListEntry* pEntry) const { return aTooltipHdl.Call(pEntry); }
 
+    VclPtr<Edit> GetEditWidget() const; // for UITest
     bool IsInplaceEditingEnabled() const { return bool(nImpFlags & SvTreeListBoxFlags::EDT_ENABLED); }
     bool IsEditingActive() const { return bool(nImpFlags & SvTreeListBoxFlags::IN_EDT); }
     void EndEditing( bool bCancel = false );
@@ -456,7 +454,7 @@ public:
     virtual css::uno::Reference< css::accessibility::XAccessible > CreateAccessible() override;
 
     /** Fills the StateSet of one entry. */
-    void FillAccessibleEntryStateSet( SvTreeListEntry* pEntry, ::utl::AccessibleStateSetHelper& rStateSet ) const;
+    void FillAccessibleEntryStateSet( SvTreeListEntry* pEntry, sal_Int64& rStateSet ) const;
 
     virtual OUString GetEntryAccessibleDescription(SvTreeListEntry* pEntry) const;
 
@@ -473,6 +471,10 @@ public:
     void set_min_width_in_chars(sal_Int32 nChars);
 
     virtual bool set_property(const OString &rKey, const OUString &rValue) override;
+
+    VCL_DLLPRIVATE void SetCollapsedNodeBmp( const Image& );
+    VCL_DLLPRIVATE void SetExpandedNodeBmp( const Image& );
+    VCL_DLLPRIVATE Image const & GetExpandedNodeBmp( ) const;
 
 protected:
 
@@ -534,7 +536,6 @@ public:
 
     void            EnableCheckButton( SvLBoxButtonData* );
     void            SetCheckButtonData( SvLBoxButtonData* );
-    void            SetNodeBitmaps( const Image& rCollapsedNodeBmp, const Image& rExpandedNodeBmp );
 
     /** Returns the default image which clients should use for expanded nodes, to have a consistent user
         interface experience in the whole product.
@@ -548,13 +549,7 @@ public:
 
     /** Sets default bitmaps for collapsed and expanded nodes.
     */
-    void    SetNodeDefaultImages( )
-    {
-        SetNodeBitmaps(
-            GetDefaultCollapsedNodeImage( ),
-            GetDefaultExpandedNodeImage( )
-        );
-    }
+    void    SetNodeDefaultImages();
 
     virtual SvTreeListEntry*    InsertEntry( const OUString& rText, SvTreeListEntry* pParent = nullptr,
                                          bool bChildrenOnDemand = false,
@@ -620,10 +615,6 @@ public:
     void            MakeVisible( SvTreeListEntry* pEntry );
     void            MakeVisible( SvTreeListEntry* pEntry, bool bMoveToTop );
 
-    void            SetCollapsedNodeBmp( const Image& );
-    void            SetExpandedNodeBmp( const Image& );
-    Image const &   GetExpandedNodeBmp( ) const;
-
     void            SetFont( const vcl::Font& rFont );
 
     SvTreeListEntry*    GetEntry( const Point& rPos, bool bHit = false ) const;
@@ -681,6 +672,9 @@ public:
     void            SetHoverSelection(bool bEnable) { mbHoverSelection = bEnable; }
     bool            GetHoverSelection() const { return mbHoverSelection; }
 
+    // only true during Select if the Select is due to a Hover
+    bool            IsSelectDueToHover() const { return mbSelectingByHover; }
+
     // Set when clicks toggle the checkbox of the row.
     void            SetClicksToToggle(sal_Int8 nCount) { mnClicksToToggle = nCount; }
 
@@ -689,6 +683,8 @@ public:
     virtual FactoryFunction GetUITestFactory() const override;
 
     void            SetDragHelper(const rtl::Reference<TransferDataContainer>& rHelper, sal_uInt8 eDNDConstants);
+
+    virtual void    EnableRTL(bool bEnable = true) override;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

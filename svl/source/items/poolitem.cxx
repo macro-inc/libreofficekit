@@ -289,6 +289,7 @@
 //    class Svx3DCloseFrontItem : public SfxBoolItem
 //    class Svx3DCloseBackItem : public SfxBoolItem
 //    class XFillBackgroundItem : public SfxBoolItem
+//    class XFillUseSlideBackgroundItem : public SfxBoolItem
 //    class XFillBmpSizeLogItem : public SfxBoolItem
 //    class XFillBmpTileItem : public SfxBoolItem
 //    class XFillBmpStretchItem : public SfxBoolItem
@@ -362,7 +363,7 @@
 // class SvxHyperlinkItem : public SfxPoolItem
 // class SvxNumberInfoItem : public SfxPoolItem
 // class OfaPtrItem : public SfxPoolItem
-// class OfaRefItem : public SfxPoolItem
+// class OfaXColorListItem : public SfxPoolItem
 // class SvxGridItem : public SvxOptionsGrid, public SfxPoolItem
 //     class SdOptionsGridItem : public SvxGridItem
 // class SvxPageItem: public SfxPoolItem
@@ -433,9 +434,6 @@
 // class SwMsgPoolItem : public SfxPoolItem
 //     class SwPtrMsgPoolItem : public SwMsgPoolItem
 //     class SwFormatChg: public SwMsgPoolItem
-//     class SwInsText: public SwMsgPoolItem
-//     class SwDelChr: public SwMsgPoolItem
-//     class SwDelText: public SwMsgPoolItem
 //     class SwUpdateAttr : public SwMsgPoolItem
 //     class SwRefMarkFieldUpdate : public SwMsgPoolItem
 //     class SwDocPosUpdate : public SwMsgPoolItem

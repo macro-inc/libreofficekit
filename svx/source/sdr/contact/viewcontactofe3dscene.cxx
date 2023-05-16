@@ -238,8 +238,8 @@ void ViewContactOfE3dScene::createObjectTransformation()
     // create 2d Object Transformation from relative point in 2d scene to world
     const tools::Rectangle aRectangle(GetE3dScene().GetSnapRect());
 
-    maObjectTransformation.set(0, 0, aRectangle.getWidth());
-    maObjectTransformation.set(1, 1, aRectangle.getHeight());
+    maObjectTransformation.set(0, 0, aRectangle.getOpenWidth());
+    maObjectTransformation.set(1, 1, aRectangle.getOpenHeight());
     maObjectTransformation.set(0, 2, aRectangle.Left());
     maObjectTransformation.set(1, 2, aRectangle.Top());
 }
@@ -320,17 +320,13 @@ drawinglayer::primitive2d::Primitive2DContainer ViewContactOfE3dScene::createSce
     return xRetval;
 }
 
-drawinglayer::primitive2d::Primitive2DContainer ViewContactOfE3dScene::createViewIndependentPrimitive2DSequence() const
+void ViewContactOfE3dScene::createViewIndependentPrimitive2DSequence(drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
 {
-    drawinglayer::primitive2d::Primitive2DContainer xRetval;
-
     if(GetObjectCount())
     {
         // create a default ScenePrimitive2D (without visibility test of members)
-        xRetval = createScenePrimitive2DSequence(nullptr);
+        rVisitor.visit(createScenePrimitive2DSequence(nullptr));
     }
-
-    return xRetval;
 }
 
 void ViewContactOfE3dScene::ActionChanged()

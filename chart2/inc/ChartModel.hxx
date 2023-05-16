@@ -57,7 +57,6 @@
 #include <memory>
 
 namespace com::sun::star::awt { class XRequestCallback; }
-namespace com::sun::star::chart2 { class XChartTypeTemplate; }
 namespace com::sun::star::chart2::data { class XDataProvider; }
 namespace com::sun::star::document { class XFilter; }
 namespace com::sun::star::embed { class XStorage; }
@@ -66,9 +65,16 @@ namespace com::sun::star::uno { class XComponentContext; }
 namespace com::sun::star::uno { class XAggregation; }
 
 class SvNumberFormatter;
+class SvNumberFormatsSupplierObj;
 
 namespace chart
 {
+class Diagram;
+class ChartTypeManager;
+class ChartTypeTemplate;
+class InternalDataProvider;
+class NameContainer;
+class PageBackground;
 
 namespace impl
 {
@@ -106,7 +112,8 @@ typedef cppu::WeakImplHelper<
 class UndoManager;
 class ChartView;
 
-class OOO_DLLPUBLIC_CHARTTOOLS ChartModel final : public impl::ChartModel_Base, public sfx2::XmlDump
+class OOO_DLLPUBLIC_CHARTTOOLS SAL_LOPLUGIN_ANNOTATE("crosscast") ChartModel final :
+    public impl::ChartModel_Base, public sfx2::XmlDump
 {
 
 private:
@@ -120,7 +127,7 @@ private:
 
     bool mbTimeBased;
 
-    rtl::Reference<ChartView> mxChartView;
+    mutable rtl::Reference<ChartView> mxChartView;
 
     OUString m_aResource;
     css::uno::Sequence< css::beans::PropertyValue >   m_aMediaDescriptor;
@@ -146,28 +153,25 @@ private:
     /** is only valid if m_xDataProvider is set. If m_xDataProvider is set to an
         external data provider this reference must be set to 0
     */
-    css::uno::Reference< css::chart2::data::XDataProvider >   m_xInternalDataProvider;
+    rtl::Reference< InternalDataProvider > m_xInternalDataProvider;
 
-    css::uno::Reference< css::util::XNumberFormatsSupplier >
-                                m_xOwnNumberFormatsSupplier;
+    rtl::Reference< SvNumberFormatsSupplierObj > m_xOwnNumberFormatsSupplier;
     css::uno::Reference< css::util::XNumberFormatsSupplier >
                                 m_xNumberFormatsSupplier;
     std::unique_ptr< SvNumberFormatter > m_apSvNumberFormatter; // #i113784# avoid memory leak
 
-    css::uno::Reference< css::chart2::XChartTypeManager >
+    rtl::Reference< ::chart::ChartTypeManager >
         m_xChartTypeManager;
 
     // Diagram Access
-    css::uno::Reference< css::chart2::XDiagram >
-        m_xDiagram;
+    rtl::Reference< ::chart::Diagram > m_xDiagram;
 
     css::uno::Reference< css::chart2::XTitle >
                                           m_xTitle;
 
-    css::uno::Reference< css::beans::XPropertySet >
-                                          m_xPageBackground;
+    rtl::Reference< ::chart::PageBackground > m_xPageBackground;
 
-    css::uno::Reference< css::container::XNameAccess>     m_xXMLNamespaceMap;
+    rtl::Reference< ::chart::NameContainer > m_xXMLNamespaceMap;
 
 private:
     //private methods
@@ -202,7 +206,7 @@ private:
     css::uno::Reference< css::document::XFilter >
         impl_createFilter( const css::uno::Sequence< css::beans::PropertyValue > & rMediaDescriptor );
 
-    css::uno::Reference< css::chart2::XChartTypeTemplate > impl_createDefaultChartTypeTemplate();
+    rtl::Reference< ::chart::ChartTypeTemplate > impl_createDefaultChartTypeTemplate();
     css::uno::Reference< css::chart2::data::XDataSource > impl_createDefaultData();
 
     void impl_adjustAdditionalShapesPositionAndSize(
@@ -212,7 +216,7 @@ private:
 
 public:
     ChartModel() = delete;
-    ChartModel(css::uno::Reference< css::uno::XComponentContext > const & xContext);
+    ChartModel(css::uno::Reference< css::uno::XComponentContext > xContext);
     explicit ChartModel( const ChartModel & rOther );
     virtual ~ChartModel() override;
 
@@ -454,7 +458,9 @@ public:
     css::uno::Reference< css::util::XNumberFormatsSupplier > const &
         getNumberFormatsSupplier();
 
-    css::uno::Reference< css::uno::XInterface > getChartView() const;
+    ChartView* getChartView() const;
+
+    const rtl::Reference< ::chart::Diagram > & getFirstChartDiagram() { return m_xDiagram; }
 
     bool isTimeBased() const { return mbTimeBased;}
 
@@ -465,6 +471,8 @@ public:
     bool isDataFromPivotTable() const;
 
     void removeDataProviders();
+
+    const rtl::Reference< ::chart::ChartTypeManager > & getTypeManager() const { return m_xChartTypeManager; }
 
     /// See sfx2::XmlDump::dumpAsXml().
     void dumpAsXml(xmlTextWriterPtr pWriter) const override;

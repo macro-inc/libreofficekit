@@ -523,7 +523,7 @@ bool LoadLibrary_ODBC3(OUString &_rPath);
 
     #define N3SQLGetCursorName(a,b,c,d) (*reinterpret_cast<T3SQLGetCursorName>(getOdbcFunction(ODBC3SQLFunctionId::GetCursorName)))(a,b,c,d)
 
-    typedef SQLRETURN  (SQL_API  *T3SQLNativeSql) ( SQLHSTMT                ConnectionHandle,
+    typedef SQLRETURN  (SQL_API  *T3SQLNativeSql) ( SQLHDBC                 ConnectionHandle,
                                                     SQLCHAR *               InStatementText,
                                                     SQLINTEGER              TextLength1,
                                                     SQLCHAR *               OutStatementText,

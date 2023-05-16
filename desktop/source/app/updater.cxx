@@ -285,7 +285,7 @@ bool isUserWritable(const OUString& rFileURL)
 
 bool update()
 {
-    utl::TempFile aTempDir(nullptr, true);
+    utl::TempFileNamed aTempDir(nullptr, true);
     OUString aTempDirURL = aTempDir.GetURL();
     CopyUpdaterToTempDir(Updater::getExecutableDirURL(), aTempDirURL);
 
@@ -562,11 +562,15 @@ std::string download_content(const OString& rURL, bool bFile, OUString& rHash)
     headerlist = curl_slist_append(headerlist, buf);
     curl_easy_setopt(curl.get(), CURLOPT_HTTPHEADER, headerlist);
     curl_easy_setopt(curl.get(), CURLOPT_FOLLOWLOCATION, 1); // follow redirects
-    // only allow redirect to http:// and https://
-    curl_easy_setopt(curl.get(), CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
+    // only allow redirect to https://
+#if (LIBCURL_VERSION_MAJOR > 7) || (LIBCURL_VERSION_MAJOR == 7 && LIBCURL_VERSION_MINOR >= 85)
+    curl_easy_setopt(curl.get(), CURLOPT_REDIR_PROTOCOLS_STR, "https");
+#else
+    curl_easy_setopt(curl.get(), CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTPS);
+#endif
 
     std::string response_body;
-    utl::TempFile aTempFile;
+    utl::TempFileNamed aTempFile;
     WriteDataFile aFile(aTempFile.GetStream(StreamMode::WRITE));
     if (!bFile)
     {

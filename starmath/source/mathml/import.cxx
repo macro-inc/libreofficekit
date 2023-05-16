@@ -32,27 +32,23 @@
 #include <sfx2/docfile.hxx>
 #include <sfx2/frame.hxx>
 #include <sfx2/sfxsids.hrc>
-#include <sfx2/sfxmodelfactory.hxx>
 #include <sot/storage.hxx>
 #include <svtools/sfxecode.hxx>
 #include <svl/itemset.hxx>
 #include <svl/stritem.hxx>
-#include <sax/tools/converter.hxx>
 #include <svx/dialmgr.hxx>
 #include <svx/strings.hrc>
-#include <tools/diagnose_ex.h>
 #include <unotools/streamwrap.hxx>
 #include <xmloff/DocumentSettingsContext.hxx>
 #include <xmloff/xmlmetai.hxx>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/xmltoken.hxx>
-#include <xmloff/xmluconv.hxx>
+#include <o3tl/string_view.hxx>
 
 // Our starmath tools
 #include <cfgitem.hxx>
 #include <document.hxx>
 #include <xparsmlbase.hxx>
-#include <utility.hxx>
 #include <smmod.hxx>
 #include <starmathdatabase.hxx>
 #include <unomodel.hxx>
@@ -137,15 +133,14 @@ ErrCode SmMLImportWrapper::Import(SfxMedium& rMedium)
         SfxItemSet* pSet = rMedium.GetItemSet();
         if (pSet)
         {
-            const SfxUnoAnyItem* pItem
-                = static_cast<const SfxUnoAnyItem*>(pSet->GetItem(SID_PROGRESS_STATUSBAR_CONTROL));
+            const SfxUnoAnyItem* pItem = pSet->GetItem(SID_PROGRESS_STATUSBAR_CONTROL);
             if (pItem != nullptr)
                 pItem->GetValue() >>= xStatusIndicator;
         }
     }
 
     // Create property list
-    comphelper::PropertyMapEntry aInfoMap[]
+    static const comphelper::PropertyMapEntry aInfoMap[]
         = { { u"PrivateData", 0, cppu::UnoType<XInterface>::get(),
               beans::PropertyAttribute::MAYBEVOID, 0 },
             { u"BaseURI", 0, ::cppu::UnoType<OUString>::get(), beans::PropertyAttribute::MAYBEVOID,
@@ -153,15 +148,14 @@ ErrCode SmMLImportWrapper::Import(SfxMedium& rMedium)
             { u"StreamRelPath", 0, ::cppu::UnoType<OUString>::get(),
               beans::PropertyAttribute::MAYBEVOID, 0 },
             { u"StreamName", 0, ::cppu::UnoType<OUString>::get(),
-              beans::PropertyAttribute::MAYBEVOID, 0 },
-            { u"", 0, css::uno::Type(), 0, 0 } };
+              beans::PropertyAttribute::MAYBEVOID, 0 } };
     uno::Reference<beans::XPropertySet> xInfoSet(
         comphelper::GenericPropertySet_CreateInstance(new comphelper::PropertySetInfo(aInfoMap)));
 
     // Set base URI
     // needed for relative URLs; but it's OK to import e.g. MathML from the clipboard without one
     SAL_INFO_IF(rMedium.GetBaseURL().isEmpty(), "starmath", "SmMLImportWrapper: no base URL");
-    xInfoSet->setPropertyValue("BaseURI", makeAny(rMedium.GetBaseURL()));
+    xInfoSet->setPropertyValue("BaseURI", Any(rMedium.GetBaseURL()));
 
     // Fetch progress range
     sal_Int32 nProgressRange(rMedium.IsStorage() ? 3 : 1);
@@ -180,14 +174,14 @@ ErrCode SmMLImportWrapper::Import(SfxMedium& rMedium)
             OUString aName(u"dummyObjName");
             if (rMedium.GetItemSet())
             {
-                const SfxStringItem* pDocHierarchItem = static_cast<const SfxStringItem*>(
-                    rMedium.GetItemSet()->GetItem(SID_DOC_HIERARCHICALNAME));
+                const SfxStringItem* pDocHierarchItem
+                    = rMedium.GetItemSet()->GetItem(SID_DOC_HIERARCHICALNAME);
                 if (pDocHierarchItem != nullptr)
                     aName = pDocHierarchItem->GetValue();
             }
 
             if (!aName.isEmpty())
-                xInfoSet->setPropertyValue("StreamRelPath", makeAny(aName));
+                xInfoSet->setPropertyValue("StreamRelPath", Any(aName));
         }
 
         // Check if use OASIS ( new document format )
@@ -237,7 +231,7 @@ ErrCode SmMLImportWrapper::Import(SfxMedium& rMedium)
                                         xInfoSet, u"com.sun.star.comp.Math.XMLSettingsImporter", 5);
 
         // Check if successful
-        if (nWarn == ERRCODE_IO_BROKENPACKAGE)
+        if (nWarn != ERRCODE_NONE)
         {
             if (xStatusIndicator.is())
                 xStatusIndicator->end();
@@ -347,7 +341,7 @@ ErrCode SmMLImportWrapper::Import(std::u16string_view aSource)
     }
 
     // Create property list
-    comphelper::PropertyMapEntry aInfoMap[]
+    static const comphelper::PropertyMapEntry aInfoMap[]
         = { { u"PrivateData", 0, cppu::UnoType<XInterface>::get(),
               beans::PropertyAttribute::MAYBEVOID, 0 },
             { u"BaseURI", 0, ::cppu::UnoType<OUString>::get(), beans::PropertyAttribute::MAYBEVOID,
@@ -355,8 +349,7 @@ ErrCode SmMLImportWrapper::Import(std::u16string_view aSource)
             { u"StreamRelPath", 0, ::cppu::UnoType<OUString>::get(),
               beans::PropertyAttribute::MAYBEVOID, 0 },
             { u"StreamName", 0, ::cppu::UnoType<OUString>::get(),
-              beans::PropertyAttribute::MAYBEVOID, 0 },
-            { u"", 0, css::uno::Type(), 0, 0 } };
+              beans::PropertyAttribute::MAYBEVOID, 0 } };
     uno::Reference<beans::XPropertySet> xInfoSet(
         comphelper::GenericPropertySet_CreateInstance(new comphelper::PropertySetInfo(aInfoMap)));
 
@@ -442,6 +435,9 @@ ErrCode SmMLImportWrapper::ReadThroughComponentIS(
             else
             {
                 SAL_WARN("starmath", "Filter failed on file input");
+                // However this can not be included since it's not public
+                if (pXMlImport == nullptr)
+                    return ERRCODE_NONE;
                 return ERRCODE_SFX_DOLOADFAILED;
             }
         }
@@ -540,7 +536,7 @@ ErrCode SmMLImportWrapper::ReadThroughComponentS(const uno::Reference<embed::XSt
         aAny >>= bEncrypted;
 
         // Set base URL and open stream
-        rPropSet->setPropertyValue("StreamName", makeAny(OUString(pStreamName)));
+        rPropSet->setPropertyValue("StreamName", Any(OUString(pStreamName)));
         Reference<io::XInputStream> xStream = xEventsStream->getInputStream();
 
         // Execute read
@@ -691,7 +687,7 @@ public:
 
     /** Handle mathml length attributes
     */
-    SmLengthValue handleLengthAttributte(const OUString& aAttribute);
+    SmLengthValue handleLengthAttribute(const OUString& aAttribute);
 };
 
 uno::Reference<XFastContextHandler> SAL_CALL
@@ -810,7 +806,7 @@ void SmMLImportContext::inheritStyleEnd()
     }
 }
 
-SmLengthValue SmMLImportContext::handleLengthAttributte(const OUString& aAttribute)
+SmLengthValue SmMLImportContext::handleLengthAttribute(const OUString& aAttribute)
 {
     // Locate unit indication
     int32_t nUnitPos;
@@ -846,8 +842,8 @@ SmLengthValue SmMLImportContext::handleLengthAttributte(const OUString& aAttribu
     }
 
     // Get value
-    OUString aValue = aAttribute.copy(0, nUnitPos);
-    double nValue = aValue.toDouble();
+    std::u16string_view aValue = aAttribute.subView(0, nUnitPos);
+    double nValue = o3tl::toDouble(aValue);
     if (nValue == 0)
     {
         nUnit = SmLengthUnit::MlM;
@@ -954,7 +950,7 @@ void SmMLImportContext::handleAttributes(const Reference<XFastAttributeList>& aA
             case XML_LSPACE:
             {
                 SmMlLspace aLspace;
-                aLspace.m_aLengthValue = handleLengthAttributte(aIter.toString());
+                aLspace.m_aLengthValue = handleLengthAttribute(aIter.toString());
                 aAttribute.setMlLspace(&aLspace);
                 break;
             }
@@ -996,7 +992,7 @@ void SmMLImportContext::handleAttributes(const Reference<XFastAttributeList>& aA
             case XML_MATHSIZE:
             {
                 SmMlMathsize aMathsize;
-                aMathsize.m_aLengthValue = handleLengthAttributte(aIter.toString());
+                aMathsize.m_aLengthValue = handleLengthAttribute(aIter.toString());
                 aAttribute.setMlMathsize(&aMathsize);
                 break;
             }
@@ -1050,11 +1046,14 @@ void SmMLImportContext::handleAttributes(const Reference<XFastAttributeList>& aA
             {
                 SmMlMaxsize aMaxsize;
                 if (IsXMLToken(aIter, XML_INFINITY))
+                {
                     aMaxsize.m_aMaxsize = SmMlAttributeValueMaxsize::MlInfinity;
+                    aMaxsize.m_aLengthValue = { SmLengthUnit::MlP, 10000, new OUString(u"10000%") };
+                }
                 else
                 {
                     aMaxsize.m_aMaxsize = SmMlAttributeValueMaxsize::MlFinite;
-                    aMaxsize.m_aLengthValue = handleLengthAttributte(aIter.toString());
+                    aMaxsize.m_aLengthValue = handleLengthAttribute(aIter.toString());
                 }
                 aAttribute.setMlMaxsize(&aMaxsize);
                 break;
@@ -1062,7 +1061,7 @@ void SmMLImportContext::handleAttributes(const Reference<XFastAttributeList>& aA
             case XML_MINSIZE:
             {
                 SmMlMinsize aMinsize;
-                aMinsize.m_aLengthValue = handleLengthAttributte(aIter.toString());
+                aMinsize.m_aLengthValue = handleLengthAttribute(aIter.toString());
                 aAttribute.setMlMinsize(&aMinsize);
                 break;
             }
@@ -1087,7 +1086,7 @@ void SmMLImportContext::handleAttributes(const Reference<XFastAttributeList>& aA
             case XML_RSPACE:
             {
                 SmMlRspace aRspace;
-                aRspace.m_aLengthValue = handleLengthAttributte(aIter.toString());
+                aRspace.m_aLengthValue = handleLengthAttribute(aIter.toString());
                 aAttribute.setMlRspace(&aRspace);
                 break;
             }

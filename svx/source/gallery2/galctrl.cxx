@@ -205,7 +205,8 @@ void GalleryPreview::PreviewMedia( const INetURLObject& rURL )
 
     if (!pFloater)
     {
-        SfxViewFrame::Current()->GetBindings().GetDispatcher()->Execute( SID_AVMEDIA_PLAYER, SfxCallMode::SYNCHRON );
+        if (SfxViewFrame* pViewFrm = SfxViewFrame::Current())
+            pViewFrm->GetBindings().GetDispatcher()->Execute( SID_AVMEDIA_PLAYER, SfxCallMode::SYNCHRON );
         pFloater = avmedia::getMediaFloater();
     }
 
@@ -383,9 +384,9 @@ bool GalleryIconView::Command(const CommandEvent& rCEvt)
 {
     bool bRet = ValueSet::Command(rCEvt);
 
-    if (rCEvt.GetCommand() == CommandEventId::ContextMenu)
+    if (!bRet && rCEvt.GetCommand() == CommandEventId::ContextMenu)
     {
-        mpParent->ShowContextMenu(rCEvt);
+        bRet = mpParent->ShowContextMenu(rCEvt);
     }
 
     return bRet;

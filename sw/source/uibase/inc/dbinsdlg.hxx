@@ -20,6 +20,7 @@
 #ifndef INCLUDED_SW_SOURCE_UIBASE_INC_DBINSDLG_HXX
 #define INCLUDED_SW_SOURCE_UIBASE_INC_DBINSDLG_HXX
 
+#include <utility>
 #include <vcl/weld.hxx>
 #include <sfx2/basedlgs.hxx>
 #include <unotools/configitem.hxx>
@@ -60,8 +61,8 @@ struct SwInsDBColumn
     bool bHasFormat : 1;
     bool bIsDBFormat : 1;
 
-    SwInsDBColumn( const OUString& rStr )
-        : sColumn( rStr ),
+    SwInsDBColumn( OUString aStr )
+        : sColumn(std::move( aStr )),
         nDBNumFormat( 0 ),
         nUsrNumFormat( 0 ),
         eUsrNumFormatLng( LANGUAGE_SYSTEM ),
@@ -78,17 +79,17 @@ class SwInsDBColumns : public o3tl::sorted_vector<std::unique_ptr<SwInsDBColumn>
 
 class SwInsertDBColAutoPilot final : public SfxDialogController, public utl::ConfigItem
 {
-    SwInsDBColumns  aDBColumns;
-    const SwDBData  aDBData;
+    SwInsDBColumns  m_aDBColumns;
+    const SwDBData  m_aDBData;
 
-    OUString        sNoTmpl;
+    OUString        m_sNoTmpl;
 
-    SwView*         pView;
+    SwView*         m_pView;
     std::unique_ptr<SwTableAutoFormat> m_xTAutoFormat;
 
-    std::unique_ptr<SfxItemSet>  pTableSet;
-    std::unique_ptr<SwTableRep>  pRep;
-    sal_Int32       nGBFormatLen;
+    std::unique_ptr<SfxItemSet>  m_pTableSet;
+    std::unique_ptr<SwTableRep>  m_pRep;
+    sal_Int32       m_nGBFormatLen;
 
     std::unique_ptr<weld::RadioButton> m_xRbAsTable;
     std::unique_ptr<weld::RadioButton> m_xRbAsField;
@@ -145,7 +146,7 @@ public:
     SwInsertDBColAutoPilot( SwView& rView,
         css::uno::Reference< css::sdbc::XDataSource> const & rxSource,
         css::uno::Reference<css::sdbcx::XColumnsSupplier> const & xColSupp,
-        const SwDBData& rData  );
+        SwDBData aData  );
 
     virtual ~SwInsertDBColAutoPilot() override;
 

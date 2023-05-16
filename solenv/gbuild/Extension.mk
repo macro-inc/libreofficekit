@@ -81,7 +81,7 @@ else
 $(call gb_Extension_get_workdir,%)/description.xml : $(gb_Extension_XRMEXDEPS) $(gb_Helper_LANGSTARGET)
 	$(call gb_Output_announce,$*/description.xml,$(true),XRM,3)
 	$(call gb_Trace_StartRange,$*/description.xml,XRM)
-	MERGEINPUT=$(call gb_var2file,$(shell $(gb_MKTEMP)),100,$(POFILES)) && \
+	MERGEINPUT=$(call gb_var2file,$(shell $(gb_MKTEMP)),$(POFILES)) && \
 	$(call gb_Helper_abbreviate_dirs,\
 		mkdir -p $(call gb_Extension_get_workdir,$*) && \
 		$(gb_Extension_XRMEXCOMMAND) \
@@ -108,7 +108,7 @@ $(call gb_Extension_get_target,%) : \
 		$(if $(LICENSE),cp -f $(LICENSE) $(call gb_Extension_get_rootdir,$*)/registration &&) \
 		$(if $(and $(gb_Extension_TRANS_LANGS),$(DESCRIPTION)),cp $(foreach lang,$(gb_Extension_TRANS_LANGS),$(call gb_Extension_get_workdir,$*)/description-$(lang).txt) $(call gb_Extension_get_rootdir,$*) &&) \
 		cd $(call gb_Extension_get_rootdir,$*) && \
-		ZIPFILES=$(call gb_var2file,$(shell $(gb_MKTEMP)),500,$(sort $(FILES))) && \
+		ZIPFILES=$(call gb_var2file,$(shell $(gb_MKTEMP)),$(sort $(FILES))) && \
 		$(gb_Extension_ZIPCOMMAND) -rX --filesync --must-match \
 			$(call gb_Extension_get_target,$*) \
 			`cat $${ZIPFILES} | tr -d '\r'` && rm $${ZIPFILES})
@@ -189,7 +189,7 @@ endef
 # add a library from workdir; DO NOT use gb_Library_get_target
 define gb_Extension_add_library
 $(call gb_Extension_add_file,$(1),$(call gb_Library_get_runtime_filename,$(2)),\
-	$(call gb_LinkTarget_get_target,$(call gb_Library_get_linktarget,$(2))))
+	$(call gb_Library_get_linktarget_target,$(2)))
 
 endef
 

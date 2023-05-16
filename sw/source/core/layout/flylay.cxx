@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <pagefrm.hxx>
 #include <rootfrm.hxx>
 #include <cntfrm.hxx>
@@ -25,7 +27,6 @@
 #include <ftnfrm.hxx>
 #include <frmatr.hxx>
 #include <frmtool.hxx>
-#include <hints.hxx>
 #include <sectfrm.hxx>
 #include <notxtfrm.hxx>
 #include <txtfly.hxx>
@@ -51,8 +52,8 @@
 
 using namespace ::com::sun::star;
 
-SwFlyFreeFrame::SwFlyFreeFrame( SwFlyFrameFormat *pFormat, SwFrame* pSib, SwFrame *pAnch )
-:   SwFlyFrame( pFormat, pSib, pAnch ),
+SwFlyFreeFrame::SwFlyFreeFrame( SwFlyFrameFormat *pFormat, SwFrame* pSib, SwFrame *pAnch, bool bFollow )
+:   SwFlyFrame( pFormat, pSib, pAnch, bFollow ),
     // #i34753#
     mbNoMakePos( false ),
     // #i37068#
@@ -331,13 +332,11 @@ bool SwFlyFreeFrame::supportsAutoContour() const
 
     // Check for Padding. Do not support when padding is used, this will
     // produce a covered space around the object (filled with fill defines)
-    const SfxPoolItem* pItem(nullptr);
+    const SvxBoxItem* pBoxItem(nullptr);
 
-    if(GetFormat() && SfxItemState::SET == GetFormat()->GetItemState(RES_BOX, false, &pItem))
+    if(GetFormat() && (pBoxItem = GetFormat()->GetItemIfSet(RES_BOX, false)))
     {
-        const SvxBoxItem& rBox = *static_cast< const SvxBoxItem* >(pItem);
-
-        if(rBox.HasBorder(/*bTreatPaddingAsBorder*/true))
+        if(pBoxItem->HasBorder(/*bTreatPaddingAsBorder*/true))
         {
             return false;
         }
@@ -358,7 +357,7 @@ bool SwFlyFreeFrame::supportsAutoContour() const
     {
         const std::unique_ptr<SvxBrushItem> aBack(GetFormat()->makeBackgroundBrushItem());
 
-        if(aBack && aBack->isUsed())
+        if(aBack->isUsed())
         {
             return false;
         }
@@ -721,6 +720,19 @@ SwFlyLayFrame::SwFlyLayFrame( SwFlyFrameFormat *pFormat, SwFrame* pSib, SwFrame 
     m_bLayout = true;
 }
 
+void SwFlyLayFrame::RegisterAtPage(SwPageFrame & rPageFrame)
+{
+    assert(GetPageFrame() != &rPageFrame);
+    if (GetPageFrame())
+    {
+        GetPageFrame()->MoveFly( this, &rPageFrame );
+    }
+    else
+    {
+        rPageFrame.AppendFlyToPage( this );
+    }
+}
+
 // #i28701#
 
 void SwFlyLayFrame::SwClientNotify(const SwModify& rMod, const SfxHint& rHint)
@@ -768,7 +780,7 @@ void SwFlyLayFrame::SwClientNotify(const SwModify& rMod, const SfxHint& rHint)
     }
     else
     {
-        SwNodeIndex aIdx(pAnch->GetContentAnchor()->nNode);
+        SwNodeIndex aIdx(*pAnch->GetAnchorNode());
         SwContentFrame* pContent = GetFormat()->GetDoc()->GetNodes().GoNext(&aIdx)->
                 GetContentNode()->getLayoutFrame(getRootFrame(), nullptr, nullptr);
         if(pContent)
@@ -811,10 +823,23 @@ void SwPageFrame::AppendFlyToPage( SwFlyFrame *pNew )
     {
         //#i119945# set pFly's OrdNum to _rNewObj's. So when pFly is removed by Undo, the original OrdNum will not be changed.
         sal_uInt32 nNewNum = pObj->GetOrdNumDirect();
+        SdrObject* pDrawObj = nullptr;
+        if (auto pFormat = pFly->GetFormat())
+            if (auto pShapeFormat = SwTextBoxHelper::getOtherTextBoxFormat(pFormat, RES_FLYFRMFMT))
+                pDrawObj = pShapeFormat->FindRealSdrObject();
+
+        if (pDrawObj)
+        {
+            if (auto pPage = pDrawObj->getSdrPageFromSdrObject())
+                pPage->SetObjectOrdNum(pDrawObj->GetOrdNumDirect(), nNewNum);
+            else
+                pDrawObj->SetOrdNum(nNewNum);
+        }
+
         if ( pObj->getSdrPageFromSdrObject() )
-            pObj->getSdrPageFromSdrObject()->SetObjectOrdNum( pFly->GetVirtDrawObj()->GetOrdNumDirect(), nNewNum );
+            pObj->getSdrPageFromSdrObject()->SetObjectOrdNum( pFly->GetVirtDrawObj()->GetOrdNumDirect(), nNewNum + (pDrawObj ? 1 : 0) );
         else
-            pFly->GetVirtDrawObj()->SetOrdNum( nNewNum );
+            pFly->GetVirtDrawObj()->SetOrdNum( nNewNum + (pDrawObj ? 1 : 0));
     }
 
     // Don't look further at Flys that sit inside the Content.
@@ -846,6 +871,7 @@ void SwPageFrame::AppendFlyToPage( SwFlyFrame *pNew )
         // Notify accessible layout. That's required at this place for
         // frames only where the anchor is moved. Creation of new frames
         // is additionally handled by the SwFrameNotify class.
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
         if( GetUpper() &&
             static_cast< SwRootFrame * >( GetUpper() )->IsAnyShellAccessible() &&
              static_cast< SwRootFrame * >( GetUpper() )->GetCurrShell() )
@@ -853,6 +879,7 @@ void SwPageFrame::AppendFlyToPage( SwFlyFrame *pNew )
             static_cast< SwRootFrame * >( GetUpper() )->GetCurrShell()->Imp()
                                       ->AddAccessibleFrame( pNew );
         }
+#endif
     }
 
     // #i28701# - correction: consider also drawing objects
@@ -919,6 +946,7 @@ void SwPageFrame::RemoveFlyFromPage( SwFlyFrame *pToRemove )
     // Notify accessible layout. That's required at this place for
     // frames only where the anchor is moved. Creation of new frames
     // is additionally handled by the SwFrameNotify class.
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if( GetUpper() &&
         static_cast< SwRootFrame * >( GetUpper() )->IsAnyShellAccessible() &&
         static_cast< SwRootFrame * >( GetUpper() )->GetCurrShell() )
@@ -926,6 +954,7 @@ void SwPageFrame::RemoveFlyFromPage( SwFlyFrame *pToRemove )
         static_cast< SwRootFrame * >( GetUpper() )->GetCurrShell()->Imp()
                                   ->DisposeAccessibleFrame( pToRemove, true );
     }
+#endif
 
     // #i28701# - use new method <SetPageFrame(..)>
     pToRemove->SetPageFrame( nullptr );
@@ -955,6 +984,7 @@ void SwPageFrame::MoveFly( SwFlyFrame *pToMove, SwPageFrame *pDest )
     // Notify accessible layout. That's required at this place for
     // frames only where the anchor is moved. Creation of new frames
     // is additionally handled by the SwFrameNotify class.
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if( GetUpper() &&
         static_cast< SwRootFrame * >( GetUpper() )->IsAnyShellAccessible() &&
         static_cast< SwRootFrame * >( GetUpper() )->GetCurrShell() )
@@ -962,6 +992,7 @@ void SwPageFrame::MoveFly( SwFlyFrame *pToMove, SwPageFrame *pDest )
         static_cast< SwRootFrame * >( GetUpper() )->GetCurrShell()->Imp()
                                   ->DisposeAccessibleFrame( pToMove, true );
     }
+#endif
 
     // The FlyColl might be gone already, because the page's dtor is being executed.
     if ( m_pSortedObjs )
@@ -970,6 +1001,24 @@ void SwPageFrame::MoveFly( SwFlyFrame *pToMove, SwPageFrame *pDest )
         if ( !m_pSortedObjs->size() )
         {
             m_pSortedObjs.reset();
+        }
+
+        // Removing a fly from the page affects the margin of tables, so update the frame print area
+        // of the lowers of my body frame.
+        SwFrame* pBodyFrame = FindBodyCont();
+        if (pBodyFrame)
+        {
+            for (SwFrame* pFrame = pBodyFrame->GetLower(); pFrame; pFrame = pFrame->GetNext())
+            {
+                if (!pFrame->IsTabFrame())
+                {
+                    // This is meant to match SwTabFrame::CalcFlyOffsets(), so not relevant for
+                    // other frame types.
+                    continue;
+                }
+
+                pFrame->InvalidatePrt();
+            }
         }
     }
 
@@ -991,6 +1040,7 @@ void SwPageFrame::MoveFly( SwFlyFrame *pToMove, SwPageFrame *pDest )
     // Notify accessible layout. That's required at this place for
     // frames only where the anchor is moved. Creation of new frames
     // is additionally handled by the SwFrameNotify class.
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if( GetUpper() &&
         static_cast< SwRootFrame * >( GetUpper() )->IsAnyShellAccessible() &&
         static_cast< SwRootFrame * >( GetUpper() )->GetCurrShell() )
@@ -998,6 +1048,7 @@ void SwPageFrame::MoveFly( SwFlyFrame *pToMove, SwPageFrame *pDest )
         static_cast< SwRootFrame * >( GetUpper() )->GetCurrShell()->Imp()
                                   ->AddAccessibleFrame( pToMove );
     }
+#endif
 
     // #i28701# - correction: move lowers of Writer fly frame
     if ( !pToMove->GetDrawObjs() )

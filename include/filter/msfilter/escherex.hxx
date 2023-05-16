@@ -21,6 +21,7 @@
 #define INCLUDED_FILTER_MSFILTER_ESCHEREX_HXX
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include <com/sun/star/awt/Point.hpp>
@@ -37,7 +38,6 @@
 #include <svx/svdtypes.hxx>
 #include <svx/msdffdef.hxx>
 #include <tools/gen.hxx>
-#include <tools/solar.h>
 #include <tools/stream.hxx>
 #include <vcl/mapmod.hxx>
 #include <o3tl/typed_flags_set.hxx>
@@ -462,34 +462,36 @@ struct MSFILTER_DLLPUBLIC EscherConnectorListEntry
 
     sal_uInt32      GetConnectorRule( bool bFirst );
 
-                    EscherConnectorListEntry( const css::uno::Reference< css::drawing::XShape > & rC,
+                    EscherConnectorListEntry( css::uno::Reference< css::drawing::XShape > xC,
                                         const css::awt::Point& rPA,
-                                        css::uno::Reference< css::drawing::XShape > const & rSA ,
+                                        css::uno::Reference< css::drawing::XShape > xSA ,
                                         const css::awt::Point& rPB,
-                                        css::uno::Reference< css::drawing::XShape > const & rSB ) :
-                                            mXConnector ( rC ),
+                                        css::uno::Reference< css::drawing::XShape > xSB ) :
+                                            mXConnector (std::move( xC )),
                                             maPointA    ( rPA ),
-                                            mXConnectToA( rSA ),
+                                            mXConnectToA(std::move( xSA )),
                                             maPointB    ( rPB ),
-                                            mXConnectToB( rSB ) {}
+                                            mXConnectToB(std::move( xSB )) {}
 
                     static sal_uInt32 GetClosestPoint( const tools::Polygon& rPoly, const css::awt::Point& rP );
 };
 
 struct MSFILTER_DLLPUBLIC EscherExContainer
 {
+private:
     sal_uInt32  nContPos;
     SvStream&   rStrm;
-
+public:
     EscherExContainer( SvStream& rSt, const sal_uInt16 nRecType, const sal_uInt16 nInstance = 0 );
     ~EscherExContainer();
 };
 
 struct MSFILTER_DLLPUBLIC EscherExAtom
 {
+private:
     sal_uInt32  nContPos;
     SvStream&   rStrm;
-
+public:
     EscherExAtom( SvStream& rSt, const sal_uInt16 nRecType, const sal_uInt16 nInstance = 0, const sal_uInt8 nVersion = 0 );
     ~EscherExAtom();
 };
@@ -704,7 +706,7 @@ public:
 
     void AddOpt(
         sal_uInt16 nPropertyID,
-        const OUString& rString);
+        std::u16string_view rString);
 
     void AddOpt(
         sal_uInt16 nPropertyID,
@@ -886,7 +888,6 @@ class EscherEx;
 class MSFILTER_DLLPUBLIC EscherExClientRecord_Base
 {
 public:
-                                EscherExClientRecord_Base() {}
     virtual                     ~EscherExClientRecord_Base();
 
                                 /// Application writes the record header
@@ -900,7 +901,6 @@ public:
 class MSFILTER_DLLPUBLIC EscherExClientAnchor_Base
 {
 public:
-                                EscherExClientAnchor_Base() {}
     virtual                     ~EscherExClientAnchor_Base();
 
                                 /// Application writes the record header
@@ -1050,9 +1050,9 @@ class MSFILTER_DLLPUBLIC EscherEx : public EscherPersistTable
 {
     protected:
         std::shared_ptr<EscherExGlobal>           mxGlobal;
-        ::std::unique_ptr< ImplEESdrWriter > mpImplEESdrWriter;
+        std::unique_ptr<ImplEESdrWriter> mpImplEESdrWriter;
+        std::unique_ptr<SvStream> mxOwnStrm;
         SvStream*                   mpOutStrm;
-        bool                        mbOwnsStrm;
         sal_uInt32                  mnStrmStartOfs;
         std::vector< sal_uInt32 >   mOffsets;
         std::vector< sal_uInt16 >   mRecTypes;
@@ -1072,7 +1072,7 @@ class MSFILTER_DLLPUBLIC EscherEx : public EscherPersistTable
         bool DoSeek( sal_uInt32 nKey );
 
 public:
-    explicit            EscherEx( const std::shared_ptr<EscherExGlobal>& rxGlobal, SvStream* pOutStrm, bool bOOXML = false );
+    explicit            EscherEx( std::shared_ptr<EscherExGlobal> xGlobal, SvStream* pOutStrm, bool bOOXML = false );
     virtual             ~EscherEx() override;
 
     /** Creates and returns a new shape identifier, updates the internal shape
@@ -1123,7 +1123,7 @@ public:
     void            SetEditAs( const OUString& rEditAs );
     const OUString& GetEditAs() const { return mEditAs; }
     SvStream&       GetStream() const   { return *mpOutStrm; }
-    sal_uLong       GetStreamPos() const    { return mpOutStrm->Tell(); }
+    sal_uInt64      GetStreamPos() const    { return mpOutStrm->Tell(); }
 
                 // features during the creation of the following Containers:
 

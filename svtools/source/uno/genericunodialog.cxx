@@ -28,7 +28,7 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/queryinterface.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/mutex.hxx>
 #include <vcl/svapp.hxx>
 
@@ -140,7 +140,7 @@ void SAL_CALL OGenericUnoDialog::setTitle( const OUString& _rTitle )
 
     try
     {
-        setPropertyValue(UNODIALOG_PROPERTY_TITLE, makeAny(_rTitle));
+        setPropertyValue(UNODIALOG_PROPERTY_TITLE, Any(_rTitle));
     }
     catch(RuntimeException&)
     {

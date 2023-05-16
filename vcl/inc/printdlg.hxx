@@ -93,7 +93,7 @@ namespace vcl
             }
         };
 
-        PrintDialog(weld::Window*, const std::shared_ptr<PrinterController>&);
+        PrintDialog(weld::Window*, std::shared_ptr<PrinterController> );
         virtual ~PrintDialog() override;
 
         bool isPrintToFile() const;
@@ -132,7 +132,6 @@ namespace vcl
         std::unique_ptr<weld::Button>           mxOKButton;
         std::unique_ptr<weld::Button>           mxCancelButton;
         std::unique_ptr<weld::Button>           mxHelpButton;
-        std::unique_ptr<weld::Button>           mxMoreOptionsBtn;
 
         std::unique_ptr<weld::Button>           mxBackwardBtn;
         std::unique_ptr<weld::Button>           mxForwardBtn;

@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xnamed.hxx>
 #include <test/lang/xserviceinfo.hxx>
 
@@ -38,7 +38,7 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScDataPilotFieldGroupItemObj : public CalcUnoApiTest,
+class ScDataPilotFieldGroupItemObj : public UnoApiTest,
                                      public apitest::XNamed,
                                      public apitest::XServiceInfo
 {
@@ -47,7 +47,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScDataPilotFieldGroupItemObj);
 
@@ -64,11 +63,10 @@ public:
 
 private:
     static const int m_nMaxFieldIndex = 6;
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScDataPilotFieldGroupItemObj::ScDataPilotFieldGroupItemObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XNamed("aName")
     , XServiceInfo("ScDataPilotFieldGroupItemObj", "com.sun.star.sheet.DataPilotFieldGroupItem")
 {
@@ -79,7 +77,7 @@ uno::Reference<uno::XInterface> ScDataPilotFieldGroupItemObj::init()
     table::CellRangeAddress aCellRangeAddress(0, 1, 0, m_nMaxFieldIndex - 1, m_nMaxFieldIndex - 1);
     table::CellAddress aCellAddress(0, 7, 8);
 
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     uno::Reference<sheet::XSpreadsheets> xSheets(xDoc->getSheets(), uno::UNO_SET_THROW);
     uno::Reference<container::XIndexAccess> xIA(xSheets, uno::UNO_QUERY_THROW);
     xSheets->insertNewByName("Some Sheet", 0);
@@ -122,19 +120,17 @@ uno::Reference<uno::XInterface> ScDataPilotFieldGroupItemObj::init()
 
     uno::Reference<beans::XPropertySet> xPropertySet0(xDPD->getDataPilotFields()->getByIndex(0),
                                                       uno::UNO_QUERY_THROW);
-    xPropertySet0->setPropertyValue("Orientation",
-                                    uno::makeAny(sheet::DataPilotFieldOrientation_ROW));
+    xPropertySet0->setPropertyValue("Orientation", uno::Any(sheet::DataPilotFieldOrientation_ROW));
 
     uno::Reference<beans::XPropertySet> xPropertySet1(xDPD->getDataPilotFields()->getByIndex(1),
                                                       uno::UNO_QUERY_THROW);
-    xPropertySet1->setPropertyValue("Function", uno::makeAny(sheet::GeneralFunction_SUM));
-    xPropertySet1->setPropertyValue("Orientation",
-                                    uno::makeAny(sheet::DataPilotFieldOrientation_DATA));
+    xPropertySet1->setPropertyValue("Function", uno::Any(sheet::GeneralFunction_SUM));
+    xPropertySet1->setPropertyValue("Orientation", uno::Any(sheet::DataPilotFieldOrientation_DATA));
 
     uno::Reference<beans::XPropertySet> xPropertySet2(xDPD->getDataPilotFields()->getByIndex(2),
                                                       uno::UNO_QUERY_THROW);
     xPropertySet2->setPropertyValue("Orientation",
-                                    uno::makeAny(sheet::DataPilotFieldOrientation_COLUMN));
+                                    uno::Any(sheet::DataPilotFieldOrientation_COLUMN));
 
     xDPT->insertNewByName("DataPilotTable", aCellAddress, xDPD);
 
@@ -174,15 +170,9 @@ uno::Reference<uno::XInterface> ScDataPilotFieldGroupItemObj::init()
 
 void ScDataPilotFieldGroupItemObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScDataPilotFieldGroupItemObj::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScDataPilotFieldGroupItemObj);

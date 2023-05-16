@@ -28,6 +28,7 @@
 #include <sdr/primitive2d/sdrpathprimitive2d.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
+#include <osl/diagnose.h>
 #include <unotools/configmgr.hxx>
 #include <vcl/canvastools.hxx>
 
@@ -42,7 +43,8 @@ namespace sdr::contact
         {
         }
 
-        static sal_uInt32 ensureGeometry(basegfx::B2DPolyPolygon& rUnitPolyPolygon)
+        /// return true if polycount == 1
+        static bool ensureGeometry(basegfx::B2DPolyPolygon& rUnitPolyPolygon)
         {
             sal_uInt32 nPolyCount(rUnitPolyPolygon.count());
             sal_uInt32 nPointCount(0);
@@ -50,6 +52,9 @@ namespace sdr::contact
             for(auto const& rPolygon : std::as_const(rUnitPolyPolygon))
             {
                 nPointCount += rPolygon.count();
+                // return early if we definitely have geometry
+                if (nPointCount > 1)
+                    return nPolyCount == 1;
             }
 
             if(!nPointCount)
@@ -63,10 +68,10 @@ namespace sdr::contact
                 nPolyCount = 1;
             }
 
-            return nPolyCount;
+            return nPolyCount == 1;
         }
 
-        drawinglayer::primitive2d::Primitive2DContainer ViewContactOfSdrPathObj::createViewIndependentPrimitive2DSequence() const
+        void ViewContactOfSdrPathObj::createViewIndependentPrimitive2DSequence(drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
         {
             const SfxItemSet& rItemSet = GetPathObj().GetMergedItemSet();
             const drawinglayer::attribute::SdrLineFillEffectsTextAttribute aAttribute(
@@ -75,14 +80,14 @@ namespace sdr::contact
                     GetPathObj().getText(0),
                     false));
             basegfx::B2DPolyPolygon aUnitPolyPolygon(GetPathObj().GetPathPoly());
-            sal_uInt32 nPolyCount(ensureGeometry(aUnitPolyPolygon));
+            bool bPolyCountIsOne(ensureGeometry(aUnitPolyPolygon));
 
             // prepare object transformation and unit polygon (direct model data)
             basegfx::B2DHomMatrix aObjectMatrix;
             basegfx::B2DPolyPolygon aUnitDefinitionPolyPolygon;
             bool bIsLine(
                 !aUnitPolyPolygon.areControlPointsUsed()
-                && 1 == nPolyCount
+                && bPolyCountIsOne
                 && 2 == aUnitPolyPolygon.getB2DPolygon(0).count());
 
             if(bIsLine)
@@ -112,12 +117,12 @@ namespace sdr::contact
 
                     aUnitPolyPolygon = basegfx::utils::clipPolyPolygonOnRange(aUnitPolyPolygon,
                                                                        aClipRange, true, true);
-                    nPolyCount = ensureGeometry(aUnitPolyPolygon);
+                    bPolyCountIsOne = ensureGeometry(aUnitPolyPolygon);
 
                     // re-check that we have't been clipped out to oblivion
                     bIsLine =
                         !aUnitPolyPolygon.areControlPointsUsed()
-                        && 1 == nPolyCount
+                        && bPolyCountIsOne
                         && 2 == aUnitPolyPolygon.getB2DPolygon(0).count();
                 }
             }
@@ -195,10 +200,10 @@ namespace sdr::contact
                 new drawinglayer::primitive2d::SdrPathPrimitive2D(
                     aObjectMatrix,
                     aAttribute,
-                    aUnitPolyPolygon,
-                    aUnitDefinitionPolyPolygon));
+                    std::move(aUnitPolyPolygon),
+                    std::move(aUnitDefinitionPolyPolygon)));
 
-            return drawinglayer::primitive2d::Primitive2DContainer { xReference };
+            rVisitor.visit(xReference);
         }
 
 } // end of namespace

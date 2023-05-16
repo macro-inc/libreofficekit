@@ -77,9 +77,9 @@ void ScDocument::TransferDrawPage(const ScDocument& rSrcDoc, SCTAB nSrcPos, SCTA
             while (pOldObject)
             {
                 // Clone to target SdrModel
-                SdrObject* pNewObject(pOldObject->CloneSdrObject(*mpDrawLayer));
+                rtl::Reference<SdrObject> pNewObject(pOldObject->CloneSdrObject(*mpDrawLayer));
                 pNewObject->NbcMove(Size(0,0));
-                pNewPage->InsertObject( pNewObject );
+                pNewPage->InsertObject( pNewObject.get() );
 
                 if (mpDrawLayer->IsRecording())
                     mpDrawLayer->AddCalcUndo( std::make_unique<SdrUndoInsertObj>( *pNewObject ) );
@@ -203,7 +203,7 @@ void ScDocument::SetDrawPageSize(SCTAB nTab)
 bool ScDocument::IsChart( const SdrObject* pObject )
 {
     // IsChart() implementation moved to svx drawinglayer
-    if(pObject && OBJ_OLE2 == pObject->GetObjIdentifier())
+    if(pObject && SdrObjKind::OLE2 == pObject->GetObjIdentifier())
     {
         return static_cast<const SdrOle2Obj*>(pObject)->IsChart();
     }
@@ -303,7 +303,7 @@ bool ScDocument::HasOLEObjectsInArea( const ScRange& rRange, const ScMarkData* p
                 SdrObject* pObject = aIter.Next();
                 while (pObject)
                 {
-                    if ( pObject->GetObjIdentifier() == OBJ_OLE2 &&
+                    if ( pObject->GetObjIdentifier() == SdrObjKind::OLE2 &&
                             aMMRect.Contains( pObject->GetCurrentBoundRect() ) )
                         return true;
 
@@ -432,11 +432,12 @@ SdrObject* ScDocument::GetObjectAtPoint( SCTAB nTab, const Point& rPos )
     return pFound;
 }
 
-bool ScDocument::IsPrintEmpty( SCTAB nTab, SCCOL nStartCol, SCROW nStartRow,
-                                SCCOL nEndCol, SCROW nEndRow, bool bLeftIsEmpty,
+bool ScDocument::IsPrintEmpty( SCCOL nStartCol, SCROW nStartRow,
+                                SCCOL nEndCol, SCROW nEndRow,
+                                SCTAB nTab, bool bLeftIsEmpty,
                                 ScRange* pLastRange, tools::Rectangle* pLastMM ) const
 {
-    if (!IsBlockEmpty( nTab, nStartCol, nStartRow, nEndCol, nEndRow ))
+    if (!IsBlockEmpty( nStartCol, nStartRow, nEndCol, nEndRow, nTab ))
         return false;
 
     if (HasAttrib(ScRange(nStartCol, nStartRow, nTab, nEndCol, nEndRow, nTab), HasAttrFlags::Lines))

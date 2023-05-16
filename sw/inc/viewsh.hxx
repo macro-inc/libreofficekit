@@ -79,6 +79,14 @@ typedef std::shared_ptr<SwRootFrame> SwRootFramePtr;
 
 typedef struct _xmlTextWriter* xmlTextWriterPtr;
 
+struct SwVisiblePageNumbers
+{
+    sal_uInt16 nFirstPhy, nLastPhy;
+    sal_uInt16 nFirstVirt, nLastVirt;
+    OUString sFirstCustomPhy, sLastCustomPhy;
+    OUString sFirstCustomVirt, sLastCustomVirt;
+};
+
 class SW_DLLPUBLIC SwViewShell : public sw::Ring<SwViewShell>
 {
     friend void SetOutDev( SwViewShell *pSh, OutputDevice *pOut );
@@ -370,6 +378,10 @@ public:
     // All about fields.
     void UpdateFields(bool bCloseDB = false);
     bool IsAnyFieldInDoc() const;
+
+    /// Update the previews of all OLE objects.
+    void UpdateOleObjectPreviews();
+
     // Update all charts, for that exists any table.
     void UpdateAllCharts();
     bool HasCharts() const;
@@ -387,9 +399,6 @@ public:
 
     // Font metric attribute "External Leading" should be considered.
     void SetAddExtLeading( bool bNew );
-
-    // Formatting by virtual device or printer.
-    void SetUseVirDev( bool bNew );
 
     // Adding paragraph and table spacing at bottom
     // of table cells.
@@ -568,6 +577,8 @@ public:
     void setOutputToWindow(bool bOutputToWindow);
     bool isOutputToWindow() const;
     void OnGraphicArrived(const SwRect&);
+
+    void GetFirstLastVisPageNumbers(SwVisiblePageNumbers& rVisiblePageNumbers);
 
     virtual void dumpAsXml(xmlTextWriterPtr pWriter) const;
 };

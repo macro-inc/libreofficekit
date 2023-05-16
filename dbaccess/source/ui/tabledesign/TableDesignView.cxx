@@ -30,7 +30,6 @@
 #include <memory>
 
 using namespace ::dbaui;
-using namespace ::utl;
 using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star::datatransfer::clipboard;
 using namespace ::com::sun::star::lang;
@@ -166,7 +165,7 @@ IMPL_LINK_NOARG(OTableDesignView, FieldDescFocusIn, weld::Widget&, void)
 
 bool OTableDesignView::PreNotify( NotifyEvent& rNEvt )
 {
-    if (rNEvt.GetType() == MouseNotifyEvent::GETFOCUS)
+    if (rNEvt.GetType() == NotifyEventType::GETFOCUS)
     {
         if( GetDescWin() && GetDescWin()->HasChildPathFocus() )
             m_eChildFocus = DESCRIPTION;

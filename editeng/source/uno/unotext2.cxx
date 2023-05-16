@@ -34,7 +34,7 @@ using namespace ::com::sun::star;
 
 #define QUERYINT( xint ) \
     if( rType == cppu::UnoType<xint>::get() ) \
-        return uno::makeAny(uno::Reference< xint >(this))
+        return uno::Any(uno::Reference< xint >(this))
 
 
 // SvxUnoTextContentEnumeration
@@ -46,6 +46,9 @@ SvxUnoTextContentEnumeration::SvxUnoTextContentEnumeration( const SvxUnoTextBase
     if( rText.GetEditSource() )
         mpEditSource = rText.GetEditSource()->Clone();
     mnNextParagraph = 0;
+
+    if (!mpEditSource)
+        return;
 
     const SvxTextForwarder* pTextForwarder = rText.GetEditSource()->GetTextForwarder();
     const sal_Int32 maxParaIndex = std::min( rSel.nEndPara + 1, pTextForwarder->GetParagraphCount() );
@@ -108,7 +111,7 @@ uno::Any SvxUnoTextContentEnumeration::nextElement()
 
     uno::Reference< text::XTextContent > xRef( maContents.at(mnNextParagraph) );
     mnNextParagraph++;
-    return uno::makeAny( xRef );
+    return uno::Any( xRef );
 }
 
 
@@ -118,7 +121,6 @@ SvxUnoTextContent::SvxUnoTextContent( const SvxUnoTextBase& rText, sal_Int32 nPa
 :   SvxUnoTextRangeBase(rText)
 ,   mnParagraph(nPara)
 ,   mrParentText(rText)
-,   maDisposeListeners(maDisposeContainerMutex)
 ,   mbDisposing( false )
 {
     mxParentText = const_cast<SvxUnoTextBase*>(&rText);
@@ -131,7 +133,6 @@ SvxUnoTextContent::SvxUnoTextContent( const SvxUnoTextContent& rContent ) noexce
 ,   lang::XTypeProvider()
 ,   cppu::OWeakAggObject()
 ,   mrParentText(rContent.mrParentText)
-,   maDisposeListeners(maDisposeContainerMutex)
 ,   mbDisposing( false )
 {
     mxParentText = rContent.mxParentText;
@@ -232,7 +233,10 @@ void SAL_CALL SvxUnoTextContent::dispose()
 
     lang::EventObject aEvt;
     aEvt.Source = *static_cast<OWeakAggObject*>(this);
-    maDisposeListeners.disposeAndClear(aEvt);
+    {
+        std::unique_lock aMutexGuard(maDisposeContainerMutex);
+        maDisposeListeners.disposeAndClear(aMutexGuard, aEvt);
+    }
 
     if( mxParentText.is() )
         mxParentText->removeTextContent( this );
@@ -240,12 +244,14 @@ void SAL_CALL SvxUnoTextContent::dispose()
 
 void SAL_CALL SvxUnoTextContent::addEventListener( const uno::Reference< lang::XEventListener >& xListener )
 {
-    maDisposeListeners.addInterface(xListener);
+    std::unique_lock aGuard(maDisposeContainerMutex);
+    maDisposeListeners.addInterface(aGuard, xListener);
 }
 
 void SAL_CALL SvxUnoTextContent::removeEventListener( const uno::Reference< lang::XEventListener >& aListener )
 {
-   maDisposeListeners.removeInterface(aListener);
+   std::unique_lock aGuard(maDisposeContainerMutex);
+   maDisposeListeners.removeInterface(aGuard, aListener);
 }
 
 // XEnumerationAccess
@@ -426,7 +432,7 @@ uno::Any SAL_CALL SvxUnoTextRangeEnumeration::nextElement()
 
     uno::Reference< text::XTextRange > xRange = maPortions.at(mnNextPortion);
     mnNextPortion++;
-    return uno::makeAny( xRange );
+    return uno::Any( xRange );
 }
 
 SvxUnoTextCursor::SvxUnoTextCursor( const SvxUnoTextBase& rText ) noexcept
@@ -454,7 +460,7 @@ SvxUnoTextCursor::~SvxUnoTextCursor() noexcept
 uno::Any SAL_CALL SvxUnoTextCursor::queryAggregation( const uno::Type & rType )
 {
     if( rType == cppu::UnoType<text::XTextRange>::get())
-        return uno::makeAny(uno::Reference< text::XTextRange >(static_cast<SvxUnoTextRangeBase *>(this)));
+        return uno::Any(uno::Reference< text::XTextRange >(static_cast<SvxUnoTextRangeBase *>(this)));
     else QUERYINT( text::XTextCursor );
     else QUERYINT( beans::XMultiPropertyStates );
     else QUERYINT( beans::XPropertySet );

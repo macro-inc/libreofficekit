@@ -24,7 +24,9 @@
 #include "atkwrapper.hxx"
 
 #include <com/sun/star/accessibility/XAccessibleTable.hpp>
+#include <com/sun/star/accessibility/XAccessibleTableSelection.hpp>
 #include <comphelper/sequence.hxx>
+#include <sal/log.hxx>
 
 using namespace ::com::sun::star;
 
@@ -71,6 +73,23 @@ static css::uno::Reference<css::accessibility::XAccessibleTable>
     return css::uno::Reference<css::accessibility::XAccessibleTable>();
 }
 
+static css::uno::Reference<css::accessibility::XAccessibleTableSelection>
+    getTableSelection(AtkTable *pTable)
+{
+    AtkObjectWrapper *pWrap = ATK_OBJECT_WRAPPER(pTable);
+    if (pWrap)
+    {
+        if (!pWrap->mpTableSelection.is())
+        {
+            pWrap->mpTableSelection.set(pWrap->mpContext, css::uno::UNO_QUERY);
+        }
+
+        return pWrap->mpTableSelection;
+    }
+
+    return css::uno::Reference<css::accessibility::XAccessibleTableSelection>();
+}
+
 /*****************************************************************************/
 
 extern "C" {
@@ -104,7 +123,19 @@ table_wrapper_get_index_at (AtkTable      *table,
         css::uno::Reference<css::accessibility::XAccessibleTable> pTable
             = getTable( table );
         if( pTable.is() )
-            return pTable->getAccessibleIndex( row, column );
+        {
+            sal_Int64 nIndex = pTable->getAccessibleIndex( row, column );
+            if (nIndex > std::numeric_limits<gint>::max())
+            {
+                // use -2 when the child index is too large to fit into 32 bit to neither use the
+                // valid index of another cell nor -1, which might easily be interpreted as the cell
+                // not/no longer being valid
+                SAL_WARN("vcl.gtk", "table_wrapper_get_index_at: Child index exceeds maximum gint value, "
+                                    "returning -2.");
+                nIndex = -2;
+            }
+            return nIndex;
+        }
     }
     catch(const uno::Exception&) {
         g_warning( "Exception in getAccessibleIndex()" );
@@ -466,37 +497,69 @@ table_wrapper_is_selected( AtkTable      *table,
 /*****************************************************************************/
 
 static gboolean
-table_wrapper_add_row_selection( AtkTable *, gint )
+table_wrapper_add_row_selection(AtkTable *pTable, gint row)
 {
-    g_warning( "FIXME: no simple analogue for add_row_selection" );
-    return 0;
+    try {
+        css::uno::Reference<css::accessibility::XAccessibleTableSelection> xTableSelection = getTableSelection(pTable);
+        if (xTableSelection.is())
+            return xTableSelection->selectRow(row);
+    }
+    catch(const uno::Exception&) {
+        g_warning( "Exception in selectRow()" );
+    }
+
+    return false;
 }
 
 /*****************************************************************************/
 
 static gboolean
-table_wrapper_remove_row_selection( AtkTable *, gint )
+table_wrapper_remove_row_selection(AtkTable *pTable, gint row)
 {
-    g_warning( "FIXME: no simple analogue for remove_row_selection" );
-    return 0;
+    try {
+        css::uno::Reference<css::accessibility::XAccessibleTableSelection> xTableSelection = getTableSelection(pTable);
+        if (xTableSelection.is())
+            return xTableSelection->unselectRow(row);
+    }
+    catch(const uno::Exception&) {
+        g_warning( "Exception in unselectRow()" );
+    }
+
+    return false;
 }
 
 /*****************************************************************************/
 
 static gboolean
-table_wrapper_add_column_selection( AtkTable *, gint )
+table_wrapper_add_column_selection(AtkTable *pTable, gint column)
 {
-    g_warning( "FIXME: no simple analogue for add_column_selection" );
-    return 0;
+    try {
+        css::uno::Reference<css::accessibility::XAccessibleTableSelection> xTableSelection = getTableSelection(pTable);
+        if (xTableSelection.is())
+            return xTableSelection->selectColumn(column);
+    }
+    catch(const uno::Exception&) {
+        g_warning( "Exception in selectColumn()" );
+    }
+
+    return false;
 }
 
 /*****************************************************************************/
 
 static gboolean
-table_wrapper_remove_column_selection( AtkTable *, gint )
+table_wrapper_remove_column_selection(AtkTable *pTable, gint column)
 {
-    g_warning( "FIXME: no simple analogue for remove_column_selection" );
-    return 0;
+    try {
+        css::uno::Reference<css::accessibility::XAccessibleTableSelection> xTableSelection = getTableSelection(pTable);
+        if (xTableSelection.is())
+            return xTableSelection->unselectColumn(column);
+    }
+    catch(const uno::Exception&) {
+        g_warning( "Exception in unselectColumn()" );
+    }
+
+    return false;
 }
 
 /*****************************************************************************/

@@ -26,35 +26,32 @@
 #include <com/sun/star/linguistic2/XSpellChecker1.hpp>
 
 #include <functional>
+#include <utility>
 
+struct SwPosition;
 class SwTextFrame;
 class SwTextNode;
-class SwIndex;
+class SwContentIndex;
 namespace vcl { class Font; }
 namespace com::sun::star::linguistic2 { class XHyphenatedWord; }
 
 struct SwArgsBase     // used for text conversion (Hangul/Hanja, ...)
 {
-    SwTextNode  *pStartNode;
-    SwIndex    *pStartIdx;
-    SwTextNode  *pEndNode;
-    SwIndex    *pEndIdx;
+    SwPosition *pStartPos; // these both point to SwTextNode
+    SwPosition *pEndPos;
 
-    SwArgsBase(
-            SwTextNode* pStart, SwIndex& rStart,
-            SwTextNode* pEnd, SwIndex& rEnd )
-        : pStartNode( pStart ), pStartIdx( &rStart ),
-          pEndNode( pEnd ), pEndIdx( &rEnd )
+    SwArgsBase(SwPosition& rStart, SwPosition& rEnd )
+        : pStartPos( &rStart ), pEndPos( &rEnd )
         {}
 
-    void SetStart(SwTextNode* pStart, SwIndex& rStart )
+    void SetStart(SwPosition& rStart )
     {
-        pStartNode = pStart;    pStartIdx = &rStart ;
+        pStartPos = &rStart;
     }
 
-    void SetEnd( SwTextNode* pEnd, SwIndex& rEnd  )
+    void SetEnd( SwPosition& rEnd  )
     {
-        pEndNode = pEnd;        pEndIdx = &rEnd ;
+        pEndPos = &rEnd ;
     }
 };
 
@@ -72,9 +69,9 @@ struct SwConversionArgs : SwArgsBase
     bool            bAllowImplicitChangesForNotConvertibleText;
 
     SwConversionArgs( LanguageType nLang,
-            SwTextNode* pStart, SwIndex& rStart,
-            SwTextNode* pEnd, SwIndex& rEnd )
-        : SwArgsBase( pStart, rStart, pEnd, rEnd ),
+            SwPosition& rStart,
+            SwPosition& rEnd )
+        : SwArgsBase( rStart, rEnd ),
           nConvSrcLang( nLang ),
           nConvTextLang( LANGUAGE_NONE ),
           nConvTargetLang( LANGUAGE_NONE ),
@@ -91,13 +88,12 @@ struct SwSpellArgs : SwArgsBase
 
     bool bIsGrammarCheck;
 
-    SwSpellArgs(css::uno::Reference<
-            css::linguistic2::XSpellChecker1 > const &rxSplChk,
-            SwTextNode* pStart, SwIndex& rStart,
-            SwTextNode* pEnd, SwIndex& rEnd,
+    SwSpellArgs(css::uno::Reference< css::linguistic2::XSpellChecker1 > xSplChk,
+            SwPosition& rStart,
+            SwPosition& rEnd,
             bool bGrammar )
-        :   SwArgsBase( pStart, rStart, pEnd, rEnd ),
-            xSpeller( rxSplChk ),
+        :   SwArgsBase( rStart, rEnd ),
+            xSpeller(std::move( xSplChk )),
             bIsGrammarCheck( bGrammar )
         {}
 };

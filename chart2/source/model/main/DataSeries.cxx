@@ -25,12 +25,12 @@
 #include "DataPoint.hxx"
 #include <DataSeriesHelper.hxx>
 #include <CloneHelper.hxx>
+#include <RegressionCurveModel.hxx>
 #include <ModifyListenerHelper.hxx>
-#include <EventListenerHelper.hxx>
 #include <com/sun/star/container/NoSuchElementException.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/ref.hxx>
 
 #include <algorithm>
@@ -127,24 +127,22 @@ namespace chart
 {
 
 DataSeries::DataSeries() :
-        ::property::OPropertySet( m_aMutex ),
-        m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+        m_xModifyEventForwarder( new ModifyEventForwarder() )
 {
 }
 
 DataSeries::DataSeries( const DataSeries & rOther ) :
         impl::DataSeries_Base(rOther),
-        ::property::OPropertySet( rOther, m_aMutex ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+        ::property::OPropertySet( rOther ),
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {
     if( ! rOther.m_aDataSequences.empty())
     {
-        CloneHelper::CloneRefVector<css::chart2::data::XLabeledDataSequence>(
-            rOther.m_aDataSequences, m_aDataSequences );
+        CloneHelper::CloneRefVector(rOther.m_aDataSequences, m_aDataSequences );
         ModifyListenerHelper::addListenerToAllElements( m_aDataSequences, m_xModifyEventForwarder );
     }
 
-    CloneHelper::CloneRefVector< chart2::XRegressionCurve >( rOther.m_aRegressionCurves, m_aRegressionCurves );
+    CloneHelper::CloneRefVector( rOther.m_aRegressionCurves, m_aRegressionCurves );
     ModifyListenerHelper::addListenerToAllElements( m_aRegressionCurves, m_xModifyEventForwarder );
 
     // add as listener to XPropertySet properties
@@ -165,9 +163,6 @@ DataSeries::DataSeries( const DataSeries & rOther ) :
 // late initialization to call after copy-constructing
 void DataSeries::Init( const DataSeries & rOther )
 {
-    if( ! rOther.m_aDataSequences.empty())
-        EventListenerHelper::addListenerToAllElements( m_aDataSequences, this );
-
     Reference< uno::XInterface > xThisInterface( static_cast< ::cppu::OWeakObject * >( this ));
     if( ! rOther.m_aAttributedDataPoints.empty())
     {
@@ -230,13 +225,14 @@ uno::Reference< util::XCloneable > SAL_CALL DataSeries::createClone()
 }
 
 // ____ OPropertySet ____
-uno::Any DataSeries::GetDefaultValue( sal_Int32 nHandle ) const
+void DataSeries::GetDefaultValue( sal_Int32 nHandle, uno::Any& rDest ) const
 {
     const tPropertyValueMap& rStaticDefaults = StaticDataSeriesDefaults::get();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rDest.clear();
+    else
+        rDest = (*aFound).second;
 }
 
 // ____ OPropertySet ____
@@ -299,13 +295,13 @@ Reference< beans::XPropertySet >
 {
     Reference< beans::XPropertySet > xResult;
 
-    Sequence< Reference< chart2::data::XLabeledDataSequence > > aSequences;
+    std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > aSequences;
     {
         MutexGuard aGuard( m_aMutex );
-        aSequences = comphelper::containerToSequence( m_aDataSequences );
+        aSequences = m_aDataSequences;
     }
 
-    std::vector< Reference< chart2::data::XLabeledDataSequence > > aValuesSeries(
+    std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > aValuesSeries(
         DataSeriesHelper::getAllDataSequencesByRole( aSequences , "values" ) );
 
     if (aValuesSeries.empty())
@@ -387,18 +383,34 @@ void SAL_CALL DataSeries::setData( const uno::Sequence< Reference< chart2::data:
     tDataSequenceContainer aOldDataSequences;
     tDataSequenceContainer aNewDataSequences;
     Reference< util::XModifyListener > xModifyEventForwarder;
-    Reference< lang::XEventListener > xListener;
     {
         MutexGuard aGuard( m_aMutex );
         xModifyEventForwarder = m_xModifyEventForwarder;
-        xListener = this;
         std::swap( aOldDataSequences, m_aDataSequences );
-        aNewDataSequences = comphelper::sequenceToContainer<tDataSequenceContainer>( aData );
+        for (const auto & i : aData)
+        {
+            aNewDataSequences.push_back(i);
+        }
         m_aDataSequences = aNewDataSequences;
     }
     ModifyListenerHelper::removeListenerFromAllElements( aOldDataSequences, xModifyEventForwarder );
-    EventListenerHelper::removeListenerFromAllElements( aOldDataSequences, xListener );
-    EventListenerHelper::addListenerToAllElements( aNewDataSequences, xListener );
+    ModifyListenerHelper::addListenerToAllElements( aNewDataSequences, xModifyEventForwarder );
+    fireModifyEvent();
+}
+
+void DataSeries::setData( const std::vector< uno::Reference< chart2::data::XLabeledDataSequence > >& aData )
+{
+    tDataSequenceContainer aOldDataSequences;
+    tDataSequenceContainer aNewDataSequences;
+    Reference< util::XModifyListener > xModifyEventForwarder;
+    {
+        MutexGuard aGuard( m_aMutex );
+        xModifyEventForwarder = m_xModifyEventForwarder;
+        std::swap( aOldDataSequences, m_aDataSequences );
+        aNewDataSequences = aData;
+        m_aDataSequences = aNewDataSequences;
+    }
+    ModifyListenerHelper::removeListenerFromAllElements( aOldDataSequences, xModifyEventForwarder );
     ModifyListenerHelper::addListenerToAllElements( aNewDataSequences, xModifyEventForwarder );
     fireModifyEvent();
 }
@@ -407,23 +419,25 @@ void SAL_CALL DataSeries::setData( const uno::Sequence< Reference< chart2::data:
 Sequence< Reference< chart2::data::XLabeledDataSequence > > SAL_CALL DataSeries::getDataSequences()
 {
     MutexGuard aGuard( m_aMutex );
-    return comphelper::containerToSequence( m_aDataSequences );
+    return comphelper::containerToSequence<Reference< chart2::data::XLabeledDataSequence >>( m_aDataSequences );
 }
 
 // ____ XRegressionCurveContainer ____
 void SAL_CALL DataSeries::addRegressionCurve(
     const uno::Reference< chart2::XRegressionCurve >& xRegressionCurve )
 {
+    auto pRegressionCurve = dynamic_cast<RegressionCurveModel*>(xRegressionCurve.get());
+    assert(pRegressionCurve);
     Reference< util::XModifyListener > xModifyEventForwarder;
     {
         MutexGuard aGuard( m_aMutex );
         xModifyEventForwarder = m_xModifyEventForwarder;
-        if( std::find( m_aRegressionCurves.begin(), m_aRegressionCurves.end(), xRegressionCurve )
+        if( std::find( m_aRegressionCurves.begin(), m_aRegressionCurves.end(), pRegressionCurve )
             != m_aRegressionCurves.end())
             throw lang::IllegalArgumentException("curve not found", static_cast<cppu::OWeakObject*>(this), 1);
-        m_aRegressionCurves.push_back( xRegressionCurve );
+        m_aRegressionCurves.push_back( pRegressionCurve );
     }
-    ModifyListenerHelper::addListener( xRegressionCurve, xModifyEventForwarder );
+    ModifyListenerHelper::addListener( rtl::Reference<RegressionCurveModel>(pRegressionCurve), xModifyEventForwarder );
     fireModifyEvent();
 }
 
@@ -432,13 +446,15 @@ void SAL_CALL DataSeries::removeRegressionCurve(
 {
     if( !xRegressionCurve.is() )
         throw container::NoSuchElementException();
+    auto pRegressionCurve = dynamic_cast<RegressionCurveModel*>(xRegressionCurve.get());
+    assert(pRegressionCurve);
 
     Reference< util::XModifyListener > xModifyEventForwarder;
     {
         MutexGuard aGuard( m_aMutex );
         xModifyEventForwarder = m_xModifyEventForwarder;
         tRegressionCurveContainerType::iterator aIt(
-            std::find( m_aRegressionCurves.begin(), m_aRegressionCurves.end(), xRegressionCurve ) );
+            std::find( m_aRegressionCurves.begin(), m_aRegressionCurves.end(), pRegressionCurve ) );
         if( aIt == m_aRegressionCurves.end())
             throw container::NoSuchElementException(
                 "The given regression curve is no element of this series",
@@ -446,21 +462,27 @@ void SAL_CALL DataSeries::removeRegressionCurve(
         m_aRegressionCurves.erase( aIt );
     }
 
-    ModifyListenerHelper::removeListener( xRegressionCurve, xModifyEventForwarder );
+    ModifyListenerHelper::removeListener( rtl::Reference<RegressionCurveModel>(pRegressionCurve), xModifyEventForwarder );
     fireModifyEvent();
 }
 
 uno::Sequence< uno::Reference< chart2::XRegressionCurve > > SAL_CALL DataSeries::getRegressionCurves()
 {
     MutexGuard aGuard( m_aMutex );
-    return comphelper::containerToSequence( m_aRegressionCurves );
+    return comphelper::containerToSequence<uno::Reference< chart2::XRegressionCurve >>( m_aRegressionCurves );
 }
 
 void SAL_CALL DataSeries::setRegressionCurves(
     const Sequence< Reference< chart2::XRegressionCurve > >& aRegressionCurves )
 {
     tRegressionCurveContainerType aOldCurves;
-    auto aNewCurves( comphelper::sequenceToContainer<tRegressionCurveContainerType>( aRegressionCurves ) );
+    tRegressionCurveContainerType aNewCurves;
+    for (const auto & i : aRegressionCurves)
+    {
+        auto pRegressionCurve = dynamic_cast<RegressionCurveModel*>(i.get());
+        assert(pRegressionCurve);
+        aNewCurves.push_back(pRegressionCurve);
+    }
     Reference< util::XModifyListener > xModifyEventForwarder;
     {
         MutexGuard aGuard( m_aMutex );
@@ -476,28 +498,12 @@ void SAL_CALL DataSeries::setRegressionCurves(
 // ____ XModifyBroadcaster ____
 void SAL_CALL DataSeries::addModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL DataSeries::removeModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 // ____ XModifyListener ____
@@ -507,13 +513,8 @@ void SAL_CALL DataSeries::modified( const lang::EventObject& aEvent )
 }
 
 // ____ XEventListener (base of XModifyListener) ____
-void SAL_CALL DataSeries::disposing( const lang::EventObject& rEventObject )
+void SAL_CALL DataSeries::disposing( const lang::EventObject& )
 {
-    // forget disposed data sequences
-    tDataSequenceContainer::iterator aIt(
-        std::find( m_aDataSequences.begin(), m_aDataSequences.end(), rEventObject.Source ));
-    if( aIt != m_aDataSequences.end())
-        m_aDataSequences.erase( aIt );
 }
 
 // ____ OPropertySet ____

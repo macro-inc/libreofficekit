@@ -24,6 +24,7 @@
 #include <drawinglayer/primitive2d/transformprimitive2d.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <drawinglayer/primitive2d/maskprimitive2d.hxx>
+#include <utility>
 
 
 using namespace com::sun::star;
@@ -33,13 +34,13 @@ namespace drawinglayer::primitive2d
 {
         CropPrimitive2D::CropPrimitive2D(
             Primitive2DContainer&& aChildren,
-            const basegfx::B2DHomMatrix& rTransformation,
+            basegfx::B2DHomMatrix aTransformation,
             double fCropLeft,
             double fCropTop,
             double fCropRight,
             double fCropBottom)
         :   GroupPrimitive2D(std::move(aChildren)),
-            maTransformation(rTransformation),
+            maTransformation(std::move(aTransformation)),
             mfCropLeft(fCropLeft),
             mfCropTop(fCropTop),
             mfCropRight(fCropRight),
@@ -126,7 +127,7 @@ namespace drawinglayer::primitive2d
             {
                 // the new range is completely inside the old range (unit range),
                 // so no masking is needed
-                rVisitor.append(xTransformPrimitive);
+                rVisitor.visit(xTransformPrimitive);
             }
             else
             {
@@ -137,10 +138,10 @@ namespace drawinglayer::primitive2d
                 // create maskPrimitive with aMaskPolyPolygon and aMaskContentVector
                 const Primitive2DReference xMask(
                     new MaskPrimitive2D(
-                        aMaskPolyPolygon,
+                        std::move(aMaskPolyPolygon),
                         Primitive2DContainer { xTransformPrimitive }));
 
-                rVisitor.append(xMask);
+                rVisitor.visit(xMask);
             }
         }
 

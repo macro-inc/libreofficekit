@@ -46,14 +46,16 @@
 #include <comphelper/sequence.hxx>
 #include <comphelper/storagehelper.hxx>
 #include <cppuhelper/exc_hlp.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <sfx2/docfile.hxx>
 #include <sfx2/XmlIdRegistry.hxx>
 #include <sfx2/objsh.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <libxml/tree.h>
 
+#include <utility>
 #include <vector>
 #include <set>
 #include <string_view>
@@ -220,9 +222,9 @@ struct DocumentMetadataAccess_Impl
     uno::Reference<rdf::XRepository> m_xRepository;
     uno::Reference<rdf::XNamedGraph> m_xManifest;
     DocumentMetadataAccess_Impl(
-            uno::Reference<uno::XComponentContext> const& i_xContext,
+            uno::Reference<uno::XComponentContext> i_xContext,
             SfxObjectShell const & i_rRegistrySupplier)
-      : m_xContext(i_xContext)
+      : m_xContext(std::move(i_xContext))
       , m_rXmlIdRegistrySupplier(i_rRegistrySupplier)
     {
         OSL_ENSURE(m_xContext.is(), "context null");
@@ -241,14 +243,14 @@ getURI(uno::Reference< uno::XComponentContext > const & i_xContext)
 
 
 /** would storing the file to a XStorage succeed? */
-static bool isFileNameValid(const OUString & i_rFileName)
+static bool isFileNameValid(std::u16string_view i_rFileName)
 {
-    if (i_rFileName.isEmpty()) return false;
+    if (i_rFileName.empty()) return false;
     if (i_rFileName[0] == '/')        return false; // no absolute paths!
     sal_Int32 idx(0);
     do {
       const OUString segment(
-        i_rFileName.getToken(0, u'/', idx) );
+        o3tl::getToken(i_rFileName, 0, u'/', idx) );
       if (segment.isEmpty()      ||  // no empty segments
           segment == "."         ||  // no . segments
           segment == ".."        ||  // no .. segments
@@ -280,17 +282,15 @@ splitPath(OUString const & i_rPath,
 }
 
 static bool
-splitXmlId(OUString const & i_XmlId,
+splitXmlId(std::u16string_view i_XmlId,
     OUString & o_StreamName, OUString& o_Idref )
 {
-    const sal_Int32 idx(i_XmlId.indexOf(u'#'));
-    if ((idx <= 0) || (idx >= i_XmlId.getLength() - 1)) {
+    const size_t idx(i_XmlId.find(u'#'));
+    if (idx == std::u16string_view::npos)
         return false;
-    } else {
-        o_StreamName = i_XmlId.copy(0, idx);
-        o_Idref      = i_XmlId.copy(idx+1);
-        return isValidXmlId(o_StreamName, o_Idref);
-    }
+    o_StreamName = i_XmlId.substr(0, idx);
+    o_Idref      = i_XmlId.substr(idx+1);
+    return isValidXmlId(o_StreamName, o_Idref);
 }
 
 
@@ -481,7 +481,7 @@ getAllParts(struct DocumentMetadataAccess_Impl const& i_rImpl,
     catch (const uno::Exception& e)
     {
         throw lang::WrappedTargetRuntimeException("getAllParts: exception", nullptr,
-                                                  uno::makeAny(e));
+                                                  uno::Any(e));
     }
 }
 
@@ -496,11 +496,11 @@ mkException( OUString const & i_rMessage,
     iaioe.Code = i_ErrorCode;
 
     const beans::PropertyValue uriProp("Uri",
-        -1, uno::makeAny(i_rUri), static_cast<beans::PropertyState>(0));
+        -1, uno::Any(i_rUri), static_cast<beans::PropertyState>(0));
     const beans::PropertyValue rnProp(
         "ResourceName",
-        -1, uno::makeAny(i_rResource), static_cast<beans::PropertyState>(0));
-    iaioe.Arguments = { uno::makeAny(uriProp), uno::makeAny(rnProp) };
+        -1, uno::Any(i_rResource), static_cast<beans::PropertyState>(0));
+    iaioe.Arguments = { uno::Any(uriProp), uno::Any(rnProp) };
     return iaioe;
 }
 
@@ -519,11 +519,11 @@ handleError( ucb::InteractiveAugmentedIOException const & i_rException,
     if (!i_xHandler.is()) {
         throw lang::WrappedTargetException(
             "DocumentMetadataAccess::loadMetadataFromStorage: exception",
-            /* *this*/ nullptr, uno::makeAny(i_rException));
+            /* *this*/ nullptr, uno::Any(i_rException));
     }
 
     ::rtl::Reference< ::comphelper::OInteractionRequest > pRequest(
-        new ::comphelper::OInteractionRequest(uno::makeAny(i_rException)) );
+        new ::comphelper::OInteractionRequest(uno::Any(i_rException)) );
     ::rtl::Reference< ::comphelper::OInteractionRetry > pRetry(
         new ::comphelper::OInteractionRetry );
     ::rtl::Reference< ::comphelper::OInteractionApprove > pApprove(
@@ -543,7 +543,7 @@ handleError( ucb::InteractiveAugmentedIOException const & i_rException,
         OSL_ENSURE(pAbort->wasSelected(), "no continuation selected?");
         throw lang::WrappedTargetException(
             "DocumentMetadataAccess::loadMetadataFromStorage: exception",
-            /* *this*/ nullptr, uno::makeAny(i_rException));
+            /* *this*/ nullptr, uno::Any(i_rException));
     }
 }
 
@@ -673,7 +673,7 @@ exportStream(struct DocumentMetadataAccess_Impl const & i_rImpl,
     if (xStreamProps.is()) { // this is NOT supported in FileSystemStorage
         xStreamProps->setPropertyValue(
             "MediaType",
-            uno::makeAny(OUString("application/rdf+xml")));
+            uno::Any(OUString("application/rdf+xml")));
     }
     const uno::Reference<io::XOutputStream> xOutStream(
         xStream->getOutputStream(), uno::UNO_SET_THROW );
@@ -910,7 +910,7 @@ DocumentMetadataAccess::getElementByURI(
     }
     OUString path;
     OUString idref;
-    if (!splitXmlId(name.copy(baseURI.getLength()), path, idref)) {
+    if (!splitXmlId(name.subView(baseURI.getLength()), path, idref)) {
         return nullptr;
     }
 
@@ -1368,10 +1368,10 @@ DocumentMetadataAccess::storeMetadataToMedium(
             nError = ERRCODE_IO_GENERAL;
         }
         task::ErrorCodeIOException ex(
-            "DocumentMetadataAccess::storeMetadataToMedium Commit failed: " + nError.toHexString(),
+            "DocumentMetadataAccess::storeMetadataToMedium Commit failed: " + nError.toString(),
             uno::Reference< uno::XInterface >(), sal_uInt32(nError));
         throw lang::WrappedTargetException(OUString(), *this,
-                uno::makeAny(ex));
+                uno::Any(ex));
     }
 }
 

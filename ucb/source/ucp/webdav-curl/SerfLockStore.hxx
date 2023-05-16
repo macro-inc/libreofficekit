@@ -21,10 +21,11 @@
 #pragma once
 
 #include <map>
-#include <osl/mutex.hxx>
+#include <mutex>
 #include <rtl/ref.hxx>
 #include <rtl/ustring.hxx>
 #include <com/sun/star/ucb/Lock.hpp>
+#include <utility>
 
 #include "CurlSession.hxx"
 
@@ -43,13 +44,13 @@ struct LockInfo
     LockInfo()
         : m_nLastChanceToSendRefreshRequest( -1 ) {}
 
-    LockInfo( const OUString& sToken,
-              css::ucb::Lock const& rLock,
-              rtl::Reference<CurlSession> const & xSession,
+    LockInfo( OUString  sToken,
+              css::ucb::Lock aLock,
+              rtl::Reference<CurlSession> xSession,
               sal_Int32 nLastChanceToSendRefreshRequest )
-        : m_sToken(sToken)
-        , m_Lock(rLock)
-        , m_xSession(xSession)
+        : m_sToken(std::move(sToken))
+        , m_Lock(std::move(aLock))
+        , m_xSession(std::move(xSession))
         , m_nLastChanceToSendRefreshRequest(nLastChanceToSendRefreshRequest)
     {}
 };
@@ -58,16 +59,13 @@ typedef std::map< OUString, LockInfo > LockInfoMap;
 
 class SerfLockStore
 {
-    osl::Mutex         m_aMutex;
+    std::mutex         m_aMutex;
     rtl::Reference< TickerThread > m_pTickerThread;
-    bool               m_bFinishing;
     LockInfoMap        m_aLockInfoMap;
 
 public:
     SerfLockStore();
     ~SerfLockStore();
-
-    bool finishing() const;
 
     OUString const* getLockTokenForURI(OUString const& rURI, css::ucb::Lock const* pLock);
 
@@ -79,16 +77,14 @@ public:
                   // -1: infinite lock, no refresh
                   sal_Int32 nLastChanceToSendRefreshRequest );
 
-    void updateLock( const OUString& rURI,
-                     sal_Int32 nLastChanceToSendRefreshRequest );
-
     void removeLock(const OUString& rURI);
 
     void refreshLocks();
 
 private:
+    void removeLockImpl(std::unique_lock<std::mutex> & rGuard, const OUString& rURI);
     void startTicker();
-    void stopTicker(osl::ClearableMutexGuard & rGuard);
+    void stopTicker(std::unique_lock<std::mutex> & rGuard);
 };
 
 } // namespace http_dav_ucp

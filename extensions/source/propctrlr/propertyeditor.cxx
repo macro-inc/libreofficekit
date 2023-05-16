@@ -23,6 +23,7 @@
 #include "linedescriptor.hxx"
 
 #include <tools/debug.hxx>
+#include <utility>
 #include <osl/diagnose.h>
 
 namespace pcr
@@ -346,9 +347,9 @@ namespace pcr
         return xControl;
     }
 
-    IMPL_LINK_NOARG(OPropertyEditor, OnPageActivate, const OString&, void)
+    IMPL_LINK(OPropertyEditor, OnPageActivate, const OString&, rNewPage, void)
     {
-        m_aPageActivationHandler.Call(nullptr);
+        m_aPageActivationHandler.Call(rNewPage);
     }
 
     IMPL_LINK(OPropertyEditor, OnPageDeactivate, const OString&, rIdent, bool)
@@ -370,8 +371,8 @@ namespace pcr
     {
     }
 
-    OPropertyEditor::PropertyPage::PropertyPage(sal_uInt16 nPagePos, const OUString& rLabel, std::unique_ptr<OBrowserPage> pPage)
-        : nPos(nPagePos), sLabel(rLabel), xPage(std::move(pPage))
+    OPropertyEditor::PropertyPage::PropertyPage(sal_uInt16 nPagePos, OUString aLabel, std::unique_ptr<OBrowserPage> pPage)
+        : nPos(nPagePos), sLabel(std::move(aLabel)), xPage(std::move(pPage))
     {
     }
 

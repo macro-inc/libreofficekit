@@ -101,26 +101,18 @@ HRESULT checkResult(HRESULT hr, const char* file, size_t line)
 
 D2DWriteTextOutRenderer::D2DWriteTextOutRenderer(bool bRenderingModeNatural)
     : mpD2DFactory(nullptr),
-    mpDWriteFactory(nullptr),
-    mpGdiInterop(nullptr),
     mpRT(nullptr),
     mRTProps(D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT,
                                           D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
                                           0, 0)),
-    mpFontFace(nullptr),
-    mlfEmHeight(0.0f),
-    mhDC(nullptr),
     mbRenderingModeNatural(bRenderingModeNatural),
     meTextAntiAliasMode(D2DTextAntiAliasMode::Default)
 {
+    WinSalGraphics::getDWriteFactory(&mpDWriteFactory);
     HRESULT hr = S_OK;
     hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory), nullptr, reinterpret_cast<void **>(&mpD2DFactory));
-    hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&mpDWriteFactory));
     if (SUCCEEDED(hr))
-    {
-        hr = mpDWriteFactory->GetGdiInterop(&mpGdiInterop);
         hr = CreateRenderTarget(bRenderingModeNatural);
-    }
     meTextAntiAliasMode = lclGetSystemTextAntiAliasMode();
 }
 
@@ -128,10 +120,6 @@ D2DWriteTextOutRenderer::~D2DWriteTextOutRenderer()
 {
     if (mpRT)
         mpRT->Release();
-    if (mpGdiInterop)
-        mpGdiInterop->Release();
-    if (mpDWriteFactory)
-        mpDWriteFactory->Release();
     if (mpD2DFactory)
         mpD2DFactory->Release();
 }
@@ -184,7 +172,7 @@ HRESULT D2DWriteTextOutRenderer::CreateRenderTarget(bool bRenderingModeNatural)
 
 bool D2DWriteTextOutRenderer::Ready() const
 {
-    return mpGdiInterop && mpRT;
+    return mpRT;
 }
 
 HRESULT D2DWriteTextOutRenderer::BindDC(HDC hDC, tools::Rectangle const & rRect)
@@ -229,12 +217,13 @@ bool D2DWriteTextOutRenderer::performRender(GenericSalLayout const & rLayout, Sa
         return ExTextOutRenderer()(rLayout, rGraphics, hDC, bRenderingModeNatural);
     }
 
-    mlfEmHeight = 0;
-    if (!GetDWriteFaceFromHDC(hDC, &mpFontFace, &mlfEmHeight))
-        return false;
-
     const WinFontInstance& rWinFont = static_cast<const WinFontInstance&>(rLayout.GetFont());
     float fHScale = rWinFont.getHScale();
+
+    float lfEmHeight = 0;
+    IDWriteFontFace* pFontFace = GetDWriteFace(rWinFont, &lfEmHeight);
+    if (!pFontFace)
+        return false;
 
     tools::Rectangle bounds;
     bool succeeded = rLayout.GetBoundRect(bounds);
@@ -261,15 +250,15 @@ bool D2DWriteTextOutRenderer::performRender(GenericSalLayout const & rLayout, Sa
         const GlyphItem* pGlyph;
         while (rLayout.GetNextGlyph(&pGlyph, aPos, nStart))
         {
-            UINT16 glyphIndices[] = { pGlyph->glyphId() };
-            FLOAT glyphAdvances[] = { static_cast<FLOAT>(pGlyph->m_nNewWidth) / fHScale };
+            UINT16 glyphIndices[] = { static_cast<UINT16>(pGlyph->glyphId()) };
+            FLOAT glyphAdvances[] = { static_cast<FLOAT>(pGlyph->newWidth()) / fHScale };
             DWRITE_GLYPH_OFFSET glyphOffsets[] = { { 0.0f, 0.0f }, };
             D2D1_POINT_2F baseline = { static_cast<FLOAT>(aPos.getX() - bounds.Left()) / fHScale,
                                        static_cast<FLOAT>(aPos.getY() - bounds.Top()) };
             WinFontTransformGuard aTransformGuard(mpRT, fHScale, rLayout, baseline, pGlyph->IsVertical());
             DWRITE_GLYPH_RUN glyphs = {
-                mpFontFace,
-                mlfEmHeight,
+                pFontFace,
+                lfEmHeight,
                 1,
                 glyphIndices,
                 glyphAdvances,
@@ -287,8 +276,6 @@ bool D2DWriteTextOutRenderer::performRender(GenericSalLayout const & rLayout, Sa
     if (pBrush)
         pBrush->Release();
 
-    ReleaseFont();
-
     if (hr == D2DERR_RECREATE_TARGET)
     {
         CreateRenderTarget(bRenderingModeNatural);
@@ -298,80 +285,14 @@ bool D2DWriteTextOutRenderer::performRender(GenericSalLayout const & rLayout, Sa
     return succeeded;
 }
 
-bool D2DWriteTextOutRenderer::BindFont(HDC hDC)
+IDWriteFontFace* D2DWriteTextOutRenderer::GetDWriteFace(const WinFontInstance& rWinFont,
+                                                        float* lfSize) const
 {
-    // A TextOutRender can only be bound to one font at a time, so the
-    assert(mpFontFace == nullptr);
-    if (mpFontFace)
-    {
-        ReleaseFont();
-        return false;
-    }
-
-    // Initially bind to an empty rectangle to get access to the font face,
-    //  we'll update it once we've calculated a bounding rect in DrawGlyphs
-    if (FAILED(BindDC(mhDC = hDC)))
-        return false;
-
-    mlfEmHeight = 0;
-    return GetDWriteFaceFromHDC(hDC, &mpFontFace, &mlfEmHeight);
-}
-
-bool D2DWriteTextOutRenderer::ReleaseFont()
-{
-    mpFontFace->Release();
-    mpFontFace = nullptr;
-    mhDC = nullptr;
-
-    return true;
-}
-
-// GetGlyphInkBoxes
-// The inkboxes returned have their origin on the baseline, to a -ve value
-// of Top() means the glyph extends abs(Top()) many pixels above the
-// baseline, and +ve means the ink starts that many pixels below.
-std::vector<tools::Rectangle> D2DWriteTextOutRenderer::GetGlyphInkBoxes(uint16_t const * pGid, uint16_t const * pGidEnd) const
-{
-    ptrdiff_t nGlyphs = pGidEnd - pGid;
-    if (nGlyphs < 0)
-        return std::vector<tools::Rectangle>();
-
-    DWRITE_FONT_METRICS aFontMetrics;
-    mpFontFace->GetMetrics(&aFontMetrics);
-
-    std::vector<DWRITE_GLYPH_METRICS> metrics(nGlyphs);
-    if (!SUCCEEDED(CHECKHR(mpFontFace->GetDesignGlyphMetrics(pGid, nGlyphs, metrics.data()))))
-        return std::vector<tools::Rectangle>();
-
-    std::vector<tools::Rectangle> aOut(nGlyphs);
-    auto pOut = aOut.begin();
-    for (auto &m : metrics)
-    {
-        const auto left  = m.leftSideBearing;
-        const auto top   = m.topSideBearing - m.verticalOriginY;
-        const auto right = m.advanceWidth - m.rightSideBearing;
-        const auto bottom = INT32(m.advanceHeight) - m.verticalOriginY - m.bottomSideBearing;
-
-        // Scale to screen space.
-        pOut->SetLeft( std::floor(left * mlfEmHeight / aFontMetrics.designUnitsPerEm) );
-        pOut->SetTop( std::floor(top * mlfEmHeight / aFontMetrics.designUnitsPerEm) );
-        pOut->SetRight( std::ceil(right * mlfEmHeight / aFontMetrics.designUnitsPerEm) );
-        pOut->SetBottom( std::ceil(bottom * mlfEmHeight / aFontMetrics.designUnitsPerEm) );
-
-        ++pOut;
-    }
-
-    return aOut;
-}
-
-bool D2DWriteTextOutRenderer::GetDWriteFaceFromHDC(HDC hDC, IDWriteFontFace ** ppFontFace, float * lfSize) const
-{
-    bool succeeded = SUCCEEDED(CHECKHR(mpGdiInterop->CreateFontFaceFromHdc(hDC, ppFontFace)));
-
-    if (succeeded)
+    auto pFontFace = rWinFont.GetDWFontFace();
+    if (pFontFace)
     {
         LOGFONTW aLogFont;
-        HFONT hFont = static_cast<HFONT>(::GetCurrentObject(hDC, OBJ_FONT));
+        HFONT hFont = rWinFont.GetHFONT();
 
         GetObjectW(hFont, sizeof(LOGFONTW), &aLogFont);
         float dpix, dpiy;
@@ -382,7 +303,7 @@ bool D2DWriteTextOutRenderer::GetDWriteFaceFromHDC(HDC hDC, IDWriteFontFace ** p
         *lfSize *= -1;
     }
 
-    return succeeded;
+    return pFontFace;
 }
 
 WinFontTransformGuard::WinFontTransformGuard(ID2D1RenderTarget* pRenderTarget, float fHScale,

@@ -23,6 +23,7 @@
 #include <osl/endian.h>
 #include <sal/log.hxx>
 #include <editeng/lrspitem.hxx>
+#include <svx/xflbmtit.hxx>
 #include <svx/xfillit0.hxx>
 #include <svx/xlineit0.hxx>
 #include <svx/xlnclit.hxx>
@@ -100,6 +101,7 @@
 #include <memory>
 #include <optional>
 #include <filter/msfilter/escherex.hxx>
+#include <utility>
 #include "sprmids.hxx"
 
 using ::editeng::SvxBorderLine;
@@ -165,7 +167,7 @@ void wwFrameNamer::SetUniqueGraphName(SwFrameFormat *pFrameFormat, std::u16strin
     if (mbIsDisabled || rFixed.empty())
         return;
 
-    pFrameFormat->SetName(msSeed+OUString::number(++mnImportedGraphicsCount) + ": " + rFixed);
+    pFrameFormat->SetFormatName(msSeed+OUString::number(++mnImportedGraphicsCount) + ": " + rFixed);
 }
 
 // ReadGrafStart reads object data and if necessary creates an anchor
@@ -306,7 +308,7 @@ static void SetLineEndAttr( SfxItemSet& rSet, WW8_DP_LINEEND const & rLe,
 }
 
 // start of routines for the different objects
-SdrObject* SwWW8ImplReader::ReadLine(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
+rtl::Reference<SdrObject> SwWW8ImplReader::ReadLine(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
 {
     WW8_DP_LINE aLine;
 
@@ -330,9 +332,9 @@ SdrObject* SwWW8ImplReader::ReadLine(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet
     ::basegfx::B2DPolygon aPolygon;
     aPolygon.append(::basegfx::B2DPoint(aP[0].X(), aP[0].Y()));
     aPolygon.append(::basegfx::B2DPoint(aP[1].X(), aP[1].Y()));
-    SdrObject* pObj = new SdrPathObj(
+    rtl::Reference<SdrObject> pObj = new SdrPathObj(
         *m_pDrawModel,
-        OBJ_LINE,
+        SdrObjKind::Line,
         ::basegfx::B2DPolyPolygon(aPolygon));
 
     SetStdAttr( rSet, aLine.aLnt, aLine.aShd );
@@ -341,7 +343,7 @@ SdrObject* SwWW8ImplReader::ReadLine(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet
     return pObj;
 }
 
-SdrObject* SwWW8ImplReader::ReadRect(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
+rtl::Reference<SdrObject> SwWW8ImplReader::ReadRect(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
 {
     WW8_DP_RECT aRect;
 
@@ -354,7 +356,7 @@ SdrObject* SwWW8ImplReader::ReadRect(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet
     aP1.AdjustX(static_cast<sal_Int16>(SVBT16ToUInt16( pHd->dxa )) );
     aP1.AdjustY(static_cast<sal_Int16>(SVBT16ToUInt16( pHd->dya )) );
 
-    SdrObject* pObj = new SdrRectObj(
+    rtl::Reference<SdrObject> pObj = new SdrRectObj(
         *m_pDrawModel,
         tools::Rectangle(aP0, aP1));
 
@@ -364,7 +366,7 @@ SdrObject* SwWW8ImplReader::ReadRect(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet
     return pObj;
 }
 
-SdrObject* SwWW8ImplReader::ReadEllipse(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
+rtl::Reference<SdrObject> SwWW8ImplReader::ReadEllipse(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
 {
     WW8_DP_ELLIPSE aEllipse;
 
@@ -377,7 +379,7 @@ SdrObject* SwWW8ImplReader::ReadEllipse(WW8_DPHEAD const * pHd, SfxAllItemSet &r
     aP1.AdjustX(static_cast<sal_Int16>(SVBT16ToUInt16( pHd->dxa )) );
     aP1.AdjustY(static_cast<sal_Int16>(SVBT16ToUInt16( pHd->dya )) );
 
-    SdrObject* pObj = new SdrCircObj(
+    rtl::Reference<SdrObject> pObj = new SdrCircObj(
         *m_pDrawModel,
         SdrCircKind::Full,
         tools::Rectangle(aP0, aP1));
@@ -388,7 +390,7 @@ SdrObject* SwWW8ImplReader::ReadEllipse(WW8_DPHEAD const * pHd, SfxAllItemSet &r
     return pObj;
 }
 
-SdrObject* SwWW8ImplReader::ReadArc(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
+rtl::Reference<SdrObject> SwWW8ImplReader::ReadArc(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
 {
     WW8_DP_ARC aArc;
 
@@ -412,7 +414,7 @@ SdrObject* SwWW8ImplReader::ReadArc(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
         aP1.AdjustX( -static_cast<sal_Int16>(SVBT16ToUInt16( pHd->dxa )) );
     }
 
-    SdrObject* pObj = new SdrCircObj(
+    rtl::Reference<SdrObject> pObj = new SdrCircObj(
         *m_pDrawModel,
         SdrCircKind::Section,
         tools::Rectangle(aP0, aP1),
@@ -425,7 +427,7 @@ SdrObject* SwWW8ImplReader::ReadArc(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
     return pObj;
 }
 
-SdrObject* SwWW8ImplReader::ReadPolyLine(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
+rtl::Reference<SdrObject> SwWW8ImplReader::ReadPolyLine(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
 {
     WW8_DP_POLYLINE aPoly;
 
@@ -452,9 +454,9 @@ SdrObject* SwWW8ImplReader::ReadPolyLine(WW8_DPHEAD const * pHd, SfxAllItemSet &
     }
     xP.reset();
 
-    SdrObject* pObj = new SdrPathObj(
+    rtl::Reference<SdrObject> pObj = new SdrPathObj(
         *m_pDrawModel,
-        (SVBT16ToUInt16(aPoly.aBits1) & 0x1) ? OBJ_POLY : OBJ_PLIN,
+        (SVBT16ToUInt16(aPoly.aBits1) & 0x1) ? SdrObjKind::Polygon : SdrObjKind::PolyLine,
         ::basegfx::B2DPolyPolygon(aP.getB2DPolygon()));
 
     SetStdAttr( rSet, aPoly.aLnt, aPoly.aShd );
@@ -565,8 +567,8 @@ private:
     tools::Long mnStartPos; // 0x13
     tools::Long mnEndPos;   // 0x15
 public:
-    explicit Chunk(tools::Long nStart, const OUString &rURL)
-        : msURL(rURL), mnStartPos(nStart), mnEndPos(0)  {}
+    explicit Chunk(tools::Long nStart, OUString aURL)
+        : msURL(std::move(aURL)), mnStartPos(nStart), mnEndPos(0)  {}
 
     void SetEndPos(tools::Long nEnd) { mnEndPos = nEnd; }
     tools::Long GetStartPos() const {return mnStartPos;}
@@ -671,9 +673,9 @@ void SwWW8ImplReader::InsertAttrsAsDrawingAttrs(WW8_CP nStartCp, WW8_CP nEndCp,
 
                         if (!bBadSelection)
                         {
-                            OUStringBuffer sTemp;
-                            comphelper::string::padToLength(sTemp,
-                                nTextStart - nStartReplace, cReplaceSymbol);
+                            sal_Int32 nCount = nTextStart - nStartReplace;
+                            OUStringBuffer sTemp(nCount);
+                            comphelper::string::padToLength(sTemp, nCount, cReplaceSymbol);
                             m_pDrawEditEngine->QuickInsertText(sTemp.makeStringAndClear(), aReplaceSel);
                         }
                     }
@@ -731,7 +733,12 @@ void SwWW8ImplReader::InsertAttrsAsDrawingAttrs(WW8_CP nStartCp, WW8_CP nEndCp,
                         nWhich >= RES_FLTRATTR_END )
                     {
                         sal_uInt16 nSlotId = m_rDoc.GetAttrPool().GetSlotId(nWhich);
-                        if (
+                        if (nWhich == RES_CHRATR_BACKGROUND || nWhich == RES_CHRATR_HIGHLIGHT)
+                        {
+                            Color aColor(static_cast<const SvxBrushItem*>(pItem)->GetColor());
+                            pS->Put(SvxColorItem(aColor, EE_CHAR_BKGCOLOR));
+                        }
+                        else if (
                             nSlotId && nWhich != nSlotId &&
                             0 != (nWhich = pEditPool->GetWhich(nSlotId)) &&
                             nWhich != nSlotId
@@ -1026,7 +1033,7 @@ void SwWW8ImplReader::InsertTxbxText(SdrTextObj* pTextObj,
     bool* pbContainsGraphics, SvxMSDffImportRec const * pRecord)
 {
     SwFrameFormat* pFlyFormat = nullptr;
-    sal_uLong nOld = m_pStrm->Tell();
+    sal_uInt64 nOld = m_pStrm->Tell();
 
     ManTypes eType = m_xPlcxMan->GetManType() == MAN_HDFT ? MAN_TXBX_HDFT : MAN_TXBX;
 
@@ -1126,12 +1133,12 @@ void SwWW8ImplReader::InsertTxbxText(SdrTextObj* pTextObj,
                                 // SdrTextObj in this Group
 
                                 Graphic aGraph;
-                                SdrObject* pNew = ImportOleBase(aGraph);
+                                rtl::Reference<SdrObject> pNew = ImportOleBase(aGraph);
 
                                 if( !pNew )
                                 {
                                     pNew = new SdrGrafObj(*m_pDrawModel);
-                                    static_cast<SdrGrafObj*>(pNew)->SetGraphic(aGraph);
+                                    static_cast<SdrGrafObj*>(pNew.get())->SetGraphic(aGraph);
                                 }
 
                                 GraphicCtor();
@@ -1140,7 +1147,7 @@ void SwWW8ImplReader::InsertTxbxText(SdrTextObj* pTextObj,
                                 pNew->SetLayer( pTextObj->GetLayer() );
 
                                 pTextObj->getParentSdrObjectFromSdrObject()->GetSubList()->
-                                    ReplaceObject(pNew, pTextObj->GetOrdNum());
+                                    ReplaceObject(pNew.get(), pTextObj->GetOrdNum());
                             }
                             else
                                 pFlyFormat = ImportOle();
@@ -1239,7 +1246,7 @@ bool SwWW8ImplReader::TxbxChainContainsRealText(sal_uInt16 nTxBxS, tools::Long& 
 }
 
 // TextBoxes only for Ver67 !!
-SdrObject* SwWW8ImplReader::ReadTextBox(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
+rtl::Reference<SdrObject> SwWW8ImplReader::ReadTextBox(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
 {
     bool bDummy;
     WW8_DP_TXTBOX aTextB;
@@ -1253,9 +1260,9 @@ SdrObject* SwWW8ImplReader::ReadTextBox(WW8_DPHEAD const * pHd, SfxAllItemSet &r
     aP1.AdjustX(static_cast<sal_Int16>(SVBT16ToUInt16( pHd->dxa )) );
     aP1.AdjustY(static_cast<sal_Int16>(SVBT16ToUInt16( pHd->dya )) );
 
-    SdrRectObj* pObj = new SdrRectObj(
+    rtl::Reference<SdrRectObj> pObj = new SdrRectObj(
         *m_pDrawModel,
-        OBJ_TEXT,
+        SdrObjKind::Text,
         tools::Rectangle(aP0, aP1));
 
     pObj->NbcSetSnapRect(tools::Rectangle(aP0, aP1));
@@ -1264,7 +1271,7 @@ SdrObject* SwWW8ImplReader::ReadTextBox(WW8_DPHEAD const * pHd, SfxAllItemSet &r
 
     tools::Long nStartCpFly,nEndCpFly;
     bool bContainsGraphics;
-    InsertTxbxText(pObj, &aSize, 0, 0, 0, nullptr, false,
+    InsertTxbxText(pObj.get(), &aSize, 0, 0, 0, nullptr, false,
         bDummy,nullptr,&nStartCpFly,&nEndCpFly,&bContainsGraphics);
 
     SetStdAttr( rSet, aTextB.aLnt, aTextB.aShd );
@@ -1281,7 +1288,7 @@ SdrObject* SwWW8ImplReader::ReadTextBox(WW8_DPHEAD const * pHd, SfxAllItemSet &r
     return pObj;
 }
 
-SdrObject* SwWW8ImplReader::ReadCaptionBox(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
+rtl::Reference<SdrObject> SwWW8ImplReader::ReadCaptionBox(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
 {
     static const SdrCaptionType aCaptA[] = { SdrCaptionType::Type1, SdrCaptionType::Type2,
                                        SdrCaptionType::Type3, SdrCaptionType::Type4 };
@@ -1326,7 +1333,7 @@ SdrObject* SwWW8ImplReader::ReadCaptionBox(WW8_DPHEAD const * pHd, SfxAllItemSet
                + m_nDrawYOfs2 + static_cast<sal_Int16>(SVBT16ToUInt16( xP[1] )) );
     xP.reset();
 
-    SdrCaptionObj* pObj = new SdrCaptionObj(
+    rtl::Reference<SdrCaptionObj> pObj = new SdrCaptionObj(
         *m_pDrawModel,
         tools::Rectangle(aP0, aP1),
         aP2);
@@ -1336,7 +1343,7 @@ SdrObject* SwWW8ImplReader::ReadCaptionBox(WW8_DPHEAD const * pHd, SfxAllItemSet
                            static_cast<sal_Int16>(SVBT16ToUInt16(  aCallB.dpheadTxbx.dya )) );
     bool bEraseThisObject;
 
-    InsertTxbxText(pObj, &aSize, 0, 0, 0, nullptr, false, bEraseThisObject );
+    InsertTxbxText(pObj.get(), &aSize, 0, 0, 0, nullptr, false, bEraseThisObject );
 
     if( SVBT16ToUInt16( aCallB.dptxbx.aLnt.lnps ) != 5 ) // Is border visible ?
         SetStdAttr( rSet, aCallB.dptxbx.aLnt, aCallB.dptxbx.aShd );
@@ -1348,7 +1355,7 @@ SdrObject* SwWW8ImplReader::ReadCaptionBox(WW8_DPHEAD const * pHd, SfxAllItemSet
     return pObj;
 }
 
-SdrObject *SwWW8ImplReader::ReadGroup(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
+rtl::Reference<SdrObject> SwWW8ImplReader::ReadGroup(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet)
 {
     sal_Int16 nGrouped;
 
@@ -1362,19 +1369,19 @@ SdrObject *SwWW8ImplReader::ReadGroup(WW8_DPHEAD const * pHd, SfxAllItemSet &rSe
     m_nDrawXOfs = m_nDrawXOfs + static_cast<sal_Int16>(SVBT16ToUInt16( pHd->xa ));
     m_nDrawYOfs = m_nDrawYOfs + static_cast<sal_Int16>(SVBT16ToUInt16( pHd->ya ));
 
-    SdrObject* pObj = new SdrObjGroup(*m_pDrawModel);
+    rtl::Reference<SdrObject> pObj = new SdrObjGroup(*m_pDrawModel);
 
     short nLeft = static_cast<sal_Int16>(SVBT16ToUInt16( pHd->cb )) - sizeof( WW8_DPHEAD );
     for (int i = 0; i < nGrouped && nLeft >= static_cast<short>(sizeof(WW8_DPHEAD)); ++i)
     {
         SfxAllItemSet aSet(m_pDrawModel->GetItemPool());
-        if (SdrObject *pObject = ReadGrafPrimitive(nLeft, aSet))
+        if (rtl::Reference<SdrObject> pObject = ReadGrafPrimitive(nLeft, aSet))
         {
             // first add and then set ItemSet
             SdrObjList *pSubGroup = pObj->GetSubList();
             OSL_ENSURE(pSubGroup, "Why no sublist available?");
             if (pSubGroup)
-                pSubGroup->InsertObject(pObject, 0);
+                pSubGroup->InsertObject(pObject.get(), 0);
             pObject->SetMergedItemSetAndBroadcast(aSet);
         }
     }
@@ -1385,11 +1392,11 @@ SdrObject *SwWW8ImplReader::ReadGroup(WW8_DPHEAD const * pHd, SfxAllItemSet &rSe
     return pObj;
 }
 
-SdrObject* SwWW8ImplReader::ReadGrafPrimitive(short& rLeft, SfxAllItemSet &rSet)
+rtl::Reference<SdrObject> SwWW8ImplReader::ReadGrafPrimitive(short& rLeft, SfxAllItemSet &rSet)
 {
     // This whole archaic word 6 graphic import can probably be refactored
     // into an object hierarchy with a little effort.
-    SdrObject *pRet=nullptr;
+    rtl::Reference<SdrObject> pRet;
     WW8_DPHEAD aHd;                         // Read Draw-Primitive-Header
     bool bCouldRead = checkRead(*m_pStrm, &aHd, sizeof(WW8_DPHEAD)) &&
                       SVBT16ToUInt16(aHd.cb) >= sizeof(WW8_DPHEAD);
@@ -1484,9 +1491,9 @@ void SwWW8ImplReader::ReadGrafLayer1(WW8PLCFspecial& rPF, tools::Long nGrafAncho
     while (nLeft > static_cast<short>(sizeof(WW8_DPHEAD)))
     {
         SfxAllItemSet aSet( m_pDrawModel->GetItemPool() );
-        if (SdrObject *pObject = ReadGrafPrimitive(nLeft, aSet))
+        if (rtl::Reference<SdrObject> pObject = ReadGrafPrimitive(nLeft, aSet))
         {
-            m_xWWZOrder->InsertDrawingObject(pObject, SVBT16ToUInt16(aDo.dhgt));
+            m_xWWZOrder->InsertDrawingObject(pObject.get(), SVBT16ToUInt16(aDo.dhgt));
 
             tools::Rectangle aRect(pObject->GetSnapRect());
 
@@ -1741,15 +1748,14 @@ void SwWW8ImplReader::MatchSdrItemsIntoFlySet( SdrObject const * pSdrObj,
 
     // now calculate the borders and build the box: The unit is needed for the
     // frame SIZE!
-    SvxBoxItem aBox(sw::util::ItemGet<SvxBoxItem>(rFlySet, RES_BOX));
+    SvxBoxItem aBox(rFlySet.Get(RES_BOX));
     // dashed or solid becomes solid
     // WW-default: 0.75 pt = 15 twips
     sal_Int32 nLineThick = 15, nOutside=0;
 
     // check if LineStyle is *really* set!
-    const SfxPoolItem* pItem;
 
-    SfxItemState eState = rOldSet.GetItemState(XATTR_LINESTYLE,true,&pItem);
+    SfxItemState eState = rOldSet.GetItemState(XATTR_LINESTYLE);
     if( eState == SfxItemState::SET )
     {
         // Now, that we know there is a line style we will make use the
@@ -1864,7 +1870,7 @@ void SwWW8ImplReader::MatchSdrItemsIntoFlySet( SdrObject const * pSdrObj,
     sal_uInt8 nTrans = 0;
 
     // Separate transparency
-    eState = rOldSet.GetItemState(XATTR_FILLTRANSPARENCE, true, &pItem);
+    eState = rOldSet.GetItemState(XATTR_FILLTRANSPARENCE);
     if (!bSkipResBackground && eState == SfxItemState::SET)
     {
         sal_uInt16 nRes = WW8ITEMVALUE(rOldSet, XATTR_FILLTRANSPARENCE,
@@ -1875,10 +1881,10 @@ void SwWW8ImplReader::MatchSdrItemsIntoFlySet( SdrObject const * pSdrObj,
     }
 
     // Background: SvxBrushItem
-    eState = rOldSet.GetItemState(XATTR_FILLSTYLE, true, &pItem);
-    if (!bSkipResBackground && eState == SfxItemState::SET)
+    const  XFillStyleItem* pFillStyleItem = rOldSet.GetItemIfSet(XATTR_FILLSTYLE);
+    if (!bSkipResBackground && pFillStyleItem)
     {
-        const drawing::FillStyle eFill = static_cast<const XFillStyleItem*>(pItem)->GetValue();
+        const drawing::FillStyle eFill = pFillStyleItem->GetValue();
 
         switch (eFill)
         {
@@ -1909,7 +1915,7 @@ void SwWW8ImplReader::MatchSdrItemsIntoFlySet( SdrObject const * pSdrObj,
             case drawing::FillStyle_BITMAP:
                 {
                     GraphicObject aGrfObj(rOldSet.Get(XATTR_FILLBITMAP).GetGraphicObject());
-                    const bool bTile(WW8ITEMVALUE(rOldSet, XATTR_FILLBMP_TILE, SfxBoolItem));
+                    const bool bTile(WW8ITEMVALUE(rOldSet, XATTR_FILLBMP_TILE, XFillBmpTileItem));
 
                     if(bBrushItemOk) // has trans
                     {
@@ -2401,7 +2407,7 @@ RndStdIds SwWW8ImplReader::ProcessEscherAlign(SvxMSDffImportRec& rRecord, WW8_FS
     if (m_nInTable &&
             (eHoriRel == text::RelOrientation::FRAME || eHoriRel == text::RelOrientation::CHAR) &&
             rFSPA.nwr == 3 &&
-            !IsObjectLayoutInTableCell(rRecord.nLayoutInTableCell))
+            !IsObjectLayoutInTableCell(rRecord.nGroupShapeBooleanProperties))
     {
         eHoriRel = text::RelOrientation::PAGE_PRINT_AREA;
     }
@@ -2451,7 +2457,7 @@ RndStdIds SwWW8ImplReader::ProcessEscherAlign(SvxMSDffImportRec& rRecord, WW8_FS
 }
 
 // #i84783#
-bool SwWW8ImplReader::IsObjectLayoutInTableCell( const sal_uInt32 nLayoutInTableCell ) const
+bool SwWW8ImplReader::IsObjectLayoutInTableCell(const sal_uInt32 nGroupShapeBooleanProperties) const
 {
     bool bIsObjectLayoutInTableCell = false;
 
@@ -2473,7 +2479,7 @@ bool SwWW8ImplReader::IsObjectLayoutInTableCell( const sal_uInt32 nLayoutInTable
             case 0x0000: // version 8 aka Microsoft Word 97
             {
                 bIsObjectLayoutInTableCell = false;
-                OSL_ENSURE( nLayoutInTableCell == 0xFFFFFFFF,
+                OSL_ENSURE(nGroupShapeBooleanProperties == 0,
                         "no explicit object attribute layout in table cell expected." );
             }
             break;
@@ -2484,23 +2490,11 @@ bool SwWW8ImplReader::IsObjectLayoutInTableCell( const sal_uInt32 nLayoutInTable
             case 0xC000: // version 14 aka Microsoft Word 2010
             case 0xE000: // version 15 aka Microsoft Word 2013
             {
-                // #i98037#
-                // adjustment of conditions needed after deeper analysis of
-                // certain test cases.
-                if ( nLayoutInTableCell == 0xFFFFFFFF || // no explicit attribute value given
-                     nLayoutInTableCell == 0x80008000 ||
-                     ( nLayoutInTableCell & 0x02000000 &&
-                       !(nLayoutInTableCell & 0x80000000 ) ) )
-                {
-                    bIsObjectLayoutInTableCell = true;
-                }
-                else
-                {
-                    // Documented in [MS-ODRAW], 2.3.4.44 "Group Shape Boolean Properties".
-                    bool fUsefLayoutInCell = (nLayoutInTableCell & 0x80000000) >> 31;
-                    bool fLayoutInCell = (nLayoutInTableCell & 0x8000) >> 15;
-                    bIsObjectLayoutInTableCell = fUsefLayoutInCell && fLayoutInCell;
-                }
+                // Documented in [MS-ODRAW], 2.3.4.44 "Group Shape Boolean Properties".
+                bool fUsefLayoutInCell = (nGroupShapeBooleanProperties & 0x80000000) >> 31;
+                bool fLayoutInCell = (nGroupShapeBooleanProperties & 0x8000) >> 15;
+                // If unspecified, defaults to true
+                bIsObjectLayoutInTableCell = !fUsefLayoutInCell || fLayoutInCell;
             }
             break;
             default:
@@ -2534,7 +2528,7 @@ SwFrameFormat* SwWW8ImplReader::Read_GrafLayer( tools::Long nGrafAnchorCp )
 
     if( m_bVer67 )
     {
-        tools::Long nOldPos = m_pStrm->Tell();
+        sal_uInt64 nOldPos = m_pStrm->Tell();
 
         m_nDrawXOfs = m_nDrawYOfs = 0;
         ReadGrafLayer1(*pPF, nGrafAnchorCp);
@@ -2569,18 +2563,8 @@ SwFrameFormat* SwWW8ImplReader::Read_GrafLayer( tools::Long nGrafAnchorCp )
     tools::Rectangle aRect(aFSFA.nXaLeft, aFSFA.nYaTop, aFSFA.nXaRight, aFSFA.nYaBottom);
     SvxMSDffImportData aData( aRect );
 
-    /*
-    #i20540#
-    The SdrOle2Obj will try and manage any ole objects it finds, causing all
-    sorts of trouble later on
-    */
-    SwDocShell* pPersist = m_rDoc.GetDocShell();
-    m_rDoc.SetDocShell(nullptr);         // #i20540# Persist guard
-
-    SdrObject* pObject = nullptr;
+    rtl::Reference<SdrObject> pObject;
     bool bOk = (m_xMSDffManager->GetShape(aFSFA.nSpId, pObject, aData) && pObject);
-
-    m_rDoc.SetDocShell(pPersist);  // #i20540# Persist guard
 
     if (!bOk)
     {
@@ -2600,16 +2584,16 @@ SwFrameFormat* SwWW8ImplReader::Read_GrafLayer( tools::Long nGrafAnchorCp )
     }
 
     bool bDone = false;
-    SdrObject* pOurNewObject = nullptr;
+    rtl::Reference<SdrObject> pOurNewObject;
     bool bReplaceable = false;
 
     switch (pObject->GetObjIdentifier())
     {
-        case OBJ_GRAF:
+        case SdrObjKind::Graphic:
             bReplaceable = true;
             bDone = true;
             break;
-        case OBJ_OLE2:
+        case SdrObjKind::OLE2:
             bReplaceable = true;
             break;
         default:
@@ -2684,18 +2668,16 @@ SwFrameFormat* SwWW8ImplReader::Read_GrafLayer( tools::Long nGrafAnchorCp )
         Get the record for top level object, so we can get the word anchoring
         and wrapping information for it.
     */
-    SvxMSDffImportRec* pRecord = aData.find(pObject);
+    SvxMSDffImportRec* pRecord = aData.find(pObject.get());
     OSL_ENSURE(pRecord, "how did that happen?");
     if (!pRecord)
     {
         // remove old object from the Z-Order list
-        m_xMSDffManager->RemoveFromShapeOrder(pObject);
-        // and delete the object
-        SdrObject::Free(pObject);
+        m_xMSDffManager->RemoveFromShapeOrder(pObject.get());
         return nullptr;
     }
     const bool bLayoutInTableCell =
-        m_nInTable && IsObjectLayoutInTableCell( pRecord->nLayoutInTableCell );
+        m_nInTable && IsObjectLayoutInTableCell(pRecord->nGroupShapeBooleanProperties);
 
     // #i18732# - Switch on 'follow text flow', if object is laid out
     // inside table cell
@@ -2710,9 +2692,7 @@ SwFrameFormat* SwWW8ImplReader::Read_GrafLayer( tools::Long nGrafAnchorCp )
     if (pRecord->bHidden)
     {
         // remove old object from the Z-Order list
-        m_xMSDffManager->RemoveFromShapeOrder(pObject);
-        // and delete the object
-        SdrObject::Free(pObject);
+        m_xMSDffManager->RemoveFromShapeOrder(pObject.get());
         return nullptr;
     }
 
@@ -2743,7 +2723,7 @@ SwFrameFormat* SwWW8ImplReader::Read_GrafLayer( tools::Long nGrafAnchorCp )
         if (!aTarFrame.isEmpty())
             pFormatURL->SetTargetFrameName(aTarFrame);
         pFormatURL->SetMap(nullptr);
-        aFlySet.Put(*pFormatURL);
+        aFlySet.Put(std::move(pFormatURL));
     }
 
     // If we are to be "below text" then we are not to be opaque
@@ -2806,12 +2786,12 @@ SwFrameFormat* SwWW8ImplReader::Read_GrafLayer( tools::Long nGrafAnchorCp )
             {
                 /* Need to make sure that the correct layer ordering is applied. */
                 //  pass information, if object is in page header|footer to method.
-                m_xWWZOrder->InsertEscherObject(pObject, aFSFA.nSpId, pRecord->bDrawHell,
+                m_xWWZOrder->InsertEscherObject(pObject.get(), aFSFA.nSpId, pRecord->bDrawHell,
                                                 m_bIsHeader || m_bIsFooter);
             }
             else
             {
-                m_xWWZOrder->InsertTextLayerObject(pObject);
+                m_xWWZOrder->InsertTextLayerObject(pObject.get());
             }
 
             pRetFrameFormat = m_rDoc.getIDocumentContentOperations().InsertDrawObj(*m_pPaM, *pObject, aFlySet );
@@ -2845,13 +2825,13 @@ SwFrameFormat* SwWW8ImplReader::Read_GrafLayer( tools::Long nGrafAnchorCp )
     if (pRetFrameFormat /*#i52825# */)
     {
         if (!aObjName.isEmpty())
-            pRetFrameFormat->SetName( aObjName );
+            pRetFrameFormat->SetFormatName( aObjName );
         if (pRetFrameFormat->GetName().isEmpty())
         {
             if (bDrawObj)
-                pRetFrameFormat->SetName(m_rDoc.GetUniqueDrawObjectName());
+                pRetFrameFormat->SetFormatName(m_rDoc.GetUniqueDrawObjectName());
             else if (bFrame)
-                pRetFrameFormat->SetName(m_rDoc.GetUniqueFrameName());
+                pRetFrameFormat->SetFormatName(m_rDoc.GetUniqueFrameName());
         }
     }
     return AddAutoAnchor(pRetFrameFormat);
@@ -2875,18 +2855,18 @@ SwFrameFormat *SwWW8ImplReader::AddAutoAnchor(SwFrameFormat *pFormat)
 SwFrameFormat* SwWW8ImplReader::MungeTextIntoDrawBox(SvxMSDffImportRec& rRecord,
     tools::Long nGrafAnchorCp, SwFrameFormat* pRetFrameFormat)
 {
-    SdrObject* pTrueObject = rRecord.pObj;
+    rtl::Reference<SdrObject> pTrueObject = rRecord.pObj;
 
-    SdrTextObj* pSdrTextObj;
+    rtl::Reference<SdrTextObj> pSdrTextObj;
 
     // check for group object (e.g. two parentheses)
-    if (SdrObjGroup* pThisGroup = dynamic_cast<SdrObjGroup*>(rRecord.pObj))
+    if (SdrObjGroup* pThisGroup = dynamic_cast<SdrObjGroup*>(rRecord.pObj.get()))
     {
         // Group objects don't have text. Insert a text object into
         // the group for holding the text.
         pSdrTextObj = new SdrRectObj(
             *m_pDrawModel,
-            OBJ_TEXT,
+            SdrObjKind::Text,
             pThisGroup->GetCurrentBoundRect());
 
         SfxItemSet aSet(m_pDrawModel->GetItemPool());
@@ -2897,10 +2877,10 @@ SwFrameFormat* SwWW8ImplReader::MungeTextIntoDrawBox(SvxMSDffImportRec& rRecord,
         aSet.Put(makeSdrTextAutoGrowWidthItem(false));
         pSdrTextObj->SetMergedItemSet(aSet);
         pSdrTextObj->NbcSetLayer( pThisGroup->GetLayer() );
-        pThisGroup->GetSubList()->NbcInsertObject(pSdrTextObj);
+        pThisGroup->GetSubList()->NbcInsertObject(pSdrTextObj.get());
     }
     else
-        pSdrTextObj = dynamic_cast<SdrTextObj*>(rRecord.pObj);
+        pSdrTextObj = DynCastSdrTextObj(rRecord.pObj.get());
 
     if( pSdrTextObj )
     {
@@ -2912,27 +2892,25 @@ SwFrameFormat* SwWW8ImplReader::MungeTextIntoDrawBox(SvxMSDffImportRec& rRecord,
 
         const size_t nOrdNum = pSdrTextObj->GetOrdNum();
         bool bEraseThisObject;
-        InsertTxbxText(pSdrTextObj, &aObjSize, rRecord.aTextId.nTxBxS, rRecord.aTextId.nSequence,
+        InsertTxbxText(pSdrTextObj.get(), &aObjSize, rRecord.aTextId.nTxBxS, rRecord.aTextId.nSequence,
                        nGrafAnchorCp, pRetFrameFormat,
-                       (pSdrTextObj != pTrueObject) || (nullptr != pGroupObject), bEraseThisObject,
+                       (pSdrTextObj.get() != pTrueObject.get()) || (nullptr != pGroupObject), bEraseThisObject,
                        nullptr, nullptr, nullptr, nullptr, &rRecord);
 
         // was this object replaced ??
         if (bEraseThisObject)
         {
-            if( pGroupObject || (pSdrTextObj != pTrueObject) )
+            if( pGroupObject || (pSdrTextObj.get() != pTrueObject.get()) )
             {
                 // Object is already replaced by a new SdrGrafObj (in the group
                 // and) the Drawing-Page.
 
                 SdrObject* pNewObj = pGroupObject ?
-                    pGroupObject->GetSubList()->GetObj(nOrdNum) : pTrueObject;
-                if (pSdrTextObj != pNewObj)
+                    pGroupObject->GetSubList()->GetObj(nOrdNum) : pTrueObject.get();
+                if (pSdrTextObj.get() != pNewObj)
                 {
                     // Replace object in the Z-Order-List
-                    m_xMSDffManager->ExchangeInShapeOrder(pSdrTextObj, 0, pNewObj);
-                    // now delete object
-                    SdrObject::Free(rRecord.pObj);
+                    m_xMSDffManager->ExchangeInShapeOrder(pSdrTextObj.get(), 0, pNewObj);
                     // and save the new object.
                     rRecord.pObj = pNewObj;
                 }
@@ -2940,7 +2918,7 @@ SwFrameFormat* SwWW8ImplReader::MungeTextIntoDrawBox(SvxMSDffImportRec& rRecord,
             else
             {
                 // remove the object from Z-Order list
-                m_xMSDffManager->RemoveFromShapeOrder( pSdrTextObj );
+                m_xMSDffManager->RemoveFromShapeOrder( pSdrTextObj.get() );
                 // take the object from the drawing page
                 if( pSdrTextObj->getSdrPageFromSdrObject() )
                     m_pDrawPg->RemoveObject( pSdrTextObj->GetOrdNum() );
@@ -2967,8 +2945,8 @@ SwFrameFormat* SwWW8ImplReader::MungeTextIntoDrawBox(SvxMSDffImportRec& rRecord,
     return pRetFrameFormat;
 }
 
-SwFlyFrameFormat* SwWW8ImplReader::ConvertDrawTextToFly(SdrObject*& rpObject,
-                                                        SdrObject*& rpOurNewObject,
+SwFlyFrameFormat* SwWW8ImplReader::ConvertDrawTextToFly(rtl::Reference<SdrObject>& rpObject,
+                                                        rtl::Reference<SdrObject>& rpOurNewObject,
                                                         const SvxMSDffImportRec& rRecord,
                                                         RndStdIds eAnchor, const WW8_FSPA& rF,
                                                         SfxItemSet &rFlySet)
@@ -2995,10 +2973,10 @@ SwFlyFrameFormat* SwWW8ImplReader::ConvertDrawTextToFly(SdrObject*& rpObject,
                                                        : SwFrameSize::Fixed);
         rFlySet.Put(aFrameSize);
 
-        MatchSdrItemsIntoFlySet(rpObject, rFlySet, rRecord.eLineStyle, rRecord.eLineDashing,
+        MatchSdrItemsIntoFlySet(rpObject.get(), rFlySet, rRecord.eLineStyle, rRecord.eLineDashing,
                                 rRecord.eShapeType, aInnerDist);
 
-        SdrTextObj *pSdrTextObj = dynamic_cast<SdrTextObj*>(rpObject);
+        SdrTextObj *pSdrTextObj = DynCastSdrTextObj(rpObject.get());
         if (pSdrTextObj && pSdrTextObj->IsVerticalWriting())
             rFlySet.Put(SvxFrameDirectionItem(SvxFrameDirection::Vertical_RL_TB, RES_FRAMEDIR));
 
@@ -3011,10 +2989,10 @@ SwFlyFrameFormat* SwWW8ImplReader::ConvertDrawTextToFly(SdrObject*& rpObject,
         rpOurNewObject = CreateContactObject(pRetFrameFormat);
 
         // remove old object from the Z-Order list
-        m_xMSDffManager->RemoveFromShapeOrder( rpObject );
+        m_xMSDffManager->RemoveFromShapeOrder( rpObject.get() );
 
         // and delete the object
-        SdrObject::Free( rpObject );
+        rpObject.clear();
         /*
             NB: only query pOrgShapeObject starting here!
         */
@@ -3041,7 +3019,7 @@ SwFlyFrameFormat* SwWW8ImplReader::ConvertDrawTextToFly(SdrObject*& rpObject,
             if (!rpOurNewObject->IsInserted())
             {
                 // pass information, if object is in page header|footer to method.
-                m_xWWZOrder->InsertEscherObject(rpOurNewObject, rF.nSpId, rRecord.bDrawHell,
+                m_xWWZOrder->InsertEscherObject(rpOurNewObject.get(), rF.nSpId, rRecord.bDrawHell,
                                                 m_bIsHeader || m_bIsFooter);
             }
         }
@@ -3090,8 +3068,8 @@ void MatchEscherMirrorIntoFlySet(const SvxMSDffImportRec &rRecord, SfxItemSet &r
     }
 }
 
-SwFlyFrameFormat* SwWW8ImplReader::ImportReplaceableDrawables(SdrObject* &rpObject,
-                                                              SdrObject* &rpOurNewObject,
+SwFlyFrameFormat* SwWW8ImplReader::ImportReplaceableDrawables(rtl::Reference<SdrObject> &rpObject,
+                                                              rtl::Reference<SdrObject> &rpOurNewObject,
                                                               SvxMSDffImportRec& rRecord,
                                                               WW8_FSPA& rF,
                                                               SfxItemSet &rFlySet )
@@ -3114,17 +3092,17 @@ SwFlyFrameFormat* SwWW8ImplReader::ImportReplaceableDrawables(SdrObject* &rpObje
     // word for textboxes, not for graphics and ole objects.
     tools::Rectangle aInnerDist(0, 0, 0, 0);
 
-    MatchSdrItemsIntoFlySet(rpObject, rFlySet, rRecord.eLineStyle, rRecord.eLineDashing,
+    MatchSdrItemsIntoFlySet(rpObject.get(), rFlySet, rRecord.eLineStyle, rRecord.eLineDashing,
                             rRecord.eShapeType, aInnerDist);
 
     MatchEscherMirrorIntoFlySet(rRecord, aGrSet);
 
     OUString aObjectName(rpObject->GetName());
-    if (OBJ_OLE2 == rpObject->GetObjIdentifier())
-        pRetFrameFormat = InsertOle(*static_cast<SdrOle2Obj*>(rpObject), rFlySet, &aGrSet);
+    if (SdrObjKind::OLE2 == rpObject->GetObjIdentifier())
+        pRetFrameFormat = InsertOle(*static_cast<SdrOle2Obj*>(rpObject.get()), rFlySet, &aGrSet);
     else
     {
-        const SdrGrafObj *pGrf = static_cast<const SdrGrafObj*>(rpObject);
+        const SdrGrafObj *pGrf = static_cast<const SdrGrafObj*>(rpObject.get());
         bool bDone = false;
         if (pGrf->IsLinkedGraphic() && !pGrf->GetFileName().isEmpty())
         {
@@ -3155,7 +3133,7 @@ SwFlyFrameFormat* SwWW8ImplReader::ImportReplaceableDrawables(SdrObject* &rpObje
 
     if (pRetFrameFormat)
     {
-        if (OBJ_OLE2 != rpObject->GetObjIdentifier())
+        if (SdrObjKind::OLE2 != rpObject->GetObjIdentifier())
             SetAttributesAtGrfNode(rRecord, *pRetFrameFormat, &rF);
         // avoid multiple occurrences of the same graphic name
         m_aGrfNameGenerator.SetUniqueGraphName(pRetFrameFormat, aObjectName);
@@ -3165,13 +3143,14 @@ SwFlyFrameFormat* SwWW8ImplReader::ImportReplaceableDrawables(SdrObject* &rpObje
     rpOurNewObject = CreateContactObject(pRetFrameFormat);
 
     // remove old object from Z-Order-List
-    m_xMSDffManager->RemoveFromShapeOrder( rpObject );
+    m_xMSDffManager->RemoveFromShapeOrder( rpObject.get() );
     // remove from Drawing-Page
     if( rpObject->getSdrPageFromSdrObject() )
         m_pDrawPg->RemoveObject( rpObject->GetOrdNum() );
 
     // and delete the object
-    SdrObject::Free( rpObject );
+    rpObject.clear();
+
     /*
         Warning: from now on query only pOrgShapeObject!
     */
@@ -3180,14 +3159,14 @@ SwFlyFrameFormat* SwWW8ImplReader::ImportReplaceableDrawables(SdrObject* &rpObje
     if (rpOurNewObject)
     {
         if (!m_bHdFtFootnoteEdn)
-            m_xMSDffManager->StoreShapeOrder(rF.nSpId, 0, rpOurNewObject);
+            m_xMSDffManager->StoreShapeOrder(rF.nSpId, 0, rpOurNewObject.get());
 
         // The Contact-Object MUST be set in the Draw-Page, so that in
         // SwWW8ImplReader::LoadDoc1() the Z-Order can be defined !!!
         if (!rpOurNewObject->IsInserted())
         {
             // pass information, if object is in page header|footer to method.
-            m_xWWZOrder->InsertEscherObject(rpOurNewObject, rF.nSpId, rRecord.bDrawHell,
+            m_xWWZOrder->InsertEscherObject(rpOurNewObject.get(), rF.nSpId, rRecord.bDrawHell,
                                             m_bIsHeader || m_bIsFooter);
         }
     }

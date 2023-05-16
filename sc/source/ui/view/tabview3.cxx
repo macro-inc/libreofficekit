@@ -87,7 +87,7 @@ ScRange lcl_getSubRangeByIndex( const ScRange& rRange, sal_Int32 nIndex )
         aResult.IncCol( static_cast< SCCOL >( nIndex % nWidth ) );
         aResult.IncRow( static_cast< SCROW >( (nIndex % nArea) / nWidth ) );
         aResult.IncTab( static_cast< SCTAB >( nIndex / nArea ) );
-        if( !rRange.In( aResult ) )
+        if( !rRange.Contains( aResult ) )
             aResult = rRange.aStart;
     }
 
@@ -429,13 +429,13 @@ void ScTabView::SetCursor( SCCOL nPosX, SCROW nPosY, bool bNew )
     tools::Rectangle aNewRowArea(0, aOldSize.getHeight(), aOldSize.getWidth(), aNewSize.getHeight());
 
     // Only invalidate if spreadsheet extended to the right
-    if (aNewColArea.getWidth())
+    if (aNewColArea.getOpenWidth())
     {
         SfxLokHelper::notifyInvalidation(aViewData.GetViewShell(), &aNewColArea);
     }
 
     // Only invalidate if spreadsheet extended to the bottom
-    if (aNewRowArea.getHeight())
+    if (aNewRowArea.getOpenHeight())
     {
         SfxLokHelper::notifyInvalidation(aViewData.GetViewShell(), &aNewRowArea);
     }
@@ -1230,7 +1230,7 @@ void ScTabView::MoveCursorAbs( SCCOL nCurX, SCROW nCurY, ScFollowMode eMode,
         const ScMarkData& rMark = aViewData.GetMarkData();
         ScRangeList aSelList;
         rMark.FillRangeListWithMarks(&aSelList, false);
-        if (!aSelList.In(ScRange(nCurX, nCurY, aViewData.GetTabNo())))
+        if (!aSelList.Contains(ScRange(nCurX, nCurY, aViewData.GetTabNo())))
             // Cursor not in existing selection.  Start a new selection.
             DoneBlockMode(true);
     }
@@ -1238,14 +1238,16 @@ void ScTabView::MoveCursorAbs( SCCOL nCurX, SCROW nCurY, ScFollowMode eMode,
     {
         if (!bShift)
         {
-            // Remove all marked data on cursor movement unless the Shift is locked.
+            // Remove all marked data on cursor movement unless the Shift is
+            // locked or while editing a formula. It is cheaper to check for
+            // marks first and then formula mode.
             ScMarkData& rMark = aViewData.GetMarkData();
             bool bMarked = rMark.IsMarked() || rMark.IsMultiMarked();
-            if (bMarked)
+            if (bMarked && !SC_MOD()->IsFormulaMode())
             {
                 rMark.ResetMark();
                 DoneBlockMode();
-                InitOwnBlockMode();
+                InitOwnBlockMode( ScRange( nCurX, nCurY, aViewData.GetTabNo()));
                 MarkDataChanged();
             }
         }
@@ -1759,7 +1761,7 @@ void ScTabView::Unmark()
 void ScTabView::SetMarkData( const ScMarkData& rNew )
 {
     DoneBlockMode();
-    InitOwnBlockMode();
+    InitOwnBlockMode( rNew.GetMarkArea());
     aViewData.GetMarkData() = rNew;
 
     MarkDataChanged();
@@ -1825,7 +1827,7 @@ void ScTabView::SetTabNo( SCTAB nTab, bool bNew, bool bExtendSelection, bool bSa
         return;
     }
 
-    if ( !(nTab != aViewData.GetTabNo() || bNew) )
+    if (!bNew && nTab == aViewData.GetTabNo())
         return;
 
     // FormShell would like to be informed before the switch
@@ -1901,6 +1903,7 @@ void ScTabView::SetTabNo( SCTAB nTab, bool bNew, bool bExtendSelection, bool bSa
     // UpdateShow before SetCursor, so that UpdateAutoFillMark finds the correct
     // window  (is called from SetCursor)
     UpdateShow();
+    aViewData.GetView()->TestHintWindow();
 
     SfxBindings& rBindings = aViewData.GetBindings();
     ScMarkData& rMark = aViewData.GetMarkData();
@@ -2413,11 +2416,11 @@ void ScTabView::PaintArea( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCRO
                 // Remember that wsd expects int and that aEnd.X() is
                 // in pixels and will be converted in twips, before performing
                 // the lok callback, so we need to avoid that an overflow occurs.
-                aEnd.setX( (!bIsTiledRendering && bLayoutRTL) ? 0 : std::numeric_limits<int>::max() / 1000 );
+                aEnd.setX( std::numeric_limits<int>::max() / 1000 );
             }
             else
             {
-                aEnd.setX( (!bIsTiledRendering && bLayoutRTL) ? 0 : pGridWin[i]->GetOutputSizePixel().Width() );
+                aEnd.setX( bLayoutRTL ? 0 : pGridWin[i]->GetOutputSizePixel().Width() );
             }
         }
         aEnd.AdjustX( -nLayoutSign );
@@ -2433,11 +2436,11 @@ void ScTabView::PaintArea( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCRO
         bool bMarkClipped = aViewData.GetOptions().GetOption( VOPT_CLIPMARKS );
         if (bMarkClipped)
         {
-            // ScColumn::IsEmptyBlock has to be optimized for this
+            // ScColumn::IsEmptyData has to be optimized for this
             //  (switch to Search() )
             //!if ( nCol1 > 0 && !aViewData.GetDocument()->IsBlockEmpty(
-            //!                     aViewData.GetTabNo(),
-            //!                     0, nRow1, nCol1-1, nRow2 ) )
+            //!                     0, nRow1, nCol1-1, nRow2.
+            //!                     aViewData.GetTabNo() ) )
             tools::Long nMarkPixel = static_cast<tools::Long>( SC_CLIPMARK_SIZE * aViewData.GetPPTX() );
             aStart.AdjustX( -(nMarkPixel * nLayoutSign) );
         }

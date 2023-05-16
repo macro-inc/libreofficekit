@@ -17,22 +17,21 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <limits>
 #include <stdio.h>
 #include <string>
 
 #include <sal/log.hxx>
 #include <unotools/localedatawrapper.hxx>
-#include <unotools/calendarwrapper.hxx>
 #include <unotools/digitgroupingiterator.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/debug.hxx>
 #include <i18nlangtag/languagetag.hxx>
+#include <o3tl/safeint.hxx>
 
 #include <com/sun/star/i18n/KNumberFormatUsage.hpp>
 #include <com/sun/star/i18n/KNumberFormatType.hpp>
 #include <com/sun/star/i18n/LocaleData2.hpp>
-#include <com/sun/star/i18n/CalendarFieldIndex.hpp>
-#include <com/sun/star/i18n/CalendarDisplayIndex.hpp>
 #include <com/sun/star/i18n/NumberFormatIndex.hpp>
 #include <com/sun/star/i18n/NumberFormatMapper.hpp>
 
@@ -40,6 +39,10 @@
 #include <comphelper/sequence.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <rtl/math.hxx>
+#include <tools/date.hxx>
+#include <tools/time.hxx>
+#include <o3tl/string_view.hxx>
+#include <utility>
 
 const sal_uInt16 nCurrFormatDefault = 0;
 
@@ -57,25 +60,25 @@ sal_uInt8 LocaleDataWrapper::nLocaleDataChecking = 0;
 
 LocaleDataWrapper::LocaleDataWrapper(
             const Reference< uno::XComponentContext > & rxContext,
-            const LanguageTag& rLanguageTag
+            LanguageTag aLanguageTag
             )
         :
         m_xContext( rxContext ),
         xLD( LocaleData2::create(rxContext) ),
-        maLanguageTag( rLanguageTag )
+        maLanguageTag(std::move( aLanguageTag ))
 {
     loadData();
     loadDateAcceptancePatterns({});
 }
 
 LocaleDataWrapper::LocaleDataWrapper(
-            const LanguageTag& rLanguageTag,
+            LanguageTag aLanguageTag,
             const std::vector<OUString> & rOverrideDateAcceptancePatterns
             )
         :
         m_xContext( comphelper::getProcessComponentContext() ),
         xLD( LocaleData2::create(m_xContext) ),
-        maLanguageTag( rLanguageTag )
+        maLanguageTag(std::move( aLanguageTag ))
 {
     loadData();
     loadDateAcceptancePatterns(rOverrideDateAcceptancePatterns);
@@ -350,7 +353,7 @@ const std::vector< LanguageType >& LocaleDataWrapper::getInstalledLanguageTypes(
                     aMsg.append(static_cast<sal_Int32>(static_cast<sal_uInt16>(eLang)), 16);
                     aMsg.append("  ->  ");
                     aMsg.append(aBackLanguageTag.getBcp47());
-                    outputCheckMessage( aMsg.makeStringAndClear() );
+                    outputCheckMessage( aMsg );
                 }
                 eLang = LANGUAGE_DONTKNOW;
             }
@@ -375,7 +378,7 @@ const OUString& LocaleDataWrapper::getOneLocaleItem( sal_Int16 nItem ) const
 
 const OUString& LocaleDataWrapper::getOneReservedWord( sal_Int16 nWord ) const
 {
-    if ( nWord < 0 || nWord >= static_cast<sal_Int16>(aReservedWords.size()) )
+    if ( nWord < 0 || o3tl::make_unsigned(nWord) >= aReservedWords.size() )
     {
         SAL_WARN( "unotools.i18n", "getOneReservedWord: bounds" );
         static const OUString EMPTY;
@@ -384,10 +387,10 @@ const OUString& LocaleDataWrapper::getOneReservedWord( sal_Int16 nWord ) const
     return aReservedWords[nWord];
 }
 
-MeasurementSystem LocaleDataWrapper::mapMeasurementStringToEnum( const OUString& rMS ) const
+MeasurementSystem LocaleDataWrapper::mapMeasurementStringToEnum( std::u16string_view rMS ) const
 {
 //! TODO: could be cached too
-    if ( rMS.equalsIgnoreAsciiCase( "metric" ) )
+    if ( o3tl::equalsIgnoreAsciiCase( rMS, u"metric" ) )
         return MeasurementSystem::Metric;
 //! TODO: other measurement systems? => extend enum MeasurementSystem
     return MeasurementSystem::US;
@@ -458,13 +461,13 @@ sal_uInt16 LocaleDataWrapper::getCurrDigits() const
     return nCurrDigits;
 }
 
-void LocaleDataWrapper::scanCurrFormatImpl( const OUString& rCode,
+void LocaleDataWrapper::scanCurrFormatImpl( std::u16string_view rCode,
         sal_Int32 nStart, sal_Int32& nSign, sal_Int32& nPar,
         sal_Int32& nNum, sal_Int32& nBlank, sal_Int32& nSym ) const
 {
     nSign = nPar = nNum = nBlank = nSym = -1;
-    const sal_Unicode* const pStr = rCode.getStr();
-    const sal_Unicode* const pStop = pStr + rCode.getLength();
+    const sal_Unicode* const pStr = rCode.data();
+    const sal_Unicode* const pStop = pStr + rCode.size();
     const sal_Unicode* p = pStr + nStart;
     int nInSection = 0;
     bool bQuote = false;
@@ -521,7 +524,7 @@ void LocaleDataWrapper::scanCurrFormatImpl( const OUString& rCode,
                         p = pStop;
                 break;
                 default:
-                    if (!nInSection && nSym == -1 && rCode.match(aCurrSymbol, static_cast<sal_Int32>(p - pStr)))
+                    if (!nInSection && nSym == -1 && o3tl::starts_with(rCode.substr(static_cast<sal_Int32>(p - pStr)), aCurrSymbol))
                     {   // currency symbol not surrounded by [$...]
                         nSym = p - pStr;
                         if (nBlank == -1 && pStr < p && *(p-1) == ' ')
@@ -684,7 +687,7 @@ LongDateOrder LocaleDataWrapper::getLongDateOrder() const
     return nLongDateOrder;
 }
 
-LongDateOrder LocaleDataWrapper::scanDateOrderImpl( const OUString& rCode ) const
+LongDateOrder LocaleDataWrapper::scanDateOrderImpl( std::u16string_view rCode ) const
 {
     // Only some european versions were translated, the ones with different
     // keyword combinations are:
@@ -692,35 +695,35 @@ LongDateOrder LocaleDataWrapper::scanDateOrderImpl( const OUString& rCode ) cons
     // Dutch DMJ, Finnish PKV
 
     // default is English keywords for every other language
-    sal_Int32 nDay = rCode.indexOf('D');
-    sal_Int32 nMonth = rCode.indexOf('M');
-    sal_Int32 nYear = rCode.indexOf('Y');
-    if (nDay == -1 || nMonth == -1 || nYear == -1)
+    size_t nDay = rCode.find('D');
+    size_t nMonth = rCode.find('M');
+    size_t nYear = rCode.find('Y');
+    if (nDay == std::u16string_view::npos || nMonth == std::u16string_view::npos || nYear == std::u16string_view::npos)
     {   // This algorithm assumes that all three parts (DMY) are present
-        if (nMonth == -1)
+        if (nMonth == std::u16string_view::npos)
         {   // only Finnish has something else than 'M' for month
-            nMonth = rCode.indexOf('K');
-            if (nMonth != -1)
+            nMonth = rCode.find('K');
+            if (nMonth != std::u16string_view::npos)
             {
-                nDay = rCode.indexOf('P');
-                nYear = rCode.indexOf('V');
+                nDay = rCode.find('P');
+                nYear = rCode.find('V');
             }
         }
-        else if (nDay == -1)
+        else if (nDay == std::u16string_view::npos)
         {   // We have a month 'M' if we reach this branch.
             // Possible languages containing 'M' but no 'D':
             // German, French, Italian
-            nDay = rCode.indexOf('T');         // German
-            if (nDay != -1)
-                nYear = rCode.indexOf('J');
+            nDay = rCode.find('T');         // German
+            if (nDay != std::u16string_view::npos)
+                nYear = rCode.find('J');
             else
             {
-                nYear = rCode.indexOf('A');    // French, Italian
-                if (nYear != -1)
+                nYear = rCode.find('A');    // French, Italian
+                if (nYear != std::u16string_view::npos)
                 {
-                    nDay = rCode.indexOf('J'); // French
-                    if (nDay == -1)
-                        nDay = rCode.indexOf('G'); // Italian
+                    nDay = rCode.find('J'); // French
+                    if (nDay == std::u16string_view::npos)
+                        nDay = rCode.find('G'); // Italian
                 }
             }
         }
@@ -728,22 +731,22 @@ LongDateOrder LocaleDataWrapper::scanDateOrderImpl( const OUString& rCode ) cons
         {   // We have a month 'M' and a day 'D'.
             // Possible languages containing 'D' and 'M' but not 'Y':
             // Spanish, Dutch
-            nYear = rCode.indexOf('A');        // Spanish
-            if (nYear == -1)
-                nYear = rCode.indexOf('J');    // Dutch
+            nYear = rCode.find('A');        // Spanish
+            if (nYear == std::u16string_view::npos)
+                nYear = rCode.find('J');    // Dutch
         }
-        if (nDay == -1 || nMonth == -1 || nYear == -1)
+        if (nDay == std::u16string_view::npos || nMonth == std::u16string_view::npos || nYear == std::u16string_view::npos)
         {
             if (areChecksEnabled())
             {
                 outputCheckMessage( appendLocaleInfo( u"LocaleDataWrapper::scanDateOrder: not all DMY present" ) );
             }
-            if (nDay == -1)
-                nDay = rCode.getLength();
-            if (nMonth == -1)
-                nMonth = rCode.getLength();
-            if (nYear == -1)
-                nYear = rCode.getLength();
+            if (nDay == std::u16string_view::npos)
+                nDay = rCode.size();
+            if (nMonth == std::u16string_view::npos)
+                nMonth = rCode.size();
+            if (nYear == std::u16string_view::npos)
+                nYear = rCode.size();
         }
     }
     // compare with <= because each position may equal rCode.getLength()
@@ -971,16 +974,13 @@ static void ImplAddNum( OUStringBuffer& rBuf, sal_Int64 nNumber, int nMinLen )
     return ImplAddUNum( rBuf, nNumber, nMinLen);
 }
 
-static void ImplAdd2UNum( OUStringBuffer& rBuf, sal_uInt16 nNumber, bool bLeading )
+static void ImplAdd2UNum( OUStringBuffer& rBuf, sal_uInt16 nNumber )
 {
     DBG_ASSERT( nNumber < 100, "ImplAdd2UNum() - Number >= 100" );
 
     if ( nNumber < 10 )
     {
-        if ( bLeading )
-        {
-            rBuf.append('0');
-        }
+        rBuf.append('0');
         rBuf.append(static_cast<char>(nNumber + '0'));
     }
     else
@@ -1012,14 +1012,21 @@ void LocaleDataWrapper::ImplAddFormatNum( OUStringBuffer& rBuf,
     sal_uInt16  nNumLen;
 
     // negative number
+    sal_uInt64 abs;
     if ( nNumber < 0 )
     {
-        nNumber *= -1;
+        // Avoid overflow, map -2^63 -> 2^63 explicitly:
+        abs = nNumber == std::numeric_limits<sal_Int64>::min()
+            ? static_cast<sal_uInt64>(std::numeric_limits<sal_Int64>::min()) : nNumber * -1;
         rBuf.append('-');
+    }
+    else
+    {
+        abs = nNumber;
     }
 
     // convert number
-    ImplAddUNum( aNumBuf, static_cast<sal_uInt64>(nNumber) );
+    ImplAddUNum( aNumBuf, abs );
     nNumLen = static_cast<sal_uInt16>(aNumBuf.getLength());
 
     if ( nNumLen <= nDecimals )
@@ -1116,25 +1123,25 @@ OUString LocaleDataWrapper::getDate( const Date& rDate ) const
     switch ( getDateOrder() )
     {
         case DateOrder::DMY :
-            ImplAdd2UNum( aBuf, nDay, true /* IsDateDayLeadingZero() */ );
+            ImplAdd2UNum( aBuf, nDay );
             aBuf.append( aLocaleDataItem.dateSeparator );
-            ImplAdd2UNum( aBuf, nMonth, true /* IsDateMonthLeadingZero() */ );
+            ImplAdd2UNum( aBuf, nMonth );
             aBuf.append( aLocaleDataItem.dateSeparator );
             ImplAddNum( aBuf, nYear, nYearLen );
         break;
         case DateOrder::MDY :
-            ImplAdd2UNum( aBuf, nMonth, true /* IsDateMonthLeadingZero() */ );
+            ImplAdd2UNum( aBuf, nMonth );
             aBuf.append( aLocaleDataItem.dateSeparator );
-            ImplAdd2UNum( aBuf, nDay, true /* IsDateDayLeadingZero() */ );
+            ImplAdd2UNum( aBuf, nDay );
             aBuf.append( aLocaleDataItem.dateSeparator );
             ImplAddNum( aBuf, nYear, nYearLen );
         break;
         default:
             ImplAddNum( aBuf, nYear, nYearLen );
             aBuf.append( aLocaleDataItem.dateSeparator );
-            ImplAdd2UNum( aBuf, nMonth, true /* IsDateMonthLeadingZero() */ );
+            ImplAdd2UNum( aBuf, nMonth );
             aBuf.append( aLocaleDataItem.dateSeparator );
-            ImplAdd2UNum( aBuf, nDay, true /* IsDateDayLeadingZero() */ );
+            ImplAdd2UNum( aBuf, nDay );
     }
 
     return aBuf.makeStringAndClear();
@@ -1148,13 +1155,13 @@ OUString LocaleDataWrapper::getTime( const tools::Time& rTime, bool bSec, bool b
 
     nHour %= 24;
 
-    ImplAdd2UNum( aBuf, nHour, true /* IsTimeLeadingZero() */ );
+    ImplAdd2UNum( aBuf, nHour );
     aBuf.append( aLocaleDataItem.timeSeparator );
-    ImplAdd2UNum( aBuf, rTime.GetMin(), true );
+    ImplAdd2UNum( aBuf, rTime.GetMin() );
     if ( bSec )
     {
         aBuf.append( aLocaleDataItem.timeSeparator );
-        ImplAdd2UNum( aBuf, rTime.GetSec(), true );
+        ImplAdd2UNum( aBuf, rTime.GetSec() );
 
         if ( b100Sec )
         {
@@ -1178,11 +1185,11 @@ OUString LocaleDataWrapper::getDuration( const tools::Time& rTime, bool bSec, bo
     else
         ImplAddUNum( aBuf, rTime.GetHour() );
     aBuf.append( aLocaleDataItem.timeSeparator );
-    ImplAdd2UNum( aBuf, rTime.GetMin(), true );
+    ImplAdd2UNum( aBuf, rTime.GetMin() );
     if ( bSec )
     {
         aBuf.append( aLocaleDataItem.timeSeparator );
-        ImplAdd2UNum( aBuf, rTime.GetSec(), true );
+        ImplAdd2UNum( aBuf, rTime.GetSec() );
 
         if ( b100Sec )
         {
@@ -1221,14 +1228,14 @@ OUString LocaleDataWrapper::getNum( sal_Int64 nNumber, sal_uInt16 nDecimals,
 }
 
 OUString LocaleDataWrapper::getCurr( sal_Int64 nNumber, sal_uInt16 nDecimals,
-        const OUString& rCurrencySymbol, bool bUseThousandSep ) const
+        std::u16string_view rCurrencySymbol, bool bUseThousandSep ) const
 {
     sal_Unicode cZeroChar = getCurrZeroChar();
 
     // check if digits and separators will fit into fixed buffer or allocate
     size_t nGuess = ImplGetNumberStringLengthGuess( aLocaleDataItem, nDecimals );
     OUStringBuffer aNumBuf(int(nGuess + 16));
-    OUStringBuffer aBuf(int(rCurrencySymbol.getLength() + nGuess + 20 ));
+    OUStringBuffer aBuf(int(rCurrencySymbol.size() + nGuess + 20 ));
 
     bool bNeg;
     if ( nNumber < 0 )
@@ -1407,22 +1414,13 @@ OUString LocaleDataWrapper::getCurr( sal_Int64 nNumber, sal_uInt16 nDecimals,
 
 // --- number parsing -------------------------------------------------
 
-double LocaleDataWrapper::stringToDouble( const OUString& rString, bool bUseGroupSep,
+double LocaleDataWrapper::stringToDouble( std::u16string_view aString, bool bUseGroupSep,
         rtl_math_ConversionStatus* pStatus, sal_Int32* pParseEnd ) const
 {
-    const sal_Unicode cGroupSep = (bUseGroupSep ? aLocaleDataItem.thousandSeparator[0] : 0);
-    rtl_math_ConversionStatus eStatus = rtl_math_ConversionStatus_Ok;
-    sal_Int32 nParseEnd = 0;
-    double fValue = rtl::math::stringToDouble( rString, aLocaleDataItem.decimalSeparator[0], cGroupSep, &eStatus, &nParseEnd);
-    bool bTryAlt = (nParseEnd < rString.getLength() && !aLocaleDataItem.decimalSeparatorAlternative.isEmpty() &&
-            rString[nParseEnd] == aLocaleDataItem.decimalSeparatorAlternative.toChar());
-    // Try re-parsing with alternative if that was the reason to stop.
-    if (bTryAlt)
-        fValue = rtl::math::stringToDouble( rString, aLocaleDataItem.decimalSeparatorAlternative.toChar(), cGroupSep, &eStatus, &nParseEnd);
-    if (pStatus)
-        *pStatus = eStatus;
+    const sal_Unicode* pParseEndChar;
+    double fValue = stringToDouble(aString.data(), aString.data() + aString.size(), bUseGroupSep, pStatus, &pParseEndChar);
     if (pParseEnd)
-        *pParseEnd = nParseEnd;
+        *pParseEnd = pParseEndChar - aString.data();
     return fValue;
 }
 
@@ -1552,19 +1550,13 @@ void LocaleDataWrapper::loadDateAcceptancePatterns(
         }
     }
 
-    // Never overwrite the locale's full date pattern! The first.
-    if (std::as_const(aDateAcceptancePatterns)[0] == rPatterns[0])
-        aDateAcceptancePatterns = comphelper::containerToSequence(rPatterns);    // sane
-    else
-    {
-        // Copy existing full date pattern and append the sequence passed.
-        /* TODO: could check for duplicates and shrink target sequence */
-        Sequence< OUString > aTmp( rPatterns.size() + 1 );
-        auto it = aTmp.getArray();
-        *it = std::as_const(aDateAcceptancePatterns)[0];
-        std::copy(rPatterns.begin(), rPatterns.end(), std::next(it));
-        aDateAcceptancePatterns = aTmp;
-    }
+    // Earlier versions checked for presence of the full date pattern with
+    // aDateAcceptancePatterns[0] == rPatterns[0] and prepended that if not.
+    // This lead to confusion if the patterns were intentionally specified
+    // without, giving entirely a different DMY order, see tdf#150288.
+    // Not checking this and accepting the given patterns as is may result in
+    // the user shooting themself in the foot, but we can't have both.
+    aDateAcceptancePatterns = comphelper::containerToSequence(rPatterns);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

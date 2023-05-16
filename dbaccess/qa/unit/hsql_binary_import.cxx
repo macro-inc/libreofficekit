@@ -46,8 +46,9 @@ void HsqlBinaryImportTest::testBinaryImport()
     }
 
     // the migration requires the file to be writable
-    utl::TempFile const temp(createTempCopy(u"hsqldb_migration_test.odb"));
-    uno::Reference<XOfficeDatabaseDocument> const xDocument = getDocumentForUrl(temp.GetURL());
+    createTempCopy(u"hsqldb_migration_test.odb");
+    uno::Reference<XOfficeDatabaseDocument> const xDocument
+        = getDocumentForUrl(maTempFile.GetURL());
 
     uno::Reference<XConnection> xConnection = getConnectionForDocument(xDocument);
     // at this point migration is already done
@@ -86,7 +87,6 @@ void HsqlBinaryImportTest::testBinaryImport()
     CPPUNIT_ASSERT_EQUAL(sal_uInt16{ 2 }, date.Month);
     CPPUNIT_ASSERT_EQUAL(sal_Int16{ 1998 }, date.Year);
 
-    closeDocument(uno::Reference<lang::XComponent>(xDocument, uno::UNO_QUERY));
     if (!oldValue)
     {
         std::shared_ptr<comphelper::ConfigurationChanges> xChanges(

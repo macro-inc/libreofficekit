@@ -66,8 +66,9 @@ private:
     std::unique_ptr<ScTypedCaseStrSet> pColumnData;
     std::unique_ptr<ScTypedCaseStrSet> pFormulaData;
     std::unique_ptr<ScTypedCaseStrSet> pFormulaDataPara;
-    ScTypedCaseStrSet::const_iterator miAutoPosColumn;
-    ScTypedCaseStrSet::const_iterator miAutoPosFormula;
+    ScTypedCaseStrSet::const_iterator  miAutoPosColumn;
+    ScTypedCaseStrSet::const_iterator  miAutoPosFormula;
+    std::set<sal_Unicode>              maFormulaChar;
 
     VclPtr<vcl::Window>     pTipVisibleParent;
     void*                   nTipVisible;
@@ -126,10 +127,6 @@ private:
 
     std::unique_ptr<ScRangeFindList>
                             pRangeFindList;
-
-    static bool             bAutoComplete;              // from app options
-    static bool             bOptLoaded;
-    ::std::set< sal_Unicode >    maFormulaChar;  //fdo 75264
 
 private:
     void            UpdateActiveView();
@@ -260,7 +257,7 @@ public:
     // Communication with the autopilot function
     void            InputGetSelection       ( sal_Int32& rStart, sal_Int32& rEnd );
     void            InputSetSelection       ( sal_Int32 nStart, sal_Int32 nEnd );
-    void            InputReplaceSelection   ( const OUString& rStr );
+    void            InputReplaceSelection   ( std::u16string_view aStr );
     void            InputTurnOffWinEngine();
 
     bool            IsFormulaMode() const                   { return bFormulaMode; }
@@ -293,14 +290,12 @@ public:
 
     void SetDocumentDisposing( bool b );
 
-    static void     SetAutoComplete(bool bSet)  { bAutoComplete = bSet; }
-
     static ReferenceMark GetReferenceMark( const ScViewData& rViewData, ScDocShell* pDocSh,
                                     tools::Long nX1, tools::Long nX2, tools::Long nY1, tools::Long nY2,
                                     tools::Long nTab, const Color& rColor );
 
     void            LOKPasteFunctionData(const OUString& rFunctionName);
-    static void     LOKSendFormulabarUpdate(const SfxViewShell* pActiveViewSh,
+    static void     LOKSendFormulabarUpdate(EditView* pEditView, const SfxViewShell* pActiveViewSh,
                                             const OUString& rText, const ESelection& rSelection);
 };
 
@@ -314,7 +309,7 @@ public:
         ScInputHdlState( const ScAddress& rCurPos,
                          const ScAddress& rStartPos,
                          const ScAddress& rEndPos,
-                         const OUString& rString,
+                         OUString aString,
                          const EditTextObject* pData );
         ScInputHdlState( const ScInputHdlState& rCpy );
         ~ScInputHdlState();

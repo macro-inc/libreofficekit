@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -25,10 +27,10 @@ class Subtotals(UITestCase):
             with self.ui_test.execute_dialog_through_command(".uno:DataSubTotals") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
                 select_pos(xTabs, "0")
-                xGroupBy = xDialog.getChild("group_by")
+                xGroupBy = xDialog.getChild("group_by1")
                 select_by_text(xGroupBy, "Store Name")
                 xCheckListMenu = xDialog.getChild("grid1")
-                xTreeList = xCheckListMenu.getChild("columns")
+                xTreeList = xCheckListMenu.getChild("columns1")
                 xEntry = xTreeList.getChild("1")
                 xEntry.executeAction("CLICK", tuple())
 

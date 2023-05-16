@@ -20,15 +20,21 @@
 #ifndef INCLUDED_VCL_INC_WIN_SALFRAME_H
 #define INCLUDED_VCL_INC_WIN_SALFRAME_H
 
+#include <sal/config.h>
+
+#include <string_view>
+
 #include <vcl/sysdata.hxx>
+#include <vcl/windowstate.hxx>
 #include <salframe.hxx>
 #include <svsys.h>
 
 class WinSalGraphics;
 
-
 class WinSalFrame final: public SalFrame
 {
+    vcl::WindowState m_eState;
+
 public:
     HWND                    mhWnd;                  // Window handle
     HCURSOR                 mhCursor;               // cursor handle
@@ -39,10 +45,7 @@ public:
     HMENU                   mSelectedhMenu;         // the menu where highlighting is currently going on
     HMENU                   mLastActivatedhMenu;    // the menu that was most recently opened
     SystemEnvData           maSysData;              // system data
-    SalFrameState           maState = {};           // frame state
     int                     mnShowState;            // show state
-    LONG                    mnWidth;                // client width in pixeln
-    LONG                    mnHeight;               // client height in pixeln
     int                     mnMinWidth;             // min. client width in pixeln
     int                     mnMinHeight;            // min. client height in pixeln
     int                     mnMaxWidth;             // max. client width in pixeln
@@ -60,7 +63,6 @@ public:
     bool                    mbSizeBorder;           // has window a sizeable border
     bool                    mbNoIcon;               // is a window without an icon
     bool                    mbFloatWin;             // is a FloatingWindow
-    bool                    mbFullScreen;           // TRUE: in full screen mode
     bool                    mbPresentation;         // TRUE: Presentation Mode running
     bool                    mbInShow;               // inside a show call
     bool                    mbRestoreMaximize;      // Restore-Maximize
@@ -99,7 +101,6 @@ public:
     virtual void                SetTitle( const OUString& rTitle ) override;
     virtual void                SetIcon( sal_uInt16 nIcon ) override;
     virtual void                SetMenu( SalMenu* pSalMenu ) override;
-    virtual void                DrawMenuBar() override;
     virtual void                SetExtendedFrameStyle( SalExtStyle nExtStyle ) override;
     virtual void                Show( bool bVisible, bool bNoActivate = false ) override;
     virtual void                SetMinClientSize( tools::Long nWidth, tools::Long nHeight ) override;
@@ -108,8 +109,8 @@ public:
     virtual void                GetClientSize( tools::Long& rWidth, tools::Long& rHeight ) override;
     virtual void                GetWorkArea( tools::Rectangle& rRect ) override;
     virtual SalFrame*           GetParent() const override;
-    virtual void                SetWindowState( const SalFrameState* pState ) override;
-    virtual bool                GetWindowState( SalFrameState* pState ) override;
+    virtual void SetWindowState(const vcl::WindowData*) override;
+    virtual bool GetWindowState(vcl::WindowData*) override;
     virtual void                ShowFullScreen( bool bFullScreen, sal_Int32 nDisplay ) override;
     virtual void                StartPresentation( bool bStart ) override;
     virtual void                SetAlwaysOnTop( bool bOnTop ) override;
@@ -138,14 +139,22 @@ public:
     virtual void                BeginSetClipRegion( sal_uInt32 nRects ) override;
     virtual void                UnionClipRegion( tools::Long nX, tools::Long nY, tools::Long nWidth, tools::Long nHeight ) override;
     virtual void                EndSetClipRegion() override;
+    virtual void                UpdateDarkMode() override;
+
+    constexpr vcl::WindowState state() const { return m_eState; }
+    void UpdateFrameState();
+    constexpr bool isFullScreen() const { return bool(m_eState & vcl::WindowState::FullScreen); }
 };
 
 void ImplSalGetWorkArea( HWND hWnd, RECT *pRect, const RECT *pParentRect );
 
+bool UseDarkMode();
+bool OSSupportsDarkMode();
+
 // get foreign key names
 namespace vcl_sal {
     OUString getKeysReplacementName(
-        OUString const & pLang,
+        std::u16string_view pLang,
         LONG nSymbol );
 }
 

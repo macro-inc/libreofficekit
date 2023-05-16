@@ -37,6 +37,11 @@
   * This file is largely copied from the ICU project,
   * under folder source/extra/scrptrun/scrptrun.cpp
   */
+
+#include <sal/config.h>
+
+#include <rtl/character.hxx>
+#include <unicode/uchar.h>
 #include <unicode/utypes.h>
 #include <unicode/uscript.h>
 
@@ -115,14 +120,21 @@ struct PairIndices
 
 };
 
-// There are three Unicode script codes for Japanese text, but only one
-// OpenType script tag, so we want to keep them in one run as splitting is
-// pointless for the purpose of OpenType shaping.
 UScriptCode getScript(UChar32 ch, UErrorCode* status)
 {
+    // tdf#154549
+    // Make combining marks inherit the script of their bases, regardless of
+    // their own script.
+    if (u_getIntPropertyValue(ch, UCHAR_GENERAL_CATEGORY) == U_NON_SPACING_MARK)
+        return USCRIPT_INHERITED;
+
     UScriptCode script = uscript_getScript(ch, status);
     if (U_FAILURE(*status))
         return script;
+
+    // There are three Unicode script codes for Japanese text, but only one
+    // OpenType script tag, so we want to keep them in one run as splitting is
+    // pointless for the purpose of OpenType shaping.
     if (script == USCRIPT_KATAKANA || script == USCRIPT_KATAKANA_OR_HIRAGANA)
         return USCRIPT_HIRAGANA;
     return script;
@@ -160,14 +172,14 @@ UBool ScriptRun::next()
 
         // if the character is a high surrogate and it's not the last one
         // in the text, see if it's followed by a low surrogate
-        if (high >= 0xD800 && high <= 0xDBFF && scriptEnd < charLimit - 1)
+        if (rtl::isHighSurrogate(high) && scriptEnd < charLimit - 1)
         {
             UChar low = charArray[scriptEnd + 1];
 
             // if it is followed by a low surrogate,
             // consume it and form the full character
-            if (low >= 0xDC00 && low <= 0xDFFF) {
-                ch = (high - 0xD800) * 0x0400 + low - 0xDC00 + 0x10000;
+            if (rtl::isLowSurrogate(low)) {
+                ch = rtl::combineSurrogates(high, low);
                 scriptEnd += 1;
             }
         }

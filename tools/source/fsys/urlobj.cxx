@@ -45,6 +45,7 @@
 
 #include <com/sun/star/uno/Sequence.hxx>
 #include <comphelper/base64.hxx>
+#include <comphelper/string.hxx>
 
 using namespace css;
 
@@ -347,6 +348,7 @@ INetURLObject::getSchemeInfo(INetProtocol eTheScheme)
     static constexpr OUStringLiteral VND_CMIS = u"vnd.libreoffice.cmis";
 
     static o3tl::enumarray<INetProtocol, SchemeInfo> const map = {
+        // [-loplugin:redundantfcast]:
         SchemeInfo{
             EMPTY, "", false, false, false, false, false, false, false, false},
         SchemeInfo{
@@ -616,6 +618,7 @@ std::unique_ptr<SvMemoryStream> memoryStream(
     std::unique_ptr<SvMemoryStream> s(
         new SvMemoryStream(b.get(), length, StreamMode::READ));
     s->ObjectOwnsMemory(true);
+    // coverity[leaked_storage : FALSE] - belongs to SvMemoryStream s at this point
     b.release();
     return s;
 }
@@ -646,10 +649,10 @@ std::unique_ptr<SvMemoryStream> INetURLObject::getData() const
     else if (sURLPath.matchIgnoreAsciiCase(";base64,", nCharactersSkipped))
     {
         nCharactersSkipped += strlen(";base64,");
-        OUString sBase64Data = sURLPath.copy( nCharactersSkipped );
+        std::u16string_view sBase64Data = sURLPath.subView( nCharactersSkipped );
         css::uno::Sequence< sal_Int8 > aDecodedData;
         if (comphelper::Base64::decodeSomeChars(aDecodedData, sBase64Data)
-            == sBase64Data.getLength())
+            == sBase64Data.size())
         {
             return memoryStream(
                 aDecodedData.getArray(), aDecodedData.getLength());
@@ -719,14 +722,14 @@ OUString parseScheme(
 
 }
 
-bool INetURLObject::setAbsURIRef(OUString const & rTheAbsURIRef,
+bool INetURLObject::setAbsURIRef(std::u16string_view rTheAbsURIRef,
                                  EncodeMechanism eMechanism,
                                  rtl_TextEncoding eCharset,
                                  bool bSmart,
                                  FSysStyle eStyle)
 {
-    sal_Unicode const * pPos = rTheAbsURIRef.getStr();
-    sal_Unicode const * pEnd = pPos + rTheAbsURIRef.getLength();
+    sal_Unicode const * pPos = rTheAbsURIRef.data();
+    sal_Unicode const * pEnd = pPos + rTheAbsURIRef.size();
 
     setInvalid();
 
@@ -869,8 +872,34 @@ bool INetURLObject::setAbsURIRef(OUString const & rTheAbsURIRef,
             aSynScheme = parseScheme(&p1, pEnd, nFragmentDelimiter);
             if (!aSynScheme.isEmpty())
             {
-                m_eScheme = INetProtocol::Generic;
-                pPos = p1;
+                if (bSmart && m_eSmartScheme != m_eScheme && p1 != pEnd && rtl::isAsciiDigit(*p1))
+                {
+                    // rTheAbsURIRef doesn't define a known scheme (handled by the "if (pPrefix)"
+                    // branch above); but a known scheme is defined in m_eSmartScheme. If this
+                    // scheme may have a port in authority component, then avoid misinterpreting
+                    // URLs like www.foo.bar:123/baz as using unknown "www.foo.bar" scheme with
+                    // 123/baz rootless path. For now, do not try to handle possible colons in
+                    // user information, require such ambiguous URLs to have explicit scheme part.
+                    // Also ignore possibility of empty port.
+                    const SchemeInfo& rInfo = getSchemeInfo(m_eSmartScheme);
+                    if (rInfo.m_bAuthority && rInfo.m_bPort)
+                    {
+                        // Make sure that all characters from colon to [/?#] or to EOL are digits.
+                        // Or maybe make it simple, and just assume that "xyz:1..." is more likely
+                        // to be host "xyz" and port "1...", than scheme "xyz" and path "1..."?
+                        sal_Unicode const* p2 = p1 + 1;
+                        while (p2 != pEnd && rtl::isAsciiDigit(*p2))
+                            ++p2;
+                        if (p2 == pEnd || *p2 == '/' || *p2 == '?' || *p2 == '#')
+                            m_eScheme = m_eSmartScheme;
+                    }
+                }
+
+                if (m_eScheme == INetProtocol::NotValid)
+                {
+                    m_eScheme = INetProtocol::Generic;
+                    pPos = p1;
+                }
             }
         }
 
@@ -930,7 +959,7 @@ bool INetURLObject::setAbsURIRef(OUString const & rTheAbsURIRef,
                                PART_AUTHORITY, eCharset, false);
                 }
                 m_aHost.set(m_aAbsURIRef,
-                            aSynAuthority.makeStringAndClear(),
+                            aSynAuthority,
                             m_aAbsURIRef.getLength());
                     // misusing m_aHost to store the authority
                 break;
@@ -966,7 +995,7 @@ bool INetURLObject::setAbsURIRef(OUString const & rTheAbsURIRef,
                         return false;
                     }
                     m_aHost.set(m_aAbsURIRef,
-                                aSynAuthority.makeStringAndClear(),
+                                aSynAuthority,
                                 m_aAbsURIRef.getLength());
                         // misusing m_aHost to store the authority
                 }
@@ -1007,7 +1036,7 @@ bool INetURLObject::setAbsURIRef(OUString const & rTheAbsURIRef,
                 else
                 {
                     m_aUser.set(m_aAbsURIRef,
-                            aSynUser.makeStringAndClear(),
+                            aSynUser,
                             m_aAbsURIRef.getLength());
                     m_aAbsURIRef.append("@");
                     ++pPos;
@@ -1030,7 +1059,7 @@ bool INetURLObject::setAbsURIRef(OUString const & rTheAbsURIRef,
                     return false;
                 }
                 m_aHost.set(m_aAbsURIRef,
-                            aSynAuthority.makeStringAndClear(),
+                            aSynAuthority,
                             m_aAbsURIRef.getLength());
                     // misusing m_aHost to store the authority
                 break;
@@ -1314,8 +1343,7 @@ bool INetURLObject::setAbsURIRef(OUString const & rTheAbsURIRef,
                 appendUCS4(aSynUser, nUTF32, eEscapeType, ePart,
                            eCharset, false);
             }
-            m_aUser.set(m_aAbsURIRef, aSynUser.makeStringAndClear(),
-                m_aAbsURIRef.getLength());
+            m_aUser.set(m_aAbsURIRef, aSynUser, m_aAbsURIRef.getLength());
             if (bHasAuth)
             {
                 if (bSupportsPassword)
@@ -1331,8 +1359,7 @@ bool INetURLObject::setAbsURIRef(OUString const & rTheAbsURIRef,
                         appendUCS4(aSynAuth, nUTF32, eEscapeType,
                                    ePart, eCharset, false);
                     }
-                    m_aAuth.set(m_aAbsURIRef, aSynAuth.makeStringAndClear(),
-                        m_aAbsURIRef.getLength());
+                    m_aAuth.set(m_aAbsURIRef, aSynAuth, m_aAbsURIRef.getLength());
                 }
                 else
                 {
@@ -1352,8 +1379,7 @@ bool INetURLObject::setAbsURIRef(OUString const & rTheAbsURIRef,
                         appendUCS4(aSynAuth, nUTF32, eEscapeType,
                                    ePart, eCharset, false);
                     }
-                    m_aAuth.set(m_aAbsURIRef, aSynAuth.makeStringAndClear(),
-                        m_aAbsURIRef.getLength());
+                    m_aAuth.set(m_aAbsURIRef, aSynAuth, m_aAbsURIRef.getLength());
                 }
             }
             if (pHostPortBegin)
@@ -1444,8 +1470,7 @@ bool INetURLObject::setAbsURIRef(OUString const & rTheAbsURIRef,
             appendUCS4(aSynQuery, nUTF32, eEscapeType,
                        PART_URIC, eCharset, true);
         }
-        m_aQuery.set(m_aAbsURIRef, aSynQuery.makeStringAndClear(),
-            m_aAbsURIRef.getLength());
+        m_aQuery.set(m_aAbsURIRef, aSynQuery, m_aAbsURIRef.getLength());
     }
 
     // Parse #<fragment>
@@ -1461,8 +1486,7 @@ bool INetURLObject::setAbsURIRef(OUString const & rTheAbsURIRef,
             appendUCS4(aSynFragment, nUTF32, eEscapeType, PART_URIC,
                        eCharset, true);
         }
-        m_aFragment.set(m_aAbsURIRef, aSynFragment.makeStringAndClear(),
-            m_aAbsURIRef.getLength());
+        m_aFragment.set(m_aAbsURIRef, aSynFragment, m_aAbsURIRef.getLength());
     }
 
     if (pPos != pEnd)
@@ -1875,7 +1899,7 @@ bool INetURLObject::convertRelToAbs(OUString const & rTheRelURIRef,
         }
     }
 
-    INetURLObject aNewURI(aSynAbsURIRef.makeStringAndClear());
+    INetURLObject aNewURI(aSynAbsURIRef);
     if (aNewURI.HasError())
     {
         // Detect cases where a relative input could not be made absolute
@@ -2059,8 +2083,9 @@ bool INetURLObject::convertIntToExt(std::u16string_view rTheIntURIRef,
                                     DecodeMechanism eDecodeMechanism,
                                     rtl_TextEncoding eCharset)
 {
-    OUString aSynExtURIRef(encodeText(rTheIntURIRef, PART_VISIBLE,
-                                       EncodeMechanism::NotCanonical, eCharset, true));
+    OUStringBuffer aSynExtURIRef(256);
+    encodeText(aSynExtURIRef, rTheIntURIRef, PART_VISIBLE,
+               EncodeMechanism::NotCanonical, eCharset, true);
     sal_Unicode const * pBegin = aSynExtURIRef.getStr();
     sal_Unicode const * pEnd = pBegin + aSynExtURIRef.getLength();
     sal_Unicode const * p = pBegin;
@@ -2068,8 +2093,7 @@ bool INetURLObject::convertIntToExt(std::u16string_view rTheIntURIRef,
     bool bConvert = pPrefix && pPrefix->m_eKind == PrefixInfo::Kind::Internal;
     if (bConvert)
     {
-        aSynExtURIRef =
-            aSynExtURIRef.replaceAt(0, p - pBegin,
+        comphelper::string::replaceAt(aSynExtURIRef, 0, p - pBegin,
                 OUString::createFromAscii(pPrefix->m_pTranslatedPrefix));
     }
     rTheExtURIRef = decode(aSynExtURIRef, eDecodeMechanism, eCharset);
@@ -2082,8 +2106,9 @@ bool INetURLObject::convertExtToInt(std::u16string_view rTheExtURIRef,
                                     DecodeMechanism eDecodeMechanism,
                                     rtl_TextEncoding eCharset)
 {
-    OUString aSynIntURIRef(encodeText(rTheExtURIRef, PART_VISIBLE,
-                                       EncodeMechanism::NotCanonical, eCharset, true));
+    OUStringBuffer aSynIntURIRef(256);
+    encodeText(aSynIntURIRef, rTheExtURIRef, PART_VISIBLE,
+               EncodeMechanism::NotCanonical, eCharset, true);
     sal_Unicode const * pBegin = aSynIntURIRef.getStr();
     sal_Unicode const * pEnd = pBegin + aSynIntURIRef.getLength();
     sal_Unicode const * p = pBegin;
@@ -2091,9 +2116,8 @@ bool INetURLObject::convertExtToInt(std::u16string_view rTheExtURIRef,
     bool bConvert = pPrefix && pPrefix->m_eKind == PrefixInfo::Kind::External;
     if (bConvert)
     {
-        aSynIntURIRef =
-            aSynIntURIRef.replaceAt(0, p - pBegin,
-                OUString::createFromAscii(pPrefix->m_pTranslatedPrefix));
+        comphelper::string::replaceAt(aSynIntURIRef, 0, p - pBegin,
+            OUString::createFromAscii(pPrefix->m_pTranslatedPrefix));
     }
     rTheIntURIRef = decode(aSynIntURIRef, eDecodeMechanism, eCharset);
     return bConvert;
@@ -2262,8 +2286,9 @@ bool INetURLObject::setUser(std::u16string_view rTheUser,
         return false;
     }
 
-    OUString aNewUser(encodeText(rTheUser, PART_USER_PASSWORD,
-                                  EncodeMechanism::WasEncoded, eCharset, false));
+    OUStringBuffer aNewUser;
+    encodeText(aNewUser, rTheUser, PART_USER_PASSWORD,
+              EncodeMechanism::WasEncoded, eCharset, false);
     sal_Int32 nDelta;
     if (m_aUser.isPresent())
         nDelta = m_aUser.set(m_aAbsURIRef, aNewUser);
@@ -2317,8 +2342,9 @@ bool INetURLObject::setPassword(std::u16string_view rThePassword,
 {
     if (!getSchemeInfo().m_bPassword)
         return false;
-    OUString aNewAuth(encodeText(rThePassword, PART_USER_PASSWORD,
-                                  EncodeMechanism::WasEncoded, eCharset, false));
+    OUStringBuffer aNewAuth;
+    encodeText(aNewAuth, rThePassword, PART_USER_PASSWORD,
+                  EncodeMechanism::WasEncoded, eCharset, false);
     sal_Int32 nDelta;
     if (m_aAuth.isPresent())
         nDelta = m_aAuth.set(m_aAbsURIRef, aNewAuth);
@@ -2831,66 +2857,47 @@ bool INetURLObject::parseHostOrNetBiosName(
     EncodeMechanism eMechanism, rtl_TextEncoding eCharset, bool bNetBiosName,
     OUStringBuffer* pCanonic)
 {
+    if (pBegin >= pEnd)
+        return true;
     sal_Int32 nOriginalCanonicLength = pCanonic ? pCanonic->getLength() : 0;
-    if (pBegin < pEnd)
+    if (sal_Unicode const* p = pBegin; parseHost(p, pEnd, pCanonic) && p == pEnd)
+        return true;
+    if (pCanonic)
+        pCanonic->setLength(nOriginalCanonicLength); // discard parseHost results
+    if (!bNetBiosName)
+        return false;
+    while (pBegin < pEnd)
     {
-        sal_Unicode const * p = pBegin;
-        if (!parseHost(p, pEnd, pCanonic) || p != pEnd)
+        EscapeType eEscapeType;
+        switch (sal_uInt32 nUTF32 = getUTF32(pBegin, pEnd, eMechanism, eCharset, eEscapeType))
         {
-            if (bNetBiosName)
-            {
-                OUStringBuffer buf;
-                while (pBegin < pEnd)
+            default:
+                if (INetMIME::isVisible(nUTF32))
                 {
-                    EscapeType eEscapeType;
-                    sal_uInt32 nUTF32 = getUTF32(pBegin, pEnd,
-                                                 eMechanism, eCharset,
-                                                 eEscapeType);
-                    if (!INetMIME::isVisible(nUTF32))
-                    {
-                        if (pCanonic)
-                            pCanonic->setLength(nOriginalCanonicLength);
-                        return false;
-                    }
-                    if (!rtl::isAsciiAlphanumeric(nUTF32))
-                        switch (nUTF32)
-                        {
-                        case '"':
-                        case '*':
-                        case '+':
-                        case ',':
-                        case '/':
-                        case ':':
-                        case ';':
-                        case '<':
-                        case '=':
-                        case '>':
-                        case '?':
-                        case '[':
-                        case '\\':
-                        case ']':
-                        case '`':
-                        case '|':
-                            return false;
-                        }
-                    if (pCanonic != nullptr) {
-                        appendUCS4(
-                            buf, nUTF32, eEscapeType, PART_URIC,
-                            eCharset, true);
-                    }
+                    if (pCanonic)
+                        appendUCS4(*pCanonic, nUTF32, eEscapeType, PART_URIC, eCharset, true);
+                    break;
                 }
-                if (pCanonic)
-                {
-                    pCanonic->setLength(nOriginalCanonicLength);
-                    pCanonic->append(buf);
-                }
-            }
-            else
-            {
+                [[fallthrough]];
+            case '"':
+            case '*':
+            case '+':
+            case ',':
+            case '/':
+            case ':':
+            case ';':
+            case '<':
+            case '=':
+            case '>':
+            case '?':
+            case '[':
+            case '\\':
+            case ']':
+            case '`':
+            case '|':
                 if (pCanonic)
                     pCanonic->setLength(nOriginalCanonicLength);
                 return false;
-            }
         }
     }
     return true;
@@ -2907,8 +2914,7 @@ bool INetURLObject::setHost(std::u16string_view rTheHost,
     {
         case INetProtocol::File:
             {
-                OUString sTemp(aSynHost.toString());
-                if (sTemp.equalsIgnoreAsciiCase("localhost"))
+                if (OUString::unacquired(aSynHost).equalsIgnoreAsciiCase("localhost"))
                 {
                     aSynHost.setLength(0);
                 }
@@ -2929,7 +2935,7 @@ bool INetURLObject::setHost(std::u16string_view rTheHost,
             aSynHost.getStr(), aSynHost.getStr() + aSynHost.getLength(),
             EncodeMechanism::WasEncoded, eCharset, bNetBiosName, &aSynHost))
         return false;
-    sal_Int32 nDelta = m_aHost.set(m_aAbsURIRef, aSynHost.makeStringAndClear());
+    sal_Int32 nDelta = m_aHost.set(m_aAbsURIRef, aSynHost);
     m_aPort += nDelta;
     m_aPath += nDelta;
     m_aQuery += nDelta;
@@ -3194,18 +3200,18 @@ failed:
     return false;
 }
 
-bool INetURLObject::setPath(OUString const & rThePath,
+bool INetURLObject::setPath(std::u16string_view rThePath,
                             EncodeMechanism eMechanism,
                             rtl_TextEncoding eCharset)
 {
     OUStringBuffer aSynPath(256);
-    sal_Unicode const * p = rThePath.getStr();
-    sal_Unicode const * pEnd = p + rThePath.getLength();
+    sal_Unicode const * p = rThePath.data();
+    sal_Unicode const * pEnd = p + rThePath.size();
     if (!parsePath(m_eScheme, &p, pEnd, eMechanism, eCharset, false,
                    '/', 0x80000000, 0x80000000, 0x80000000, aSynPath)
         || p != pEnd)
         return false;
-    sal_Int32 nDelta = m_aPath.set(m_aAbsURIRef, aSynPath.makeStringAndClear());
+    sal_Int32 nDelta = m_aPath.set(m_aAbsURIRef, aSynPath);
     m_aQuery += nDelta;
     m_aFragment += nDelta;
     return true;
@@ -3349,14 +3355,14 @@ bool INetURLObject::insertName(std::u16string_view rTheName,
     OUStringBuffer aNewPath(256);
     aNewPath.append(pPathBegin, pPrefixEnd - pPathBegin);
     aNewPath.append('/');
-    aNewPath.append(encodeText(rTheName, PART_PCHAR,
-                           eMechanism, eCharset, true));
+    encodeText(aNewPath, rTheName, PART_PCHAR,
+               eMechanism, eCharset, true);
     if (bInsertSlash) {
         aNewPath.append('/');
     }
     aNewPath.append(pSuffixBegin, pPathEnd - pSuffixBegin);
 
-    return setPath(aNewPath.makeStringAndClear(), EncodeMechanism::NotCanonical,
+    return setPath(aNewPath, EncodeMechanism::NotCanonical,
         RTL_TEXTENCODING_UTF8);
 }
 
@@ -3378,8 +3384,9 @@ bool INetURLObject::setQuery(std::u16string_view rTheQuery,
 {
     if (!getSchemeInfo().m_bQuery)
         return false;
-    OUString aNewQuery(encodeText(rTheQuery, PART_URIC,
-                                   eMechanism, eCharset, true));
+    OUStringBuffer aNewQuery;
+    encodeText(aNewQuery, rTheQuery, PART_URIC,
+               eMechanism, eCharset, true);
     sal_Int32 nDelta;
     if (m_aQuery.isPresent())
         nDelta = m_aQuery.set(m_aAbsURIRef, aNewQuery);
@@ -3411,8 +3418,9 @@ bool INetURLObject::setFragment(std::u16string_view rTheFragment,
 {
     if (HasError())
         return false;
-    OUString aNewFragment(encodeText(rTheFragment, PART_URIC,
-                                      eMechanism, eCharset, true));
+    OUStringBuffer aNewFragment;
+    encodeText(aNewFragment, rTheFragment, PART_URIC,
+              eMechanism, eCharset, true);
     if (m_aFragment.isPresent())
         m_aFragment.set(m_aAbsURIRef, aNewFragment);
     else
@@ -3435,22 +3443,21 @@ bool INetURLObject::hasDosVolume(FSysStyle eStyle) const
 }
 
 // static
-OUString INetURLObject::encodeText(sal_Unicode const * pBegin,
-                                    sal_Unicode const * pEnd,
-                                    Part ePart, EncodeMechanism eMechanism,
-                                    rtl_TextEncoding eCharset,
-                                    bool bKeepVisibleEscapes)
+void INetURLObject::encodeText( OUStringBuffer& rOutputBuffer,
+                                sal_Unicode const * pBegin,
+                                sal_Unicode const * pEnd,
+                                Part ePart, EncodeMechanism eMechanism,
+                                rtl_TextEncoding eCharset,
+                                bool bKeepVisibleEscapes)
 {
-    OUStringBuffer aResult(256);
     while (pBegin < pEnd)
     {
         EscapeType eEscapeType;
         sal_uInt32 nUTF32 = getUTF32(pBegin, pEnd,
                                      eMechanism, eCharset, eEscapeType);
-        appendUCS4(aResult, nUTF32, eEscapeType, ePart,
+        appendUCS4(rOutputBuffer, nUTF32, eEscapeType, ePart,
                    eCharset, bKeepVisibleEscapes);
     }
-    return aResult.makeStringAndClear();
 }
 
 // static
@@ -3714,7 +3721,7 @@ bool INetURLObject::operator ==(INetURLObject const & rObject) const
     if (m_eScheme != rObject.m_eScheme)
         return false;
     if (m_eScheme == INetProtocol::NotValid)
-        return m_aAbsURIRef.toString() == rObject.m_aAbsURIRef.toString();
+        return std::u16string_view(m_aAbsURIRef) == std::u16string_view(rObject.m_aAbsURIRef);
     if ((m_aScheme.compare(
              rObject.m_aScheme, m_aAbsURIRef, rObject.m_aAbsURIRef)
          != 0)
@@ -3767,7 +3774,7 @@ bool INetURLObject::ConcatData(INetProtocol eTheScheme,
                                std::u16string_view rThePassword,
                                std::u16string_view rTheHost,
                                sal_uInt32 nThePort,
-                               OUString const & rThePath)
+                               std::u16string_view rThePath)
 {
     setInvalid();
     m_eScheme = eTheScheme;
@@ -3784,10 +3791,10 @@ bool INetURLObject::ConcatData(INetProtocol eTheScheme,
         {
             if (!rTheUser.empty())
             {
-                m_aUser.set(m_aAbsURIRef,
-                            encodeText(rTheUser, PART_USER_PASSWORD,
-                                       EncodeMechanism::WasEncoded, RTL_TEXTENCODING_UTF8, false),
-                            m_aAbsURIRef.getLength());
+                OUStringBuffer aNewUser;
+                encodeText(aNewUser, rTheUser, PART_USER_PASSWORD,
+                           EncodeMechanism::WasEncoded, RTL_TEXTENCODING_UTF8, false);
+                m_aUser.set(m_aAbsURIRef, aNewUser, m_aAbsURIRef.getLength());
                 bUserInfo = true;
             }
         }
@@ -3801,10 +3808,10 @@ bool INetURLObject::ConcatData(INetProtocol eTheScheme,
             if (getSchemeInfo().m_bPassword)
             {
                 m_aAbsURIRef.append(':');
-                m_aAuth.set(m_aAbsURIRef,
-                            encodeText(rThePassword, PART_USER_PASSWORD,
-                                       EncodeMechanism::WasEncoded, RTL_TEXTENCODING_UTF8, false),
-                            m_aAbsURIRef.getLength());
+                OUStringBuffer aNewAuth;
+                encodeText(aNewAuth, rThePassword, PART_USER_PASSWORD,
+                           EncodeMechanism::WasEncoded, RTL_TEXTENCODING_UTF8, false);
+                m_aAuth.set(m_aAbsURIRef, aNewAuth, m_aAbsURIRef.getLength());
                 bUserInfo = true;
             }
             else
@@ -3823,8 +3830,7 @@ bool INetURLObject::ConcatData(INetProtocol eTheScheme,
             {
                 case INetProtocol::File:
                     {
-                        OUString sTemp(aSynHost.toString());
-                        if (sTemp.equalsIgnoreAsciiCase( "localhost" ))
+                        if (OUString::unacquired(aSynHost).equalsIgnoreAsciiCase( "localhost" ))
                         {
                             aSynHost.setLength(0);
                         }
@@ -3855,8 +3861,7 @@ bool INetURLObject::ConcatData(INetProtocol eTheScheme,
                 setInvalid();
                 return false;
             }
-            m_aHost.set(m_aAbsURIRef, aSynHost.makeStringAndClear(),
-                m_aAbsURIRef.getLength());
+            m_aHost.set(m_aAbsURIRef, aSynHost, m_aAbsURIRef.getLength());
             if (nThePort != 0)
             {
                 if (getSchemeInfo().m_bPort)
@@ -3880,8 +3885,8 @@ bool INetURLObject::ConcatData(INetProtocol eTheScheme,
         }
     }
     OUStringBuffer aSynPath(256);
-    sal_Unicode const * p = rThePath.getStr();
-    sal_Unicode const * pEnd = p + rThePath.getLength();
+    sal_Unicode const * p = rThePath.data();
+    sal_Unicode const * pEnd = p + rThePath.size();
     if (!parsePath(m_eScheme, &p, pEnd, EncodeMechanism::WasEncoded, RTL_TEXTENCODING_UTF8, false, '/',
                    0x80000000, 0x80000000, 0x80000000, aSynPath)
         || p != pEnd)
@@ -3889,13 +3894,12 @@ bool INetURLObject::ConcatData(INetProtocol eTheScheme,
         setInvalid();
         return false;
     }
-    m_aPath.set(m_aAbsURIRef, aSynPath.makeStringAndClear(),
-        m_aAbsURIRef.getLength());
+    m_aPath.set(m_aAbsURIRef, aSynPath, m_aAbsURIRef.getLength());
     return true;
 }
 
 // static
-OUString INetURLObject::GetAbsURL(OUString const & rTheBaseURIRef,
+OUString INetURLObject::GetAbsURL(std::u16string_view rTheBaseURIRef,
                                        OUString const & rTheRelURIRef,
                                        EncodeMechanism eEncodeMechanism,
                                        DecodeMechanism eDecodeMechanism,
@@ -3923,7 +3927,7 @@ OUString INetURLObject::getExternalURL() const
 {
     OUString aTheExtURIRef;
     translateToExternal(
-        m_aAbsURIRef.toString(), aTheExtURIRef);
+        m_aAbsURIRef, aTheExtURIRef);
     return aTheExtURIRef;
 }
 
@@ -3958,11 +3962,10 @@ const OUString & INetURLObject::GetSchemeName(INetProtocol eTheScheme)
 }
 
 // static
-INetProtocol INetURLObject::CompareProtocolScheme(OUString const &
-                                                      rTheAbsURIRef)
+INetProtocol INetURLObject::CompareProtocolScheme(std::u16string_view aTheAbsURIRef)
 {
-    sal_Unicode const * p = rTheAbsURIRef.getStr();
-    PrefixInfo const * pPrefix = getPrefix(p, p + rTheAbsURIRef.getLength());
+    sal_Unicode const * p = aTheAbsURIRef.data();
+    PrefixInfo const * pPrefix = getPrefix(p, p + aTheAbsURIRef.size());
     return pPrefix ? pPrefix->m_eScheme : INetProtocol::NotValid;
 }
 
@@ -4052,7 +4055,7 @@ bool INetURLObject::removeSegment(sal_Int32 nIndex, bool bIgnoreFinalSlash)
         aNewPath.append('/');
     }
 
-    return setPath(aNewPath.makeStringAndClear(), EncodeMechanism::NotCanonical,
+    return setPath(aNewPath, EncodeMechanism::NotCanonical,
         RTL_TEXTENCODING_UTF8);
 }
 
@@ -4097,12 +4100,11 @@ bool INetURLObject::setName(std::u16string_view rTheName, EncodeMechanism eMecha
     while (p != pSegEnd && *p != ';')
         ++p;
 
-    return setPath(
-        std::u16string_view(pPathBegin, pSegBegin - pPathBegin)
-            + encodeText(rTheName, PART_PCHAR, eMechanism, eCharset, true)
-            + std::u16string_view(p, pPathEnd - p),
-        EncodeMechanism::NotCanonical,
-        RTL_TEXTENCODING_UTF8);
+    OUStringBuffer aNewPath(256);
+    aNewPath.append(std::u16string_view(pPathBegin, pSegBegin - pPathBegin));
+    encodeText(aNewPath, rTheName, PART_PCHAR, eMechanism, eCharset, true);
+    aNewPath.append(std::u16string_view(p, pPathEnd - p));
+    return setPath(aNewPath, EncodeMechanism::NotCanonical, RTL_TEXTENCODING_UTF8);
 }
 
 bool INetURLObject::hasExtension()
@@ -4174,12 +4176,11 @@ bool INetURLObject::setBase(std::u16string_view rTheBase, sal_Int32 nIndex,
     if (!pExtension)
         pExtension = p;
 
-    return setPath(
-        std::u16string_view(pPathBegin, pSegBegin - pPathBegin)
-            + encodeText(rTheBase, PART_PCHAR, eMechanism, eCharset, true)
-            + std::u16string_view(pExtension, pPathEnd - pExtension),
-        EncodeMechanism::NotCanonical,
-        RTL_TEXTENCODING_UTF8);
+    OUStringBuffer aNewPath(256);
+    aNewPath.append(std::u16string_view(pPathBegin, pSegBegin - pPathBegin));
+    encodeText(aNewPath, rTheBase, PART_PCHAR, eMechanism, eCharset, true);
+    aNewPath.append(std::u16string_view(pExtension, pPathEnd - pExtension));
+    return setPath(aNewPath, EncodeMechanism::NotCanonical, RTL_TEXTENCODING_UTF8);
 }
 
 OUString INetURLObject::getExtension(sal_Int32 nIndex,
@@ -4234,12 +4235,11 @@ bool INetURLObject::setExtension(std::u16string_view rTheExtension,
     if (!pExtension)
         pExtension = p;
 
-    return setPath(
-        OUString::Concat(std::u16string_view(pPathBegin, pExtension - pPathBegin)) + "."
-            + encodeText(rTheExtension, PART_PCHAR, EncodeMechanism::WasEncoded, eCharset, true)
-            + std::u16string_view(p, pPathEnd - p),
-        EncodeMechanism::NotCanonical,
-        RTL_TEXTENCODING_UTF8);
+    OUStringBuffer aNewPath(256);
+    aNewPath.append(OUString::Concat(std::u16string_view(pPathBegin, pExtension - pPathBegin)) + ".");
+    encodeText(aNewPath, rTheExtension, PART_PCHAR, EncodeMechanism::WasEncoded, eCharset, true);
+    aNewPath.append(std::u16string_view(p, pPathEnd - p));
+    return setPath(aNewPath, EncodeMechanism::NotCanonical, RTL_TEXTENCODING_UTF8);
 }
 
 bool INetURLObject::removeExtension(sal_Int32 nIndex, bool bIgnoreFinalSlash)

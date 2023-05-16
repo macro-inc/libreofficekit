@@ -86,8 +86,8 @@ private:
     virtual void SAL_CALL grabFocus( ) override;
 
     //---  XAccessibleContext  ---------------------------------
-    virtual sal_Int32 SAL_CALL getAccessibleChildCount( ) override;
-    virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int32 i ) override;
+    virtual sal_Int64 SAL_CALL getAccessibleChildCount( ) override;
+    virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int64 i ) override;
     virtual css::uno::Reference< css::accessibility::XAccessibleRelationSet > SAL_CALL getAccessibleRelationSet(  ) override;
 
     //---  XServiceInfo  ---------------------------------------
@@ -139,7 +139,7 @@ private:
 
 #ifdef DBG_UTIL
     /// Set the specified state
-    virtual bool SetState( sal_Int16 _nState ) override;
+    virtual bool SetState( sal_Int64 _nState ) override;
 #endif // DBG_UTIL
 
     /// (safely) reads the given property from the model of the UNO control

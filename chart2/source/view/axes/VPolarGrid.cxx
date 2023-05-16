@@ -38,9 +38,9 @@ using namespace ::com::sun::star::chart2;
 using ::com::sun::star::uno::Reference;
 
 VPolarGrid::VPolarGrid( sal_Int32 nDimensionIndex, sal_Int32 nDimensionCount
-                       , const uno::Sequence< Reference< beans::XPropertySet > > & rGridPropertiesList )
+                       , std::vector< Reference< beans::XPropertySet > > aGridPropertiesList )
             : VAxisOrGridBase( nDimensionIndex, nDimensionCount )
-            , m_aGridPropertiesList( rGridPropertiesList )
+            , m_aGridPropertiesList( std::move(aGridPropertiesList) )
             , m_pPosHelper( new PolarPlottingPositionHelper() )
 {
     PlotterBase::m_pPosHelper = m_pPosHelper.get();
@@ -146,7 +146,7 @@ void VPolarGrid::create2DAngleGrid( const Reference< drawing::XShapes >& xLogicT
             appendPointSequence( aAllPoints, aPoints );
         }
 
-        Reference< drawing::XShape > xShape = m_pShapeFactory->createLine2D(
+        rtl::Reference<SvxShapePolyPolygon> xShape = ShapeFactory::createLine2D(
                 xMainTarget, aAllPoints, &rLinePropertiesList[nDepth] );
         //because of this name this line will be used for marking
         m_pShapeFactory->setShapeName( xShape, "MarkHandles" );
@@ -154,13 +154,13 @@ void VPolarGrid::create2DAngleGrid( const Reference< drawing::XShapes >& xLogicT
 }
 #endif
 
-void VPolarGrid::create2DRadiusGrid( const Reference< drawing::XShapes >& xLogicTarget
+void VPolarGrid::create2DRadiusGrid( const rtl::Reference<SvxShapeGroupAnyD>& xLogicTarget
         , TickInfoArraysType& rRadiusTickInfos
         , TickInfoArraysType& rAngleTickInfos
         , const std::vector<VLineProperties>& rLinePropertiesList )
 {
-    Reference< drawing::XShapes > xMainTarget(
-        createGroupShape( xLogicTarget, m_aCID ) );
+    rtl::Reference<SvxShapeGroupAnyD> xMainTarget =
+        createGroupShape( xLogicTarget, m_aCID );
 
     const std::vector<ExplicitScaleData>& rScales = m_pPosHelper->getScales();
     const ExplicitScaleData&     rRadiusScale = rScales[1];
@@ -180,14 +180,14 @@ void VPolarGrid::create2DRadiusGrid( const Reference< drawing::XShapes >& xLogic
         if( !rLinePropertiesList[nDepth].isLineVisible() )
             continue;
 
-        Reference< drawing::XShapes > xTarget( xMainTarget );
+        rtl::Reference<SvxShapeGroupAnyD> xTarget( xMainTarget );
         if( nDepth > 0 )
         {
-            xTarget.set( createGroupShape( xLogicTarget
+            xTarget = createGroupShape( xLogicTarget
                 , ObjectIdentifier::addChildParticle( m_aCID, ObjectIdentifier::createChildParticleWithIndex( OBJECTTYPE_SUBGRID, nDepth-1 ) )
-                ) );
+                );
             if(!xTarget.is())
-                xTarget.set( xMainTarget );
+                xTarget = xMainTarget;
         }
 
         //create axis main lines
@@ -208,7 +208,7 @@ void VPolarGrid::create2DRadiusGrid( const Reference< drawing::XShapes >& xLogic
                 appendPointSequence( aAllPoints, aPoints );
         }
 
-        Reference< drawing::XShape > xShape = m_pShapeFactory->createLine2D(
+        rtl::Reference<SvxShapePolyPolygon> xShape = ShapeFactory::createLine2D(
                 xTarget, aAllPoints, &rLinePropertiesList[nDepth] );
         //because of this name this line will be used for marking
         ::chart::ShapeFactory::setShapeName( xShape, "MarkHandles" );
@@ -217,10 +217,10 @@ void VPolarGrid::create2DRadiusGrid( const Reference< drawing::XShapes >& xLogic
 
 void VPolarGrid::createShapes()
 {
-    OSL_PRECOND(m_pShapeFactory&&m_xLogicTarget.is()&&m_xFinalTarget.is(),"Axis is not proper initialized");
-    if(!(m_pShapeFactory&&m_xLogicTarget.is()&&m_xFinalTarget.is()))
+    OSL_PRECOND(m_xLogicTarget.is()&&m_xFinalTarget.is(),"Axis is not proper initialized");
+    if(!(m_xLogicTarget.is()&&m_xFinalTarget.is()))
         return;
-    if(!m_aGridPropertiesList.hasElements())
+    if(m_aGridPropertiesList.empty())
         return;
 
     //create all scaled tickmark values

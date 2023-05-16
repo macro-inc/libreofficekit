@@ -57,18 +57,18 @@ public:
     static bool ParseMapOptions(ImageMap* pImageMap, const HTMLOptions& rOptions);
     bool ParseMapOptions(ImageMap * pImageMap)
     { return ParseMapOptions(pImageMap, GetOptions()); }
-    static bool ParseAreaOptions(ImageMap * pImageMap, const OUString& rBaseURL,
+    static bool ParseAreaOptions(ImageMap * pImageMap, std::u16string_view rBaseURL,
                                  const HTMLOptions& rOptions,
                                  SvMacroItemId nEventMouseOver,
                                  SvMacroItemId nEventMouseOut );
-    inline bool ParseAreaOptions(ImageMap * pImageMap, const OUString& rBaseURL,
+    inline bool ParseAreaOptions(ImageMap * pImageMap, std::u16string_view rBaseURL,
                                  SvMacroItemId nEventMouseOver,
                                  SvMacroItemId nEventMouseOut);
 
     // <TD SDVAL="..." SDNUM="...">
     static double GetTableDataOptionsValNum( sal_uInt32& nNumForm,
             LanguageType& eNumLang, const OUString& aValStr,
-            const OUString& aNumStr, SvNumberFormatter& rFormatter );
+            std::u16string_view aNumStr, SvNumberFormatter& rFormatter );
 
 protected:
     // Start a file download. This is done asynchronously or synchronously.
@@ -99,7 +99,7 @@ protected:
     const OUString& GetScriptTypeString( SvKeyValueIterator* ) const;
 };
 
-inline bool SfxHTMLParser::ParseAreaOptions(ImageMap * pImageMap, const OUString& rBaseURL,
+inline bool SfxHTMLParser::ParseAreaOptions(ImageMap * pImageMap, std::u16string_view rBaseURL,
                                             SvMacroItemId nEventMouseOver,
                                             SvMacroItemId nEventMouseOut)
 {

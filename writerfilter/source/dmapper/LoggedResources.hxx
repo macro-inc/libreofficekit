@@ -31,7 +31,7 @@ namespace writerfilter
 class LoggedResourcesHelper final
 {
 public:
-    explicit LoggedResourcesHelper(const std::string& sPrefix);
+    explicit LoggedResourcesHelper(std::string sPrefix);
     ~LoggedResourcesHelper();
 
     void startElement(const std::string& sElement);
@@ -60,6 +60,8 @@ public:
     void endCharacterGroup() override;
     void startShape(css::uno::Reference<css::drawing::XShape> const& xShape) override;
     void endShape() override;
+    void startTextBoxContent() override;
+    void endTextBoxContent() override;
     void text(const sal_uInt8* data, size_t len) override;
     void utext(const sal_uInt8* data, size_t len) override;
     void positionOffset(const OUString& rText, bool bVertical) override;
@@ -71,8 +73,9 @@ public:
     void info(const std::string& info) override;
     void startGlossaryEntry() override;
     void endGlossaryEntry() override;
+    void checkId(const sal_Int32 nId) override;
 
-    virtual void setDocumentReference(void* /*pDocument*/) override{};
+    virtual void setDocumentReference(writerfilter::ooxml::OOXMLDocument* /*pDocument*/) override{};
 
 protected:
     virtual void lcl_startSectionGroup() = 0;
@@ -83,6 +86,8 @@ protected:
     virtual void lcl_endCharacterGroup() = 0;
     virtual void lcl_startShape(css::uno::Reference<css::drawing::XShape> const& xShape) = 0;
     virtual void lcl_endShape() = 0;
+    virtual void lcl_startTextBoxContent() = 0;
+    virtual void lcl_endTextBoxContent() = 0;
     virtual void lcl_text(const sal_uInt8* data, size_t len) = 0;
     virtual void lcl_utext(const sal_uInt8* data, size_t len) = 0;
     virtual void lcl_positionOffset(const OUString& /*rText*/, bool /*bVertical*/) {}
@@ -94,6 +99,7 @@ protected:
     virtual void lcl_substream(Id name, writerfilter::Reference<Stream>::Pointer_t ref) = 0;
     virtual void lcl_startGlossaryEntry() {}
     virtual void lcl_endGlossaryEntry() {}
+    virtual void lcl_checkId(const sal_Int32) {}
 
 #ifdef DBG_UTIL
     LoggedResourcesHelper mHelper;

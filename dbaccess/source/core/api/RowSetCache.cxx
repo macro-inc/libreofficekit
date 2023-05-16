@@ -45,7 +45,7 @@
 #include <connectivity/sqlnode.hxx>
 #include <connectivity/sqlparse.hxx>
 #include <sqlbison.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 
@@ -207,7 +207,7 @@ ORowSetCache::ORowSetCache(const Reference< XResultSet >& _xRs,
                             Reference<XDatabaseMetaData> xMeta = xConnection->getMetaData();
                             SelectColumnsMetaData aColumnNames(xMeta.is() && xMeta->supportsMixedCaseQuotedIdentifiers());
                             ::dbaccess::getColumnPositions(xSelColumns,xPrimaryKeyColumns->getElementNames(),aUpdateTableName,aColumnNames);
-                            bAllKeysFound = !aColumnNames.empty() && sal_Int32(aColumnNames.size()) == xPrimaryKeyColumns->getElementNames().getLength();
+                            bAllKeysFound = !aColumnNames.empty() && aColumnNames.size() == o3tl::make_unsigned(xPrimaryKeyColumns->getElementNames().getLength());
                         }
                     }
                 }
@@ -455,7 +455,7 @@ static Any lcl_getBookmark(ORowSetValue& i_aValue,OCacheSet* i_pCacheSet)
         case DataType::TINYINT:
         case DataType::SMALLINT:
         case DataType::INTEGER:
-            return makeAny(i_aValue.getInt32());
+            return Any(i_aValue.getInt32());
         default:
             if ( i_pCacheSet && i_aValue.isNull())
                 i_aValue = i_pCacheSet->getBookmark();
@@ -591,7 +591,7 @@ void ORowSetCache::updateCharacterStream( sal_Int32 columnIndex, const Reference
     rInsert[columnIndex].setBound(true);
     rInsert[columnIndex] = aSeq;
     rInsert[columnIndex].setModified(true);
-    io_aRow[columnIndex] = makeAny(x);
+    io_aRow[columnIndex] = Any(x);
 
     m_xCacheSet->mergeColumnValues(columnIndex,rInsert,io_aRow,o_ChangedColumns);
     impl_updateRowFromCache_throw(io_aRow,o_ChangedColumns);
@@ -946,7 +946,7 @@ void ORowSetCache::moveWindow()
             if ( nRowsInCache < m_nFetchSize )
             {
                 // There is some unused space in *m_pMatrix; fill it
-                OSL_ENSURE((nRowsInCache >= static_cast<ORowSetMatrix::difference_type>(0)) && (nRowsInCache < static_cast<sal_Int32>(m_pMatrix->size())),"Position is invalid!");
+                OSL_ENSURE((nRowsInCache >= static_cast<ORowSetMatrix::difference_type>(0)) && (o3tl::make_unsigned(nRowsInCache) < m_pMatrix->size()),"Position is invalid!");
                 sal_Int32 nPos = m_nEndPos + 1;
                 bool bCheck = m_xCacheSet->absolute(nPos);
                 ORowSetMatrix::iterator aIter = m_pMatrix->begin() + nRowsInCache;
@@ -964,7 +964,7 @@ void ORowSetCache::moveWindow()
             // The rows behind this can be reused
             ORowSetMatrix::iterator aIter = m_pMatrix->begin();
             const sal_Int32 nNewStartPosInMatrix = nNewStartPos - m_nStartPos;
-            OSL_ENSURE((nNewStartPosInMatrix >= static_cast<ORowSetMatrix::difference_type>(0)) && (nNewStartPosInMatrix < static_cast<sal_Int32>(m_pMatrix->size())),"Position is invalid!");
+            OSL_ENSURE((nNewStartPosInMatrix >= static_cast<ORowSetMatrix::difference_type>(0)) && (o3tl::make_unsigned(nNewStartPosInMatrix) < m_pMatrix->size()),"Position is invalid!");
             // first position we reuse
             const ORowSetMatrix::const_iterator aEnd  = m_pMatrix->begin() + nNewStartPosInMatrix;
             // End of used portion of the matrix. Is < m_pMatrix->end() if less data than window size
@@ -1623,8 +1623,8 @@ void ORowSetCache::clearInsertRow()
 ORowSetMatrix::iterator ORowSetCache::calcPosition() const
 {
     sal_Int32 nValue = (m_nPosition - m_nStartPos) - 1;
-    OSL_ENSURE((nValue >= static_cast<ORowSetMatrix::difference_type>(0)) && (nValue < static_cast<sal_Int32>(m_pMatrix->size())),"Position is invalid!");
-    return ( nValue < 0 || nValue >= static_cast<sal_Int32>(m_pMatrix->size()) ) ? m_pMatrix->end() : (m_pMatrix->begin() + nValue);
+    OSL_ENSURE((nValue >= static_cast<ORowSetMatrix::difference_type>(0)) && (o3tl::make_unsigned(nValue) < m_pMatrix->size()),"Position is invalid!");
+    return ( nValue < 0 || o3tl::make_unsigned(nValue) >= m_pMatrix->size() ) ? m_pMatrix->end() : (m_pMatrix->begin() + nValue);
 }
 
 TORowSetOldRowHelperRef ORowSetCache::registerOldRow()

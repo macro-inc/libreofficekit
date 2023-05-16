@@ -22,6 +22,7 @@
 #include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 #include <sal/log.hxx>
+#include <utility>
 
 #include <limits.h>
 
@@ -43,20 +44,19 @@ void SwCache::Check()
     SwCacheObj *const pOldRealFirst = m_pRealFirst;
     while ( pObj )
     {
-        // the object must be found also when moving backwards
-        SwCacheObj *pTmp = m_pLast;
-        while ( pTmp && pTmp != pObj )
-            pTmp = pTmp->GetPrev();
-        assert(pTmp && "Object not found.");
-
         ++nCnt;
         if ( pObj == m_pFirst )
             bFirstFound = true;
-        if ( !pObj->GetNext() )
+        SwCacheObj* pNext = pObj->GetNext();
+        if ( !pNext )
         {
             assert(pObj == m_pLast);
         }
-        pObj = pObj->GetNext();
+        else
+        {
+            assert(pObj == pNext->GetPrev());
+        }
+        pObj = pNext;
         assert(pObj != pOldRealFirst); (void) pOldRealFirst;
     }
     assert(bFirstFound);
@@ -76,7 +76,7 @@ void SwCache::Check()
 
 SwCache::SwCache( const sal_uInt16 nInitSize
 #ifdef DBG_UTIL
-    , const OString &rNm
+    , OString aNm
 #endif
     ) :
     m_pRealFirst( nullptr ),
@@ -84,7 +84,7 @@ SwCache::SwCache( const sal_uInt16 nInitSize
     m_pLast( nullptr ),
     m_nCurMax( nInitSize )
 #ifdef DBG_UTIL
-    , m_aName( rNm )
+    , m_aName(std::move( aNm ))
     , m_nAppend( 0 )
     , m_nInsertFree( 0 )
     , m_nReplace( 0 )
@@ -150,17 +150,14 @@ void SwCache::Flush()
     INCREMENT( m_nFlushCnt );
     SwCacheObj *pObj = m_pRealFirst;
     m_pRealFirst = m_pFirst = m_pLast = nullptr;
-    SwCacheObj *pTmp;
     while ( pObj )
     {
         assert(!pObj->IsLocked());
-        {
-            pTmp = pObj;
-            pObj = pTmp->GetNext();
-            m_aFreePositions.push_back( pTmp->GetCachePos() );
-            m_aCacheObjects[pTmp->GetCachePos()].reset(); // deletes pTmp
-            INCREMENT( m_nFlushedObjects );
-        }
+        SwCacheObj *pTmp = pObj;
+        pObj = pTmp->GetNext();
+        m_aFreePositions.push_back( pTmp->GetCachePos() );
+        m_aCacheObjects[pTmp->GetCachePos()].reset(); // deletes pTmp
+        INCREMENT( m_nFlushedObjects );
     }
 }
 
@@ -473,13 +470,13 @@ SwCacheObj::~SwCacheObj()
 #ifdef DBG_UTIL
 void SwCacheObj::Lock()
 {
-    OSL_ENSURE( m_nLock < UCHAR_MAX, "Too many Locks for CacheObject." );
+    assert( m_nLock < UCHAR_MAX && "Too many Locks for CacheObject." );
     ++m_nLock;
 }
 
 void SwCacheObj::Unlock()
 {
-    OSL_ENSURE( m_nLock, "No more Locks available." );
+    assert( m_nLock && "No more Locks available." );
     --m_nLock;
 }
 #endif

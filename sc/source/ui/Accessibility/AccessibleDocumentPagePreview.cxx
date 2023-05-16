@@ -38,7 +38,6 @@
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <comphelper/sequence.hxx>
 
-#include <unotools/accessiblestatesethelper.hxx>
 #include <tools/gen.hxx>
 #include <svx/fmview.hxx>
 #include <svx/svdpage.hxx>
@@ -1343,12 +1342,12 @@ void SAL_CALL ScAccessibleDocumentPagePreview::grabFocus()
 
 //=====  XAccessibleContext  ==============================================
 
-sal_Int32 SAL_CALL ScAccessibleDocumentPagePreview::getAccessibleChildCount()
+sal_Int64 SAL_CALL ScAccessibleDocumentPagePreview::getAccessibleChildCount()
 {
     SolarMutexGuard aGuard;
     IsObjectValid();
 
-    tools::Long nRet = 0;
+    sal_Int64 nRet = 0;
     if ( mpViewShell )
     {
         ScPagePreviewCountData aCount( mpViewShell->GetLocationData(), mpViewShell->GetWindow(), GetNotesChildren(), GetShapeChildren() );
@@ -1358,7 +1357,7 @@ sal_Int32 SAL_CALL ScAccessibleDocumentPagePreview::getAccessibleChildCount()
     return nRet;
 }
 
-uno::Reference<XAccessible> SAL_CALL ScAccessibleDocumentPagePreview::getAccessibleChild(sal_Int32 nIndex)
+uno::Reference<XAccessible> SAL_CALL ScAccessibleDocumentPagePreview::getAccessibleChild(sal_Int64 nIndex)
 {
     SolarMutexGuard aGuard;
     IsObjectValid();
@@ -1405,7 +1404,7 @@ uno::Reference<XAccessible> SAL_CALL ScAccessibleDocumentPagePreview::getAccessi
         }
         else
         {
-            sal_Int32 nIdx(nIndex - (aCount.nBackShapes + aCount.nHeaders + aCount.nTables + aCount.nNoteParagraphs + aCount.nFooters));
+            sal_Int64 nIdx(nIndex - (aCount.nBackShapes + aCount.nHeaders + aCount.nTables + aCount.nNoteParagraphs + aCount.nFooters));
             if (nIdx < aCount.nForeShapes)
                 xAccessible = GetShapeChildren()->GetForeShape(nIdx);
             else
@@ -1420,29 +1419,29 @@ uno::Reference<XAccessible> SAL_CALL ScAccessibleDocumentPagePreview::getAccessi
 }
 
     /// Return the set of current states.
-uno::Reference<XAccessibleStateSet> SAL_CALL ScAccessibleDocumentPagePreview::getAccessibleStateSet()
+sal_Int64 SAL_CALL ScAccessibleDocumentPagePreview::getAccessibleStateSet()
 {
     SolarMutexGuard aGuard;
-    uno::Reference<XAccessibleStateSet> xParentStates;
+    sal_Int64 nParentStates = 0;
     if (getAccessibleParent().is())
     {
         uno::Reference<XAccessibleContext> xParentContext = getAccessibleParent()->getAccessibleContext();
-        xParentStates = xParentContext->getAccessibleStateSet();
+        nParentStates = xParentContext->getAccessibleStateSet();
     }
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSet = new utl::AccessibleStateSetHelper();
-    if (IsDefunc(xParentStates))
-        pStateSet->AddState(AccessibleStateType::DEFUNC);
+    sal_Int64 nStateSet = 0;
+    if (IsDefunc(nParentStates))
+        nStateSet |= AccessibleStateType::DEFUNC;
     else
     {
         // never editable
-        pStateSet->AddState(AccessibleStateType::ENABLED);
-        pStateSet->AddState(AccessibleStateType::OPAQUE);
+        nStateSet |= AccessibleStateType::ENABLED;
+        nStateSet |= AccessibleStateType::OPAQUE;
         if (isShowing())
-            pStateSet->AddState(AccessibleStateType::SHOWING);
+            nStateSet |= AccessibleStateType::SHOWING;
         if (isVisible())
-            pStateSet->AddState(AccessibleStateType::VISIBLE);
+            nStateSet |= AccessibleStateType::VISIBLE;
     }
-    return pStateSet;
+    return nStateSet;
 }
 
     //=====  XServiceInfo  ====================================================
@@ -1503,11 +1502,10 @@ tools::Rectangle ScAccessibleDocumentPagePreview::GetBoundingBox() const
     return aRect;
 }
 
-bool ScAccessibleDocumentPagePreview::IsDefunc(
-    const uno::Reference<XAccessibleStateSet>& rxParentStates)
+bool ScAccessibleDocumentPagePreview::IsDefunc(sal_Int64 nParentStates)
 {
     return ScAccessibleContextBase::IsDefunc() || !getAccessibleParent().is() ||
-        (rxParentStates.is() && rxParentStates->contains(AccessibleStateType::DEFUNC));
+        (nParentStates & AccessibleStateType::DEFUNC);
 }
 
 ScNotesChildren* ScAccessibleDocumentPagePreview::GetNotesChildren()

@@ -22,6 +22,7 @@
 #include <strings.hrc>
 
 #include <sal/log.hxx>
+#include <utility>
 #include <vcl/texteng.hxx>
 #include <vcl/textview.hxx>
 #include <vcl/textdata.hxx>
@@ -173,6 +174,7 @@ void TextUndoDelPara::Redo()
     auto it = ::std::find_if( rDocNodes.begin(), rDocNodes.end(),
                               [&] (std::unique_ptr<TextNode> const & p) { return p.get() == mpNode; } );
     assert(it != rDocNodes.end());
+    // coverity[leaked_storage : FALSE] - ownership transferred to this with mbDelObject
     it->release();
     GetDoc()->GetNodes().erase( it );
 
@@ -248,9 +250,9 @@ OUString TextUndoSplitPara::GetComment () const
     return VclResId(STR_TEXTUNDO_SPLITPARA);
 }
 
-TextUndoInsertChars::TextUndoInsertChars( TextEngine* pTextEngine, const TextPaM& rTextPaM, const OUString& rStr )
+TextUndoInsertChars::TextUndoInsertChars( TextEngine* pTextEngine, const TextPaM& rTextPaM, OUString aStr )
                     : TextUndo( pTextEngine ),
-                        maTextPaM( rTextPaM ), maText( rStr )
+                        maTextPaM( rTextPaM ), maText(std::move( aStr ))
 {
 }
 
@@ -296,9 +298,9 @@ OUString TextUndoInsertChars::GetComment () const
     return VclResId(STR_TEXTUNDO_INSERTCHARS).replaceAll("$1", sText);
 }
 
-TextUndoRemoveChars::TextUndoRemoveChars( TextEngine* pTextEngine, const TextPaM& rTextPaM, const OUString& rStr )
+TextUndoRemoveChars::TextUndoRemoveChars( TextEngine* pTextEngine, const TextPaM& rTextPaM, OUString aStr )
                     : TextUndo( pTextEngine ),
-                        maTextPaM( rTextPaM ), maText( rStr )
+                        maTextPaM( rTextPaM ), maText(std::move( aStr ))
 {
 }
 

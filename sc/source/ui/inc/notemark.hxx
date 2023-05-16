@@ -49,13 +49,13 @@ private:
 
     tools::Rectangle       m_aRect;
     std::unique_ptr<SdrModel>           m_pModel;
-    ScCaptionPtr    m_xObject;
+    rtl::Reference<SdrCaptionObj> m_xObject;
     bool            m_bVisible;
     DECL_LINK( TimeHdl, Timer*, void );
 
 public:
                 ScNoteMarker( vcl::Window* pWin, vcl::Window* pRight, vcl::Window* pBottom, vcl::Window* pDiagonal,
-                                ScDocument* pD, const ScAddress& aPos, const OUString& rUser,
+                                ScDocument* pD, const ScAddress& aPos, OUString aUser,
                                 const MapMode& rMap, bool bLeftEdge, bool bForce, bool bKeyboard);
                 ~ScNoteMarker();
 

@@ -24,7 +24,6 @@
 #include <vcl/dllapi.h>
 #include <vcl/mapmod.hxx>
 #include <vcl/BinaryDataContainer.hxx>
-#include <memory>
 
 class SvStream;
 
@@ -72,8 +71,7 @@ private:
 
 public:
     GfxLink();
-    explicit GfxLink(std::unique_ptr<sal_uInt8[]> pBuf, sal_uInt32 nBufSize, GfxLinkType nType);
-    explicit GfxLink(BinaryDataContainer const & rDataConainer, GfxLinkType nType);
+    explicit GfxLink(BinaryDataContainer aDataConainer, GfxLinkType nType);
 
     bool                operator==( const GfxLink& ) const;
 
@@ -86,6 +84,9 @@ public:
 
     sal_uInt32          GetDataSize() const { return maDataContainer.getSize(); }
     const sal_uInt8*    GetData() const;
+
+    /// return the in-memory size as of now.
+    size_t              getSizeBytes() const { return maDataContainer.getSizeBytes(); }
 
     const BinaryDataContainer& getDataContainer() const
     {

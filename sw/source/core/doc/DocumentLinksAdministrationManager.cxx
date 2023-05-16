@@ -45,6 +45,7 @@
 #include <tools/urlobj.hxx>
 #include <unotools/charclass.hxx>
 #include <unotools/securityoptions.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -57,8 +58,8 @@ namespace
         SwTableNode* pTableNd;
         SwSectionNode* pSectNd;
 
-        explicit FindItem(const OUString& rS)
-            : m_Item(rS), pTableNd(nullptr), pSectNd(nullptr)
+        explicit FindItem(OUString aS)
+            : m_Item(std::move(aS)), pTableNd(nullptr), pSectNd(nullptr)
         {}
      };
 
@@ -442,11 +443,11 @@ DocumentLinksAdministrationManager::~DocumentLinksAdministrationManager()
 {
 }
 
-bool DocumentLinksAdministrationManager::SelectServerObj( std::u16string_view rStr, SwPaM*& rpPam, std::unique_ptr<SwNodeRange>& rpRange ) const
+bool DocumentLinksAdministrationManager::SelectServerObj( std::u16string_view rStr, SwPaM*& rpPam, std::optional<SwNodeRange>& roRange ) const
 {
     // Do we actually have the Item?
     rpPam = nullptr;
-    rpRange = nullptr;
+    roRange.reset();
 
     OUString sItem( INetURLObject::decode( rStr,
                                          INetURLObject::DecodeMechanism::WithCharset ));
@@ -461,12 +462,12 @@ bool DocumentLinksAdministrationManager::SelectServerObj( std::u16string_view rS
     {
         bool bContinue = false;
         OUString sName( sItem.copy( 0, nPos ) );
-        OUString sCmp( sItem.copy( nPos + 1 ));
+        std::u16string_view sCmp( sItem.subView( nPos + 1 ));
         sItem = rCC.lowercase( sItem );
 
         FindItem aPara( sName );
 
-        if( sCmp == "table" )
+        if( sCmp == u"table" )
         {
             sName = rCC.lowercase( sName );
             for( const SwFrameFormat* pFormat : *m_rDoc.GetTableFrameFormats() )
@@ -476,12 +477,12 @@ bool DocumentLinksAdministrationManager::SelectServerObj( std::u16string_view rS
             }
             if( aPara.pTableNd )
             {
-                rpRange.reset(new SwNodeRange( *aPara.pTableNd, SwNodeOffset(0),
-                                *aPara.pTableNd->EndOfSectionNode(), SwNodeOffset(1) ));
+                roRange.emplace( *aPara.pTableNd, SwNodeOffset(0),
+                                 *aPara.pTableNd->EndOfSectionNode(), SwNodeOffset(1) );
                 return true;
             }
         }
-        else if( sCmp == "frame" )
+        else if( sCmp == u"frame" )
         {
             const SwFlyFrameFormat* pFlyFormat = m_rDoc.FindFlyByName( sName );
             if( pFlyFormat )
@@ -492,29 +493,29 @@ bool DocumentLinksAdministrationManager::SelectServerObj( std::u16string_view rS
                     SwNode* pNd = &pIdx->GetNode();
                     if( !pNd->IsNoTextNode() )
                     {
-                        rpRange.reset(new SwNodeRange( *pNd, SwNodeOffset(1), *pNd->EndOfSectionNode() ));
+                        roRange.emplace( *pNd, SwNodeOffset(1), *pNd->EndOfSectionNode() );
                         return true;
                     }
                 }
             }
         }
-        else if( sCmp == "region" )
+        else if( sCmp == u"region" )
         {
             sItem = sName;              // Is being dealt with further down!
             bContinue = true;
         }
-        else if( sCmp == "outline" )
+        else if( sCmp == u"outline" )
         {
-            SwPosition aPos( SwNodeIndex( m_rDoc.GetNodes() ));
+            SwPosition aPos( m_rDoc.GetNodes() );
             if (m_rDoc.GotoOutline(aPos, sName, nullptr))
             {
-                SwNode* pNd = &aPos.nNode.GetNode();
+                SwNode* pNd = &aPos.GetNode();
                 const int nLvl = pNd->GetTextNode()->GetAttrOutlineLevel()-1;
 
                 const SwOutlineNodes& rOutlNds = m_rDoc.GetNodes().GetOutLineNds();
                 SwOutlineNodes::size_type nTmpPos;
                 (void)rOutlNds.Seek_Entry( pNd, &nTmpPos );
-                rpRange.reset(new SwNodeRange( aPos.nNode, SwNodeOffset(0), aPos.nNode ));
+                roRange.emplace( aPos.GetNode(), SwNodeOffset(0), aPos.GetNode() );
 
                 // look for the section's end, now
                 for( ++nTmpPos;
@@ -525,9 +526,9 @@ bool DocumentLinksAdministrationManager::SelectServerObj( std::u16string_view rS
                     ;       // there is no block
 
                 if( nTmpPos < rOutlNds.size() )
-                    rpRange->aEnd = *rOutlNds[ nTmpPos ];
+                    roRange->aEnd = *rOutlNds[ nTmpPos ];
                 else
-                    rpRange->aEnd = m_rDoc.GetNodes().GetEndOfContent();
+                    roRange->aEnd = m_rDoc.GetNodes().GetEndOfContent();
                 return true;
             }
         }
@@ -561,8 +562,8 @@ bool DocumentLinksAdministrationManager::SelectServerObj( std::u16string_view rS
             }
             if( aPara.pSectNd )
             {
-                rpRange.reset(new SwNodeRange( *aPara.pSectNd, SwNodeOffset(1),
-                                        *aPara.pSectNd->EndOfSectionNode() ));
+                roRange.emplace( *aPara.pSectNd, SwNodeOffset(1),
+                                 *aPara.pSectNd->EndOfSectionNode() );
                 return true;
 
             }

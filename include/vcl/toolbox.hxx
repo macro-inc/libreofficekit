@@ -25,6 +25,7 @@
 #include <vcl/dockwin.hxx>
 #include <vcl/image.hxx>
 #include <vcl/keycod.hxx>
+#include <vcl/toolboxid.hxx>
 #include <o3tl/typed_flags_set.hxx>
 #include <tools/degree.hxx>
 
@@ -33,8 +34,6 @@
 #include <vector>
 
 namespace com::sun::star::frame { class XFrame; }
-namespace com::sun::star::frame { struct FeatureStateEvent; }
-template <class T> class VclStatusListener;
 
 class Timer;
 struct ImplToolItem;
@@ -68,17 +67,9 @@ enum class ToolBoxLayoutMode
 // Position of the text when icon and text are painted
 enum class ToolBoxTextPosition { Right, Bottom };
 
-typedef o3tl::strong_int<sal_uInt16, struct ToolBoxItemIdTag> ToolBoxItemId;
-namespace std {
-    template<>
-    struct hash<ToolBoxItemId>
-    {
-        std::size_t operator()(ToolBoxItemId const & s) const
-        { return std::size_t(sal_uInt16(s)); }
-    };
-}
-
 class Idle;
+
+/// A toolbar: contains all those icons, typically below the menu bar.
 class VCL_DLLPUBLIC ToolBox : public DockingWindow
 {
     friend class FloatingWindow;
@@ -123,7 +114,6 @@ private:
     tools::Long                mnBottomBorder;
     tools::Long                mnLastResizeDY;
     tools::Long                mnActivateCount;
-    Degree10            mnImagesRotationAngle;
     ToolBoxItemId       mnLastFocusItemId;
     ToolBoxItemId       mnHighItemId;
     ToolBoxItemId       mnCurItemId;
@@ -150,7 +140,6 @@ private:
                         mbDragging:1,
                         mbIsKeyEvent:1,
                         mbChangingHighlight:1,
-                        mbImagesMirrored:1,
                         mbLineSpacing:1,
                         mbIsArranged:1;
     WindowAlign         meAlign;
@@ -168,8 +157,6 @@ private:
     Link<ToolBox *, void> maMenuButtonHdl;
     Link<StateChangedType const *, void> maStateChangedHandler;
     Link<DataChangedEvent const *, void> maDataChangedHandler;
-    /** StatusListener. Notifies about rotated images etc */
-    rtl::Reference<VclStatusListener<ToolBox>> mpStatusListener;
 
 public:
     using Window::ImplInit;
@@ -320,6 +307,7 @@ public:
                                     ToolBoxItemBits nBits = ToolBoxItemBits::NONE,
                                     ImplToolItems::size_type nPos = APPEND );
     void                InsertItem( ToolBoxItemId nItemId, const OUString& rText,
+                                    const OUString& rCommand,
                                     ToolBoxItemBits nBits = ToolBoxItemBits::NONE,
                                     ImplToolItems::size_type nPos = APPEND );
     void                InsertWindow( ToolBoxItemId nItemId, vcl::Window* pWindow,
@@ -510,7 +498,6 @@ public:
 
 
     void SetToolbarLayoutMode( ToolBoxLayoutMode eLayout );
-    void statusChanged(const css::frame::FeatureStateEvent& rEvent);
 
     void SetToolBoxTextPosition( ToolBoxTextPosition ePosition );
 

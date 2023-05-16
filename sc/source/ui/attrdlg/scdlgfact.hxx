@@ -30,6 +30,7 @@
 #include <delcldlg.hxx>
 #include <dpgroupdlg.hxx>
 #include <filldlg.hxx>
+#include <gototabdlg.hxx>
 #include <groupdlg.hxx>
 #include <linkarea.hxx>
 #include <lbseldlg.hxx>
@@ -51,51 +52,6 @@
 #include <strindlg.hxx>
 #include <tabbgcolordlg.hxx>
 #include <textimportoptions.hxx>
-
-#define DECL_ABSTDLG_BASE(Class,DialogClass)        \
-    ScopedVclPtr<DialogClass> pDlg;                 \
-public:                                             \
-    explicit        Class( DialogClass* p)          \
-                     : pDlg(p)                      \
-                     {}                             \
-    virtual         ~Class() override;                       \
-    virtual short   Execute() override ;            \
-    virtual bool    StartExecuteAsync(VclAbstractDialog::AsyncContext &rCtx) override; \
-    std::vector<OString> getAllPageUIXMLDescriptions() const override; \
-    bool selectPageByUIXMLDescription(const OString& rUIXMLDescription) override; \
-    virtual BitmapEx createScreenshot() const override; \
-    virtual OString GetScreenshotId() const override; \
-
-#define IMPL_ABSTDLG_BASE(Class)                    \
-Class::~Class()                                     \
-{                                                   \
-}                                                   \
-short Class::Execute()                              \
-{                                                   \
-    return pDlg->Execute();                         \
-}                                                   \
-bool Class::StartExecuteAsync(VclAbstractDialog::AsyncContext &rCtx)\
-{ \
-    return pDlg->StartExecuteAsync( rCtx ); \
-} \
-std::vector<OString> Class::getAllPageUIXMLDescriptions() const \
-{                                                   \
-    return pDlg->getAllPageUIXMLDescriptions();     \
-}                                                   \
-bool Class::selectPageByUIXMLDescription(const OString& rUIXMLDescription) \
-{                                                   \
-   return pDlg->selectPageByUIXMLDescription(rUIXMLDescription);  \
-}                                                   \
-BitmapEx Class::createScreenshot() const            \
-{                                                   \
-    VclPtr<VirtualDevice> xDialogSurface(VclPtr<VirtualDevice>::Create(DeviceFormat::DEFAULT)); \
-    pDlg->createScreenshot(*xDialogSurface);        \
-    return xDialogSurface->GetBitmapEx(Point(), xDialogSurface->GetOutputSizePixel()); \
-}                                                   \
-OString Class::GetScreenshotId() const              \
-{                                                   \
-    return pDlg->GetScreenshotId();                 \
-}
 
 class AbstractScImportAsciiDlg_Impl : public AbstractScImportAsciiDlg
 {
@@ -382,12 +338,12 @@ public:
     virtual short           Execute() override;
     virtual void            InitFromOldLink( const OUString& rFile, const OUString& rFilter,
                                         const OUString& rOptions, const OUString& rSource,
-                                        sal_uLong nRefresh ) override;
+                                        sal_Int32 nRefreshDelaySeconds ) override;
     virtual OUString        GetURL() override;
     virtual OUString        GetFilter() override;        // may be empty
     virtual OUString        GetOptions() override;       // filter options
     virtual OUString        GetSource() override;        // separated by ";"
-    virtual sal_uLong       GetRefresh() override;       // 0 if disabled
+    virtual sal_Int32       GetRefreshDelaySeconds() override;       // 0 if disabled
 };
 
 class AbstractScMetricInputDlg_Impl : public AbstractScMetricInputDlg
@@ -563,6 +519,22 @@ public:
     virtual void SetDescription(const OUString& rTitle, const OUString& rFixedText, const OString& sDlgHelpId, const OString& sLbHelpId) override;
     virtual OUString GetEntry(sal_Int32 nPos) const override;
     virtual std::vector<sal_Int32> GetSelectedRows() const override;
+};
+
+class AbstractScGoToTabDlg_Impl : public AbstractScGoToTabDlg
+{
+    std::shared_ptr<ScGoToTabDlg> m_xDlg;
+public:
+    explicit AbstractScGoToTabDlg_Impl(std::shared_ptr<ScGoToTabDlg> p)
+        : m_xDlg(std::move(p))
+    {
+    }
+    virtual short Execute() override;
+    virtual bool StartExecuteAsync(VclAbstractDialog::AsyncContext &rCtx) override;
+    virtual void Insert( const OUString& rString, bool bSelected ) override;
+    virtual void SetDescription(const OUString& rTitle, const OUString& rEntryLabel, const OUString& rListLabel,
+                                const OString& rDlgHelpId, const OString& rEnHelpId, const OString& rLbHelpId) override;
+    virtual OUString GetSelectedEntry() const override;
 };
 
 class AbstractScSortWarningDlg_Impl : public AbstractScSortWarningDlg
@@ -787,6 +759,7 @@ public:
     virtual VclPtr<AbstractScNewScenarioDlg> CreateScNewScenarioDlg(weld::Window* pParent, const OUString& rName,
                                                                     bool bEdit, bool bSheetProtected) override;
     virtual VclPtr<AbstractScShowTabDlg> CreateScShowTabDlg(weld::Window* pParent) override;
+    virtual VclPtr<AbstractScGoToTabDlg> CreateScGoToTabDlg(weld::Window* pParent) override;
 
     virtual VclPtr<AbstractScStringInputDlg> CreateScStringInputDlg(weld::Window* pParent,
                                                                     const OUString& rTitle,

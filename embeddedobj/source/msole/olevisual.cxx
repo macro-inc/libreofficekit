@@ -27,14 +27,16 @@
 #include <com/sun/star/embed/NoVisualAreaSizeException.hpp>
 
 #include <oleembobj.hxx>
+#if defined (_WIN32)
 #include <comphelper/mimeconfighelper.hxx>
+#endif
 #include <comphelper/seqstream.hxx>
 #include <filter/msfilter/classids.hxx>
 #include <sal/log.hxx>
 
 #if defined(_WIN32)
 #include "olecomponent.hxx"
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #endif
 
 using namespace ::com::sun::star;

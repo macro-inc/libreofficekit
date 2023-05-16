@@ -33,7 +33,7 @@
 #include <com/sun/star/sdbcx/XDataDefinitionSupplier.hpp>
 #include <com/sun/star/sdbc/DriverManager.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/namedvaluecollection.hxx>
 #include <comphelper/processfactory.hxx>
 #include <sal/log.hxx>
@@ -135,8 +135,7 @@ namespace dbtools
                 else
                 {
                     Reference< XDatabaseMetaData2 > xExtendedMetaData( _metaData.xConnectionMetaData, UNO_QUERY_THROW );
-                    ::comphelper::NamedValueCollection aSettings( xExtendedMetaData->getConnectionInfo() );
-                    _out_setting = aSettings.get( _asciiName );
+                    _out_setting = ::comphelper::NamedValueCollection::get( xExtendedMetaData->getConnectionInfo(), _asciiName );
                     return _out_setting.hasValue();
                 }
                 return true;

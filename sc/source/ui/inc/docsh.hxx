@@ -80,7 +80,7 @@ extern "C" SAL_DLLPUBLIC_EXPORT bool TestImportDBF(SvStream &rStream);
 
 class SC_DLLPUBLIC ScDocShell final: public SfxObjectShell, public SfxListener
 {
-    ScDocument          m_aDocument;
+    std::shared_ptr<ScDocument> m_pDocument;
 
     OUString            m_aDdeTextFmt;
 
@@ -95,7 +95,6 @@ class SC_DLLPUBLIC ScDocShell final: public SfxObjectShell, public SfxListener
     bool                m_bIsInUndo:1;
     bool                m_bDocumentModifiedPending:1;
     bool                m_bUpdateEnabled:1;
-    bool                m_bUcalcTest:1; // avoid loading the styles in the ucalc test
     bool                m_bAreasChangedNeedBroadcast:1;
     sal_uInt16          m_nDocumentLock;
     sal_Int16           m_nCanUpdate;  // stores the UpdateDocMode from loading a document till update links
@@ -171,7 +170,7 @@ private:
 
 public:
     explicit        ScDocShell( const ScDocShell& rDocShell ) = delete;
-    explicit        ScDocShell( const SfxModelFlags i_nSfxCreationFlags = SfxModelFlags::EMBEDDED_OBJECT );
+    explicit        ScDocShell( const SfxModelFlags i_nSfxCreationFlags = SfxModelFlags::EMBEDDED_OBJECT, const std::shared_ptr<ScDocument>& pDoc = {} );
                     virtual ~ScDocShell() override;
 
     virtual SfxUndoManager*
@@ -218,8 +217,8 @@ public:
 
     void    GetDocStat( ScDocStat& rDocStat );
 
-    const ScDocument& GetDocument() const { return m_aDocument; }
-    ScDocument&     GetDocument()   { return m_aDocument; }
+    const ScDocument& GetDocument() const { return *m_pDocument; }
+    ScDocument&     GetDocument()   { return *m_pDocument; }
     ScDocFunc&      GetDocFunc()    { return *m_pDocFunc; }
 
     css::uno::Reference<css::datatransfer::XTransferable2> const & GetClipData() const { return m_xClipData; }
@@ -429,8 +428,6 @@ public:
     virtual bool    GetProtectionHash( /*out*/ css::uno::Sequence< sal_Int8 > &rPasswordHash ) override;
 
     void SnapVisArea( tools::Rectangle& rRect ) const;
-
-    void SetIsInUcalc();
 
     void RegisterAutomationWorkbookObject(css::uno::Reference< ooo::vba::excel::XWorkbook > const& xWorkbook);
 };

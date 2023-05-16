@@ -21,11 +21,15 @@
 #include "SchWhichPairs.hxx"
 
 #include <ChartModelHelper.hxx>
+#include <ChartType.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
 #include <ChartTypeHelper.hxx>
 #include <DataSeriesHelper.hxx>
 #include <ChartModel.hxx>
+#include <BaseCoordinateSystem.hxx>
 
 #include <com/sun/star/chart2/XDataSeries.hpp>
 
@@ -33,7 +37,8 @@
 #include <svl/intitem.hxx>
 #include <svl/ilstitem.hxx>
 #include <svx/sdangitm.hxx>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
@@ -42,13 +47,13 @@ namespace chart::wrapper
 {
 
 SeriesOptionsItemConverter::SeriesOptionsItemConverter(
-        const uno::Reference< frame::XModel >& xChartModel
-        , const uno::Reference< uno::XComponentContext > & xContext
+        const rtl::Reference<::chart::ChartModel>& xChartModel
+        , uno::Reference< uno::XComponentContext > xContext
         , const uno::Reference< beans::XPropertySet >& xPropertySet
         , SfxItemPool& rItemPool )
         : ItemConverter( xPropertySet, rItemPool )
         , m_xChartModel(xChartModel)
-        , m_xCC(xContext)
+        , m_xCC(std::move(xContext))
         , m_bAttachToMainAxis(true)
         , m_bSupportingOverlapAndGapWidthProperties(false)
         , m_bSupportingBarConnectors(false)
@@ -71,14 +76,13 @@ SeriesOptionsItemConverter::SeriesOptionsItemConverter(
 
         m_bAttachToMainAxis = DiagramHelper::isSeriesAttachedToMainAxis( xDataSeries );
 
-        uno::Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram(xChartModel) );
-        uno::Reference< beans::XPropertySet > xDiagramProperties( xDiagram, uno::UNO_QUERY );
-        uno::Reference< XChartType > xChartType( DiagramHelper::getChartTypeOfSeries( xDiagram , xDataSeries ) );
+        rtl::Reference< Diagram > xDiagram( ChartModelHelper::findDiagram(xChartModel) );
+        rtl::Reference< ChartType > xChartType( DiagramHelper::getChartTypeOfSeries( xDiagram , xDataSeries ) );
 
         m_xCooSys = DataSeriesHelper::getCoordinateSystemOfSeries( xDataSeries, xDiagram );
         if( m_xCooSys.is() )
         {
-            uno::Reference< chart2::XAxis > xAxis( AxisHelper::getAxis( 1, 0, m_xCooSys ) );
+            rtl::Reference< Axis > xAxis = AxisHelper::getAxis( 1, 0, m_xCooSys );
             chart2::ScaleData aScale( xAxis->getScaleData() );
             m_bClockwise = (aScale.Orientation == chart2::AxisOrientation_REVERSE);
         }
@@ -92,15 +96,14 @@ SeriesOptionsItemConverter::SeriesOptionsItemConverter(
             sal_Int32 nAxisIndex = DataSeriesHelper::getAttachedAxisIndex(xDataSeries);
 
             uno::Sequence< sal_Int32 > aBarPositionSequence;
-            uno::Reference< beans::XPropertySet > xChartTypeProps( xChartType, uno::UNO_QUERY );
-            if( xChartTypeProps.is() )
+            if( xChartType.is() )
             {
-                if( xChartTypeProps->getPropertyValue( "OverlapSequence" ) >>= aBarPositionSequence )
+                if( xChartType->getPropertyValue( "OverlapSequence" ) >>= aBarPositionSequence )
                 {
                     if( nAxisIndex >= 0 && nAxisIndex < aBarPositionSequence.getLength() )
                         m_nBarOverlap = aBarPositionSequence[nAxisIndex];
                 }
-                if( xChartTypeProps->getPropertyValue( "GapwidthSequence" ) >>= aBarPositionSequence )
+                if( xChartType->getPropertyValue( "GapwidthSequence" ) >>= aBarPositionSequence )
                 {
                     if( nAxisIndex >= 0 && nAxisIndex < aBarPositionSequence.getLength() )
                         m_nGapWidth = aBarPositionSequence[nAxisIndex];
@@ -109,29 +112,28 @@ SeriesOptionsItemConverter::SeriesOptionsItemConverter(
         }
 
         m_bSupportingBarConnectors = ChartTypeHelper::isSupportingBarConnectors( xChartType, nDimensionCount );
-        if( m_bSupportingBarConnectors && xDiagramProperties.is() )
+        if( m_bSupportingBarConnectors && xDiagram.is() )
         {
-            xDiagramProperties->getPropertyValue( "ConnectBars" ) >>= m_bConnectBars;
+            xDiagram->getPropertyValue( "ConnectBars" ) >>= m_bConnectBars;
         }
 
         m_bSupportingAxisSideBySide = ChartTypeHelper::isSupportingAxisSideBySide( xChartType, nDimensionCount );
-        if( m_bSupportingAxisSideBySide && xDiagramProperties.is() )
+        if( m_bSupportingAxisSideBySide && xDiagram.is() )
         {
-            xDiagramProperties->getPropertyValue( "GroupBarsPerAxis" ) >>= m_bGroupBarsPerAxis;
+            xDiagram->getPropertyValue( "GroupBarsPerAxis" ) >>= m_bGroupBarsPerAxis;
         }
 
         m_bSupportingStartingAngle = ChartTypeHelper::isSupportingStartingAngle( xChartType );
         if( m_bSupportingStartingAngle )
         {
-            xDiagramProperties->getPropertyValue( "StartingAngle" ) >>= m_nStartingAngle;
+            xDiagram->getPropertyValue( "StartingAngle" ) >>= m_nStartingAngle;
         }
 
         m_aSupportedMissingValueTreatments = ChartTypeHelper::getSupportedMissingValueTreatments( xChartType );
         m_nMissingValueTreatment = DiagramHelper::getCorrectedMissingValueTreatment(
             ChartModelHelper::findDiagram(m_xChartModel), xChartType );
 
-        uno::Reference< XChartDocument > xChartDoc( m_xChartModel, uno::UNO_QUERY );
-        uno::Reference< beans::XPropertySet > xProp( xChartDoc->getDataProvider(), uno::UNO_QUERY );
+        uno::Reference< beans::XPropertySet > xProp( m_xChartModel->getDataProvider(), uno::UNO_QUERY );
         if( xProp.is() )
         {
             try
@@ -140,7 +142,7 @@ SeriesOptionsItemConverter::SeriesOptionsItemConverter(
                 xProp->getPropertyValue( "IncludeHiddenCells" );
                 //if not exception is thrown the property is offered
                 m_bSupportingPlottingOfHiddenCells = true;
-                xDiagramProperties->getPropertyValue( "IncludeHiddenCells" ) >>= m_bIncludeHiddenCells;
+                xDiagram->getPropertyValue( "IncludeHiddenCells" ) >>= m_bIncludeHiddenCells;
             }
             catch( const beans::UnknownPropertyException& )
             {
@@ -205,29 +207,26 @@ bool SeriesOptionsItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const Sf
                     aPropName = "OverlapSequence";
 
                 uno::Reference< XDataSeries > xDataSeries( GetPropertySet(), uno::UNO_QUERY );
-                uno::Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram(m_xChartModel) );
-                uno::Reference< beans::XPropertySet > xChartTypeProps( DiagramHelper::getChartTypeOfSeries( xDiagram , xDataSeries ), uno::UNO_QUERY );
-                if( xChartTypeProps.is() )
+                rtl::Reference< Diagram > xDiagram( ChartModelHelper::findDiagram(m_xChartModel) );
+                rtl::Reference< ChartType > xChartType( DiagramHelper::getChartTypeOfSeries( xDiagram , xDataSeries ) );
+                if( xChartType.is() )
                 {
                     sal_Int32 nAxisIndex = DataSeriesHelper::getAttachedAxisIndex(xDataSeries);
                     uno::Sequence< sal_Int32 > aBarPositionSequence;
-                    if( xChartTypeProps.is() )
+                    if( xChartType->getPropertyValue( aPropName ) >>= aBarPositionSequence )
                     {
-                        if( xChartTypeProps->getPropertyValue( aPropName ) >>= aBarPositionSequence )
+                        bool bGroupBarsPerAxis =  rItemSet.Get( SCHATTR_GROUP_BARS_PER_AXIS ).GetValue();
+                        if(!bGroupBarsPerAxis)
                         {
-                            bool bGroupBarsPerAxis =  rItemSet.Get( SCHATTR_GROUP_BARS_PER_AXIS ).GetValue();
-                            if(!bGroupBarsPerAxis)
-                            {
-                                //set the same value for all axes
-                                for( auto & pos : asNonConstRange(aBarPositionSequence) )
-                                    pos = rBarPosition;
-                            }
-                            else if( nAxisIndex >= 0 && nAxisIndex < aBarPositionSequence.getLength() )
-                                aBarPositionSequence.getArray()[nAxisIndex] = rBarPosition;
-
-                            xChartTypeProps->setPropertyValue( aPropName, uno::Any(aBarPositionSequence) );
-                            bChanged = true;
+                            //set the same value for all axes
+                            for( auto & pos : asNonConstRange(aBarPositionSequence) )
+                                pos = rBarPosition;
                         }
+                        else if( nAxisIndex >= 0 && nAxisIndex < aBarPositionSequence.getLength() )
+                            aBarPositionSequence.getArray()[nAxisIndex] = rBarPosition;
+
+                        xChartType->setPropertyValue( aPropName, uno::Any(aBarPositionSequence) );
+                        bChanged = true;
                     }
                 }
             }
@@ -241,7 +240,7 @@ bool SeriesOptionsItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const Sf
             if( m_bSupportingBarConnectors )
             {
                 bool bOldConnectBars = false;
-                uno::Reference< beans::XPropertySet > xDiagramProperties( ChartModelHelper::findDiagram(m_xChartModel), uno::UNO_QUERY );
+                rtl::Reference< Diagram > xDiagramProperties( ChartModelHelper::findDiagram(m_xChartModel), uno::UNO_QUERY );
                 if( xDiagramProperties.is() &&
                     (xDiagramProperties->getPropertyValue( "ConnectBars" ) >>= bOldConnectBars) &&
                     bOldConnectBars != m_bConnectBars )
@@ -260,7 +259,7 @@ bool SeriesOptionsItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const Sf
             if( m_bSupportingAxisSideBySide )
             {
                 bool bOldGroupBarsPerAxis = true;
-                uno::Reference< beans::XPropertySet > xDiagramProperties( ChartModelHelper::findDiagram(m_xChartModel), uno::UNO_QUERY );
+                rtl::Reference< Diagram > xDiagramProperties( ChartModelHelper::findDiagram(m_xChartModel), uno::UNO_QUERY );
                 if( xDiagramProperties.is() &&
                     (xDiagramProperties->getPropertyValue( "GroupBarsPerAxis" ) >>= bOldGroupBarsPerAxis) &&
                     bOldGroupBarsPerAxis != m_bGroupBarsPerAxis )
@@ -277,7 +276,7 @@ bool SeriesOptionsItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const Sf
             if( m_bSupportingStartingAngle )
             {
                 m_nStartingAngle = static_cast< const SdrAngleItem & >( rItemSet.Get( nWhichId )).GetValue().get() / 100;
-                uno::Reference< beans::XPropertySet > xDiagramProperties( ChartModelHelper::findDiagram(m_xChartModel), uno::UNO_QUERY );
+                rtl::Reference< Diagram > xDiagramProperties( ChartModelHelper::findDiagram(m_xChartModel), uno::UNO_QUERY );
                 if( xDiagramProperties.is() )
                 {
                     xDiagramProperties->setPropertyValue( "StartingAngle" , uno::Any(m_nStartingAngle) );
@@ -293,7 +292,7 @@ bool SeriesOptionsItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const Sf
                      rItemSet.Get( nWhichId )).GetValue();
             if( m_xCooSys.is() )
             {
-                uno::Reference< chart2::XAxis > xAxis( AxisHelper::getAxis( 1, 0, m_xCooSys ) );
+                rtl::Reference< Axis > xAxis = AxisHelper::getAxis( 1, 0, m_xCooSys );
                 if( xAxis.is() )
                 {
                     chart2::ScaleData aScaleData( xAxis->getScaleData() );
@@ -314,7 +313,7 @@ bool SeriesOptionsItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const Sf
                 {
                     try
                     {
-                        uno::Reference< beans::XPropertySet > xDiagramProperties( ChartModelHelper::findDiagram(m_xChartModel), uno::UNO_QUERY );
+                        rtl::Reference< Diagram > xDiagramProperties( ChartModelHelper::findDiagram(m_xChartModel), uno::UNO_QUERY );
                         if( xDiagramProperties.is() )
                         {
                             xDiagramProperties->setPropertyValue( "MissingValueTreatment" , uno::Any( nNew ));
@@ -336,9 +335,8 @@ bool SeriesOptionsItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const Sf
                 bool bIncludeHiddenCells = static_cast<const SfxBoolItem &>(rItemSet.Get(nWhichId)).GetValue();
                 if (bIncludeHiddenCells != m_bIncludeHiddenCells)
                 {
-                    ChartModel* pModel = dynamic_cast<ChartModel*>(m_xChartModel.get());
-                    if (pModel)
-                        bChanged = ChartModelHelper::setIncludeHiddenCells( bIncludeHiddenCells, *pModel );
+                    if (m_xChartModel)
+                        bChanged = ChartModelHelper::setIncludeHiddenCells( bIncludeHiddenCells, *m_xChartModel );
                 }
             }
         }
@@ -348,7 +346,7 @@ bool SeriesOptionsItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const Sf
             bool bHideLegendEntry = static_cast<const SfxBoolItem &>(rItemSet.Get(nWhichId)).GetValue();
             if (bHideLegendEntry != m_bHideLegendEntry)
             {
-                GetPropertySet()->setPropertyValue("ShowLegendEntry", css::uno::makeAny(!bHideLegendEntry));
+                GetPropertySet()->setPropertyValue("ShowLegendEntry", css::uno::Any(!bHideLegendEntry));
             }
         }
         break;
@@ -398,7 +396,7 @@ void SeriesOptionsItemConverter::FillSpecialItem(
         case SCHATTR_STARTING_ANGLE:
         {
             if( m_bSupportingStartingAngle )
-                rOutItemSet.Put( SdrAngleItem(nWhichId, Degree100(m_nStartingAngle*100)) );
+                rOutItemSet.Put( SdrAngleItem(SCHATTR_STARTING_ANGLE, Degree100(m_nStartingAngle*100)) );
             break;
         }
         case SCHATTR_CLOCKWISE:

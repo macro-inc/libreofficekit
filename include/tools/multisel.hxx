@@ -23,6 +23,7 @@
 #include <tools/gen.hxx>
 #include <rtl/ustring.hxx>
 
+#include <cstddef>
 #include <vector>
 #include <o3tl/sorted_vector.hxx>
 
@@ -34,14 +35,14 @@ private:
     std::vector< Range >
                     aSels;      // array of SV-selections
     Range           aTotRange;  // total range of indexes
-    sal_Int32       nCurSubSel; // index in aSels of current selected index
+    std::size_t     nCurSubSel; // index in aSels of current selected index
     sal_Int32       nCurIndex;  // current selected entry
     sal_Int32       nSelCount;  // number of selected indexes
     bool            bCurValid;  // are nCurIndex and nCurSubSel valid
 
     TOOLS_DLLPRIVATE void           ImplClear();
-    TOOLS_DLLPRIVATE sal_Int32      ImplFindSubSelection( sal_Int32 nIndex ) const;
-    TOOLS_DLLPRIVATE void           ImplMergeSubSelections( sal_Int32 nPos1, sal_Int32 nPos2 );
+    TOOLS_DLLPRIVATE std::size_t    ImplFindSubSelection( sal_Int32 nIndex ) const;
+    TOOLS_DLLPRIVATE void           ImplMergeSubSelections( sal_Int32 nPos1, std::size_t nPos2 );
 
 public:
                     MultiSelection();
@@ -89,7 +90,7 @@ class SAL_WARN_UNUSED TOOLS_DLLPUBLIC StringRangeEnumerator
     sal_Int32                                              mnOffset;
     bool                                                   mbValidInput;
 
-    bool setRange( const OUString& i_rNewRange );
+    bool setRange( std::u16string_view i_rNewRange );
     bool insertRange( sal_Int32 nFirst, sal_Int32 nLast, bool bSequence );
     void insertJoinedRanges( const std::vector< sal_Int32 >& rNumbers );
     bool checkValue( sal_Int32, const o3tl::sorted_vector< sal_Int32 >* i_pPossibleValues = nullptr ) const;
@@ -119,7 +120,7 @@ public:
 
     friend class StringRangeEnumerator::Iterator;
 
-    StringRangeEnumerator( const OUString& i_rInput,
+    StringRangeEnumerator( std::u16string_view i_rInput,
                            sal_Int32 i_nMinNumber,
                            sal_Int32 i_nMaxNumber,
                            sal_Int32 i_nLogicalOffset = -1
@@ -155,7 +156,7 @@ public:
     - single number that doesn't fit in [i_nMinNumber,i_nMaxNumber] will be ignored
     - range that doesn't fit in [i_nMinNumber,i_nMaxNumber] will be adjusted
     */
-    static bool getRangesFromString( const OUString& i_rPageRange,
+    static bool getRangesFromString( std::u16string_view i_rPageRange,
                                      std::vector< sal_Int32 >& o_rPageVector,
                                      sal_Int32 i_nMinNumber,
                                      sal_Int32 i_nMaxNumber,

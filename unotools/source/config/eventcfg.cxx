@@ -81,6 +81,12 @@ static o3tl::enumarray<GlobalEventId, const char*> pEventAsciiNames =
 typedef std::unordered_map< OUString, OUString > EventBindingHash;
 typedef o3tl::enumarray< GlobalEventId, OUString > SupportedEventsVector;
 
+static std::mutex& GetOwnStaticMutex()
+{
+    static std::mutex INSTANCE;
+    return INSTANCE;
+}
+
 class GlobalEventConfig_Impl : public utl::ConfigItem
 {
 private:
@@ -105,7 +111,7 @@ public:
     /// @throws css::container::NoSuchElementException
     /// @throws css::lang::WrappedTargetException
     /// @throws css::uno::RuntimeException
-    css::uno::Any getByName( const OUString& aName );
+    css::uno::Sequence < css::beans::PropertyValue > getByName( const OUString& aName );
     /// @throws css::uno::RuntimeException
     css::uno::Sequence< OUString > getElementNames(  );
     /// @throws css::uno::RuntimeException
@@ -150,7 +156,7 @@ OUString const & GlobalEventConfig_Impl::GetEventName( GlobalEventId nIndex ) co
 
 void GlobalEventConfig_Impl::Notify( const Sequence< OUString >& )
 {
-    MutexGuard aGuard( GlobalEventConfig::GetOwnStaticMutex() );
+    std::unique_lock aGuard( GetOwnStaticMutex() );
 
     initBindingInfo();
 }
@@ -232,14 +238,15 @@ void GlobalEventConfig_Impl::replaceByName( const OUString& aName, const Any& aE
     SetModified();
 }
 
-Any GlobalEventConfig_Impl::getByName( const OUString& aName )
+css::uno::Sequence < css::beans::PropertyValue > GlobalEventConfig_Impl::getByName( const OUString& aName )
 {
-    Any aRet;
+    static constexpr OUStringLiteral sEventType = u"EventType";
+    static constexpr OUStringLiteral sScript = u"Script";
     Sequence< beans::PropertyValue > props(2);
     auto pProps = props.getArray();
-    pProps[0].Name = "EventType";
-    pProps[0].Value <<= OUString("Script");
-    pProps[1].Name = "Script";
+    pProps[0].Name = sEventType;
+    pProps[0].Value <<= OUString(sScript);
+    pProps[1].Name = sScript;
     EventBindingHash::const_iterator it = m_eventBindingHash.find( aName );
     if( it != m_eventBindingHash.end() )
     {
@@ -255,8 +262,7 @@ Any GlobalEventConfig_Impl::getByName( const OUString& aName )
 
         pProps[1].Value <<= OUString();
     }
-    aRet <<= props;
-    return aRet;
+    return props;
 }
 
 Sequence< OUString > GlobalEventConfig_Impl::getElementNames(  )
@@ -295,13 +301,14 @@ sal_Int32                   GlobalEventConfig::m_nRefCount      = 0;
 GlobalEventConfig::GlobalEventConfig()
 {
     // Global access, must be guarded (multithreading!).
-    MutexGuard aGuard( GetOwnStaticMutex() );
+    std::unique_lock aGuard( GetOwnStaticMutex() );
     // Increase our refcount ...
     ++m_nRefCount;
     // ... and initialize our data container only if it not already exist!
     if( m_pImpl == nullptr )
     {
         m_pImpl = new GlobalEventConfig_Impl;
+        aGuard.unlock();
         ItemHolder1::holdConfigItem(EItem::EventConfig);
     }
 }
@@ -309,7 +316,7 @@ GlobalEventConfig::GlobalEventConfig()
 GlobalEventConfig::~GlobalEventConfig()
 {
     // Global access, must be guarded (multithreading!)
-    MutexGuard aGuard( GetOwnStaticMutex() );
+    std::unique_lock aGuard( GetOwnStaticMutex() );
     // Decrease our refcount.
     --m_nRefCount;
     // If last instance was deleted ...
@@ -323,57 +330,51 @@ GlobalEventConfig::~GlobalEventConfig()
 
 Reference< container::XNameReplace > SAL_CALL GlobalEventConfig::getEvents()
 {
-    MutexGuard aGuard( GetOwnStaticMutex() );
+    std::unique_lock aGuard( GetOwnStaticMutex() );
     Reference< container::XNameReplace > ret(this);
     return ret;
 }
 
 void SAL_CALL GlobalEventConfig::replaceByName( const OUString& aName, const Any& aElement )
 {
-    MutexGuard aGuard( GetOwnStaticMutex() );
+    std::unique_lock aGuard( GetOwnStaticMutex() );
     m_pImpl->replaceByName( aName, aElement );
 }
 Any SAL_CALL GlobalEventConfig::getByName( const OUString& aName )
 {
-    MutexGuard aGuard( GetOwnStaticMutex() );
+    return Any(getByName2(aName));
+}
+css::uno::Sequence < css::beans::PropertyValue > GlobalEventConfig::getByName2( const OUString& aName )
+{
+    std::unique_lock aGuard( GetOwnStaticMutex() );
     return m_pImpl->getByName( aName );
 }
 Sequence< OUString > SAL_CALL GlobalEventConfig::getElementNames(  )
 {
-    MutexGuard aGuard( GetOwnStaticMutex() );
+    std::unique_lock aGuard( GetOwnStaticMutex() );
     return m_pImpl->getElementNames( );
 }
 sal_Bool SAL_CALL GlobalEventConfig::hasByName( const OUString& aName )
 {
-    MutexGuard aGuard( GetOwnStaticMutex() );
+    std::unique_lock aGuard( GetOwnStaticMutex() );
     return m_pImpl->hasByName( aName );
 }
 Type SAL_CALL GlobalEventConfig::getElementType(  )
 {
-    MutexGuard aGuard( GetOwnStaticMutex() );
+    std::unique_lock aGuard( GetOwnStaticMutex() );
     return GlobalEventConfig_Impl::getElementType( );
 }
 sal_Bool SAL_CALL GlobalEventConfig::hasElements(  )
 {
-    MutexGuard aGuard( GetOwnStaticMutex() );
+    std::unique_lock aGuard( GetOwnStaticMutex() );
     return m_pImpl->hasElements( );
-}
-
-namespace
-{
-    class theGlobalEventConfigMutex : public rtl::Static<osl::Mutex, theGlobalEventConfigMutex>{};
-}
-
-Mutex& GlobalEventConfig::GetOwnStaticMutex()
-{
-    return theGlobalEventConfigMutex::get();
 }
 
 OUString GlobalEventConfig::GetEventName( GlobalEventId nIndex )
 {
     if (utl::ConfigManager::IsFuzzing())
         return OUString();
-    rtl::Reference<GlobalEventConfig> createImpl(new GlobalEventConfig);
+    static rtl::Reference<GlobalEventConfig> createImpl(new GlobalEventConfig);
     return GlobalEventConfig::m_pImpl->GetEventName( nIndex );
 }
 

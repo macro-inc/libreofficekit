@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -58,7 +60,6 @@ class CalcRows(UITestCase):
 
             with self.ui_test.execute_dialog_through_command(".uno:RowHeight") as xDialog:
                 xvalue = xDialog.getChild("value")
-                xdefault = xDialog.getChild("default")
                 #write your own value
                 xvalue.executeAction("TYPE", mkPropertyValues({"KEYCODE":"CTRL+A"}))
                 xvalue.executeAction("TYPE", mkPropertyValues({"KEYCODE":"BACKSPACE"}))

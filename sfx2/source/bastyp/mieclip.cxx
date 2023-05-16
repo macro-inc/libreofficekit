@@ -20,7 +20,9 @@
 #include <sal/config.h>
 
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <tools/stream.hxx>
+#include <comphelper/string.hxx>
 
 #include <sfx2/mieclip.hxx>
 
@@ -33,7 +35,7 @@ SvStream* MSE40HTMLClipFormatObj::IsValid( SvStream& rStream )
     bool bRet = false;
     pStrm.reset();
 
-    OString sLine;
+    OStringBuffer sLine;
     sal_Int32 nStt = -1, nEnd = -1, nFragStart = -1, nFragEnd = -1;
     sal_Int32 nIndex = 0;
 
@@ -41,22 +43,23 @@ SvStream* MSE40HTMLClipFormatObj::IsValid( SvStream& rStream )
     rStream.ResetError();
 
     if( rStream.ReadLine( sLine ) &&
-        sLine.getToken( 0, ':', nIndex ) == "Version" )
+        o3tl::getToken(sLine, 0, ':', nIndex ) == "Version" )
     {
         while( rStream.ReadLine( sLine ) )
         {
             nIndex = 0;
-            OString sTmp(sLine.getToken(0, ':', nIndex));
+            std::string_view sTmp(o3tl::getToken(sLine, 0, ':', nIndex));
+            std::string_view sView(sLine);
             if (sTmp == "StartHTML")
-                nStt = sLine.copy(nIndex).toInt32();
+                nStt = o3tl::toInt32(sView.substr(nIndex));
             else if (sTmp == "EndHTML")
-                nEnd = sLine.copy(nIndex).toInt32();
+                nEnd = o3tl::toInt32(sView.substr(nIndex));
             else if (sTmp == "StartFragment")
-                nFragStart = sLine.copy(nIndex).toInt32();
+                nFragStart = o3tl::toInt32(sView.substr(nIndex));
             else if (sTmp == "EndFragment")
-                nFragEnd = sLine.copy(nIndex).toInt32();
+                nFragEnd = o3tl::toInt32(sView.substr(nIndex));
             else if (sTmp == "SourceURL")
-                sBaseURL = OStringToOUString( sLine.subView(nIndex), RTL_TEXTENCODING_UTF8 );
+                sBaseURL = OStringToOUString( sView.substr(nIndex), RTL_TEXTENCODING_UTF8 );
 
             if (nEnd >= 0 && nStt >= 0 &&
                 (!sBaseURL.isEmpty() || rStream.Tell() >= o3tl::make_unsigned(nStt)))

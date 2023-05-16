@@ -25,9 +25,10 @@
 #include <com/sun/star/beans/XPropertySetInfo.hpp>
 #include <cppuhelper/implbase.hxx>
 #include <comphelper/comphelperdllapi.h>
+#include <o3tl/span.hxx>
 #include <o3tl/typed_flags_set.hxx>
-#include <map>
-#include <vector>
+#include <unordered_map>
+#include <utility>
 
 enum class PropertyMoreFlags : sal_uInt8 {
     NONE            = 0x00,
@@ -52,7 +53,7 @@ struct PropertyMapEntry
 
     PropertyMapEntry(OUString _aName, sal_Int32 _nHandle, css::uno::Type const & _rType,
                      sal_Int16 _nAttributes, sal_uInt8 _nMemberId, PropertyMoreFlags _nMoreFlags = PropertyMoreFlags::NONE)
-        : maName( _aName )
+        : maName(std::move( _aName ))
         , maType( _rType )
         , mnHandle( _nHandle )
         , mnAttributes( _nAttributes )
@@ -74,7 +75,7 @@ struct PropertyMapEntry
     PropertyMapEntry() = default;
 };
 
-typedef std::map<OUString, PropertyMapEntry const *> PropertyMap;
+typedef std::unordered_map<OUString, PropertyMapEntry const *> PropertyMap;
 
 // don't export to avoid duplicate WeakImplHelper definitions with MSVC
 class SAL_DLLPUBLIC_TEMPLATE PropertySetInfo_BASE
@@ -89,8 +90,7 @@ class COMPHELPER_DLLPUBLIC PropertySetInfo final
 {
 public:
     PropertySetInfo() noexcept;
-    PropertySetInfo( PropertyMapEntry const * pMap ) noexcept;
-    PropertySetInfo(css::uno::Sequence<css::beans::Property> const &) noexcept;
+    PropertySetInfo( o3tl::span<const PropertyMapEntry> pMap ) noexcept;
     virtual ~PropertySetInfo() noexcept override;
 
     /** returns a stl map with all PropertyMapEntry pointer.<p>
@@ -101,7 +101,7 @@ public:
     /** adds an array of PropertyMapEntry to this instance.<p>
         The end is marked with a PropertyMapEntry where mpName equals NULL</p>
     */
-    void add( PropertyMapEntry const * pMap ) noexcept;
+    void add( o3tl::span<PropertyMapEntry const> pMap ) noexcept;
 
     /** removes an already added PropertyMapEntry which string in mpName equals to aName */
     void remove( const OUString& aName ) noexcept;
@@ -111,10 +111,9 @@ public:
     virtual sal_Bool SAL_CALL hasPropertyByName( const OUString& Name ) override;
 
 private:
-    void addImpl(PropertyMapEntry const * pMap) noexcept;
-
     PropertyMap maPropertyMap;
-    std::vector< css::beans::Property > maProperties;
+    /// Cache the value we return in getProperties because it is expensive to construct
+    css::uno::Sequence< css::beans::Property > maProperties;
 };
 
 }

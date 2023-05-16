@@ -21,6 +21,7 @@
 #include <property.hxx>
 #include <componenttools.hxx>
 #include "findpos.hxx"
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/io/XPersistObject.hpp>
 #include <com/sun/star/io/XMarkableStream.hpp>
 #include <com/sun/star/form/XFormComponent.hpp>
@@ -35,6 +36,7 @@
 #include <services.hxx>
 #include <tools/debug.hxx>
 #include <o3tl/sorted_vector.hxx>
+#include <utility>
 
 
 namespace frm
@@ -185,11 +187,11 @@ Any SAL_CALL OGridColumn::queryAggregation( const Type& _rType )
 }
 
 
-OGridColumn::OGridColumn( const Reference<XComponentContext>& _rContext, const OUString& _sModelName )
+OGridColumn::OGridColumn( const Reference<XComponentContext>& _rContext, OUString _sModelName )
     :OGridColumn_BASE(m_aMutex)
     ,OPropertySetAggregationHelper(OGridColumn_BASE::rBHelper)
-    ,m_aHidden( makeAny( false ) )
-    ,m_aModelName(_sModelName)
+    ,m_aHidden( Any( false ) )
+    ,m_aModelName(std::move(_sModelName))
 {
 
     // Create the UnoControlModel
@@ -442,7 +444,7 @@ Any OGridColumn::getPropertyDefaultByHandle( sal_Int32 nHandle ) const
         case PROPERTY_ID_ALIGN:
             return Any();
         case PROPERTY_ID_HIDDEN:
-            return makeAny(false);
+            return Any(false);
         default:
             return OPropertySetAggregationHelper::getPropertyDefaultByHandle(nHandle);
     }

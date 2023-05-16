@@ -61,10 +61,14 @@ SkiaSalBitmap::SkiaSalBitmap(const sk_sp<SkImage>& image)
     ResetAllData();
     mImage = image;
     mPalette = BitmapPalette();
+#if SKIA_USE_BITMAP32
     mBitCount = 32;
+#else
+    mBitCount = 24;
+#endif
     mSize = mPixelsSize = Size(image->width(), image->height());
     ComputeScanlineSize();
-    mAnyAccessCount = 0;
+    mReadAccessCount = 0;
 #ifdef DBG_UTIL
     mWriteAccessCount = 0;
 #endif
@@ -74,7 +78,7 @@ SkiaSalBitmap::SkiaSalBitmap(const sk_sp<SkImage>& image)
 bool SkiaSalBitmap::Create(const Size& rSize, vcl::PixelFormat ePixelFormat,
                            const BitmapPalette& rPal)
 {
-    assert(mAnyAccessCount == 0);
+    assert(mReadAccessCount == 0);
     ResetAllData();
     if (ePixelFormat == vcl::PixelFormat::INVALID)
         return false;
@@ -153,7 +157,9 @@ bool SkiaSalBitmap::Create(const SalBitmap& rSalBmp, SalGraphics* pGraphics)
 
 bool SkiaSalBitmap::Create(const SalBitmap& rSalBmp, vcl::PixelFormat eNewPixelFormat)
 {
-    assert(mAnyAccessCount == 0);
+    assert(mReadAccessCount == 0);
+    assert(&rSalBmp != this);
+    ResetAllData();
     const SkiaSalBitmap& src = static_cast<const SkiaSalBitmap&>(rSalBmp);
     mImage = src.mImage;
     mAlphaImage = src.mAlphaImage;
@@ -189,7 +195,7 @@ void SkiaSalBitmap::Destroy()
 #ifdef DBG_UTIL
     assert(mWriteAccessCount == 0);
 #endif
-    assert(mAnyAccessCount == 0);
+    assert(mReadAccessCount == 0);
     ResetAllData();
 }
 
@@ -268,7 +274,12 @@ BitmapBuffer* SkiaSalBitmap::AcquireBuffer(BitmapAccessMode nMode)
             abort();
     }
     buffer->mnFormat |= ScanlineFormat::TopDown;
-    ++mAnyAccessCount;
+    // Refcount all read/write accesses, to catch problems with existing accesses while
+    // a bitmap changes, and also to detect when we can free mBuffer if wanted.
+    // Write mode implies also reading. It would be probably a good idea to count even
+    // Info accesses, but VclCanvasBitmap keeps one around pointlessly, causing tdf#150817.
+    if (nMode == BitmapAccessMode::Read || nMode == BitmapAccessMode::Write)
+        ++mReadAccessCount;
 #ifdef DBG_UTIL
     if (nMode == BitmapAccessMode::Write)
         ++mWriteAccessCount;
@@ -292,10 +303,13 @@ void SkiaSalBitmap::ReleaseBuffer(BitmapBuffer* pBuffer, BitmapAccessMode nMode,
 #endif
         mPalette = pBuffer->maPalette;
         ResetToBuffer();
-        InvalidateChecksum();
+        DataChanged();
     }
-    assert(mAnyAccessCount > 0);
-    --mAnyAccessCount;
+    if (nMode == BitmapAccessMode::Read || nMode == BitmapAccessMode::Write)
+    {
+        assert(mReadAccessCount > 0);
+        --mReadAccessCount;
+    }
     // Are there any more ground movements underneath us ?
     assert(pBuffer->mnWidth == mSize.Width());
     assert(pBuffer->mnHeight == mSize.Height());
@@ -447,6 +461,7 @@ bool SkiaSalBitmap::Scale(const double& rScaleX, const double& rScaleY, BmpScale
         ResetToSkImage(mImage);
     else
         ResetToBuffer();
+    DataChanged();
     // The rest will be handled when the scaled bitmap is actually needed,
     // such as in EnsureBitmapData() or GetSkImage().
     return true;
@@ -490,6 +505,7 @@ bool SkiaSalBitmap::ConvertToGreyscale()
         ComputeScanlineSize();
         mPalette = Bitmap::GetGreyPalette(256);
         ResetToSkImage(makeCheckedImageSnapshot(surface));
+        DataChanged();
         SAL_INFO("vcl.skia.trace", "converttogreyscale(" << this << ")");
         return true;
     }
@@ -527,6 +543,7 @@ bool SkiaSalBitmap::InterpretAs8Bit()
         ComputeScanlineSize();
         mPalette = Bitmap::GetGreyPalette(256);
         ResetToSkImage(mImage); // keep mImage, it will be interpreted as 8bit if needed
+        DataChanged();
         SAL_INFO("vcl.skia.trace", "interpretas8bit(" << this << ") with image");
         return true;
     }
@@ -580,6 +597,7 @@ bool SkiaSalBitmap::AlphaBlendWith(const SalBitmap& rSalBmp)
         const sal_uInt16 nGrey2 = otherBitmap->mEraseColor.GetRed();
         const sal_uInt8 nGrey = static_cast<sal_uInt8>(nGrey1 + nGrey2 - nGrey1 * nGrey2 / 255);
         mEraseColor = Color(nGrey, nGrey, nGrey);
+        DataChanged();
         SAL_INFO("vcl.skia.trace",
                  "alphablendwith(" << this << ") : with erase color " << otherBitmap);
         return true;
@@ -592,13 +610,15 @@ bool SkiaSalBitmap::AlphaBlendWith(const SalBitmap& rSalBmp)
             return false;
         otherBitmap = otherBitmapAllocated.get();
     }
-    sk_sp<SkSurface> surface = createSkSurface(mSize);
+    // This is 8-bit bitmap serving as mask, so the image itself needs no alpha.
+    sk_sp<SkSurface> surface = createSkSurface(mSize, kOpaque_SkAlphaType);
     SkPaint paint;
     paint.setBlendMode(SkBlendMode::kSrc); // set as is
     surface->getCanvas()->drawImage(GetSkImage(), 0, 0, SkSamplingOptions(), &paint);
     paint.setBlendMode(SkBlendMode::kScreen); // src+dest - src*dest/255 (in 0..1)
     surface->getCanvas()->drawImage(otherBitmap->GetSkImage(), 0, 0, SkSamplingOptions(), &paint);
     ResetToSkImage(makeCheckedImageSnapshot(surface));
+    DataChanged();
     SAL_INFO("vcl.skia.trace", "alphablendwith(" << this << ") : with image " << otherBitmap);
     return true;
 }
@@ -800,7 +820,7 @@ const sk_sp<SkImage>& SkiaSalBitmap::GetSkImage(DirectImage direct) const
     thisPtr->mImage = image;
     // The data is now stored both in the SkImage and in our mBuffer, so drop the buffer
     // if conserving memory. It'll be converted back by EnsureBitmapData() if needed.
-    if (ConserveMemory() && mAnyAccessCount == 0)
+    if (ConserveMemory() && mReadAccessCount == 0)
     {
         SAL_INFO("vcl.skia.trace", "getskimage(" << this << "): dropping buffer");
         thisPtr->ResetToSkImage(mImage);
@@ -956,7 +976,7 @@ const sk_sp<SkImage>& SkiaSalBitmap::GetAlphaSkImage(DirectImage direct) const
     // The data is now stored both in the SkImage and in our mBuffer, so drop the buffer
     // if conserving memory and the conversion back would be simple (it'll be converted back
     // by EnsureBitmapData() if needed).
-    if (ConserveMemory() && mBitCount == 8 && mPalette.IsGreyPalette8Bit() && mAnyAccessCount == 0)
+    if (ConserveMemory() && mBitCount == 8 && mPalette.IsGreyPalette8Bit() && mReadAccessCount == 0)
     {
         SAL_INFO("vcl.skia.trace", "getalphaskimage(" << this << "): dropping buffer");
         SkiaSalBitmap* thisPtr = const_cast<SkiaSalBitmap*>(this);
@@ -1296,7 +1316,7 @@ void SkiaSalBitmap::ResetToBuffer()
 
 void SkiaSalBitmap::ResetToSkImage(sk_sp<SkImage> image)
 {
-    assert(mAnyAccessCount == 0); // can't reset mBuffer if there's a read access pointing to it
+    assert(mReadAccessCount == 0); // can't reset mBuffer if there's a read access pointing to it
     SkiaZone zone;
     mBuffer.reset();
     mImage = image;
@@ -1306,7 +1326,7 @@ void SkiaSalBitmap::ResetToSkImage(sk_sp<SkImage> image)
 
 void SkiaSalBitmap::ResetAllData()
 {
-    assert(mAnyAccessCount == 0);
+    assert(mReadAccessCount == 0);
     SkiaZone zone;
     mBuffer.reset();
     mImage.reset();
@@ -1314,7 +1334,10 @@ void SkiaSalBitmap::ResetAllData()
     mEraseColorSet = false;
     mPixelsSize = mSize;
     ComputeScanlineSize();
+    DataChanged();
 }
+
+void SkiaSalBitmap::DataChanged() { InvalidateChecksum(); }
 
 void SkiaSalBitmap::ResetPendingScaling()
 {
@@ -1343,7 +1366,14 @@ OString SkiaSalBitmap::GetImageKey(DirectImage direct) const
         return OString::Concat("E") + ss.str().c_str();
     }
     assert(direct == DirectImage::No || mImage);
-    return OString::Concat("I") + OString::number(GetSkImage(direct)->uniqueID());
+    sk_sp<SkImage> image = GetSkImage(direct);
+    // In some cases drawing code may try to draw the same content but using
+    // different bitmaps (even underlying bitmaps), for example canvas apparently
+    // copies the same things around in tdf#146095. For pixel-based images
+    // it should be still cheaper to compute a checksum and avoid re-caching.
+    if (!image->isTextureBacked())
+        return OString::Concat("C") + OString::number(getSkImageChecksum(image));
+    return OString::Concat("I") + OString::number(image->uniqueID());
 }
 
 OString SkiaSalBitmap::GetAlphaImageKey(DirectImage direct) const
@@ -1356,7 +1386,10 @@ OString SkiaSalBitmap::GetAlphaImageKey(DirectImage direct) const
         return OString::Concat("E") + ss.str().c_str();
     }
     assert(direct == DirectImage::No || mAlphaImage);
-    return OString::Concat("I") + OString::number(GetAlphaSkImage(direct)->uniqueID());
+    sk_sp<SkImage> image = GetAlphaSkImage(direct);
+    if (!image->isTextureBacked())
+        return OString::Concat("C") + OString::number(getSkImageChecksum(image));
+    return OString::Concat("I") + OString::number(image->uniqueID());
 }
 
 void SkiaSalBitmap::dump(const char* file) const

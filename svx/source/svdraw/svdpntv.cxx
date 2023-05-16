@@ -41,10 +41,12 @@
 #include <svx/sdr/contact/objectcontact.hxx>
 #include <svx/sdr/animation/objectanimator.hxx>
 #include <drawinglayer/primitive2d/metafileprimitive2d.hxx>
+#include <drawinglayer/converters.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <comphelper/lok.hxx>
 #include <svx/svdviter.hxx>
 #include <svtools/optionsdrawinglayer.hxx>
+#include <osl/diagnose.h>
 
 using namespace ::com::sun::star;
 
@@ -97,7 +99,7 @@ OutputDevice* SdrPaintView::GetFirstOutputDevice() const
 }
 
 
-SvxViewChangedHint::SvxViewChangedHint()
+SvxViewChangedHint::SvxViewChangedHint() : SfxHint(SfxHintId::SvxViewChanged)
 {
 }
 
@@ -117,7 +119,7 @@ BitmapEx convertMetafileToBitmapEx(
                     rTargetRange.getRange(),
                     rTargetRange.getMinimum()),
                 rMtf));
-        aBitmapEx = convertPrimitive2DSequenceToBitmapEx(
+        aBitmapEx = drawinglayer::convertPrimitive2DContainerToBitmapEx(
             drawinglayer::primitive2d::Primitive2DContainer { aMtf },
             rTargetRange,
             nMaximumQuadraticPixels);
@@ -173,7 +175,7 @@ SdrPaintView::SdrPaintView(SdrModel& rSdrModel, OutputDevice* pOut)
         SetDefaultStyleSheet(mpModel->GetDefaultStyleSheet(), true);
 
     if (pOut)
-        AddWindowToPaintView(pOut, nullptr);
+        AddDeviceToPaintView(*pOut, nullptr);
 
     maColorConfig.AddListener(this);
     onChangeColorConfig();
@@ -383,10 +385,9 @@ void SdrPaintView::HideSdrPage()
     }
 }
 
-void SdrPaintView::AddWindowToPaintView(OutputDevice* pNewWin, vcl::Window *pWindow)
+void SdrPaintView::AddDeviceToPaintView(OutputDevice& rNewDev, vcl::Window *pWindow)
 {
-    DBG_ASSERT(pNewWin, "SdrPaintView::AddWindowToPaintView: No OutputDevice(!)");
-    SdrPaintWindow* pNewPaintWindow = new SdrPaintWindow(*this, *pNewWin, pWindow);
+    SdrPaintWindow* pNewPaintWindow = new SdrPaintWindow(*this, rNewDev, pWindow);
     maPaintWindows.emplace_back(pNewPaintWindow);
 
     if(mpPageView)
@@ -395,10 +396,9 @@ void SdrPaintView::AddWindowToPaintView(OutputDevice* pNewWin, vcl::Window *pWin
     }
 }
 
-void SdrPaintView::DeleteWindowFromPaintView(OutputDevice* pOldWin)
+void SdrPaintView::DeleteDeviceFromPaintView(OutputDevice& rOldDev)
 {
-    assert(pOldWin && "SdrPaintView::DeleteWindowFromPaintView: No OutputDevice(!)");
-    SdrPaintWindow* pCandidate = FindPaintWindow(*pOldWin);
+    SdrPaintWindow* pCandidate = FindPaintWindow(rOldDev);
 
     if(pCandidate)
     {
@@ -631,7 +631,8 @@ void SdrPaintView::EndCompleteRedraw(SdrPaintWindow& rPaintWindow, bool bPaintFo
     {
         // draw postprocessing, only for known devices
         // it is necessary to always paint FormLayer
-        if(bPaintFormLayer)
+        // In the LOK case control rendering is performed through LokControlHandler
+        if(!comphelper::LibreOfficeKit::isActive() && bPaintFormLayer)
         {
             ImpFormLayerDrawing(rPaintWindow);
         }
@@ -646,7 +647,7 @@ void SdrPaintView::EndCompleteRedraw(SdrPaintWindow& rPaintWindow, bool bPaintFo
                 static_cast< SdrView* >(this)->TextEditDrawing(rPaintWindow);
         }
 
-        if (comphelper::LibreOfficeKit::isActive() && mbPaintTextEdit && pPageView)
+        if (comphelper::LibreOfficeKit::isActive() && pPageView)
         {
             // Look for active text edits in other views showing the same page,
             // and show them as well. Show only if Page/MasterPage mode is matching.
@@ -903,18 +904,20 @@ void SdrPaintView::SetNotPersistDefaultAttr(const SfxItemSet& rAttr)
 {
     // bReplaceAll has no effect here at all.
     bool bMeasure= dynamic_cast<const SdrView*>(this) != nullptr && static_cast<SdrView*>(this)->IsMeasureTool();
-    const SfxPoolItem *pPoolItem=nullptr;
-    if (rAttr.GetItemState(SDRATTR_LAYERID,true,&pPoolItem)==SfxItemState::SET) {
-        SdrLayerID nLayerId=static_cast<const SdrLayerIdItem*>(pPoolItem)->GetValue();
+
+    if (const SdrLayerIdItem *pPoolItem = rAttr.GetItemIfSet(SDRATTR_LAYERID))
+    {
+        SdrLayerID nLayerId = pPoolItem->GetValue();
         const SdrLayer* pLayer=mpModel->GetLayerAdmin().GetLayerPerID(nLayerId);
         if (pLayer!=nullptr) {
             if (bMeasure) maMeasureLayer=pLayer->GetName();
             else maActualLayer=pLayer->GetName();
         }
     }
-    if (rAttr.GetItemState(SDRATTR_LAYERNAME,true,&pPoolItem)==SfxItemState::SET) {
-        if (bMeasure) maMeasureLayer=static_cast<const SdrLayerNameItem*>(pPoolItem)->GetValue();
-        else maActualLayer=static_cast<const SdrLayerNameItem*>(pPoolItem)->GetValue();
+    if (const SdrLayerNameItem *pPoolItem = rAttr.GetItemIfSet(SDRATTR_LAYERNAME))
+    {
+        if (bMeasure) maMeasureLayer = pPoolItem->GetValue();
+        else maActualLayer = pPoolItem->GetValue();
     }
 }
 
@@ -971,7 +974,7 @@ void SdrPaintView::SetDefaultStyleSheet(SfxStyleSheet* pStyleSheet, bool bDontRe
         SfxWhichIter aIter(pStyleSheet->GetItemSet());
         sal_uInt16 nWhich=aIter.FirstWhich();
         while (nWhich!=0) {
-            if (pStyleSheet->GetItemSet().GetItemState(nWhich)==SfxItemState::SET) {
+            if (aIter.GetItemState()==SfxItemState::SET) {
                 maDefaultAttr.ClearItem(nWhich);
             }
             nWhich=aIter.NextWhich();

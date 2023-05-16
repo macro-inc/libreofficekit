@@ -19,10 +19,8 @@
 
 #pragma once
 
-#include <MutexOwner.hxx>
-
 #include <com/sun/star/drawing/framework/XConfigurationChangeListener.hpp>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 
 namespace com::sun::star::drawing::framework { class XConfigurationController; }
 namespace com::sun::star::drawing::framework { class XTabBar; }
@@ -30,7 +28,7 @@ namespace com::sun::star::frame { class XController; }
 
 namespace sd::framework {
 
-typedef ::cppu::WeakComponentImplHelper <
+typedef comphelper::WeakComponentImplHelper <
     css::drawing::framework::XConfigurationChangeListener
     > ViewTabBarModuleInterfaceBase;
 
@@ -38,8 +36,7 @@ typedef ::cppu::WeakComponentImplHelper <
     the center pane.
 */
 class ViewTabBarModule
-    : private sd::MutexOwner,
-      public ViewTabBarModuleInterfaceBase
+    : public ViewTabBarModuleInterfaceBase
 {
 public:
     /** Create a new module that controls the view tab bar above the view
@@ -56,7 +53,7 @@ public:
             css::drawing::framework::XResourceId>& rxViewTabBarId);
     virtual ~ViewTabBarModule() override;
 
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
     // XConfigurationChangeListener
 

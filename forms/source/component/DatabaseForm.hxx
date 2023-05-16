@@ -22,6 +22,7 @@
 #include <sal/config.h>
 
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <propertybaghelper.hxx>
@@ -62,7 +63,7 @@
 #include <connectivity/filtermanager.hxx>
 #include <connectivity/warningscontainer.hxx>
 
-#include <listenercontainers.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <comphelper/propmultiplex.hxx>
 #include <comphelper/uno3.hxx>
 #include <cppuhelper/implbase12.hxx>
@@ -94,10 +95,10 @@ public:
     OUString     aValue;
     sal_uInt16          nRepresentation;
 
-    HtmlSuccessfulObj( const OUString& _rName, const OUString& _rValue,
+    HtmlSuccessfulObj( OUString _aName, OUString _aValue,
         sal_uInt16 _nRepresent = SUCCESSFUL_REPRESENT_TEXT )
-        :aName( _rName )
-        ,aValue( _rValue )
+        :aName(std::move( _aName ))
+        ,aValue(std::move( _aValue ))
         ,nRepresentation( _nRepresent )
     {
     }
@@ -149,11 +150,11 @@ class ODatabaseForm :public OFormComponents
     friend class OFormSubmitResetThread;
 
     // listener administration
-    ::comphelper::OInterfaceContainerHelper2   m_aLoadListeners;
-    ::comphelper::OInterfaceContainerHelper2   m_aRowSetApproveListeners;
-    ::comphelper::OInterfaceContainerHelper2   m_aSubmitListeners;
-    ::comphelper::OInterfaceContainerHelper2   m_aErrorListeners;
-    ResetListeners                      m_aResetListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::form::XLoadListener>   m_aLoadListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::sdb::XRowSetApproveListener>   m_aRowSetApproveListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::form::XSubmitListener>   m_aSubmitListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::sdb::XSQLErrorListener>   m_aErrorListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::form::XResetListener> m_aResetListeners;
     ::osl::Mutex                        m_aResetSafety;
     css::uno::Any                       m_aCycle;
     css::uno::Any                       m_aIgnoreResult; // set when we are a subform and our master form positioned on a new row

@@ -3,7 +3,7 @@ package org.libreoffice;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +12,11 @@ import android.widget.ImageButton;
 
 public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.ColorPickerViewHolder> {
 
-    Context mContext;
-    ColorPaletteAdapter colorPaletteAdapter;
-    ColorPaletteListener colorPaletteListener;
-    int[] colorList;
-    int[][] colorPalette = new int[11][8];
-    int selectedBox = 0;
+    private final Context mContext;
+    private final ColorPaletteAdapter colorPaletteAdapter;
+    private final ColorPaletteListener colorPaletteListener;
+    private final int[] colorList;
+    private final int[][] colorPalette = new int[11][8];
 
     public ColorPickerAdapter(Context mContext, final ColorPaletteAdapter colorPaletteAdapter, ColorPaletteListener colorPaletteListener) {
         this.mContext = mContext;
@@ -41,10 +40,11 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
     public void onBindViewHolder(final ColorPickerViewHolder holder, int position) {
         holder.colorBox.setBackgroundColor(colorList[position]);
 
-        if (selectedBox != position)
-            holder.colorBox.setImageDrawable(null);
-        else {
+        if (colorPaletteAdapter.getUpperSelectedBox() == position
+                && colorPaletteAdapter.getSelectedBox() >= 0) {
             holder.colorBox.setImageResource(R.drawable.ic_done_white_12dp);
+        } else {
+            holder.colorBox.setImageDrawable(null);
         }
 
         holder.colorBox.setOnClickListener(new View.OnClickListener() {
@@ -64,9 +64,17 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
 
 
     private void setPosition(int position) {
-        this.selectedBox = position;
         selectSubColor(position, position==0?0:3);
         colorPaletteListener.applyColor(colorList[position]);
+        updateAdapter();
+    }
+
+    /**
+     * Switches to first palette, but doesn't mark any color as selected.
+     * Use this if no color in the palette matches the actual one.
+     */
+    public void unselectColors() {
+        colorPaletteAdapter.changePosition(0, -1);
         updateAdapter();
     }
 
@@ -88,7 +96,15 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
             int red_shade = red;
             int green_shade = green;
             int blue_shade = blue;
-            if (i != 0) {
+            if (i == 0) {
+                colorPalette[0][0] = colorList[i];
+                for (int k = 1; k < 7; k++) {
+                    red_tint = (int) (red_tint + (255 - red_tint) * 0.25);
+                    green_tint = (int) (green_tint + (255 - green_tint) * 0.25);
+                    blue_tint = (int) (blue_tint + (255 - blue_tint) * 0.25);
+                    colorPalette[i][k] = (Color.rgb(red_tint, green_tint, blue_tint));
+                }
+            } else {
                 colorPalette[i][3] = colorList[i];
                 for (int k = 2; k >= 0; k--) {
                     red_shade = (int) (red_shade * 0.75);
@@ -102,48 +118,28 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
                     blue_tint = (int) (blue_tint + (255 - blue_tint) * 0.45);
                     colorPalette[i][k] = (Color.rgb(red_tint, green_tint, blue_tint));
                 }
-            } else {
-                colorPalette[0][0] = colorList[i];
-                for (int k = 1; k < 7; k++) {
-                    red_tint = (int) (red_tint + (255 - red_tint) * 0.25);
-                    green_tint = (int) (green_tint + (255 - green_tint) * 0.25);
-                    blue_tint = (int) (blue_tint + (255 - blue_tint) * 0.25);
-                    colorPalette[i][k] = (Color.rgb(red_tint, green_tint, blue_tint));
-                }
             }
-        }
-        for (int i = 0; i < 11; i++){
-            this.colorPalette[i][7] = (Color.rgb(255, 255, 255)); // last one is always white
+            colorPalette[i][7] = Color.WHITE; // last one is always white
         }
         colorPaletteAdapter.setColorPalette(colorPalette);
     }
 
     public void findSelectedTextColor(int color) {
-        /*
-            Libreoffice recognizes -1 as Black
-         */
-        if (color == -1) {
-            colorPaletteAdapter.changePosition(0, 0);
-            selectedBox = 0;
-            updateAdapter();
-            return;
-        }
-        /*
-            Find the color if the palette points another color
-         */
-        if (colorPalette[selectedBox][colorPaletteAdapter.getSelectedBox()] != color) {
-            for (int i = 0; i < 11; i++) {
-                for (int k = 0; k < 8; k++) {
-                    if (colorPalette[i][k] == color) {
-                        colorPaletteAdapter.changePosition(i, k);
-                        selectedBox = i;
-                        updateAdapter();
-                        return;
-                    }
+        // try to find and highlight the color in the existing palettes
+        for (int i = 0; i < 11; i++) {
+            for (int k = 0; k < 8; k++) {
+                if (colorPalette[i][k] == color) {
+                    colorPaletteAdapter.changePosition(i, k);
+                    updateAdapter();
+                    return;
                 }
             }
         }
+
+        // no color in the palettes matched
+        unselectColors();
     }
+
     private void updateAdapter(){
         LOKitShell.getMainHandler().post(new Runnable() {
             @Override

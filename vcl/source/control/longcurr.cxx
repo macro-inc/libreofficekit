@@ -48,7 +48,7 @@ BigInt ImplPower10( sal_uInt16 n )
     return nValue;
 }
 
-OUString ImplGetCurr( const LocaleDataWrapper& rLocaleDataWrapper, const BigInt &rNumber, sal_uInt16 nDigits, const OUString& rCurrSymbol, bool bShowThousandSep )
+OUString ImplGetCurr( const LocaleDataWrapper& rLocaleDataWrapper, const BigInt &rNumber, sal_uInt16 nDigits, std::u16string_view rCurrSymbol, bool bShowThousandSep )
 {
     SAL_WARN_IF( nDigits >= 10, "vcl", "LongCurrency may only have 9 decimal places" );
 
@@ -192,8 +192,7 @@ bool ImplCurrencyGetValue( const OUString& rStr, BigInt& rValue,
             bRound = true;
         string::truncateToLength(aStr2, nDecDigits);
     }
-    if (aStr2.getLength() < nDecDigits)
-        string::padToLength(aStr2, nDecDigits, '0');
+    string::padToLength(aStr2, nDecDigits, '0');
 
     aStr1.append(aStr2);
     aStr  = aStr1.makeStringAndClear();
@@ -389,11 +388,11 @@ LongCurrencyBox::LongCurrencyBox(vcl::Window* pParent, WinBits nWinStyle)
 
 bool LongCurrencyBox::EventNotify( NotifyEvent& rNEvt )
 {
-    if( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if( rNEvt.GetType() == NotifyEventType::GETFOCUS )
     {
         MarkToBeReformatted( false );
     }
-    else if( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+    else if( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
     {
         if ( MustBeReformatted() )
         {

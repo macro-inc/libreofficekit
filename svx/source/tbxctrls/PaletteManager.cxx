@@ -41,6 +41,11 @@
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/util/XURLTransformer.hpp>
 #include <com/sun/star/util/URLTransformer.hpp>
+#include <docmodel/theme/ThemeColor.hxx>
+#include <docmodel/theme/ThemeColorJSON.hxx>
+#include <editeng/colritem.hxx>
+#include <svx/svxids.hrc>
+#include <editeng/memberids.h>
 
 #include <palettes.hxx>
 
@@ -61,8 +66,7 @@ PaletteManager::PaletteManager() :
     mnCurrentPalette(0),
     mnColorCount(0),
     mpBtnUpdater(nullptr),
-    maColorSelectFunction(PaletteManager::DispatchColorCommand),
-    m_context(comphelper::getProcessComponentContext())
+    maColorSelectFunction(PaletteManager::DispatchColorCommand)
 {
     SfxObjectShell* pDocSh = SfxObjectShell::Current();
     if(pDocSh)
@@ -76,6 +80,25 @@ PaletteManager::PaletteManager() :
     LoadPalettes();
     mnNumOfPalettes += m_Palettes.size();
 
+}
+
+PaletteManager::PaletteManager(const PaletteManager* pClone)
+    : mnMaxRecentColors(pClone->mnMaxRecentColors)
+    , mnNumOfPalettes(pClone->mnNumOfPalettes)
+    , mnCurrentPalette(pClone->mnCurrentPalette)
+    , mnColorCount(pClone->mnColorCount)
+    , mpBtnUpdater(nullptr)
+    , pColorList(pClone->pColorList)
+    , maRecentColors(pClone->maRecentColors)
+    , maColorSelectFunction(PaletteManager::DispatchColorCommand)
+{
+    for (const auto& a : pClone->m_Palettes)
+        m_Palettes.emplace_back(a->Clone());
+}
+
+PaletteManager* PaletteManager::Clone() const
+{
+    return new PaletteManager(this);
 }
 
 PaletteManager::~PaletteManager()
@@ -227,7 +250,7 @@ void PaletteManager::ReloadColorSet(SvxColorValueSet &rColorSet)
             std::set<Color> aColors = pDocSh->GetDocColors();
             mnColorCount = aColors.size();
             rColorSet.Clear();
-            rColorSet.addEntriesForColorSet(aColors, SvxResId( RID_SVXSTR_DOC_COLOR_PREFIX ) + " " );
+            rColorSet.addEntriesForColorSet(aColors, Concat2View(SvxResId( RID_SVXSTR_DOC_COLOR_PREFIX ) + " ") );
         }
     }
     else
@@ -294,7 +317,7 @@ void PaletteManager::SetPalette( sal_Int32 nPos )
     OUString aPaletteName(officecfg::Office::Common::UserColors::PaletteName::get());
     if (aPaletteName != GetPaletteName())
     {
-        std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create(m_context));
+        std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
         officecfg::Office::Common::UserColors::PaletteName::set(GetPaletteName(), batch);
         batch->commit();
     }
@@ -363,7 +386,7 @@ void PaletteManager::AddRecentColor(const Color& rRecentColor, const OUString& r
         aColorListRange[i] = static_cast<sal_Int32>(maRecentColors[i].first);
         aColorNameListRange[i] = maRecentColors[i].second;
     }
-    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create(m_context));
+    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
     officecfg::Office::Common::UserColors::RecentColor::set(aColorList, batch);
     officecfg::Office::Common::UserColors::RecentColorName::set(aColorNameList, batch);
     batch->commit();
@@ -402,6 +425,7 @@ void PaletteManager::PopupColorPicker(weld::Window* pParent, const OUString& aCo
 
 void PaletteManager::DispatchColorCommand(const OUString& aCommand, const svx::NamedThemedColor& rColor)
 {
+    using namespace css;
     using namespace css::uno;
     using namespace css::frame;
     using namespace css::beans;
@@ -417,13 +441,22 @@ void PaletteManager::DispatchColorCommand(const OUString& aCommand, const svx::N
     INetURLObject aObj( aCommand );
 
     std::vector<PropertyValue> aArgs{
-        comphelper::makePropertyValue(aObj.GetURLPath(), sal_Int32(rColor.m_aColor)),
+        comphelper::makePropertyValue(aObj.GetURLPath()+ ".Color", sal_Int32(rColor.m_aColor)),
     };
+
     if (rColor.m_nThemeIndex != -1)
     {
-        aArgs.push_back(comphelper::makePropertyValue("ColorThemeIndex", rColor.m_nThemeIndex));
-        aArgs.push_back(comphelper::makePropertyValue("ColorLumMod", rColor.m_nLumMod));
-        aArgs.push_back(comphelper::makePropertyValue("ColorLumOff", rColor.m_nLumOff));
+        model::ThemeColor aThemeColor;
+        aThemeColor.setType(model::convertToThemeColorType(rColor.m_nThemeIndex));
+        if (rColor.m_nLumMod != 10000)
+            aThemeColor.addTransformation({model::TransformationType::LumMod, rColor.m_nLumMod});
+        if (rColor.m_nLumMod != 0)
+            aThemeColor.addTransformation({model::TransformationType::LumOff, rColor.m_nLumOff});
+
+        uno::Any aAny;
+        aAny <<= OStringToOUString(model::theme::convertToJSON(aThemeColor), RTL_TEXTENCODING_UTF8);
+
+        aArgs.push_back(comphelper::makePropertyValue(aObj.GetURLPath() + ".ThemeReferenceJSON", aAny));
     }
 
     URL aTargetURL;

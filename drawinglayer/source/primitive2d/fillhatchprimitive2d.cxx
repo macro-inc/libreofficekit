@@ -19,12 +19,13 @@
 
 #include <drawinglayer/primitive2d/fillhatchprimitive2d.hxx>
 #include <texture/texture.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
+#include <utility>
 
 
 using namespace com::sun::star;
@@ -123,17 +124,17 @@ namespace drawinglayer::primitive2d
                 aNewLine.append(rMatrix * aEnd);
 
                 // create hairline
-                rContainer.push_back(new PolygonHairlinePrimitive2D(aNewLine, aHatchColor));
+                rContainer.push_back(new PolygonHairlinePrimitive2D(std::move(aNewLine), aHatchColor));
             }
         }
 
         FillHatchPrimitive2D::FillHatchPrimitive2D(
             const basegfx::B2DRange& rOutputRange,
             const basegfx::BColor& rBColor,
-            const attribute::FillHatchAttribute& rFillHatch)
+            attribute::FillHatchAttribute aFillHatch)
         :   maOutputRange(rOutputRange),
             maDefinitionRange(rOutputRange),
-            maFillHatch(rFillHatch),
+            maFillHatch(std::move(aFillHatch)),
             maBColor(rBColor)
         {
         }
@@ -142,10 +143,10 @@ namespace drawinglayer::primitive2d
             const basegfx::B2DRange& rOutputRange,
             const basegfx::B2DRange& rDefinitionRange,
             const basegfx::BColor& rBColor,
-            const attribute::FillHatchAttribute& rFillHatch)
+            attribute::FillHatchAttribute aFillHatch)
         :   maOutputRange(rOutputRange),
             maDefinitionRange(rDefinitionRange),
-            maFillHatch(rFillHatch),
+            maFillHatch(std::move(aFillHatch)),
             maBColor(rBColor)
         {
         }
@@ -173,10 +174,8 @@ namespace drawinglayer::primitive2d
 
         void FillHatchPrimitive2D::get2DDecomposition(Primitive2DDecompositionVisitor& rVisitor, const geometry::ViewInformation2D& rViewInformation) const
         {
-            std::unique_lock aGuard( m_aMutex );
             bool bAdaptDistance(0 != getFillHatch().getMinimalDiscreteDistance());
 
-            aGuard.unlock();
             if(bAdaptDistance)
             {
                 // behave view-dependent

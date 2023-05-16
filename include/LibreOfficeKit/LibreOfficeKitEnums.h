@@ -371,7 +371,7 @@ typedef enum
      * {
      *     "classification": "error" | "warning" | "info"
      *     "kind": "network" etc.
-     *     "code": a structured 32-bit error code, the ErrCode from LibreOffice's <tools/errcode.hxx>
+     *     "code": a structured 32-bit error code, the ErrCode from LibreOffice's <comphelper/errcode.hxx>
      *     "message": freeform description
      * }
      */
@@ -907,6 +907,55 @@ typedef enum
      * "file:///tmp/hello-world.pdf"
      */
     LOK_CALLBACK_EXPORT_FILE = 59,
+
+    /**
+     * Some attribute of this view has changed, that will cause it
+     * to completely re-render, eg. non-printing characters or
+     * or dark mode was toggled, and then distinct from other views.
+     *
+     * Payload is an opaque string that matches this set of states.
+     * this will be emitted after creating a new view.
+     */
+    LOK_CALLBACK_VIEW_RENDER_STATE = 60,
+
+    /**
+     * Informs the LibreOfficeKit client that the background color surrounding
+     * the document has changed.
+    */
+   LOK_CALLBACK_APPLICATION_BACKGROUND_COLOR = 61,
+
+    /**
+     * Accessibility event: a paragraph get focus.
+     * The payload is a json with the following structure.
+     *
+     *   {
+     *       "content": "<paragraph text>"
+     *       "position": N
+     *   }
+     *   where N is the position of the text cursor inside the focused paragraph.
+     */
+    LOK_CALLBACK_A11Y_FOCUS_CHANGED = 62,
+
+    /**
+     * Accessibility event: text cursor position has changed.
+     *
+     *  {
+     *      "position": N
+     *  }
+     *  where N is the position of the text cursor inside the focused paragraph.
+     */
+    LOK_CALLBACK_A11Y_CARET_CHANGED = 63,
+
+    /**
+     * Accessibility event: text cursor position has changed.
+     *
+     *  {
+     *      "start": N1
+     *      "end": N2
+     *  }
+     *  where [N1,N2] is the range of the text selection inside the focused paragraph.
+     */
+    LOK_CALLBACK_A11Y_TEXT_SELECTION_CHANGED = 64
 }
 LibreOfficeKitCallbackType;
 
@@ -1055,6 +1104,16 @@ static inline const char* lokCallbackTypeToString(int nType)
         return "LOK_CALLBACK_MEDIA_SHAPE";
     case LOK_CALLBACK_EXPORT_FILE:
         return "LOK_CALLBACK_EXPORT_FILE";
+    case LOK_CALLBACK_VIEW_RENDER_STATE:
+        return "LOK_CALLBACK_VIEW_RENDER_STATE";
+    case LOK_CALLBACK_APPLICATION_BACKGROUND_COLOR:
+        return "LOK_CALLBACK_APPLICATION_BACKGROUND_COLOR";
+    case LOK_CALLBACK_A11Y_FOCUS_CHANGED:
+        return "LOK_CALLBACK_A11Y_FOCUS_CHANGED";
+    case LOK_CALLBACK_A11Y_CARET_CHANGED:
+        return "LOK_CALLBACK_A11Y_CARET_CHANGED";
+    case LOK_CALLBACK_A11Y_TEXT_SELECTION_CHANGED:
+        return "LOK_CALLBACK_A11Y_TEXT_SELECTION_CHANGED";
     }
 
     assert(!"Unknown LibreOfficeKitCallbackType type.");
@@ -1063,11 +1122,11 @@ static inline const char* lokCallbackTypeToString(int nType)
 
 typedef enum
 {
-    /// A pressed gesture has started.
+    /// A mouse button has been pressed down.
     LOK_MOUSEEVENT_MOUSEBUTTONDOWN,
-    /// A pressed gesture has finished.
+    /// A mouse button has been let go.
     LOK_MOUSEEVENT_MOUSEBUTTONUP,
-    /// A change has happened during a press gesture.
+    /// The mouse has moved while a button is pressed.
     LOK_MOUSEEVENT_MOUSEMOVE
 }
 LibreOfficeKitMouseEventType;

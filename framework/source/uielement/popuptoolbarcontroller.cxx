@@ -27,8 +27,9 @@
 #include <svtools/toolboxcontroller.hxx>
 #include <toolkit/awt/vclxmenu.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
+#include <utility>
 #include <vcl/commandinfoprovider.hxx>
 #include <vcl/menu.hxx>
 #include <vcl/svapp.hxx>
@@ -70,7 +71,7 @@ public:
 
 protected:
     PopupMenuToolbarController( const css::uno::Reference< css::uno::XComponentContext >& rxContext,
-                                const OUString &rPopupCommand = OUString() );
+                                OUString aPopupCommand = OUString() );
     virtual void functionExecuted( const OUString &rCommand );
     virtual ToolBoxItemBits getDropDownStyle() const;
     void createPopupMenuController();
@@ -87,11 +88,11 @@ private:
 
 PopupMenuToolbarController::PopupMenuToolbarController(
     const css::uno::Reference< css::uno::XComponentContext >& xContext,
-    const OUString &rPopupCommand )
+    OUString aPopupCommand )
     : ToolBarBase( xContext, css::uno::Reference< css::frame::XFrame >(), /*aCommandURL*/OUString() )
     , m_bHasController( false )
     , m_bResourceURL( false )
-    , m_aPopupCommand( rPopupCommand )
+    , m_aPopupCommand(std::move( aPopupCommand ))
 {
 }
 
@@ -239,9 +240,9 @@ void PopupMenuToolbarController::createPopupMenuController()
     else
     {
         css::uno::Sequence<css::uno::Any> aArgs {
-            css::uno::makeAny(comphelper::makePropertyValue("Frame", m_xFrame)),
-            css::uno::makeAny(comphelper::makePropertyValue("ModuleIdentifier", m_sModuleName)),
-            css::uno::makeAny(comphelper::makePropertyValue("InToolbar", true))
+            css::uno::Any(comphelper::makePropertyValue("Frame", m_xFrame)),
+            css::uno::Any(comphelper::makePropertyValue("ModuleIdentifier", m_sModuleName)),
+            css::uno::Any(comphelper::makePropertyValue("InToolbar", true))
         };
 
         try
@@ -352,22 +353,21 @@ void GenericPopupToolbarController::statusChanged( const css::frame::FeatureStat
 
     if ( m_bReplaceWithLast && !rEvent.IsEnabled && m_xPopupMenu.is() )
     {
-        Menu* pVclMenu = comphelper::getFromUnoTunnel<VCLXMenu>( m_xPopupMenu )->GetMenu();
-
         ToolBox* pToolBox = nullptr;
         ToolBoxItemId nId;
         if ( getToolboxId( nId, &pToolBox ) && pToolBox->IsItemEnabled( nId ) )
         {
+            Menu* pVclMenu = comphelper::getFromUnoTunnel<VCLXMenu>( m_xPopupMenu )->GetMenu();
             pVclMenu->Activate();
             pVclMenu->Deactivate();
         }
 
-        for ( sal_uInt16 i = 0; i < pVclMenu->GetItemCount(); ++i )
+        for (sal_uInt16 i = 0, nCount = m_xPopupMenu->getItemCount(); i < nCount; ++i )
         {
-            sal_uInt16 nItemId = pVclMenu->GetItemId( i );
-            if ( nItemId && pVclMenu->IsItemEnabled( nItemId ) && !pVclMenu->GetPopupMenu( nItemId ) )
+            sal_uInt16 nItemId = m_xPopupMenu->getItemId(i);
+            if (nItemId && m_xPopupMenu->isItemEnabled(nItemId) && !m_xPopupMenu->getPopupMenu(nItemId).is())
             {
-                functionExecuted( pVclMenu->GetItemCommand( nItemId ) );
+                functionExecuted(m_xPopupMenu->getCommand(nItemId));
                 return;
             }
         }
@@ -693,12 +693,12 @@ void SAL_CALL NewToolbarController::execute( sal_Int16 /*KeyModifier*/ )
     OUString aURL, aTarget;
     if ( m_xPopupMenu.is() && m_nMenuId )
     {
-        // TODO investigate how to wrap Get/SetUserValue in css::awt::XMenu
         SolarMutexGuard aSolarMutexGuard;
-        Menu* pVclMenu = comphelper::getFromUnoTunnel<VCLXMenu>( m_xPopupMenu )->GetMenu();
-        aURL = pVclMenu->GetItemCommand( m_nMenuId );
+        aURL = m_xPopupMenu->getCommand(m_nMenuId);
 
-        MenuAttributes* pMenuAttributes( static_cast<MenuAttributes*>( pVclMenu->GetUserValue( m_nMenuId ) ) );
+        // TODO investigate how to wrap Get/SetUserValue in css::awt::XMenu
+        VCLXMenu* pMenu = comphelper::getFromUnoTunnel<VCLXMenu>(m_xPopupMenu);
+        MenuAttributes* pMenuAttributes(static_cast<MenuAttributes*>(pMenu->getUserValue(m_nMenuId)));
         if ( pMenuAttributes )
             aTarget = pMenuAttributes->aTargetFrame;
         else
@@ -723,12 +723,11 @@ sal_uInt16 NewToolbarController::getMenuIdForCommand( std::u16string_view rComma
 {
     if ( m_xPopupMenu.is() && !rCommand.empty() )
     {
-        Menu* pVclMenu( comphelper::getFromUnoTunnel<VCLXMenu>( m_xPopupMenu )->GetMenu() );
-        sal_uInt16 nCount = pVclMenu->GetItemCount();
+        sal_uInt16 nCount = m_xPopupMenu->getItemCount();
         for ( sal_uInt16 n = 0; n < nCount; ++n )
         {
-            sal_uInt16 nId = pVclMenu->GetItemId( n );
-            OUString aCmd( pVclMenu->GetItemCommand( nId ) );
+            sal_uInt16 nId = m_xPopupMenu->getItemId(n);
+            OUString aCmd(m_xPopupMenu->getCommand(nId));
 
             // match even if the menu command is more detailed
             // (maybe an additional query) #i28667#
@@ -750,10 +749,9 @@ void SAL_CALL NewToolbarController::updateImage()
     OUString aURL, aImageId;
     if ( m_xPopupMenu.is() && m_nMenuId )
     {
-        Menu* pVclMenu = comphelper::getFromUnoTunnel<VCLXMenu>( m_xPopupMenu )->GetMenu();
-        aURL = pVclMenu->GetItemCommand( m_nMenuId );
-
-        MenuAttributes* pMenuAttributes( static_cast<MenuAttributes*>( pVclMenu->GetUserValue( m_nMenuId ) ) );
+        aURL = m_xPopupMenu->getCommand(m_nMenuId);
+        VCLXMenu* pMenu = comphelper::getFromUnoTunnel<VCLXMenu>(m_xPopupMenu);
+        MenuAttributes* pMenuAttributes(static_cast<MenuAttributes*>(pMenu->getUserValue(m_nMenuId)));
         if ( pMenuAttributes )
             aImageId = pMenuAttributes->aImageId;
     }

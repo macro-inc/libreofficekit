@@ -15,7 +15,10 @@
 #include <com/sun/star/text/XText.hpp>
 #include <com/sun/star/text/XDocumentIndex.hpp>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <officecfg/Office/Common.hxx>
+#include <tools/zcodec.hxx>
+#include <vcl/filter/pdfdocument.hxx>
 #include <sfx2/linkmgr.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <unotxdoc.hxx>
@@ -38,7 +41,7 @@
 class Test : public SwModelTestBase
 {
 public:
-    Test() : SwModelTestBase() {}
+    Test() : SwModelTestBase("/sw/qa/extras/globalfilter/data/") {}
 
     void testEmbeddedGraphicRoundtrip();
     void testLinkedGraphicRT();
@@ -103,23 +106,10 @@ void Test::testEmbeddedGraphicRoundtrip()
     {
         // Check whether the export code swaps in the image which was swapped out before by auto mechanism
 
-        if (mxComponent.is())
-            mxComponent->dispose();
-
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/document_with_two_images.odt"), "com.sun.star.text.TextDocument");
+        createSwDoc("document_with_two_images.odt");
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         // Check whether graphic exported well after it was swapped out
         const OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
@@ -170,24 +160,12 @@ void Test::testLinkedGraphicRT()
 
     for (OUString const & rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-            mxComponent->dispose();
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/document_with_linked_graphic.odt"), "com.sun.star.text.TextDocument");
+        createSwDoc("document_with_linked_graphic.odt");
 
         const OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument *>(mxComponent.get());
         CPPUNIT_ASSERT_MESSAGE(sFailedMessage.getStr(), pTextDoc);
@@ -238,22 +216,10 @@ void Test::testImageWithSpecialID()
 
     for (OUString const & rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-            mxComponent->dispose();
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/images_with_special_IDs.odt"), "com.sun.star.text.TextDocument");
+        createSwDoc("images_with_special_IDs.odt");
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         // Check whether graphic exported well
         const OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
@@ -333,22 +299,10 @@ void Test::testGraphicShape()
 
     for (OUString const & rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-            mxComponent->dispose();
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/graphic_shape.odt"), "com.sun.star.text.TextDocument");
+        createSwDoc("graphic_shape.odt");
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         // Check whether graphic exported well
         const OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
@@ -404,7 +358,6 @@ std::vector<uno::Reference<graphic::XGraphic>>
     lcl_getGraphics(const uno::Reference<lang::XComponent>& xComponent)
 {
     std::vector<uno::Reference<graphic::XGraphic>> aGraphics;
-    uno::Reference<drawing::XShape> xShape;
 
     uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(xComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
@@ -440,21 +393,10 @@ void Test::testMultipleIdenticalGraphics()
 
     for (OUString const & rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-            mxComponent->dispose();
-
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/multiple_identical_graphics.odt"), "com.sun.star.text.TextDocument");
+        createSwDoc("multiple_identical_graphics.odt");
 
         // Export the document and import again for a check
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        mxComponent->dispose();
-
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         // Check whether graphic exported well
         const OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
@@ -493,62 +435,49 @@ void Test::testCharHighlightBody()
 
     for (OUString const & rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-            mxComponent->dispose();
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/char_highlight.docx"),
-                                      "com.sun.star.text.TextDocument");
+        createSwDoc("char_highlight.docx");
 
         const OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         const uno::Reference< text::XTextRange > xPara = getParagraph(1);
         // Both highlight and background
-        const sal_Int32 nBackColor(0x4F81BD);
+        const Color nBackColor(0x4F81BD);
         for( int nRun = 1; nRun <= 16; ++nRun )
         {
             const uno::Reference<beans::XPropertySet> xRun(getRun(xPara,nRun), uno::UNO_QUERY);
-            sal_Int32 nHighlightColor = 0;
+            Color nHighlightColor;
             switch( nRun )
             {
-                case 1: nHighlightColor = 0x000000; break; //black
-                case 2: nHighlightColor = 0x0000ff; break; //blue
-                case 3: nHighlightColor = 0x00ffff; break; //cyan
-                case 4: nHighlightColor = 0x00ff00; break; //green
-                case 5: nHighlightColor = 0xff00ff; break; //magenta
-                case 6: nHighlightColor = 0xff0000; break; //red
-                case 7: nHighlightColor = 0xffff00; break; //yellow
-                case 8: nHighlightColor = 0xffffff; break; //white
-                case 9: nHighlightColor = 0x000080;  break;//dark blue
-                case 10: nHighlightColor = 0x008080; break; //dark cyan
-                case 11: nHighlightColor = 0x008000; break; //dark green
-                case 12: nHighlightColor = 0x800080; break; //dark magenta
-                case 13: nHighlightColor = 0x800000; break; //dark red
-                case 14: nHighlightColor = 0x808000; break; //dark yellow
-                case 15: nHighlightColor = 0x808080; break; //dark gray
-                case 16: nHighlightColor = 0xC0C0C0; break; //light gray
+                case 1: nHighlightColor = COL_BLACK; break; //black 0x000000
+                case 2: nHighlightColor = COL_LIGHTBLUE; break; //light blue 0x0000ff
+                case 3: nHighlightColor = COL_LIGHTCYAN; break; //light cyan 0x00ffff
+                case 4: nHighlightColor = COL_LIGHTGREEN; break; //light green 0x00ff00
+                case 5: nHighlightColor = COL_LIGHTMAGENTA; break; //light magenta 0xff00ff
+                case 6: nHighlightColor = COL_LIGHTRED; break; //light red 0xff0000
+                case 7: nHighlightColor = COL_YELLOW; break; //yellow 0xffff00
+                case 8: nHighlightColor = COL_WHITE; break; //white 0xffffff
+                case 9: nHighlightColor = COL_BLUE;  break;//blue 0x000080
+                case 10: nHighlightColor = COL_CYAN; break; //cyan 0x008080
+                case 11: nHighlightColor = COL_GREEN; break; //green 0x008000
+                case 12: nHighlightColor = COL_MAGENTA; break; //magenta 0x800080
+                case 13: nHighlightColor = COL_RED; break; //red 0x800000
+                case 14: nHighlightColor = COL_BROWN; break; //brown 0x808000
+                case 15: nHighlightColor = COL_GRAY; break; //dark gray 0x808080
+                case 16: nHighlightColor = COL_LIGHTGRAY; break; //light gray 0xC0C0C0
             }
 
             if (rFilterName == "writer8")
             {
-                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(COL_TRANSPARENT), getProperty<sal_Int32>(xRun,"CharHighlight"));
-                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), nHighlightColor, getProperty<sal_Int32>(xRun,"CharBackColor"));
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_TRANSPARENT, getProperty<Color>(xRun,"CharHighlight"));
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), nHighlightColor, getProperty<Color>(xRun,"CharBackColor"));
             }
             else // MS filters
             {
-                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), nHighlightColor, getProperty<sal_Int32>(xRun,"CharHighlight"));
-                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), nBackColor, getProperty<sal_Int32>(xRun,"CharBackColor"));
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), nHighlightColor, getProperty<Color>(xRun,"CharHighlight"));
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), nBackColor, getProperty<Color>(xRun,"CharBackColor"));
             }
         }
 
@@ -557,21 +486,21 @@ void Test::testCharHighlightBody()
             const uno::Reference<beans::XPropertySet> xRun(getRun(xPara,18), uno::UNO_QUERY);
             if (rFilterName == "writer8")
             {
-                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(COL_TRANSPARENT), getProperty<sal_Int32>(xRun,"CharHighlight"));
-                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(0xff0000), getProperty<sal_Int32>(xRun,"CharBackColor"));
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_TRANSPARENT, getProperty<Color>(xRun,"CharHighlight"));
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_LIGHTRED, getProperty<Color>(xRun,"CharBackColor"));
             }
             else
             {
-                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(0xff0000), getProperty<sal_Int32>(xRun,"CharHighlight"));
-                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(COL_TRANSPARENT), getProperty<sal_Int32>(xRun,"CharBackColor"));
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_LIGHTRED, getProperty<Color>(xRun,"CharHighlight"));
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_TRANSPARENT, getProperty<Color>(xRun,"CharBackColor"));
             }
         }
 
         // Only background
         {
             const uno::Reference<beans::XPropertySet> xRun(getRun(xPara,19), uno::UNO_QUERY);
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(COL_TRANSPARENT), getProperty<sal_Int32>(xRun,"CharHighlight"));
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(0x0000ff), getProperty<sal_Int32>(xRun,"CharBackColor"));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_TRANSPARENT, getProperty<Color>(xRun,"CharHighlight"));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_LIGHTBLUE, getProperty<Color>(xRun,"CharBackColor"));
         }
     }
 }
@@ -589,33 +518,20 @@ void Test::testCharStyleHighlight()
 
     for (OUString const & rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-            mxComponent->dispose();
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/tdf138345_charstyle_highlight.odt"),
-                                      "com.sun.star.text.TextDocument");
+        createSwDoc("tdf138345_charstyle_highlight.odt");
 
         const OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         uno::Reference<beans::XPropertySet> xCharStyle;
         getStyles("CharacterStyles")->getByName("charBackground") >>= xCharStyle;
-        const sal_Int32 nBackColor(0xFFDBB6); //orange-y
+        const Color nBackColor(0xFFDBB6); //orange-y
 
         // Always export character style's background colour as shading, never as highlighting.
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(COL_TRANSPARENT), getProperty<sal_Int32>(xCharStyle,"CharHighlight"));
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), nBackColor, getProperty<sal_Int32>(xCharStyle,"CharBackColor"));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_TRANSPARENT, getProperty<Color>(xCharStyle,"CharHighlight"));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), nBackColor, getProperty<Color>(xCharStyle,"CharBackColor"));
     }
 }
 
@@ -635,8 +551,7 @@ void Test::testCharHighlight()
 
 void Test::testCharHighlightODF()
 {
-    mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/char_background_editing.docx"),
-                                      "com.sun.star.text.TextDocument");
+    createSwDoc("char_background_editing.docx");
 
     // don't check import, testMSCharBackgroundEditing already does that
 
@@ -647,42 +562,32 @@ void Test::testCharHighlightODF()
         switch (i)
         {
             case 1: // non-transparent highlight
-            xRun->setPropertyValue("CharBackColor", uno::makeAny(static_cast<sal_Int32>(128)));
-            xRun->setPropertyValue("CharBackTransparent", uno::makeAny(true));
-            xRun->setPropertyValue("CharHighlight", uno::makeAny(static_cast<sal_Int32>(64)));
+            xRun->setPropertyValue("CharBackColor", uno::Any(static_cast<sal_Int32>(128)));
+            xRun->setPropertyValue("CharBackTransparent", uno::Any(true));
+            xRun->setPropertyValue("CharHighlight", uno::Any(static_cast<sal_Int32>(64)));
             break;
 
             case 2: // transparent backcolor
-            xRun->setPropertyValue("CharBackColor", uno::makeAny(static_cast<sal_Int32>(128)));
-            xRun->setPropertyValue("CharBackTransparent", uno::makeAny(true));
-            xRun->setPropertyValue("CharHighlight", uno::makeAny(static_cast<sal_Int32>(COL_TRANSPARENT)));
+            xRun->setPropertyValue("CharBackColor", uno::Any(static_cast<sal_Int32>(128)));
+            xRun->setPropertyValue("CharBackTransparent", uno::Any(true));
+            xRun->setPropertyValue("CharHighlight", uno::Any(static_cast<sal_Int32>(COL_TRANSPARENT)));
             break;
 
             case 3: // non-transparent backcolor
-            xRun->setPropertyValue("CharBackColor", uno::makeAny(static_cast<sal_Int32>(128)));
-            xRun->setPropertyValue("CharBackTransparent", uno::makeAny(false));
-            xRun->setPropertyValue("CharHighlight", uno::makeAny(static_cast<sal_Int32>(COL_TRANSPARENT)));
+            xRun->setPropertyValue("CharBackColor", uno::Any(static_cast<sal_Int32>(128)));
+            xRun->setPropertyValue("CharBackTransparent", uno::Any(false));
+            xRun->setPropertyValue("CharHighlight", uno::Any(static_cast<sal_Int32>(COL_TRANSPARENT)));
             break;
 
             case 4: // non-transparent highlight again
-            xRun->setPropertyValue("CharBackColor", uno::makeAny(static_cast<sal_Int32>(128)));
-            xRun->setPropertyValue("CharBackTransparent", uno::makeAny(false));
-            xRun->setPropertyValue("CharHighlight", uno::makeAny(static_cast<sal_Int32>(64)));
+            xRun->setPropertyValue("CharBackColor", uno::Any(static_cast<sal_Int32>(128)));
+            xRun->setPropertyValue("CharBackTransparent", uno::Any(false));
+            xRun->setPropertyValue("CharHighlight", uno::Any(static_cast<sal_Int32>(64)));
             break;
         }
     }
 
-    uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-    utl::MediaDescriptor aMediaDescriptor;
-    aMediaDescriptor["FilterName"] <<= OUString("writer8");
-
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-
-    uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-    xComponent->dispose();
-    mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+    reload("writer8", nullptr);
 
     xPara.set(getParagraph(1));
     for (int i = 1; i <= 4; ++i)
@@ -692,19 +597,19 @@ void Test::testCharHighlightODF()
         switch (i)
         {
             case 1: // non-transparent highlight
-            CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(64), getProperty<sal_Int32>(xRun, "CharBackColor"));
+            CPPUNIT_ASSERT_EQUAL(Color(0x000040), getProperty<Color>(xRun, "CharBackColor"));
             CPPUNIT_ASSERT_EQUAL(false, getProperty<bool>(xRun, "CharBackTransparent"));
             break;
             case 2: // transparent backcolor
-            CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(COL_TRANSPARENT), getProperty<sal_Int32>(xRun, "CharBackColor"));
+            CPPUNIT_ASSERT_EQUAL(COL_TRANSPARENT, getProperty<Color>(xRun, "CharBackColor"));
             CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xRun, "CharBackTransparent"));
             break;
             case 3: // non-transparent backcolor
-            CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(128), getProperty<sal_Int32>(xRun, "CharBackColor"));
+            CPPUNIT_ASSERT_EQUAL(COL_BLUE, getProperty<Color>(xRun, "CharBackColor"));
             CPPUNIT_ASSERT_EQUAL(false, getProperty<bool>(xRun, "CharBackTransparent"));
             break;
             case 4: // non-transparent highlight again
-            CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(64), getProperty<sal_Int32>(xRun, "CharBackColor"));
+            CPPUNIT_ASSERT_EQUAL(Color(0x000040), getProperty<Color>(xRun, "CharBackColor"));
             CPPUNIT_ASSERT_EQUAL(false, getProperty<bool>(xRun, "CharBackTransparent"));
             break;
         }
@@ -725,11 +630,7 @@ void Test::testMSCharBackgroundEditing()
 
     for (OUString const & rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-            mxComponent->dispose();
-
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/char_background_editing.docx"),
-                                      "com.sun.star.text.TextDocument");
+        createSwDoc("char_background_editing.docx");
 
         const OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
 
@@ -737,20 +638,20 @@ void Test::testMSCharBackgroundEditing()
         uno::Reference< text::XTextRange > xPara = getParagraph(1);
         {
             uno::Reference<beans::XPropertySet> xRun(getRun(xPara,1), uno::UNO_QUERY);
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(COL_TRANSPARENT), getProperty<sal_Int32>(xRun,"CharHighlight"));
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(0xff0000), getProperty<sal_Int32>(xRun,"CharBackColor"));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_TRANSPARENT, getProperty<Color>(xRun,"CharHighlight"));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_LIGHTRED, getProperty<Color>(xRun,"CharBackColor"));
 
             xRun.set(getRun(xPara,2), uno::UNO_QUERY);
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(0x0000ff), getProperty<sal_Int32>(xRun,"CharHighlight"));
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(COL_TRANSPARENT), getProperty<sal_Int32>(xRun,"CharBackColor"));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_LIGHTBLUE, getProperty<Color>(xRun,"CharHighlight"));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_TRANSPARENT, getProperty<Color>(xRun,"CharBackColor"));
 
             xRun.set(getRun(xPara,3), uno::UNO_QUERY);
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(0x0000ff), getProperty<sal_Int32>(xRun,"CharHighlight"));
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(0xff0000), getProperty<sal_Int32>(xRun,"CharBackColor"));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_LIGHTBLUE, getProperty<Color>(xRun,"CharHighlight"));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_LIGHTRED, getProperty<Color>(xRun,"CharBackColor"));
 
             xRun.set(getRun(xPara,4), uno::UNO_QUERY);
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(COL_TRANSPARENT), getProperty<sal_Int32>(xRun,"CharHighlight"));
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(COL_TRANSPARENT), getProperty<sal_Int32>(xRun,"CharBackColor"));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_TRANSPARENT, getProperty<Color>(xRun,"CharHighlight"));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_TRANSPARENT, getProperty<Color>(xRun,"CharBackColor"));
         }
 
         // Simulate editing
@@ -758,17 +659,17 @@ void Test::testMSCharBackgroundEditing()
         {
             uno::Reference<beans::XPropertySet> xRun(getRun(xPara,i), uno::UNO_QUERY);
             // Change background
-            sal_Int32 nBackColor = 0;
+            Color nBackColor;
             switch( i )
             {
-                case 1: nBackColor = 0x000000; break; //black
-                case 2: nBackColor = 0x00ffff; break; //cyan
-                case 3: nBackColor = 0x00ff00; break; //green
-                case 4: nBackColor = 0xff00ff; break; //magenta
+                case 1: nBackColor = COL_BLACK; break; //black 0x000000
+                case 2: nBackColor = COL_LIGHTCYAN; break; //cyan 0x00ffff
+                case 3: nBackColor = COL_LIGHTGREEN; break; //green 0x00ff00
+                case 4: nBackColor = COL_LIGHTMAGENTA; break; //magenta 0xff00ff
             }
-            xRun->setPropertyValue("CharBackColor", uno::makeAny(nBackColor));
+            xRun->setPropertyValue("CharBackColor", uno::Any(nBackColor));
             // Remove highlighting
-            xRun->setPropertyValue("CharHighlight", uno::makeAny(static_cast<sal_Int32>(COL_TRANSPARENT)));
+            xRun->setPropertyValue("CharHighlight", uno::Any(COL_TRANSPARENT));
             // Remove shading marker
             uno::Sequence<beans::PropertyValue> aGrabBag = getProperty<uno::Sequence<beans::PropertyValue> >(xRun,"CharInteropGrabBag");
             for (beans::PropertyValue& rProp : asNonConstRange(aGrabBag))
@@ -779,47 +680,37 @@ void Test::testMSCharBackgroundEditing()
                     rProp.Value <<= false;
                 }
             }
-            xRun->setPropertyValue("CharInteropGrabBag", uno::makeAny(aGrabBag));
+            xRun->setPropertyValue("CharInteropGrabBag", uno::Any(aGrabBag));
         }
 
         SvtFilterOptions& rOpt = SvtFilterOptions::Get();
         rOpt.SetCharBackground2Highlighting();
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         // Check whether background was exported as highlighting
         xPara.set(getParagraph(1));
         for( int i = 1; i <= 4; ++i )
         {
-            sal_Int32 nBackColor = 0;
+            Color nBackColor;
             switch( i )
             {
-                case 1: nBackColor = 0x000000; break; //black
-                case 2: nBackColor = 0x00ffff; break; //cyan
-                case 3: nBackColor = 0x00ff00; break; //green
-                case 4: nBackColor = 0xff00ff; break; //magenta
+                case 1: nBackColor = COL_BLACK; break; //black 0x000000
+                case 2: nBackColor = COL_LIGHTCYAN; break; //light cyan 0x00ffff
+                case 3: nBackColor = COL_LIGHTGREEN; break; //light green 0x00ff00
+                case 4: nBackColor = COL_LIGHTMAGENTA; break; //light magenta 0xff00ff
             }
             const uno::Reference<beans::XPropertySet> xRun(getRun(xPara,i), uno::UNO_QUERY);
             if (rFilterName == "writer8")
             {
-                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(COL_TRANSPARENT), getProperty<sal_Int32>(xRun,"CharHighlight"));
-                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), nBackColor, getProperty<sal_Int32>(xRun,"CharBackColor"));
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_TRANSPARENT, getProperty<Color>(xRun,"CharHighlight"));
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), nBackColor, getProperty<Color>(xRun,"CharBackColor"));
             }
             else
             {
-                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), nBackColor, getProperty<sal_Int32>(xRun,"CharHighlight"));
-                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), static_cast<sal_Int32>(COL_TRANSPARENT), getProperty<sal_Int32>(xRun,"CharBackColor"));
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), nBackColor, getProperty<Color>(xRun,"CharHighlight"));
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_TRANSPARENT, getProperty<Color>(xRun,"CharBackColor"));
             }
         }
     }
@@ -838,10 +729,7 @@ void Test::testCharBackgroundToHighlighting()
 
     for (OUString const & rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-            mxComponent->dispose();
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/char_background.odt"),
-                                      "com.sun.star.text.TextDocument");
+        createSwDoc("char_background.odt");
 
         OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
 
@@ -850,48 +738,38 @@ void Test::testCharBackgroundToHighlighting()
         rOpt.SetCharBackground2Highlighting();
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         // Check highlight color
         const uno::Reference< text::XTextRange > xPara = getParagraph(1);
         for( int nRun = 1; nRun <= 19; ++nRun )
         {
             const uno::Reference<beans::XPropertySet> xRun(getRun(xPara,nRun), uno::UNO_QUERY);
-            sal_Int32 nHighlightColor = 0;
+            Color nHighlightColor;
             switch( nRun )
             {
-                case 1: nHighlightColor = 0x000000; break; //black
-                case 2: nHighlightColor = 0xffff00; break; //yellow
-                case 3: nHighlightColor = 0xff00ff; break; //magenta
-                case 4: nHighlightColor = 0x00ffff; break; //cyan
-                case 5: nHighlightColor = 0xffff00; break; //yellow
-                case 6: nHighlightColor = 0xff0000; break; //red
-                case 7: nHighlightColor = 0x0000ff; break; //blue
-                case 8: nHighlightColor = 0x00ff00; break; //green
-                case 9: nHighlightColor = 0x008000; break; //dark green
-                case 10: nHighlightColor = 0x800080; break; //dark magenta
-                case 11: nHighlightColor = 0x000080; break; //dark blue
-                case 12: nHighlightColor = 0x808000; break; //dark yellow
-                case 13: nHighlightColor = 0x808080; break; //dark gray
-                case 14: nHighlightColor = 0x000000; break; //black
-                case 15: nHighlightColor = 0xff0000; break; //red
-                case 16: nHighlightColor = 0xC0C0C0; break; //light gray
-                case 17: nHighlightColor = 0x800000; break; //dark red
-                case 18: nHighlightColor = 0x808080; break; //dark gray
-                case 19: nHighlightColor = 0xffff00; break; //yellow
+                case 1: nHighlightColor = COL_BLACK; break; //black 0x000000
+                case 2: nHighlightColor = COL_YELLOW; break; //yellow 0xffff00
+                case 3: nHighlightColor = COL_LIGHTMAGENTA; break; //light magenta 0xff00ff
+                case 4: nHighlightColor = COL_LIGHTCYAN; break; //light cyan 0x00ffff
+                case 5: nHighlightColor = COL_YELLOW; break; //yellow 0xffff00
+                case 6: nHighlightColor = COL_LIGHTRED; break; //light red 0xff0000
+                case 7: nHighlightColor = COL_LIGHTBLUE; break; //light blue 0x0000ff
+                case 8: nHighlightColor = COL_LIGHTGREEN; break; //light green 0x00ff00
+                case 9: nHighlightColor = COL_GREEN; break; //dark green 0x008000
+                case 10: nHighlightColor = COL_MAGENTA; break; //dark magenta 0x800080
+                case 11: nHighlightColor = COL_BLUE; break; //dark blue 0x000080
+                case 12: nHighlightColor = COL_BROWN; break; //brown 0x808000
+                case 13: nHighlightColor = COL_GRAY; break; //dark gray 0x808080
+                case 14: nHighlightColor = COL_BLACK; break; //black 0x000000
+                case 15: nHighlightColor = COL_LIGHTRED; break; //light red 0xff0000
+                case 16: nHighlightColor = COL_LIGHTGRAY; break; //light gray 0xC0C0C0
+                case 17: nHighlightColor = COL_RED; break; //dark red 0x800000
+                case 18: nHighlightColor = COL_GRAY; break; //dark gray 0x808080
+                case 19: nHighlightColor = COL_YELLOW; break; //yellow 0xffff00
             }
             const OString sMessage = sFailedMessage +". Index of run with unmatched color: " + OString::number(nRun);
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sMessage.getStr(), nHighlightColor, getProperty<sal_Int32>(xRun,"CharHighlight"));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sMessage.getStr(), nHighlightColor, getProperty<Color>(xRun,"CharHighlight"));
         }
     }
 }
@@ -903,10 +781,10 @@ void Test::testSkipImages()
     // during DOC and DOCX import, using the "SkipImages" FilterOptions.
 
     std::pair<OUString, OUString> aFilterNames[] = {
-        { "/sw/qa/extras/globalfilter/data/skipimages.doc", "" },
-        { "/sw/qa/extras/globalfilter/data/skipimages.doc", "SkipImages" },
-        { "/sw/qa/extras/globalfilter/data/skipimages.docx", "" },
-        { "/sw/qa/extras/globalfilter/data/skipimages.docx", "SkipImages" }
+        { "skipimages.doc", "" },
+        { "skipimages.doc", "SkipImages" },
+        { "skipimages.docx", "" },
+        { "skipimages.docx", "SkipImages" }
     };
 
     for (auto const & rFilterNamePair : aFilterNames)
@@ -914,22 +792,9 @@ void Test::testSkipImages()
         bool bSkipImages = !rFilterNamePair.second.isEmpty();
         OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterNamePair.first.toUtf8();
 
-        if (mxComponent.is())
-            mxComponent->dispose();
-
-        if (bSkipImages)
-        {
-            // FilterOptions parameter
-            uno::Sequence<beans::PropertyValue> args(comphelper::InitPropertySequence({
-                    { "FilterOptions", uno::Any(rFilterNamePair.second) }
-            }));
-            mxComponent = loadFromDesktop(m_directories.getURLFromSrc(rFilterNamePair.first), "com.sun.star.text.TextDocument", args);
-            sFailedMessage += " - " + rFilterNamePair.second.toUtf8();
-        }
-        else
-        {
-            mxComponent = loadFromDesktop(m_directories.getURLFromSrc(rFilterNamePair.first), "com.sun.star.text.TextDocument");
-        }
+        setImportFilterOptions(rFilterNamePair.second);
+        createSwDoc(rFilterNamePair.first.toUtf8().getStr());
+        sFailedMessage += " - " + rFilterNamePair.second.toUtf8();
 
         // Check shapes (images, textboxes, custom shapes)
         uno::Reference<drawing::XShape> xShape;
@@ -988,7 +853,7 @@ static auto verifyNestedFieldmark(OUString const& rTestName,
     SwPosition const innerPos(*node1.GetNode().GetTextNode(),
         node1.GetNode().GetTextNode()->GetText().indexOf(CH_TXT_ATR_FIELDSTART));
     CPPUNIT_ASSERT_EQUAL_MESSAGE(rTestName.toUtf8().getStr(),
-            sal_Int32(1), innerPos.nContent.GetIndex());
+            sal_Int32(1), innerPos.GetContentIndex());
     ::sw::mark::IFieldmark *const pInner(rIDMA.getFieldmarkAt(innerPos));
     CPPUNIT_ASSERT_MESSAGE(rTestName.toUtf8().getStr(), pInner);
     OUString const innerString(SwPaM(pInner->GetMarkPos(), pInner->GetOtherMarkPos()).GetText());
@@ -1004,7 +869,7 @@ static auto verifyNestedFieldmark(OUString const& rTestName,
     SwPosition const outerPos(*node2.GetNode().GetTextNode(),
         node2.GetNode().GetTextNode()->GetText().indexOf(CH_TXT_ATR_FIELDSTART));
     CPPUNIT_ASSERT_EQUAL_MESSAGE(rTestName.toUtf8().getStr(),
-            sal_Int32(0), outerPos.nContent.GetIndex());
+            sal_Int32(0), outerPos.GetContentIndex());
     ::sw::mark::IFieldmark const*const pOuter(rIDMA.getFieldmarkAt(outerPos));
     CPPUNIT_ASSERT_MESSAGE(rTestName.toUtf8().getStr(), pOuter);
     OUString const outerString(SwPaM(pOuter->GetMarkPos(), pOuter->GetOtherMarkPos()).GetText());
@@ -1042,36 +907,21 @@ void Test::testNestedFieldmark()
     pBatch->commit();
 
     std::pair<OUString, OUString> const aFilterNames[] = {
+        {"writer8", "fieldmark_QUOTE_nest.fodt"},
         {"Office Open XML Text", "fieldmark_QUOTE_nest.docx"},
         {"Rich Text Format", "fieldmark_QUOTE_nest.rtf"},
     };
 
     for (auto const & rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-        {
-            mxComponent->dispose();
-        }
-
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(
-                OUStringConcatenation("/sw/qa/extras/globalfilter/data/" + rFilterName.second)),
-            "com.sun.star.text.TextDocument");
+        createSwDoc(rFilterName.second.toUtf8().getStr());
 
         verifyNestedFieldmark(rFilterName.first + ", load", mxComponent);
 
         // Export the document and import again
-        uno::Reference<frame::XStorable> const xStorable(mxComponent, uno::UNO_QUERY);
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName.first;
-
-        utl::TempFile aTempFile;
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        mxComponent->dispose();
-
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.first.toUtf8().getStr(), nullptr);
 
         verifyNestedFieldmark(rFilterName.first + " exported-reload", mxComponent);
-        aTempFile.EnableKillingFile();
     }
 }
 
@@ -1109,9 +959,7 @@ auto Test::verifyText13(char const*const pTestName) -> void
 void Test::testODF13()
 {
     // import
-    mxComponent = loadFromDesktop(m_directories.getURLFromSrc(
-            u"/sw/qa/extras/globalfilter/data/text13e.odt"),
-        "com.sun.star.text.TextDocument");
+    createSwDoc("text13e.odt");
 
     // check model
     verifyText13("import");
@@ -1130,15 +978,10 @@ void Test::testODF13()
         officecfg::Office::Common::Save::ODF::DefaultVersion::set(10, pBatch);
         pBatch->commit();
 
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= OUString("writer8");
-
-        utl::TempFile aTempFile;
-        uno::Reference<frame::XStorable> const xStorable(mxComponent, uno::UNO_QUERY);
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
+        reload("writer8", nullptr);
 
         // check XML
-        xmlDocUniquePtr pContentXml = parseExportInternal(aTempFile.GetURL(), "content.xml");
+        xmlDocUniquePtr pContentXml = parseExport("content.xml");
         assertXPath(pContentXml, "/office:document-content/office:automatic-styles/style:style/style:paragraph-properties[@style:contextual-spacing='true']");
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:p/office:annotation/meta:creator-initials");
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:p/office:annotation/loext:sender-initials", 0);
@@ -1146,15 +989,11 @@ void Test::testODF13()
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:illustration-index/text:illustration-index-source/text:illustration-index-entry-template/loext:index-entry-link-start", 0);
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:illustration-index/text:illustration-index-source/text:illustration-index-entry-template/text:index-entry-link-end");
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:illustration-index/text:illustration-index-source/text:illustration-index-entry-template/loext:index-entry-link-end", 0);
-        xmlDocUniquePtr pStylesXml = parseExportInternal(aTempFile.GetURL(), "styles.xml");
+        xmlDocUniquePtr pStylesXml = parseExport("styles.xml");
         assertXPath(pStylesXml, "/office:document-styles/office:master-styles/style:master-page/style:header-first");
         assertXPath(pStylesXml, "/office:document-styles/office:master-styles/style:master-page/loext:header-first", 0);
         assertXPath(pStylesXml, "/office:document-styles/office:master-styles/style:master-page/style:footer-first");
         assertXPath(pStylesXml, "/office:document-styles/office:master-styles/style:master-page/loext:footer-first", 0);
-
-        // reload
-        mxComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
 
         // check model
         verifyText13("1.3 reload");
@@ -1166,15 +1005,16 @@ void Test::testODF13()
         officecfg::Office::Common::Save::ODF::DefaultVersion::set(9, pBatch);
         pBatch->commit();
 
+        // FIXME: it's not possible to use 'reload' here because the validation fails with
+        // Error: unexpected attribute "loext:contextual-spacing"
         utl::MediaDescriptor aMediaDescriptor;
         aMediaDescriptor["FilterName"] <<= OUString("writer8");
 
-        utl::TempFile aTempFile;
         uno::Reference<frame::XStorable> const xStorable(mxComponent, uno::UNO_QUERY);
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
+        xStorable->storeToURL(maTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
 
         // check XML
-        xmlDocUniquePtr pContentXml = parseExportInternal(aTempFile.GetURL(), "content.xml");
+        xmlDocUniquePtr pContentXml = parseExport("content.xml");
         assertXPath(pContentXml, "/office:document-content/office:automatic-styles/style:style/style:paragraph-properties[@loext:contextual-spacing='true']");
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:p/office:annotation/loext:sender-initials");
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:p/office:annotation/meta:creator-initials", 0);
@@ -1182,7 +1022,7 @@ void Test::testODF13()
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:illustration-index/text:illustration-index-source/text:illustration-index-entry-template/text:index-entry-link-start", 0);
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:illustration-index/text:illustration-index-source/text:illustration-index-entry-template/loext:index-entry-link-end");
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:illustration-index/text:illustration-index-source/text:illustration-index-entry-template/text:index-entry-link-end", 0);
-        xmlDocUniquePtr pStylesXml = parseExportInternal(aTempFile.GetURL(), "styles.xml");
+        xmlDocUniquePtr pStylesXml = parseExport("styles.xml");
         assertXPath(pStylesXml, "/office:document-styles/office:master-styles/style:master-page/loext:header-first");
         assertXPath(pStylesXml, "/office:document-styles/office:master-styles/style:master-page/style:header-first", 0);
         assertXPath(pStylesXml, "/office:document-styles/office:master-styles/style:master-page/loext:footer-first");
@@ -1190,7 +1030,7 @@ void Test::testODF13()
 
         // reload
         mxComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        mxComponent = loadFromDesktop(maTempFile.GetURL(), "com.sun.star.text.TextDocument");
 
         // check model
         verifyText13("1.2 Extended reload");
@@ -1202,15 +1042,11 @@ void Test::testODF13()
         officecfg::Office::Common::Save::ODF::DefaultVersion::set(4, pBatch);
         pBatch->commit();
 
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= OUString("writer8");
-
-        utl::TempFile aTempFile;
-        uno::Reference<frame::XStorable> const xStorable(mxComponent, uno::UNO_QUERY);
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
+        // don't reload - no point
+        save("writer8");
 
         // check XML
-        xmlDocUniquePtr pContentXml = parseExportInternal(aTempFile.GetURL(), "content.xml");
+        xmlDocUniquePtr pContentXml = parseExport("content.xml");
         assertXPathNoAttribute(pContentXml, "/office:document-content/office:automatic-styles/style:style/style:paragraph-properties", "contextual-spacing");
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:p/office:annotation/meta:creator-initials", 0);
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:p/office:annotation/loext:sender-initials", 0);
@@ -1218,13 +1054,11 @@ void Test::testODF13()
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:illustration-index/text:illustration-index-source/text:illustration-index-entry-template/loext:index-entry-link-start", 0);
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:illustration-index/text:illustration-index-source/text:illustration-index-entry-template/text:index-entry-link-end", 0);
         assertXPath(pContentXml, "/office:document-content/office:body/office:text/text:illustration-index/text:illustration-index-source/text:illustration-index-entry-template/loext:index-entry-link-end", 0);
-        xmlDocUniquePtr pStylesXml = parseExportInternal(aTempFile.GetURL(), "styles.xml");
+        xmlDocUniquePtr pStylesXml = parseExport("styles.xml");
         assertXPath(pStylesXml, "/office:document-styles/office:master-styles/style:master-page/style:header-first", 0);
         assertXPath(pStylesXml, "/office:document-styles/office:master-styles/style:master-page/loext:header-first", 0);
         assertXPath(pStylesXml, "/office:document-styles/office:master-styles/style:master-page/style:footer-first", 0);
         assertXPath(pStylesXml, "/office:document-styles/office:master-styles/style:master-page/loext:footer-first", 0);
-
-        // don't reload - no point
     }
 }
 
@@ -1237,12 +1071,10 @@ void Test::testRedlineFlags()
         "Office Open XML Text",
     };
 
-    mxComponent = loadFromDesktop("private:factory/swriter", "com.sun.star.text.TextDocument");
-    SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument *>(mxComponent.get());
-    CPPUNIT_ASSERT(pTextDoc);
-    SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
 
-    SwPaM pam(SwPosition(SwNodeIndex(pDoc->GetNodes().GetEndOfContent(), -1)));
+    SwPaM pam(SwPosition(pDoc->GetNodes().GetEndOfContent(), SwNodeOffset(-1)));
     pDoc->getIDocumentContentOperations().InsertString(pam, "foo bar baz");
 
     IDocumentRedlineAccess & rIDRA(pDoc->getIDocumentRedlineAccess());
@@ -1264,14 +1096,7 @@ void Test::testRedlineFlags()
     for (OUString const & rFilterName : aFilterNames)
     {
         // export the document
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(),
-                aMediaDescriptor.getAsConstPropertyValueList());
+        save(rFilterName);
 
         // tdf#97103 check that redline mode is properly restored
         CPPUNIT_ASSERT_EQUAL_MESSAGE(
@@ -1293,10 +1118,7 @@ void Test::testBulletAsImage()
     {
         OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
 
-        if (mxComponent.is())
-            mxComponent->dispose();
-
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/BulletAsImage.odt"), "com.sun.star.text.TextDocument");
+        createSwDoc("BulletAsImage.odt");
 
         // Check if import was successful
         {
@@ -1345,19 +1167,7 @@ void Test::testBulletAsImage()
         }
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-
-
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference<lang::XComponent> xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         {
             uno::Reference<text::XTextRange> xPara(getParagraph(1));
@@ -1420,6 +1230,111 @@ void Test::testBulletAsImage()
     }
 }
 
+CPPUNIT_TEST_FIXTURE(Test, testTdf143311)
+{
+    createSwDoc("tdf143311-1.docx");
+    CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(getShape(1), "Decorative"));
+    // check DOCX filters
+    saveAndReload("Office Open XML Text");
+    CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(getShape(1), "Decorative"));
+    {
+        // tdf#153925 not imported - check default and set it to test ODF filters
+        uno::Reference<beans::XPropertySet> const xStyle(getStyles("FrameStyles")->getByName("Formula"), uno::UNO_QUERY_THROW);
+        CPPUNIT_ASSERT_EQUAL(false, getProperty<bool>(xStyle, "Decorative"));
+        xStyle->setPropertyValue("Decorative", uno::Any(true));
+    }
+    // check ODF filters
+    saveAndReload("writer8");
+    CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(getShape(1), "Decorative"));
+    CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(getStyles("FrameStyles")->getByName("Formula"), "Decorative"));
+
+    // check PDF export
+    utl::MediaDescriptor aMediaDescriptor;
+    aMediaDescriptor["FilterName"] <<= OUString("writer_pdf_Export");
+    // Enable PDF/UA
+    uno::Sequence<beans::PropertyValue> aFilterData(
+        comphelper::InitPropertySequence({ { "PDFUACompliance", uno::Any(true) } }));
+    aMediaDescriptor["FilterData"] <<= aFilterData;
+    css::uno::Reference<frame::XStorable> xStorable(mxComponent, css::uno::UNO_QUERY_THROW);
+    xStorable->storeToURL(maTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
+
+    vcl::filter::PDFDocument aDocument;
+    SvFileStream aStream(maTempFile.GetURL(), StreamMode::READ);
+    CPPUNIT_ASSERT(aDocument.Read(aStream));
+
+    // The document has one page.
+    std::vector<vcl::filter::PDFObjectElement*> aPages = aDocument.GetPages();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), aPages.size());
+
+    vcl::filter::PDFObjectElement* pContents = aPages[0]->LookupObject("Contents");
+    CPPUNIT_ASSERT(pContents);
+    vcl::filter::PDFStreamElement* pStream = pContents->GetStream();
+    CPPUNIT_ASSERT(pStream);
+    SvMemoryStream& rObjectStream = pStream->GetMemory();
+    // Uncompress it.
+    SvMemoryStream aUncompressed;
+    ZCodec aZCodec;
+    aZCodec.BeginCompression();
+    rObjectStream.Seek(0);
+    aZCodec.Decompress(rObjectStream, aUncompressed);
+    CPPUNIT_ASSERT(aZCodec.EndCompression());
+
+    auto pStart = static_cast<const char*>(aUncompressed.GetData());
+    const char* const pEnd = pStart + aUncompressed.GetSize();
+
+    enum
+    {
+        Default,
+        Artifact,
+        Tagged
+    } state
+        = Default;
+
+    auto nLine(0);
+    auto nTagged(0);
+    auto nArtifacts(0);
+    while (true)
+    {
+        ++nLine;
+        auto const pLine = ::std::find(pStart, pEnd, '\n');
+        if (pLine == pEnd)
+        {
+            break;
+        }
+        std::string_view const line(pStart, pLine - pStart);
+        pStart = pLine + 1;
+        if (!line.empty() && line[0] != '%')
+        {
+            ::std::cerr << nLine << ": " << line << "\n";
+            if (line == "/Artifact BMC")
+            {
+                CPPUNIT_ASSERT_EQUAL_MESSAGE("unexpected nesting", Default, state);
+                state = Artifact;
+                ++nArtifacts;
+            }
+            else if (o3tl::starts_with(line, "/Standard<</MCID") && o3tl::ends_with(line, ">>BDC"))
+            {
+                CPPUNIT_ASSERT_EQUAL_MESSAGE("unexpected nesting", Default, state);
+                state = Tagged;
+                ++nTagged;
+            }
+            else if (line == "EMC")
+            {
+                CPPUNIT_ASSERT_MESSAGE("unexpected end", state != Default);
+                state = Default;
+            }
+            else if (nLine > 1) // first line is expected "0.1 w"
+            {
+                CPPUNIT_ASSERT_MESSAGE("unexpected content outside MCS", state != Default);
+            }
+        }
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("unclosed MCS", Default, state);
+    CPPUNIT_ASSERT_EQUAL(static_cast<decltype(nTagged)>(25), nTagged); // text in body
+    // 1 decorative image + 1 pre-existing rectangle border or something
+    CPPUNIT_ASSERT(nArtifacts >= 2);
+}
+
 void Test::testTextFormField()
 {
     const OUString aFilterNames[] = {
@@ -1430,22 +1345,12 @@ void Test::testTextFormField()
 
     for (const OUString& rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-            mxComponent->dispose();
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/text_form_field.odt"), "com.sun.star.text.TextDocument");
+        createSwDoc("text_form_field.odt");
 
         const OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         // Check the document after round trip
         SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument *>(mxComponent.get());
@@ -1466,12 +1371,20 @@ void Test::testTextFormField()
 
         // In the first paragraph we have an empty text form field with the placeholder spaces
         const uno::Reference< text::XTextRange > xPara = getParagraph(1);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("TextFieldStart"), getProperty<OUString>(getRun(xPara, 1), "TextPortionType"));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("TextFieldSeparator"), getProperty<OUString>(getRun(xPara, 2), "TextPortionType"));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("Text"), getProperty<OUString>(getRun(xPara, 3), "TextPortionType"));
         sal_Unicode vEnSpaces[5] = {8194, 8194, 8194, 8194, 8194};
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString(vEnSpaces, 5), xPara->getString());
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString(vEnSpaces, 5), getRun(xPara, 3)->getString());
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("TextFieldEnd"), getProperty<OUString>(getRun(xPara, 4), "TextPortionType"));
 
         // In the second paragraph we have a set text
         const uno::Reference< text::XTextRange > xPara2 = getParagraph(2);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("xxxxx"), xPara2->getString());
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("TextFieldStart"), getProperty<OUString>(getRun(xPara2, 1), "TextPortionType"));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("TextFieldSeparator"), getProperty<OUString>(getRun(xPara2, 2), "TextPortionType"));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("Text"), getProperty<OUString>(getRun(xPara2, 3), "TextPortionType"));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("xxxxx"), getRun(xPara2, 3)->getString());
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("TextFieldEnd"), getProperty<OUString>(getRun(xPara2, 4), "TextPortionType"));
     }
 }
 
@@ -1485,22 +1398,12 @@ void Test::testCheckBoxFormField()
 
     for (const OUString& rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-            mxComponent->dispose();
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/checkbox_form_field.odt"), "com.sun.star.text.TextDocument");
+        createSwDoc("checkbox_form_field.odt");
 
         const OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         // Check the document after round trip
         SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument *>(mxComponent.get());
@@ -1548,22 +1451,12 @@ void Test::testDropDownFormField()
 
     for (const OUString& rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-            mxComponent->dispose();
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/dropdown_form_field.odt"), "com.sun.star.text.TextDocument");
+        createSwDoc("dropdown_form_field.odt");
 
         const OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         // Check the document after round trip
         SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument *>(mxComponent.get());
@@ -1633,22 +1526,12 @@ void Test::testDateFormField()
 
     for (const OUString& rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-            mxComponent->dispose();
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/date_form_field.odt"), "com.sun.star.text.TextDocument");
+        createSwDoc("date_form_field.odt");
 
         const OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         // Check the document after round trip
         if (rFilterName == "writer8")
@@ -1694,8 +1577,8 @@ void Test::testDateFormField()
                     sal_Unicode vEnSpaces[ODF_FORMFIELD_DEFAULT_LENGTH] = {8194, 8194, 8194, 8194, 8194};
                     CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString(vEnSpaces, 5), sCurrentDate);
 
-                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), SwNodeOffset(9), pFieldmark->GetMarkStart().nNode.GetIndex());
-                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(5), pFieldmark->GetMarkStart().nContent.GetIndex());
+                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), SwNodeOffset(9), pFieldmark->GetMarkStart().GetNodeIndex());
+                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(5), pFieldmark->GetMarkStart().GetContentIndex());
                 }
                 else if (nIndex == 1) // The second has the default format
                 {
@@ -1703,8 +1586,8 @@ void Test::testDateFormField()
                     CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("en-US"), sLang);
                     CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("06/12/19"), sCurrentDate);
 
-                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), SwNodeOffset(9), pFieldmark->GetMarkStart().nNode.GetIndex());
-                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(20), pFieldmark->GetMarkStart().nContent.GetIndex());
+                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), SwNodeOffset(9), pFieldmark->GetMarkStart().GetNodeIndex());
+                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(20), pFieldmark->GetMarkStart().GetContentIndex());
                 }
                 else if (nIndex == 2) // The third one has special format
                 {
@@ -1712,8 +1595,8 @@ void Test::testDateFormField()
                     CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("hu-HU"), sLang);
                     CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("2019. febr. 12."), sCurrentDate);
 
-                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), SwNodeOffset(9), pFieldmark->GetMarkStart().nNode.GetIndex());
-                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(40), pFieldmark->GetMarkStart().nContent.GetIndex());
+                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), SwNodeOffset(9), pFieldmark->GetMarkStart().GetNodeIndex());
+                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(40), pFieldmark->GetMarkStart().GetContentIndex());
 
                 }
                 else if (nIndex == 3) // The fourth one has placeholder text
@@ -1722,8 +1605,8 @@ void Test::testDateFormField()
                     CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("bm-ML"), sLang);
                     CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("[select date]"), sCurrentDate);
 
-                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), SwNodeOffset(9), pFieldmark->GetMarkStart().nNode.GetIndex());
-                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(62), pFieldmark->GetMarkStart().nContent.GetIndex());
+                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), SwNodeOffset(9), pFieldmark->GetMarkStart().GetNodeIndex());
+                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(62), pFieldmark->GetMarkStart().GetContentIndex());
 
                 }
                 else // The last one is really empty
@@ -1732,8 +1615,8 @@ void Test::testDateFormField()
                     CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString("en-US"), sLang);
                     CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString(""), sCurrentDate);
 
-                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), SwNodeOffset(9), pFieldmark->GetMarkStart().nNode.GetIndex());
-                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(82), pFieldmark->GetMarkStart().nContent.GetIndex());
+                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), SwNodeOffset(9), pFieldmark->GetMarkStart().GetNodeIndex());
+                    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(82), pFieldmark->GetMarkStart().GetContentIndex());
 
                 }
                 ++nIndex;
@@ -1827,22 +1710,12 @@ void Test::testDateFormFieldCharacterFormatting()
 
     for (const OUString& rFilterName : aFilterNames)
     {
-        if (mxComponent.is())
-            mxComponent->dispose();
-        mxComponent = loadFromDesktop(m_directories.getURLFromSrc(u"/sw/qa/extras/globalfilter/data/date_form_field_char_formatting.odt"), "com.sun.star.text.TextDocument");
+        createSwDoc("date_form_field_char_formatting.odt");
 
         const OString sFailedMessage = OString::Concat("Failed on filter: ") + rFilterName.toUtf8();
 
         // Export the document and import again for a check
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= rFilterName;
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
-        xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-        uno::Reference< lang::XComponent > xComponent(xStorable, uno::UNO_QUERY);
-        xComponent->dispose();
-        mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+        reload(rFilterName.toUtf8().getStr(), nullptr);
 
         // Check the document after round trip
         if (rFilterName == "writer8")
@@ -1857,14 +1730,14 @@ void Test::testDateFormFieldCharacterFormatting()
             ::sw::mark::IDateFieldmark* pFieldmark = dynamic_cast<::sw::mark::IDateFieldmark*>(*pMarkAccess->getAllMarksBegin());
             CPPUNIT_ASSERT_MESSAGE(sFailedMessage.getStr(), pFieldmark);
             CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), OUString(ODF_FORMDATE), pFieldmark->GetFieldname());
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(0), pFieldmark->GetMarkStart().nContent.GetIndex());
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(11), pFieldmark->GetMarkEnd().nContent.GetIndex());
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(0), pFieldmark->GetMarkStart().GetContentIndex());
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), sal_Int32(11), pFieldmark->GetMarkEnd().GetContentIndex());
 
             // We have one date field, first half of the field has bold character weight and second part has red character color
             CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), awt::FontWeight::BOLD, getProperty<float>(getRun(getParagraph(1), 3), "CharWeight"));
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_AUTO, Color(ColorTransparency, getProperty<sal_Int32>(getRun(getParagraph(1), 3), "CharColor")));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_AUTO, getProperty<Color>(getRun(getParagraph(1), 3), "CharColor"));
             CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), awt::FontWeight::NORMAL, getProperty<float>(getRun(getParagraph(1), 4), "CharWeight"));
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), Color(0xff0000), Color(ColorTransparency, getProperty<sal_Int32>(getRun(getParagraph(1), 4), "CharColor")));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), Color(0xff0000), getProperty<Color>(getRun(getParagraph(1), 4), "CharColor"));
         }
         else
         {
@@ -1886,10 +1759,10 @@ void Test::testDateFormFieldCharacterFormatting()
                 = xContentControlEnumAccess->createEnumeration();
             xTextPortion.set(xContentControlEnum->nextElement(), uno::UNO_QUERY);
             CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), awt::FontWeight::BOLD, getProperty<float>(xTextPortion, "CharWeight"));
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_AUTO, Color(ColorTransparency, getProperty<sal_Int32>(xTextPortion, "CharColor")));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), COL_AUTO, getProperty<Color>(xTextPortion, "CharColor"));
             xTextPortion.set(xContentControlEnum->nextElement(), uno::UNO_QUERY);
             CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), awt::FontWeight::NORMAL, getProperty<float>(xTextPortion, "CharWeight"));
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), Color(0xff0000), Color(ColorTransparency, getProperty<sal_Int32>(xTextPortion, "CharColor")));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailedMessage.getStr(), Color(0xff0000), getProperty<Color>(xTextPortion, "CharColor"));
         }
     }
 }

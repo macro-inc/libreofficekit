@@ -73,9 +73,8 @@ $(eval $(call gb_Library_use_libraries,sofficeapp,\
     tl \
     ucbhelper \
     utl \
+    vcl \
 ))
-
-$(eval $(call gb_Library_use_glxtest,sofficeapp,-lm))
 
 ifeq ($(OS),WNT)
 $(eval $(call gb_Library_use_static_libraries,sofficeapp,\
@@ -138,23 +137,15 @@ $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
 		desktop/source/lib/lokandroid) \
 ))
 $(if $(filter-out $(OS),IOS), \
-    $(eval $(call gb_Library_set_componentfile,sofficeapp,desktop/lokclipboard)))
+    $(eval $(call gb_Library_set_componentfile,sofficeapp,desktop/lokclipboard,services)))
 else
-ifeq ($(USING_X11),TRUE)
+ifneq ($(filter TRUE,$(USING_X11) $(DISABLE_GUI))($filter EMSCRIPTEN,$(OS)),)
 $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
 	desktop/source/lib/init \
 	desktop/source/lib/lokinteractionhandler \
 	desktop/source/lib/lokclipboard \
 ))
-$(eval $(call gb_Library_set_componentfile,sofficeapp,desktop/lokclipboard))
-endif
-ifeq ($(DISABLE_GUI),TRUE)
-$(eval $(call gb_Library_add_exception_objects,sofficeapp,\
-    desktop/source/lib/init \
-    desktop/source/lib/lokinteractionhandler \
-    desktop/source/lib/lokclipboard \
-))
-$(eval $(call gb_Library_set_componentfile,sofficeapp,desktop/lokclipboard))
+$(eval $(call gb_Library_set_componentfile,sofficeapp,desktop/lokclipboard,services))
 endif
 endif
 

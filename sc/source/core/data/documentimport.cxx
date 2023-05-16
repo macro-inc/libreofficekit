@@ -220,26 +220,24 @@ void ScDocumentImport::setAutoInput(const ScAddress& rPos, const OUString& rStr,
         aCell, rPos.Row(), rPos.Tab(), rStr, mpImpl->mrDoc.GetAddressConvention(), pStringParam);
 
     sc::CellStoreType& rCells = pTab->aCol[rPos.Col()].maCells;
-    switch (aCell.meType)
+    switch (aCell.getType())
     {
         case CELLTYPE_STRING:
             // string is copied.
-            pBlockPos->miCellPos = rCells.set(pBlockPos->miCellPos, rPos.Row(), *aCell.mpString);
+            pBlockPos->miCellPos = rCells.set(pBlockPos->miCellPos, rPos.Row(), *aCell.getSharedString());
         break;
         case CELLTYPE_EDIT:
             // Cell takes the ownership of the text object.
-            pBlockPos->miCellPos = rCells.set(pBlockPos->miCellPos, rPos.Row(), aCell.mpEditText);
-            aCell.mpEditText = nullptr;
+            pBlockPos->miCellPos = rCells.set(pBlockPos->miCellPos, rPos.Row(), aCell.releaseEditText());
         break;
         case CELLTYPE_VALUE:
-            pBlockPos->miCellPos = rCells.set(pBlockPos->miCellPos, rPos.Row(), aCell.mfValue);
+            pBlockPos->miCellPos = rCells.set(pBlockPos->miCellPos, rPos.Row(), aCell.getDouble());
         break;
         case CELLTYPE_FORMULA:
             if (!pStringParam)
-                mpImpl->mrDoc.CheckLinkFormulaNeedingCheck( *aCell.mpFormula->GetCode());
+                mpImpl->mrDoc.CheckLinkFormulaNeedingCheck( *aCell.getFormula()->GetCode());
             // This formula cell instance is directly placed in the document without copying.
-            pBlockPos->miCellPos = rCells.set(pBlockPos->miCellPos, rPos.Row(), aCell.mpFormula);
-            aCell.mpFormula = nullptr;
+            pBlockPos->miCellPos = rCells.set(pBlockPos->miCellPos, rPos.Row(), aCell.releaseFormula());
         break;
         default:
             pBlockPos->miCellPos = rCells.set_empty(pBlockPos->miCellPos, rPos.Row(), rPos.Row());
@@ -387,6 +385,14 @@ void ScDocumentImport::setFormulaCell(const ScAddress& rPos, ScFormulaCell* pCel
         mpImpl->mrDoc.CheckLinkFormulaNeedingCheck( *pCell->GetCode());
 
     sc::CellStoreType& rCells = pTab->aCol[rPos.Col()].maCells;
+
+    sc::CellStoreType::position_type aPos = rCells.position(rPos.Row());
+    if (aPos.first != rCells.end() && aPos.first->type == sc::element_type_formula)
+    {
+        ScFormulaCell* p = sc::formula_block::at(*aPos.first->data, aPos.second);
+        sc::SharedFormulaUtil::unshareFormulaCell(aPos, *p);
+    }
+
     pBlockPos->miCellPos =
         rCells.set(pBlockPos->miCellPos, rPos.Row(), pCell);
 }
@@ -441,8 +447,8 @@ void ScDocumentImport::setMatrixCells(
         // Reference in each cell must point to the origin cell relative to the current cell.
         aRefData.SetAddress(mpImpl->mrDoc.GetSheetLimits(), rBasePos, aPos);
         *t->GetSingleRef() = aRefData;
-        std::unique_ptr<ScTokenArray> pTokArr(aArr.Clone());
-        pCell = new ScFormulaCell(mpImpl->mrDoc, aPos, *pTokArr, eGram, ScMatrixMode::Reference);
+        ScTokenArray aTokArr(aArr.CloneValue());
+        pCell = new ScFormulaCell(mpImpl->mrDoc, aPos, aTokArr, eGram, ScMatrixMode::Reference);
         pBlockPos->miCellPos =
             rCells.set(pBlockPos->miCellPos, aPos.Row(), pCell);
     }
@@ -461,8 +467,8 @@ void ScDocumentImport::setMatrixCells(
             aPos.SetRow(nRow);
             aRefData.SetAddress(mpImpl->mrDoc.GetSheetLimits(), rBasePos, aPos);
             *t->GetSingleRef() = aRefData;
-            std::unique_ptr<ScTokenArray> pTokArr(aArr.Clone());
-            pCell = new ScFormulaCell(mpImpl->mrDoc, aPos, *pTokArr, eGram, ScMatrixMode::Reference);
+            ScTokenArray aTokArr(aArr.CloneValue());
+            pCell = new ScFormulaCell(mpImpl->mrDoc, aPos, aTokArr, eGram, ScMatrixMode::Reference);
             pBlockPos->miCellPos =
                 rColCells.set(pBlockPos->miCellPos, aPos.Row(), pCell);
         }
@@ -572,18 +578,18 @@ void ScDocumentImport::fillDownCells(const ScAddress& rPos, SCROW nFillSize)
     sc::CellStoreType& rCells = pTab->aCol[rPos.Col()].maCells;
     ScRefCellValue aRefCell = pTab->aCol[rPos.Col()].GetCellValue(*pBlockPos, rPos.Row());
 
-    switch (aRefCell.meType)
+    switch (aRefCell.getType())
     {
         case CELLTYPE_VALUE:
         {
-            std::vector<double> aCopied(nFillSize, aRefCell.mfValue);
+            std::vector<double> aCopied(nFillSize, aRefCell.getDouble());
             pBlockPos->miCellPos = rCells.set(
                 pBlockPos->miCellPos, rPos.Row()+1, aCopied.begin(), aCopied.end());
             break;
         }
         case CELLTYPE_STRING:
         {
-            std::vector<svl::SharedString> aCopied(nFillSize, *aRefCell.mpString);
+            std::vector<svl::SharedString> aCopied(nFillSize, *aRefCell.getSharedString());
             pBlockPos->miCellPos = rCells.set(
                 pBlockPos->miCellPos, rPos.Row()+1, aCopied.begin(), aCopied.end());
             break;

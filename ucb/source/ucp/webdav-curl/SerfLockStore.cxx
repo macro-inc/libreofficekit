@@ -82,17 +82,15 @@ void TickerThread::execute()
 
 
 SerfLockStore::SerfLockStore()
-    : m_bFinishing( false )
 {
 }
 
 
 SerfLockStore::~SerfLockStore()
 {
-    osl::ResettableMutexGuard aGuard(m_aMutex);
+    std::unique_lock aGuard(m_aMutex);
     stopTicker(aGuard);
-    aGuard.reset(); // actually no threads should even try to access members now
-    m_bFinishing = true;
+    aGuard.lock(); // actually no threads should even try to access members now
 
     // release active locks, if any.
     SAL_WARN_IF( !m_aLockInfoMap.empty(), "ucb.ucp.webdav",
@@ -104,14 +102,9 @@ SerfLockStore::~SerfLockStore()
     }
 }
 
-bool SerfLockStore::finishing() const
-{
-    return m_bFinishing;
-}
-
 void SerfLockStore::startTicker()
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     if ( !m_pTickerThread.is() )
     {
@@ -121,7 +114,7 @@ void SerfLockStore::startTicker()
 }
 
 
-void SerfLockStore::stopTicker(osl::ClearableMutexGuard & rGuard)
+void SerfLockStore::stopTicker(std::unique_lock<std::mutex> & rGuard)
 {
     rtl::Reference<TickerThread> pTickerThread;
 
@@ -133,7 +126,7 @@ void SerfLockStore::stopTicker(osl::ClearableMutexGuard & rGuard)
         m_pTickerThread.clear();
     }
 
-    rGuard.clear();
+    rGuard.unlock();
 
     if (pTickerThread.is() && pTickerThread->getIdentifier() != osl::Thread::getCurrentIdentifier())
     {
@@ -146,7 +139,7 @@ SerfLockStore::getLockTokenForURI(OUString const& rURI, css::ucb::Lock const*con
 {
     assert(rURI.startsWith("http://") || rURI.startsWith("https://"));
 
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     auto const it(m_aLockInfoMap.find(rURI));
 
@@ -183,51 +176,39 @@ void SerfLockStore::addLock( const OUString& rURI,
                              sal_Int32 nLastChanceToSendRefreshRequest )
 {
     assert(rURI.startsWith("http://") || rURI.startsWith("https://"));
+    {
+        std::unique_lock aGuard( m_aMutex );
 
-    osl::MutexGuard aGuard( m_aMutex );
-
-    m_aLockInfoMap[ rURI ]
-        = LockInfo(sToken, rLock, xSession, nLastChanceToSendRefreshRequest);
+        m_aLockInfoMap[ rURI ]
+            = LockInfo(sToken, rLock, xSession, nLastChanceToSendRefreshRequest);
+    }
 
     startTicker();
 }
 
 
-void SerfLockStore::updateLock( const OUString& rURI,
-                                sal_Int32 nLastChanceToSendRefreshRequest )
-{
-    assert(rURI.startsWith("http://") || rURI.startsWith("https://"));
-
-    osl::MutexGuard aGuard( m_aMutex );
-
-    LockInfoMap::iterator const it(m_aLockInfoMap.find(rURI));
-    SAL_WARN_IF( it == m_aLockInfoMap.end(), "ucb.ucp.webdav",
-                "SerfLockStore::updateLock: lock not found!" );
-
-    if ( it != m_aLockInfoMap.end() )
-    {
-        (*it).second.m_nLastChanceToSendRefreshRequest
-            = nLastChanceToSendRefreshRequest;
-    }
-}
-
-
 void SerfLockStore::removeLock(const OUString& rURI)
 {
-    assert(rURI.startsWith("http://") || rURI.startsWith("https://"));
+    std::unique_lock aGuard( m_aMutex );
 
-    osl::ClearableMutexGuard aGuard( m_aMutex );
+    removeLockImpl(aGuard, rURI);
+}
+
+void SerfLockStore::removeLockImpl(std::unique_lock<std::mutex> & rGuard, const OUString& rURI)
+{
+    assert(rURI.startsWith("http://") || rURI.startsWith("https://"));
 
     m_aLockInfoMap.erase(rURI);
 
     if ( m_aLockInfoMap.empty() )
-        stopTicker(aGuard);
+    {
+        stopTicker(rGuard);
+    }
 }
-
 
 void SerfLockStore::refreshLocks()
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     ::std::vector<OUString> authFailedLocks;
 
@@ -268,7 +249,7 @@ void SerfLockStore::refreshLocks()
 
     for (auto const& rLock : authFailedLocks)
     {
-        removeLock(rLock);
+        removeLockImpl(aGuard, rLock);
     }
 }
 

@@ -19,12 +19,12 @@
 #pragma once
 
 #include <memory>
+#include <stack>
 #include <cppuhelper/implbase.hxx>
+#include <oox/drawingml/color.hxx>
 #include <oox/drawingml/graphicshapecontext.hxx>
 #include <oox/core/fragmenthandler2.hxx>
 #include <oox/core/xmlfilterbase.hxx>
-#include <com/sun/star/uno/XComponentContext.hpp>
-#include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/document/XDocumentProperties.hpp>
 #include <com/sun/star/graphic/XGraphicMapper.hpp>
 #include <com/sun/star/drawing/XDrawPage.hpp>
@@ -50,7 +50,7 @@ class OOX_DLLPUBLIC ShapeContextHandler final :
     public ::cppu::WeakImplHelper< css::xml::sax::XFastContextHandler >
 {
 public:
-    explicit ShapeContextHandler(const rtl::Reference<ShapeFilterBase>& xFilterBase);
+    explicit ShapeContextHandler(rtl::Reference<ShapeFilterBase> xFilterBase);
 
     virtual ~ShapeContextHandler() override;
 
@@ -92,9 +92,16 @@ public:
     void setRelationFragmentPath(const OUString & the_value);
 
     sal_Int32 getStartToken() const;
-    void setStartToken( sal_Int32 _starttoken );
+    void popStartToken();
+    void pushStartToken( sal_Int32 _starttoken );
 
     void setPosition(const css::awt::Point& rPosition);
+    void setSize(const css::awt::Size& rSize);
+
+    const bool& getFullWPGSupport() { return m_bFullWPGSUpport; }
+    void setFullWPGSupport(bool bUse) { m_bFullWPGSUpport = bUse; }
+
+    bool isWordProcessingGroupShape() const { return mxWpgContext ? true : false; }
 
     void setDocumentProperties(const css::uno::Reference<css::document::XDocumentProperties>& xDocProps);
     void setMediaDescriptor(const css::uno::Sequence<css::beans::PropertyValue>& rMediaDescriptor);
@@ -108,8 +115,13 @@ private:
     ShapeContextHandler(ShapeContextHandler const &) = delete;
     void operator =(ShapeContextHandler const &) = delete;
 
-    ::sal_uInt32 mnStartToken;
+    // Special stack which always has at least one element.
+    // In case of group shapes with embedded content it will have more element than one.
+    std::stack<sal_uInt32> mnStartTokenStack;
+
     css::awt::Point maPosition;
+    css::awt::Size maSize;  // from cx and cy, in EMU
+    bool m_bFullWPGSUpport; // Is this DrawingML shape supposed to be processed as WPG?
 
     drawingml::ShapePtr mpShape;
     std::shared_ptr< vml::Drawing > mpDrawing;
@@ -140,8 +152,10 @@ private:
     css::uno::Reference<XFastContextHandler> const & getWpsContext(sal_Int32 nStartElement, sal_Int32 nElement);
     css::uno::Reference<XFastContextHandler> const & getWpgContext(sal_Int32 nElement);
     css::uno::Reference<XFastContextHandler> getContextHandler(sal_Int32 nElement = 0);
-};
 
+    void applyFontRefColor(const oox::drawingml::ShapePtr& pShape,
+                           const oox::drawingml::Color& rFontRefColor);
+};
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

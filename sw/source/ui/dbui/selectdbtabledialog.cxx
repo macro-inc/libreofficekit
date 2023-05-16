@@ -18,6 +18,7 @@
  */
 
 #include <o3tl/safeint.hxx>
+#include <comphelper/propertyvalue.hxx>
 #include <swtypes.hxx>
 #include "selectdbtabledialog.hxx"
 #include "dbtablepreviewdialog.hxx"
@@ -30,6 +31,7 @@
 #include <com/sun/star/sdbc/XDataSource.hpp>
 
 #include <strings.hrc>
+#include <utility>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::sdbcx;
@@ -40,9 +42,9 @@ using namespace ::com::sun::star::container;
 using namespace ::com::sun::star::beans;
 
 SwSelectDBTableDialog::SwSelectDBTableDialog(weld::Window* pParent,
-                                             const uno::Reference<sdbc::XConnection>& rConnection)
+                                             uno::Reference<sdbc::XConnection> xConnection)
     : SfxDialogController(pParent, "modules/swriter/ui/selecttabledialog.ui", "SelectTableDialog")
-    , m_xConnection(rConnection)
+    , m_xConnection(std::move(xConnection))
     , m_xTable(m_xBuilder->weld_tree_view("table"))
     , m_xPreviewPB(m_xBuilder->weld_button("preview"))
 {
@@ -103,18 +105,13 @@ IMPL_LINK_NOARG(SwSelectDBTableDialog, PreviewHdl, weld::Button&, void)
         xPrSet->getPropertyValue("Name") >>= sDataSourceName;
     }
     OSL_ENSURE(!sDataSourceName.isEmpty(), "no data source found");
-    Sequence<PropertyValue> aProperties(5);
-    PropertyValue* pProperties = aProperties.getArray();
-    pProperties[0].Name = "DataSourceName";
-    pProperties[0].Value <<= sDataSourceName;
-    pProperties[1].Name = "Command";
-    pProperties[1].Value <<= sTableOrQuery;
-    pProperties[2].Name = "CommandType";
-    pProperties[2].Value <<= nCommandType;
-    pProperties[3].Name = "ShowTreeView";
-    pProperties[3].Value <<= false;
-    pProperties[4].Name = "ShowTreeViewButton";
-    pProperties[4].Value <<= false;
+    Sequence<PropertyValue> aProperties{
+        comphelper::makePropertyValue("DataSourceName", sDataSourceName),
+        comphelper::makePropertyValue("Command", sTableOrQuery),
+        comphelper::makePropertyValue("CommandType", nCommandType),
+        comphelper::makePropertyValue("ShowTreeView", false),
+        comphelper::makePropertyValue("ShowTreeViewButton", false)
+    };
 
     SwDBTablePreviewDialog aDlg(m_xDialog.get(), aProperties);
     aDlg.run();

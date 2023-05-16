@@ -23,7 +23,7 @@ $(eval $(call gb_Library_add_defs,fwk,\
     -DFWK_DLLIMPLEMENTATION \
 ))
 
-$(eval $(call gb_Library_set_componentfile,fwk,framework/util/fwk))
+$(eval $(call gb_Library_set_componentfile,fwk,framework/util/fwk,services))
 
 $(eval $(call gb_Library_set_include,fwk,\
     -I$(SRCDIR)/framework/source/inc \
@@ -60,6 +60,14 @@ $(eval $(call gb_Library_use_libraries,fwk,\
     utl \
     vcl \
 ))
+
+ifneq ($(ENABLE_WASM_STRIP_RECOVERYUI),TRUE)
+$(eval $(call gb_Library_add_exception_objects,fwk,\
+    framework/source/services/autorecovery \
+))
+
+$(eval $(call gb_Library_add_componentimpl,fwk,autorecovery))
+endif
 
 $(eval $(call gb_Library_add_exception_objects,fwk,\
     framework/source/accelerators/acceleratorcache \
@@ -108,7 +116,6 @@ $(eval $(call gb_Library_add_exception_objects,fwk,\
     framework/source/fwe/classes/addonsoptions \
     framework/source/fwe/classes/framelistanalyzer \
     framework/source/fwe/classes/fwkresid \
-    framework/source/fwe/classes/imagewrapper \
     framework/source/fwe/classes/rootactiontriggercontainer \
     framework/source/fwe/classes/sfxhelperfunctions \
     framework/source/fwe/dispatch/interaction \
@@ -150,7 +157,6 @@ $(eval $(call gb_Library_add_exception_objects,fwk,\
     framework/source/recording/dispatchrecorder \
     framework/source/recording/dispatchrecordersupplier \
     framework/source/services/ContextChangeEventMultiplexer \
-    framework/source/services/autorecovery \
     framework/source/services/desktop \
     framework/source/services/dispatchhelper \
     framework/source/services/frame \

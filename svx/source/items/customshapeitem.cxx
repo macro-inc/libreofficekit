@@ -20,6 +20,8 @@
 #include <sal/config.h>
 
 #include <o3tl/any.hxx>
+#include <comphelper/anycompare.hxx>
+#include <comphelper/anytohash.hxx>
 #include <svx/sdasitm.hxx>
 
 #include <com/sun/star/beans/PropertyValue.hpp>
@@ -35,30 +37,7 @@ SdrCustomShapeGeometryItem::SdrCustomShapeGeometryItem()
 SdrCustomShapeGeometryItem::SdrCustomShapeGeometryItem( const uno::Sequence< beans::PropertyValue >& rVal )
 :   SfxPoolItem( SDRATTR_CUSTOMSHAPE_GEOMETRY )
 {
-    sal_Int32 i, j;
-    aPropSeq = rVal;
-
-    for ( i = 0; i < aPropSeq.getLength(); i++ )
-    {
-        const beans::PropertyValue& rPropVal = aPropSeq[ i ];
-        std::pair<PropertyHashMap::iterator, bool> const ret(
-                aPropHashMap.insert(std::make_pair(rPropVal.Name, i)));
-        assert(ret.second); // serious bug: duplicate xml attribute exported
-        if (!ret.second)
-        {
-            throw uno::RuntimeException(
-                "CustomShapeGeometry has duplicate property " + rPropVal.Name);
-        }
-        if (auto rPropSeq = o3tl::tryAccess<uno::Sequence<beans::PropertyValue>>(
-                rPropVal.Value))
-        {
-            for ( j = 0; j < rPropSeq->getLength(); j++ )
-            {
-                beans::PropertyValue const & rPropVal2 = (*rPropSeq)[ j ];
-                aPropPairHashMap[ PropertyPair( rPropVal.Name, rPropVal2.Name ) ] = j;
-            }
-        }
-    }
+    SetPropSeq( rVal );
 }
 
 css::uno::Any* SdrCustomShapeGeometryItem::GetPropertyValueByName( const OUString& rPropName )
@@ -150,6 +129,7 @@ void SdrCustomShapeGeometryItem::SetPropertyValue( const css::beans::PropertyVal
 
         aPropHashMap[ rPropVal.Name ] = nIndex;
     }
+    InvalidateHash();
 }
 
 void SdrCustomShapeGeometryItem::SetPropertyValue( const OUString& rSequenceName, const css::beans::PropertyValue& rPropVal )
@@ -198,6 +178,7 @@ void SdrCustomShapeGeometryItem::SetPropertyValue( const OUString& rSequenceName
             }
         }
     }
+    InvalidateHash();
 }
 
 void SdrCustomShapeGeometryItem::ClearPropertyValue( const OUString& rPropName )
@@ -234,17 +215,65 @@ void SdrCustomShapeGeometryItem::ClearPropertyValue( const OUString& rPropName )
         aPropSeq.realloc( nLength - 1 );
     }
     aPropHashMap.erase( aHashIter );                            // removing property from hashmap
+    InvalidateHash();
 }
 
 SdrCustomShapeGeometryItem::~SdrCustomShapeGeometryItem()
 {
 }
+
 bool SdrCustomShapeGeometryItem::operator==( const SfxPoolItem& rCmp ) const
 {
-    bool bRet = SfxPoolItem::operator==( rCmp );
-    if ( bRet )
-        bRet = static_cast<const SdrCustomShapeGeometryItem&>(rCmp).aPropSeq == aPropSeq;
-    return bRet;
+    if( !SfxPoolItem::operator==( rCmp ))
+        return false;
+    const SdrCustomShapeGeometryItem& other = static_cast<const SdrCustomShapeGeometryItem&>(rCmp);
+    // This is called often by SfxItemPool, and comparing uno sequences is relatively slow.
+    // So keep a hash of the sequence and if either of the sequences has a usable hash,
+    // compare using that.
+    UpdateHash();
+    other.UpdateHash();
+    if( aHashState != other.aHashState )
+        return false;
+    if( aHashState == HashState::Valid && aHash != other.aHash )
+        return false;
+
+    return aPropSeq == other.aPropSeq;
+}
+
+bool SdrCustomShapeGeometryItem::operator<( const SfxPoolItem& rCmp ) const
+{
+    assert(dynamic_cast<const SdrCustomShapeGeometryItem*>( &rCmp ));
+    const SdrCustomShapeGeometryItem& other = static_cast<const SdrCustomShapeGeometryItem&>(rCmp);
+    // Again, try to optimize by checking hashes first (this is operator< for sorting purposes,
+    // so the ordering can be somewhat arbitrary).
+    UpdateHash();
+    other.UpdateHash();
+    if( aHashState != other.aHashState )
+        return aHashState < other.aHashState;
+    if( aHashState == HashState::Valid )
+        return aHash < other.aHash;
+
+    return comphelper::anyLess( css::uno::Any( aPropSeq ),
+        css::uno::Any( other.aPropSeq ));
+}
+
+void SdrCustomShapeGeometryItem::UpdateHash() const
+{
+    if( aHashState != HashState::Unknown )
+        return;
+    std::optional< size_t > hash = comphelper::anyToHash( css::uno::Any( aPropSeq ));
+    if( hash.has_value())
+    {
+        aHash = *hash;
+        aHashState = HashState::Valid;
+    }
+    else
+        aHashState = HashState::Unusable;
+}
+
+void SdrCustomShapeGeometryItem::InvalidateHash()
+{
+    aHashState = HashState::Unknown;
 }
 
 bool SdrCustomShapeGeometryItem::GetPresentation(
@@ -275,24 +304,44 @@ bool SdrCustomShapeGeometryItem::QueryValue( uno::Any& rVal, sal_uInt8 /*nMember
 
 bool SdrCustomShapeGeometryItem::PutValue( const uno::Any& rVal, sal_uInt8 /*nMemberId*/ )
 {
-    if ( ! ( rVal >>= aPropSeq ) )
+    css::uno::Sequence< css::beans::PropertyValue > propSeq;
+    if ( ! ( rVal >>= propSeq ) )
         return false;
 
-    for (sal_Int32 i = 0; i < aPropSeq.getLength(); ++i)
+    SetPropSeq( propSeq );
+    return true;
+}
+
+void SdrCustomShapeGeometryItem::SetPropSeq( const css::uno::Sequence< css::beans::PropertyValue >& rVal )
+{
+    if( aPropSeq == rVal )
+        return;
+
+    aPropSeq = rVal;
+    aPropHashMap.clear();
+    aPropPairHashMap.clear();
+    for ( sal_Int32 i = 0; i < aPropSeq.getLength(); i++ )
     {
-        const auto& rName = aPropSeq[i].Name;
-        bool isDuplicated = std::any_of(std::next(std::cbegin(aPropSeq), i + 1), std::cend(aPropSeq),
-            [&rName](const css::beans::PropertyValue& rProp) { return rProp.Name == rName; });
-        if (isDuplicated)
+        const beans::PropertyValue& rPropVal = aPropSeq[ i ];
+        std::pair<PropertyHashMap::iterator, bool> const ret(
+                aPropHashMap.insert(std::make_pair(rPropVal.Name, i)));
+        assert(ret.second); // serious bug: duplicate xml attribute exported
+        if (!ret.second)
         {
-            assert(false); // serious bug: duplicate xml attribute exported
-            OUString const name(aPropSeq[i].Name);
-            aPropSeq.realloc(0);
             throw uno::RuntimeException(
-                "CustomShapeGeometry has duplicate property " + name);
+                "CustomShapeGeometry has duplicate property " + rPropVal.Name);
+        }
+        if (auto rPropSeq = o3tl::tryAccess<uno::Sequence<beans::PropertyValue>>(
+                rPropVal.Value))
+        {
+            for ( sal_Int32 j = 0; j < rPropSeq->getLength(); j++ )
+            {
+                beans::PropertyValue const & rPropVal2 = (*rPropSeq)[ j ];
+                aPropPairHashMap[ PropertyPair( rPropVal.Name, rPropVal2.Name ) ] = j;
+            }
         }
     }
-    return true;
+    InvalidateHash();
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

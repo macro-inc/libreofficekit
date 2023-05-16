@@ -63,7 +63,7 @@ using namespace ::sf_misc;
 namespace dlgprov
 {
 
-    Reference< resource::XStringResourceManager > lcl_getStringResourceManager(const Reference< XComponentContext >& i_xContext,const OUString& i_sURL)
+    Reference< resource::XStringResourceManager > lcl_getStringResourceManager(const Reference< XComponentContext >& i_xContext, std::u16string_view i_sURL)
     {
         INetURLObject aInetObj( i_sURL );
         OUString aDlgName = aInetObj.GetBase();
@@ -292,8 +292,7 @@ namespace dlgprov
                     OUString sDocURL = xModel->getURL();
                     if ( sDocURL.isEmpty() )
                     {
-                        ::comphelper::NamedValueCollection aModelArgs( xModel->getArgs() );
-                        sDocURL = aModelArgs.getOrDefault( "Title", sDocURL );
+                        sDocURL = ::comphelper::NamedValueCollection::getOrDefault( xModel->getArgs(), u"Title", sDocURL );
                     }
 
                     if ( sLocation != sDocURL )
@@ -603,8 +602,8 @@ namespace dlgprov
                         aDecorationAny >>= bDecoration;
                         if( !bDecoration )
                         {
-                            xDlgModPropSet->setPropertyValue( aDecorationPropName, makeAny( true ) );
-                            xDlgModPropSet->setPropertyValue( "Title", makeAny( OUString() ) );
+                            xDlgModPropSet->setPropertyValue( aDecorationPropName, Any( true ) );
+                            xDlgModPropSet->setPropertyValue( "Title", Any( OUString() ) );
                         }
                     }
                     catch( UnknownPropertyException& )

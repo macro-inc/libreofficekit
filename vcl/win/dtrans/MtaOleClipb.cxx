@@ -246,8 +246,8 @@ CMtaOleClipboard::CMtaOleClipboard( ) :
 
     s_theMtaOleClipboardInst = this;
 
-    m_hOleThread = reinterpret_cast<HANDLE>(_beginthreadex(
-        nullptr, 0, CMtaOleClipboard::oleThreadProc, this, 0, &m_uOleThreadId ));
+    m_hOleThread = CreateThread(
+        nullptr, 0, CMtaOleClipboard::oleThreadProc, this, 0, &m_uOleThreadId );
     OSL_ASSERT( nullptr != m_hOleThread );
 
     // setup the clipboard changed notifier thread
@@ -258,9 +258,9 @@ CMtaOleClipboard::CMtaOleClipboard( ) :
     m_hClipboardChangedNotifierEvents[1] = CreateEventW( nullptr, MANUAL_RESET, INIT_NONSIGNALED, nullptr );
     OSL_ASSERT( nullptr != m_hClipboardChangedNotifierEvents[1] );
 
-    unsigned uThreadId;
-    m_hClipboardChangedNotifierThread = reinterpret_cast<HANDLE>(_beginthreadex(
-        nullptr, 0, CMtaOleClipboard::clipboardChangedNotifierThreadProc, this, 0, &uThreadId ));
+    DWORD uThreadId;
+    m_hClipboardChangedNotifierThread = CreateThread(
+        nullptr, 0, CMtaOleClipboard::clipboardChangedNotifierThreadProc, this, 0, &uThreadId );
 
     OSL_ASSERT( nullptr != m_hClipboardChangedNotifierThread );
 }
@@ -482,7 +482,7 @@ HRESULT CMtaOleClipboard::onGetClipboard( LPSTREAM* ppStream )
     if ( SUCCEEDED( hr ) )
     {
         hr = MarshalIDataObjectInStream(pIDataObject.get(), ppStream);
-        OSL_ENSURE(SUCCEEDED(hr), "marshalling cliboard data object failed");
+        OSL_ENSURE(SUCCEEDED(hr), "marshalling clipboard data object failed");
     }
     return hr;
 }
@@ -660,7 +660,7 @@ unsigned int CMtaOleClipboard::run( )
         for (;;)
         {
             MSG msg;
-            auto const bRet = GetMessageW(&msg, nullptr, 0, 0);
+            int const bRet = GetMessageW(&msg, nullptr, 0, 0);
             if (bRet == 0)
             {
                 break;
@@ -680,7 +680,7 @@ unsigned int CMtaOleClipboard::run( )
     return nRet;
 }
 
-unsigned int WINAPI CMtaOleClipboard::oleThreadProc( LPVOID pParam )
+DWORD WINAPI CMtaOleClipboard::oleThreadProc( _In_ LPVOID pParam )
 {
     osl_setThreadName("CMtaOleClipboard::run()");
 
@@ -691,13 +691,14 @@ unsigned int WINAPI CMtaOleClipboard::oleThreadProc( LPVOID pParam )
     return pInst->run( );
 }
 
-unsigned int WINAPI CMtaOleClipboard::clipboardChangedNotifierThreadProc( LPVOID pParam )
+DWORD WINAPI CMtaOleClipboard::clipboardChangedNotifierThreadProc( _In_ LPVOID pParam )
 {
     osl_setThreadName("CMtaOleClipboard::clipboardChangedNotifierThreadProc()");
     CMtaOleClipboard* pInst = static_cast< CMtaOleClipboard* >( pParam );
     OSL_ASSERT( nullptr != pInst );
 
-    CoInitializeEx( nullptr, COINIT_APARTMENTTHREADED );
+    sal::systools::CoInitializeGuard aGuard(COINIT_APARTMENTTHREADED, false,
+                                            sal::systools::CoInitializeGuard::WhenFailed::NoThrow);
 
     // assuming we don't need a lock for
     // a boolean variable like m_bRun...
@@ -712,7 +713,7 @@ unsigned int WINAPI CMtaOleClipboard::clipboardChangedNotifierThreadProc( LPVOID
         MsgWaitForMultipleObjects(2, pInst->m_hClipboardChangedNotifierEvents, false, INFINITE,
                                   QS_ALLINPUT | QS_ALLPOSTMESSAGE);
 
-        ClearableMutexGuard aGuard( pInst->m_ClipboardChangedEventCountMutex );
+        ClearableMutexGuard aGuard2( pInst->m_ClipboardChangedEventCountMutex );
 
         if ( pInst->m_ClipboardChangedEventCount > 0 )
         {
@@ -720,7 +721,7 @@ unsigned int WINAPI CMtaOleClipboard::clipboardChangedNotifierThreadProc( LPVOID
             if ( 0 == pInst->m_ClipboardChangedEventCount )
                 ResetEvent( pInst->m_hClipboardChangedEvent );
 
-            aGuard.clear( );
+            aGuard2.clear( );
 
             // nobody should touch m_pfncClipViewerCallback while we do
             MutexGuard aClipViewerGuard( pInst->m_pfncClipViewerCallbackMutex );
@@ -730,10 +731,8 @@ unsigned int WINAPI CMtaOleClipboard::clipboardChangedNotifierThreadProc( LPVOID
                 pInst->m_pfncClipViewerCallback( );
         }
         else
-            aGuard.clear( );
+            aGuard2.clear( );
     }
-
-    CoUninitialize( );
 
     return 0;
 }

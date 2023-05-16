@@ -26,6 +26,7 @@ include $(GBUILDDIR)/platform/windows.mk
 gb_CC := cl
 gb_CXX := cl
 gb_LINK := link
+gb_DUMPBIN := dumpbin
 gb_AWK := awk
 gb_CLASSPATHSEP := ;
 gb_RC := rc
@@ -132,7 +133,6 @@ gb_CXXFLAGS := \
 	-Gs \
 	-GS \
 	-Gy \
-	-Zc:inline \
 	$(if $(MSVC_USE_DEBUG_RUNTIME),-MDd,-MD) \
 	-nologo \
 	-W4 \
@@ -148,7 +148,10 @@ gb_CXXFLAGS := \
 	-wd4706 \
 	-bigobj \
 
+ifneq ($(COM_IS_CLANG),TRUE)
+gb_CXXFLAGS += -Zc:inline
 gb_CXXFLAGS_ZCINLINE_OFF := -Zc:inline-
+endif
 
 ifeq ($(CPUNAME),INTEL)
 
@@ -162,6 +165,11 @@ endif
 
 ifeq ($(HAVE_DLLEXPORTINLINES),TRUE)
 gb_CXXFLAGS += -Zc:dllexportInlines-
+endif
+
+gb_CXXFLAGS_include := -FI
+ifeq ($(COM_IS_CLANG),TRUE)
+gb_CXXFLAGS_no_pch_warnings := -Wno-clang-cl-pch
 endif
 
 ifneq ($(COM_IS_CLANG),TRUE)
@@ -198,10 +206,16 @@ gb_CFLAGS_WERROR = $(if $(ENABLE_WERROR),-WX)
 gb_CXX03FLAGS :=
 
 gb_LinkTarget_EXCEPTIONFLAGS := \
-	-DEXCEPTIONS_ON \
 	-EHs \
 
 gb_PrecompiledHeader_EXCEPTIONFLAGS := $(gb_LinkTarget_EXCEPTIONFLAGS)
+
+ifneq ($(gb_ENABLE_PCH),)
+ifeq ($(COM_IS_CLANG),TRUE)
+# the same as in com_GCC_defs.mk
+gb_NO_PCH_TIMESTAMP := -Xclang -fno-pch-timestamp
+endif
+endif
 
 gb_LinkTarget_LDFLAGS := \
 	$(if $(findstring s,$(filter-out --%,$(MAKEFLAGS))),-nologo,) \
@@ -236,12 +250,12 @@ gb_COMPILERDEBUGOPTFLAGS :=
 ifeq ($(gb_FULLDEPS),$(true))
 gb_COMPILERDEPFLAGS := -showIncludes
 define gb_create_deps
-| LC_ALL=C $(GBUILDDIR)/platform/filter-showIncludes.awk -vdepfile=$(1) -vobjectfile=$(2) -vsourcefile=$(3); exit $${PIPESTATUS[0]}
+| $(GBUILDDIR)/platform/filter-showIncludes.awk -vdepfile=$(1) -vobjectfile=$(2) -vsourcefile=$(3); exit $${PIPESTATUS[0]}
 endef
 else
 gb_COMPILERDEPFLAGS :=
 define gb_create_deps
-| LC_ALL=C $(GBUILDDIR)/platform/filter-sourceName.awk; exit $${PIPESTATUS[0]}
+| $(GBUILDDIR)/platform/filter-sourceName.awk; exit $${PIPESTATUS[0]}
 endef
 endif
 
@@ -265,7 +279,6 @@ gb_CXXCLRFLAGS := \
 ifeq ($(COM_IS_CLANG),TRUE)
 
 gb_CFLAGS += \
-	-Wdeclaration-after-statement \
 	-Wendif-labels \
 	-Wshadow \
 	-Wstrict-prototypes \
@@ -276,7 +289,6 @@ gb_CXXFLAGS += \
 	-Wendif-labels \
 	-Wimplicit-fallthrough \
 	-Wno-missing-braces \
-	-Wnon-virtual-dtor \
 	-Woverloaded-virtual \
 	-Wshadow \
 	-Wundef \

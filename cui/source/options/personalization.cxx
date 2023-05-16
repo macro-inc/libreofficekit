@@ -63,11 +63,8 @@ bool SvxPersonalizationTabPage::FillItemSet(SfxItemSet*)
         aPersona = "no";
 
     bool bModified = false;
-    uno::Reference<uno::XComponentContext> xContext(comphelper::getProcessComponentContext());
-    if (xContext.is()
-        && (aPersona != officecfg::Office::Common::Misc::Persona::get(xContext)
-            || m_aPersonaSettings
-                   != officecfg::Office::Common::Misc::PersonaSettings::get(xContext)))
+    if (aPersona != officecfg::Office::Common::Misc::Persona::get()
+        || m_aPersonaSettings != officecfg::Office::Common::Misc::PersonaSettings::get())
     {
         bModified = true;
     }
@@ -94,15 +91,9 @@ bool SvxPersonalizationTabPage::FillItemSet(SfxItemSet*)
 
 void SvxPersonalizationTabPage::Reset(const SfxItemSet*)
 {
-    uno::Reference<uno::XComponentContext> xContext(comphelper::getProcessComponentContext());
-
     // persona
-    OUString aPersona("default");
-    if (xContext.is())
-    {
-        aPersona = officecfg::Office::Common::Misc::Persona::get(xContext);
-        m_aPersonaSettings = officecfg::Office::Common::Misc::PersonaSettings::get(xContext);
-    }
+    OUString aPersona = officecfg::Office::Common::Misc::Persona::get();
+    m_aPersonaSettings = officecfg::Office::Common::Misc::PersonaSettings::get();
 
     if (aPersona == "no")
         m_xNoPersona->set_active(true);
@@ -123,9 +114,9 @@ void SvxPersonalizationTabPage::LoadDefaultImages()
     sal_Int32 nIndex = 0;
     bool foundOne = false;
 
+    OStringBuffer aLine;
     while (aStream.IsOpen() && !aStream.eof() && nIndex < MAX_DEFAULT_PERSONAS)
     {
-        OString aLine;
         OUString aPersonaSetting, aPreviewFile, aName;
         sal_Int32 nParseIndex = 0;
 
@@ -139,7 +130,7 @@ void SvxPersonalizationTabPage::LoadDefaultImages()
 
         m_vDefaultPersonaSettings.push_back(aPersonaSetting);
 
-        INetURLObject aURLObj(gallery + aPreviewFile);
+        INetURLObject aURLObj(rtl::Concat2View(gallery + aPreviewFile));
         aFilter.ImportGraphic(aGraphic, aURLObj);
 
         Size aSize(aGraphic.GetSizePixel());

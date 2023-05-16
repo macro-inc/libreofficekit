@@ -22,7 +22,7 @@
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/xmlnamespace.hxx>
 #include <strings.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <svl/filenotation.hxx>
 #include <unotools/pathoptions.hxx>
 #include <dsntypes.hxx>
@@ -95,7 +95,7 @@ OXMLFileBasedDatabase::OXMLFileBasedDatabase( ODBFilter& rImport,
     OUString sURL = aTypeCollection.getDatasourcePrefixFromMediaType(sMediaType,sFileTypeExtension) + sLocation;
     try
     {
-        xDataSource->setPropertyValue(PROPERTY_URL,makeAny(sURL));
+        xDataSource->setPropertyValue(PROPERTY_URL,Any(sURL));
     }
     catch(const Exception&)
     {

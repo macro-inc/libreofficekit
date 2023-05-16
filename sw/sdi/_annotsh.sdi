@@ -204,11 +204,6 @@ interface _Annotation
         DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
     ]
 
-    SID_EMOJI_CONTROL
-    [
-        DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
-    ]
-
     SID_CHARMAP_CONTROL
     [
         DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
@@ -320,6 +315,13 @@ interface _Annotation
     ]
 
     SID_CHAR_DLG_EFFECT
+    [
+        ExecMethod = Exec ;
+        StateMethod = GetState ;
+        DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
+    ]
+
+    SID_CHAR_DLG_POSITION
     [
         ExecMethod = Exec ;
         StateMethod = GetState ;

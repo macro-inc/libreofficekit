@@ -25,6 +25,7 @@
 #include <com/sun/star/xml/dom/DocumentBuilder.hpp>
 #include <com/sun/star/graphic/GraphicMapper.hpp>
 #include <ooxml/resourceids.hxx>
+#include <oox/drawingml/theme.hxx>
 #include <oox/shape/ShapeFilterBase.hxx>
 #include "OOXMLStreamImpl.hxx"
 #include "OOXMLDocumentImpl.hxx"
@@ -33,7 +34,7 @@
 #include "OOXMLPropertySet.hxx"
 
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <svx/dialmgr.hxx>
 #include <svx/strings.hrc>
 #include <comphelper/sequence.hxx>
@@ -43,6 +44,7 @@
 
 #include <iostream>
 #include <sfx2/objsh.hxx>
+#include <utility>
 
 // this extern variable is declared in OOXMLStreamImpl.hxx
 OUString customTarget;
@@ -51,9 +53,9 @@ using namespace ::com::sun::star;
 namespace writerfilter::ooxml
 {
 
-OOXMLDocumentImpl::OOXMLDocumentImpl(OOXMLStream::Pointer_t const & pStream, const uno::Reference<task::XStatusIndicator>& xStatusIndicator, bool bSkipImages, const uno::Sequence<beans::PropertyValue>& rDescriptor)
-    : mpStream(pStream)
-    , mxStatusIndicator(xStatusIndicator)
+OOXMLDocumentImpl::OOXMLDocumentImpl(OOXMLStream::Pointer_t pStream, uno::Reference<task::XStatusIndicator> xStatusIndicator, bool bSkipImages, const uno::Sequence<beans::PropertyValue>& rDescriptor)
+    : mpStream(std::move(pStream))
+    , mxStatusIndicator(std::move(xStatusIndicator))
     , mnXNoteId(0)
     , mbIsSubstream(false)
     , mbSkipImages(bSkipImages)
@@ -417,8 +419,8 @@ namespace {
 // Ensures that the indicator is reset after exiting OOXMLDocumentImpl::resolve
 class StatusIndicatorGuard{
 public:
-    explicit StatusIndicatorGuard(css::uno::Reference<css::task::XStatusIndicator> const & xStatusIndicator)
-        :mxStatusIndicator(xStatusIndicator)
+    explicit StatusIndicatorGuard(css::uno::Reference<css::task::XStatusIndicator> xStatusIndicator)
+        :mxStatusIndicator(std::move(xStatusIndicator))
     {
     }
 
@@ -483,6 +485,12 @@ void OOXMLDocumentImpl::resolve(Stream & rStream)
     resolveFastSubStream(rStream, OOXMLStream::SETTINGS);
     mxThemeDom = importSubStream(OOXMLStream::THEME);
     resolveFastSubStream(rStream, OOXMLStream::THEME);
+    // Convert the oox::Theme to the draw page
+    {
+        auto pThemePtr = getTheme();
+        if (pThemePtr)
+            pThemePtr->addTheme(getDrawPage());
+    }
     mxGlossaryDocDom = importSubStream(OOXMLStream::GLOSSARY);
     if (mxGlossaryDocDom.is())
         resolveGlossaryStream(rStream);
@@ -514,7 +522,7 @@ void OOXMLDocumentImpl::resolve(Stream & rStream)
         SfxObjectShell* rShell = SfxObjectShell::GetShellFromComponent(mxModel);
         if (!rShell
             || !rShell->IsContinueImportOnFilterExceptions(
-                OUStringConcatenation("SAXException: " + rErr.Message)))
+                Concat2View("SAXException: " + rErr.Message)))
             throw;
     }
     catch (uno::RuntimeException const&)
@@ -882,6 +890,13 @@ const rtl::Reference<oox::shape::ShapeFilterBase>& OOXMLDocumentImpl::getShapeFi
     if (!mxShapeFilterBase)
         mxShapeFilterBase = new oox::shape::ShapeFilterBase(mpStream->getContext());
     return mxShapeFilterBase;
+}
+
+const rtl::Reference<oox::drawingml::ThemeFilterBase>& OOXMLDocumentImpl::getThemeFilterBase()
+{
+    if (!mxThemeFilterBase)
+        mxThemeFilterBase = new oox::drawingml::ThemeFilterBase(mpStream->getContext());
+    return mxThemeFilterBase;
 }
 
 OOXMLDocument *

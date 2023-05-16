@@ -23,7 +23,7 @@
 #include <sfx2/dllapi.h>
 #include <sfx2/signaturestate.hxx>
 #include <sal/types.h>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <com/sun/star/uno/Reference.h>
 #include <com/sun/star/uno/Sequence.hxx>
 #include <com/sun/star/frame/XModel3.hpp>
@@ -295,7 +295,7 @@ public:
      * @return true if the initialization is successful, false otherwise.
      */
     void                        DoInitUnitTest();
-    bool                        DoInitNew( SfxMedium* pMedium=nullptr );
+    bool                        DoInitNew();
     bool                        DoLoad( SfxMedium* pMedium );
     bool                        DoLoadExternal( SfxMedium* pMed );
     bool                        DoSave();
@@ -329,7 +329,7 @@ public:
 
     void                        SaveChildren(bool bObjectsOnly=false);
     bool                        SaveAsChildren( SfxMedium &rMedium );
-    bool                        SwitchChildrenPersistance(
+    bool                        SwitchChildrenPersistence(
                                     const css::uno::Reference< css::embed::XStorage >& xStorage,
                                     bool bForceNonModified = false );
     bool                        SaveCompletedChildren();
@@ -742,7 +742,7 @@ public:
     PreDoSaveAs_Impl(const OUString& rFileName, const OUString& rFiltName,
                      SfxItemSet const& rItemSet,
                      const css::uno::Sequence<css::beans::PropertyValue>& rArgs);
-    SAL_DLLPRIVATE bool APISaveAs_Impl(const OUString& aFileName, SfxItemSet& rItemSet,
+    SAL_DLLPRIVATE bool APISaveAs_Impl(std::u16string_view aFileName, SfxItemSet& rItemSet,
                                        const css::uno::Sequence<css::beans::PropertyValue>& rArgs);
     SAL_DLLPRIVATE bool
     CommonSaveAs_Impl(const INetURLObject& aURL, const OUString& aFilterName, SfxItemSet& rItemSet,
@@ -781,6 +781,9 @@ public:
     /// Gets the certificate that is already picked by the user but not yet used for signing.
     css::uno::Reference<css::security::XCertificate> GetSignPDFCertificate() const;
 
+    /// Gets grab-bagged password info to unprotect change tracking with verification
+    css::uno::Sequence< css::beans::PropertyValue > GetDocumentProtectionFromGrabBag() const;
+
     // Lock all unlocked views, and returns a guard object which unlocks those views when destructed
     virtual std::unique_ptr<LockAllViewsGuard> LockAllViews()
     {
@@ -795,8 +798,10 @@ public:
 
     struct ModifyBlocker_Impl
     {
+    private:
         SfxObjectShell* pPersist;
         bool bWasEnabled;
+    public:
         ModifyBlocker_Impl( SfxObjectShell* pPersistP ) : pPersist( pPersistP )
         {
             bWasEnabled = pPersistP->IsEnableSetModified();

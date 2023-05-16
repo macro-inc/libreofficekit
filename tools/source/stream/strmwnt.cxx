@@ -107,7 +107,6 @@ SvFileStream::SvFileStream( const OUString& rFileName, StreamMode nMode )
     bIsOpen             = false;
     nLockCounter        = 0;
     m_isWritable        = false;
-    mbDontFlushOnClose  = false;
     pInstanceData.reset( new StreamData );
 
     SetBufferSize( 8192 );
@@ -124,7 +123,6 @@ SvFileStream::SvFileStream()
     bIsOpen             = false;
     nLockCounter        = 0;
     m_isWritable        = false;
-    mbDontFlushOnClose  = false;
     pInstanceData.reset( new StreamData );
 
     SetBufferSize( 8192 );
@@ -166,24 +164,29 @@ sal_uInt64 SvFileStream::SeekPos(sal_uInt64 const nPos)
 {
     // check if a truncated STREAM_SEEK_TO_END was passed
     assert(nPos != SAL_MAX_UINT32);
-    DWORD nNewPos = 0;
+    LARGE_INTEGER nNewPos, nActPos;
+    nNewPos.QuadPart = 0;
+    nActPos.QuadPart = nPos;
+    bool result = false;
     if( IsOpen() )
     {
         if( nPos != STREAM_SEEK_TO_END )
-            // 64-Bit files are not supported
-            nNewPos=SetFilePointer(pInstanceData->hFile,nPos,nullptr,FILE_BEGIN);
-        else
-            nNewPos=SetFilePointer(pInstanceData->hFile,0L,nullptr,FILE_END);
-
-        if( nNewPos == 0xFFFFFFFF )
         {
-            SetError(::GetSvError( GetLastError() ) );
-            nNewPos = 0;
+            result = SetFilePointerEx(pInstanceData->hFile, nActPos, &nNewPos, FILE_BEGIN);
+        }
+        else
+        {
+            result = SetFilePointerEx(pInstanceData->hFile, nNewPos, &nNewPos, FILE_END);
+        }
+        if (!result)
+        {
+            SetError(::GetSvError(GetLastError()));
+            return 0;
         }
     }
     else
         SetError( SVSTREAM_GENERALERROR );
-    return static_cast<sal_uInt64>(nNewPos);
+    return static_cast<sal_uInt64>(nNewPos.QuadPart);
 }
 
 void SvFileStream::FlushData()
@@ -306,6 +309,8 @@ void SvFileStream::Open( const OUString& rFilename, StreamMode nMode )
 
     if ( nMode & StreamMode::TEMPORARY )
         nAttributes |= FILE_ATTRIBUTE_TEMPORARY;
+    if ( nMode & StreamMode::DELETE_ON_CLOSE )
+        nAttributes |= FILE_FLAG_DELETE_ON_CLOSE;
 
     pInstanceData->hFile = CreateFileW(
         o3tl::toW(aFilename.getStr()),
@@ -379,8 +384,7 @@ void SvFileStream::Close()
             nLockCounter = 1;
             UnlockFile();
         }
-        if ( !mbDontFlushOnClose )
-            Flush();
+        FlushBuffer();
         CloseHandle( pInstanceData->hFile );
     }
     bIsOpen     = false;

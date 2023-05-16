@@ -42,6 +42,7 @@
 #include <svx/xlinjoit.hxx>
 #include <svx/xlncapit.hxx>
 #include <svx/xfillit0.hxx>
+#include <svx/xfilluseslidebackgrounditem.hxx>
 #include <svx/xtextit0.hxx>
 #include <svx/xlnasit.hxx>
 #include <svx/xlndsit.hxx>
@@ -73,7 +74,6 @@ XOutdevItemPool::XOutdevItemPool(SfxItemPool* _pMaster)
 {
     // prepare some defaults
     const OUString aNullStr;
-    const Graphic aNullGraphic;
     const basegfx::B2DPolyPolygon aNullPol;
     const Color aNullLineCol(COL_DEFAULT_SHAPE_STROKE); // #i121448# Use defined default color
     const Color aNullFillCol(COL_DEFAULT_SHAPE_FILLING); // #i121448# Use defined default color
@@ -108,9 +108,12 @@ XOutdevItemPool::XOutdevItemPool(SfxItemPool* _pMaster)
     rPoolDefaults[XATTR_LINECAP            -XATTR_START] = new XLineCapItem;
     rPoolDefaults[XATTR_FILLSTYLE                -XATTR_START] = new XFillStyleItem;
     rPoolDefaults[XATTR_FILLCOLOR                -XATTR_START] = new XFillColorItem   (aNullStr,aNullFillCol);
-    rPoolDefaults[XATTR_FILLGRADIENT         -XATTR_START] = new XFillGradientItem(XGradient(COL_BLACK, COL_WHITE));
+
+    // XGradient() default already creates [COL_BLACK, COL_WHITE] as defaults
+    rPoolDefaults[XATTR_FILLGRADIENT         -XATTR_START] = new XFillGradientItem(XGradient());
+
     rPoolDefaults[XATTR_FILLHATCH                -XATTR_START] = new XFillHatchItem   (aNullHatch);
-    rPoolDefaults[XATTR_FILLBITMAP               -XATTR_START] = new XFillBitmapItem  (aNullGraphic);
+    rPoolDefaults[XATTR_FILLBITMAP               -XATTR_START] = new XFillBitmapItem  (Graphic());
     rPoolDefaults[XATTR_FILLTRANSPARENCE     -XATTR_START] = new XFillTransparenceItem;
     rPoolDefaults[XATTR_GRADIENTSTEPCOUNT        -XATTR_START] = new XGradientStepCountItem;
     rPoolDefaults[XATTR_FILLBMP_TILE         -XATTR_START] = new XFillBmpTileItem;
@@ -123,9 +126,17 @@ XOutdevItemPool::XOutdevItemPool(SfxItemPool* _pMaster)
     rPoolDefaults[XATTR_FILLBMP_STRETCH      -XATTR_START] = new XFillBmpStretchItem;
     rPoolDefaults[XATTR_FILLBMP_POSOFFSETX       -XATTR_START] = new XFillBmpPosOffsetXItem;
     rPoolDefaults[XATTR_FILLBMP_POSOFFSETY       -XATTR_START] = new XFillBmpPosOffsetYItem;
-    rPoolDefaults[XATTR_FILLFLOATTRANSPARENCE    -XATTR_START] = new XFillFloatTransparenceItem( XGradient(COL_BLACK, COL_BLACK), false );
+
+    rPoolDefaults[XATTR_FILLFLOATTRANSPARENCE    -XATTR_START] = new XFillFloatTransparenceItem(
+        XGradient(
+            basegfx::utils::createColorStopsFromStartEndColor(
+                COL_BLACK.getBColor(),
+                COL_BLACK.getBColor())),
+                false);
+
     rPoolDefaults[XATTR_SECONDARYFILLCOLOR       -XATTR_START] = new XSecondaryFillColorItem(aNullStr, aNullFillCol);
     rPoolDefaults[XATTR_FILLBACKGROUND           -XATTR_START] = new XFillBackgroundItem;
+    rPoolDefaults[XATTR_FILLUSESLIDEBACKGROUND   -XATTR_START] = new XFillUseSlideBackgroundItem;
     rPoolDefaults[XATTR_FORMTXTSTYLE       -XATTR_START] = new XFormTextStyleItem;
     rPoolDefaults[XATTR_FORMTXTADJUST      -XATTR_START] = new XFormTextAdjustItem;
     rPoolDefaults[XATTR_FORMTXTDISTANCE    -XATTR_START] = new XFormTextDistanceItem;
@@ -180,6 +191,7 @@ XOutdevItemPool::XOutdevItemPool(SfxItemPool* _pMaster)
     mpLocalItemInfos[XATTR_FORMTXTHIDEFORM  -XATTR_START]._nSID = SID_FORMTEXT_HIDEFORM;
 
     // associate new slots for panels with known items
+    mpLocalItemInfos[XATTR_FILLUSESLIDEBACKGROUND - XATTR_START]._nSID = SID_ATTR_FILL_USE_SLIDE_BACKGROUND;
     mpLocalItemInfos[XATTR_FILLTRANSPARENCE - XATTR_START]._nSID = SID_ATTR_FILL_TRANSPARENCE;
     mpLocalItemInfos[XATTR_FILLFLOATTRANSPARENCE - XATTR_START]._nSID = SID_ATTR_FILL_FLOATTRANSPARENCE;
     mpLocalItemInfos[XATTR_LINETRANSPARENCE - XATTR_START]._nSID = SID_ATTR_LINE_TRANSPARENCE;

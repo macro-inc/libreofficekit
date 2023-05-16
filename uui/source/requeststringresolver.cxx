@@ -28,7 +28,7 @@ using namespace css;
 UUIInteractionRequestStringResolver::UUIInteractionRequestStringResolver(
     uno::Reference< uno::XComponentContext > const &
         rxContext)
-        : m_pImpl(new UUIInteractionHelper(rxContext))
+        : m_pImpl(rxContext)
 {
 }
 
@@ -63,7 +63,7 @@ UUIInteractionRequestStringResolver::getStringFromInformationalRequest(
 {
     try
     {
-        return m_pImpl->getStringFromRequest(Request);
+        return m_pImpl.getStringFromRequest(Request);
     }
     catch (uno::RuntimeException const & ex)
     {

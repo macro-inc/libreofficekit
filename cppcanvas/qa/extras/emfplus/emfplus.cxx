@@ -7,15 +7,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <com/sun/star/frame/Desktop.hpp>
+#include <test/unoapi_test.hxx>
 
-#include <comphelper/processfactory.hxx>
-#include <sfx2/app.hxx>
 #include <sfx2/objsh.hxx>
 #include <sfx2/sfxbasemodel.hxx>
-#include <test/unoapi_test.hxx>
 #include <vcl/BitmapReadAccess.hxx>
-#include <vcl/pngwrite.hxx>
+#include <vcl/filter/PngImageWriter.hxx>
 #include <vcl/gdimtf.hxx>
 #include <tools/stream.hxx>
 
@@ -29,29 +26,9 @@ public:
     {
     }
 
-    virtual void setUp() override
-    {
-        UnoApiTest::setUp();
-        mxDesktop.set(
-            frame::Desktop::create(comphelper::getComponentContext(getMultiServiceFactory())));
-        SfxApplication::GetOrCreate();
-    };
-
-    virtual void tearDown() override
-    {
-        if (mxComponent.is())
-        {
-            closeDocument(mxComponent);
-            mxComponent->dispose();
-        }
-        UnoApiTest::tearDown();
-    };
-
     Bitmap load(const char* pName)
     {
-        OUString aFileURL;
-        createFileURL(OUString::createFromAscii(pName), aFileURL);
-        mxComponent = loadFromDesktop(aFileURL, "com.sun.star.drawing.DrawingDocument");
+        loadFromURL(OUString::createFromAscii(pName));
         SfxBaseModel* pModel = dynamic_cast<SfxBaseModel*>(mxComponent.get());
         CPPUNIT_ASSERT(pModel);
         SfxObjectShell* pShell = pModel->GetObjectShell();
@@ -63,14 +40,12 @@ public:
         if (pEnv)
         {
             SvFileStream aStream(OUString::fromUtf8(pEnv), StreamMode::WRITE);
-            vcl::PNGWriter aWriter(aResultBitmap);
-            CPPUNIT_ASSERT(aWriter.Write(aStream));
+            vcl::PngImageWriter aWriter(aStream);
+            CPPUNIT_ASSERT(aWriter.write(aResultBitmap));
         }
 
         return aResultBitmap.GetBitmap();
     }
-
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 CPPUNIT_TEST_FIXTURE(Test, testFdo77229)

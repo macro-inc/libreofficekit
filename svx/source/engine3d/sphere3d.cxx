@@ -29,7 +29,6 @@
 #include <basegfx/vector/b3dvector.hxx>
 #include <basegfx/point/b3dpoint.hxx>
 #include <sdr/contact/viewcontactofe3dsphere.hxx>
-#include <rtl/ustrbuf.hxx>
 
 // DrawContact section
 std::unique_ptr<sdr::contact::ViewContact> E3dSphereObj::CreateObjectSpecificViewContact()
@@ -90,17 +89,17 @@ void E3dSphereObj::SetDefaultAttributes(const E3dDefaultAttributes& rDefault)
 
 SdrObjKind E3dSphereObj::GetObjIdentifier() const
 {
-    return E3D_SPHEREOBJ_ID;
+    return SdrObjKind::E3D_Sphere;
 }
 
 // Convert the object into a group object consisting of n polygons
 
-SdrObjectUniquePtr E3dSphereObj::DoConvertToPolyObj(bool /*bBezier*/, bool /*bAddText*/) const
+rtl::Reference<SdrObject> E3dSphereObj::DoConvertToPolyObj(bool /*bBezier*/, bool /*bAddText*/) const
 {
     return nullptr;
 }
 
-E3dSphereObj* E3dSphereObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> E3dSphereObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new E3dSphereObj(rTargetModel, *this);
 }

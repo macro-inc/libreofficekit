@@ -19,6 +19,7 @@
 
 #include <config_features.h>
 #include <config_fuzzers.h>
+#include <config_wasm_strip.h>
 
 #include "swdlgfact.hxx"
 #include <svl/style.hxx>
@@ -35,6 +36,7 @@
 #include <colwd.hxx>
 #include <contentcontroldlg.hxx>
 #include <contentcontrollistitemdlg.hxx>
+#include <pagenumberdlg.hxx>
 #include <convert.hxx>
 #include <cption.hxx>
 #include <dbinsdlg.hxx>
@@ -83,7 +85,6 @@
 #include <optload.hxx>
 #include <optpage.hxx>
 #include <swuiidxmrk.hxx>
-#include <svl/numformat.hxx>
 #include <svx/dialogs.hrc>
 #include <mailmergewizard.hxx>
 #include <mailconfigpage.hxx>
@@ -149,6 +150,16 @@ short AbstractSwTableHeightDlg_Impl::Execute()
 short AbstractSwMergeTableDlg_Impl::Execute()
 {
     return m_xDlg->run();
+}
+
+short AbstractSwPageNumberDlg_Impl::Execute()
+{
+    return m_xDlg->run();
+}
+
+bool AbstractSwPageNumberDlg_Impl::StartExecuteAsync(AsyncContext &rCtx)
+{
+    return weld::GenericDialogController::runAsync(m_xDlg, rCtx.maEndDialogFn);
 }
 
 short AbstractGenericDialog_Impl::Execute()
@@ -591,11 +602,6 @@ void    AbstractSwRenameXNamedDlg_Impl::SetAlternativeAccess(
     m_xDlg->SetAlternativeAccess( xSecond, xThird);
 }
 
-void AbstractSwModalRedlineAcceptDlg_Impl::AcceptAll( bool bAccept )
-{
-    m_xDlg->AcceptAll( bAccept);
-}
-
 OUString AbstractGlossaryDlg_Impl::GetCurrGrpName() const
 {
     return m_xDlg->GetCurrGrpName();
@@ -624,6 +630,16 @@ bool AbstractFieldInputDlg_Impl::NextButtonPressed() const
 OUString AbstractInsFootNoteDlg_Impl::GetFontName()
 {
     return m_xDlg->GetFontName();
+}
+
+int AbstractSwPageNumberDlg_Impl::GetPageNumberPosition() const
+{
+    return m_xDlg->GetPageNumberPosition();
+}
+
+int AbstractSwPageNumberDlg_Impl::GetPageNumberAlignment() const
+{
+    return m_xDlg->GetPageNumberAlignment();
 }
 
 bool AbstractInsFootNoteDlg_Impl::IsEndNote()
@@ -835,8 +851,12 @@ sal_uInt16 AbstractMailMergeWizard_Impl::GetRestartPage() const
 
 std::optional<SwLanguageListItem> AbstractSwTranslateLangSelectDlg_Impl::GetSelectedLanguage()
 {
+#if !ENABLE_WASM_STRIP_EXTRA
     SwTranslateLangSelectDlg* pDlg = dynamic_cast<SwTranslateLangSelectDlg*>(m_xDlg.get());
     return pDlg->GetSelectedLanguage();
+#else
+    return {};
+#endif
 }
 
 VclPtr<AbstractSwInsertAbstractDlg> SwAbstractDialogFactory_Impl::CreateSwInsertAbstractDlg(weld::Window* pParent)
@@ -874,9 +894,9 @@ VclPtr<AbstractSwAsciiFilterDlg> SwAbstractDialogFactory_Impl::CreateSwAsciiFilt
 }
 
 VclPtr<VclAbstractDialog> SwAbstractDialogFactory_Impl::CreateSwInsertBookmarkDlg(weld::Window *pParent,
-                                                                                  SwWrtShell &rSh)
+        SwWrtShell &rSh, OUString const*const pSelected)
 {
-    return VclPtr<AbstractGenericDialog_Impl>::Create(std::make_shared<SwInsertBookmarkDlg>(pParent, rSh));
+    return VclPtr<AbstractGenericDialog_Impl>::Create(std::make_shared<SwInsertBookmarkDlg>(pParent, rSh, pSelected));
 }
 
 VclPtr<VclAbstractDialog> SwAbstractDialogFactory_Impl::CreateSwContentControlDlg(weld::Window* pParent,
@@ -900,7 +920,13 @@ std::shared_ptr<AbstractSwBreakDlg> SwAbstractDialogFactory_Impl::CreateSwBreakD
 
 std::shared_ptr<AbstractSwTranslateLangSelectDlg> SwAbstractDialogFactory_Impl::CreateSwTranslateLangSelectDlg(weld::Window* pParent, SwWrtShell &rSh)
 {
+#if !ENABLE_WASM_STRIP_EXTRA
     return std::make_shared<AbstractSwTranslateLangSelectDlg_Impl>(std::make_unique<SwTranslateLangSelectDlg>(pParent, rSh));
+#else
+    (void) pParent;
+    (void) rSh;
+    return nullptr;
+#endif
 }
 
 VclPtr<VclAbstractDialog> SwAbstractDialogFactory_Impl::CreateSwChangeDBDlg(SwView& rVw)
@@ -1071,6 +1097,11 @@ VclPtr<AbstractSwRenameXNamedDlg> SwAbstractDialogFactory_Impl::CreateSwRenameXN
 VclPtr<AbstractSwModalRedlineAcceptDlg> SwAbstractDialogFactory_Impl::CreateSwModalRedlineAcceptDlg(weld::Window *pParent)
 {
     return VclPtr<AbstractSwModalRedlineAcceptDlg_Impl>::Create(std::make_unique<SwModalRedlineAcceptDlg>(pParent));
+}
+
+VclPtr<AbstractSwPageNumberDlg> SwAbstractDialogFactory_Impl::CreateSwPageNumberDlg(weld::Window *pParent)
+{
+    return VclPtr<AbstractSwPageNumberDlg_Impl>::Create(std::make_shared<SwPageNumberDlg>(pParent));
 }
 
 VclPtr<VclAbstractDialog> SwAbstractDialogFactory_Impl::CreateTableMergeDialog(weld::Window* pParent, bool& rWithPrev)

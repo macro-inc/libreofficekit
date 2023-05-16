@@ -13,7 +13,7 @@
  manual changes will be rewritten by the next run of update_pch.sh (which presumably
  also fixes all possible problems, so it's usually better to use it).
 
- Generated on 2021-08-22 14:52:19 using:
+ Generated on 2022-08-13 18:01:14 using:
  ./bin/update_pch sc sc --cutoff=12 --exclude:system --include:module --include:local
 
  If after updating build fails, use the following command to locate conflicting headers:
@@ -79,7 +79,6 @@
 #include <osl/process.h>
 #include <osl/security.hxx>
 #include <osl/thread.h>
-#include <osl/time.h>
 #include <rtl/alloc.h>
 #include <rtl/bootstrap.hxx>
 #include <rtl/character.hxx>
@@ -89,6 +88,7 @@
 #include <rtl/math.h>
 #include <rtl/math.hxx>
 #include <rtl/ref.hxx>
+#include <rtl/strbuf.h>
 #include <rtl/strbuf.hxx>
 #include <rtl/string.h>
 #include <rtl/string.hxx>
@@ -110,14 +110,17 @@
 #include <sal/types.h>
 #include <sal/typesizes.h>
 #include <vcl/BinaryDataContainer.hxx>
+#include <vcl/EnumContext.hxx>
 #include <vcl/GraphicAttributes.hxx>
 #include <vcl/GraphicExternalLink.hxx>
 #include <vcl/GraphicObject.hxx>
 #include <vcl/IDialogRenderable.hxx>
+#include <vcl/InterimItemWindow.hxx>
 #include <vcl/Scanline.hxx>
+#include <vcl/WindowPosSize.hxx>
 #include <vcl/alpha.hxx>
 #include <vcl/animate/Animation.hxx>
-#include <vcl/animate/AnimationBitmap.hxx>
+#include <vcl/animate/AnimationFrame.hxx>
 #include <vcl/bitmap.hxx>
 #include <vcl/bitmap/BitmapTypes.hxx>
 #include <vcl/bitmapex.hxx>
@@ -126,8 +129,7 @@
 #include <vcl/ctrl.hxx>
 #include <vcl/customweld.hxx>
 #include <vcl/dllapi.h>
-#include <vcl/dockwin.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <vcl/event.hxx>
 #include <vcl/fntstyle.hxx>
 #include <vcl/font.hxx>
@@ -146,7 +148,7 @@
 #include <vcl/syswin.hxx>
 #include <vcl/task.hxx>
 #include <vcl/timer.hxx>
-#include <vcl/toolbox.hxx>
+#include <vcl/toolboxid.hxx>
 #include <vcl/transfer.hxx>
 #include <vcl/uitest/factory.hxx>
 #include <vcl/vclenum.hxx>
@@ -156,6 +158,7 @@
 #include <vcl/weld.hxx>
 #include <vcl/window.hxx>
 #include <vcl/windowstate.hxx>
+#include <vcl/wintypes.hxx>
 #endif // PCH_LEVEL >= 2
 #if PCH_LEVEL >= 3
 #include <basegfx/basegfxdllapi.h>
@@ -166,6 +169,7 @@
 #include <basegfx/point/b2ipoint.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
 #include <basegfx/polygon/b2dpolypolygon.hxx>
+#include <basegfx/range/Range2D.hxx>
 #include <basegfx/range/b2drange.hxx>
 #include <basegfx/range/b2drectangle.hxx>
 #include <basegfx/range/basicrange.hxx>
@@ -242,7 +246,6 @@
 #include <com/sun/star/style/XStyle.hpp>
 #include <com/sun/star/uno/Any.h>
 #include <com/sun/star/uno/Any.hxx>
-#include <com/sun/star/uno/Exception.hpp>
 #include <com/sun/star/uno/Reference.h>
 #include <com/sun/star/uno/Reference.hxx>
 #include <com/sun/star/uno/RuntimeException.hpp>
@@ -263,8 +266,10 @@
 #include <com/sun/star/util/XUpdatable.hpp>
 #include <com/sun/star/xml/sax/XFastContextHandler.hpp>
 #include <comphelper/broadcasthelper.hxx>
+#include <comphelper/compbase.hxx>
 #include <comphelper/comphelperdllapi.h>
 #include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <comphelper/lok.hxx>
 #include <comphelper/multicontainer2.hxx>
 #include <comphelper/processfactory.hxx>
@@ -279,11 +284,9 @@
 #include <comphelper/servicehelper.hxx>
 #include <comphelper/string.hxx>
 #include <comphelper/uno3.hxx>
-#include <comphelper/weak.hxx>
 #include <cppu/cppudllapi.h>
 #include <cppu/unotype.hxx>
 #include <cppuhelper/basemutex.hxx>
-#include <cppuhelper/compbase.hxx>
 #include <cppuhelper/compbase5.hxx>
 #include <cppuhelper/compbase_ex.hxx>
 #include <cppuhelper/cppuhelperdllapi.h>
@@ -296,11 +299,13 @@
 #include <cppuhelper/implbase_ex_pre.hxx>
 #include <cppuhelper/interfacecontainer.h>
 #include <cppuhelper/propshlp.hxx>
+#include <cppuhelper/queryinterface.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/weak.hxx>
 #include <cppuhelper/weakagg.hxx>
 #include <cppuhelper/weakref.hxx>
 #include <drawinglayer/drawinglayerdllapi.h>
+#include <drawinglayer/geometry/viewinformation2d.hxx>
 #include <drawinglayer/primitive2d/CommonTypes.hxx>
 #include <drawinglayer/primitive2d/Primitive2DContainer.hxx>
 #include <drawinglayer/primitive2d/Primitive2DVisitor.hxx>
@@ -339,6 +344,8 @@
 #include <o3tl/enumarray.hxx>
 #include <o3tl/safeint.hxx>
 #include <o3tl/sorted_vector.hxx>
+#include <o3tl/span.hxx>
+#include <o3tl/string_view.hxx>
 #include <o3tl/strong_int.hxx>
 #include <o3tl/typed_flags_set.hxx>
 #include <o3tl/underlyingenumvalue.hxx>
@@ -379,6 +386,7 @@
 #include <svl/lstner.hxx>
 #include <svl/numformat.hxx>
 #include <svl/poolitem.hxx>
+#include <svl/sharedstring.hxx>
 #include <svl/sharedstringpool.hxx>
 #include <svl/stritem.hxx>
 #include <svl/style.hxx>
@@ -444,7 +452,7 @@
 #include <tools/date.hxx>
 #include <tools/datetime.hxx>
 #include <tools/degree.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/fldunit.hxx>
 #include <tools/fontenum.hxx>
 #include <tools/fract.hxx>
@@ -464,7 +472,6 @@
 #include <tools/urlobj.hxx>
 #include <tools/weakbase.h>
 #include <tools/weakbase.hxx>
-#include <tools/wintypes.hxx>
 #include <typelib/typeclass.h>
 #include <typelib/typedescription.h>
 #include <typelib/uik.h>
@@ -489,6 +496,8 @@
 #if PCH_LEVEL >= 4
 #include <AccessibleContextBase.hxx>
 #include <IAnyRefDialog.hxx>
+#include <Sparkline.hxx>
+#include <SparklineGroup.hxx>
 #include <TableFillingAndNavigationTools.hxx>
 #include <address.hxx>
 #include <anyrefdg.hxx>
@@ -502,6 +511,7 @@
 #include <chartlis.hxx>
 #include <chgtrack.hxx>
 #include <clipparam.hxx>
+#include <colorscale.hxx>
 #include <column.hxx>
 #include <columnspanset.hxx>
 #include <compiler.hxx>
@@ -568,7 +578,6 @@
 #include <refundo.hxx>
 #include <refupdat.hxx>
 #include <refupdatecontext.hxx>
-#include <root.hxx>
 #include <rowheightcontext.hxx>
 #include <scabstdlg.hxx>
 #include <scdllapi.h>
@@ -577,6 +586,7 @@
 #include <scmod.hxx>
 #include <scopetools.hxx>
 #include <scresid.hxx>
+#include <segmenttree.hxx>
 #include <sheetdata.hxx>
 #include <sheetevents.hxx>
 #include <shellids.hxx>
@@ -592,12 +602,12 @@
 #include <transobj.hxx>
 #include <types.hxx>
 #include <uiitems.hxx>
+#include <undobase.hxx>
 #include <undoblk.hxx>
 #include <unonames.hxx>
 #include <userdat.hxx>
 #include <validat.hxx>
 #include <viewdata.hxx>
-#include <xiroot.hxx>
 #include <xlconst.hxx>
 #include <xlroot.hxx>
 #endif // PCH_LEVEL >= 4

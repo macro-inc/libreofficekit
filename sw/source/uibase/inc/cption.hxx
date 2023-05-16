@@ -33,14 +33,14 @@ class SwCaptionDialog final : public SfxDialogController
 {
     OUString m_sNone;
     TextFilterAutoConvert m_aTextFilter;
-    SwView& rView; // search per active, avoid View
-    std::unique_ptr<SwFieldMgr> pMgr; // pointer to save the include
+    SwView& m_rView; // search per active, avoid View
+    std::unique_ptr<SwFieldMgr> m_pMgr; // pointer to save the include
 
-    OUString sCharacterStyle;
-    bool bCopyAttributes;
-    bool bOrderNumberingFirst; //#i61007# order of captions
+    OUString m_sCharacterStyle;
+    bool m_bCopyAttributes;
+    bool m_bOrderNumberingFirst; //#i61007# order of captions
 
-    css::uno::Reference<css::container::XNameAccess> xNameAccess;
+    css::uno::Reference<css::container::XNameAccess> m_xNameAccess;
 
     SwCaptionPreview m_aPreview;
     std::unique_ptr<weld::Entry> m_xTextEdit;
@@ -52,7 +52,6 @@ class SwCaptionDialog final : public SfxDialogController
     std::unique_ptr<weld::Entry> m_xNumberingSeparatorED;
     std::unique_ptr<weld::Label> m_xSepText;
     std::unique_ptr<weld::Entry> m_xSepEdit;
-    std::unique_ptr<weld::Label> m_xPosText;
     std::unique_ptr<weld::ComboBox> m_xPosBox;
     std::unique_ptr<weld::Button> m_xOKButton;
     std::unique_ptr<weld::Button> m_xAutoCaptionButton;
@@ -72,7 +71,7 @@ class SwCaptionDialog final : public SfxDialogController
     void DrawSample();
     void ApplyCaptionOrder(); //#i61007# order of captions
 
-    static OUString our_aSepTextSave; // Save caption separator text
+    static OUString s_aSepTextSave; // Save caption separator text
 public:
     SwCaptionDialog(weld::Window* pParent, SwView& rV);
     virtual short run() override;

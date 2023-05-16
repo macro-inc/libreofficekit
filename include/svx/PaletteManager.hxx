@@ -47,9 +47,10 @@ class SVXCORE_DLLPUBLIC PaletteManager
     std::vector<std::unique_ptr<Palette>> m_Palettes;
 
     ColorSelectFunction maColorSelectFunction;
-    css::uno::Reference < css::uno::XComponentContext > m_context;
 
     std::unique_ptr<SvColorDialog> m_pColorDlg;
+
+    PaletteManager(const PaletteManager* pClone);
 public:
     PaletteManager();
     ~PaletteManager();
@@ -75,6 +76,8 @@ public:
     void        SetColorSelectFunction(const ColorSelectFunction& aColorSelectFunction);
 
     bool IsThemePaletteSelected() const;
+
+    PaletteManager* Clone() const;
 
     static void GetThemeIndexLumModOff(sal_uInt16 nItemId, sal_Int16& rThemeIndex,
                                        sal_Int16& rLumMod, sal_Int16& rLumOff);

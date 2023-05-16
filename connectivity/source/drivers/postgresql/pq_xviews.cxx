@@ -41,6 +41,7 @@
 #include <com/sun/star/sdbc/SQLException.hpp>
 #include <com/sun/star/sdbc/XRow.hpp>
 #include <cppuhelper/exc_hlp.hxx>
+#include <o3tl/safeint.hxx>
 
 #include "pq_xviews.hxx"
 #include "pq_xview.hxx"
@@ -52,7 +53,7 @@ using osl::MutexGuard;
 
 using com::sun::star::beans::XPropertySet;
 
-using com::sun::star::uno::makeAny;
+using com::sun::star::uno::Any;
 using com::sun::star::uno::UNO_QUERY;
 using com::sun::star::uno::Reference;
 
@@ -110,12 +111,12 @@ void Views::refresh()
             rtl::Reference<View> pView = new View (m_xMutex, m_origin, m_pSettings );
             Reference< css::beans::XPropertySet > prop = pView;
 
-            pView->setPropertyValue_NoBroadcast_public(st.NAME , makeAny(table) );
-            pView->setPropertyValue_NoBroadcast_public(st.SCHEMA_NAME, makeAny(schema) );
-            pView->setPropertyValue_NoBroadcast_public(st.COMMAND, makeAny(command) );
+            pView->setPropertyValue_NoBroadcast_public(st.NAME , Any(table) );
+            pView->setPropertyValue_NoBroadcast_public(st.SCHEMA_NAME, Any(schema) );
+            pView->setPropertyValue_NoBroadcast_public(st.COMMAND, Any(command) );
 
             {
-                m_values.push_back( makeAny( prop ) );
+                m_values.push_back( Any( prop ) );
                 map[ schema + "." + table ] = viewIndex;
                 ++viewIndex;
             }
@@ -175,7 +176,7 @@ void Views::dropByName( const OUString& elementName )
 void Views::dropByIndex( sal_Int32 index )
 {
     osl::MutexGuard guard( m_xMutex->GetMutex() );
-    if( index < 0 ||  index >= static_cast<sal_Int32>(m_values.size()) )
+    if( index < 0 ||  o3tl::make_unsigned(index) >= m_values.size() )
     {
         throw css::lang::IndexOutOfBoundsException(
             "VIEWS: Index out of range (allowed 0 to " + OUString::number(m_values.size() -1)

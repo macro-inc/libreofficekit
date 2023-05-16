@@ -25,6 +25,7 @@
 #include <comphelper/sequence.hxx>
 #include <editeng/brushitem.hxx>
 #include <editeng/editview.hxx>
+#include <editeng/memberids.h>
 #include <editeng/outliner.hxx>
 #include <o3tl/any.hxx>
 #include <o3tl/safeint.hxx>
@@ -32,7 +33,6 @@
 #include <svx/svditer.hxx>
 #include <svx/svdpage.hxx>
 #include <svx/svxids.hrc>
-#include <svx/unoshape.hxx>
 
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
 #include <comphelper/propertysequence.hxx>
@@ -52,7 +52,6 @@
 #include <tools/multisel.hxx>
 #include <tools/UnitConversion.hxx>
 #include <toolkit/awt/vclxdevice.hxx>
-#include <unotools/saveopt.hxx>
 
 #include <float.h>
 
@@ -67,10 +66,10 @@
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <com/sun/star/lang/ServiceNotRegisteredException.hpp>
 #include <com/sun/star/document/XDocumentEventBroadcaster.hpp>
-#include <com/sun/star/document/IndexedPropertyValues.hpp>
 #include <com/sun/star/script/XInvocation.hpp>
 #include <com/sun/star/script/vba/XVBAEventProcessor.hpp>
 #include <com/sun/star/beans/XFastPropertySet.hpp>
+#include <comphelper/indexedpropertyvalues.hxx>
 #include <comphelper/lok.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/profilezone.hxx>
@@ -139,89 +138,86 @@ constexpr OUStringLiteral SC_UNO_VBAGLOBNAME = u"VBAGlobalConstantName";
 //  no Which-ID here, map only for PropertySetInfo
 
 //! rename this, those are no longer only options
-static const SfxItemPropertyMapEntry* lcl_GetDocOptPropertyMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetDocOptPropertyMap()
 {
     static const SfxItemPropertyMapEntry aDocOptPropertyMap_Impl[] =
     {
-        {u"" SC_UNO_APPLYFMDES,              0, cppu::UnoType<bool>::get(),                                             0, 0},
-        {u"" SC_UNO_AREALINKS,               0, cppu::UnoType<sheet::XAreaLinks>::get(),               0, 0},
-        {u"" SC_UNO_AUTOCONTFOC,             0, cppu::UnoType<bool>::get(),                                             0, 0},
-        {u"" SC_UNO_BASICLIBRARIES,          0, cppu::UnoType<script::XLibraryContainer>::get(),     beans::PropertyAttribute::READONLY, 0},
-        {u"" SC_UNO_DIALOGLIBRARIES,         0, cppu::UnoType<script::XLibraryContainer>::get(),     beans::PropertyAttribute::READONLY, 0},
-        {    SC_UNO_VBAGLOBNAME,             0, cppu::UnoType<OUString>::get(),                  beans::PropertyAttribute::READONLY, 0},
-        {u"" SC_UNO_CALCASSHOWN,             PROP_UNO_CALCASSHOWN, cppu::UnoType<bool>::get(),                          0, 0},
-        {u"" SC_UNONAME_CLOCAL,              0, cppu::UnoType<lang::Locale>::get(),                                    0, 0},
-        {u"" SC_UNO_CJK_CLOCAL,              0, cppu::UnoType<lang::Locale>::get(),                                    0, 0},
-        {u"" SC_UNO_CTL_CLOCAL,              0, cppu::UnoType<lang::Locale>::get(),                                    0, 0},
-        {u"" SC_UNO_COLLABELRNG,             0, cppu::UnoType<sheet::XLabelRanges>::get(),             0, 0},
-        {u"" SC_UNO_DDELINKS,                0, cppu::UnoType<container::XNameAccess>::get(),          0, 0},
-        {u"" SC_UNO_DEFTABSTOP,              PROP_UNO_DEFTABSTOP, cppu::UnoType<sal_Int16>::get(),                     0, 0},
-        {u"" SC_UNO_EXTERNALDOCLINKS,        0, cppu::UnoType<sheet::XExternalDocLinks>::get(),        0, 0},
-        {u"" SC_UNO_FORBIDDEN,               0, cppu::UnoType<i18n::XForbiddenCharacters>::get(),      beans::PropertyAttribute::READONLY, 0},
-        {u"" SC_UNO_HASDRAWPAGES,            0, cppu::UnoType<bool>::get(),                                             beans::PropertyAttribute::READONLY, 0},
-        {u"" SC_UNO_IGNORECASE,              PROP_UNO_IGNORECASE, cppu::UnoType<bool>::get(),                           0, 0},
-        {u"" SC_UNO_ITERENABLED,             PROP_UNO_ITERENABLED, cppu::UnoType<bool>::get(),                          0, 0},
-        {u"" SC_UNO_ITERCOUNT,               PROP_UNO_ITERCOUNT, cppu::UnoType<sal_Int32>::get(),                      0, 0},
-        {u"" SC_UNO_ITEREPSILON,             PROP_UNO_ITEREPSILON, cppu::UnoType<double>::get(),                       0, 0},
-        {u"" SC_UNO_LOOKUPLABELS,            PROP_UNO_LOOKUPLABELS, cppu::UnoType<bool>::get(),                         0, 0},
-        {u"" SC_UNO_MATCHWHOLE,              PROP_UNO_MATCHWHOLE, cppu::UnoType<bool>::get(),                           0, 0},
-        {u"" SC_UNO_NAMEDRANGES,             0, cppu::UnoType<sheet::XNamedRanges>::get(),             0, 0},
-        {u"" SC_UNO_DATABASERNG,             0, cppu::UnoType<sheet::XDatabaseRanges>::get(),          0, 0},
-        {u"" SC_UNO_NULLDATE,                PROP_UNO_NULLDATE, cppu::UnoType<util::Date>::get(),                      0, 0},
-        {u"" SC_UNO_ROWLABELRNG,             0, cppu::UnoType<sheet::XLabelRanges>::get(),             0, 0},
-        {u"" SC_UNO_SHEETLINKS,              0, cppu::UnoType<container::XNameAccess>::get(),          0, 0},
-        {u"" SC_UNO_SPELLONLINE,             PROP_UNO_SPELLONLINE, cppu::UnoType<bool>::get(),                          0, 0},
-        {u"" SC_UNO_STANDARDDEC,             PROP_UNO_STANDARDDEC, cppu::UnoType<sal_Int16>::get(),                    0, 0},
-        {u"" SC_UNO_REGEXENABLED,            PROP_UNO_REGEXENABLED, cppu::UnoType<bool>::get(),                         0, 0},
-        {u"" SC_UNO_WILDCARDSENABLED,        PROP_UNO_WILDCARDSENABLED, cppu::UnoType<bool>::get(),                         0, 0},
-        {u"" SC_UNO_RUNTIMEUID,              0, cppu::UnoType<OUString>::get(),                  beans::PropertyAttribute::READONLY, 0},
-        {u"" SC_UNO_HASVALIDSIGNATURES,      0, cppu::UnoType<bool>::get(),                                             beans::PropertyAttribute::READONLY, 0},
-        {u"" SC_UNO_ISLOADED,                0, cppu::UnoType<bool>::get(),                                             0, 0},
-        {u"" SC_UNO_ISUNDOENABLED,           0, cppu::UnoType<bool>::get(),                                             0, 0},
-        {u"" SC_UNO_RECORDCHANGES,           0, cppu::UnoType<bool>::get(),                                             0, 0},
-        {u"" SC_UNO_ISRECORDCHANGESPROTECTED,0, cppu::UnoType<bool>::get(),            beans::PropertyAttribute::READONLY, 0},
-        {u"" SC_UNO_ISADJUSTHEIGHTENABLED,   0, cppu::UnoType<bool>::get(),                                             0, 0},
-        {u"" SC_UNO_ISEXECUTELINKENABLED,    0, cppu::UnoType<bool>::get(),                                             0, 0},
-        {u"" SC_UNO_ISCHANGEREADONLYENABLED, 0, cppu::UnoType<bool>::get(),                                             0, 0},
-        {u"" SC_UNO_REFERENCEDEVICE,         0, cppu::UnoType<awt::XDevice>::get(),                    beans::PropertyAttribute::READONLY, 0},
+        { SC_UNO_APPLYFMDES,              0, cppu::UnoType<bool>::get(),                                             0, 0},
+        { SC_UNO_AREALINKS,               0, cppu::UnoType<sheet::XAreaLinks>::get(),               0, 0},
+        { SC_UNO_AUTOCONTFOC,             0, cppu::UnoType<bool>::get(),                                             0, 0},
+        { SC_UNO_BASICLIBRARIES,          0, cppu::UnoType<script::XLibraryContainer>::get(),     beans::PropertyAttribute::READONLY, 0},
+        { SC_UNO_DIALOGLIBRARIES,         0, cppu::UnoType<script::XLibraryContainer>::get(),     beans::PropertyAttribute::READONLY, 0},
+        { SC_UNO_VBAGLOBNAME,             0, cppu::UnoType<OUString>::get(),                  beans::PropertyAttribute::READONLY, 0},
+        { SC_UNO_CALCASSHOWN,             PROP_UNO_CALCASSHOWN, cppu::UnoType<bool>::get(),                          0, 0},
+        { SC_UNONAME_CLOCAL,              0, cppu::UnoType<lang::Locale>::get(),                                    0, 0},
+        { SC_UNO_CJK_CLOCAL,              0, cppu::UnoType<lang::Locale>::get(),                                    0, 0},
+        { SC_UNO_CTL_CLOCAL,              0, cppu::UnoType<lang::Locale>::get(),                                    0, 0},
+        { SC_UNO_COLLABELRNG,             0, cppu::UnoType<sheet::XLabelRanges>::get(),             0, 0},
+        { SC_UNO_DDELINKS,                0, cppu::UnoType<container::XNameAccess>::get(),          0, 0},
+        { SC_UNO_DEFTABSTOP,              PROP_UNO_DEFTABSTOP, cppu::UnoType<sal_Int16>::get(),                     0, 0},
+        { SC_UNO_EXTERNALDOCLINKS,        0, cppu::UnoType<sheet::XExternalDocLinks>::get(),        0, 0},
+        { SC_UNO_FORBIDDEN,               0, cppu::UnoType<i18n::XForbiddenCharacters>::get(),      beans::PropertyAttribute::READONLY, 0},
+        { SC_UNO_HASDRAWPAGES,            0, cppu::UnoType<bool>::get(),                                             beans::PropertyAttribute::READONLY, 0},
+        { SC_UNO_IGNORECASE,              PROP_UNO_IGNORECASE, cppu::UnoType<bool>::get(),                           0, 0},
+        { SC_UNO_ITERENABLED,             PROP_UNO_ITERENABLED, cppu::UnoType<bool>::get(),                          0, 0},
+        { SC_UNO_ITERCOUNT,               PROP_UNO_ITERCOUNT, cppu::UnoType<sal_Int32>::get(),                      0, 0},
+        { SC_UNO_ITEREPSILON,             PROP_UNO_ITEREPSILON, cppu::UnoType<double>::get(),                       0, 0},
+        { SC_UNO_LOOKUPLABELS,            PROP_UNO_LOOKUPLABELS, cppu::UnoType<bool>::get(),                         0, 0},
+        { SC_UNO_MATCHWHOLE,              PROP_UNO_MATCHWHOLE, cppu::UnoType<bool>::get(),                           0, 0},
+        { SC_UNO_NAMEDRANGES,             0, cppu::UnoType<sheet::XNamedRanges>::get(),             0, 0},
+        { SC_UNO_DATABASERNG,             0, cppu::UnoType<sheet::XDatabaseRanges>::get(),          0, 0},
+        { SC_UNO_NULLDATE,                PROP_UNO_NULLDATE, cppu::UnoType<util::Date>::get(),                      0, 0},
+        { SC_UNO_ROWLABELRNG,             0, cppu::UnoType<sheet::XLabelRanges>::get(),             0, 0},
+        { SC_UNO_SHEETLINKS,              0, cppu::UnoType<container::XNameAccess>::get(),          0, 0},
+        { SC_UNO_SPELLONLINE,             PROP_UNO_SPELLONLINE, cppu::UnoType<bool>::get(),                          0, 0},
+        { SC_UNO_STANDARDDEC,             PROP_UNO_STANDARDDEC, cppu::UnoType<sal_Int16>::get(),                    0, 0},
+        { SC_UNO_REGEXENABLED,            PROP_UNO_REGEXENABLED, cppu::UnoType<bool>::get(),                         0, 0},
+        { SC_UNO_WILDCARDSENABLED,        PROP_UNO_WILDCARDSENABLED, cppu::UnoType<bool>::get(),                         0, 0},
+        { SC_UNO_RUNTIMEUID,              0, cppu::UnoType<OUString>::get(),                  beans::PropertyAttribute::READONLY, 0},
+        { SC_UNO_HASVALIDSIGNATURES,      0, cppu::UnoType<bool>::get(),                                             beans::PropertyAttribute::READONLY, 0},
+        { SC_UNO_ISLOADED,                0, cppu::UnoType<bool>::get(),                                             0, 0},
+        { SC_UNO_ISUNDOENABLED,           0, cppu::UnoType<bool>::get(),                                             0, 0},
+        { SC_UNO_RECORDCHANGES,           0, cppu::UnoType<bool>::get(),                                             0, 0},
+        { SC_UNO_ISRECORDCHANGESPROTECTED,0, cppu::UnoType<bool>::get(),            beans::PropertyAttribute::READONLY, 0},
+        { SC_UNO_ISADJUSTHEIGHTENABLED,   0, cppu::UnoType<bool>::get(),                                             0, 0},
+        { SC_UNO_ISEXECUTELINKENABLED,    0, cppu::UnoType<bool>::get(),                                             0, 0},
+        { SC_UNO_ISCHANGEREADONLYENABLED, 0, cppu::UnoType<bool>::get(),                                             0, 0},
+        { SC_UNO_REFERENCEDEVICE,         0, cppu::UnoType<awt::XDevice>::get(),                    beans::PropertyAttribute::READONLY, 0},
         {u"BuildId",                      0, ::cppu::UnoType<OUString>::get(),                0, 0},
-        {u"" SC_UNO_CODENAME,                0, cppu::UnoType<OUString>::get(),                  0, 0},
-        {u"" SC_UNO_INTEROPGRABBAG,          0, cppu::UnoType<uno::Sequence< beans::PropertyValue >>::get(), 0, 0},
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNO_CODENAME,                0, cppu::UnoType<OUString>::get(),                  0, 0},
+        { SC_UNO_INTEROPGRABBAG,          0, cppu::UnoType<uno::Sequence< beans::PropertyValue >>::get(), 0, 0},
     };
     return aDocOptPropertyMap_Impl;
 }
 
 //! StandardDecimals as property and from NumberFormatter ????????
 
-static const SfxItemPropertyMapEntry* lcl_GetColumnsPropertyMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetColumnsPropertyMap()
 {
     static const SfxItemPropertyMapEntry aColumnsPropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_MANPAGE,  0,  cppu::UnoType<bool>::get(),          0, 0 },
-        {u"" SC_UNONAME_NEWPAGE,  0,  cppu::UnoType<bool>::get(),          0, 0 },
-        {u"" SC_UNONAME_CELLVIS,  0,  cppu::UnoType<bool>::get(),          0, 0 },
-        {u"" SC_UNONAME_OWIDTH,   0,  cppu::UnoType<bool>::get(),          0, 0 },
-        {u"" SC_UNONAME_CELLWID,  0,  cppu::UnoType<sal_Int32>::get(),    0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_MANPAGE,  0,  cppu::UnoType<bool>::get(),          0, 0 },
+        { SC_UNONAME_NEWPAGE,  0,  cppu::UnoType<bool>::get(),          0, 0 },
+        { SC_UNONAME_CELLVIS,  0,  cppu::UnoType<bool>::get(),          0, 0 },
+        { SC_UNONAME_OWIDTH,   0,  cppu::UnoType<bool>::get(),          0, 0 },
+        { SC_UNONAME_CELLWID,  0,  cppu::UnoType<sal_Int32>::get(),    0, 0 },
     };
     return aColumnsPropertyMap_Impl;
 }
 
-static const SfxItemPropertyMapEntry* lcl_GetRowsPropertyMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetRowsPropertyMap()
 {
     static const SfxItemPropertyMapEntry aRowsPropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_CELLHGT,  0,  cppu::UnoType<sal_Int32>::get(),    0, 0 },
-        {u"" SC_UNONAME_CELLFILT, 0,  cppu::UnoType<bool>::get(),          0, 0 },
-        {u"" SC_UNONAME_OHEIGHT,  0,  cppu::UnoType<bool>::get(),          0, 0 },
-        {u"" SC_UNONAME_MANPAGE,  0,  cppu::UnoType<bool>::get(),          0, 0 },
-        {u"" SC_UNONAME_NEWPAGE,  0,  cppu::UnoType<bool>::get(),          0, 0 },
-        {u"" SC_UNONAME_CELLVIS,  0,  cppu::UnoType<bool>::get(),          0, 0 },
-        {u"" SC_UNONAME_CELLBACK, ATTR_BACKGROUND, ::cppu::UnoType<sal_Int32>::get(), 0, MID_BACK_COLOR },
-        {u"" SC_UNONAME_CELLTRAN, ATTR_BACKGROUND, cppu::UnoType<bool>::get(), 0, MID_GRAPHIC_TRANSPARENT },
+        { SC_UNONAME_CELLHGT,  0,  cppu::UnoType<sal_Int32>::get(),    0, 0 },
+        { SC_UNONAME_CELLFILT, 0,  cppu::UnoType<bool>::get(),          0, 0 },
+        { SC_UNONAME_OHEIGHT,  0,  cppu::UnoType<bool>::get(),          0, 0 },
+        { SC_UNONAME_MANPAGE,  0,  cppu::UnoType<bool>::get(),          0, 0 },
+        { SC_UNONAME_NEWPAGE,  0,  cppu::UnoType<bool>::get(),          0, 0 },
+        { SC_UNONAME_CELLVIS,  0,  cppu::UnoType<bool>::get(),          0, 0 },
+        { SC_UNONAME_CELLBACK, ATTR_BACKGROUND, ::cppu::UnoType<sal_Int32>::get(), 0, MID_BACK_COLOR },
+        { SC_UNONAME_CELLTRAN, ATTR_BACKGROUND, cppu::UnoType<bool>::get(), 0, MID_GRAPHIC_TRANSPARENT },
         // not sorted, not used with SfxItemPropertyMapEntry::GetByName
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
     return aRowsPropertyMap_Impl;
 }
@@ -572,16 +568,18 @@ void ScModelObj::paintTile( VirtualDevice& rDevice,
 void ScModelObj::setPart( int nPart, bool /*bAllowChangeFocus*/ )
 {
     ScViewData* pViewData = ScDocShell::GetViewData();
+    if (!pViewData)
+        return;
+
     ScTabView* pTabView = pViewData->GetView();
+    if (!pTabView)
+        return;
 
-    if (pTabView)
-    {
-        if (SdrView* pDrawView = pViewData->GetViewShell()->GetScDrawView())
-            pDrawView->SetNegativeX(comphelper::LibreOfficeKit::isActive() &&
-                pViewData->GetDocument().IsLayoutRTL(nPart));
+    if (SdrView* pDrawView = pViewData->GetViewShell()->GetScDrawView())
+        pDrawView->SetNegativeX(comphelper::LibreOfficeKit::isActive() &&
+            pViewData->GetDocument().IsLayoutRTL(nPart));
 
-        pTabView->SelectTabPage(nPart + 1);
-    }
+    pTabView->SelectTabPage(nPart + 1);
 }
 
 int ScModelObj::getParts()
@@ -599,6 +597,9 @@ int ScModelObj::getPart()
 OUString ScModelObj::getPartInfo( int nPart )
 {
     ScViewData* pViewData = ScDocShell::GetViewData();
+    if (!pViewData)
+        return OUString();
+
     const bool bIsVisible = pViewData->GetDocument().IsVisible(nPart);
     //FIXME: Implement IsSelected().
     const bool bIsSelected = false; //pViewData->GetDocument()->IsSelected(nPart);
@@ -616,16 +617,22 @@ OUString ScModelObj::getPartInfo( int nPart )
 
 OUString ScModelObj::getPartName( int nPart )
 {
-    OUString sTabName;
     ScViewData* pViewData = ScDocShell::GetViewData();
+    if (!pViewData)
+        return OUString();
+
+    OUString sTabName;
     pViewData->GetDocument().GetName(nPart, sTabName);
     return sTabName;
 }
 
 OUString ScModelObj::getPartHash( int nPart )
 {
-    sal_Int64 nHashCode;
     ScViewData* pViewData = ScDocShell::GetViewData();
+    if (!pViewData)
+        return OUString();
+
+    sal_Int64 nHashCode;
     return (pViewData->GetDocument().GetHashCode(nPart, nHashCode) ? OUString::number(nHashCode) : OUString());
 }
 
@@ -784,7 +791,11 @@ void ScModelObj::postMouseEvent(int nType, int nX, int nY, int nCount, int nButt
 void ScModelObj::setTextSelection(int nType, int nX, int nY)
 {
     SolarMutexGuard aGuard;
+
     ScViewData* pViewData = ScDocShell::GetViewData();
+    if (!pViewData)
+        return;
+
     ScTabViewShell* pViewShell = pViewData->GetViewShell();
 
     LokChartHelper aChartHelper(pViewShell);
@@ -866,22 +877,24 @@ uno::Reference<datatransfer::XTransferable> ScModelObj::getSelection()
     SolarMutexGuard aGuard;
 
     TransferableDataHelper aDataHelper;
-    ScViewData* pViewData = ScDocShell::GetViewData();
     uno::Reference<datatransfer::XTransferable> xTransferable;
 
-    if ( ScEditShell * pShell = dynamic_cast<ScEditShell*>( pViewData->GetViewShell()->GetViewFrame()->GetDispatcher()->GetShell(0) ) )
-        xTransferable = pShell->GetEditView()->GetTransferable();
-    else if ( nullptr != dynamic_cast<ScDrawTextObjectBar*>( pViewData->GetViewShell()->GetViewFrame()->GetDispatcher()->GetShell(0) ))
+    if (ScViewData* pViewData = ScDocShell::GetViewData())
     {
-        ScDrawView* pView = pViewData->GetScDrawView();
-        OutlinerView* pOutView = pView->GetTextEditOutlinerView();
-        if (pOutView)
-            xTransferable = pOutView->GetEditView().GetTransferable();
+        if ( ScEditShell * pShell = dynamic_cast<ScEditShell*>( pViewData->GetViewShell()->GetViewFrame()->GetDispatcher()->GetShell(0) ) )
+            xTransferable = pShell->GetEditView()->GetTransferable();
+        else if ( nullptr != dynamic_cast<ScDrawTextObjectBar*>( pViewData->GetViewShell()->GetViewFrame()->GetDispatcher()->GetShell(0) ))
+        {
+            ScDrawView* pView = pViewData->GetScDrawView();
+            OutlinerView* pOutView = pView->GetTextEditOutlinerView();
+            if (pOutView)
+                xTransferable = pOutView->GetEditView().GetTransferable();
+        }
+        else if ( ScDrawShell * pDrawShell = dynamic_cast<ScDrawShell*>( pViewData->GetViewShell()->GetViewFrame()->GetDispatcher()->GetShell(0) ) )
+            xTransferable = pDrawShell->GetDrawView()->CopyToTransferable();
+        else
+            xTransferable = pViewData->GetViewShell()->CopyToTransferable();
     }
-    else if ( ScDrawShell * pDrawShell = dynamic_cast<ScDrawShell*>( pViewData->GetViewShell()->GetViewFrame()->GetDispatcher()->GetShell(0) ) )
-        xTransferable = pDrawShell->GetDrawView()->CopyToTransferable();
-    else
-        xTransferable = pViewData->GetViewShell()->CopyToTransferable();
 
     if (!xTransferable.is())
         xTransferable.set( aDataHelper.GetTransferable() );
@@ -943,6 +956,9 @@ void ScModelObj::resetSelection()
     SolarMutexGuard aGuard;
 
     ScViewData* pViewData = ScDocShell::GetViewData();
+    if (!pViewData)
+        return;
+
     ScTabViewShell* pViewShell = pViewData->GetViewShell();
 
     // deselect the shapes & texts
@@ -1000,7 +1016,6 @@ static void lcl_sendLOKDocumentBackground(const ScViewData* pViewData)
 void ScModelObj::setClientZoom(int nTilePixelWidth_, int nTilePixelHeight_, int nTileTwipWidth_, int nTileTwipHeight_)
 {
     ScViewData* pViewData = ScDocShell::GetViewData();
-
     if (!pViewData)
         return;
 
@@ -1032,7 +1047,6 @@ void ScModelObj::setClientZoom(int nTilePixelWidth_, int nTilePixelHeight_, int 
 void ScModelObj::getRowColumnHeaders(const tools::Rectangle& rRectangle, tools::JsonWriter& rJsonWriter)
 {
     ScViewData* pViewData = ScDocShell::GetViewData();
-
     if (!pViewData)
         return;
 
@@ -1047,7 +1061,6 @@ OString ScModelObj::getSheetGeometryData(bool bColumns, bool bRows, bool bSizes,
                                          bool bFiltered, bool bGroups)
 {
     ScViewData* pViewData = ScDocShell::GetViewData();
-
     if (!pViewData)
         return "";
 
@@ -1063,7 +1076,6 @@ void ScModelObj::getCellCursor(tools::JsonWriter& rJsonWriter)
     SolarMutexGuard aGuard;
 
     ScViewData* pViewData = ScDocShell::GetViewData();
-
     if (!pViewData)
         return;
 
@@ -1123,7 +1135,6 @@ void ScModelObj::setClientVisibleArea(const tools::Rectangle& rRectangle)
 void ScModelObj::setOutlineState(bool bColumn, int nLevel, int nIndex, bool bHidden)
 {
     ScViewData* pViewData = ScDocShell::GetViewData();
-
     if (!pViewData)
         return;
 
@@ -1154,23 +1165,25 @@ void ScModelObj::getPostIts(tools::JsonWriter& rJsonWriter)
         rJsonWriter.put("text", aNote.mpNote->GetText());
 
         // Calculating the cell cursor position
-        ScViewData* pViewData = ScDocShell::GetViewData();
-        ScGridWindow* pGridWindow = pViewData->GetActiveWin();
-        if (pGridWindow)
+        if (ScViewData* pViewData = ScDocShell::GetViewData())
         {
-            SCCOL nX = aNote.maPos.Col();
-            SCROW nY = aNote.maPos.Row();
-            Point aScrPos = pViewData->GetScrPos(nX, nY, pViewData->GetActivePart(), true);
-            tools::Long nSizeXPix;
-            tools::Long nSizeYPix;
-            pViewData->GetMergeSizePixel(nX, nY, nSizeXPix, nSizeYPix);
+            ScGridWindow* pGridWindow = pViewData->GetActiveWin();
+            if (pGridWindow)
+            {
+                SCCOL nX = aNote.maPos.Col();
+                SCROW nY = aNote.maPos.Row();
+                Point aScrPos = pViewData->GetScrPos(nX, nY, pViewData->GetActivePart(), true);
+                tools::Long nSizeXPix;
+                tools::Long nSizeYPix;
+                pViewData->GetMergeSizePixel(nX, nY, nSizeXPix, nSizeYPix);
 
-            double fPPTX = pViewData->GetPPTX();
-            double fPPTY = pViewData->GetPPTY();
-            tools::Rectangle aRect(Point(aScrPos.getX() / fPPTX, aScrPos.getY() / fPPTY),
-                            Size(nSizeXPix / fPPTX, nSizeYPix / fPPTY));
+                double fPPTX = pViewData->GetPPTX();
+                double fPPTY = pViewData->GetPPTY();
+                tools::Rectangle aRect(Point(aScrPos.getX() / fPPTX, aScrPos.getY() / fPPTY),
+                                Size(nSizeXPix / fPPTX, nSizeYPix / fPPTY));
 
-            rJsonWriter.put("cellPos", aRect.toString());
+                rJsonWriter.put("cellPos", aRect.toString());
+            }
         }
     }
 }
@@ -1193,23 +1206,25 @@ void ScModelObj::getPostItsPos(tools::JsonWriter& rJsonWriter)
         rJsonWriter.put("tab", aNote.maPos.Tab());
 
         // Calculating the cell cursor position
-        ScViewData* pViewData = ScDocShell::GetViewData();
-        ScGridWindow* pGridWindow = pViewData->GetActiveWin();
-        if (pGridWindow)
+        if (ScViewData* pViewData = ScDocShell::GetViewData())
         {
-            SCCOL nX = aNote.maPos.Col();
-            SCROW nY = aNote.maPos.Row();
-            Point aScrPos = pViewData->GetScrPos(nX, nY, pViewData->GetActivePart(), true);
-            tools::Long nSizeXPix;
-            tools::Long nSizeYPix;
-            pViewData->GetMergeSizePixel(nX, nY, nSizeXPix, nSizeYPix);
+            ScGridWindow* pGridWindow = pViewData->GetActiveWin();
+            if (pGridWindow)
+            {
+                SCCOL nX = aNote.maPos.Col();
+                SCROW nY = aNote.maPos.Row();
+                Point aScrPos = pViewData->GetScrPos(nX, nY, pViewData->GetActivePart(), true);
+                tools::Long nSizeXPix;
+                tools::Long nSizeYPix;
+                pViewData->GetMergeSizePixel(nX, nY, nSizeXPix, nSizeYPix);
 
-            double fPPTX = pViewData->GetPPTX();
-            double fPPTY = pViewData->GetPPTY();
-            tools::Rectangle aRect(Point(aScrPos.getX() / fPPTX, aScrPos.getY() / fPPTY),
-                            Size(nSizeXPix / fPPTX, nSizeYPix / fPPTY));
+                double fPPTX = pViewData->GetPPTX();
+                double fPPTY = pViewData->GetPPTY();
+                tools::Rectangle aRect(Point(aScrPos.getX() / fPPTX, aScrPos.getY() / fPPTY),
+                                Size(nSizeXPix / fPPTX, nSizeYPix / fPPTY));
 
-            rJsonWriter.put("cellPos", aRect.toString());
+                rJsonWriter.put("cellPos", aRect.toString());
+            }
         }
     }
 }
@@ -1227,6 +1242,11 @@ void ScModelObj::completeFunction(const OUString& rFunctionName)
 void ScModelObj::initializeForTiledRendering(const css::uno::Sequence<css::beans::PropertyValue>& rArguments)
 {
     SolarMutexGuard aGuard;
+
+    // enable word autocompletion
+    ScAppOptions aAppOptions(SC_MOD()->GetAppOptions());
+    aAppOptions.SetAutoComplete(true);
+    SC_MOD()->SetAppOptions(aAppOptions);
 
     for (const beans::PropertyValue& rValue : rArguments)
     {
@@ -1674,7 +1694,7 @@ bool ScModelObj::FillRenderMarkData( const uno::Any& aSelection,
 
     // restrict to selected sheets if a view is available
     uno::Reference<sheet::XSelectedSheetsSupplier> xSelectedSheets(xView, uno::UNO_QUERY);
-    if (bSelectedSheetsOnly && xSelectedSheets.is())
+    if (bSelectedSheetsOnly && pDocShell && xSelectedSheets.is())
     {
         const uno::Sequence<sal_Int32> aSelected = xSelectedSheets->getSelectedSheets();
         ScMarkData::MarkedTabsType aSelectedTabs;
@@ -1778,9 +1798,9 @@ sal_Int32 SAL_CALL ScModelObj::getRendererCount(const uno::Any& aSelection,
     return (nSelectCount > 0) ? nSelectCount : 1;
 }
 
-static sal_Int32 lcl_GetRendererNum( sal_Int32 nSelRenderer, const OUString& rPagesStr, sal_Int32 nTotalPages )
+static sal_Int32 lcl_GetRendererNum( sal_Int32 nSelRenderer, std::u16string_view rPagesStr, sal_Int32 nTotalPages )
 {
-    if ( rPagesStr.isEmpty() )
+    if ( rPagesStr.empty() )
         return nSelRenderer;
 
     StringRangeEnumerator aRangeEnum( rPagesStr, 0, nTotalPages-1 );
@@ -1913,19 +1933,15 @@ uno::Sequence<beans::PropertyValue> SAL_CALL ScModelObj::getRenderer( sal_Int32 
         const awt::Size aPageSize(aMMRect.GetWidth(), aMMRect.GetHeight());
         const awt::Point aCalcPagePos(aMMRect.Left(), aMMRect.Top());
 
-        uno::Sequence<beans::PropertyValue> aSequence(5);
-        beans::PropertyValue* pArray = aSequence.getArray();
-        pArray[0].Name = SC_UNONAME_PAGESIZE;
-        pArray[0].Value <<= aPageSize;
-        // #i111158# all positions are relative to the whole page, including non-printable area
-        pArray[1].Name = SC_UNONAME_INC_NP_AREA;
-        pArray[1].Value <<= true;
-        pArray[2].Name = SC_UNONAME_SOURCERANGE;
-        pArray[2].Value <<= aRangeAddress;
-        pArray[3].Name = SC_UNONAME_CALCPAGESIZE;
-        pArray[3].Value <<= aPageSize;
-        pArray[4].Name = SC_UNONAME_CALCPAGEPOS;
-        pArray[4].Value <<= aCalcPagePos;
+        uno::Sequence<beans::PropertyValue> aSequence
+        {
+            comphelper::makePropertyValue(SC_UNONAME_PAGESIZE, aPageSize),
+            // #i111158# all positions are relative to the whole page, including non-printable area
+            comphelper::makePropertyValue(SC_UNONAME_INC_NP_AREA, true),
+            comphelper::makePropertyValue(SC_UNONAME_SOURCERANGE, aRangeAddress),
+            comphelper::makePropertyValue(SC_UNONAME_CALCPAGESIZE, aPageSize), // TODO aPageSize too ?
+            comphelper::makePropertyValue(SC_UNONAME_CALCPAGEPOS, aCalcPagePos)
+        };
 
         if( ! pPrinterOptions )
             pPrinterOptions.reset(new ScPrintUIOptions);
@@ -2228,6 +2244,12 @@ void SAL_CALL ScModelObj::render( sal_Int32 nSelRenderer, const uno::Any& aSelec
     vcl::PDFExtOutDevData* pPDFData = dynamic_cast< vcl::PDFExtOutDevData* >(pDev->GetExtOutDevData() );
     if ( nRenderer == nTabStart )
     {
+        if (pPDFData)
+        {
+            css::lang::Locale const docLocale(Application::GetSettings().GetLanguageTag().getLocale());
+            pPDFData->SetDocumentLocale(docLocale);
+        }
+
         // first page of a sheet: add outline item for the sheet name
 
         if ( pPDFData && pPDFData->GetIsExportBookmarks() )
@@ -2610,8 +2632,8 @@ uno::Reference< container::XIndexAccess > SAL_CALL ScModelObj::getViewData(  )
         SolarMutexGuard aGuard;
         if (pDocShell && pDocShell->GetCreateMode() == SfxObjectCreateMode::EMBEDDED)
         {
-            uno::Reference < container::XIndexContainer > xCont = document::IndexedPropertyValues::create( ::comphelper::getProcessComponentContext() );
-            xRet.set( xCont, uno::UNO_QUERY_THROW );
+            rtl::Reference< comphelper::IndexedPropertyValuesContainer > xCont = new comphelper::IndexedPropertyValuesContainer();
+            xRet = xCont;
 
             OUString sName;
             pDocShell->GetDocument().GetName( pDocShell->GetDocument().GetVisibleTab(), sName );
@@ -2622,7 +2644,7 @@ uno::Reference< container::XIndexAccess > SAL_CALL ScModelObj::getViewData(  )
                 comphelper::makePropertyValue(SC_POSITIONLEFT, nPosLeft),
                 comphelper::makePropertyValue(SC_POSITIONTOP, nPosTop)
             };
-            xCont->insertByIndex( 0, uno::makeAny( aSeq ) );
+            xCont->insertByIndex( 0, uno::Any( aSeq ) );
         }
     }
 
@@ -3274,12 +3296,12 @@ void ScModelObj::NotifyChanges( const OUString& rOperation, const ScRangeList& r
             rChange.ReplacedElement <<= xRangeObj;
         }
 
-        ::comphelper::OInterfaceIteratorHelper2 aIter( maChangesListeners );
+        ::comphelper::OInterfaceIteratorHelper3 aIter( maChangesListeners );
         while ( aIter.hasMoreElements() )
         {
             try
             {
-                static_cast< util::XChangesListener* >( aIter.next() )->changesOccurred( aEvent );
+                aIter.next()->changesOccurred( aEvent );
             }
             catch( uno::Exception& )
             {
@@ -3408,7 +3430,7 @@ void ScModelObj::enableOpenCL(sal_Bool bEnable)
     ScInterpreter::SetGlobalConfig(aConfig);
 
 #if HAVE_FEATURE_OPENCL
-    sc::FormulaGroupInterpreter::switchOpenCLDevice(OUString(), true);
+    sc::FormulaGroupInterpreter::switchOpenCLDevice(u"", true);
 #endif
 
     ScDocument* pDoc = GetDocument();
@@ -3427,7 +3449,7 @@ void ScModelObj::enableAutomaticDeviceSelection(sal_Bool bForce)
 #if !HAVE_FEATURE_OPENCL
     (void) bForce;
 #else
-    sc::FormulaGroupInterpreter::switchOpenCLDevice(OUString(), true, bForce);
+    sc::FormulaGroupInterpreter::switchOpenCLDevice(u"", true, bForce);
 #endif
 }
 
@@ -3647,12 +3669,11 @@ uno::Any SAL_CALL ScDrawPagesObj::getByIndex( sal_Int32 nIndex )
     if (!xPage.is())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xPage);
+    return uno::Any(xPage);
 }
 
 uno::Type SAL_CALL ScDrawPagesObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<drawing::XDrawPage>::get();
 }
 
@@ -3974,14 +3995,13 @@ uno::Any SAL_CALL ScTableSheetsObj::getByIndex( sal_Int32 nIndex )
     if (!xSheet.is())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xSheet);
+    return uno::Any(xSheet);
 
 //    return uno::Any();
 }
 
 uno::Type SAL_CALL ScTableSheetsObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<sheet::XSpreadsheet>::get();
 }
 
@@ -4000,7 +4020,7 @@ uno::Any SAL_CALL ScTableSheetsObj::getByName( const OUString& aName )
     if (!xSheet.is())
         throw container::NoSuchElementException();
 
-    return uno::makeAny(xSheet);
+    return uno::Any(xSheet);
 }
 
 uno::Sequence<OUString> SAL_CALL ScTableSheetsObj::getElementNames()
@@ -4075,11 +4095,11 @@ rtl::Reference<ScTableColumnObj> ScTableColumnsObj::GetObjectByIndex_Impl(sal_In
     return nullptr;    // wrong index
 }
 
-rtl::Reference<ScTableColumnObj> ScTableColumnsObj::GetObjectByName_Impl(const OUString& aName) const
+rtl::Reference<ScTableColumnObj> ScTableColumnsObj::GetObjectByName_Impl(std::u16string_view aName) const
 {
     SCCOL nCol = 0;
-    if ( ::AlphaToCol( pDocShell->GetDocument(), nCol, aName) )
-        if ( pDocShell && nCol >= nStartCol && nCol <= nEndCol )
+    if (pDocShell && ::AlphaToCol(pDocShell->GetDocument(), nCol, aName))
+        if (nCol >= nStartCol && nCol <= nEndCol)
             return new ScTableColumnObj( pDocShell, nCol, nTab );
 
     return nullptr;
@@ -4146,13 +4166,12 @@ uno::Any SAL_CALL ScTableColumnsObj::getByIndex( sal_Int32 nIndex )
     if (!xColumn.is())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xColumn);
+    return uno::Any(xColumn);
 
 }
 
 uno::Type SAL_CALL ScTableColumnsObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<table::XCellRange>::get();
 }
 
@@ -4169,7 +4188,7 @@ uno::Any SAL_CALL ScTableColumnsObj::getByName( const OUString& aName )
     if (!xColumn.is())
         throw container::NoSuchElementException();
 
-    return uno::makeAny(xColumn);
+    return uno::Any(xColumn);
 }
 
 uno::Sequence<OUString> SAL_CALL ScTableColumnsObj::getElementNames()
@@ -4188,8 +4207,8 @@ sal_Bool SAL_CALL ScTableColumnsObj::hasByName( const OUString& aName )
 {
     SolarMutexGuard aGuard;
     SCCOL nCol = 0;
-    if ( ::AlphaToCol( pDocShell->GetDocument(), nCol, aName) )
-        if ( pDocShell && nCol >= nStartCol && nCol <= nEndCol )
+    if (pDocShell && ::AlphaToCol(pDocShell->GetDocument(), nCol, aName))
+        if (nCol >= nStartCol && nCol <= nEndCol)
             return true;
 
     return false;       // not found
@@ -4199,7 +4218,6 @@ sal_Bool SAL_CALL ScTableColumnsObj::hasByName( const OUString& aName )
 
 uno::Reference<beans::XPropertySetInfo> SAL_CALL ScTableColumnsObj::getPropertySetInfo()
 {
-    SolarMutexGuard aGuard;
     static uno::Reference<beans::XPropertySetInfo> aRef(
         new SfxItemPropertySetInfo( lcl_GetColumnsPropertyMap() ));
     return aRef;
@@ -4390,12 +4408,11 @@ uno::Any SAL_CALL ScTableRowsObj::getByIndex( sal_Int32 nIndex )
     if (!xRow.is())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xRow);
+    return uno::Any(xRow);
 }
 
 uno::Type SAL_CALL ScTableRowsObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<table::XCellRange>::get();
 }
 
@@ -4409,7 +4426,6 @@ sal_Bool SAL_CALL ScTableRowsObj::hasElements()
 
 uno::Reference<beans::XPropertySetInfo> SAL_CALL ScTableRowsObj::getPropertySetInfo()
 {
-    SolarMutexGuard aGuard;
     static uno::Reference<beans::XPropertySetInfo> aRef(
         new SfxItemPropertySetInfo( lcl_GetRowsPropertyMap() ));
     return aRef;
@@ -4701,12 +4717,11 @@ uno::Any SAL_CALL ScAnnotationsObj::getByIndex( sal_Int32 nIndex )
     if (!xAnnotation.is())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xAnnotation);
+    return uno::Any(xAnnotation);
 }
 
 uno::Type SAL_CALL ScAnnotationsObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<sheet::XSheetAnnotation>::get();
 }
 
@@ -4856,12 +4871,11 @@ uno::Any SAL_CALL ScScenariosObj::getByIndex( sal_Int32 nIndex )
     if (!xScen.is())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xScen);
+    return uno::Any(xScen);
 }
 
 uno::Type SAL_CALL ScScenariosObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<sheet::XScenario>::get();
 }
 
@@ -4878,7 +4892,7 @@ uno::Any SAL_CALL ScScenariosObj::getByName( const OUString& aName )
     if (!xScen.is())
         throw container::NoSuchElementException();
 
-    return uno::makeAny(xScen);
+    return uno::Any(xScen);
 }
 
 uno::Sequence<OUString> SAL_CALL ScScenariosObj::getElementNames()

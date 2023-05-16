@@ -27,16 +27,16 @@ class SW_DLLPUBLIC SwPercentField
 {
     std::unique_ptr<weld::MetricSpinButton> m_pField;
 
-    int nRefValue;      // 100% value for conversion (in Twips)
-    int nOldMax;
-    int nOldMin;
-    int nOldSpinSize;
-    int nOldPageSize;
-    int nLastPercent;
-    int nLastValue;
-    sal_uInt16  nOldDigits;
-    FieldUnit   eOldUnit;
-    bool bLockAutoCalculation; //prevent recalculation of percent values when the
+    sal_Int64 m_nRefValue;      // 100% value for conversion (in Twips)
+    sal_Int64 m_nOldMax;
+    sal_Int64 m_nOldMin;
+    int m_nOldSpinSize;
+    int m_nOldPageSize;
+    sal_Int64 m_nLastPercent;
+    sal_Int64 m_nLastValue;
+    sal_uInt16  m_nOldDigits;
+    FieldUnit   m_eOldUnit;
+    bool m_bLockAutoCalculation; //prevent recalculation of percent values when the
                                //reference value is changed
 
     SAL_DLLPRIVATE static int ImpPower10(sal_uInt16 n);
@@ -55,30 +55,30 @@ public:
     bool get_value_changed_from_saved() const { return m_pField->get_value_changed_from_saved(); }
     void set_text(const OUString& rStr) { m_pField->set_text(rStr); }
     void set_accessible_name(const OUString& rStr) { m_pField->set_accessible_name(rStr); }
-    void SetMetricFieldMin(int nNewMin) { m_pField->set_min(nNewMin, FieldUnit::NONE); }
-    void SetMetricFieldMax(int nNewMax) { m_pField->set_max(nNewMax, FieldUnit::NONE); }
-    void SetMetricFieldRange(int nNewMin, int nNewMax) { m_pField->set_range(nNewMin, nNewMax, FieldUnit::NONE); }
-    void GetMetricFieldRange(int &rOldMin, int& rOldMax) const { m_pField->get_range(rOldMin, rOldMax, FieldUnit::NONE); }
+    void SetMetricFieldMin(sal_Int64 nNewMin) { m_pField->set_min(nNewMin, FieldUnit::NONE); }
+    void SetMetricFieldMax(sal_Int64 nNewMax) { m_pField->set_max(nNewMax, FieldUnit::NONE); }
+    void SetMetricFieldRange(sal_Int64 nNewMin, sal_Int64 nNewMax) { m_pField->set_range(nNewMin, nNewMax, FieldUnit::NONE); }
+    void GetMetricFieldRange(sal_Int64 &rOldMin, sal_Int64& rOldMax) const { m_pField->get_range(rOldMin, rOldMax, FieldUnit::NONE); }
 
-    void set_value(int nNewValue, FieldUnit eInUnit = FieldUnit::NONE);
-    int get_value(FieldUnit eOutUnit = FieldUnit::NONE);
+    void set_value(sal_Int64 nNewValue, FieldUnit eInUnit = FieldUnit::NONE);
+    sal_Int64 get_value(FieldUnit eOutUnit = FieldUnit::NONE);
 
-    void set_min(int nNewMin, FieldUnit eInUnit);
-    void set_max(int nNewMax, FieldUnit eInUnit);
+    void set_min(sal_Int64 nNewMin, FieldUnit eInUnit);
+    void set_max(sal_Int64 nNewMax, FieldUnit eInUnit);
 
-    int get_min(FieldUnit eOutUnit = FieldUnit::NONE) const { return m_pField->get_min(eOutUnit); }
+    sal_Int64 get_min(FieldUnit eOutUnit = FieldUnit::NONE) const { return m_pField->get_min(eOutUnit); }
 
-    int NormalizePercent(int nValue);
-    int DenormalizePercent(int nValue);
+    sal_Int64 NormalizePercent(sal_Int64 nValue);
+    sal_Int64 DenormalizePercent(sal_Int64 nValue);
 
-    void SetRefValue(int nValue);
-    int GetRealValue(FieldUnit eOutUnit);
+    void SetRefValue(sal_Int64 nValue);
+    sal_Int64 GetRealValue(FieldUnit eOutUnit);
 
-    int Convert(int nValue, FieldUnit eInUnit, FieldUnit eOutUnit);
+    sal_Int64 Convert(sal_Int64 nValue, FieldUnit eInUnit, FieldUnit eOutUnit);
 
     void ShowPercent(bool bPercent);
 
-    void LockAutoCalculation(bool bLock) {bLockAutoCalculation = bLock;}
+    void LockAutoCalculation(bool bLock) {m_bLockAutoCalculation = bLock;}
 };
 
 

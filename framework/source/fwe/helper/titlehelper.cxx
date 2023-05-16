@@ -17,8 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <config_features.h>
-
 #include <framework/titlehelper.hxx>
 #include <classes/fwkresid.hxx>
 #include <strings.hrc>
@@ -38,7 +36,7 @@
 #include <rtl/ustrbuf.hxx>
 #include <osl/mutex.hxx>
 #include <tools/urlobj.hxx>
-#include <vcl/skia/SkiaHelper.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 
@@ -48,11 +46,11 @@ using namespace css::frame;
 
 namespace framework{
 
-TitleHelper::TitleHelper(const css::uno::Reference< css::uno::XComponentContext >& rxContext,
+TitleHelper::TitleHelper(css::uno::Reference< css::uno::XComponentContext > xContext,
                         const css::uno::Reference< css::uno::XInterface >& xOwner,
                         const css::uno::Reference< css::frame::XUntitledNumbers >& xNumbers)
     : ::cppu::BaseMutex ()
-    , m_xContext        (rxContext)
+    , m_xContext        (std::move(xContext))
     , m_bExternalTitle  (false)
     , m_nLeasedNumber   (css::frame::UntitledNumbersConst::INVALID_NUMBER)
     , m_aListener       (m_aMutex)
@@ -246,7 +244,7 @@ void SAL_CALL TitleHelper::disposing(const css::lang::EventObject& aEvent)
     {
         osl::MutexGuard aLock(m_aMutex);
 
-        m_xOwner        = nullptr;
+        m_xOwner.clear();
         m_sTitle        = OUString ();
         m_nLeasedNumber = css::frame::UntitledNumbersConst::INVALID_NUMBER;
     }
@@ -371,14 +369,10 @@ void TitleHelper::impl_updateTitleForModel (const css::uno::Reference< css::fram
         if (nLeasedNumber == css::frame::UntitledNumbersConst::INVALID_NUMBER)
             nLeasedNumber = xNumbers->leaseNumber (xOwner);
 
-        OUStringBuffer sNewTitle(256);
-        sNewTitle.append (xNumbers->getUntitledPrefix ());
         if (nLeasedNumber != css::frame::UntitledNumbersConst::INVALID_NUMBER)
-            sNewTitle.append(nLeasedNumber);
+            sTitle = xNumbers->getUntitledPrefix() + OUString::number(nLeasedNumber);
         else
-            sNewTitle.append("?");
-
-        sTitle = sNewTitle.makeStringAndClear ();
+            sTitle = xNumbers->getUntitledPrefix() + "?";
     }
 
     bool     bChanged;
@@ -659,7 +653,7 @@ void TitleHelper::impl_setSubTitle (const css::uno::Reference< css::frame::XTitl
         xNewBroadcaster->addTitleChangeListener (xThis);
 }
 
-OUString TitleHelper::impl_convertURL2Title(const OUString& sURL)
+OUString TitleHelper::impl_convertURL2Title(std::u16string_view sURL)
 {
     INetURLObject   aURL (sURL);
     OUString sTitle;

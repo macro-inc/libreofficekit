@@ -18,6 +18,7 @@
 #include <vcl/formatter.hxx>
 #include <vcl/toolkit/spinfld.hxx>
 #include <vcl/toolkit/fixed.hxx>
+#include <vcl/toolkit/fixedhyper.hxx>
 #include <vcl/toolkit/lstbox.hxx>
 #include <vcl/toolkit/menubtn.hxx>
 #include <vcl/toolkit/combobox.hxx>
@@ -29,6 +30,11 @@
 #include "iconview.hxx"
 #include "listbox.hxx"
 #include "messagedialog.hxx"
+
+namespace vcl
+{
+class RoadmapWizard;
+};
 
 class SalInstanceBuilder : public weld::Builder
 {
@@ -126,6 +132,8 @@ public:
 
     virtual std::unique_ptr<weld::Toolbar> weld_toolbar(const OString& id) override;
 
+    virtual std::unique_ptr<weld::Scrollbar> weld_scrollbar(const OString& id) override;
+
     virtual std::unique_ptr<weld::SizeGroup> create_size_group() override;
 
     OString get_current_page_help_id() const;
@@ -167,10 +175,13 @@ public:
     virtual ~SalInstanceMenu() override;
 };
 
+class SalFlashAttention;
+
 class SalInstanceWidget : public virtual weld::Widget
 {
 protected:
     VclPtr<vcl::Window> m_xWidget;
+    std::unique_ptr<SalFlashAttention> m_xFlashAttention;
     SalInstanceBuilder* m_pBuilder;
 
 private:
@@ -227,10 +238,6 @@ public:
     virtual bool is_active() const override;
 
     virtual bool has_child_focus() const override;
-
-    virtual void set_has_default(bool has_default) override;
-
-    virtual bool get_has_default() const override;
 
     virtual void show() override;
 
@@ -301,8 +308,6 @@ public:
     virtual OUString get_accessible_description() const override;
 
     virtual void set_accessible_relation_labeled_by(weld::Widget* pLabel) override;
-
-    virtual void set_accessible_relation_label_for(weld::Widget* pLabeled) override;
 
     virtual void set_tooltip_text(const OUString& rTip) override;
 
@@ -375,6 +380,8 @@ public:
 
     virtual void get_property_tree(tools::JsonWriter& rJsonWriter) override;
 
+    virtual void call_attention_to() override;
+
     virtual void set_stack_background() override;
 
     virtual void set_title_background() override;
@@ -416,11 +423,7 @@ public:
 
 class SalInstanceContainer : public SalInstanceWidget, public virtual weld::Container
 {
-protected:
     VclPtr<vcl::Window> m_xContainer;
-
-private:
-    void implResetDefault(const vcl::Window* _pWindow);
 
 public:
     SalInstanceContainer(vcl::Window* pContainer, SalInstanceBuilder* pBuilder,
@@ -429,7 +432,6 @@ public:
     virtual void connect_container_focus_changed(const Link<Container&, void>& rLink) override;
     virtual void child_grab_focus() override;
     virtual void move(weld::Widget* pWidget, weld::Container* pNewParent) override;
-    virtual void recursively_unset_default_buttons() override;
     virtual css::uno::Reference<css::awt::XWindow> CreateChildFrame() override;
 };
 
@@ -443,6 +445,10 @@ private:
     void override_child_help(vcl::Window* pParent);
 
     void clear_child_help(vcl::Window* pParent);
+
+    void recursively_unset_default_buttons();
+
+    void implResetDefault(const vcl::Window* _pWindow);
 
 public:
     SalInstanceWindow(vcl::Window* pWindow, SalInstanceBuilder* pBuilder, bool bTakeOwnership);
@@ -477,9 +483,13 @@ public:
 
     virtual void present() override;
 
+    virtual void change_default_widget(weld::Widget* pOld, weld::Widget* pNew) override;
+
+    virtual bool is_default_widget(const weld::Widget* pCandidate) const override;
+
     virtual void set_window_state(const OString& rStr) override;
 
-    virtual OString get_window_state(WindowStateMask nMask) const override;
+    virtual OString get_window_state(vcl::WindowDataMask nMask) const override;
 
     virtual SystemEnvData get_system_data() const override;
 
@@ -487,14 +497,17 @@ public:
 
     virtual VclPtr<VirtualDevice> screenshot() override;
 
+    virtual const vcl::ILibreOfficeKitNotifier* GetLOKNotifier() override;
+
     virtual ~SalInstanceWindow() override;
 };
 
 class SalInstanceDialog : public SalInstanceWindow, public virtual weld::Dialog
 {
-private:
+protected:
     VclPtr<::Dialog> m_xDialog;
 
+private:
     // for calc ref dialog that shrink to range selection widgets and resize back
     VclPtr<vcl::Window> m_xRefEdit;
     std::vector<VclPtr<vcl::Window>> m_aHiddenWidgets; // vector of hidden Controls
@@ -535,6 +548,45 @@ public:
     virtual void set_default_response(int nResponse) override;
 
     virtual weld::Container* weld_content_area() override;
+};
+
+class SalInstanceAssistant : public SalInstanceDialog, public virtual weld::Assistant
+{
+protected:
+    VclPtr<vcl::RoadmapWizard> m_xWizard;
+
+private:
+    std::vector<std::unique_ptr<SalInstanceContainer>> m_aPages;
+    std::vector<VclPtr<TabPage>> m_aAddedPages;
+    std::vector<int> m_aIds;
+    std::vector<VclPtr<VclGrid>> m_aAddedGrids;
+    Idle m_aUpdateRoadmapIdle;
+
+    int find_page(std::string_view rIdent) const;
+    int find_id(int nId) const;
+
+    DECL_LINK(OnRoadmapItemSelected, LinkParamNone*, void);
+    DECL_LINK(UpdateRoadmap_Hdl, Timer*, void);
+
+public:
+    SalInstanceAssistant(vcl::RoadmapWizard* pDialog, SalInstanceBuilder* pBuilder,
+                         bool bTakeOwnership);
+    virtual int get_current_page() const override;
+    virtual int get_n_pages() const override;
+    virtual OString get_page_ident(int nPage) const override;
+    virtual OString get_current_page_ident() const override;
+    virtual void set_current_page(int nPage) override;
+    virtual void set_current_page(const OString& rIdent) override;
+    virtual void set_page_index(const OString& rIdent, int nNewIndex) override;
+    virtual weld::Container* append_page(const OString& rIdent) override;
+    virtual OUString get_page_title(const OString& rIdent) const override;
+    virtual void set_page_title(const OString& rIdent, const OUString& rTitle) override;
+    virtual void set_page_sensitive(const OString& rIdent, bool bSensitive) override;
+    virtual void set_page_side_help_id(const OString& rHelpId) override;
+    virtual void set_page_side_image(const OUString& rImage) override;
+    weld::Button* weld_widget_for_response(int nResponse) override;
+
+    virtual ~SalInstanceAssistant() override;
 };
 
 class WeldTextFilter final : public TextFilter
@@ -629,21 +681,21 @@ private:
     DECL_LINK(InputHdl, sal_Int64*, TriState);
     DECL_LINK(ActivateHdl, Edit&, bool);
 
-    double toField(int nValue) const;
+    double toField(sal_Int64 nValue) const;
 
-    int fromField(double fValue) const;
+    sal_Int64 fromField(double fValue) const;
 
 public:
     SalInstanceSpinButton(FormattedField* pButton, SalInstanceBuilder* pBuilder,
                           bool bTakeOwnership);
 
-    virtual int get_value() const override;
+    virtual sal_Int64 get_value() const override;
 
-    virtual void set_value(int value) override;
+    virtual void set_value(sal_Int64 value) override;
 
-    virtual void set_range(int min, int max) override;
+    virtual void set_range(sal_Int64 min, sal_Int64 max) override;
 
-    virtual void get_range(int& min, int& max) const override;
+    virtual void get_range(sal_Int64& min, sal_Int64& max) const override;
 
     virtual void set_increments(int step, int /*page*/) override;
 
@@ -1006,6 +1058,8 @@ public:
 
     virtual void HandleEventListener(VclWindowEvent& rEvent) override;
 
+    virtual void call_attention_to() override;
+
     virtual ~SalInstanceComboBoxWithEdit() override;
 };
 
@@ -1038,6 +1092,57 @@ public:
     virtual void set_custom_button(VirtualDevice* pDevice) override;
 
     virtual ~SalInstanceButton() override;
+};
+
+class SalInstanceToggleButton : public SalInstanceButton, public virtual weld::ToggleButton
+{
+private:
+    VclPtr<PushButton> m_xToggleButton;
+
+    DECL_LINK(ToggleListener, VclWindowEvent&, void);
+
+public:
+    SalInstanceToggleButton(PushButton* pButton, SalInstanceBuilder* pBuilder, bool bTakeOwnership)
+        : SalInstanceButton(pButton, pBuilder, bTakeOwnership)
+        , m_xToggleButton(pButton)
+    {
+        m_xToggleButton->setToggleButton(true);
+    }
+
+    virtual void connect_toggled(const Link<Toggleable&, void>& rLink) override
+    {
+        assert(!m_aToggleHdl.IsSet());
+        m_xToggleButton->AddEventListener(LINK(this, SalInstanceToggleButton, ToggleListener));
+        weld::ToggleButton::connect_toggled(rLink);
+    }
+
+    virtual void set_active(bool active) override
+    {
+        disable_notify_events();
+        m_xToggleButton->Check(active);
+        enable_notify_events();
+    }
+
+    virtual bool get_active() const override { return m_xToggleButton->IsChecked(); }
+
+    virtual void set_inconsistent(bool inconsistent) override
+    {
+        disable_notify_events();
+        m_xToggleButton->SetState(inconsistent ? TRISTATE_INDET : TRISTATE_FALSE);
+        enable_notify_events();
+    }
+
+    virtual bool get_inconsistent() const override
+    {
+        return m_xToggleButton->GetState() == TRISTATE_INDET;
+    }
+
+    virtual ~SalInstanceToggleButton() override
+    {
+        if (m_aToggleHdl.IsSet())
+            m_xToggleButton->RemoveEventListener(
+                LINK(this, SalInstanceToggleButton, ToggleListener));
+    }
 };
 
 class SalInstanceNotebook : public SalInstanceWidget, public virtual weld::Notebook
@@ -1077,6 +1182,8 @@ public:
 
     virtual void set_tab_label_text(const OString& rIdent, const OUString& rText) override;
 
+    virtual void set_show_tabs(bool bShow) override;
+
     virtual ~SalInstanceNotebook() override;
 };
 
@@ -1098,6 +1205,35 @@ public:
     virtual OUString get_secondary_text() const override;
 
     virtual weld::Container* weld_message_area() override;
+};
+
+class SalInstanceLinkButton : public SalInstanceWidget, public virtual weld::LinkButton
+{
+private:
+    VclPtr<FixedHyperlink> m_xButton;
+    Link<FixedHyperlink&, void> m_aOrigClickHdl;
+
+    DECL_LINK(ClickHdl, FixedHyperlink&, void);
+
+public:
+    SalInstanceLinkButton(FixedHyperlink* pButton, SalInstanceBuilder* pBuilder,
+                          bool bTakeOwnership)
+        : SalInstanceWidget(pButton, pBuilder, bTakeOwnership)
+        , m_xButton(pButton)
+    {
+        m_aOrigClickHdl = m_xButton->GetClickHdl();
+        m_xButton->SetClickHdl(LINK(this, SalInstanceLinkButton, ClickHdl));
+    }
+
+    virtual void set_label(const OUString& rText) override { m_xButton->SetText(rText); }
+
+    virtual OUString get_label() const override { return m_xButton->GetText(); }
+
+    virtual void set_uri(const OUString& rUri) override { m_xButton->SetURL(rUri); }
+
+    virtual OUString get_uri() const override { return m_xButton->GetURL(); }
+
+    virtual ~SalInstanceLinkButton() override { m_xButton->SetClickHdl(m_aOrigClickHdl); }
 };
 
 class SalInstanceCheckButton : public SalInstanceButton, public virtual weld::CheckButton
@@ -1194,6 +1330,14 @@ public:
     virtual OutputDevice& get_ref_device() override;
 
     virtual void click(const Point& rPos) override;
+
+    virtual void dblclick(const Point& rPos) override;
+
+    virtual void mouse_up(const Point& rPos) override;
+
+    virtual void mouse_down(const Point& rPos) override;
+
+    virtual void mouse_move(const Point& rPos) override;
 };
 
 class SalInstanceToolbar : public SalInstanceWidget, public virtual weld::Toolbar
@@ -1251,6 +1395,8 @@ public:
     virtual void set_item_label(const OString& rIdent, const OUString& rLabel) override;
 
     virtual void set_item_icon_name(const OString& rIdent, const OUString& rIconName) override;
+
+    virtual void set_item_image_mirrored(const OString& rIdent, bool bMirrored) override;
 
     virtual void set_item_image(const OString& rIdent,
                                 const css::uno::Reference<css::graphic::XGraphic>& rIcon) override;
@@ -1393,6 +1539,8 @@ protected:
     DECL_LINK(CustomRenderHdl, svtree_render_args, void);
     DECL_LINK(CustomMeasureHdl, svtree_measure_args, Size);
 
+    bool ExpandRow(const SalInstanceTreeIter& rIter);
+
     // Each row has a cell for the expander image, (and an optional cell for a
     // checkbutton if enable_toggle_buttons has been called) which precede
     // index 0
@@ -1420,6 +1568,7 @@ protected:
     void do_set_toggle(SvTreeListEntry* pEntry, TriState eState, int col);
 
     static TriState do_get_toggle(SvTreeListEntry* pEntry, int col);
+    static bool do_get_sensitive(SvTreeListEntry* pEntry, int col);
 
     TriState get_toggle(SvTreeListEntry* pEntry, int col) const;
 
@@ -1513,13 +1662,19 @@ public:
 
     virtual void set_text(int pos, const OUString& rText, int col = -1) override;
 
-    void set_sensitive(SvTreeListEntry* pEntry, bool bSensitive, int col);
-
     using SalInstanceWidget::set_sensitive;
+    using SalInstanceWidget::get_sensitive;
+
+    void set_sensitive(SvTreeListEntry* pEntry, bool bSensitive, int col);
+    bool get_sensitive(SvTreeListEntry* pEntry, int col) const;
 
     virtual void set_sensitive(int pos, bool bSensitive, int col = -1) override;
 
     virtual void set_sensitive(const weld::TreeIter& rIter, bool bSensitive, int col = -1) override;
+
+    virtual bool get_sensitive(int pos, int col) const override;
+
+    virtual bool get_sensitive(const weld::TreeIter& rIter, int col) const override;
 
     virtual TriState get_toggle(int pos, int col = -1) const override;
 
@@ -1699,8 +1854,8 @@ public:
 
     SvTabListBox& getTreeView();
 
-    virtual bool get_dest_row_at_pos(const Point& rPos, weld::TreeIter* pResult,
-                                     bool bDnDMode) override;
+    virtual bool get_dest_row_at_pos(const Point& rPos, weld::TreeIter* pResult, bool bDnDMode,
+                                     bool bAutoScroll = true) override;
 
     virtual void unset_drag_dest_row() override;
 
@@ -1712,7 +1867,9 @@ public:
 
     virtual void vadjustment_set_value(int nValue) override;
 
-    void set_show_expanders(bool bShow) override;
+    virtual void set_show_expanders(bool bShow) override;
+
+    virtual bool changed_by_hover() const override;
 
     virtual ~SalInstanceTreeView() override;
 };
@@ -1922,6 +2079,8 @@ public:
                                weld::Placement ePlace = weld::Placement::Under) override;
 
     virtual void popdown() override;
+
+    virtual void resize_to_request() override;
 };
 
 class SalInstanceBox : public SalInstanceContainer, public virtual weld::Box
@@ -1948,6 +2107,60 @@ public:
     virtual void set_image(VirtualDevice* pDevice) override;
 
     virtual void set_image(const css::uno::Reference<css::graphic::XGraphic>& rImage) override;
+};
+
+class SalInstanceScrolledWindow : public SalInstanceContainer, public virtual weld::ScrolledWindow
+{
+private:
+    VclPtr<VclScrolledWindow> m_xScrolledWindow;
+    Link<ScrollBar*, void> m_aOrigVScrollHdl;
+    Link<ScrollBar*, void> m_aOrigHScrollHdl;
+    bool m_bUserManagedScrolling;
+
+    DECL_LINK(VscrollHdl, ScrollBar*, void);
+    DECL_LINK(HscrollHdl, ScrollBar*, void);
+
+    static void customize_scrollbars(ScrollBar& rScrollBar, const Color& rButtonTextColor,
+                                     const Color& rBackgroundColor, const Color& rShadowColor,
+                                     const Color& rFaceColor);
+
+public:
+    SalInstanceScrolledWindow(VclScrolledWindow* pScrolledWindow, SalInstanceBuilder* pBuilder,
+                              bool bTakeOwnership, bool bUserManagedScrolling);
+
+    virtual void hadjustment_configure(int value, int lower, int upper, int step_increment,
+                                       int page_increment, int page_size) override;
+    virtual int hadjustment_get_value() const override;
+    virtual void hadjustment_set_value(int value) override;
+    virtual int hadjustment_get_upper() const override;
+    virtual void hadjustment_set_upper(int upper) override;
+    virtual int hadjustment_get_page_size() const override;
+    virtual void hadjustment_set_page_size(int size) override;
+    virtual void hadjustment_set_page_increment(int size) override;
+    virtual void hadjustment_set_step_increment(int size) override;
+    virtual void set_hpolicy(VclPolicyType eHPolicy) override;
+    virtual VclPolicyType get_hpolicy() const override;
+
+    virtual void vadjustment_configure(int value, int lower, int upper, int step_increment,
+                                       int page_increment, int page_size) override;
+    virtual int vadjustment_get_value() const override;
+    virtual void vadjustment_set_value(int value) override;
+    virtual int vadjustment_get_upper() const override;
+    virtual void vadjustment_set_upper(int upper) override;
+    virtual int vadjustment_get_lower() const override;
+    virtual void vadjustment_set_lower(int lower) override;
+    virtual int vadjustment_get_page_size() const override;
+    virtual void vadjustment_set_page_size(int size) override;
+    virtual void vadjustment_set_page_increment(int size) override;
+    virtual void vadjustment_set_step_increment(int size) override;
+
+    virtual void set_vpolicy(VclPolicyType eVPolicy) override;
+    virtual VclPolicyType get_vpolicy() const override;
+    virtual int get_scroll_thickness() const override;
+    virtual void set_scroll_thickness(int nThickness) override;
+    virtual void customize_scrollbars(const Color& rBackgroundColor, const Color& rShadowColor,
+                                      const Color& rFaceColor) override;
+    virtual ~SalInstanceScrolledWindow() override;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab cinoptions=b1,g0,N-s cinkeys+=0=break: */

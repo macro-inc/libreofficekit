@@ -28,6 +28,7 @@
 #include <unotools/caserotate.hxx>
 #include <unotools/options.hxx>
 #include <sddllapi.h>
+#include <viewopt.hxx>
 
 namespace svx::sidebar { class SelectionChangeHandler; }
 namespace com::sun::star::lang { class XEventListener; }
@@ -253,7 +254,7 @@ public:
     bool            IsSelected(sal_uInt16 nPage);
     bool            IsVisible(sal_uInt16 nPage);
 
-    void            GotoBookmark(const OUString& rBookmark);
+    void            GotoBookmark(std::u16string_view rBookmark);
     //Realize multi-selection of objects, If object is marked, the
     //corresponding entry is set true, else the corresponding entry is set
     //false.
@@ -373,27 +374,10 @@ public:
 
     bool IsInSwitchPage() const { return mbIsInSwitchPage; }
 
+    const SdViewOptions& GetViewOptions() const { return maViewOptions; }
     //move this method to ViewShell.
     //void  NotifyAccUpdate();
 protected:
-    std::unique_ptr<DrawView> mpDrawView;
-    SdPage*             mpActualPage;
-    ::tools::Rectangle           maMarkRect;
-    Point               maMousePos;
-    VclPtr<TabControl>  maTabControl;
-    EditMode            meEditMode;
-    PageKind            mePageKind;
-    // tdf#137445 at context menu popup time set if the EditHyperlink entry
-    // should be disabled and use that state if queried about it if
-    // EditHyperlink is dispatched from the menu. So ignoring where the mouse
-    // currently happens to be when the menu was dismissed.
-    std::optional<bool> moAtContextMenu_DisableEditHyperlink;
-    bool                mbZoomOnPage;
-    bool                mbIsRulerDrag;
-    sal_uLong           mnLockCount;
-    bool                mbReadOnly;
-    static bool         mbPipette;
-
                     DECL_DLLPRIVATE_LINK( ClipboardChanged, TransferableDataHelper*, void );
                     DECL_DLLPRIVATE_LINK( TabSplitHdl, TabBar *, void );
                     DECL_DLLPRIVATE_LINK( NameObjectHdl, AbstractSvxObjectNameDialog&, bool );
@@ -414,32 +398,6 @@ protected:
     void            GetMenuStateSel(SfxItemSet& rSet);
 
 private:
-    /** This flag controls whether the layer mode is active, i.e. the layer
-        dialog is visible.
-    */
-    bool mbIsLayerModeActive;
-
-    /** This item contains the clipboard formats of the current clipboard
-        content that are supported both by that content and by the
-        DrawViewShell.
-    */
-    ::std::unique_ptr<SvxClipboardFormatItem> mpCurrentClipboardFormats;
-
-    /** On some occasions it is necessary to make SwitchPage calls
-        asynchronously.
-    */
-    tools::AsynchronousCall maAsynchronousSwitchPageCall;
-
-    /** This flag is used to prevent nested calls to SwitchPage().
-    */
-    bool mbIsInSwitchPage;
-
-    RotateTransliteration m_aRotateCase;
-
-    /** Listen for selection changes and broadcast context changes for the sidebar.
-    */
-    ::rtl::Reference<svx::sidebar::SelectionChangeHandler> mpSelectionChangeHandler;
-
     void Construct (DrawDocShell* pDocSh, PageKind ePageKind);
 
     /** Depending on the given request create a new page or duplicate an
@@ -454,13 +412,6 @@ private:
 
     void DuplicateSelectedSlides (SfxRequest& rRequest);
 
-    css::uno::Reference< css::scanner::XScannerManager2 > mxScannerManager;
-    css::uno::Reference< css::lang::XEventListener >      mxScannerListener;
-    rtl::Reference<TransferableClipboardListener>         mxClipEvtLstnr;
-    bool                                                  mbPastePossible;
-    bool                                                  mbMouseButtonDown;
-    bool                                                  mbMouseSelecting;
-
     virtual void Notify (SfxBroadcaster& rBC, const SfxHint& rHint) override;
 
     /** Stop a running slide show.
@@ -471,26 +422,20 @@ private:
         can not be selected the index of the snap line/point for which the
         popup menu is opened has to be passed to the processing slot
         handlers.  This can be done only by manually showing the popup menu.
+        @param pParent
+            The parent for the context menu.
+        @param rRect
+            The location at which to display the context menu.
         @param rPageView
             The page view is used to access the help lines.
         @param nSnapLineIndex
             Index of the snap line or snap point for which to show the
             context menu.
-        @param rMouseLocation
-            The mouse location defines the location at which to display the
-            context menu.
     */
-    void ShowSnapLineContextMenu (
-        SdrPageView& rPageView,
-        const sal_uInt16 nSnapLineIndex,
-        const Point& rMouseLocation);
+    void ShowSnapLineContextMenu(weld::Window* pParent, const ::tools::Rectangle& rRect,
+        SdrPageView& rPageView, const sal_uInt16 nSnapLineIndex);
 
     using ViewShell::Notify;
-
-    ::std::unique_ptr< AnnotationManager > mpAnnotationManager;
-    ::std::unique_ptr< ViewOverlayManager > mpViewOverlayManager;
-
-    std::vector<std::unique_ptr<SdrExternalToolEdit>> m_ExternalEdits;
 
     virtual void ConfigurationChanged( utl::ConfigurationBroadcaster* pCb, ConfigurationHints ) override;
 
@@ -502,8 +447,58 @@ private:
     /// later Invalidated to reset it back to its natural value
     void EnableEditHyperlink();
 
-    // The colour of the area behind the slide (used to be called "Wiese")
-    Color mnAppBackgroundColor;
+private:
+    std::unique_ptr<DrawView> mpDrawView;
+    SdPage*             mpActualPage;
+    ::tools::Rectangle           maMarkRect;
+    Point               maMousePos;
+    VclPtr<TabControl>  maTabControl;
+    EditMode            meEditMode;
+    PageKind            mePageKind;
+    // tdf#137445 at context menu popup time set if the EditHyperlink entry
+    // should be disabled and use that state if queried about it if
+    // EditHyperlink is dispatched from the menu. So ignoring where the mouse
+    // currently happens to be when the menu was dismissed.
+    std::optional<bool> moAtContextMenu_DisableEditHyperlink;
+    bool                mbZoomOnPage;
+    bool                mbIsRulerDrag;
+    sal_uLong           mnLockCount;
+    bool                mbReadOnly;
+    static bool         mbPipette;
+    /** Prevents grabbing focus while loading - see tdf#83773 that introduced
+        the grabbing, and tdf#150773 that needs grabbing disabled on loading
+    */
+    bool mbFirstTimeActivation = true;
+    /** This flag controls whether the layer mode is active, i.e. the layer
+        dialog is visible.
+    */
+    bool mbIsLayerModeActive;
+    /** This item contains the clipboard formats of the current clipboard
+        content that are supported both by that content and by the
+        DrawViewShell.
+    */
+    ::std::unique_ptr<SvxClipboardFormatItem> mpCurrentClipboardFormats;
+    /** On some occasions it is necessary to make SwitchPage calls
+        asynchronously.
+    */
+    tools::AsynchronousCall maAsynchronousSwitchPageCall;
+    /** This flag is used to prevent nested calls to SwitchPage().
+    */
+    bool mbIsInSwitchPage;
+    RotateTransliteration m_aRotateCase;
+    /** Listen for selection changes and broadcast context changes for the sidebar.
+    */
+    ::rtl::Reference<svx::sidebar::SelectionChangeHandler> mpSelectionChangeHandler;
+    css::uno::Reference< css::scanner::XScannerManager2 > mxScannerManager;
+    css::uno::Reference< css::lang::XEventListener >      mxScannerListener;
+    rtl::Reference<TransferableClipboardListener>         mxClipEvtLstnr;
+    bool                                                  mbPastePossible;
+    bool                                                  mbMouseButtonDown;
+    bool                                                  mbMouseSelecting;
+    ::std::unique_ptr< AnnotationManager > mpAnnotationManager;
+    ::std::unique_ptr< ViewOverlayManager > mpViewOverlayManager;
+    std::vector<std::unique_ptr<SdrExternalToolEdit>> m_ExternalEdits;
+    SdViewOptions maViewOptions;
 };
 
     /// Merge the background properties together and deposit the result in rMergeAttr

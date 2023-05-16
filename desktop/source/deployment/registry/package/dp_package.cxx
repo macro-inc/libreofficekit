@@ -21,6 +21,7 @@
 #include <strings.hrc>
 #include <dp_package.hxx>
 #include <dp_backend.h>
+#include <dp_misc.h>
 #include <dp_ucb.h>
 #include <dp_interact.h>
 #include <dp_dependencies.hxx>
@@ -31,6 +32,7 @@
 #include <rtl/uri.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
@@ -66,11 +68,12 @@
 #include <com/sun/star/deployment/PlatformException.hpp>
 #include <com/sun/star/deployment/Prerequisites.hpp>
 #include <optional>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 #include <memory>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "dp_extbackenddb.hxx"
@@ -251,7 +254,7 @@ class XPackage_eq
 {
     OUString m_URL;
 public:
-    explicit XPackage_eq(const OUString & s) : m_URL(s) {}
+    explicit XPackage_eq(OUString s) : m_URL(std::move(s)) {}
     bool operator() (const Reference<deployment::XPackage> & p) const
     {
         return m_URL == p->getURL();
@@ -1249,7 +1252,7 @@ Sequence< Reference<deployment::XPackage> > BackendImpl::PackageImpl::getBundle(
         }
         OSL_ASSERT( lower_end == upper_end );
 
-        const ::osl::MutexGuard guard( getMutex() );
+        const ::osl::MutexGuard guard( m_aMutex );
         pBundle = m_pBundle;
         if (pBundle == nullptr) {
             m_bundle = ret;
@@ -1264,12 +1267,12 @@ Sequence< Reference<deployment::XPackage> > BackendImpl::PackageImpl::getBundle(
     return *pBundle;
 }
 
-bool isBundle_( OUString const & mediaType )
+bool isBundle_( std::u16string_view mediaType )
 {
     // xxx todo: additional parsing?
-    return !mediaType.isEmpty() &&
-        (mediaType.matchIgnoreAsciiCase( "application/vnd.sun.star.package-bundle") ||
-         mediaType.matchIgnoreAsciiCase( "application/vnd.sun.star.legacy-package-bundle"));
+    return !mediaType.empty() &&
+        (o3tl::matchIgnoreAsciiCase( mediaType, u"application/vnd.sun.star.package-bundle") ||
+         o3tl::matchIgnoreAsciiCase( mediaType, u"application/vnd.sun.star.legacy-package-bundle"));
 }
 
 
@@ -1486,7 +1489,7 @@ void BackendImpl::PackageImpl::scanLegacyBundle(
     // check for platform paths:
     const OUString title( StrTitle::getTitle( ucbContent ) );
     if (title.endsWithIgnoreAsciiCase( ".plt" ) &&
-        !platform_fits( title.copy( 0, title.getLength() - 4 ) )) {
+        !platform_fits( title.subView( 0, title.getLength() - 4 ) )) {
         return;
     }
     if (title.endsWithIgnoreAsciiCase("skip_registration") )

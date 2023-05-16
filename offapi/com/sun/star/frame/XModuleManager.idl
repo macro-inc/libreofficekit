@@ -17,13 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef __com_sun_star_frame_XModuleManager_idl__
-#define __com_sun_star_frame_XModuleManager_idl__
-
-#include <com/sun/star/uno/XInterface.idl>
-#include <com/sun/star/lang/IllegalArgumentException.idl>
-#include <com/sun/star/frame/UnknownModuleException.idl>
-
 
 module com { module sun { module star { module frame {
 
@@ -44,7 +37,7 @@ interface XModuleManager : com::sun::star::uno::XInterface
                this value can be queried and checked against the configuration.
 
                Since OOo 2.3.0 also the optional interface XModule will be used.
-               If its exists it will be preferred.
+               If it exists it will be preferred.
 
        @param  Module
                Possible objects for this parameter can be the following one:
@@ -92,7 +85,5 @@ interface XModuleManager : com::sun::star::uno::XInterface
 };
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

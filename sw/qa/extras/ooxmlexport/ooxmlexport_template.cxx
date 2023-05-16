@@ -8,6 +8,7 @@
  */
 
 #include <swmodeltestbase.hxx>
+#include <o3tl/string_view.hxx>
 
 class Test : public SwModelTestBase
 {
@@ -16,16 +17,11 @@ public:
         : SwModelTestBase("/sw/qa/extras/ooxmlexport/data/", "MS Word 2007 XML Template")
     {
     }
-
-protected:
-    bool mustTestImportOf(const char* filename) const override
-    {
-        return OString(filename).endsWith(".dotx");
-    }
 };
 
-DECLARE_OOXMLEXPORT_EXPORTONLY_TEST(testSaveAsDotX, "sample.dotx")
+CPPUNIT_TEST_FIXTURE(Test, testSaveAsDotX)
 {
+    loadAndReload("sample.dotx");
     xmlDocUniquePtr pXmlDocCT = parseExport("[Content_Types].xml");
 
     // Ensure that document has correct content type

@@ -28,7 +28,6 @@
 
 #include <com/sun/star/ucb/ContentCreationException.hpp>
 #include <com/sun/star/ucb/XContent.hpp>
-#include <com/sun/star/ucb/XCommandEnvironment.hpp>
 #include <com/sun/star/task/XInteractionHandler.hpp>
 #include <com/sun/star/io/XStream.hpp>
 #include <com/sun/star/io/XActiveDataSink.hpp>
@@ -44,7 +43,7 @@
 #include <comphelper/processfactory.hxx>
 #include <tools/urlobj.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace utl {
 
@@ -312,7 +311,7 @@ bool MediaDescriptor::impl_openStreamWithPostData( const css::uno::Reference< cs
         aPostArgument.MediaType = sMediaType;
         aPostArgument.Referer = getUnpackedValueOrDefault( PROP_REFERRER, OUString() );
 
-        aContent.executeCommand( "post", css::uno::makeAny( aPostArgument ) );
+        aContent.executeCommand( "post", css::uno::Any( aPostArgument ) );
 
         // get result
         xResultStream = xSink->getInputStream();

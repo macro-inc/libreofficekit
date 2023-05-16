@@ -7,31 +7,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
-#include <memory>
-#include <string>
-
-#include <cppunit/TestAssert.h>
-
-#include <sal/types.h>
-#include <scdll.hxx>
+#include <rtl/math.hxx>
 #include "helper/qahelper.hxx"
 #include <dpshttab.hxx>
 #include <dpobject.hxx>
 #include <dpsave.hxx>
 #include <dpdimsave.hxx>
-#include <dpcache.hxx>
-#include <dpfilteredcache.hxx>
 #include <scopetools.hxx>
-#include <queryentry.hxx>
 #include <stringutil.hxx>
 #include <dbdocfun.hxx>
 #include <generalfunction.hxx>
 
 #include <formula/errorcodes.hxx>
-#include <com/sun/star/sheet/DataPilotFieldOrientation.hpp>
 #include <com/sun/star/sheet/DataPilotFieldGroupBy.hpp>
-#include <com/sun/star/sheet/DataPilotFieldReference.hpp>
 #include <com/sun/star/sheet/DataPilotFieldReferenceType.hpp>
 #include <com/sun/star/sheet/DataPilotFieldReferenceItemType.hpp>
 
@@ -54,40 +42,6 @@ struct DPFieldDef
     ScGeneralFunction eFunc;
     bool bRepeatItemLabels;
 };
-
-template<size_t Size>
-ScRange insertDPSourceData(ScDocument* pDoc, DPFieldDef const aFields[], size_t nFieldCount, const char* aData[][Size], size_t nDataCount)
-{
-    // Insert field names in row 0.
-    for (size_t i = 0; i < nFieldCount; ++i)
-        pDoc->SetString(static_cast<SCCOL>(i), 0, 0, OUString(aFields[i].pName, strlen(aFields[i].pName), RTL_TEXTENCODING_UTF8));
-
-    // Insert data into row 1 and downward.
-    for (size_t i = 0; i < nDataCount; ++i)
-    {
-        SCROW nRow = static_cast<SCROW>(i) + 1;
-        for (size_t j = 0; j < nFieldCount; ++j)
-        {
-            SCCOL nCol = static_cast<SCCOL>(j);
-            pDoc->SetString(
-                nCol, nRow, 0, OUString(aData[i][j], strlen(aData[i][j]), RTL_TEXTENCODING_UTF8));
-        }
-    }
-
-    SCROW nRow1 = 0, nRow2 = 0;
-    SCCOL nCol1 = 0, nCol2 = 0;
-    pDoc->GetDataArea(0, nCol1, nRow1, nCol2, nRow2, true, false);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Data is expected to start from (col=0,row=0).", SCCOL(0), nCol1);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Data is expected to start from (col=0,row=0).", SCROW(0), nRow1);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Unexpected data range.",
-                           static_cast<SCCOL>(nFieldCount - 1), nCol2);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Unexpected data range.",
-                           static_cast<SCROW>(nDataCount), nRow2);
-
-    ScRange aSrcRange(nCol1, nRow1, 0, nCol2, nRow2, 0);
-    printRange(pDoc, aSrcRange, "Data sheet content");
-    return aSrcRange;
-}
 
 bool checkDPTableOutput(
     const ScDocument* pDoc, const ScRange& aOutRange,
@@ -202,14 +156,9 @@ ScRange refreshGroups(ScDPCollection* pDPs, ScDPObject* pDPObj)
 
 }
 
-class TestPivottable : public test::BootstrapFixture
+class TestPivottable : public ScUcalcTestBase
 {
 public:
-    TestPivottable();
-
-    virtual void setUp() override;
-    virtual void tearDown() override;
-
     /**
      * Basic test for pivot tables.
      */
@@ -323,37 +272,44 @@ public:
     CPPUNIT_TEST_SUITE_END();
 
 private:
-    ScDocShellRef m_xDocShell;
-    ScDocument* m_pDoc;
+    template<size_t Size>
+    ScRange insertDPSourceData(ScDocument* pDoc, DPFieldDef const aFields[], size_t nFieldCount, const char* aData[][Size], size_t nDataCount);
 };
 
-TestPivottable::TestPivottable()
+template<size_t Size>
+ScRange TestPivottable::insertDPSourceData(ScDocument* pDoc, DPFieldDef const aFields[], size_t nFieldCount, const char* aData[][Size], size_t nDataCount)
 {
+    // Insert field names in row 0.
+    for (size_t i = 0; i < nFieldCount; ++i)
+        pDoc->SetString(static_cast<SCCOL>(i), 0, 0, OUString(aFields[i].pName, strlen(aFields[i].pName), RTL_TEXTENCODING_UTF8));
+
+    // Insert data into row 1 and downward.
+    for (size_t i = 0; i < nDataCount; ++i)
+    {
+        SCROW nRow = static_cast<SCROW>(i) + 1;
+        for (size_t j = 0; j < nFieldCount; ++j)
+        {
+            SCCOL nCol = static_cast<SCCOL>(j);
+            pDoc->SetString(
+                nCol, nRow, 0, OUString(aData[i][j], strlen(aData[i][j]), RTL_TEXTENCODING_UTF8));
+        }
+    }
+
+    SCROW nRow1 = 0, nRow2 = 0;
+    SCCOL nCol1 = 0, nCol2 = 0;
+    pDoc->GetDataArea(0, nCol1, nRow1, nCol2, nRow2, true, false);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Data is expected to start from (col=0,row=0).", SCCOL(0), nCol1);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Data is expected to start from (col=0,row=0).", SCROW(0), nRow1);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Unexpected data range.",
+                           static_cast<SCCOL>(nFieldCount - 1), nCol2);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Unexpected data range.",
+                           static_cast<SCROW>(nDataCount), nRow2);
+
+    ScRange aSrcRange(nCol1, nRow1, 0, nCol2, nRow2, 0);
+    printRange(pDoc, aSrcRange, "Data sheet content");
+    return aSrcRange;
 }
 
-void TestPivottable::setUp()
-{
-    BootstrapFixture::setUp();
-
-    ScDLL::Init();
-
-    m_xDocShell = new ScDocShell(
-        SfxModelFlags::EMBEDDED_OBJECT |
-        SfxModelFlags::DISABLE_EMBEDDED_SCRIPTS |
-        SfxModelFlags::DISABLE_DOCUMENT_RECOVERY);
-    m_xDocShell->SetIsInUcalc();
-    m_xDocShell->DoInitUnitTest();
-
-    m_pDoc = &m_xDocShell->GetDocument();
-}
-
-void TestPivottable::tearDown()
-{
-    m_xDocShell->DoClose();
-    m_xDocShell.clear();
-
-    test::BootstrapFixture::tearDown();
-}
 
 void TestPivottable::testPivotTable()
 {

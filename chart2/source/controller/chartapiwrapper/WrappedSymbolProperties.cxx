@@ -20,6 +20,7 @@
 #include "WrappedSymbolProperties.hxx"
 #include "WrappedSeriesOrDiagramProperty.hxx"
 #include <FastPropertyIdRanges.hxx>
+#include <ChartType.hxx>
 #include <ChartTypeHelper.hxx>
 #include <com/sun/star/chart2/Symbol.hpp>
 #include <com/sun/star/chart2/SymbolStyle.hpp>
@@ -31,8 +32,7 @@
 #include <vcl/GraphicLoader.hxx>
 
 #include <vcl/graph.hxx>
-#include <vcl/outdev.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using ::com::sun::star::uno::Any;
@@ -285,9 +285,9 @@ beans::PropertyState WrappedSymbolTypeProperty::getPropertyState( const Referenc
     if( m_ePropertyType == DATA_SERIES && //single series or point
         m_spChart2ModelContact)
     {
-        Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
+        rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
         Reference< chart2::XDataSeries > xSeries( xInnerPropertyState, uno::UNO_QUERY );
-        Reference< chart2::XChartType > xChartType( DiagramHelper::getChartTypeOfSeries( xDiagram, xSeries ) );
+        rtl::Reference< ChartType > xChartType( DiagramHelper::getChartTypeOfSeries( xDiagram, xSeries ) );
         if( ChartTypeHelper::isSupportingSymbolProperties( xChartType, 2 ) )
             return beans::PropertyState_DIRECT_VALUE;
     }

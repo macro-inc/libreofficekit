@@ -32,6 +32,7 @@ OUString getPropertyName( PropertyIds eId )
         case PROP_CHAR_SHADOWED:   sName = "CharShadowed"; break;
         case PROP_CHAR_CASE_MAP:   sName = "CharCaseMap"; break;
         case PROP_CHAR_COLOR:      sName = "CharColor"; break;
+        case PROP_CHAR_COLOR_THEME_REFERENCE: sName = "CharColorThemeReference"; break;
         case PROP_CHAR_RELIEF:     sName = "CharRelief"; break;
         case PROP_CHAR_UNDERLINE:  sName = "CharUnderline"; break;
         case PROP_CHAR_UNDERLINE_COLOR:  sName = "CharUnderlineColor"; break;
@@ -91,6 +92,7 @@ OUString getPropertyName( PropertyIds eId )
         case PROP_PARA_BOTTOM_MARGIN:       sName = "ParaBottomMargin"; break;
         case PROP_PARA_IS_HYPHENATION:     sName = "ParaIsHyphenation"; break;
         case PROP_PARA_HYPHENATION_NO_CAPS: sName = "ParaHyphenationNoCaps"; break;
+        case PROP_PARA_HYPHENATION_ZONE: sName = "ParaHyphenationZone"; break;
         case PROP_PARA_LINE_NUMBER_COUNT:     sName = "ParaLineNumberCount"; break;
         case PROP_PARA_IS_HANGING_PUNCTUATION: sName = "ParaIsHangingPunctuation"; break;
         case PROP_PARA_LINE_SPACING:     sName = "ParaLineSpacing"; break;
@@ -239,8 +241,6 @@ OUString getPropertyName( PropertyIds eId )
         case PROP_BULLET_CHAR      :    sName = "BulletChar"; break;
         case PROP_BULLET_FONT_NAME :    sName = "BulletFontName"; break;
         case PROP_TABS_RELATIVE_TO_INDENT:    sName = "TabsRelativeToIndent"; break;
-        case PROP_PREFIX           :    sName = "Prefix"; break;
-        case PROP_SUFFIX           :    sName = "Suffix"; break;
         case PROP_CREATE_FROM_LEVEL_PARAGRAPH_STYLES:    sName = "CreateFromLevelParagraphStyles"; break;
         case PROP_DROP_CAP_FORMAT  :    sName = "DropCapFormat"; break;
         case PROP_REFERENCE_FIELD_PART :    sName = "ReferenceFieldPart"; break;
@@ -365,6 +365,7 @@ OUString getPropertyName( PropertyIds eId )
             break;
         case PROP_CURSOR_NOT_IGNORE_TABLES_IN_HF: sName = "CursorNotIgnoreTables"; break;
         case PROP_PARA_CONNECT_BORDERS: sName= "ParaIsConnectBorder"; break;
+        case PROP_DECORATIVE: sName = "Decorative"; break;
     }
     assert(sName.getLength()>0);
     return sName;

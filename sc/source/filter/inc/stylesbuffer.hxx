@@ -206,7 +206,7 @@ class Font : public WorkbookHelper
 {
 public:
     explicit            Font( const WorkbookHelper& rHelper, bool bDxf );
-    explicit            Font( const WorkbookHelper& rHelper, const FontModel& rModel );
+    explicit            Font( const WorkbookHelper& rHelper, FontModel aModel );
 
     /** Sets font formatting attributes for the passed element. */
     void                importAttribs( sal_Int32 nElement, const AttributeList& rAttribs );
@@ -791,7 +791,7 @@ public:
     /** Creates a new empty font object. */
     FontRef             createFont();
     /** Creates a number format. */
-    NumberFormatRef     createNumFmt( sal_Int32 nNumFmtId, const OUString& rFmtCode );
+    NumberFormatRef     createNumFmt( sal_Int32 nNumFmtId, std::u16string_view aFmtCode );
     sal_Int32           nextFreeNumFmtId();
     /** Creates a new empty border object. */
     BorderRef           createBorder();

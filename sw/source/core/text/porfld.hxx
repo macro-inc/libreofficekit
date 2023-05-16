@@ -60,7 +60,7 @@ protected:
 
 public:
     SwFieldPortion( const SwFieldPortion& rField );
-    SwFieldPortion(const OUString &rExpand, std::unique_ptr<SwFont> pFnt = nullptr, bool bPlaceHolder = false, TextFrameIndex nLen = TextFrameIndex(1));
+    SwFieldPortion(OUString aExpand, std::unique_ptr<SwFont> pFnt = nullptr, bool bPlaceHolder = false, TextFrameIndex nLen = TextFrameIndex(1));
     virtual ~SwFieldPortion() override;
 
     sal_uInt16 m_nAttrFieldType;
@@ -110,6 +110,9 @@ public:
     virtual void HandlePortion( SwPortionHandler& rPH ) const override;
 
     void SetContentControl(bool bContentControl) { m_bContentControl = bContentControl; }
+
+    void dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText,
+                   TextFrameIndex& nOffset) const override;
 };
 
 /**

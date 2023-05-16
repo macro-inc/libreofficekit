@@ -30,13 +30,15 @@
 #include <com/sun/star/container/XIndexAccess.hpp>
 #include <com/sun/star/drawing/XDrawPage.hpp>
 #include <svx/svdobj.hxx>
-#include <svx/ColorSets.hxx>
+#include <unotools/weakref.hxx>
 #include <memory>
 #include <optional>
 #include <vector>
+#include <deque>
 
 
 // predefines
+namespace model { class Theme; }
 namespace reportdesign { class OSection; }
 namespace sdr::contact { class ViewContact; }
 class SdrPage;
@@ -108,13 +110,13 @@ public:
     void InsertObjectThenMakeNameUnique(SdrObject* pObj, std::unordered_set<rtl::OUString>& rNameSet, size_t nPos=SAL_MAX_SIZE);
 
     /// remove from list without delete
-    virtual SdrObject* NbcRemoveObject(size_t nObjNum);
-    virtual SdrObject* RemoveObject(size_t nObjNum);
+    virtual rtl::Reference<SdrObject> NbcRemoveObject(size_t nObjNum);
+    virtual rtl::Reference<SdrObject> RemoveObject(size_t nObjNum);
 
     /// Replace existing object by different one.
     /// Same as Remove(old)+Insert(new) but faster because the order numbers
     /// do not have to be set dirty.
-    virtual SdrObject* ReplaceObject(SdrObject* pNewObj, size_t nObjNum);
+    virtual rtl::Reference<SdrObject> ReplaceObject(SdrObject* pNewObj, size_t nObjNum);
 
     /// Modify ZOrder of an SdrObject
     virtual SdrObject* SetObjectOrdNum(size_t nOldObjNum, size_t nNewObjNum);
@@ -225,10 +227,10 @@ public:
 private:
     tools::Rectangle    maSdrObjListOutRect;
     tools::Rectangle    maSdrObjListSnapRect;
-    std::vector<SdrObject*> maList;
+    std::deque<rtl::Reference<SdrObject>> maList;
     /// This list, if it exists, defines the navigation order. If it does
     /// not exist then maList defines the navigation order.
-    std::optional<std::vector<tools::WeakReference<SdrObject>>> mxNavigationOrder;
+    std::optional<std::vector<unotools::WeakReference<SdrObject>>> mxNavigationOrder;
     bool                mbObjOrdNumsDirty;
     bool                mbRectsDirty;
     /// This flag is <TRUE/> when the mpNavigation list has been changed but
@@ -272,6 +274,8 @@ private:
     */
     void RemoveObjectFromContainer (
         const sal_uInt32 nObjectPosition);
+
+    void ImplReformatAllEdgeObjects(const SdrObjList& );
 };
 
 // Used for all methods which return a page number
@@ -313,7 +317,7 @@ private:
     // data
     SdrPage*                mpSdrPage;
     SfxStyleSheet*          mpStyleSheet;
-    std::unique_ptr<svx::Theme> mpTheme;
+    std::shared_ptr<model::Theme> mpTheme;
     SfxItemSet              maProperties;
 
     // internal helpers
@@ -342,8 +346,8 @@ public:
     void SetStyleSheet(SfxStyleSheet* pStyleSheet);
     SfxStyleSheet* GetStyleSheet() const { return mpStyleSheet;}
 
-    void SetTheme(std::unique_ptr<svx::Theme> pTheme);
-    svx::Theme* GetTheme();
+    void SetTheme(std::shared_ptr<model::Theme> const& pTheme);
+    std::shared_ptr<model::Theme> const& GetTheme() const;
 
     void dumpAsXml(xmlTextWriterPtr pWriter) const;
 };

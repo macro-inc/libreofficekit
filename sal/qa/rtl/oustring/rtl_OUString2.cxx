@@ -30,7 +30,9 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/plugin/TestPlugIn.h>
 
+#include <config_options.h>
 #include <o3tl/cppunittraitshelper.hxx>
+#include <o3tl/safeint.hxx>
 
 #include <stringhelper.hxx>
 #include <valueequal.hxx>
@@ -41,14 +43,22 @@ namespace rtl_OUString
 namespace {
 
 // Avoid -fsanitize=undefined warning e.g. "runtime error: value 1e+99 is
-// outside the range of representable values of type 'float'":
+// outside the range of representable values of type 'float'" with Clang prior to
+// <https://github.com/llvm/llvm-project/commit/9e52c43090f8cd980167bbd2719878ae36bcf6b5> "Treat the
+// range of representable values of floating-point types as [-inf, +inf] not as [-max, +max]"
+// (ENABLE_RUNTIME_OPTIMIZATIONS is an approximation for checking whether building is done without
+// -fsanitize=undefined):
 float doubleToFloat(double x) {
+#if !defined __clang__ || __clang_major__ >= 9 || ENABLE_RUNTIME_OPTIMIZATIONS
+    return static_cast<float>(x);
+#else
     return
         x < -std::numeric_limits<float>::max()
         ? -std::numeric_limits<float>::infinity()
         : x > std::numeric_limits<float>::max()
         ? std::numeric_limits<float>::infinity()
         : static_cast<float>(x);
+#endif
 }
 
 }
@@ -772,6 +782,18 @@ public:
             "token should be empty", ab.getToken(0, '-', n).isEmpty());
     }
 
+    void getToken_006()
+    {
+        OUString suTokenStr;
+        auto pTokenStr = suTokenStr.getStr();
+        sal_uInt64 n64 = reinterpret_cast<sal_uInt64>(pTokenStr) / sizeof(sal_Unicode);
+        // Point either to 0x0, or to some random address -4GiB away from this string
+        sal_Int32 n = n64 > o3tl::make_unsigned(SAL_MAX_INT32) ? -SAL_MAX_INT32
+                                                               : -static_cast<sal_Int32>(n64);
+        suTokenStr.getToken(0, ';', n);
+        // should not GPF with negative index
+    }
+
     CPPUNIT_TEST_SUITE(getToken);
     CPPUNIT_TEST(getToken_000);
     CPPUNIT_TEST(getToken_001);
@@ -779,6 +801,7 @@ public:
     CPPUNIT_TEST(getToken_003);
     CPPUNIT_TEST(getToken_004);
     CPPUNIT_TEST(getToken_005);
+    CPPUNIT_TEST(getToken_006);
     CPPUNIT_TEST_SUITE_END();
 }; // class getToken
 

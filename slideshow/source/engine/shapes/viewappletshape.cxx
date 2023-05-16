@@ -18,7 +18,7 @@
  */
 
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/range/b2irange.hxx>
@@ -45,22 +45,23 @@
 
 #include "viewappletshape.hxx"
 #include <tools.hxx>
+#include <utility>
 
 
 using namespace ::com::sun::star;
 
 namespace slideshow::internal
 {
-        ViewAppletShape::ViewAppletShape( const ViewLayerSharedPtr&                       rViewLayer,
+        ViewAppletShape::ViewAppletShape( ViewLayerSharedPtr                              xViewLayer,
                                           const uno::Reference< drawing::XShape >&        rxShape,
                                           const OUString&                          rServiceName,
                                           const char**                                    pPropCopyTable,
                                           std::size_t                                     nNumPropEntries,
-                                          const uno::Reference< uno::XComponentContext >& rxContext ) :
-            mpViewLayer( rViewLayer ),
+                                          uno::Reference< uno::XComponentContext >        xContext ) :
+            mpViewLayer(std::move( xViewLayer )),
             mxViewer(),
             mxFrame(),
-            mxComponentContext( rxContext )
+            mxComponentContext(std::move( xContext ))
         {
             ENSURE_OR_THROW( rxShape.is(), "ViewAppletShape::ViewAppletShape(): Invalid Shape" );
             ENSURE_OR_THROW( mpViewLayer, "ViewAppletShape::ViewAppletShape(): Invalid View" );

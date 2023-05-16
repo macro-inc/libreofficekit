@@ -29,13 +29,13 @@ struct ImplSVEvent;
 
 class SwFormatTablePage : public SfxTabPage
 {
-    SwTableRep*     pTableData;
+    SwTableRep*     m_pTableData;
     std::unique_ptr<SwTableRep> m_xOrigTableData;
-    SwTwips         nSaveWidth;
-    SwTwips         nMinTableWidth;
-    bool            bModified;
-    bool            bFull:1;
-    bool            bHtmlMode : 1;
+    SwTwips         m_nSaveWidth;
+    SwTwips         m_nMinTableWidth;
+    bool            m_bModified;
+    bool            m_bFull:1;
+    bool            m_bHtmlMode : 1;
 
     std::unique_ptr<weld::Entry> m_xNameED;
     std::unique_ptr<weld::Label> m_xWidthFT;
@@ -61,12 +61,12 @@ class SwFormatTablePage : public SfxTabPage
     std::unique_ptr<svx::FrameDirectionListBox> m_xTextDirectionLB;
     std::unique_ptr<weld::Widget> m_xProperties;
 
-    int m_nOrigWidthMin;
-    int m_nOrigWidthMax;
-    int m_nOrigLeftMin;
-    int m_nOrigLeftMax;
-    int m_nOrigRightMin;
-    int m_nOrigRightMax;
+    sal_Int64 m_nOrigWidthMin;
+    sal_Int64 m_nOrigWidthMax;
+    sal_Int64 m_nOrigLeftMin;
+    sal_Int64 m_nOrigLeftMax;
+    sal_Int64 m_nOrigRightMin;
+    sal_Int64 m_nOrigRightMax;
 
     void        Init();
     void ModifyHdl(const weld::MetricSpinButton& rEdit, bool bAllowInconsistencies = false);
@@ -140,9 +140,9 @@ public:
 
 class SwTextFlowPage : public SfxTabPage
 {
-    SwWrtShell*     pShell;
-    bool            bPageBreak;
-    bool            bHtmlMode;
+    SwWrtShell*     m_pShell;
+    bool            m_bPageBreak;
+    bool            m_bHtmlMode;
 
     std::unique_ptr<weld::CheckButton> m_xPgBrkCB;
     std::unique_ptr<weld::RadioButton> m_xPgBrkRB;

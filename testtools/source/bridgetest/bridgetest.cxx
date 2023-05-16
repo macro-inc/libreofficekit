@@ -18,14 +18,15 @@
  */
 
 
+#include <sal/config.h>
 #include <stdio.h>
 #include <string.h>
 #include <string_view>
 
 #include <o3tl/any.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <osl/diagnose.hxx>
-#include <osl/time.h>
 #include <sal/types.h>
 #include <typelib/typedescription.hxx>
 #include <uno/dispatcher.hxx>
@@ -39,7 +40,6 @@
 #include <cppuhelper/supportsservice.hxx>
 
 #include <com/sun/star/lang/XServiceInfo.hpp>
-#include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/lang/XMain.hpp>
 #include <com/sun/star/lang/XSingleComponentFactory.hpp>
 #include <com/sun/star/bridge/UnoUrlResolver.hpp>
@@ -51,12 +51,12 @@
 #include <test/testtools/bridgetest/TestPolyStruct.hpp>
 #include <test/testtools/bridgetest/XBridgeTest.hpp>
 #include <test/testtools/bridgetest/XBridgeTest2.hpp>
-#include <test/testtools/bridgetest/XMulti.hpp>
 
 #include "currentcontextchecker.hxx"
 #include "multi.hxx"
 #include <memory>
 #include <utility>
+#include <cmath>
 
 using namespace osl;
 using namespace cppu;
@@ -376,7 +376,7 @@ static bool performTest(
         assign(
             static_cast<TestElement &>(aData), true, '@', 17, 0x1234, 0xFEDC,
             0x12345678, 0xFEDCBA98, SAL_CONST_INT64(0x123456789ABCDEF0),
-            SAL_CONST_UINT64(0xFEDCBA9876543210), 17.0815f, 3.1415926359,
+            SAL_CONST_UINT64(0xFEDCBA9876543210), 17.0815f, M_PI,
             TestEnum_LOLA, STRING_TEST_CONSTANT, 18, 0x5678, xI,
             Any(&xI, cppu::UnoType<XInterface>::get()));
         bRet &= check(aData.Any == xI, "### unexpected any!");
@@ -732,19 +732,19 @@ static bool performTest(
         assign(
             _arStruct[0], true, '@', 17, 0x1234, 0xFEDC, 0x12345678, 0xFEDCBA98,
             SAL_CONST_INT64(0x123456789ABCDEF0),
-            SAL_CONST_UINT64(0xFEDCBA9876543210), 17.0815f, 3.1415926359,
+            SAL_CONST_UINT64(0xFEDCBA9876543210), 17.0815f, M_PI,
             TestEnum_LOLA, STRING_TEST_CONSTANT, 18, 0x5678, _arObj[0],
             Any(&_arObj[0], cppu::UnoType<XInterface>::get()));
         assign(
             _arStruct[1], true, 'A', 17, 0x1234, 0xFEDC, 0x12345678, 0xFEDCBA98,
             SAL_CONST_INT64(0x123456789ABCDEF0),
-            SAL_CONST_UINT64(0xFEDCBA9876543210), 17.0815f, 3.1415926359,
+            SAL_CONST_UINT64(0xFEDCBA9876543210), 17.0815f, M_PI,
             TestEnum_TWO, STRING_TEST_CONSTANT, 18, 0x5678, _arObj[1],
             Any(&_arObj[1], cppu::UnoType<XInterface>::get()));
         assign(
             _arStruct[2], true, 'B', 17, 0x1234, 0xFEDC, 0x12345678, 0xFEDCBA98,
             SAL_CONST_INT64(0x123456789ABCDEF0),
-            SAL_CONST_UINT64(0xFEDCBA9876543210), 17.0815f, 3.1415926359,
+            SAL_CONST_UINT64(0xFEDCBA9876543210), 17.0815f, M_PI,
             TestEnum_CHECK, STRING_TEST_CONSTANT, 18, 0x5678, _arObj[2],
             Any(&_arObj[2], cppu::UnoType<XInterface>::get()));
         {
@@ -1314,7 +1314,7 @@ SAL_DLLPUBLIC_EXPORT void * component_getFactory(
 {
     void * pRet = nullptr;
 
-    if (pServiceManager && OUString(IMPLNAME).equalsAscii(pImplName))
+    if (pServiceManager && o3tl::equalsAscii(IMPLNAME, pImplName))
     {
         Reference< XInterface > xFactory(
             createSingleComponentFactory(

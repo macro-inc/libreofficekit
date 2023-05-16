@@ -17,6 +17,7 @@
 #include <sal/config.h>
 
 #include <o3tl/unreachable.hxx>
+#include <o3tl/string_view.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <unoidl/unoidl.hxx>
 
@@ -165,11 +166,11 @@ template<typename T> rtl::Reference<T> getCurrentPad(
     return pad;
 }
 
-bool nameHasSameIdentifierAs(OUString const & name, OUString const & identifier)
+bool nameHasSameIdentifierAs(std::u16string_view name, std::u16string_view identifier)
 {
-    sal_Int32 i = name.lastIndexOf('.') + 1;
-    return identifier.getLength() == name.getLength() - i
-        && name.match(identifier, i);
+    size_t i = name.rfind('.') + 1;
+    return identifier.size() == name.size() - i
+        && o3tl::starts_with(name.substr(i), identifier);
 }
 
 bool coerce(
@@ -399,7 +400,7 @@ Found findEntity(
                                  + t));
                             return FOUND_ERROR;
                         }
-                        OUString tmpl(typeNucleus.copy(0, i));
+                        std::u16string_view tmpl(typeNucleus.subView(0, i));
                         do {
                             ++i; // skip '<' or ','
                             sal_Int32 j = i;
@@ -2530,7 +2531,7 @@ ctorParam:
       }
       pad->constructors.back().parameters.push_back(
           unoidl::detail::SourceProviderSingleInterfaceBasedServiceEntityPad::Constructor::Parameter(
-              id, t, $5));
+              id, std::move(t), $5));
   }
 ;
 
@@ -3508,7 +3509,7 @@ primaryExpr:
               YYERROR;
           }
           if (ent != nullptr) {
-              OUString id(name.copy(i + 1));
+              std::u16string_view id(name.subView(i + 1));
               // No need to check for enum members here, as they cannot be
               // referenced in expressions by qualified name (TODO: is that true?):
               if (ent->entity.is()) {

@@ -19,8 +19,6 @@
 
 #include <sal/config.h>
 
-#include <string_view>
-
 #include "PresenterController.hxx"
 
 #include "PresenterAccessibility.hxx"
@@ -53,6 +51,7 @@
 #include <com/sun/star/util/URLTransformer.hpp>
 
 #include <rtl/ustrbuf.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -84,19 +83,19 @@ PresenterController::InstanceContainer PresenterController::maInstances;
 }
 
 PresenterController::PresenterController (
-    const css::uno::WeakReference<css::lang::XEventListener> &rxScreen,
+    css::uno::WeakReference<css::lang::XEventListener> xScreen,
     const Reference<XComponentContext>& rxContext,
     const Reference<frame::XController>& rxController,
     const Reference<presentation::XSlideShowController>& rxSlideShowController,
-    const rtl::Reference<PresenterPaneContainer>& rpPaneContainer,
+    rtl::Reference<PresenterPaneContainer> xPaneContainer,
     const Reference<XResourceId>& rxMainPaneId)
     : PresenterControllerInterfaceBase(m_aMutex),
-      mxScreen(rxScreen),
+      mxScreen(std::move(xScreen)),
       mxComponentContext(rxContext),
       mxController(rxController),
       mxSlideShowController(rxSlideShowController),
       mxMainPaneId(rxMainPaneId),
-      mpPaneContainer(rpPaneContainer),
+      mpPaneContainer(std::move(xPaneContainer)),
       mnCurrentSlideIndex(-1),
       mpWindowManager(new PresenterWindowManager(rxContext,mpPaneContainer,this)),
       mpCanvasHelper(std::make_shared<PresenterCanvasHelper>()),
@@ -374,7 +373,7 @@ void PresenterController::UpdatePaneTitles()
                 // Get the placeholder
                 ++nStartIndex;
                 const sal_Int32 nEndIndex (sTemplate.indexOf('%', nStartIndex+1));
-                const OUString sPlaceholder (sTemplate.copy(nStartIndex, nEndIndex-nStartIndex));
+                const std::u16string_view sPlaceholder (sTemplate.subView(nStartIndex, nEndIndex-nStartIndex));
                 nIndex = nEndIndex+1;
 
                 // Replace the placeholder with its current value.
@@ -877,6 +876,17 @@ void SAL_CALL PresenterController::keyReleased (const awt::KeyEvent& rEvent)
             {
                 bool bPenEnabled = mxSlideShowController->getUsePen();
                 mxSlideShowController->setUsePen( !bPenEnabled );
+            }
+            break;
+
+        // tdf#149351 Ctrl+A disables pointer as pen mode
+        case awt::Key::A:
+            if (mxSlideShowController.is())
+            {
+                if (rEvent.Modifiers == awt::KeyModifier::MOD1)
+                {
+                    mxSlideShowController->setUsePen( false );
+                }
             }
             break;
 

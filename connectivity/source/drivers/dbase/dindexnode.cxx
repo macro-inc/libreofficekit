@@ -26,6 +26,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <utility>
 
 
 using namespace connectivity;
@@ -38,10 +39,10 @@ ONDXKey::ONDXKey()
 {
 }
 
-ONDXKey::ONDXKey(const ORowSetValue& rVal, sal_Int32 eType, sal_uInt32 nRec)
+ONDXKey::ONDXKey(ORowSetValue aVal, sal_Int32 eType, sal_uInt32 nRec)
     : ONDXKey_BASE(eType)
     , nRecord(nRec)
-    , xValue(rVal)
+    , xValue(std::move(aVal))
 {
 }
 
@@ -482,7 +483,7 @@ void ONDXPage::Merge(sal_uInt16 nParentNodePos, const ONDXPagePtr& xPage)
            nMaxNodes_2 = nMaxNodes / 2;
 
     // Determine if page is right or left neighbour
-    bool    bRight    = ((*xPage)[0].GetKey() > (*this)[0].GetKey()); // sal_True, whenn xPage the right side is
+    bool    bRight    = ((*xPage)[0].GetKey() > (*this)[0].GetKey()); // true when xPage is at the right side
     sal_uInt16  nNewCount = (*xPage).Count() + Count();
 
     if (IsLeaf())

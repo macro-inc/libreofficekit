@@ -77,6 +77,7 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/frame/XModel.hpp>
 #include <svl/numformat.hxx>
+#include <o3tl/string_view.hxx>
 
 using ::std::vector;
 using namespace ::com::sun::star;
@@ -100,7 +101,7 @@ public:
     virtual uno::Any SAL_CALL getByIndex( ::sal_Int32 Index ) override
     {
         //--Index;  // apparently the palette is already 1 based
-        return uno::makeAny( sal_Int32( maColor[ Index ] ) );
+        return uno::Any( sal_Int32( maColor[ Index ] ) );
     }
 
     // Methods XElementAccess
@@ -137,7 +138,7 @@ XclImpPalette::ExportPalette()
     if ( xProps.is() )
     {
         uno::Reference< container::XIndexAccess > xIndex( new PaletteIndex( std::move(aColors) ) );
-        xProps->setPropertyValue( "ColorPalette", uno::makeAny( xIndex ) );
+        xProps->setPropertyValue( "ColorPalette", uno::Any( xIndex ) );
     }
 
 }
@@ -1603,8 +1604,8 @@ namespace {
 /** Functor for case-insensitive string comparison, usable in maps etc. */
 struct IgnoreCaseCompare
 {
-    bool operator()( const OUString& rName1, std::u16string_view rName2 ) const
-        { return rName1.compareToIgnoreAsciiCase( rName2 ) < 0; }
+    bool operator()( std::u16string_view rName1, std::u16string_view rName2 ) const
+        { return o3tl::compareToIgnoreAsciiCase( rName1, rName2 ) < 0; }
 };
 
 } // namespace
@@ -2066,7 +2067,7 @@ void XclImpXFRangeBuffer::Finalize()
             SetBorderLine( rRange, nScTab, SvxBoxItemLine::BOTTOM );
         // do merge
         if( bMultiCol || bMultiRow )
-            rDoc.DoMerge( nScTab, rStart.Col(), rStart.Row(), rEnd.Col(), rEnd.Row() );
+            rDoc.DoMerge( rStart.Col(), rStart.Row(), rEnd.Col(), rEnd.Row(), nScTab );
         // #i93609# merged range in a single row: test if manual row height is needed
         if( !bMultiRow )
         {

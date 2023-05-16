@@ -30,7 +30,6 @@
 #include <IDocumentDrawModelAccess.hxx>
 #include <frmtool.hxx>
 #include <dflyobj.hxx>
-#include <hints.hxx>
 #include <fmtanchr.hxx>
 #include <fmtornt.hxx>
 #include <fmtfsize.hxx>
@@ -51,6 +50,8 @@
 #include <textboxhelper.hxx>
 #include <fmtfollowtextflow.hxx>
 #include <unoprnms.hxx>
+#include <rootfrm.hxx>
+#include <bodyfrm.hxx>
 
 using namespace ::com::sun::star;
 
@@ -74,11 +75,24 @@ SwTwips lcl_GetTopForObjPos(const SwContentFrame* pCnt, const bool bVert, const 
 
 }
 
-SwFlyAtContentFrame::SwFlyAtContentFrame( SwFlyFrameFormat *pFormat, SwFrame* pSib, SwFrame *pAnch ) :
-    SwFlyFreeFrame( pFormat, pSib, pAnch )
+SwFlyAtContentFrame::SwFlyAtContentFrame( SwFlyFrameFormat *pFormat, SwFrame* pSib, SwFrame *pAnch, bool bFollow ) :
+    SwFlyFreeFrame( pFormat, pSib, pAnch, bFollow ),
+    SwFlowFrame(static_cast<SwFrame&>(*this))
 {
     m_bAtCnt = true;
     m_bAutoPosition = (RndStdIds::FLY_AT_CHAR == pFormat->GetAnchor().GetAnchorId());
+}
+
+SwFlyAtContentFrame::SwFlyAtContentFrame(SwFlyAtContentFrame& rPrecede)
+    : SwFlyAtContentFrame(rPrecede.GetFormat(), const_cast<SwFrame*>(rPrecede.GetAnchorFrame()),
+                          const_cast<SwFrame*>(rPrecede.GetAnchorFrame()), /*bFollow=*/true)
+{
+    SetFollow(rPrecede.GetFollow());
+    rPrecede.SetFollow(this);
+}
+
+SwFlyAtContentFrame::~SwFlyAtContentFrame()
+{
 }
 
 // #i28701#
@@ -111,7 +125,7 @@ void SwFlyAtContentFrame::SwClientNotify(const SwModify& rMod, const SfxHint& rH
 
     // Search the new anchor using the NodeIdx; the relation between old
     // and new NodeIdx determines the search direction
-    const SwNodeIndex aNewIdx(pAnch->GetContentAnchor()->nNode);
+    const SwNodeIndex aNewIdx(*pAnch->GetAnchorNode());
     SwNodeIndex aOldIdx(pContent->IsTextFrame()
             // sw_redlinehide: can pick any node here, the compare with
             // FrameContainsNode should catch it
@@ -541,7 +555,7 @@ void SwFlyAtContentFrame::MakeAll(vcl::RenderContext* pRenderContext)
     {
         // get the text area of the shape
         const tools::Rectangle aTextRectangle
-            = SwTextBoxHelper::getTextRectangle(pShapeFormat->FindRealSdrObject(), false);
+            = SwTextBoxHelper::getRelativeTextRectangle(pShapeFormat->FindRealSdrObject());
         // get the original textframe position
         SwFormatHoriOrient aHOri = pShapeFormat->GetHoriOrient();
         SwFormatVertOrient aVOri = pShapeFormat->GetVertOrient();
@@ -1387,14 +1401,14 @@ void SwFlyAtContentFrame::SetAbsPos( const Point &rNew )
             SwCursorMoveState eTmpState( CursorMoveState::SetOnlyText );
             Point aPt( rNew );
             if( pCnt->GetModelPositionForViewPoint( &pos, aPt, &eTmpState )
-                && FrameContainsNode(*pTextFrame, pos.nNode.GetIndex()))
+                && FrameContainsNode(*pTextFrame, pos.GetNodeIndex()))
             {
                 const SwTextAttr *const pTextInputField =
-                    pos.nNode.GetNode().GetTextNode()->GetTextAttrAt(
-                        pos.nContent.GetIndex(), RES_TXTATR_INPUTFIELD, SwTextNode::PARENT );
+                    pos.GetNode().GetTextNode()->GetTextAttrAt(
+                        pos.GetContentIndex(), RES_TXTATR_INPUTFIELD, ::sw::GetTextAttrMode::Parent);
                 if (pTextInputField != nullptr)
                 {
-                    pos.nContent = pTextInputField->GetStart();
+                    pos.SetContent( pTextInputField->GetStart() );
                 }
                 ResetLastCharRectHeight();
                 if( text::RelOrientation::CHAR == pFormat->GetVertOrient().GetRelationOrient() )
@@ -1414,8 +1428,7 @@ void SwFlyAtContentFrame::SetAbsPos( const Point &rNew )
         else // is that even possible? maybe if there was a change of anchor type from AT_FLY or something?
         {
             assert(pCnt->IsNoTextFrame());
-            pos.nNode = *static_cast<SwNoTextFrame*>(pCnt)->GetNode();
-            pos.nContent.Assign(static_cast<SwNoTextFrame*>(pCnt)->GetNode(), 0);
+            pos.Assign(*static_cast<SwNoTextFrame*>(pCnt)->GetNode());
         }
         aAnch.SetAnchor( &pos );
 
@@ -1518,6 +1531,204 @@ bool SwFlyAtContentFrame::InvalidationAllowed( const InvalidationType _nInvalid 
     }
 
     return bAllowed;
+}
+
+bool SwFlyAtContentFrame::ShouldBwdMoved(SwLayoutFrame* /*pNewUpper*/, bool& /*rReformat*/)
+{
+    return false;
+}
+
+const SwFlyAtContentFrame* SwFlyAtContentFrame::GetFollow() const
+{
+    return static_cast<const SwFlyAtContentFrame*>(SwFlowFrame::GetFollow());
+}
+
+SwFlyAtContentFrame* SwFlyAtContentFrame::GetFollow()
+{
+    return static_cast<SwFlyAtContentFrame*>(SwFlowFrame::GetFollow());
+}
+
+SwLayoutFrame *SwFrame::GetNextFlyLeaf( MakePageType eMakePage )
+{
+    auto pFly = dynamic_cast<SwFlyAtContentFrame*>(FindFlyFrame());
+    assert(pFly && "GetNextFlyLeaf: missing fly frame");
+    assert(pFly->IsFlySplitAllowed() && "GetNextFlyLeaf: fly split not allowed");
+
+    SwTextFrame* pFlyAnchor = pFly->FindAnchorCharFrame();
+    bool bBody = pFlyAnchor && pFlyAnchor->IsInDocBody();
+    SwLayoutFrame *pLayLeaf = nullptr;
+    // Look up the first candidate.
+    SwSectionFrame* pFlyAnchorSection = pFlyAnchor ? pFlyAnchor->FindSctFrame() : nullptr;
+    if (pFlyAnchorSection)
+    {
+        // We can't just move the split anchor to the next page, that would be outside the section.
+        // Rather split that section as well.
+        pLayLeaf = pFlyAnchorSection->GetNextSctLeaf(eMakePage);
+    }
+    else if (IsTabFrame())
+    {
+        // If we're in a table, try to find the next frame of the table's last content.
+        SwFrame* pContent = static_cast<SwTabFrame*>(this)->FindLastContentOrTable();
+        pLayLeaf = pContent ? pContent->GetUpper() : nullptr;
+    }
+    else
+    {
+        pLayLeaf = GetNextLayoutLeaf();
+    }
+
+    SwLayoutFrame* pOldLayLeaf = nullptr;
+    while (true)
+    {
+        if (pLayLeaf)
+        {
+            // If we're anchored in a body frame, the candidate has to be in a body frame as well.
+            bool bLeftBody = bBody && !pLayLeaf->IsInDocBody();
+            // If the candiate is in a fly, make sure that the candidate is a child of our follow.
+            bool bLeftFly = pLayLeaf->IsInFly() && pLayLeaf->FindFlyFrame() != pFly->GetFollow();
+            bool bSameBody = false;
+            if (bBody && pLayLeaf->IsInDocBody())
+            {
+                // Make sure the candidate is not inside the same body frame, that would prevent
+                // inserting a new page.
+                if (pFlyAnchor->FindBodyFrame() == pLayLeaf->FindBodyFrame())
+                {
+                    bSameBody = true;
+                }
+            }
+            if (bLeftBody || bLeftFly || bSameBody)
+            {
+                // The above conditions are not held, reject.
+                pOldLayLeaf = pLayLeaf;
+                pLayLeaf = pLayLeaf->GetNextLayoutLeaf();
+                continue;
+            }
+        }
+        else
+        {
+            // No candidate: insert a page and try again.
+            if (eMakePage == MAKEPAGE_INSERT)
+            {
+                InsertPage(FindPageFrame(), false);
+                // If we already had a cancidate, continue trying with that instead of starting from
+                // scratch.
+                pLayLeaf = pOldLayLeaf ? pOldLayLeaf : GetNextLayoutLeaf();
+                continue;
+            }
+        }
+        break;
+    }
+
+    if( pLayLeaf )
+    {
+        SwFlyAtContentFrame* pNew = nullptr;
+        // Find the anchor frame to split.
+        if (pFlyAnchor)
+        {
+            // Split the anchor at char 0: all the content goes to the follow of the anchor.
+            pFlyAnchor->SplitFrame(TextFrameIndex(0));
+            auto pNext = static_cast<SwTextFrame*>(pFlyAnchor->GetNext());
+            // Move the new anchor frame, before the first child of pLayLeaf.
+            pNext->MoveSubTree(pLayLeaf, pLayLeaf->Lower());
+
+            // Now create the follow of the fly and anchor it in the master of the anchor.
+            pNew = new SwFlyAtContentFrame(*pFly);
+            while (pFlyAnchor->IsFollow())
+            {
+                pFlyAnchor = pFlyAnchor->FindMaster();
+            }
+            pFlyAnchor->AppendFly(pNew);
+        }
+        pLayLeaf = pNew;
+    }
+    return pLayLeaf;
+}
+
+void SwRootFrame::DeleteEmptyFlys_()
+{
+    assert(mpFlyDestroy);
+
+    while (!mpFlyDestroy->empty())
+    {
+        SwFlyFrame* pFly = *mpFlyDestroy->begin();
+        mpFlyDestroy->erase( mpFlyDestroy->begin() );
+        // Allow deletion of non-empty flys: a fly with no content is still formatted to have a
+        // height of MINLAY.
+        if (!pFly->ContainsContent() && !pFly->IsDeleteForbidden())
+        {
+            SwFrame::DestroyFrame(pFly);
+        }
+    }
+}
+
+const SwFlyAtContentFrame* SwFlyAtContentFrame::GetPrecede() const
+{
+    return static_cast<const SwFlyAtContentFrame*>(SwFlowFrame::GetPrecede());
+}
+
+SwFlyAtContentFrame* SwFlyAtContentFrame::GetPrecede()
+{
+    return static_cast<SwFlyAtContentFrame*>(SwFlowFrame::GetPrecede());
+}
+
+void SwFlyAtContentFrame::DelEmpty()
+{
+    SwTextFrame* pAnchor = FindAnchorCharFrame();
+    if (pAnchor)
+    {
+        if (SwFlowFrame* pAnchorPrecede = pAnchor->GetPrecede())
+        {
+            // The anchor has a precede: invalidate it so that JoinFrame() is called on it.
+            pAnchorPrecede->GetFrame().InvalidateSize();
+        }
+    }
+
+    SwFlyAtContentFrame* pMaster = IsFollow() ? GetPrecede() : nullptr;
+    if (pMaster)
+    {
+        pMaster->SetFollow(GetFollow());
+    }
+
+    SwFlyAtContentFrame* pFollow = GetFollow();
+    if (pFollow)
+    {
+        // I'll be deleted, so invalidate the position of my follow, so it can move up.
+        pFollow->InvalidatePos();
+    }
+
+    SetFollow(nullptr);
+
+    {
+        SwFrameAreaDefinition::FrameAreaWriteAccess aFrm(*this);
+        aFrm.Height(0);
+    }
+    InvalidateObjRectWithSpaces();
+
+    if(getRootFrame())
+    {
+        getRootFrame()->InsertEmptyFly(this);
+    }
+}
+
+void SwRootFrame::InsertEmptyFly(SwFlyFrame* pDel)
+{
+    if (!mpFlyDestroy)
+    {
+        mpFlyDestroy.reset(new SwFlyDestroyList);
+    }
+
+    mpFlyDestroy->insert(pDel);
+}
+
+SwLayoutFrame* SwFrame::GetPrevFlyLeaf()
+{
+    auto pFly = dynamic_cast<SwFlyAtContentFrame*>(FindFlyFrame());
+    assert(pFly && "GetPrevFlyLeaf: missing fly frame");
+    if (!pFly->IsFlySplitAllowed())
+    {
+        return nullptr;
+    }
+
+    return pFly->GetPrecede();
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

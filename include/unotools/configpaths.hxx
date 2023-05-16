@@ -51,7 +51,7 @@ namespace utl
             <FALSE/>, if the path was a one-level path or an invalid path
 
     */
-    UNOTOOLS_DLLPUBLIC bool splitLastFromConfigurationPath(OUString const& _sInPath,
+    UNOTOOLS_DLLPUBLIC bool splitLastFromConfigurationPath(std::u16string_view _sInPath,
                                             OUString& _rsOutPath,
                                             OUString& _rsLocalName);
 
@@ -95,8 +95,8 @@ namespace utl
             If both paths are equal <TRUE/> is returned.
 
     */
-    bool isPrefixOfConfigurationPath(OUString const& _sNestedPath,
-                                         OUString const& _sPrefixPath);
+    bool isPrefixOfConfigurationPath(std::u16string_view _sNestedPath,
+                                         std::u16string_view _sPrefixPath);
 
     /** get the relative path to a nested node with respect to a parent path.
 
@@ -120,7 +120,7 @@ namespace utl
 
     */
     UNOTOOLS_DLLPUBLIC OUString dropPrefixFromConfigurationPath(OUString const& _sNestedPath,
-                                                    OUString const& _sPrefixPath);
+                                                    std::u16string_view _sPrefixPath);
 
     /** Create a one-level relative configuration path from a set element name
         without a known set element type.
@@ -134,7 +134,7 @@ namespace utl
             "*['<Name>']", where <Name> is properly escaped.
 
     */
-    UNOTOOLS_DLLPUBLIC OUString wrapConfigurationElementName(OUString const& _sElementName);
+    UNOTOOLS_DLLPUBLIC OUString wrapConfigurationElementName(std::u16string_view _sElementName);
 
     /** Create a one-level relative configuration path from a set element name
         and a known set element type.
@@ -152,7 +152,7 @@ namespace utl
             "<Type>['<Name>']", where <Name> is properly escaped.
 
     */
-    OUString wrapConfigurationElementName(OUString const& _sElementName,
+    OUString wrapConfigurationElementName(std::u16string_view _sElementName,
                                                  OUString const& _sTypeName);
 
 }   // namespace utl

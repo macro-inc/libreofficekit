@@ -22,6 +22,7 @@
 #include "DataBrowser.hxx"
 #include "DataBrowserModel.hxx"
 #include <strings.hrc>
+#include <DataSeries.hxx>
 #include <DataSeriesHelper.hxx>
 #include <DiagramHelper.hxx>
 #include <CommonConverters.hxx>
@@ -30,6 +31,8 @@
 #include <ResId.hxx>
 #include <bitmaps.hlst>
 #include <helpids.h>
+#include <ChartModel.hxx>
+#include <ChartType.hxx>
 
 #include <vcl/weld.hxx>
 #include <vcl/settings.hxx>
@@ -40,8 +43,6 @@
 #include <svl/numformat.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 
-#include <com/sun/star/chart2/XChartDocument.hpp>
-#include <com/sun/star/chart2/XChartType.hpp>
 #include <com/sun/star/container/XIndexReplace.hpp>
 
 #include <algorithm>
@@ -169,7 +170,7 @@ public:
     void SetColor( const Color & rCol );
     void SetPos();
     void SetWidth( sal_Int32 nWidth );
-    void SetChartType( const Reference< chart2::XChartType > & xChartType,
+    void SetChartType( const rtl::Reference< ::chart::ChartType > & xChartType,
                        bool bSwapXAndYAxis );
     void SetSeriesName( const OUString & rName );
     void SetRange( sal_Int32 nStartCol, sal_Int32 nEndCol );
@@ -221,7 +222,7 @@ private:
     DECL_LINK( SeriesNameEdited, SeriesHeaderEdit&, void );
 
     static OUString GetChartTypeImage(
-        const Reference< chart2::XChartType > & xChartType,
+        const rtl::Reference< ::chart::ChartType > & xChartType,
         bool bSwapXAndYAxis
         );
 
@@ -322,7 +323,7 @@ void SeriesHeader::SetPixelWidth( sal_Int32 nWidth )
 }
 
 void SeriesHeader::SetChartType(
-    const Reference< chart2::XChartType > & xChartType,
+    const rtl::Reference< ChartType > & xChartType,
     bool bSwapXAndYAxis
 )
 {
@@ -380,7 +381,7 @@ bool SeriesHeader::HasFocus() const
 }
 
 OUString SeriesHeader::GetChartTypeImage(
-    const Reference< chart2::XChartType > & xChartType,
+    const rtl::Reference< ChartType > & xChartType,
     bool bSwapXAndYAxis
 )
 {
@@ -619,7 +620,7 @@ void DataBrowser::RenewTable()
                             GetDataWindow().LogicToPixel( Size( 42, 0 )).getWidth() ));
 
     OUString aDefaultSeriesName(SchResId(STR_COLUMN_LABEL));
-    replaceParamterInString( aDefaultSeriesName, "%COLUMNNUMBER", OUString::number( 24 ) );
+    replaceParamterInString( aDefaultSeriesName, u"%COLUMNNUMBER", OUString::number( 24 ) );
     sal_Int32 nColumnWidth = GetDataWindow().GetTextWidth( aDefaultSeriesName )
         + GetDataWindow().LogicToPixel(Point(8 + impl::SeriesHeader::GetRelativeAppFontXPosForNameField(), 0), MapMode(MapUnit::MapAppFont)).X();
     sal_Int32 nColumnCount = m_apDataBrowserModel->getColumnCount();
@@ -643,11 +644,10 @@ void DataBrowser::RenewTable()
     for (auto const& elemHeader : aHeaders)
     {
         auto spHeader = std::make_shared<impl::SeriesHeader>( m_pColumnsWin, m_pColorsWin );
-        Reference< beans::XPropertySet > xSeriesProp( elemHeader.m_xDataSeries, uno::UNO_QUERY );
         Color nColor;
         // @todo: Set "DraftColor", i.e. interpolated colors for gradients, bitmaps, etc.
-        if( xSeriesProp.is() &&
-            ( xSeriesProp->getPropertyValue( "Color" ) >>= nColor ))
+        if( elemHeader.m_xDataSeries.is() &&
+            ( elemHeader.m_xDataSeries->getPropertyValue( "Color" ) >>= nColor ))
             spHeader->SetColor( nColor );
         spHeader->SetChartType( elemHeader.m_xChartType, elemHeader.m_bSwapXAndYAxis );
         spHeader->SetSeriesName(
@@ -719,7 +719,7 @@ OUString DataBrowser::GetCellText( sal_Int32 nRow, sal_uInt16 nColumnId ) const
                     // getDateTimeInputNumberFormat() instead of doing the
                     // guess work.
                     sal_Int32 nNumberFormat = DiagramHelper::getDateTimeInputNumberFormat(
-                            Reference< util::XNumberFormatsSupplier >( m_xChartDoc, uno::UNO_QUERY), fDouble );
+                            m_xChartDoc, fDouble );
                     Color nLabelColor;
                     bool bColorChanged = false;
                     aResult = m_spNumberFormatterWrapper->getFormattedString(
@@ -831,15 +831,13 @@ void DataBrowser::CellModified()
 }
 
 void DataBrowser::SetDataFromModel(
-    const Reference< chart2::XChartDocument > & xChartDoc,
-    const Reference< uno::XComponentContext > & xContext )
+    const rtl::Reference<::chart::ChartModel> & xChartDoc )
 {
-    m_xChartDoc.set( xChartDoc );
+    m_xChartDoc = xChartDoc;
 
-    m_apDataBrowserModel.reset( new DataBrowserModel( m_xChartDoc, xContext ));
+    m_apDataBrowserModel.reset( new DataBrowserModel( m_xChartDoc ));
     m_spNumberFormatterWrapper =
-        std::make_shared<NumberFormatterWrapper>(
-            Reference< util::XNumberFormatsSupplier >( m_xChartDoc, uno::UNO_QUERY ));
+        std::make_shared<NumberFormatterWrapper>(m_xChartDoc);
 
     Formatter& rFormatter = m_aNumberEditField->get_formatter();
     rFormatter.SetFormatter( m_spNumberFormatterWrapper->getSvNumberFormatter() );
@@ -1272,10 +1270,9 @@ void DataBrowser::RenewSeriesHeaders()
     for (auto const& elemHeader : aHeaders)
     {
         auto spHeader = std::make_shared<impl::SeriesHeader>( m_pColumnsWin, m_pColorsWin );
-        Reference< beans::XPropertySet > xSeriesProp(elemHeader.m_xDataSeries, uno::UNO_QUERY);
         Color nColor;
-        if( xSeriesProp.is() &&
-            ( xSeriesProp->getPropertyValue( "Color" ) >>= nColor ))
+        if( elemHeader.m_xDataSeries.is() &&
+            ( elemHeader.m_xDataSeries->getPropertyValue( "Color" ) >>= nColor ))
             spHeader->SetColor( nColor );
         spHeader->SetChartType( elemHeader.m_xChartType, elemHeader.m_bSwapXAndYAxis );
         spHeader->SetSeriesName(
@@ -1360,18 +1357,17 @@ IMPL_LINK( DataBrowser, SeriesHeaderGotFocus, impl::SeriesHeaderEdit&, rEdit, vo
 
 IMPL_LINK( DataBrowser, SeriesHeaderChanged, impl::SeriesHeaderEdit&, rEdit, void )
 {
-    Reference< chart2::XDataSeries > xSeries(
-        m_apDataBrowserModel->getDataSeriesByColumn( rEdit.getStartColumn() - 1 ));
-    Reference< chart2::data::XDataSource > xSource( xSeries, uno::UNO_QUERY );
-    if( !xSource.is())
+    rtl::Reference< DataSeries > xSeries =
+        m_apDataBrowserModel->getDataSeriesByColumn( rEdit.getStartColumn() - 1 );
+    if( !xSeries.is())
         return;
 
-    Reference< chart2::XChartType > xChartType(
+    rtl::Reference< ChartType > xChartType(
         m_apDataBrowserModel->getHeaderForSeries( xSeries ).m_xChartType );
     if( xChartType.is())
     {
-        Reference< chart2::data::XLabeledDataSequence > xLabeledSeq(
-            DataSeriesHelper::getDataSequenceByRole( xSource, xChartType->getRoleOfSequenceForSeriesLabel()));
+        uno::Reference< chart2::data::XLabeledDataSequence > xLabeledSeq =
+            DataSeriesHelper::getDataSequenceByRole( xSeries, xChartType->getRoleOfSequenceForSeriesLabel());
         if( xLabeledSeq.is())
         {
             Reference< container::XIndexReplace > xIndexReplace( xLabeledSeq->getLabel(), uno::UNO_QUERY );

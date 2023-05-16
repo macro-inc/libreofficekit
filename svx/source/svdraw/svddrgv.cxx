@@ -270,7 +270,7 @@ bool SdrDragView::BegDragObj(const Point& rPnt, OutputDevice* pOut, SdrHdl* pHdl
                             for(size_t a=0; !b3DObjSelected && a<GetMarkedObjectCount(); ++a)
                             {
                                 SdrObject* pObj = GetMarkedObjectByIndex(a);
-                                if(dynamic_cast< const E3dObject* >(pObj))
+                                if(DynCastE3dObject(pObj))
                                     b3DObjSelected = true;
                             }
                             // If yes, allow shear even when !IsShearAllowed,
@@ -419,7 +419,7 @@ bool SdrDragView::BegDragObj(const Point& rPnt, OutputDevice* pOut, SdrHdl* pHdl
                                 {
                                     mpMarkedObj=GetMarkedObjectByIndex(0);
                                     if ( mpMarkedObj &&
-                                        dynamic_cast<const SdrTextObj*>( mpMarkedObj) !=  nullptr &&
+                                        DynCastSdrTextObj( mpMarkedObj) !=  nullptr &&
                                         static_cast<SdrTextObj*>(mpMarkedObj)->IsTextFrame() )
                                         bSingleTextObjMark = true;
                                 }

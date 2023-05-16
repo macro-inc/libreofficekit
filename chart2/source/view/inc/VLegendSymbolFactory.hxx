@@ -20,6 +20,8 @@
 
 #include "LegendEntryProvider.hxx"
 #include <com/sun/star/uno/Reference.h>
+#include <rtl/ref.hxx>
+#include <svx/unoshape.hxx>
 
 namespace com::sun::star::awt { struct Size; }
 namespace com::sun::star::beans { class XPropertySet; }
@@ -37,12 +39,11 @@ namespace chart::VLegendSymbolFactory
         Line,
     };
 
-    css::uno::Reference< css::drawing::XShape >
+    rtl::Reference< SvxShapeGroup >
         createSymbol(
             const css::awt::Size& rEntryKeyAspectRatio,
-            const css::uno::Reference< css::drawing::XShapes >& rSymbolContainer,
+            const rtl::Reference<SvxShapeGroupAnyD>& rSymbolContainer,
             LegendSymbolStyle eStyle,
-            const css::uno::Reference< css::lang::XMultiServiceFactory > & xShapeFactory,
             const css::uno::Reference< css::beans::XPropertySet > & xLegendEntryProperties,
             PropertyType ePropertyType,
             const css::uno::Any& rExplicitSymbol /*should contain a css::chart2::Symbol without automatic symbol if the charttype does support symbols else empty*/);

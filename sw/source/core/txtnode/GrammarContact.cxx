@@ -61,7 +61,7 @@ IMPL_LINK( GrammarContact, TimerRepaint, Timer *, pTimer, void )
 void GrammarContact::updateCursorPosition( const SwPosition& rNewPos )
 {
     CheckBroadcaster();
-    SwTextNode* pTextNode = rNewPos.nNode.GetNode().GetTextNode();
+    SwTextNode* pTextNode = rNewPos.GetNode().GetTextNode();
     if( pTextNode == m_pTextNode ) // paragraph has been changed
         return;
 

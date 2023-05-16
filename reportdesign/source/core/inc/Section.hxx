@@ -24,7 +24,7 @@
 #include <comphelper/broadcasthelper.hxx>
 #include <comphelper/uno3.hxx>
 #include <cppuhelper/propertysetmixin.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/drawing/XDrawPage.hpp>
 #include <com/sun/star/drawing/XShapeGrouper.hpp>
@@ -51,7 +51,7 @@ namespace reportdesign
                     public SectionBase,
                     public SectionPropertySet
     {
-        ::comphelper::OInterfaceContainerHelper2                                            m_aContainerListeners;
+        ::comphelper::OInterfaceContainerHelper3<css::container::XContainerListener>        m_aContainerListeners;
         css::uno::Reference< css::drawing::XDrawPage >                                      m_xDrawPage;
         css::uno::Reference< css::drawing::XShapeGrouper >                                  m_xDrawPage_ShapeGrouper;
         css::uno::Reference< css::form::XFormsSupplier2 >                                   m_xDrawPage_FormSupplier;
@@ -84,7 +84,7 @@ namespace reportdesign
                 ::osl::MutexGuard aGuard(m_aMutex);
                 if ( _member != Value )
                 {
-                    prepareSet(_sProperty, css::uno::makeAny(_member), css::uno::makeAny(Value), &l);
+                    prepareSet(_sProperty, css::uno::Any(_member), css::uno::Any(Value), &l);
                     _member = Value;
                 }
             }
@@ -99,7 +99,7 @@ namespace reportdesign
                 ::osl::MutexGuard aGuard(m_aMutex);
                 if ( _member != Value )
                 {
-                    prepareSet(_sProperty, css::uno::makeAny(_member), css::uno::makeAny(Value), &l);
+                    prepareSet(_sProperty, css::uno::Any(_member), css::uno::Any(Value), &l);
                     _member = Value;
                 }
             }
@@ -221,7 +221,7 @@ namespace reportdesign
 
         // css::lang::XUnoTunnel
         virtual sal_Int64 SAL_CALL getSomething( const css::uno::Sequence< sal_Int8 >& aIdentifier ) override;
-        static css::uno::Sequence< sal_Int8 > getUnoTunnelId();
+        static const css::uno::Sequence< sal_Int8 > & getUnoTunnelId();
 
         void notifyElementAdded(const css::uno::Reference< css::drawing::XShape >& xShape);
         void notifyElementRemoved(const css::uno::Reference< css::drawing::XShape >& xShape);

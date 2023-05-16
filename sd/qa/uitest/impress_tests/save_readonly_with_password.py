@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -49,6 +51,8 @@ class save_readonly_with_password(UITestCase):
                         with self.ui_test.execute_dialog_through_action(xOk, "CLICK", close_button="save"):
                             pass
 
+            self.ui_test.wait_until_file_is_available(xFilePath)
+
             with self.ui_test.load_file(systemPathToFileUrl(xFilePath)) as document:
 
                 self.assertTrue(document.isReadonly())
@@ -87,6 +91,8 @@ class save_readonly_with_password(UITestCase):
                         xNewPassword.executeAction("TYPE", mkPropertyValues({"TEXT": "password"}))
                         xConfirmPassword = xPasswordDialog.getChild("confirmropassEntry")
                         xConfirmPassword.executeAction("TYPE", mkPropertyValues({"TEXT": "password"}))
+
+            self.ui_test.wait_until_file_is_available(xFilePath)
 
             with self.ui_test.load_file(systemPathToFileUrl(xFilePath)) as document:
 

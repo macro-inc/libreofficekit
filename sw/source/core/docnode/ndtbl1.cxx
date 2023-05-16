@@ -52,6 +52,7 @@
 #include <o3tl/enumrange.hxx>
 #include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
+#include <redline.hxx>
 
 using ::editeng::SvxBorderLine;
 using namespace ::com::sun::star;
@@ -117,7 +118,7 @@ SwFrameFormat* SwTableFormatCmp::FindNewFormat(std::vector<std::unique_ptr<SwTab
 static void lcl_GetStartEndCell( const SwCursor& rCursor,
                         SwLayoutFrame *&prStart, SwLayoutFrame *&prEnd )
 {
-    OSL_ENSURE( rCursor.GetContentNode() && rCursor.GetContentNode( false ),
+    OSL_ENSURE( rCursor.GetPointContentNode() && rCursor.GetMarkContentNode(),
             "Tab selection not at ContentNode" );
 
     Point aPtPos, aMkPos;
@@ -129,8 +130,8 @@ static void lcl_GetStartEndCell( const SwCursor& rCursor,
     }
 
     // Robust:
-    SwContentNode* pPointNd = rCursor.GetContentNode();
-    SwContentNode* pMarkNd  = rCursor.GetContentNode(false);
+    SwContentNode* pPointNd = rCursor.GetPointContentNode();
+    SwContentNode* pMarkNd  = rCursor.GetMarkContentNode();
 
     std::pair<Point, bool> tmp(aPtPos, true);
     SwFrame *const pPointFrame = pPointNd ? pPointNd->getLayoutFrame(pPointNd->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout(), nullptr, &tmp) : nullptr;
@@ -152,7 +153,7 @@ static bool lcl_GetBoxSel( const SwCursor& rCursor, SwSelBoxes& rBoxes,
     {
         const SwPaM *pCurPam = &rCursor, *pSttPam = pCurPam;
         do {
-            const SwNode* pNd = pCurPam->GetNode().FindTableBoxStartNode();
+            const SwNode* pNd = pCurPam->GetPointNode().FindTableBoxStartNode();
             if( pNd )
             {
                 SwTableBox* pBox = const_cast<SwTableBox*>(pNd->FindTableNode()->GetTable().
@@ -322,7 +323,7 @@ static void lcl_ProcessBoxSize(std::vector<std::unique_ptr<SwTableFormatCmp>>& r
 
 void SwDoc::SetRowSplit( const SwCursor& rCursor, const SwFormatRowSplit &rNew )
 {
-    SwTableNode* pTableNd = rCursor.GetPoint()->nNode.GetNode().FindTableNode();
+    SwTableNode* pTableNd = rCursor.GetPoint()->GetNode().FindTableNode();
     if( !pTableNd )
         return;
 
@@ -348,7 +349,7 @@ void SwDoc::SetRowSplit( const SwCursor& rCursor, const SwFormatRowSplit &rNew )
 
 std::unique_ptr<SwFormatRowSplit> SwDoc::GetRowSplit( const SwCursor& rCursor )
 {
-    SwTableNode* pTableNd = rCursor.GetPoint()->nNode.GetNode().FindTableNode();
+    SwTableNode* pTableNd = rCursor.GetPoint()->GetNode().FindTableNode();
     if( !pTableNd )
         return nullptr;
 
@@ -387,7 +388,7 @@ std::unique_ptr<SwFormatRowSplit> SwDoc::GetRowSplit( const SwCursor& rCursor )
 
 void SwDoc::SetRowHeight( const SwCursor& rCursor, const SwFormatFrameSize &rNew )
 {
-    SwTableNode* pTableNd = rCursor.GetPoint()->nNode.GetNode().FindTableNode();
+    SwTableNode* pTableNd = rCursor.GetPoint()->GetNode().FindTableNode();
     if( !pTableNd )
         return;
 
@@ -412,7 +413,7 @@ void SwDoc::SetRowHeight( const SwCursor& rCursor, const SwFormatFrameSize &rNew
 
 std::unique_ptr<SwFormatFrameSize> SwDoc::GetRowHeight( const SwCursor& rCursor )
 {
-    SwTableNode* pTableNd = rCursor.GetPoint()->nNode.GetNode().FindTableNode();
+    SwTableNode* pTableNd = rCursor.GetPoint()->GetNode().FindTableNode();
     if( !pTableNd )
         return nullptr;
 
@@ -435,7 +436,7 @@ std::unique_ptr<SwFormatFrameSize> SwDoc::GetRowHeight( const SwCursor& rCursor 
 bool SwDoc::BalanceRowHeight( const SwCursor& rCursor, bool bTstOnly, const bool bOptimize )
 {
     bool bRet = false;
-    SwTableNode* pTableNd = rCursor.GetPoint()->nNode.GetNode().FindTableNode();
+    SwTableNode* pTableNd = rCursor.GetPoint()->GetNode().FindTableNode();
     if( pTableNd )
     {
         std::vector<SwTableLine*> aRowArr; // For Lines collecting
@@ -487,7 +488,7 @@ bool SwDoc::BalanceRowHeight( const SwCursor& rCursor, bool bTstOnly, const bool
 
 void SwDoc::SetRowBackground( const SwCursor& rCursor, const SvxBrushItem &rNew )
 {
-    SwTableNode* pTableNd = rCursor.GetPoint()->nNode.GetNode().FindTableNode();
+    SwTableNode* pTableNd = rCursor.GetPoint()->GetNode().FindTableNode();
     if( !pTableNd )
         return;
 
@@ -514,7 +515,7 @@ void SwDoc::SetRowBackground( const SwCursor& rCursor, const SvxBrushItem &rNew 
 bool SwDoc::GetRowBackground( const SwCursor& rCursor, std::unique_ptr<SvxBrushItem>& rToFill )
 {
     bool bRet = false;
-    SwTableNode* pTableNd = rCursor.GetPoint()->nNode.GetNode().FindTableNode();
+    SwTableNode* pTableNd = rCursor.GetPoint()->GetNode().FindTableNode();
     if( pTableNd )
     {
         std::vector<SwTableLine*> aRowArr; // For Lines collecting
@@ -529,7 +530,7 @@ bool SwDoc::GetRowBackground( const SwCursor& rCursor, std::unique_ptr<SvxBrushI
             {
                 std::unique_ptr<SvxBrushItem> aAlternative(aRowArr[i]->GetFrameFormat()->makeBackgroundBrushItem());
 
-                if ( rToFill && aAlternative && *rToFill != *aAlternative )
+                if ( *rToFill != *aAlternative )
                 {
                     bRet = false;
                     break;
@@ -540,9 +541,10 @@ bool SwDoc::GetRowBackground( const SwCursor& rCursor, std::unique_ptr<SvxBrushI
     return bRet;
 }
 
+// has a table row, which is not a tracked deletion
 bool SwDoc::HasRowNotTracked( const SwCursor& rCursor )
 {
-    SwTableNode* pTableNd = rCursor.GetPoint()->nNode.GetNode().FindTableNode();
+    SwTableNode* pTableNd = rCursor.GetPoint()->GetNode().FindTableNode();
     if( !pTableNd )
         return false;
 
@@ -552,19 +554,34 @@ bool SwDoc::HasRowNotTracked( const SwCursor& rCursor )
     if( aRowArr.empty() )
         return false;
 
+    SwRedlineTable::size_type nRedlinePos = 0;
+    SwDoc* pDoc = aRowArr[0]->GetFrameFormat()->GetDoc();
+    const IDocumentRedlineAccess& rIDRA = pDoc->getIDocumentRedlineAccess();
+
     for( auto pLn : aRowArr )
     {
         auto pHasTextChangesOnlyProp = pLn->GetFrameFormat()->GetAttrSet().GetItem<SvxPrintItem>(RES_PRINT);
         if ( !pHasTextChangesOnlyProp || pHasTextChangesOnlyProp->GetValue() )
-            // there is a not deleted row in the table selection
+            // there is a not tracked row in the table selection
             return true;
+
+        // tdf#150666 examine tracked row: it's possible to delete a tracked insertion
+        SwRedlineTable::size_type nPos = pLn->UpdateTextChangesOnly(nRedlinePos);
+        if ( nPos != SwRedlineTable::npos )
+        {
+            const SwRedlineTable& aRedlineTable = rIDRA.GetRedlineTable();
+            SwRangeRedline* pTmp = aRedlineTable[ nPos ];
+            if ( RedlineType::Insert == pTmp->GetType() )
+                return true;
+        }
     }
     return false;
 }
 
-void SwDoc::SetRowNotTracked( const SwCursor& rCursor, const SvxPrintItem &rNew, bool bAll )
+void SwDoc::SetRowNotTracked( const SwCursor& rCursor,
+                                     const SvxPrintItem &rNew, bool bAll, bool bIns )
 {
-    SwTableNode* pTableNd = rCursor.GetPoint()->nNode.GetNode().FindTableNode();
+    SwTableNode* pTableNd = rCursor.GetPoint()->GetNode().FindTableNode();
     if( !pTableNd )
         return;
 
@@ -585,20 +602,45 @@ void SwDoc::SetRowNotTracked( const SwCursor& rCursor, const SvxPrintItem &rNew,
         GetIDocumentUndoRedo().AppendUndo(std::make_unique<SwUndoAttrTable>(*pTableNd));
     }
 
+    bool bInsertDummy = !bAll && !bIns &&
+            // HasTextChangesOnly == false, i.e. a tracked row change (deletion, if bIns == false)
+            !rNew.GetValue();
     std::vector<std::unique_ptr<SwTableFormatCmp>> aFormatCmp;
     aFormatCmp.reserve( std::max( 255, static_cast<int>(aRowArr.size()) ) );
 
+    SwRedlineTable::size_type nRedlinePos = 0;
     for( auto pLn : aRowArr )
     {
+        // tdf#150666 deleting row insertion from the same author needs special handling,
+        // because removing redlines of the author can result an empty line,
+        // which doesn't contain any redline for the tracked row
+        bool bDeletionOfOwnRowInsertion = false;
+        if ( bInsertDummy )
+        {
+            SwRedlineTable::size_type nPos = pLn->UpdateTextChangesOnly(nRedlinePos);
+            if ( nPos != SwRedlineTable::npos )
+            {
+                SwDoc* pDoc = pLn->GetFrameFormat()->GetDoc();
+                IDocumentRedlineAccess& rIDRA = pDoc->getIDocumentRedlineAccess();
+                const SwRedlineTable& aRedlineTable = rIDRA.GetRedlineTable();
+                SwRangeRedline* pTmp = aRedlineTable[ nPos ];
+                if ( RedlineType::Insert == pTmp->GetType() &&
+                         rIDRA.GetRedlineAuthor() == pTmp->GetRedlineData().GetAuthor() &&
+                         pTmp->GetText()[0] == CH_TXT_TRACKED_DUMMY_CHAR )
+                {
+                    bDeletionOfOwnRowInsertion = true;
+                }
+            }
+        }
+
         ::lcl_ProcessRowAttr( aFormatCmp, pLn, rNew );
         // as a workaround for the rows without text content,
         // add a redline with invisible text CH_TXT_TRACKED_DUMMY_CHAR
         // (unless the table is part of a bigger deletion, where the
         // new redline can cause a problem)
-        if ( !bAll &&
-            // HasTextChangesOnly == false, i.e. a tracked row insertion or deletion
-            !rNew.GetValue() && pLn->IsEmpty() )
+        if ( bInsertDummy && (pLn->IsEmpty() || bDeletionOfOwnRowInsertion ) )
         {
+            ::sw::UndoGuard const undoGuard(GetIDocumentUndoRedo());
             SwNodeIndex aInsPos( *(pLn->GetTabBoxes()[0]->GetSttNd()), 1 );
             RedlineFlags eOld = getIDocumentRedlineAccess().GetRedlineFlags();
             getIDocumentRedlineAccess().SetRedlineFlags_intern(RedlineFlags::NONE);
@@ -606,7 +648,6 @@ void SwDoc::SetRowNotTracked( const SwCursor& rCursor, const SvxPrintItem &rNew,
             getIDocumentContentOperations().InsertString( aPaM,
                     OUStringChar(CH_TXT_TRACKED_DUMMY_CHAR) );
             aPaM.SetMark();
-            aPaM.GetMark()->nContent.Assign(aPaM.GetContentNode(), 0);
             getIDocumentRedlineAccess().SetRedlineFlags_intern( eOld );
             getIDocumentContentOperations().DeleteAndJoin( aPaM );
         }
@@ -646,7 +687,7 @@ static void lcl_CollectCells( std::vector<SwCellFrame*> &rArr, const SwRect &rUn
 
 void SwDoc::SetTabBorders( const SwCursor& rCursor, const SfxItemSet& rSet )
 {
-    SwContentNode* pCntNd = rCursor.GetPoint()->nNode.GetNode().GetContentNode();
+    SwContentNode* pCntNd = rCursor.GetPoint()->GetNode().GetContentNode();
     SwTableNode* pTableNd = pCntNd ? pCntNd->FindTableNode() : nullptr;
     if( !pTableNd )
         return ;
@@ -682,8 +723,8 @@ void SwDoc::SetTabBorders( const SwCursor& rCursor, const SfxItemSet& rSet )
          bLeftValid = true, bRightValid = true;
 
     // The Flags in the BoxInfo Item decide whether a BorderLine is valid!
-    if( SfxItemState::SET == rSet.GetItemState( SID_ATTR_BORDER_INNER, false,
-        reinterpret_cast<const SfxPoolItem**>(&pSetBoxInfo)) )
+    pSetBoxInfo = rSet.GetItemIfSet( SID_ATTR_BORDER_INNER, false );
+    if( pSetBoxInfo )
     {
         pHori = pSetBoxInfo->GetHori();
         pVert = pSetBoxInfo->GetVert();
@@ -698,8 +739,8 @@ void SwDoc::SetTabBorders( const SwCursor& rCursor, const SfxItemSet& rSet )
         bRightValid = pSetBoxInfo->IsValid(SvxBoxInfoItemValidFlags::RIGHT);
     }
 
-    if( SfxItemState::SET == rSet.GetItemState( RES_BOX, false,
-        reinterpret_cast<const SfxPoolItem**>(&pSetBox)) )
+    pSetBox = rSet.GetItemIfSet( RES_BOX, false );
+    if( pSetBox )
     {
         pLeft = pSetBox->GetLeft();
         pRight = pSetBox->GetRight();
@@ -754,11 +795,7 @@ void SwDoc::SetTabBorders( const SwCursor& rCursor, const SfxItemSet& rSet )
             }
 
             if ( bRTL )
-            {
-                bool bTmp = bRightOver;
-                bRightOver = bLeftOver;
-                bLeftOver = bTmp;
-            }
+                std::swap( bLeftOver, bRightOver );
 
             // Do not set anything by default in HeadlineRepeats
             if ( pTab->IsFollow() &&
@@ -900,7 +937,7 @@ void SwDoc::SetTabBorders( const SwCursor& rCursor, const SfxItemSet& rSet )
     SwHTMLTableLayout *pTableLayout = rTable.GetHTMLTableLayout();
     if( pTableLayout )
     {
-        SwContentFrame* pFrame = rCursor.GetContentNode()->getLayoutFrame( rCursor.GetContentNode()->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout() );
+        SwContentFrame* pFrame = rCursor.GetPointContentNode()->getLayoutFrame( rCursor.GetPointContentNode()->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout() );
         SwTabFrame* pTabFrame = pFrame->ImplFindTabFrame();
 
         pTableLayout->BordersChanged(
@@ -932,7 +969,7 @@ void SwDoc::SetTabLineStyle( const SwCursor& rCursor,
                              const Color* pColor, bool bSetLine,
                              const SvxBorderLine* pBorderLine )
 {
-    SwContentNode* pCntNd = rCursor.GetPoint()->nNode.GetNode().GetContentNode();
+    SwContentNode* pCntNd = rCursor.GetPoint()->GetNode().GetContentNode();
     SwTableNode* pTableNd = pCntNd ? pCntNd->FindTableNode() : nullptr;
     if( !pTableNd )
         return ;
@@ -952,7 +989,10 @@ void SwDoc::SetTabLineStyle( const SwCursor& rCursor,
         GetIDocumentUndoRedo().AppendUndo(std::make_unique<SwUndoAttrTable>(*pTableNd));
     }
 
-    const SvxBorderLine aDefaultBorder(pColor, SvxBorderLineWidth::VeryThin);
+    SvxBorderLine aDefaultBorder(pBorderLine ? *pBorderLine
+                                             : SvxBorderLine(pColor, SvxBorderLineWidth::VeryThin));
+    if (pColor && pBorderLine)
+        aDefaultBorder.SetColor(*pColor);
 
     for( auto &rU : aUnions )
     {
@@ -981,7 +1021,7 @@ void SwDoc::SetTabLineStyle( const SwCursor& rCursor,
             {
                 aBox.reset(::GetDfltAttr(RES_BOX)->Clone());
             }
-            else if (pColor && !pBorderLine && !pTop && !pBot && !pLeft && !pRight)
+            else if ((pColor || pBorderLine) && !pTop && !pBot && !pLeft && !pRight)
             {
                 aBox->SetLine(&aDefaultBorder, SvxBoxItemLine::TOP);
                 aBox->SetLine(&aDefaultBorder, SvxBoxItemLine::BOTTOM);
@@ -1006,7 +1046,7 @@ void SwDoc::SetTabLineStyle( const SwCursor& rCursor,
     SwHTMLTableLayout *pTableLayout = rTable.GetHTMLTableLayout();
     if( pTableLayout )
     {
-        SwContentFrame* pFrame = rCursor.GetContentNode()->getLayoutFrame( rCursor.GetContentNode()->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout() );
+        SwContentFrame* pFrame = rCursor.GetPointContentNode()->getLayoutFrame( rCursor.GetPointContentNode()->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout() );
         SwTabFrame* pTabFrame = pFrame->ImplFindTabFrame();
 
         pTableLayout->BordersChanged(
@@ -1018,7 +1058,7 @@ void SwDoc::SetTabLineStyle( const SwCursor& rCursor,
 
 void SwDoc::GetTabBorders( const SwCursor& rCursor, SfxItemSet& rSet )
 {
-    SwContentNode* pCntNd = rCursor.GetPoint()->nNode.GetNode().GetContentNode();
+    SwContentNode* pCntNd = rCursor.GetPoint()->GetNode().GetContentNode();
     SwTableNode* pTableNd = pCntNd ? pCntNd->FindTableNode() : nullptr;
     if( !pTableNd )
         return ;
@@ -1079,11 +1119,7 @@ void SwDoc::GetTabBorders( const SwCursor& rCursor, SfxItemSet& rSet )
             }
 
             if ( bRTL )
-            {
-                bool bTmp = bRightOver;
-                bRightOver = bLeftOver;
-                bLeftOver = bTmp;
-            }
+                std::swap( bLeftOver, bRightOver );
 
             const SwFrameFormat  *pFormat  = pCell->GetFormat();
             const SvxBoxItem  &rBox  = pFormat->GetBox();
@@ -1239,7 +1275,7 @@ void SwDoc::GetTabBorders( const SwCursor& rCursor, SfxItemSet& rSet )
 
 void SwDoc::SetBoxAttr( const SwCursor& rCursor, const SfxPoolItem &rNew )
 {
-    SwTableNode* pTableNd = rCursor.GetPoint()->nNode.GetNode().FindTableNode();
+    SwTableNode* pTableNd = rCursor.GetPoint()->GetNode().FindTableNode();
     SwSelBoxes aBoxes;
     if( !(pTableNd && ::lcl_GetBoxSel( rCursor, aBoxes, true )) )
         return;
@@ -1273,7 +1309,7 @@ void SwDoc::SetBoxAttr( const SwCursor& rCursor, const SfxPoolItem &rNew )
     SwHTMLTableLayout *pTableLayout = rTable.GetHTMLTableLayout();
     if( pTableLayout )
     {
-        SwContentFrame* pFrame = rCursor.GetContentNode()->getLayoutFrame( rCursor.GetContentNode()->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout() );
+        SwContentFrame* pFrame = rCursor.GetPointContentNode()->getLayoutFrame( rCursor.GetPointContentNode()->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout() );
         SwTabFrame* pTabFrame = pFrame->ImplFindTabFrame();
 
         pTableLayout->Resize(
@@ -1287,7 +1323,7 @@ bool SwDoc::GetBoxAttr( const SwCursor& rCursor, std::unique_ptr<SfxPoolItem>& r
     // tdf#144843 calling GetBoxAttr *requires* object
     assert(rToFill && "requires object here");
     bool bRet = false;
-    SwTableNode* pTableNd = rCursor.GetPoint()->nNode.GetNode().FindTableNode();
+    SwTableNode* pTableNd = rCursor.GetPoint()->GetNode().FindTableNode();
     SwSelBoxes aBoxes;
     if( pTableNd && lcl_GetBoxSel( rCursor, aBoxes ))
     {
@@ -1359,7 +1395,7 @@ void SwDoc::SetBoxAlign( const SwCursor& rCursor, sal_uInt16 nAlign )
 sal_uInt16 SwDoc::GetBoxAlign( const SwCursor& rCursor )
 {
     sal_uInt16 nAlign = USHRT_MAX;
-    SwTableNode* pTableNd = rCursor.GetPoint()->nNode.GetNode().FindTableNode();
+    SwTableNode* pTableNd = rCursor.GetPoint()->GetNode().FindTableNode();
     SwSelBoxes aBoxes;
     if( pTableNd && ::lcl_GetBoxSel( rCursor, aBoxes ))
     {
@@ -1572,7 +1608,7 @@ void SwDoc::AdjustCellWidth( const SwCursor& rCursor,
                              const bool bNoShrink )
 {
     // Check whether the current Cursor has it's Point/Mark in a Table
-    SwContentNode* pCntNd = rCursor.GetPoint()->nNode.GetNode().GetContentNode();
+    SwContentNode* pCntNd = rCursor.GetPoint()->GetNode().GetContentNode();
     SwTableNode* pTableNd = pCntNd ? pCntNd->FindTableNode() : nullptr;
     if( !pTableNd )
         return ;
@@ -1626,12 +1662,15 @@ void SwDoc::AdjustCellWidth( const SwCursor& rCursor,
             }
             fTotalWish += aWish[i];
         }
-        assert(nCols);
-        const sal_uInt16 nEqualWidth = nCols ? nSelectedWidth / nCols : 0;
         // bBalance: Distribute the width evenly
-        for (sal_uInt16 & rn : aWish)
-            if ( rn && bBalance )
-                rn = nEqualWidth;
+        if (bBalance)
+        {
+            assert(nCols);
+            const sal_uInt16 nEqualWidth = nCols ? nSelectedWidth / nCols : 0;
+            for (sal_uInt16 & rn : aWish)
+                if (rn)
+                    rn = nEqualWidth;
+        }
     }
 
     const tools::Long nOldRight = aTabCols.GetRight();
@@ -1643,7 +1682,8 @@ void SwDoc::AdjustCellWidth( const SwCursor& rCursor,
     // only afterwards.
     // The first column's desired width would be discarded as it would cause
     // the Table's width to exceed the maximum width.
-    const sal_uInt16 nEqualWidth = (aTabCols.GetRight() - aTabCols.GetLeft()) / (aTabCols.Count() + 1);
+    const tools::Long nMaxRight = std::max(aTabCols.GetRightMax(), nOldRight);
+    const sal_uInt16 nEqualWidth = (nMaxRight - aTabCols.GetLeft()) / (aTabCols.Count() + 1);
     const sal_Int16 nTablePadding = nSelectedWidth - fTotalWish;
     for ( int k = 0; k < 2; ++k )
     {
@@ -1676,7 +1716,6 @@ void SwDoc::AdjustCellWidth( const SwCursor& rCursor,
                     nDiff -= aTabCols[i] - aTabCols[i-1];
 
                 tools::Long nTabRight = aTabCols.GetRight() + nDiff;
-                const tools::Long nMaxRight = std::max(aTabCols.GetRightMax(), nOldRight);
 
                 // If the Table would become (or is already) too wide,
                 // restrict the column growth to the allowed maximum.

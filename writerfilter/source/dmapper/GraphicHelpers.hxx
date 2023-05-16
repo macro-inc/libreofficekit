@@ -64,15 +64,18 @@ private:
     sal_Int32 m_nSide;
 };
 
-/// Keeps track of the next available unique automatic name.
-class GraphicNamingHelper
+class ExtentHandler : public Properties
 {
-    int m_nCounter;
+    css::awt::Size m_Extent; // width and height in EMU
 
 public:
-    GraphicNamingHelper();
-    /// Name a graphic based on rTemplate.
-    OUString NameGraphic(const OUString& rTemplate);
+    typedef ::tools::SvRef<ExtentHandler> Pointer_t;
+    explicit ExtentHandler();
+    virtual ~ExtentHandler() override;
+
+    virtual void attribute(Id nName, Value& rValue) override;
+    virtual void sprm(Sprm& rSprm) override;
+    css::awt::Size getExtent() const { return m_Extent; }
 };
 }
 

@@ -104,7 +104,7 @@ void ImageButtonToolbarController::executeControlCommand( const css::frame::Cont
                 m_xToolbar->SetItemImage( m_nID, aImage );
 
                 // send notification
-                uno::Sequence< beans::NamedValue > aInfo { { "URL", css::uno::makeAny(aURL) } };
+                uno::Sequence< beans::NamedValue > aInfo { { "URL", css::uno::Any(aURL) } };
                 addNotifyInfo( "ImageChanged",
                             getDispatchFromCommand( m_aCommandURL ),
                             aInfo );
@@ -117,27 +117,27 @@ void ImageButtonToolbarController::executeControlCommand( const css::frame::Cont
 bool ImageButtonToolbarController::ReadImageFromURL( bool bBigImage, const OUString& aImageURL, Image& aImage )
 {
     std::unique_ptr<SvStream> pStream(utl::UcbStreamHelper::CreateStream( aImageURL, StreamMode::STD_READ ));
-    if ( pStream && ( pStream->GetErrorCode() == ERRCODE_NONE ))
+    if ( !pStream || ( pStream->GetErrorCode() != ERRCODE_NONE ))
+        return false;
+
+    // Use graphic class to also support more graphic formats (bmp,png,...)
+    Graphic aGraphic;
+
+    GraphicFilter& rGF = GraphicFilter::GetGraphicFilter();
+    rGF.ImportGraphic( aGraphic, u"", *pStream );
+
+    BitmapEx aBitmapEx = aGraphic.GetBitmapEx();
+
+    const ::Size aSize = bBigImage ? aImageSizeBig : aImageSizeSmall; // Sizes used for toolbar images
+
+    ::Size aBmpSize = aBitmapEx.GetSizePixel();
+    if ( !aBmpSize.IsEmpty() )
     {
-        // Use graphic class to also support more graphic formats (bmp,png,...)
-        Graphic aGraphic;
-
-        GraphicFilter& rGF = GraphicFilter::GetGraphicFilter();
-        rGF.ImportGraphic( aGraphic, OUString(), *pStream );
-
-        BitmapEx aBitmapEx = aGraphic.GetBitmapEx();
-
-        const ::Size aSize = bBigImage ? aImageSizeBig : aImageSizeSmall; // Sizes used for toolbar images
-
-        ::Size aBmpSize = aBitmapEx.GetSizePixel();
-        if ( !aBmpSize.IsEmpty() )
-        {
-            ::Size aNoScaleSize( aBmpSize.Width(), aSize.Height() );
-            if ( aBmpSize != aNoScaleSize )
-                aBitmapEx.Scale( aNoScaleSize, BmpScaleFlag::BestQuality );
-            aImage = Image( aBitmapEx );
-            return true;
-        }
+        ::Size aNoScaleSize( aBmpSize.Width(), aSize.Height() );
+        if ( aBmpSize != aNoScaleSize )
+            aBitmapEx.Scale( aNoScaleSize, BmpScaleFlag::BestQuality );
+        aImage = Image( aBitmapEx );
+        return true;
     }
 
     return false;

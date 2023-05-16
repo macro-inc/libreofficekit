@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <comphelper/servicehelper.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <osl/mutex.hxx>
 #include <svl/itemprop.hxx>
@@ -25,7 +27,7 @@
 #include <sfx2/app.hxx>
 #include <sfx2/docfilt.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/string.hxx>
@@ -189,7 +191,7 @@ namespace
 
     public:
         DelayedFileDeletion( const Reference< XModel >& _rxModel,
-                             const OUString& _rTemporaryFile );
+                             OUString _aTemporaryFile );
 
     protected:
         virtual ~DelayedFileDeletion( ) override;
@@ -206,11 +208,11 @@ namespace
         DECL_LINK( OnTryDeleteFile, Timer*, void );
     };
 
-    DelayedFileDeletion::DelayedFileDeletion( const Reference< XModel >& _rxModel, const OUString& _rTemporaryFile )
+    DelayedFileDeletion::DelayedFileDeletion( const Reference< XModel >& _rxModel, OUString  _aTemporaryFile )
         :
         m_xDocument( _rxModel, UNO_QUERY )
         ,m_aDeleteTimer("sw DelayedFileDeletion m_aDeleteTimer")
-        ,m_sTemporaryFile( _rTemporaryFile )
+        ,m_sTemporaryFile(std::move( _aTemporaryFile ))
         ,m_nPendingDeleteAttempts( 0 )
     {
         osl_atomic_increment( &m_refCount );
@@ -589,7 +591,6 @@ uno::Any SAL_CALL SwXMailMerge::execute(
     SwView *pView = pFrame ? dynamic_cast<SwView*>( pFrame->GetViewShell()  ) : nullptr;
     if (!pView)
         throw RuntimeException();
-    SwWrtShell &rSh = *pView->GetWrtShellPtr();
 
     // avoid assertion in 'Update' from Sfx by supplying a shell
     // and thus avoiding the SelectShell call in Writers GetState function
@@ -619,13 +620,13 @@ uno::Any SAL_CALL SwXMailMerge::execute(
             if (xRowSetPropSet.is())
             {
                 if (xCurConnection.is())
-                    xRowSetPropSet->setPropertyValue( "ActiveConnection",  makeAny( xCurConnection ) );
-                xRowSetPropSet->setPropertyValue( "DataSourceName",    makeAny( aCurDataSourceName ) );
-                xRowSetPropSet->setPropertyValue( "Command",           makeAny( aCurDataCommand ) );
-                xRowSetPropSet->setPropertyValue( "CommandType",       makeAny( nCurDataCommandType ) );
-                xRowSetPropSet->setPropertyValue( "EscapeProcessing",  makeAny( bCurEscapeProcessing ) );
-                xRowSetPropSet->setPropertyValue( "ApplyFilter",       makeAny( true ) );
-                xRowSetPropSet->setPropertyValue( "Filter",            makeAny( aCurFilter ) );
+                    xRowSetPropSet->setPropertyValue( "ActiveConnection",  Any( xCurConnection ) );
+                xRowSetPropSet->setPropertyValue( "DataSourceName",    Any( aCurDataSourceName ) );
+                xRowSetPropSet->setPropertyValue( "Command",           Any( aCurDataCommand ) );
+                xRowSetPropSet->setPropertyValue( "CommandType",       Any( nCurDataCommandType ) );
+                xRowSetPropSet->setPropertyValue( "EscapeProcessing",  Any( bCurEscapeProcessing ) );
+                xRowSetPropSet->setPropertyValue( "ApplyFilter",       Any( true ) );
+                xRowSetPropSet->setPropertyValue( "Filter",            Any( aCurFilter ) );
 
                 Reference< sdbc::XRowSet > xRowSet( xInstance, UNO_QUERY );
                 if (xRowSet.is())
@@ -660,6 +661,7 @@ uno::Any SAL_CALL SwXMailMerge::execute(
             throw IllegalArgumentException("Invalid value of property: OutputType", static_cast < cppu::OWeakObject * > ( this ), 0 );
     }
 
+    SwWrtShell &rSh = pView->GetWrtShell();
     SwDBManager* pMgr = rSh.GetDBManager();
     //force layout creation
     rSh.CalcLayout();
@@ -765,8 +767,7 @@ uno::Any SAL_CALL SwXMailMerge::execute(
             FILTER_XML,
             SwDocShell::Factory().GetFilterContainer() );
     OUString aExtension(comphelper::string::stripStart(pSfxFlt->GetDefaultExtension(), '*'));
-    utl::TempFile aTempFile( "SwMM", true, &aExtension );
-    m_aTmpFileName = aTempFile.GetURL();
+    m_aTmpFileName = utl::CreateTempURL( u"SwMM", true, aExtension );
 
     Reference< XStorable > xStorable( xCurModel, UNO_QUERY );
     bool bStoredAsTemporary = false;
@@ -813,10 +814,10 @@ uno::Any SAL_CALL SwXMailMerge::execute(
 
     if (DBMGR_MERGE_SHELL == nMergeType)
     {
-        return makeAny( aMergeDesc.pMailMergeConfigItem->GetTargetView()->GetDocShell()->GetBaseModel() );
+        return Any( aMergeDesc.pMailMergeConfigItem->GetTargetView()->GetDocShell()->GetBaseModel() );
     }
     else
-        return makeAny( true );
+        return Any( true );
 }
 
 void SAL_CALL SwXMailMerge::cancel()
@@ -839,15 +840,11 @@ void SwXMailMerge::LaunchMailMergeEvent( const MailMergeEvent &rEvt ) const
 
 void SwXMailMerge::launchEvent( const PropertyChangeEvent &rEvt ) const
 {
-    comphelper::OInterfaceContainerHelper2 *pContainer =
+    comphelper::OInterfaceContainerHelper3<XPropertyChangeListener> *pContainer =
             m_aPropListeners.getContainer( rEvt.PropertyHandle );
     if (pContainer)
     {
-        comphelper::OInterfaceIteratorHelper2 aIt( *pContainer );
-        while (aIt.hasMoreElements())
-        {
-            static_cast< XPropertyChangeListener* >( aIt.next() )->propertyChange( rEvt );
-        }
+        pContainer->notifyEach( &XPropertyChangeListener::propertyChange, rEvt );
     }
 }
 

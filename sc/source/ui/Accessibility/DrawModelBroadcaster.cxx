@@ -21,7 +21,6 @@
 #include <svx/svdmodel.hxx>
 #include <svx/unomod.hxx>
 #include <svx/svdobj.hxx>
-#include <tools/diagnose_ex.h>
 
 using namespace ::com::sun::star;
 
@@ -40,14 +39,14 @@ ScDrawModelBroadcaster::~ScDrawModelBroadcaster()
 
 void SAL_CALL ScDrawModelBroadcaster::addEventListener( const uno::Reference< document::XEventListener >& xListener )
 {
-    std::scoped_lock aGuard(maListenerMutex);
-    maEventListeners.addInterface( xListener );
+    std::unique_lock aGuard(maListenerMutex);
+    maEventListeners.addInterface( aGuard, xListener );
 }
 
 void SAL_CALL ScDrawModelBroadcaster::removeEventListener( const uno::Reference< document::XEventListener >& xListener )
 {
-    std::scoped_lock aGuard(maListenerMutex);
-    maEventListeners.removeInterface( xListener );
+    std::unique_lock aGuard(maListenerMutex);
+    maEventListeners.removeInterface( aGuard, xListener );
 }
 
 void SAL_CALL ScDrawModelBroadcaster::addShapeEventListener(
@@ -87,27 +86,18 @@ void ScDrawModelBroadcaster::Notify( SfxBroadcaster&,
         return;
 
     std::unique_lock aGuard(maListenerMutex);
-    ::comphelper::OInterfaceIteratorHelper4 aIter( maEventListeners );
-    aGuard.unlock();
-    while( aIter.hasMoreElements() )
-    {
-        const uno::Reference < document::XEventListener >& xListener = aIter.next();
-        try
+    maEventListeners.forEach(aGuard,
+        [&aEvent](const css::uno::Reference<document::XEventListener>& xListener)
         {
-            xListener->notifyEvent( aEvent );
+            xListener->notifyEvent(aEvent);
         }
-        catch( const uno::RuntimeException& )
-        {
-            TOOLS_WARN_EXCEPTION("sc.ui", "Runtime exception caught while notifying shape");
-        }
-    }
+    );
 
     // right now, we're only handling the specific event necessary to fix this performance problem
     if (pSdrHint->GetKind() == SdrHintKind::ObjectChange)
     {
         auto pSdrObject = const_cast<SdrObject*>(pSdrHint->GetObject());
         uno::Reference<drawing::XShape> xShape(pSdrObject->getUnoShape(), uno::UNO_QUERY);
-        aGuard.lock();
         auto it = maShapeListeners.find(xShape);
         if (it != maShapeListeners.end())
             it->second->notifyShapeEvent(aEvent);

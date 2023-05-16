@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/sheet/XConditionalFormats.hpp>
@@ -21,21 +21,14 @@
 
 using namespace css;
 
-static std::ostream& operator<<(std::ostream& rStrm, const Color& rColor)
-{
-    rStrm << "Color: R:" << static_cast<int>(rColor.GetRed()) << " G:" << static_cast<int>(rColor.GetGreen()) << " B: " << static_cast<int>(rColor.GetBlue());
-    return rStrm;
-}
-
 namespace sc_apitest {
 
-class ScConditionalFormatTest : public CalcUnoApiTest
+class ScConditionalFormatTest : public UnoApiTest
 {
 public:
     ScConditionalFormatTest();
 
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     uno::Reference< uno::XInterface > init(sal_Int32 nIndex = 0);
     void testRequestCondFormatListFromSheet();
@@ -55,13 +48,10 @@ public:
     CPPUNIT_TEST(testDataBarProperties);
     CPPUNIT_TEST(testColorScaleProperties);
     CPPUNIT_TEST_SUITE_END();
-private:
-
-    uno::Reference< lang::XComponent > mxComponent;
 };
 
 ScConditionalFormatTest::ScConditionalFormatTest()
-    : CalcUnoApiTest("sc/qa/extras/testdocuments/")
+    : UnoApiTest("sc/qa/extras/testdocuments/")
 {
 }
 
@@ -442,17 +432,9 @@ void ScConditionalFormatTest::testColorScaleProperties()
 
 void ScConditionalFormatTest::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // get the test file
-    OUString aFileURL;
-    createFileURL(u"new_cond_format_api.ods", aFileURL);
-    mxComponent = loadFromDesktop(aFileURL);
-}
-
-void ScConditionalFormatTest::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
+    loadFromURL(u"new_cond_format_api.ods");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScConditionalFormatTest);

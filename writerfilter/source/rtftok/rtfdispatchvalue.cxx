@@ -393,10 +393,17 @@ bool RTFDocumentImpl::dispatchTableValue(RTFKeyword nKeyword, int nParam)
                     ? m_nNestedCurrentCellX
                     : m_nTopLevelCurrentCellX);
             int nCellX = nParam - rCurrentCellX;
-            const int COL_DFLT_WIDTH
-                = 41; // sw/source/filter/inc/wrtswtbl.hxx, minimal possible width of cells.
-            if (!nCellX)
+
+            if (!nCellX && nParam > 0)
+            {
+                // If width of cell is 0, BUT there is a value for \cellxN use minimal
+                // possible width. But if \cellxN has no value leave 0 so autofit will
+                // try to resolve this.
+
+                // sw/source/filter/inc/wrtswtbl.hxx, minimal possible width of cells.
+                const int COL_DFLT_WIDTH = 41;
                 nCellX = COL_DFLT_WIDTH;
+            }
 
             // If there is a negative left margin, then the first cellx is relative to that.
             RTFValue::Pointer_t pTblInd
@@ -439,7 +446,7 @@ bool RTFDocumentImpl::dispatchTableValue(RTFKeyword nKeyword, int nParam)
                 RTFSprms aSprms;
                 aSprms.set(NS_ooxml::LN_tblStart, new RTFValue(1));
                 writerfilter::Reference<Properties>::Pointer_t pProperties
-                    = new RTFReferenceProperties(aAttributes, aSprms);
+                    = new RTFReferenceProperties(std::move(aAttributes), std::move(aSprms));
                 Mapper().props(pProperties);
             }
             m_nCellxMax = std::max(m_nCellxMax, nParam);
@@ -1801,6 +1808,85 @@ RTFError RTFDocumentImpl::dispatchValue(RTFKeyword nKeyword, int nParam)
                 m_aStates.top().getCharacterAttributes().set(NS_ooxml::LN_CT_Br_clear,
                                                              new RTFValue(nId));
             }
+        }
+        break;
+        case RTFKeyword::PGBRDROPT:
+        {
+            sal_Int16 nOffsetFrom = (nParam & 0xe0) >> 5;
+            bool bFromEdge = nOffsetFrom == 1;
+            if (bFromEdge)
+            {
+                Id nId = NS_ooxml::LN_Value_doc_ST_PageBorderOffset_page;
+                putNestedAttribute(m_aStates.top().getSectionSprms(),
+                                   NS_ooxml::LN_EG_SectPrContents_pgBorders,
+                                   NS_ooxml::LN_CT_PageBorders_offsetFrom, new RTFValue(nId));
+            }
+        }
+        break;
+        case RTFKeyword::TPOSY:
+        {
+            if (!m_bBreakWrappedTables)
+            {
+                break;
+            }
+
+            putNestedAttribute(m_aStates.top().getTableRowSprms(), NS_ooxml::LN_CT_TblPrBase_tblpPr,
+                               NS_ooxml::LN_CT_TblPPr_tblpY, new RTFValue(nParam));
+        }
+        break;
+        case RTFKeyword::TPOSX:
+        {
+            if (!m_bBreakWrappedTables)
+            {
+                break;
+            }
+
+            putNestedAttribute(m_aStates.top().getTableRowSprms(), NS_ooxml::LN_CT_TblPrBase_tblpPr,
+                               NS_ooxml::LN_CT_TblPPr_tblpX, new RTFValue(nParam));
+        }
+        break;
+        case RTFKeyword::TDFRMTXTLEFT:
+        {
+            if (!m_bBreakWrappedTables)
+            {
+                break;
+            }
+
+            putNestedAttribute(m_aStates.top().getTableRowSprms(), NS_ooxml::LN_CT_TblPrBase_tblpPr,
+                               NS_ooxml::LN_CT_TblPPr_leftFromText, new RTFValue(nParam));
+        }
+        break;
+        case RTFKeyword::TDFRMTXTRIGHT:
+        {
+            if (!m_bBreakWrappedTables)
+            {
+                break;
+            }
+
+            putNestedAttribute(m_aStates.top().getTableRowSprms(), NS_ooxml::LN_CT_TblPrBase_tblpPr,
+                               NS_ooxml::LN_CT_TblPPr_rightFromText, new RTFValue(nParam));
+        }
+        break;
+        case RTFKeyword::TDFRMTXTTOP:
+        {
+            if (!m_bBreakWrappedTables)
+            {
+                break;
+            }
+
+            putNestedAttribute(m_aStates.top().getTableRowSprms(), NS_ooxml::LN_CT_TblPrBase_tblpPr,
+                               NS_ooxml::LN_CT_TblPPr_topFromText, new RTFValue(nParam));
+        }
+        break;
+        case RTFKeyword::TDFRMTXTBOTTOM:
+        {
+            if (!m_bBreakWrappedTables)
+            {
+                break;
+            }
+
+            putNestedAttribute(m_aStates.top().getTableRowSprms(), NS_ooxml::LN_CT_TblPrBase_tblpPr,
+                               NS_ooxml::LN_CT_TblPPr_bottomFromText, new RTFValue(nParam));
         }
         break;
         default:

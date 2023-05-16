@@ -517,7 +517,7 @@ void FuDraw::ForcePointer(const MouseEvent* pMEvt)
                 // wouldn't be possible per default.
                 const SdrMarkList& rMarkList = mpView->GetMarkedObjectList();
                 SdrObject* pObject = rMarkList.GetMark(0)->GetMarkedSdrObj();
-                if ((dynamic_cast<const E3dObject* >(pObject) !=  nullptr) && (rMarkList.GetMarkCount() == 1))
+                if (DynCastE3dObject(pObject) && (rMarkList.GetMarkCount() == 1))
                 {
                     mpWindow->SetPointer(PointerStyle::Rotate);
                     bDefPointer = false;     // Otherwise it'll be called Joe's routine and the mousepointer will reconfigurate again
@@ -535,11 +535,11 @@ void FuDraw::ForcePointer(const MouseEvent* pMEvt)
             }
             else if (eHit == SdrHitKind::TextEditObj && dynamic_cast< const FuSelection *>( this ) !=  nullptr)
             {
-                sal_uInt16 nSdrObjKind = aVEvt.mpObj->GetObjIdentifier();
+                SdrObjKind nSdrObjKind = aVEvt.mpObj->GetObjIdentifier();
 
-                if ( nSdrObjKind != OBJ_TEXT        &&
-                     nSdrObjKind != OBJ_TITLETEXT   &&
-                     nSdrObjKind != OBJ_OUTLINETEXT &&
+                if ( nSdrObjKind != SdrObjKind::Text        &&
+                     nSdrObjKind != SdrObjKind::TitleText   &&
+                     nSdrObjKind != SdrObjKind::OutlineText &&
                      aVEvt.mpObj->IsEmptyPresObj() )
                 {
                     pObj = nullptr;
@@ -556,7 +556,7 @@ void FuDraw::ForcePointer(const MouseEvent* pMEvt)
 
                 if (bDefPointer
                     && (dynamic_cast<const SdrObjGroup*>(pObj) != nullptr
-                        || dynamic_cast<const E3dScene*>(pObj) != nullptr))
+                        || DynCastE3dScene(pObj)))
                 {
                     // take a glance into the group
                     pObj = mpView->PickObj(aPnt, mpView->getHitTolLog(), pPV,
@@ -638,9 +638,9 @@ void FuDraw::DoubleClick(const MouseEvent& rMEvt)
             SdrObject* pObj = pMark->GetMarkedSdrObj();
 
             SdrInventor nInv = pObj->GetObjInventor();
-            sal_uInt16  nSdrObjKind = pObj->GetObjIdentifier();
+            SdrObjKind  nSdrObjKind = pObj->GetObjIdentifier();
 
-            if (nInv == SdrInventor::Default && nSdrObjKind == OBJ_OLE2)
+            if (nInv == SdrInventor::Default && nSdrObjKind == SdrObjKind::OLE2)
             {
                 // activate OLE-object
                 SfxInt16Item aItem(SID_OBJECT, 0);
@@ -649,13 +649,13 @@ void FuDraw::DoubleClick(const MouseEvent& rMEvt)
                                                  SfxCallMode::ASYNCHRON | SfxCallMode::RECORD,
                                                  { &aItem });
             }
-            else if (nInv == SdrInventor::Default &&  nSdrObjKind == OBJ_GRAF && pObj->IsEmptyPresObj() )
+            else if (nInv == SdrInventor::Default &&  nSdrObjKind == SdrObjKind::Graphic && pObj->IsEmptyPresObj() )
             {
                 mpViewShell->GetViewFrame()->
                     GetDispatcher()->Execute( SID_INSERT_GRAPHIC,
                                               SfxCallMode::ASYNCHRON | SfxCallMode::RECORD );
             }
-            else if ( ( dynamic_cast< const SdrTextObj *>( pObj ) != nullptr || dynamic_cast< const SdrObjGroup *>( pObj ) !=  nullptr ) &&
+            else if ( ( DynCastSdrTextObj( pObj ) != nullptr || dynamic_cast< const SdrObjGroup *>( pObj ) !=  nullptr ) &&
                       !SD_MOD()->GetWaterCan()                            &&
                       mpViewShell->GetFrameView()->IsDoubleClickTextEdit() &&
                       !mpDocSh->IsReadOnly())
@@ -666,7 +666,7 @@ void FuDraw::DoubleClick(const MouseEvent& rMEvt)
                         SfxCallMode::ASYNCHRON | SfxCallMode::RECORD,
                         { &aItem });
             }
-            else if (nInv == SdrInventor::Default &&  nSdrObjKind == OBJ_GRUP)
+            else if (nInv == SdrInventor::Default &&  nSdrObjKind == SdrObjKind::Group)
             {
                 // hit group -> select subobject
                 mpView->UnMarkAll();
@@ -698,7 +698,7 @@ bool FuDraw::RequestHelp(const HelpEvent& rHEvt)
 
             bReturn = SetHelpText(pObj, aPosPixel, aVEvt);
 
-            if (!bReturn && (dynamic_cast< const SdrObjGroup *>( pObj ) != nullptr || dynamic_cast< const E3dScene* >(pObj) != nullptr))
+            if (!bReturn && (dynamic_cast< const SdrObjGroup *>( pObj ) != nullptr || DynCastE3dScene(pObj)))
             {
                 // take a glance into the group
                 SdrPageView* pPV = nullptr;

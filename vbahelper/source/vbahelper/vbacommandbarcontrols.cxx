@@ -22,6 +22,7 @@
 
 #include <comphelper/propertyvalue.hxx>
 #include <rtl/ref.hxx>
+#include <utility>
 
 using namespace com::sun::star;
 using namespace ooo::vba;
@@ -46,13 +47,13 @@ public:
         if( !hasMoreElements() )
             throw container::NoSuchElementException();
 
-        return m_pCommandBarControls->createCollectionObject( uno::makeAny( m_nCurrentPosition++ ) );
+        return m_pCommandBarControls->createCollectionObject( uno::Any( m_nCurrentPosition++ ) );
     }
 };
 
 }
 
-ScVbaCommandBarControls::ScVbaCommandBarControls( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, const uno::Reference< container::XIndexAccess>& xIndexAccess, VbaCommandBarHelperRef const & pHelper, const uno::Reference< container::XIndexAccess>& xBarSettings, const OUString& sResourceUrl ) : CommandBarControls_BASE( xParent, xContext, xIndexAccess ), pCBarHelper( pHelper ), m_xBarSettings( xBarSettings ), m_sResourceUrl( sResourceUrl )
+ScVbaCommandBarControls::ScVbaCommandBarControls( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, const uno::Reference< container::XIndexAccess>& xIndexAccess, VbaCommandBarHelperRef  pHelper, uno::Reference< container::XIndexAccess>  xBarSettings, const OUString& sResourceUrl ) : CommandBarControls_BASE( xParent, xContext, xIndexAccess ), pCBarHelper(std::move( pHelper )), m_xBarSettings(std::move( xBarSettings )), m_sResourceUrl( sResourceUrl )
 {
     m_bIsMenu = sResourceUrl == ITEM_MENUBAR_URL;
 }
@@ -127,7 +128,7 @@ ScVbaCommandBarControls::createCollectionObject( const uno::Any& aSource )
     else
         pNewCommandBarControl = new ScVbaCommandBarButton( this, mxContext, m_xIndexAccess, pCBarHelper, m_xBarSettings, m_sResourceUrl, nPosition );
 
-    return uno::makeAny( uno::Reference< XCommandBarControl > ( pNewCommandBarControl ) );
+    return uno::Any( uno::Reference< XCommandBarControl > ( pNewCommandBarControl ) );
 }
 
 // Methods
@@ -151,7 +152,7 @@ ScVbaCommandBarControls::Item( const uno::Any& aIndex, const uno::Any& /*aIndex*
         throw uno::RuntimeException();
     }
 
-    return createCollectionObject( uno::makeAny( nPosition ) );
+    return createCollectionObject( uno::Any( nPosition ) );
 }
 
 uno::Reference< XCommandBarControl > SAL_CALL
@@ -205,7 +206,7 @@ ScVbaCommandBarControls::Add( const uno::Any& Type, const uno::Any& Id, const un
 
 
     uno::Reference< container::XIndexContainer > xIndexContainer( m_xIndexAccess, uno::UNO_QUERY_THROW );
-    xIndexContainer->insertByIndex( nPosition, uno::makeAny( aProps ) );
+    xIndexContainer->insertByIndex( nPosition, uno::Any( aProps ) );
 
     pCBarHelper->ApplyTempChange( m_sResourceUrl, m_xBarSettings );
 

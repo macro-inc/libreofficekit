@@ -53,6 +53,7 @@
 #include <svx/xlnclit.hxx>
 #include <toolkit/awt/vclxdevice.hxx>
 #include <unotools/localedatawrapper.hxx>
+#include <utility>
 #include <vcl/print.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
@@ -687,7 +688,7 @@ namespace {
             const PageKind ePageKind,
             const MapMode& rMapMode,
             const bool bPrintMarkedOnly,
-            const OUString& rsPageString,
+            OUString sPageString,
             const Point& rPageStringOffset,
             const DrawModeFlags nDrawMode,
             const Orientation eOrientation,
@@ -695,7 +696,7 @@ namespace {
             : mePageKind(ePageKind),
               maMap(rMapMode),
               mbPrintMarkedOnly(bPrintMarkedOnly),
-              msPageString(rsPageString),
+              msPageString(std::move(sPageString)),
               maPageStringOffset(rPageStringOffset),
               mnDrawMode(nDrawMode),
               meOrientation(eOrientation),
@@ -1507,11 +1508,7 @@ private:
 
         // delete all previous shapes from handout page
         while( pHandout->GetObjCount() )
-        {
-            SdrObject* pObj = pHandout->NbcRemoveObject(0);
-            if( pObj )
-                SdrObject::Free( pObj  );
-        }
+            pHandout->NbcRemoveObject(0);
 
         const bool bDrawLines (eLayout == AUTOLAYOUT_HANDOUT3);
 
@@ -1544,14 +1541,14 @@ private:
                     aPathPoly.append( aPoly );
                 }
 
-                SdrPathObj* pPathObj = new SdrPathObj(
+                rtl::Reference<SdrPathObj> pPathObj = new SdrPathObj(
                     rModel,
-                    OBJ_PATHLINE,
-                    aPathPoly);
+                    SdrObjKind::PathLine,
+                    std::move(aPathPoly));
                 pPathObj->SetMergedItem(XLineStyleItem(drawing::LineStyle_SOLID));
                 pPathObj->SetMergedItem(XLineColorItem(OUString(), COL_BLACK));
 
-                pHandout->NbcInsertObject( pPathObj );
+                pHandout->NbcInsertObject( pPathObj.get() );
             }
         }
     }
@@ -1643,9 +1640,9 @@ private:
                 {
                     SdrObject* pObj = pPage->GetObj(nObj++);
                     if (pObj->GetObjInventor() == SdrInventor::Default
-                        && pObj->GetObjIdentifier() == OBJ_TITLETEXT)
+                        && pObj->GetObjIdentifier() == SdrObjKind::TitleText)
                     {
-                        pTextObj = dynamic_cast<SdrTextObj*>(pObj);
+                        pTextObj = DynCastSdrTextObj(pObj);
                     }
                 }
 
@@ -1667,9 +1664,9 @@ private:
                 {
                     SdrObject* pObj = pPage->GetObj(nObj++);
                     if (pObj->GetObjInventor() == SdrInventor::Default
-                        && pObj->GetObjIdentifier() == OBJ_OUTLINETEXT)
+                        && pObj->GetObjIdentifier() == SdrObjKind::OutlineText)
                     {
-                        pTextObj = dynamic_cast<SdrTextObj*>(pObj);
+                        pTextObj = DynCastSdrTextObj(pObj);
                     }
                 }
 
@@ -1677,7 +1674,7 @@ private:
                 if (!pTextObj)
                 {
                     bSubTitle = true;
-                    pTextObj = dynamic_cast<SdrTextObj*>(pPage->GetPresObj(PresObjKind::Text));  // is there a subtitle?
+                    pTextObj = DynCastSdrTextObj(pPage->GetPresObj(PresObjKind::Text));  // is there a subtitle?
                 }
 
                 sal_Int32 nParaCount1 = pOutliner->GetParagraphCount();
@@ -2215,8 +2212,7 @@ bool CheckForFrontBackPages( sal_Int32 nPage )
 //===== DocumentRenderer ======================================================
 
 DocumentRenderer::DocumentRenderer (ViewShellBase& rBase)
-    : DocumentRendererInterfaceBase(m_aMutex),
-      mpImpl(new Implementation(rBase))
+    : mpImpl(new Implementation(rBase))
 {
 }
 

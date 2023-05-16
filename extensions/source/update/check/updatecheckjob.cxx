@@ -30,7 +30,7 @@
 
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/frame/XTerminateListener.hpp>
@@ -97,6 +97,8 @@ public:
 
 private:
     uno::Reference<uno::XComponentContext>  m_xContext;
+
+    std::mutex m_mutex;
     uno::Reference< frame::XDesktop2 >      m_xDesktop;
     std::unique_ptr< InitUpdateCheckJobThread > m_pInitThread;
 
@@ -205,10 +207,13 @@ UpdateCheckJob::execute(const uno::Sequence<beans::NamedValue>& namedValues)
 
     OUString aEventName = getValue< OUString > (aEnvironment, "EventName");
 
-    m_pInitThread.reset(
-        new InitUpdateCheckJobThread(
-            m_xContext, aConfig,
-            aEventName != "onFirstVisibleTask"));
+    auto thread = std::make_unique<InitUpdateCheckJobThread >(
+        m_xContext, aConfig,
+        aEventName != "onFirstVisibleTask");
+    {
+        std::scoped_lock l(m_mutex);
+        m_pInitThread = std::move(thread);
+    }
 
     return uno::Any();
 }
@@ -274,13 +279,18 @@ UpdateCheckJob::supportsService( OUString const & serviceName )
 // XEventListener
 void SAL_CALL UpdateCheckJob::disposing( lang::EventObject const & rEvt )
 {
-    bool shutDown = ( rEvt.Source == m_xDesktop );
+    css::uno::Reference<css::frame::XDesktop2> desktop;
+    {
+        std::scoped_lock l(m_mutex);
+        if ( rEvt.Source == m_xDesktop ) {
+            std::swap(m_xDesktop, desktop);
+        }
+    }
 
-    if ( shutDown && m_xDesktop.is() )
+    if ( desktop.is() )
     {
         terminateAndJoinThread();
-        m_xDesktop->removeTerminateListener( this );
-        m_xDesktop.clear();
+        desktop->removeTerminateListener( this );
     }
 }
 
@@ -292,11 +302,15 @@ void SAL_CALL UpdateCheckJob::queryTermination( lang::EventObject const & )
 
 void UpdateCheckJob::terminateAndJoinThread()
 {
-    if (m_pInitThread != nullptr)
+    std::unique_ptr<InitUpdateCheckJobThread> thread;
     {
-        m_pInitThread->setTerminating();
-        m_pInitThread->join();
-        m_pInitThread.reset();
+        std::scoped_lock l(m_mutex);
+        std::swap(m_pInitThread, thread);
+    }
+    if (thread != nullptr)
+    {
+        thread->setTerminating();
+        thread->join();
     }
 }
 

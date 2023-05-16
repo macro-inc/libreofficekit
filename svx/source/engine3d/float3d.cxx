@@ -33,6 +33,7 @@
 #include <svx/xlineit0.hxx>
 #include <svx/fmmodel.hxx>
 #include <svx/dlgutil.hxx>
+#include <svx/obj3d.hxx>
 #include <svx/sdshitm.hxx>
 #include <svx/svx3ditems.hxx>
 
@@ -1650,7 +1651,7 @@ void Svx3DWin::GetAttr( SfxItemSet& rAttrs )
 
         while(nWhich)
         {
-            SfxItemState eState = mpRemember2DAttributes->GetItemState(nWhich, false);
+            SfxItemState eState = aIter.GetItemState(false);
             if(SfxItemState::DONTCARE == eState)
                 rAttrs.InvalidateItem(nWhich);
             else if(SfxItemState::SET == eState)

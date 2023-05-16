@@ -17,15 +17,14 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <stdio.h>
 #include <utility>
 
 #include <cppu/unotype.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <osl/diagnose.hxx>
 #include <osl/thread.hxx>
 #include <osl/mutex.hxx>
-#include <osl/time.h>
 
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/factory.hxx>
@@ -748,7 +747,7 @@ void Test_Impl::setRuntimeException( sal_Int32 )
     RuntimeException aExc;
     aExc.Message          = _aData.String;
     aExc.Context          = _aData.Interface;
-    throwException( makeAny( aExc ) );
+    throwException( Any( aExc ) );
 }
 
 // XBridgeTest2 -------------------------------------------------------------
@@ -990,7 +989,7 @@ void Test_Impl::testConstructorsService(
         'X',
         "test",
         UnoType< Any >::get(),
-        makeAny(true),
+        Any(true),
         arg14,
         arg15,
         arg16,
@@ -1015,7 +1014,7 @@ void Test_Impl::testConstructorsService(
         TestEnum_TWO,
         TestStruct(10),
         TestPolyStruct< sal_Bool >(true),
-        TestPolyStruct< Any >(makeAny(true)),
+        TestPolyStruct< Any >(Any(true)),
         Reference< XInterface >(nullptr));
     Sequence< Any > args{
         Any(true),
@@ -1056,7 +1055,7 @@ void Test_Impl::testConstructorsService(
         Any(TestEnum_TWO),
         Any(TestStruct(10)),
         Any(TestPolyStruct< sal_Bool >(true)),
-        Any(TestPolyStruct< Any >(makeAny(true))),
+        Any(TestPolyStruct< Any >(Any(true))),
         Any(Reference< XInterface >(nullptr))
     };
     assert(args.getLength() == 40);
@@ -1199,7 +1198,7 @@ SAL_DLLPUBLIC_EXPORT void * component_getFactory(
 {
     void * pRet = nullptr;
 
-    if (pServiceManager && OUString(IMPLNAME).equalsAscii(pImplName))
+    if (pServiceManager && o3tl::equalsAscii(IMPLNAME, pImplName))
     {
         Reference< XSingleServiceFactory > xFactory( createSingleFactory(
             static_cast< XMultiServiceFactory * >( pServiceManager ),

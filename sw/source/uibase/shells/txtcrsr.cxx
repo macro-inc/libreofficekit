@@ -52,11 +52,10 @@ void SwTextShell::ExecBasicMove(SfxRequest &rReq)
     sal_Int32 nCount = 1;
     if(pArgs)
     {
-        const SfxPoolItem *pItem;
-        if(SfxItemState::SET == pArgs->GetItemState(FN_PARAM_MOVE_COUNT, true, &pItem))
-            nCount = static_cast<const SfxInt32Item *>(pItem)->GetValue();
-        if(SfxItemState::SET == pArgs->GetItemState(FN_PARAM_MOVE_SELECTION, true, &pItem))
-            bSelect = static_cast<const SfxBoolItem *>(pItem)->GetValue();
+        if(const SfxInt32Item* pCountItem = pArgs->GetItemIfSet(FN_PARAM_MOVE_COUNT))
+            nCount = pCountItem->GetValue();
+        if(const SfxBoolItem* pSelectionItem = pArgs->GetItemIfSet(FN_PARAM_MOVE_SELECTION))
+            bSelect = pSelectionItem->GetValue();
     }
     switch(rReq.GetSlot())
     {
@@ -94,10 +93,10 @@ void SwTextShell::ExecBasicMove(SfxRequest &rReq)
         switch(nSlot)
         {
             case FN_CHAR_LEFT:
-                rSh.Left( CRSR_SKIP_CELLS,  bSelect, 1, false, true );
+                rSh.Left( SwCursorSkipMode::Cells,  bSelect, 1, false, true );
                 break;
             case FN_CHAR_RIGHT:
-                rSh.Right( CRSR_SKIP_CELLS, bSelect, 1, false, true );
+                rSh.Right( SwCursorSkipMode::Cells, bSelect, 1, false, true );
                 break;
             case FN_LINE_UP:
                 rSh.Up( bSelect );

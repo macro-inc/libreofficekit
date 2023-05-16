@@ -20,6 +20,7 @@
 #include <memory>
 #include <hintids.hxx>
 #include <comphelper/flagguard.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <editeng/boxitem.hxx>
 #include <editeng/brushitem.hxx>
@@ -191,7 +192,7 @@ class HTMLTableCnts
 public:
 
     explicit HTMLTableCnts(const SwStartNode* pStNd);
-    explicit HTMLTableCnts(const std::shared_ptr<HTMLTable>& rTab);
+    explicit HTMLTableCnts(std::shared_ptr<HTMLTable> xTab);
 
     ~HTMLTableCnts();                   // only allowed in ~HTMLTableCell
 
@@ -649,9 +650,9 @@ HTMLTableCnts::HTMLTableCnts(const SwStartNode* pStNd)
     InitCtor();
 }
 
-HTMLTableCnts::HTMLTableCnts(const std::shared_ptr<HTMLTable>& rTab)
+HTMLTableCnts::HTMLTableCnts(std::shared_ptr<HTMLTable> xTab)
     : m_pStartNode(nullptr)
-    , m_xTable(rTab)
+    , m_xTable(std::move(xTab))
 {
     InitCtor();
 }
@@ -1429,13 +1430,12 @@ void HTMLTable::FixFrameFormat( SwTableBox *pBox,
                     const SwStartNode *pSttNd = pBox->GetSttNd();
                     pCNd = pSttNd->GetNodes()[pSttNd->GetIndex()+1]
                                  ->GetContentNode();
-                    const SfxPoolItem *pItem;
+                    const SvxAdjustItem *pItem;
                     if( pCNd && pCNd->HasSwAttrSet() &&
-                        SfxItemState::SET==pCNd->GetpSwAttrSet()->GetItemState(
-                            RES_PARATR_ADJUST, false, &pItem ) )
+                        (pItem = pCNd->GetpSwAttrSet()->GetItemIfSet(
+                            RES_PARATR_ADJUST, false )) )
                     {
-                        eAdjust = static_cast<const SvxAdjustItem *>(pItem)
-                            ->GetAdjust();
+                        eAdjust = pItem->GetAdjust();
                     }
                 }
                 aItemSet.Put( SwTableBoxNumFormat(nNumFormat) );
@@ -2423,8 +2423,8 @@ void HTMLTable::MakeTable( SwTableBox *pBox, sal_uInt16 nAbsAvail,
             // left or right adjusted table without width mustn't be adjusted in width
             // as they would only shrink but never grow
             m_xLayoutInfo->SetMustNotRecalc( true );
-            if( m_pContext->GetFrameFormat()->GetAnchor().GetContentAnchor()
-                ->nNode.GetNode().FindTableNode() )
+            if( m_pContext->GetFrameFormat()->GetAnchor().GetAnchorNode()
+                ->FindTableNode() )
             {
                 sal_uInt32 nMax = m_xLayoutInfo->GetMax();
                 if( nMax > USHRT_MAX )
@@ -2547,7 +2547,7 @@ const SwStartNode *SwHTMLParser::InsertTableSection
     const SwStartNode *pStNd;
     if (m_xTable->m_bFirstCell )
     {
-        SwNode *const pNd = & m_pPam->GetPoint()->nNode.GetNode();
+        SwNode *const pNd = & m_pPam->GetPoint()->GetNode();
         pNd->GetTextNode()->ChgFormatColl( pColl );
         pStNd = pNd->FindTableBoxStartNode();
         m_xTable->m_bFirstCell = false;
@@ -2560,7 +2560,7 @@ const SwStartNode *SwHTMLParser::InsertTableSection
         else
             pNd = pPrevStNd->EndOfSectionNode();
         SwNodeIndex nIdx( *pNd, 1 );
-        pStNd = m_xDoc->GetNodes().MakeTextSection( nIdx, SwTableBoxStartNode,
+        pStNd = m_xDoc->GetNodes().MakeTextSection( nIdx.GetNode(), SwTableBoxStartNode,
                                                   pColl );
         m_xTable->IncBoxCount();
     }
@@ -2596,7 +2596,7 @@ const SwStartNode *SwHTMLParser::InsertTableSection( sal_uInt16 nPoolId )
 
     SwTextFormatColl *pColl = m_pCSS1Parser->GetTextCollFromPool( nPoolId );
 
-    SwNode *const pNd = & m_pPam->GetPoint()->nNode.GetNode();
+    SwNode *const pNd = & m_pPam->GetPoint()->GetNode();
     const SwStartNode *pStNd;
     if (m_xTable->m_bFirstCell)
     {
@@ -2627,13 +2627,10 @@ const SwStartNode *SwHTMLParser::InsertTableSection( sal_uInt16 nPoolId )
                 pOutTable = pOutTable->StartOfSectionNode()->FindTableNode();
             } while( pOutTable && pTableNd->GetTable().GetHTMLTableLayout() );
         }
-        SwNodeIndex aIdx( *pTableNd->EndOfSectionNode() );
-        pStNd = m_xDoc->GetNodes().MakeTextSection( aIdx, SwTableBoxStartNode,
+        pStNd = m_xDoc->GetNodes().MakeTextSection( *pTableNd->EndOfSectionNode(), SwTableBoxStartNode,
                                                   pColl );
 
-        m_pPam->GetPoint()->nNode = pStNd->GetIndex() + 1;
-        SwTextNode *pTextNd = m_pPam->GetPoint()->nNode.GetNode().GetTextNode();
-        m_pPam->GetPoint()->nContent.Assign( pTextNd, 0 );
+        m_pPam->GetPoint()->Assign( pStNd->GetIndex() + 1 );
         m_xTable->IncBoxCount();
     }
 
@@ -2648,13 +2645,10 @@ const SwStartNode *SwHTMLParser::InsertTableSection( sal_uInt16 nPoolId )
 SwStartNode *SwHTMLParser::InsertTempTableCaptionSection()
 {
     SwTextFormatColl *pColl = m_pCSS1Parser->GetTextCollFromPool( RES_POOLCOLL_TEXT );
-    SwNodeIndex& rIdx = m_pPam->GetPoint()->nNode;
-    rIdx = m_xDoc->GetNodes().GetEndOfExtras();
-    SwStartNode *pStNd = m_xDoc->GetNodes().MakeTextSection( rIdx,
+    SwStartNode *pStNd = m_xDoc->GetNodes().MakeTextSection( m_xDoc->GetNodes().GetEndOfExtras(),
                                           SwNormalStartNode, pColl );
 
-    rIdx = pStNd->GetIndex() + 1;
-    m_pPam->GetPoint()->nContent.Assign( rIdx.GetNode().GetTextNode(), 0 );
+    m_pPam->GetPoint()->Assign( pStNd->GetIndex() + 1);
 
     return pStNd;
 }
@@ -2669,10 +2663,10 @@ sal_Int32 SwHTMLParser::StripTrailingLF()
         return nStripped;
     }
 
-    const sal_Int32 nLen = m_pPam->GetPoint()->nContent.GetIndex();
+    const sal_Int32 nLen = m_pPam->GetPoint()->GetContentIndex();
     if( nLen )
     {
-        SwTextNode* pTextNd = m_pPam->GetPoint()->nNode.GetNode().GetTextNode();
+        SwTextNode* pTextNd = m_pPam->GetPoint()->GetNode().GetTextNode();
         // careful, when comments aren't ignored!!!
         if( pTextNd )
         {
@@ -2695,7 +2689,7 @@ sal_Int32 SwHTMLParser::StripTrailingLF()
                 }
 
                 nPos = nLen - nLFCount;
-                SwIndex nIdx( pTextNd, nPos );
+                SwContentIndex nIdx( pTextNd, nPos );
                 pTextNd->EraseText( nIdx, nLFCount );
                 nStripped = nLFCount;
             }
@@ -2735,11 +2729,9 @@ SvxBrushItem* SwHTMLParser::CreateBrushItem( const Color *pColor,
         }
 
         m_pCSS1Parser->ParseStyleOption( rStyle, aItemSet, aPropInfo );
-        const SfxPoolItem *pItem = nullptr;
-        if( SfxItemState::SET == aItemSet.GetItemState( RES_BACKGROUND, false,
-                                                   &pItem ) )
+        if( const SvxBrushItem *pItem = aItemSet.GetItemIfSet( RES_BACKGROUND, false ) )
         {
-            pBrushItem = new SvxBrushItem( *static_cast<const SvxBrushItem *>(pItem) );
+            pBrushItem = new SvxBrushItem( *pItem );
         }
     }
 
@@ -2841,7 +2833,7 @@ class CellSaveStruct : public SectionSaveStruct
 
     std::shared_ptr<HTMLTableCnts> m_xCnts;              // List of all contents
     HTMLTableCnts* m_pCurrCnts;                          // current content or 0
-    std::unique_ptr<SwNodeIndex> m_pNoBreakEndNodeIndex; // Paragraph index of a <NOBR>
+    std::optional<SwNodeIndex> m_oNoBreakEndNodeIndex; // Paragraph index of a <NOBR>
 
     double m_nValue;
 
@@ -3026,10 +3018,9 @@ CellSaveStruct::CellSaveStruct( SwHTMLParser& rParser, HTMLTable const *pCurTabl
         if( rParser.ParseStyleOptions( m_aStyle, m_aId, m_aClass, aItemSet,
                                        aPropInfo, &aLang, &aDir ) )
         {
-            SfxPoolItem const* pItem;
-            if (SfxItemState::SET == aItemSet.GetItemState(RES_BOX, false, &pItem))
+            if (SvxBoxItem const* pItem = aItemSet.GetItemIfSet(RES_BOX, false))
             {   // fdo#41796: steal box item to set it in FixFrameFormat later!
-                m_xBoxItem.reset(dynamic_cast<SvxBoxItem *>(pItem->Clone()));
+                m_xBoxItem.reset(pItem->Clone());
                 aItemSet.ClearItem(RES_BOX);
             }
             rParser.InsertAttrs(aItemSet, aPropInfo, xCntxt.get());
@@ -3094,10 +3085,10 @@ void CellSaveStruct::InsertCell( SwHTMLParser& rParser,
 void CellSaveStruct::StartNoBreak( const SwPosition& rPos )
 {
     if( !m_xCnts ||
-        (!rPos.nContent.GetIndex() && m_pCurrCnts == m_xCnts.get() &&
+        (!rPos.GetContentIndex() && m_pCurrCnts == m_xCnts.get() &&
          m_xCnts->GetStartNode() &&
          m_xCnts->GetStartNode()->GetIndex() + 1 ==
-            rPos.nNode.GetIndex()) )
+            rPos.GetNodeIndex()) )
     {
         m_bNoBreak = true;
     }
@@ -3107,8 +3098,8 @@ void CellSaveStruct::EndNoBreak( const SwPosition& rPos )
 {
     if( m_bNoBreak )
     {
-        m_pNoBreakEndNodeIndex.reset( new SwNodeIndex( rPos.nNode ) );
-        m_nNoBreakEndContentPos = rPos.nContent.GetIndex();
+        m_oNoBreakEndNodeIndex.emplace( rPos.GetNode() );
+        m_nNoBreakEndContentPos = rPos.GetContentIndex();
         m_bNoBreak = false;
     }
 }
@@ -3123,17 +3114,17 @@ void CellSaveStruct::CheckNoBreak( const SwPosition& rPos )
         // <NOBR> wasn't closed
         m_xCnts->SetNoBreak();
     }
-    else if( m_pNoBreakEndNodeIndex &&
-             m_pNoBreakEndNodeIndex->GetIndex() == rPos.nNode.GetIndex() )
+    else if( m_oNoBreakEndNodeIndex &&
+             m_oNoBreakEndNodeIndex->GetIndex() == rPos.GetNodeIndex() )
     {
-        if( m_nNoBreakEndContentPos == rPos.nContent.GetIndex() )
+        if( m_nNoBreakEndContentPos == rPos.GetContentIndex() )
         {
             // <NOBR> was closed immediately before the cell end
             m_xCnts->SetNoBreak();
         }
-        else if( m_nNoBreakEndContentPos + 1 == rPos.nContent.GetIndex() )
+        else if( m_nNoBreakEndContentPos + 1 == rPos.GetContentIndex() )
         {
-            SwTextNode const*const pTextNd(rPos.nNode.GetNode().GetTextNode());
+            SwTextNode const*const pTextNd(rPos.GetNode().GetTextNode());
             if( pTextNd )
             {
                 sal_Unicode const cLast =
@@ -3165,8 +3156,8 @@ std::unique_ptr<HTMLTableCnts> SwHTMLParser::InsertTableContents(
     }
 
     // Reset attributation start
-    const SwNodeIndex& rSttPara = m_pPam->GetPoint()->nNode;
-    sal_Int32 nSttCnt = m_pPam->GetPoint()->nContent.GetIndex();
+    const SwNode& rSttPara = m_pPam->GetPoint()->GetNode();
+    sal_Int32 nSttCnt = m_pPam->GetPoint()->GetContentIndex();
 
     HTMLAttr** pHTMLAttributes = reinterpret_cast<HTMLAttr**>(m_xAttrTab.get());
     for (sal_uInt16 nCnt = sizeof(HTMLAttrTable) / sizeof(HTMLAttr*); nCnt--; ++pHTMLAttributes)
@@ -3251,21 +3242,19 @@ void SwHTMLParser::BuildTableCell( HTMLTable *pCurTable, bool bReadOptions,
                                                    pCurTable->GetClass(),
                                                    aItemSet, aPropInfo,
                                                       nullptr, &pCurTable->GetDirection() );
-            const SfxPoolItem *pItem = nullptr;
             if( bStyleParsed )
             {
-                if( SfxItemState::SET == aItemSet.GetItemState(
-                                        RES_BACKGROUND, false, &pItem ) )
+                if( const SvxBrushItem* pItem = aItemSet.GetItemIfSet(
+                                        RES_BACKGROUND, false ) )
                 {
-                    pCurTable->SetBGBrush( *static_cast<const SvxBrushItem *>(pItem) );
+                    pCurTable->SetBGBrush( *pItem );
                     aItemSet.ClearItem( RES_BACKGROUND );
                 }
-                if( SfxItemState::SET == aItemSet.GetItemState(
-                                        RES_PARATR_SPLIT, false, &pItem ) )
+                if( const SvxFormatSplitItem* pSplitItem = aItemSet.GetItemIfSet(
+                                        RES_PARATR_SPLIT, false ) )
                 {
                     aItemSet.Put(
-                        SwFormatLayoutSplit( static_cast<const SvxFormatSplitItem *>(pItem)
-                                                ->GetValue() ) );
+                        SwFormatLayoutSplit( pSplitItem->GetValue() ) );
                     aItemSet.ClearItem( RES_PARATR_SPLIT );
                 }
             }
@@ -3308,13 +3297,13 @@ void SwHTMLParser::BuildTableCell( HTMLTable *pCurTable, bool bReadOptions,
                     // Otherwise, we need to open a new paragraph if the paragraph
                     // is empty or contains text frames or bookmarks
                     bAppend =
-                        m_pPam->GetPoint()->nContent.GetIndex() ||
+                        m_pPam->GetPoint()->GetContentIndex() ||
                         HasCurrentParaFlys() ||
                         HasCurrentParaBookmarks();
                 }
                 if( bAppend )
                 {
-                    if( !m_pPam->GetPoint()->nContent.GetIndex() )
+                    if( !m_pPam->GetPoint()->GetContentIndex() )
                     {
                         //Set default to CJK and CTL
                         m_xDoc->SetTextFormatColl( *m_pPam,
@@ -3389,7 +3378,7 @@ void SwHTMLParser::BuildTableCell( HTMLTable *pCurTable, bool bReadOptions,
                 // still empty paragraph, since it's not gonna be deleted that way
                 if( (bTopTable && !bAppended) ||
                     (!bTopTable && !bParentLFStripped &&
-                     !m_pPam->GetPoint()->nContent.GetIndex()) )
+                     !m_pPam->GetPoint()->GetContentIndex()) )
                     pPostIts.emplace();
                 SetAttr( bTopTable, bTopTable, pPostIts ? &*pPostIts : nullptr );
             }
@@ -3464,17 +3453,14 @@ void SwHTMLParser::BuildTableCell( HTMLTable *pCurTable, bool bReadOptions,
 
                     pTCntxt->SetFrameFormat( pFrameFormat );
                     const SwFormatContent& rFlyContent = pFrameFormat->GetContent();
-                    m_pPam->GetPoint()->nNode = *rFlyContent.GetContentIdx();
-                    SwContentNode *pCNd =
-                        m_xDoc->GetNodes().GoNext( &(m_pPam->GetPoint()->nNode) );
-                    m_pPam->GetPoint()->nContent.Assign( pCNd, 0 );
-
+                    m_pPam->GetPoint()->Assign( *rFlyContent.GetContentIdx() );
+                    m_xDoc->GetNodes().GoNext( m_pPam->GetPoint() );
                 }
 
                 // create a SwTable with a box and set the PaM to the content of
                 // the box section (the adjustment parameter is a dummy for now
                 // and will be corrected later)
-                OSL_ENSURE( !m_pPam->GetPoint()->nContent.GetIndex(),
+                OSL_ENSURE( !m_pPam->GetPoint()->GetContentIndex(),
                         "The paragraph after the table is not empty!" );
                 const SwTable* pSwTable = m_xDoc->InsertTable(
                         SwInsertTableOptions( SwInsertTableFlags::HeadlineNoBorder, 1 ),
@@ -3483,7 +3469,7 @@ void SwHTMLParser::BuildTableCell( HTMLTable *pCurTable, bool bReadOptions,
 
                 if( bForceFrame )
                 {
-                    SwNodeIndex aDstIdx( m_pPam->GetPoint()->nNode );
+                    SwNodeIndex aDstIdx( m_pPam->GetPoint()->GetNode() );
                     m_pPam->Move( fnMoveBackward );
                     m_xDoc->GetNodes().Delete( aDstIdx );
                 }
@@ -3497,29 +3483,29 @@ void SwHTMLParser::BuildTableCell( HTMLTable *pCurTable, bool bReadOptions,
                     m_pPam->Move( fnMoveBackward );
                 }
 
-                SwNode const*const pNd = & m_pPam->GetPoint()->nNode.GetNode();
+                SwNode const*const pNd = & m_pPam->GetPoint()->GetNode();
                 SwTextNode *const pOldTextNd = (!bAppended && !bForceFrame) ?
-                    pSavePos->nNode.GetNode().GetTextNode() : nullptr;
+                    pSavePos->GetNode().GetTextNode() : nullptr;
 
                 if (pFrameFormat && pOldTextNd)
                 {
-                    const SfxPoolItem* pItem2;
-                    if( SfxItemState::SET == pOldTextNd->GetSwAttrSet()
-                            .GetItemState( RES_PAGEDESC, false, &pItem2 ) &&
-                        static_cast<const SwFormatPageDesc *>(pItem2)->GetPageDesc() )
+                    const SwFormatPageDesc* pPageDescItem = pOldTextNd->GetSwAttrSet()
+                            .GetItemIfSet( RES_PAGEDESC, false );
+                    if( pPageDescItem && pPageDescItem->GetPageDesc() )
                     {
-                        pFrameFormat->SetFormatAttr( *pItem2 );
+                        pFrameFormat->SetFormatAttr( *pPageDescItem );
                         pOldTextNd->ResetAttr( RES_PAGEDESC );
                     }
-                    if( SfxItemState::SET == pOldTextNd->GetSwAttrSet()
-                            .GetItemState( RES_BREAK, true, &pItem2 ) )
+
+                    if( const SvxFormatBreakItem* pBreakItem = pOldTextNd->GetSwAttrSet()
+                            .GetItemIfSet( RES_BREAK ) )
                     {
-                        switch( static_cast<const SvxFormatBreakItem *>(pItem2)->GetBreak() )
+                        switch( pBreakItem->GetBreak() )
                         {
                         case SvxBreak::PageBefore:
                         case SvxBreak::PageAfter:
                         case SvxBreak::PageBoth:
-                            pFrameFormat->SetFormatAttr( *pItem2 );
+                            pFrameFormat->SetFormatAttr( *pBreakItem );
                             pOldTextNd->ResetAttr( RES_BREAK );
                             break;
                         default:
@@ -3565,7 +3551,7 @@ void SwHTMLParser::BuildTableCell( HTMLTable *pCurTable, bool bReadOptions,
                     }
                 }
 
-                SwNode const*const pNd = & m_pPam->GetPoint()->nNode.GetNode();
+                SwNode const*const pNd = & m_pPam->GetPoint()->GetNode();
                 const SwStartNode *pStNd = (m_xTable->m_bFirstCell ? pNd->FindTableNode()
                                                             : pNd->FindTableBoxStartNode() );
 
@@ -3850,11 +3836,11 @@ void SwHTMLParser::BuildTableCell( HTMLTable *pCurTable, bool bReadOptions,
         }
 
         // Remove LFs at the paragraph end
-        if (StripTrailingLF() == 0 && !m_pPam->GetPoint()->nContent.GetIndex())
+        if (StripTrailingLF() == 0 && !m_pPam->GetPoint()->GetContentIndex())
         {
             HTMLTableContext* pTableContext = m_xTable ? m_xTable->GetContext() : nullptr;
             SwPosition* pSavedPos = pTableContext ? pTableContext->GetPos() : nullptr;
-            const bool bDeleteSafe = !pSavedPos || pSavedPos->nNode != m_pPam->GetPoint()->nNode;
+            const bool bDeleteSafe = !pSavedPos || pSavedPos->GetNode() != m_pPam->GetPoint()->GetNode();
             if (bDeleteSafe)
                 StripTrailingPara();
         }
@@ -4492,8 +4478,8 @@ public:
 
     std::shared_ptr<HTMLAttrTable> m_xAttrTab;        // attributes
 
-    CaptionSaveStruct( SwHTMLParser& rParser, const SwPosition& rPos ) :
-        SectionSaveStruct( rParser ), m_aSavePos( rPos ),
+    CaptionSaveStruct( SwHTMLParser& rParser, SwPosition aPos ) :
+        SectionSaveStruct( rParser ), m_aSavePos(std::move( aPos )),
         m_xAttrTab(std::make_shared<HTMLAttrTable>())
     {
         rParser.SaveAttrTab(m_xAttrTab);
@@ -4671,13 +4657,13 @@ void SwHTMLParser::BuildTableCaption( HTMLTable *pCurTable )
     {
         // On moving the caption later, the last paragraph isn't moved as well.
         // That means, there has to be an empty paragraph at the end of the section
-        if( m_pPam->GetPoint()->nContent.GetIndex() || bLFStripped )
+        if( m_pPam->GetPoint()->GetContentIndex() || bLFStripped )
             AppendTextNode( AM_NOSPACE );
     }
     else
     {
         // Strip LFs at the end of the paragraph
-        if( !m_pPam->GetPoint()->nContent.GetIndex() && !bLFStripped )
+        if( !m_pPam->GetPoint()->GetContentIndex() && !bLFStripped )
             StripTrailingPara();
     }
 
@@ -4705,8 +4691,8 @@ class TableSaveStruct : public SwPendingData
 public:
     std::shared_ptr<HTMLTable> m_xCurrentTable;
 
-    explicit TableSaveStruct(const std::shared_ptr<HTMLTable>& rCurTable)
-        : m_xCurrentTable(rCurTable)
+    explicit TableSaveStruct(std::shared_ptr<HTMLTable> xCurTable)
+        : m_xCurrentTable(std::move(xCurTable))
     {
     }
 
@@ -4741,9 +4727,9 @@ void TableSaveStruct::MakeTable( sal_uInt16 nWidth, SwPosition& rPos, SwDoc *pDo
         {
             pTableNd->DelFrames();
             SwNodeIndex aIdx( *pTableNd->EndOfSectionNode(), 1 );
-            OSL_ENSURE( aIdx.GetIndex() <= pTCntxt->GetPos()->nNode.GetIndex(),
+            OSL_ENSURE( aIdx.GetIndex() <= pTCntxt->GetPos()->GetNodeIndex(),
                     "unexpected node for table layout" );
-            pTableNd->MakeOwnFrames(&aIdx);
+            pTableNd->MakeOwnFrames();
         }
     }
 
@@ -4883,85 +4869,12 @@ HTMLTableOptions::HTMLTableOptions( const HTMLOptions& rOptions,
     }
 }
 
-namespace
-{
-    class IndexInRange
-    {
-    private:
-        SwNodeIndex maStart;
-        SwNodeIndex maEnd;
-    public:
-        explicit IndexInRange(const SwNodeIndex& rStart, const SwNodeIndex& rEnd)
-            : maStart(rStart)
-            , maEnd(rEnd)
-        {
-        }
-        bool operator()(const SwHTMLTextFootnote& rTextFootnote) const
-        {
-            const SwNodeIndex aTextIdx(rTextFootnote.pTextFootnote->GetTextNode());
-            return aTextIdx >= maStart && aTextIdx <= maEnd;
-        }
-    };
-}
-
-void SwHTMLParser::ClearFootnotesMarksInRange(const SwNodeIndex& rMkNdIdx, const SwNodeIndex& rPtNdIdx)
-{
-    //similarly for footnotes
-    if (m_pFootEndNoteImpl)
-    {
-        m_pFootEndNoteImpl->aTextFootnotes.erase(std::remove_if(m_pFootEndNoteImpl->aTextFootnotes.begin(),
-            m_pFootEndNoteImpl->aTextFootnotes.end(), IndexInRange(rMkNdIdx, rPtNdIdx)), m_pFootEndNoteImpl->aTextFootnotes.end());
-        if (m_pFootEndNoteImpl->aTextFootnotes.empty())
-        {
-            m_pFootEndNoteImpl.reset();
-        }
-    }
-
-    //follow DelFlyInRange pattern here
-    assert(rMkNdIdx.GetIndex() <= rPtNdIdx.GetIndex());
-
-    SwDoc& rDoc = rMkNdIdx.GetNode().GetDoc();
-
-    //ofz#9733 drop bookmarks in this range
-    IDocumentMarkAccess* const pMarkAccess = rDoc.getIDocumentMarkAccess();
-    pMarkAccess->deleteMarks(rMkNdIdx, SwNodeIndex(rPtNdIdx, 1), nullptr, nullptr, nullptr);
-
-    SwFrameFormats& rTable = *rDoc.GetSpzFrameFormats();
-    for ( auto i = rTable.size(); i; )
-    {
-        SwFrameFormat *pFormat = rTable[--i];
-        const SwFormatAnchor &rAnch = pFormat->GetAnchor();
-        SwPosition const*const pAPos = rAnch.GetContentAnchor();
-        if (pAPos &&
-            ((rAnch.GetAnchorId() == RndStdIds::FLY_AT_PARA) ||
-             (rAnch.GetAnchorId() == RndStdIds::FLY_AT_CHAR)) &&
-            ( rMkNdIdx < pAPos->nNode && pAPos->nNode <= rPtNdIdx ))
-        {
-            if( rPtNdIdx != pAPos->nNode )
-            {
-                // If the Fly is deleted, all Flys in its content have to be deleted too.
-                const SwFormatContent &rContent = pFormat->GetContent();
-                // But only fly formats own their content, not draw formats.
-                if (rContent.GetContentIdx() && pFormat->Which() == RES_FLYFRMFMT)
-                {
-                    ClearFootnotesMarksInRange(*rContent.GetContentIdx(),
-                                          SwNodeIndex(*rContent.GetContentIdx()->GetNode().EndOfSectionNode()));
-                }
-            }
-        }
-    }
-}
-
 void SwHTMLParser::DeleteSection(SwStartNode* pSttNd)
 {
     //if section to be deleted contains a pending m_pMarquee, it will be deleted
     //so clear m_pMarquee pointer if that's the case
-    SwFrameFormat* pObjectFormat = m_pMarquee ? ::FindFrameFormat(m_pMarquee) : nullptr;
+    SwFrameFormat* pObjectFormat = m_pMarquee ? ::FindFrameFormat(m_pMarquee.get()) : nullptr;
     FrameDeleteWatch aWatch(pObjectFormat);
-
-    //similarly for footnotes
-    SwNodeIndex aSttIdx(*pSttNd), aEndIdx(*pSttNd->EndOfSectionNode());
-    ClearFootnotesMarksInRange(aSttIdx, aEndIdx);
 
     m_xDoc->getIDocumentContentOperations().DeleteSection(pSttNd);
 
@@ -5004,6 +4917,35 @@ std::shared_ptr<HTMLTable> SwHTMLParser::BuildTable(SvxAdjust eParentAdjust,
     else
     {
         m_xTable.reset();
+
+        // Parse CSS on the table.
+        OUString aStyle;
+        const HTMLOptions& rHTMLOptions = GetOptions();
+        for (size_t i = rHTMLOptions.size(); i;)
+        {
+            const HTMLOption& rOption = rHTMLOptions[--i];
+            if (rOption.GetToken() == HtmlOptionId::STYLE)
+            {
+                aStyle = rOption.GetString();
+            }
+        }
+        if (!aStyle.isEmpty())
+        {
+            // Have inline CSS.
+            SfxItemSet aItemSet(m_xDoc->GetAttrPool(), m_pCSS1Parser->GetWhichMap());
+            SvxCSS1PropertyInfo aPropInfo;
+            if (ParseStyleOptions(aStyle, /*aId=*/OUString(), /*aClass=*/OUString(), aItemSet,
+                                  aPropInfo))
+            {
+                if (aPropInfo.m_eLeftMarginType == SVX_CSS1_LTYPE_AUTO
+                    && aPropInfo.m_eRightMarginType == SVX_CSS1_LTYPE_AUTO)
+                {
+                    // Both left & right is set to auto: that's our center.
+                    eParentAdjust = SvxAdjust::Center;
+                }
+            }
+        }
+
         HTMLTableOptions aTableOptions(GetOptions(), eParentAdjust);
 
         if (!aTableOptions.aId.isEmpty())
@@ -5160,27 +5102,30 @@ std::shared_ptr<HTMLTable> SwHTMLParser::BuildTable(SvxAdjust eParentAdjust,
                     SwStartNode *pTableStNd = pTCntxt->GetTableNode();
 
                     OSL_ENSURE( pTableStNd, "Where is the table node" );
-                    OSL_ENSURE( pTableStNd==m_pPam->GetNode().FindTableNode(),
+                    OSL_ENSURE( pTableStNd == m_pPam->GetPointNode().FindTableNode(),
                             "Are we in the wrong table?" );
 
-                    SwNode* pNd;
-                    if( bTop )
-                        pNd = pTableStNd;
-                    else
-                        pNd = pTableStNd->EndOfSectionNode();
-                    SwNodeIndex aDstIdx( *pNd, bTop ? 0 : 1 );
-
-                    m_xDoc->getIDocumentContentOperations().MoveNodeRange( aSrcRg, aDstIdx,
-                        SwMoveFlags::DEFAULT );
-
-                    // If the caption was added before the table, a page style on that table
-                    // needs to be moved to the first paragraph of the header.
-                    // Additionally, all remembered indices that point to the table node
-                    // need to be moved
-                    if( bTop )
+                    if (pTableStNd)
                     {
-                        MovePageDescAttrs( pTableStNd, aSrcRg.aStart.GetIndex(),
-                                           false );
+                        SwNode* pNd;
+                        if( bTop )
+                            pNd = pTableStNd;
+                        else
+                            pNd = pTableStNd->EndOfSectionNode();
+                        SwNodeIndex aDstIdx( *pNd, bTop ? 0 : 1 );
+
+                        m_xDoc->getIDocumentContentOperations().MoveNodeRange( aSrcRg, aDstIdx.GetNode(),
+                            SwMoveFlags::DEFAULT );
+
+                        // If the caption was added before the table, a page style on that table
+                        // needs to be moved to the first paragraph of the header.
+                        // Additionally, all remembered indices that point to the table node
+                        // need to be moved
+                        if( bTop )
+                        {
+                            MovePageDescAttrs( pTableStNd, aSrcRg.aStart.GetIndex(),
+                                               false );
+                        }
                     }
                 }
 
@@ -5252,25 +5197,6 @@ std::shared_ptr<HTMLTable> SwHTMLParser::BuildTable(SvxAdjust eParentAdjust,
     xSaveStruct.reset();
 
     return xRetTable;
-}
-
-bool SwHTMLParser::PendingTableInPaM(SwPaM& rPam) const
-{
-    bool bRet = false;
-    for (const auto& a : m_aTables)
-    {
-        const SwTable *pTable = a->GetSwTable();
-        if (!pTable)
-            continue;
-        const SwTableNode* pTableNode = pTable->GetTableNode();
-        if (!pTableNode)
-            continue;
-        SwNodeIndex aTableNodeIndex(*pTableNode);
-        bRet = (aTableNodeIndex >= rPam.Start()->nNode && aTableNodeIndex <= rPam.End()->nNode);
-        if (bRet)
-            break;
-    }
-    return bRet;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -21,13 +21,14 @@
 
 #include <drawinglayer/attribute/fontattribute.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/textlayoutdevice.hxx>
 #include <drawinglayer/primitive2d/textprimitive2d.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <tools/lineend.hxx>
+#include <utility>
 #include <vcl/outdev.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/metric.hxx>
@@ -37,11 +38,11 @@
 #define HINT_INDENT     3
 #define HINT_MARGIN     4
 
-ScOverlayHint::ScOverlayHint(const OUString& rTit, const OUString& rMsg, const Color& rColor, const vcl::Font& rFont)
+ScOverlayHint::ScOverlayHint(OUString aTit, const OUString& rMsg, const Color& rColor, vcl::Font aFont)
     : OverlayObject(rColor)
-    , m_aTitle(rTit)
+    , m_aTitle(std::move(aTit))
     , m_aMessage(convertLineEnd(rMsg, LINEEND_CR))
-    , m_aTextFont(rFont)
+    , m_aTextFont(std::move(aFont))
     , m_aMapMode(MapUnit::MapPixel)
     , m_nLeft(0)
     , m_nTop(0)
@@ -82,7 +83,7 @@ drawinglayer::primitive2d::Primitive2DContainer ScOverlayHint::createOverlaySequ
     rtl::Reference<drawinglayer::primitive2d::TextSimplePortionPrimitive2D> pTitle =
         new drawinglayer::primitive2d::TextSimplePortionPrimitive2D(
                         aTextMatrix, m_aTitle, 0, m_aTitle.getLength(),
-                        std::vector<double>(), aFontAttr, css::lang::Locale(),
+                        std::vector<double>(), {}, std::move(aFontAttr), css::lang::Locale(),
                         rColor.getBColor());
 
     Point aTextStart(nLeft + aHintMargin.Width() + aIndent.Width(),
@@ -122,7 +123,7 @@ drawinglayer::primitive2d::Primitive2DContainer ScOverlayHint::createOverlaySequ
         rtl::Reference<drawinglayer::primitive2d::TextSimplePortionPrimitive2D> pMessage =
                                         new drawinglayer::primitive2d::TextSimplePortionPrimitive2D(
                                                 aTextMatrix, aLine, 0, aLine.getLength(),
-                                                std::vector<double>(), aFontAttr, css::lang::Locale(),
+                                                std::vector<double>(), {}, aFontAttr, css::lang::Locale(),
                                                 rColor.getBColor());
 
         rRange.expand(pMessage->getB2DRange(aDummy));
@@ -150,7 +151,7 @@ drawinglayer::primitive2d::Primitive2DContainer ScOverlayHint::createOverlaySequ
     basegfx::BColor aBorderColor(0.5, 0.5, 0.5);
     const drawinglayer::primitive2d::Primitive2DReference aBorder(
         new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(
-            aPoly, aBorderColor));
+            std::move(aPoly), aBorderColor));
 
     aSeq.insert(aSeq.begin(), aBorder);
     aSeq.insert(aSeq.begin(), aBg);

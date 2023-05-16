@@ -25,9 +25,11 @@
 #include <o3tl/typed_flags_set.hxx>
 
 #include <vcl/dllapi.h>
-#include <vcl/glyphitem.hxx>
+
+#include "glyphid.hxx"
 
 namespace vcl { class TrueTypeFont; } ///< SFT's idea of a TTF font
+class SvStream;
 
 enum class FontType {
     NO_FONT     = 0,
@@ -56,9 +58,9 @@ public:
     void        LoadFont( vcl::TrueTypeFont* pSftTrueTypeFont );
 
     bool        CreateFontSubset( FontType nOutFontTypeMask,
-                    FILE* pOutFile, const char* pOutFontName,
+                    SvStream* pOutFile, const char* pOutFontName,
                     const sal_GlyphId* pGlyphIds, const sal_uInt8* pEncodedIds,
-                    int nReqGlyphCount, sal_Int32* pOutGlyphWidths = nullptr );
+                    int nReqGlyphCount);
 
 public: // TODO: make subsetter results private and provide accessor methods instead
         // subsetter-provided subset details needed by e.g. Postscript or PDF
@@ -68,6 +70,7 @@ public: // TODO: make subsetter results private and provide accessor methods ins
     int                     m_nCapHeight;
     tools::Rectangle               m_aFontBBox;
     FontType                m_nFontType;        ///< font-type of subset result
+    bool                    m_bFilled;
 
 private:
     // input-font-specific details
@@ -78,16 +81,17 @@ private:
 
     // subset-request details
     FontType                mnReqFontTypeMask;  ///< allowed subset-target font types
-    FILE*                   mpOutFile;
+    SvStream*               mpOutFile;
     const char*             mpReqFontName;
     const sal_GlyphId*      mpReqGlyphIds;
     const sal_uInt8*        mpReqEncodedIds;
     int                     mnReqGlyphCount;
 
-    bool    CreateFontSubsetFromCff( sal_Int32* pOutGlyphWidths );
-    bool    CreateFontSubsetFromSfnt( sal_Int32* pOutGlyphWidths );
-    static bool CreateFontSubsetFromType1( const sal_Int32* pOutGlyphWidths );
+    bool    CreateFontSubsetFromCff();
+    bool    CreateFontSubsetFromSfnt();
 };
+
+int VCL_DLLPUBLIC TestFontSubset(const void* data, sal_uInt32 size);
 
 #endif // INCLUDED_VCL_INC_FONTSUBSET_HXX
 

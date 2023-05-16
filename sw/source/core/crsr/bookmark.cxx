@@ -30,6 +30,7 @@
 #include <sfx2/viewsh.hxx>
 #include <UndoBookmark.hxx>
 #include <unobookmark.hxx>
+#include <utility>
 #include <xmloff/odffields.hxx>
 #include <libxml/xmlwriter.h>
 #include <comphelper/random.hxx>
@@ -47,6 +48,7 @@
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
 #include <rtl/strbuf.hxx>
 #include <strings.hrc>
+#include <tools/json_writer.hxx>
 
 using namespace ::sw::mark;
 using namespace ::com::sun::star;
@@ -59,9 +61,9 @@ namespace sw::mark
     {
         SwPosition const& rStartPos(rMark.GetMarkStart());
         SwPosition const& rEndPos(rMark.GetMarkEnd());
-        SwNodes const& rNodes(rStartPos.nNode.GetNodes());
-        SwNodeOffset const nStartNode(rStartPos.nNode.GetIndex());
-        SwNodeOffset const nEndNode(rEndPos.nNode.GetIndex());
+        SwNodes const& rNodes(rStartPos.GetNodes());
+        SwNodeOffset const nStartNode(rStartPos.GetNodeIndex());
+        SwNodeOffset const nEndNode(rEndPos.GetNodeIndex());
         int nFields(0);
         std::optional<SwPosition> ret;
         for (SwNodeOffset n = nEndNode; nStartNode <= n; --n)
@@ -71,11 +73,11 @@ namespace sw::mark
             {
                 SwTextNode & rTextNode(*pNode->GetTextNode());
                 sal_Int32 const nStart(n == nStartNode
-                        ? rStartPos.nContent.GetIndex() + 1
+                        ? rStartPos.GetContentIndex() + 1
                         : 0);
                 sal_Int32 const nEnd(n == nEndNode
                         // subtract 1 to ignore the end char
-                        ? rEndPos.nContent.GetIndex() - 1
+                        ? rEndPos.GetContentIndex() - 1
                         : rTextNode.Len());
                 for (sal_Int32 i = nEnd; nStart < i; --i)
                 {
@@ -95,7 +97,7 @@ namespace sw::mark
                             if (nFields == 0)
                             {
                                 assert(!ret); // one per field
-                                ret = SwPosition(rTextNode, i - 1);
+                                ret.emplace(rTextNode, i - 1);
 #ifndef DBG_UTIL
                                 return *ret;
 #endif
@@ -112,7 +114,8 @@ namespace sw::mark
             }
             else
             {
-                assert(pNode->IsNoTextNode() || pNode->IsSectionNode());
+                assert(pNode->IsNoTextNode() || pNode->IsSectionNode()
+                    || (pNode->IsEndNode() && pNode->StartOfSectionNode()->IsSectionNode()));
             }
         }
         assert(ret); // must have found it
@@ -125,20 +128,20 @@ namespace
     void lcl_FixPosition(SwPosition& rPos)
     {
         // make sure the position has 1) the proper node, and 2) a proper index
-        SwTextNode* pTextNode = rPos.nNode.GetNode().GetTextNode();
-        if(pTextNode == nullptr && rPos.nContent.GetIndex() > 0)
+        SwTextNode* pTextNode = rPos.GetNode().GetTextNode();
+        if(pTextNode == nullptr && rPos.GetContentIndex() > 0)
         {
             SAL_INFO(
                 "sw.core",
-                "illegal position: " << rPos.nContent.GetIndex()
+                "illegal position: " << rPos.GetContentIndex()
                     << " without proper TextNode");
             rPos.nContent.Assign(nullptr, 0);
         }
-        else if(pTextNode != nullptr && rPos.nContent.GetIndex() > pTextNode->Len())
+        else if(pTextNode != nullptr && rPos.GetContentIndex() > pTextNode->Len())
         {
             SAL_INFO(
                 "sw.core",
-                "illegal position: " << rPos.nContent.GetIndex()
+                "illegal position: " << rPos.GetContentIndex()
                     << " is beyond " << pTextNode->Len());
             rPos.nContent.Assign(pTextNode, pTextNode->Len());
         }
@@ -151,16 +154,16 @@ namespace
         if (aEndMark != CH_TXT_ATR_FORMELEMENT)
         {
             SwPosition const& rStart(rField.GetMarkStart());
-            assert(rStart.nNode.GetNode().GetTextNode()->GetText()[rStart.nContent.GetIndex()] == aStartMark); (void) rStart; (void) aStartMark;
+            assert(rStart.GetNode().GetTextNode()->GetText()[rStart.GetContentIndex()] == aStartMark); (void) rStart; (void) aStartMark;
             SwPosition const sepPos(sw::mark::FindFieldSep(rField));
-            assert(sepPos.nNode.GetNode().GetTextNode()->GetText()[sepPos.nContent.GetIndex()] == CH_TXT_ATR_FIELDSEP); (void) sepPos;
+            assert(sepPos.GetNode().GetTextNode()->GetText()[sepPos.GetContentIndex()] == CH_TXT_ATR_FIELDSEP); (void) sepPos;
         }
         else
         {   // must be m_pPos1 < m_pPos2 because of asymmetric SplitNode update
-            assert(rField.GetMarkPos().nContent.GetIndex() + 1 == rField.GetOtherMarkPos().nContent.GetIndex());
+            assert(rField.GetMarkPos().GetContentIndex() + 1 == rField.GetOtherMarkPos().GetContentIndex());
         }
         SwPosition const& rEnd(rField.GetMarkEnd());
-        assert(rEnd.nNode.GetNode().GetTextNode()->GetText()[rEnd.nContent.GetIndex() - 1] == aEndMark); (void) rEnd;
+        assert(rEnd.GetNode().GetTextNode()->GetText()[rEnd.GetContentIndex() - 1] == aEndMark); (void) rEnd;
     }
 
     void lcl_SetFieldMarks(Fieldmark& rField,
@@ -184,7 +187,7 @@ namespace
         {
             SwPaM aStartPaM(start);
             io_rDoc.getIDocumentContentOperations().InsertString(aStartPaM, startChar);
-            start.nContent -= startChar.getLength(); // restore, it was moved by InsertString
+            start.AdjustContent( -startChar.getLength() ); // restore, it was moved by InsertString
             // do not manipulate via reference directly but call SetMarkStartPos
             // which works even if start and end pos were the same
             rField.SetMarkStartPos( start );
@@ -197,7 +200,7 @@ namespace
                 io_rDoc.getIDocumentContentOperations().InsertString(aStartPaM, OUString(CH_TXT_ATR_FIELDSEP));
                 if (!pSepPos || rEnd < *pSepPos)
                 {   // rEnd is not moved automatically if it's same as insert pos
-                    ++rEnd.nContent;
+                    rEnd.AdjustContent(1);
                 }
             }
             assert(pSepPos == nullptr || (start < *pSepPos && *pSepPos <= rEnd));
@@ -214,11 +217,11 @@ namespace
             io_rDoc.getIDocumentContentOperations().InsertString(aEndPaM, OUString(aEndMark));
             if (aEndMark != CH_TXT_ATR_FORMELEMENT)
             {
-                ++rEnd.nContent; // InsertString didn't move non-empty mark
+                rEnd.AdjustContent(1); // InsertString didn't move non-empty mark
             }
             else
             {   // InsertString moved the mark's end, not its start
-                assert(rField.GetMarkPos().nContent.GetIndex() + 1 == rField.GetOtherMarkPos().nContent.GetIndex());
+                assert(rField.GetMarkPos().GetContentIndex() + 1 == rField.GetOtherMarkPos().GetContentIndex());
             }
         }
         lcl_AssertFieldMarksSet(rField, aStartMark, aEndMark);
@@ -234,7 +237,7 @@ namespace
         io_rDoc.GetIDocumentUndoRedo().StartUndo(SwUndoId::UI_REPLACE, nullptr);
 
         const SwPosition& rStart = rField.GetMarkStart();
-        SwTextNode const*const pStartTextNode = rStart.nNode.GetNode().GetTextNode();
+        SwTextNode const*const pStartTextNode = rStart.GetNode().GetTextNode();
         assert(pStartTextNode);
         if (aEndMark != CH_TXT_ATR_FORMELEMENT)
         {
@@ -246,11 +249,11 @@ namespace
         }
 
         const SwPosition& rEnd = rField.GetMarkEnd();
-        SwTextNode *const pEndTextNode = rEnd.nNode.GetNode().GetTextNode();
+        SwTextNode *const pEndTextNode = rEnd.GetNode().GetTextNode();
         assert(pEndTextNode);
         const sal_Int32 nEndPos = (rEnd == rStart)
-                                   ? rEnd.nContent.GetIndex()
-                                   : rEnd.nContent.GetIndex() - 1;
+                                   ? rEnd.GetContentIndex()
+                                   : rEnd.GetContentIndex() - 1;
         assert(pEndTextNode->GetText()[nEndPos] == aEndMark);
         SwPosition const aEnd(*pEndTextNode, nEndPos);
         io_rDoc.GetDocumentContentOperationsManager().DeleteDummyChar(aEnd, aEndMark);
@@ -260,26 +263,29 @@ namespace
 
     auto InvalidatePosition(SwPosition const& rPos) -> void
     {
-        SwUpdateAttr const aHint(rPos.nContent.GetIndex(), rPos.nContent.GetIndex(), 0);
-        rPos.nNode.GetNode().GetTextNode()->CallSwClientNotify(sw::LegacyModifyHint(&aHint, &aHint));
+        SwUpdateAttr const aHint(rPos.GetContentIndex(), rPos.GetContentIndex(), 0);
+        rPos.GetNode().GetTextNode()->CallSwClientNotify(sw::LegacyModifyHint(&aHint, &aHint));
     }
 }
 
 namespace sw::mark
 {
     MarkBase::MarkBase(const SwPaM& aPaM,
-        const OUString& rName)
-        : m_pPos1(new SwPosition(*(aPaM.GetPoint())))
-        , m_aName(rName)
+        OUString aName)
+        : m_oPos1(*aPaM.GetPoint())
+        , m_aName(std::move(aName))
     {
-        m_pPos1->nContent.SetMark(this);
-        lcl_FixPosition(*m_pPos1);
+        m_oPos1->SetMark(this);
+        lcl_FixPosition(*m_oPos1);
         if (aPaM.HasMark() && (*aPaM.GetMark() != *aPaM.GetPoint()))
         {
             MarkBase::SetOtherMarkPos(*(aPaM.GetMark()));
-            lcl_FixPosition(*m_pPos2);
+            lcl_FixPosition(*m_oPos2);
         }
     }
+
+    void MarkBase::SetXBookmark(rtl::Reference<SwXBookmark> const& xBkmk)
+    { m_wXBookmark = xBkmk.get(); }
 
     // For fieldmarks, the CH_TXT_ATR_FIELDSTART and CH_TXT_ATR_FIELDEND
     // themselves are part of the covered range. This is guaranteed by
@@ -291,21 +297,21 @@ namespace sw::mark
 
     void MarkBase::SetMarkPos(const SwPosition& rNewPos)
     {
-        std::make_unique<SwPosition>(rNewPos).swap(m_pPos1);
-        m_pPos1->nContent.SetMark(this);
+        m_oPos1.emplace(rNewPos);
+        m_oPos1->SetMark(this);
     }
 
     void MarkBase::SetOtherMarkPos(const SwPosition& rNewPos)
     {
-        std::make_unique<SwPosition>(rNewPos).swap(m_pPos2);
-        m_pPos2->nContent.SetMark(this);
+        m_oPos2.emplace(rNewPos);
+        m_oPos2->SetMark(this);
     }
 
     OUString MarkBase::ToString( ) const
     {
         return "Mark: ( Name, [ Node1, Index1 ] ): ( " + m_aName + ", [ "
-            + OUString::number( sal_Int32(GetMarkPos().nNode.GetIndex()) )  + ", "
-            + OUString::number( GetMarkPos().nContent.GetIndex( ) ) + " ] )";
+            + OUString::number( sal_Int32(GetMarkPos().GetNodeIndex()) )  + ", "
+            + OUString::number( GetMarkPos().GetContentIndex( ) ) + " ] )";
     }
 
     void MarkBase::dumpAsXml(xmlTextWriterPtr pWriter) const
@@ -360,7 +366,7 @@ namespace sw::mark
         auto pLegacy = static_cast<const sw::LegacyModifyHint*>(&rHint);
         if(RES_REMOVE_UNO_OBJECT == pLegacy->GetWhich())
         {   // invalidate cached uno object
-            SetXBookmark(uno::Reference<text::XTextContent>(nullptr));
+            SetXBookmark(nullptr);
         }
     }
 
@@ -412,6 +418,27 @@ namespace sw::mark
         , m_bHidden(false)
     {
         m_aName = rName;
+    }
+
+    void Bookmark::sendLOKDeleteCallback()
+    {
+        if (!comphelper::LibreOfficeKit::isActive() || GetMarkPos().GetDoc().IsClipBoard())
+            return;
+
+        SfxViewShell* pViewShell = SfxViewShell::Current();
+        if (!pViewShell)
+            return;
+
+        OUString fieldCommand = GetName();
+        tools::JsonWriter aJson;
+        aJson.put("commandName", ".uno:DeleteBookmark");
+        aJson.put("success", true);
+        {
+            auto result = aJson.startNode("result");
+            aJson.put("DeleteBookmark", fieldCommand);
+        }
+
+        pViewShell->libreOfficeKitViewCallback(LOK_CALLBACK_UNO_COMMAND_RESULT, aJson.extractData());
     }
 
     void Bookmark::InitDoc(SwDoc& io_rDoc,
@@ -488,14 +515,14 @@ namespace sw::mark
     bool Bookmark::IsInContent() const
     {
         SwDoc& rDoc( GetMarkPos().GetDoc() );
-        return !rDoc.IsInHeaderFooter( GetMarkPos().nNode );
+        return !rDoc.IsInHeaderFooter( GetMarkPos().GetNode() );
     }
 
     uno::Reference< rdf::XMetadatable > Bookmark::MakeUnoObject()
     {
         SwDoc& rDoc( GetMarkPos().GetDoc() );
         const uno::Reference< rdf::XMetadatable> xMeta(
-                SwXBookmark::CreateXBookmark(rDoc, this), uno::UNO_QUERY);
+                SwXBookmark::CreateXBookmark(rDoc, this) );
         return xMeta;
     }
 
@@ -514,21 +541,13 @@ namespace sw::mark
             return SetOtherMarkPos( rNewStartPos );
     }
 
-    void Fieldmark::SetMarkEndPos( const SwPosition& rNewEndPos )
-    {
-        if ( GetMarkPos( ) <= GetOtherMarkPos( ) )
-            return SetOtherMarkPos( rNewEndPos );
-        else
-            return SetMarkPos( rNewEndPos );
-    }
-
     OUString Fieldmark::ToString( ) const
     {
         return "Fieldmark: ( Name, Type, [ Nd1, Id1 ], [ Nd2, Id2 ] ): ( " + m_aName + ", "
-            + m_aFieldname + ", [ " + OUString::number( sal_Int32(GetMarkPos().nNode.GetIndex( )) )
-            + ", " + OUString::number( GetMarkPos( ).nContent.GetIndex( ) ) + " ], ["
-            + OUString::number( sal_Int32(GetOtherMarkPos().nNode.GetIndex( )) ) + ", "
-            + OUString::number( GetOtherMarkPos( ).nContent.GetIndex( ) ) + " ] ) ";
+            + m_aFieldname + ", [ " + OUString::number( sal_Int32(GetMarkPos().GetNodeIndex( )) )
+            + ", " + OUString::number( GetMarkPos( ).GetContentIndex( ) ) + " ], ["
+            + OUString::number( sal_Int32(GetOtherMarkPos().GetNodeIndex( )) ) + ", "
+            + OUString::number( GetOtherMarkPos( ).GetContentIndex( ) ) + " ] ) ";
     }
 
     void Fieldmark::Invalidate( )
@@ -565,6 +584,28 @@ namespace sw::mark
             m_aName = rName;
     }
 
+    TextFieldmark::~TextFieldmark()
+    {
+        if (!comphelper::LibreOfficeKit::isActive() || GetMarkPos().GetDoc().IsClipBoard())
+            return;
+
+        SfxViewShell* pViewShell = SfxViewShell::Current();
+        if (!pViewShell)
+            return;
+
+        OUString fieldCommand;
+        (*GetParameters())[OUString(ODF_CODE_PARAM)] >>= fieldCommand;
+        tools::JsonWriter aJson;
+        aJson.put("commandName", ".uno:DeleteTextFormField");
+        aJson.put("success", true);
+        {
+            auto result = aJson.startNode("result");
+            aJson.put("DeleteTextFormField", fieldCommand);
+        }
+
+        pViewShell->libreOfficeKitViewCallback(LOK_CALLBACK_UNO_COMMAND_RESULT, aJson.extractData());
+    }
+
     void TextFieldmark::InitDoc(SwDoc& io_rDoc,
             sw::mark::InsertMode const eMode, SwPosition const*const pSepPos)
     {
@@ -595,10 +636,10 @@ namespace sw::mark
 
     OUString TextFieldmark::GetContent() const
     {
-        const SwTextNode& rTextNode = *GetMarkEnd().nNode.GetNode().GetTextNode();
+        const SwTextNode& rTextNode = *GetMarkEnd().GetNode().GetTextNode();
         SwPosition const sepPos(sw::mark::FindFieldSep(*this));
-        const sal_Int32 nStart(sepPos.nContent.GetIndex());
-        const sal_Int32 nEnd(GetMarkEnd().nContent.GetIndex());
+        const sal_Int32 nStart(sepPos.GetContentIndex());
+        const sal_Int32 nEnd(GetMarkEnd().GetContentIndex());
 
         OUString sContent;
         const sal_Int32 nLen = rTextNode.GetText().getLength();
@@ -614,19 +655,19 @@ namespace sw::mark
             return;
 
         SwPosition const sepPos(sw::mark::FindFieldSep(*this));
-        const sal_Int32 nStart(sepPos.nContent.GetIndex());
-        const sal_Int32 nEnd(GetMarkEnd().nContent.GetIndex());
+        const sal_Int32 nStart(sepPos.GetContentIndex());
+        const sal_Int32 nEnd(GetMarkEnd().GetContentIndex());
 
-        const sal_Int32 nLen = GetMarkEnd().nNode.GetNode().GetTextNode()->GetText().getLength();
+        const sal_Int32 nLen = GetMarkEnd().GetNode().GetTextNode()->GetText().getLength();
         if (nStart + 1 < nLen && nEnd <= nLen && nEnd > nStart + 2)
         {
-            SwPaM aFieldPam(GetMarkStart().nNode.GetNode(), nStart + 1,
-                            GetMarkStart().nNode.GetNode(), nEnd - 1);
+            SwPaM aFieldPam(GetMarkStart().GetNode(), nStart + 1,
+                            GetMarkStart().GetNode(), nEnd - 1);
             m_pDocumentContentOperationsManager->ReplaceRange(aFieldPam, sNewContent, false);
         }
         else
         {
-            SwPaM aFieldStartPam(GetMarkStart().nNode.GetNode(), nStart + 1);
+            SwPaM aFieldStartPam(GetMarkStart().GetNode(), nStart + 1);
             m_pDocumentContentOperationsManager->InsertString(aFieldStartPam, sNewContent);
         }
         Invalidate();
@@ -716,6 +757,15 @@ namespace sw::mark
     {
         if(m_pButton)
             m_pButton.disposeAndClear();
+    }
+
+    void FieldmarkWithDropDownButton::LaunchPopup()
+    {
+        if (!m_pButton)
+            return;
+
+        m_pButton->Invalidate();
+        m_pButton->LaunchPopup();
     }
 
     DropDownFieldmark::DropDownFieldmark(const SwPaM& rPaM, const OUString& rName)
@@ -816,7 +866,8 @@ namespace sw::mark
             aList.insert(aList.begin() + nNewPos, rText);
         else
         {
-            *pIndex = nLen;
+            if (pIndex)
+                *pIndex = nLen;
             aList.push_back(rText);
         }
 
@@ -1066,10 +1117,10 @@ namespace sw::mark
 
     OUString DateFieldmark::GetContent() const
     {
-        const SwTextNode* const pTextNode = GetMarkEnd().nNode.GetNode().GetTextNode();
+        const SwTextNode* const pTextNode = GetMarkEnd().GetNode().GetTextNode();
         SwPosition const sepPos(sw::mark::FindFieldSep(*this));
-        const sal_Int32 nStart(sepPos.nContent.GetIndex());
-        const sal_Int32 nEnd  (GetMarkEnd().nContent.GetIndex());
+        const sal_Int32 nStart(sepPos.GetContentIndex());
+        const sal_Int32 nEnd  (GetMarkEnd().GetContentIndex());
 
         OUString sContent;
         if(nStart + 1 < pTextNode->GetText().getLength() && nEnd <= pTextNode->GetText().getLength() &&
@@ -1083,21 +1134,21 @@ namespace sw::mark
         if(!m_pDocumentContentOperationsManager)
             return;
 
-        const SwTextNode* const pTextNode = GetMarkEnd().nNode.GetNode().GetTextNode();
+        const SwTextNode* const pTextNode = GetMarkEnd().GetNode().GetTextNode();
         SwPosition const sepPos(sw::mark::FindFieldSep(*this));
-        const sal_Int32 nStart(sepPos.nContent.GetIndex());
-        const sal_Int32 nEnd  (GetMarkEnd().nContent.GetIndex());
+        const sal_Int32 nStart(sepPos.GetContentIndex());
+        const sal_Int32 nEnd  (GetMarkEnd().GetContentIndex());
 
         if(nStart + 1 < pTextNode->GetText().getLength() && nEnd <= pTextNode->GetText().getLength() &&
            nEnd > nStart + 2)
         {
-            SwPaM aFieldPam(GetMarkStart().nNode, nStart + 1,
-                            GetMarkStart().nNode, nEnd - 1);
+            SwPaM aFieldPam(GetMarkStart().GetNode(), nStart + 1,
+                            GetMarkStart().GetNode(), nEnd - 1);
             m_pDocumentContentOperationsManager->ReplaceRange(aFieldPam, sNewContent, false);
         }
         else
         {
-            SwPaM aFieldStartPam(GetMarkStart().nNode, nStart + 1);
+            SwPaM aFieldStartPam(GetMarkStart().GetNode(), nStart + 1);
             m_pDocumentContentOperationsManager->InsertString(aFieldStartPam, sNewContent);
         }
 

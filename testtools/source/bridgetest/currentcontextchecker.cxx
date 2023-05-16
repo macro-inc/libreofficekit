@@ -24,13 +24,11 @@
 
 #include <com/sun/star/uno/Any.hxx>
 #include <com/sun/star/uno/Reference.hxx>
-#include <com/sun/star/uno/RuntimeException.hpp>
 #include <com/sun/star/uno/XCurrentContext.hpp>
 #include <cppu/unotype.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <osl/diagnose.h>
 #include <osl/diagnose.hxx>
-#include <rtl/string.h>
 #include <rtl/ustring.hxx>
 #include <sal/types.h>
 #include <test/testtools/bridgetest/XCurrentContextChecker.hpp>
@@ -58,7 +56,7 @@ CurrentContext::CurrentContext() {}
 
 css::uno::Any CurrentContext::getValueByName(OUString const & Name)
 {
-    return Name == KEY ? css::uno::makeAny(OUString(VALUE)) : css::uno::Any();
+    return Name == KEY ? css::uno::Any(OUString(VALUE)) : css::uno::Any();
 }
 
 }

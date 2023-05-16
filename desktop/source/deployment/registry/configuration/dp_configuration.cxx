@@ -26,10 +26,12 @@
 #if HAVE_FEATURE_EXTENSIONS
 #include <dp_persmap.h>
 #endif
+#include <dp_misc.h>
 #include <dp_ucb.h>
 #include <rtl/string.hxx>
 #include <rtl/strbuf.hxx>
 #include <rtl/ustrbuf.hxx>
+#include <rtl/xmlencode.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <ucbhelper/content.hxx>
@@ -37,6 +39,7 @@
 #include <xmlscript/xml_helper.hxx>
 #include <comphelper/lok.hxx>
 #include <svl/inettype.hxx>
+#include <o3tl/string_view.hxx>
 #include <com/sun/star/configuration/Update.hpp>
 #include <com/sun/star/lang/IllegalArgumentException.hpp>
 #include <com/sun/star/lang/WrappedTargetRuntimeException.hpp>
@@ -367,7 +370,7 @@ void BackendImpl::configmgrini_verify_init(
 {
     if (transientMode())
         return;
-    const ::osl::MutexGuard guard( getMutex() );
+    const ::osl::MutexGuard guard( m_aMutex );
     if ( m_configmgrini_inited)
         return;
 
@@ -379,12 +382,12 @@ void BackendImpl::configmgrini_verify_init(
             xCmdEnv, false /* no throw */ ))
     {
         OUString line;
-        if (readLine( &line, "SCHEMA=", ucb_content,
+        if (readLine( &line, u"SCHEMA=", ucb_content,
                       RTL_TEXTENCODING_UTF8 ))
         {
             sal_Int32 index = RTL_CONSTASCII_LENGTH("SCHEMA=");
             do {
-                OUString token( line.getToken( 0, ' ', index ).trim() );
+                OUString token( o3tl::trim(o3tl::getToken(line, 0, ' ', index )) );
                 if (!token.isEmpty()) {
                     //The  file may not exist anymore if a shared or bundled
                     //extension was removed, but it can still be in the configmgrini.
@@ -395,20 +398,20 @@ void BackendImpl::configmgrini_verify_init(
             }
             while (index >= 0);
         }
-        if (readLine( &line, "DATA=", ucb_content,
+        if (readLine( &line, u"DATA=", ucb_content,
                       RTL_TEXTENCODING_UTF8 )) {
             sal_Int32 index = RTL_CONSTASCII_LENGTH("DATA=");
             do {
-                OUString token( line.getToken( 0, ' ', index ).trim() );
-                if (!token.isEmpty())
+                std::u16string_view token( o3tl::trim(o3tl::getToken(line, 0, ' ', index )) );
+                if (!token.empty())
                 {
                     if (token[ 0 ] == '?')
-                        token = token.copy( 1 );
+                        token = token.substr( 1 );
                     //The  file may not exist anymore if a shared or bundled
                     //extension was removed, but it can still be in the configmgrini.
                     //After running XExtensionManager::synchronize, the configmgrini is
                     //cleaned up
-                    m_xcu_files.push_back( token );
+                    m_xcu_files.push_back( OUString(token) );
                 }
             }
             while (index >= 0);
@@ -478,7 +481,7 @@ void BackendImpl::addToConfigmgrIni( bool isSchema, bool isURL, OUString const &
                               Reference<XCommandEnvironment> const & xCmdEnv )
 {
     const OUString rcterm( isURL ? dp_misc::makeRcTerm(url_) : url_ );
-    const ::osl::MutexGuard guard( getMutex() );
+    const ::osl::MutexGuard guard( m_aMutex );
     configmgrini_verify_init( xCmdEnv );
     std::deque<OUString> & rSet = getFiles(isSchema);
     if (std::find( rSet.begin(), rSet.end(), rcterm ) == rSet.end()) {
@@ -495,7 +498,7 @@ bool BackendImpl::removeFromConfigmgrIni(
     Reference<XCommandEnvironment> const & xCmdEnv )
 {
     const OUString rcterm( dp_misc::makeRcTerm(url_) );
-    const ::osl::MutexGuard guard( getMutex() );
+    const ::osl::MutexGuard guard( m_aMutex );
     configmgrini_verify_init( xCmdEnv );
     std::deque<OUString> & rSet = getFiles(isSchema);
     auto i(std::find(rSet.begin(), rSet.end(), rcterm));
@@ -564,39 +567,6 @@ BackendImpl::PackageImpl::isRegistered_(
 }
 
 
-OUString encodeForXml( OUString const & text )
-{
-    // encode conforming xml:
-    sal_Int32 len = text.getLength();
-    OUStringBuffer buf;
-    for ( sal_Int32 pos = 0; pos < len; ++pos )
-    {
-        sal_Unicode c = text[ pos ];
-        switch (c) {
-        case '<':
-            buf.append( "&lt;" );
-            break;
-        case '>':
-            buf.append( "&gt;" );
-            break;
-        case '&':
-            buf.append( "&amp;" );
-            break;
-        case '\'':
-            buf.append( "&apos;" );
-            break;
-        case '\"':
-            buf.append( "&quot;" );
-            break;
-        default:
-            buf.append( c );
-            break;
-        }
-    }
-    return buf.makeStringAndClear();
-}
-
-
 OUString replaceOrigin(
     OUString const & url, std::u16string_view destFolder, Reference< XCommandEnvironment > const & xCmdEnv, Reference< XComponentContext > const & xContext, bool & out_replaced)
 {
@@ -649,7 +619,7 @@ OUString replaceOrigin(
             if (origin.isEmpty()) {
                 // encode only once
                 origin = OUStringToOString(
-                    encodeForXml( url.copy( 0, url.lastIndexOf( '/' ) ) ),
+                    rtl::encodeForXml( url.subView( 0, url.lastIndexOf( '/' ) ) ),
                     // xxx todo: encode always for UTF-8? => lookup doc-header?
                     RTL_TEXTENCODING_UTF8 );
             }

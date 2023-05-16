@@ -28,7 +28,6 @@
 #include <com/sun/star/datatransfer/clipboard/XFlushableClipboard.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <cppuhelper/supportsservice.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
 #include <vcl/ctrl.hxx>
 #include <vcl/svapp.hxx>
@@ -128,15 +127,15 @@ OUString VCLXAccessibleStatusBarItem::GetItemText()
 }
 
 
-void VCLXAccessibleStatusBarItem::FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet )
+void VCLXAccessibleStatusBarItem::FillAccessibleStateSet( sal_Int64& rStateSet )
 {
-    rStateSet.AddState( AccessibleStateType::ENABLED );
-    rStateSet.AddState( AccessibleStateType::SENSITIVE );
+    rStateSet |= AccessibleStateType::ENABLED;
+    rStateSet |= AccessibleStateType::SENSITIVE;
 
-    rStateSet.AddState( AccessibleStateType::VISIBLE );
+    rStateSet |= AccessibleStateType::VISIBLE;
 
     if ( IsShowing() )
-        rStateSet.AddState( AccessibleStateType::SHOWING );
+        rStateSet |= AccessibleStateType::SHOWING;
 }
 
 
@@ -236,7 +235,7 @@ Reference< XAccessibleContext > VCLXAccessibleStatusBarItem::getAccessibleContex
 // XAccessibleContext
 
 
-sal_Int32 VCLXAccessibleStatusBarItem::getAccessibleChildCount()
+sal_Int64 VCLXAccessibleStatusBarItem::getAccessibleChildCount()
 {
     OExternalLockGuard aGuard( this );
 
@@ -244,7 +243,7 @@ sal_Int32 VCLXAccessibleStatusBarItem::getAccessibleChildCount()
 }
 
 
-Reference< XAccessible > VCLXAccessibleStatusBarItem::getAccessibleChild( sal_Int32 )
+Reference< XAccessible > VCLXAccessibleStatusBarItem::getAccessibleChild( sal_Int64 )
 {
     throw IndexOutOfBoundsException();
 }
@@ -262,11 +261,11 @@ Reference< XAccessible > VCLXAccessibleStatusBarItem::getAccessibleParent(  )
 }
 
 
-sal_Int32 VCLXAccessibleStatusBarItem::getAccessibleIndexInParent(  )
+sal_Int64 VCLXAccessibleStatusBarItem::getAccessibleIndexInParent(  )
 {
     OExternalLockGuard aGuard( this );
 
-    sal_Int32 nIndexInParent = -1;
+    sal_Int64 nIndexInParent = -1;
     if ( m_pStatusBar )
         nIndexInParent = m_pStatusBar->GetItemPos( m_nItemId );
 
@@ -310,22 +309,22 @@ Reference< XAccessibleRelationSet > VCLXAccessibleStatusBarItem::getAccessibleRe
 }
 
 
-Reference< XAccessibleStateSet > VCLXAccessibleStatusBarItem::getAccessibleStateSet(  )
+sal_Int64 VCLXAccessibleStatusBarItem::getAccessibleStateSet(  )
 {
     OExternalLockGuard aGuard( this );
 
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSetHelper = new utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if ( !rBHelper.bDisposed && !rBHelper.bInDispose )
     {
-        FillAccessibleStateSet( *pStateSetHelper );
+        FillAccessibleStateSet( nStateSet );
     }
     else
     {
-        pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+        nStateSet |= AccessibleStateType::DEFUNC;
     }
 
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 

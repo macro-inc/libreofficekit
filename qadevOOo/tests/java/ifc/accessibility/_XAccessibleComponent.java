@@ -232,8 +232,8 @@ public class _XAccessibleComponent extends MultiMethodTest {
                                              children[i]);
 
             boolean MightBeCovered = false;
-            boolean isShowing = xAc.getAccessibleStateSet()
-                                   .contains(com.sun.star.accessibility.AccessibleStateType.SHOWING);
+            boolean isShowing = (xAc.getAccessibleStateSet() &
+                                    com.sun.star.accessibility.AccessibleStateType.SHOWING) != 0;
             log.println("\tStateType containsPoint SHOWING: " +
                         isShowing);
 
@@ -265,7 +265,7 @@ public class _XAccessibleComponent extends MultiMethodTest {
                                                  chBnd.Y + curY));
 
 
-            Point p = new Point(chBnd.X + curX,chBnd.X + curX);
+            Point p = new Point(chBnd.X + curX,chBnd.Y + curY);
 
             if (isCovered(p)) {
                 log.println(
@@ -292,7 +292,7 @@ public class _XAccessibleComponent extends MultiMethodTest {
                             "," + (chBnd.Y + curY) + ") - OK");
 
                 boolean res = false;
-                int expIndex;
+                long expIndex;
                 String expName;
                 String expDesc;
 
@@ -314,7 +314,7 @@ public class _XAccessibleComponent extends MultiMethodTest {
                 }
 
                 if (!res) {
-                    int gotIndex = xAcc.getAccessibleContext()
+                    long gotIndex = xAcc.getAccessibleContext()
                                        .getAccessibleIndexInParent();
 
                     if (expIndex < gotIndex) {
@@ -337,6 +337,9 @@ public class _XAccessibleComponent extends MultiMethodTest {
                         if (MightBeCovered) {
                             log.println("... Child is covered by another - OK");
                         } else {
+                            log.println(
+                                "(xAccCh==null: " + (xAccCh == null) + "; expIndex: " + expIndex
+                                + "; gotIndex: " + gotIndex + ")");
                             log.println("... FAILED");
                             result = false;
                         }
@@ -485,7 +488,7 @@ public class _XAccessibleComponent extends MultiMethodTest {
         }
 
         XAccessibleContext xAccCon = xAcc.getAccessibleContext();
-        int cnt = xAccCon.getAccessibleChildCount();
+        long cnt = xAccCon.getAccessibleChildCount();
 
         // for cases when too many children exist checking only first 50
         if (cnt > 50) {
@@ -494,7 +497,7 @@ public class _XAccessibleComponent extends MultiMethodTest {
 
         ArrayList<XAccessibleComponent> childComp = new ArrayList<XAccessibleComponent>();
 
-        for (int i = 0; i < cnt; i++) {
+        for (long i = 0; i < cnt; i++) {
             try {
                 XAccessible child = xAccCon.getAccessibleChild(i);
                 XAccessibleContext xAccConCh = child.getAccessibleContext();

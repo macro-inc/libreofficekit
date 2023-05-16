@@ -9,9 +9,7 @@
 
 #pragma once
 
-#include <test/bootstrapfixture.hxx>
-#include <test/xmltesttools.hxx>
-#include <unotest/macros_test.hxx>
+#include <test/unoapixml_test.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertysequence.hxx>
 
@@ -111,15 +109,15 @@ OUString findChartFile(const OUString& rDir, uno::Reference< container::XNameAcc
 
 }
 
-class ChartTest : public test::BootstrapFixture, public unotest::MacrosTest, public XmlTestTools
+class ChartTest : public UnoApiXmlTest
 {
 public:
-    ChartTest():mbSkipValidation(false) {}
-    void load( std::u16string_view rDir, const OUString& rFileName );
-    std::shared_ptr<utl::TempFile> save( const OUString& rFileName );
-    std::shared_ptr<utl::TempFile> reload( const OUString& rFileName );
+    ChartTest(OUString path)
+        : UnoApiXmlTest(path)
+    {
+    }
+
     uno::Sequence < OUString > getImpressChartColumnDescriptions( std::u16string_view pDir, const char* pName );
-    OUString getFileExtension( const OUString& rFileName );
 
     uno::Reference< chart::XChartDocument > getChartDocFromImpress( std::u16string_view pDir, const char* pName );
 
@@ -130,13 +128,7 @@ public:
     awt::Size getPageSize( const Reference< chart2::XChartDocument > & xChartDoc );
     awt::Size getSize(css::uno::Reference<chart2::XDiagram> xDiagram, const awt::Size& rPageSize);
 
-    virtual void setUp() override;
-    virtual void tearDown() override;
-
 protected:
-    Reference< lang::XComponent > mxComponent;
-    OUString maServiceName;
-    bool mbSkipValidation; // if you set this flag for a new test I'm going to haunt you!
 
     /**
      * Given that some problem doesn't affect the result in the importer, we
@@ -147,90 +139,7 @@ protected:
     xmlDocUniquePtr parseExport(const OUString& rDir, const OUString& rFilterFormat);
 };
 
-OUString ChartTest::getFileExtension( const OUString& aFileName )
-{
-    sal_Int32 nDotLocation = aFileName.lastIndexOf('.');
-    CPPUNIT_ASSERT(nDotLocation != -1);
-    return aFileName.copy(nDotLocation+1); // Skip the dot.
-}
-
-void ChartTest::load( std::u16string_view aDir, const OUString& aName )
-{
-    OUString extension = getFileExtension(aName);
-    if (extension == "ods" || extension == "xlsx" || extension == "fods")
-    {
-        maServiceName = "com.sun.star.sheet.SpreadsheetDocument";
-    }
-    else if (extension == "docx")
-    {
-        maServiceName = "com.sun.star.text.TextDocument";
-    }
-    else if (extension == "odg")
-    {
-        maServiceName = "com.sun.star.drawing.DrawingDocument";
-    }
-    if (mxComponent.is())
-        mxComponent->dispose();
-    mxComponent = loadFromDesktop(m_directories.getURLFromSrc(aDir) + aName, maServiceName);
-}
-
-std::shared_ptr<utl::TempFile> ChartTest::save(const OUString& rFilterName)
-{
-    uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-    auto aArgs(::comphelper::InitPropertySequence({
-        { "FilterName", Any(rFilterName) }
-    }));
-    std::shared_ptr<utl::TempFile> pTempFile = std::make_shared<utl::TempFile>();
-    pTempFile->EnableKillingFile();
-    xStorable->storeToURL(pTempFile->GetURL(), aArgs);
-
-    return pTempFile;
-}
-
-std::shared_ptr<utl::TempFile> ChartTest::reload(const OUString& rFilterName)
-{
-    std::shared_ptr<utl::TempFile> pTempFile = save(rFilterName);
-    mxComponent->dispose();
-    mxComponent = loadFromDesktop(pTempFile->GetURL(), maServiceName);
-    std::cout << pTempFile->GetURL();
-    if(rFilterName == "Calc Office Open XML")
-    {
-        validate(pTempFile->GetFileName(), test::OOXML);
-    }
-    else if(rFilterName == "Office Open XML Text")
-    {
-        // validate(pTempFile->GetFileName(), test::OOXML);
-    }
-    else if(rFilterName == "calc8")
-    {
-        if(!mbSkipValidation)
-            validate(pTempFile->GetFileName(), test::ODF);
-    }
-    else if(rFilterName == "MS Excel 97")
-    {
-        if(!mbSkipValidation)
-            validate(pTempFile->GetFileName(), test::MSBINARY);
-    }
-    return pTempFile;
-}
-
-void ChartTest::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set( css::frame::Desktop::create( comphelper::getComponentContext(getMultiServiceFactory()) ) );
-}
-
-void ChartTest::tearDown()
-{
-    if(mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
-
-}
-
-Reference< lang::XComponent > getChartCompFromSheet( sal_Int32 nSheet, uno::Reference< lang::XComponent > const & xComponent )
+Reference< lang::XComponent > getChartCompFromSheet( sal_Int32 nSheet, sal_Int32 nChart, uno::Reference< lang::XComponent > const & xComponent )
 {
     // let us assume that we only have one chart per sheet
 
@@ -244,7 +153,7 @@ Reference< lang::XComponent > getChartCompFromSheet( sal_Int32 nSheet, uno::Refe
     CPPUNIT_ASSERT(xCharts.is());
 
     uno::Reference< container::XIndexAccess > xIACharts(xCharts, UNO_QUERY_THROW);
-    uno::Reference< table::XTableChart > xChart( xIACharts->getByIndex(0), UNO_QUERY_THROW);
+    uno::Reference< table::XTableChart > xChart( xIACharts->getByIndex(nChart), UNO_QUERY_THROW);
 
     uno::Reference< document::XEmbeddedObjectSupplier > xEmbObjectSupplier(xChart, UNO_QUERY_THROW);
 
@@ -256,7 +165,7 @@ Reference< lang::XComponent > getChartCompFromSheet( sal_Int32 nSheet, uno::Refe
 
 Reference< chart2::XChartDocument > getChartDocFromSheet( sal_Int32 nSheet, uno::Reference< lang::XComponent > const & xComponent )
 {
-    uno::Reference< chart2::XChartDocument > xChartDoc ( getChartCompFromSheet(nSheet, xComponent), UNO_QUERY_THROW );
+    uno::Reference< chart2::XChartDocument > xChartDoc ( getChartCompFromSheet(nSheet, 0, xComponent), UNO_QUERY_THROW );
 
     // Update the chart view, so that its draw page is updated and ready for the test
     css::uno::Reference<css::frame::XModel> xModel(xChartDoc, css::uno::UNO_QUERY_THROW);
@@ -723,10 +632,10 @@ getShapeByName(const uno::Reference<drawing::XShapes>& rShapes, const OUString& 
 
 xmlDocUniquePtr ChartTest::parseExport(const OUString& rDir, const OUString& rFilterFormat)
 {
-    std::shared_ptr<utl::TempFile> pTempFile = save(rFilterFormat);
+    save(rFilterFormat);
 
     // Read the XML stream we're interested in.
-    uno::Reference<packages::zip::XZipFileAccess2> xNameAccess = packages::zip::ZipFileAccess::createWithURL(comphelper::getComponentContext(m_xSFactory), pTempFile->GetURL());
+    uno::Reference<packages::zip::XZipFileAccess2> xNameAccess = packages::zip::ZipFileAccess::createWithURL(comphelper::getComponentContext(m_xSFactory), maTempFile.GetURL());
     uno::Reference<io::XInputStream> xInputStream(xNameAccess->getByName(findChartFile(rDir, xNameAccess)), uno::UNO_QUERY);
     CPPUNIT_ASSERT(xInputStream.is());
     std::unique_ptr<SvStream> pStream(utl::UcbStreamHelper::CreateStream(xInputStream, true));

@@ -22,6 +22,14 @@ $(eval $(call gb_ExternalProject_use_externals,libmspub,\
 	zlib \
 ))
 
+libmspub_CPPFLAGS := $(CPPFLAGS) $(ICU_UCHAR_TYPE) $(BOOST_CPPFLAGS)
+# Needed when workdir/UnpackedTarball/libmspub/src/lib/MSPUBCollector.cpp includes Boost 1.79.0
+# boost/multi_array.hpp, which indirectly includes
+# workdir/UnpackedTarball/boost/boost/functional.hpp using std::unary_/binary_function:
+ifeq ($(HAVE_LIBCPP),TRUE)
+libmspub_CPPFLAGS += -D_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION
+endif
+
 $(call gb_ExternalProject_get_state_target,libmspub,build) :
 	$(call gb_Trace_StartRange,libmspub,EXTERNAL)
 	$(call gb_ExternalProject_run,build,\
@@ -36,9 +44,10 @@ $(call gb_ExternalProject_get_state_target,libmspub,build) :
 			--disable-werror \
 			--disable-weffc \
 			$(if $(verbose),--disable-silent-rules,--enable-silent-rules) \
-			CXXFLAGS="$(gb_CXXFLAGS) $(if $(ENABLE_OPTIMIZED),$(gb_COMPILEROPTFLAGS),$(gb_COMPILERNOOPTFLAGS))" \
-			CPPFLAGS="$(CPPFLAGS) $(ICU_UCHAR_TYPE) $(BOOST_CPPFLAGS)" \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
+			CXXFLAGS="$(gb_CXXFLAGS) $(call gb_ExternalProject_get_build_flags,libmspub)" \
+			CPPFLAGS="$(libmspub_CPPFLAGS)" \
+			LDFLAGS="$(call gb_ExternalProject_get_link_flags,libmspub)" \
+			$(gb_CONFIGURE_PLATFORMS) \
 		&& $(MAKE) \
 	)
 	$(call gb_Trace_EndRange,libmspub,EXTERNAL)

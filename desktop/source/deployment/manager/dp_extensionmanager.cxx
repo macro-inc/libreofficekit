@@ -41,9 +41,11 @@
 #include <com/sun/star/io/XInputStream.hpp>
 #include <com/sun/star/util/XModifyBroadcaster.hpp>
 #include <comphelper/sequence.hxx>
+#include <utility>
 #include <xmlscript/xml_helper.hxx>
 #include <osl/diagnose.h>
 #include <dp_interact.h>
+#include <dp_misc.h>
 #include <dp_ucb.h>
 #include <dp_identifier.hxx>
 #include <dp_descriptioninfoset.hxx>
@@ -124,9 +126,9 @@ class ExtensionRemoveGuard
 public:
     ExtensionRemoveGuard(){};
     ExtensionRemoveGuard(
-        css::uno::Reference<css::deployment::XPackage> const & extension,
-        css::uno::Reference<css::deployment::XPackageManager> const & xPackageManager):
-        m_extension(extension), m_xPackageManager(xPackageManager) {}
+        css::uno::Reference<css::deployment::XPackage> extension,
+        css::uno::Reference<css::deployment::XPackageManager> xPackageManager):
+        m_extension(std::move(extension)), m_xPackageManager(std::move(xPackageManager)) {}
     ~ExtensionRemoveGuard();
 
     void set(css::uno::Reference<css::deployment::XPackage> const & extension,
@@ -156,7 +158,7 @@ namespace dp_manager {
 
 //ToDo: bundled extension
 ExtensionManager::ExtensionManager( Reference< uno::XComponentContext > const& xContext) :
-    ::cppu::WeakComponentImplHelper< css::deployment::XExtensionManager, css::lang::XServiceInfo >(getMutex())
+    ::cppu::WeakComponentImplHelper< css::deployment::XExtensionManager, css::lang::XServiceInfo >(m_aMutex)
     , m_xContext(xContext)
 {
     m_xPackageManagerFactory = css::deployment::thePackageManagerFactory::get(m_xContext);
@@ -294,7 +296,7 @@ std::vector<Reference<css::deployment::XPackage> >
     std::vector<Reference<css::deployment::XPackage> > extensionList;
     Reference<css::deployment::XPackageManager> lRepos[] = {
           getUserRepository(), getSharedRepository(), getBundledRepository() };
-    for (int i(0); i != SAL_N_ELEMENTS(lRepos); ++i)
+    for (std::size_t i(0); i != std::size(lRepos); ++i)
     {
         Reference<css::deployment::XPackage> xPackage;
         try
@@ -669,7 +671,7 @@ Reference<css::deployment::XPackage> ExtensionManager::addExtension(
         // http://qa.openoffice.org/issues/show_bug.cgi?id=114933
         // By not providing xCmdEnv the underlying APIs will throw an exception if
         // the XInteractionRequest cannot be handled.
-        ::osl::MutexGuard guard(getMutex());
+        ::osl::MutexGuard guard(m_aMutex);
 
         if (bCanInstall)
         {
@@ -826,7 +828,7 @@ void ExtensionManager::removeExtension(
     Reference<css::deployment::XPackage> xExtensionBackup;
     Reference<css::deployment::XPackageManager> xPackageManager;
     bool bUserDisabled = false;
-    ::osl::MutexGuard guard(getMutex());
+    ::osl::MutexGuard guard(m_aMutex);
     try
     {
 //Determine the repository to use
@@ -916,7 +918,7 @@ void ExtensionManager::enableExtension(
     Reference<task::XAbortChannel> const & xAbortChannel,
     Reference<ucb::XCommandEnvironment> const & xCmdEnv)
 {
-    ::osl::MutexGuard guard(getMutex());
+    ::osl::MutexGuard guard(m_aMutex);
     bool bUserDisabled = false;
     uno::Any excOccurred;
     try
@@ -978,7 +980,7 @@ sal_Int32 ExtensionManager::checkPrerequisitesAndEnable(
     {
         if (!extension.is())
             return 0;
-        ::osl::MutexGuard guard(getMutex());
+        ::osl::MutexGuard guard(m_aMutex);
         sal_Int32 ret = 0;
         Reference<css::deployment::XPackageManager> mgr =
             getPackageManager(extension->getRepositoryName());
@@ -1018,7 +1020,7 @@ void ExtensionManager::disableExtension(
     Reference<task::XAbortChannel> const & xAbortChannel,
     Reference<ucb::XCommandEnvironment> const & xCmdEnv )
 {
-    ::osl::MutexGuard guard(getMutex());
+    ::osl::MutexGuard guard(m_aMutex);
     uno::Any excOccurred;
     bool bUserDisabled = false;
     try
@@ -1187,7 +1189,7 @@ void ExtensionManager::reinstallDeployedExtensions(
             }
         }
 
-        ::osl::MutexGuard guard(getMutex());
+        ::osl::MutexGuard guard(m_aMutex);
         xPackageManager->reinstallDeployedPackages(
             force, xAbortChannel, xCmdEnv);
         //We must sync here, otherwise we will get exceptions when extensions
@@ -1235,7 +1237,7 @@ sal_Bool ExtensionManager::synchronize(
 {
     try
     {
-        ::osl::MutexGuard guard(getMutex());
+        ::osl::MutexGuard guard(m_aMutex);
         OUString sSynchronizingShared(StrSyncRepository());
         sSynchronizingShared = sSynchronizingShared.replaceAll("%NAME", "shared");
         dp_misc::ProgressLevel progressShared(xCmdEnv, sSynchronizingShared);
@@ -1369,7 +1371,7 @@ ExtensionManager::getExtensionsWithUnacceptedLicenses(
 {
     Reference<css::deployment::XPackageManager>
         xPackageManager = getPackageManager(repository);
-    ::osl::MutexGuard guard(getMutex());
+    ::osl::MutexGuard guard(m_aMutex);
     return xPackageManager->getExtensionsWithUnacceptedLicenses(xCmdEnv);
 }
 
@@ -1398,7 +1400,7 @@ void ExtensionManager::removeModifyListener(
 
 void ExtensionManager::check()
 {
-    ::osl::MutexGuard guard( getMutex() );
+    ::osl::MutexGuard guard( m_aMutex );
     if (rBHelper.bInDispose || rBHelper.bDisposed) {
         throw lang::DisposedException(
             "ExtensionManager instance has already been disposed!",

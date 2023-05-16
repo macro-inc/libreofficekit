@@ -28,6 +28,7 @@
 #include <ucbhelper/content.hxx>
 #include <rtl/ustring.hxx>
 #include <tools/datetime.hxx>
+#include <utility>
 
 namespace svt
 {
@@ -132,8 +133,8 @@ namespace svt
 
         FolderDescriptor() { }
 
-        explicit FolderDescriptor( const OUString& _rURL )
-            :sURL( _rURL )
+        explicit FolderDescriptor( OUString _aURL )
+            :sURL(std::move( _aURL ))
         {
         }
     };
@@ -172,7 +173,7 @@ namespace svt
 
         css::uno::Sequence< OUString > m_rDenyList;
 
-        bool URLOnDenyList ( const OUString& sRealURL );
+        bool URLOnDenyList ( std::u16string_view sRealURL );
 
     public:
         /** constructs an enumerator instance

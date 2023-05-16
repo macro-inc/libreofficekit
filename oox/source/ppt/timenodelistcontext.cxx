@@ -21,7 +21,7 @@
 
 #include <rtl/math.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/animations/AnimationTransformType.hpp>
 #include <com/sun/star/animations/AnimationCalcMode.hpp>
@@ -38,6 +38,8 @@
 #include <oox/ppt/slidetransition.hxx>
 #include <oox/token/namespaces.hxx>
 #include <oox/token/tokens.hxx>
+#include <o3tl/string_view.hxx>
+#include <utility>
 
 #include "animvariantcontext.hxx"
 #include "commonbehaviorcontext.hxx"
@@ -59,13 +61,13 @@ using ::com::sun::star::beans::NamedValue;
 
 namespace {
 
-    oox::ppt::AnimationAttributeEnum getAttributeEnumByAPIName(const OUString &rAPIName)
+    oox::ppt::AnimationAttributeEnum getAttributeEnumByAPIName(std::u16string_view rAPIName)
     {
         oox::ppt::AnimationAttributeEnum eResult = oox::ppt::AnimationAttributeEnum::UNKNOWN;
         const oox::ppt::ImplAttributeNameConversion *attrConv = oox::ppt::getAttributeConversionList();
         while(attrConv->mpAPIName != nullptr)
         {
-            if(rAPIName.equalsAscii(attrConv->mpAPIName))
+            if(o3tl::equalsAscii(rAPIName, attrConv->mpAPIName))
             {
                 eResult = attrConv->meAttribute;
                 break;
@@ -82,7 +84,7 @@ namespace {
         aAny >>= aNameList;
 
         // only get first token.
-        return oox::ppt::convertAnimationValue(getAttributeEnumByAPIName(aNameList.getToken(0, ';')), rAny);
+        return oox::ppt::convertAnimationValue(getAttributeEnumByAPIName(o3tl::getToken(aNameList, 0, ';')), rAny);
     }
 
     css::uno::Any convertPointPercent(const css::awt::Point& rPoint)
@@ -91,7 +93,7 @@ namespace {
         // rPoint.X and rPoint.Y are in 1000th of a percent, but we only need ratio.
         aPair.First <<= static_cast<double>(rPoint.X) / 100000.0;
         aPair.Second <<= static_cast<double>(rPoint.Y) / 100000.0;
-        return makeAny(aPair);
+        return Any(aPair);
     }
 }
 
@@ -304,7 +306,7 @@ namespace oox::ppt {
                         }
                         else if (msCommand.startsWith("playFrom"))
                         {
-                            const OUString aMediaTime( msCommand.copy( 9, msCommand.getLength() - 10 ) );
+                            std::u16string_view aMediaTime( msCommand.subView( 9, msCommand.getLength() - 10 ) );
                             rtl_math_ConversionStatus eStatus;
                             double fMediaTime = ::rtl::math::stringToDouble( aMediaTime, u'.', u',', &eStatus );
                             if( eStatus == rtl_math_ConversionStatus_Ok )
@@ -458,9 +460,9 @@ namespace oox::ppt {
                 rProps[ NP_COLORINTERPOLATION ] <<= mnColorSpace == XML_hsl ? AnimationColorSpace::HSL : AnimationColorSpace::RGB;
                 const GraphicHelper& rGraphicHelper = getFilter().getGraphicHelper();
                 if( maToClr.isUsed() )
-                    mpNode->setTo( makeAny( maToClr.getColor( rGraphicHelper ) ) );
+                    mpNode->setTo( Any( maToClr.getColor( rGraphicHelper ) ) );
                 if( maFromClr.isUsed() )
-                    mpNode->setFrom( makeAny( maFromClr.getColor( rGraphicHelper ) ) );
+                    mpNode->setFrom( Any( maFromClr.getColor( rGraphicHelper ) ) );
                 if( mbHasByColor )
                     mpNode->setBy( m_byColor.get() );
             }
@@ -650,7 +652,7 @@ namespace oox::ppt {
     public:
         AnimScaleContext( FragmentHandler2 const & rParent, sal_Int32  aElement,
                             const Reference< XFastAttributeList >& xAttribs,
-                            const TimeNodePtr & pNode ) noexcept
+                            const TimeNodePtr & pNode )
             : TimeNodeContext( rParent, aElement, pNode )
                 , mbZoomContents( false )
             {
@@ -740,17 +742,17 @@ namespace oox::ppt {
                 if(attribs.hasAttribute( XML_by ) )
                 {
                     double fBy = attribs.getDouble( XML_by, 0.0 ) / PER_DEGREE; //1 PowerPoint-angle-unit = 1/60000 degree
-                    pNode->setBy( makeAny( fBy ) );
+                    pNode->setBy( Any( fBy ) );
                 }
                 if(attribs.hasAttribute( XML_from ) )
                 {
                     double fFrom = attribs.getDouble( XML_from, 0.0 ) / PER_DEGREE;
-                    pNode->setFrom( makeAny( fFrom ) );
+                    pNode->setFrom( Any( fFrom ) );
                 }
                 if(attribs.hasAttribute( XML_to ) )
                 {
                     double fTo = attribs.getDouble( XML_to, 0.0 ) / PER_DEGREE;
-                    pNode->setTo( makeAny( fTo ) );
+                    pNode->setTo( Any( fTo ) );
                 }
             }
 
@@ -959,10 +961,10 @@ namespace oox::ppt {
     }
 
     TimeNodeContext::TimeNodeContext( FragmentHandler2 const & rParent, sal_Int32 aElement,
-            const TimeNodePtr & pNode ) noexcept
+            TimeNodePtr pNode ) noexcept
         : FragmentHandler2( rParent )
         , mnElement( aElement )
-        , mpNode( pNode )
+        , mpNode(std::move( pNode ))
     {
     }
 

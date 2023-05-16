@@ -19,8 +19,6 @@
 
 #include "lokinteractionhandler.hxx"
 
-#include <boost/property_tree/json_parser.hpp>
-
 #include <comphelper/processfactory.hxx>
 #include <cppuhelper/supportsservice.hxx>
 
@@ -47,6 +45,7 @@
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
 #include <sfx2/lokhelper.hxx>
 #include <sfx2/viewsh.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <tools/json_writer.hxx>
@@ -54,12 +53,12 @@
 using namespace com::sun::star;
 
 LOKInteractionHandler::LOKInteractionHandler(
-        const OString& rCommand,
+        OString command,
         desktop::LibLibreOffice_Impl *const pLOKit,
         desktop::LibLODocument_Impl *const pLOKDocument)
     : m_pLOKit(pLOKit)
     , m_pLOKDocument(pLOKDocument)
-    , m_command(rCommand)
+    , m_command(std::move(command))
     , m_usePassword(false)
 {
     assert(m_pLOKit);

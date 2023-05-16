@@ -22,13 +22,14 @@
 #include <osl/mutex.hxx>
 #include <sal/log.hxx>
 #include <comphelper/flagguard.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/long.hxx>
 #include <libxml/xmlwriter.h>
 #include <boost/property_tree/json_parser.hpp>
 #include <unotools/datetime.hxx>
 
 #include <memory>
+#include <utility>
 #include <vector>
 #include <limits.h>
 #include <algorithm>
@@ -218,10 +219,10 @@ namespace svl::undo::impl
         {
         }
 
-        NotifyUndoListener( UndoListenerStringMethod i_notificationMethod, const OUString& i_actionComment )
+        NotifyUndoListener( UndoListenerStringMethod i_notificationMethod, OUString i_actionComment )
             :m_notificationMethod( nullptr )
             ,m_altNotificationMethod( i_notificationMethod )
-            ,m_sActionComment( i_actionComment )
+            ,m_sActionComment(std::move( i_actionComment ))
         {
         }
 
@@ -262,14 +263,15 @@ namespace svl::undo::impl
 
         ~UndoManagerGuard();
 
-        void clear()
+        struct ResetGuard {
+            ResetGuard(osl::ResettableMutexGuard& r) : rGuard(r) {}
+            ~ResetGuard() { rGuard.reset(); }
+            osl::ResettableMutexGuard& rGuard;
+        };
+        ResetGuard clear()
         {
             m_aGuard.clear();
-        }
-
-        void reset()
-        {
-            m_aGuard.reset();
+            return ResetGuard(m_aGuard);
         }
 
         void cancelNotifications()
@@ -705,17 +707,14 @@ bool SfxUndoManager::ImplUndo( SfxUndoContext* i_contextOrNull )
     {
         // clear the guard/mutex before calling into the SfxUndoAction - this can be an extension-implemented UNO component
         // nowadays ...
-        aGuard.clear();
+        auto aResetGuard(aGuard.clear());
         if ( i_contextOrNull != nullptr )
             pAction->UndoWithContext( *i_contextOrNull );
         else
             pAction->Undo();
-        aGuard.reset();
     }
     catch( ... )
     {
-        aGuard.reset();
-
         // in theory, somebody might have tampered with all of *m_xData while the mutex was unlocked. So, see if
         // we still find pAction in our current Undo array
         size_t nCurAction = 0;
@@ -817,17 +816,14 @@ bool SfxUndoManager::ImplRedo( SfxUndoContext* i_contextOrNull )
     {
         // clear the guard/mutex before calling into the SfxUndoAction - this can be an extension-implemented UNO component
         // nowadays ...
-        aGuard.clear();
+        auto aResetGuard(aGuard.clear());
         if ( i_contextOrNull != nullptr )
             pAction->RedoWithContext( *i_contextOrNull );
         else
             pAction->Redo();
-        aGuard.reset();
     }
     catch( ... )
     {
-        aGuard.reset();
-
         // in theory, somebody might have tampered with all of *m_xData while the mutex was unlocked. So, see if
         // we still find pAction in our current Undo array
         size_t nCurAction = 0;
@@ -874,10 +870,9 @@ bool SfxUndoManager::Repeat( SfxRepeatTarget &rTarget )
     if ( !m_xData->pActUndoArray->maUndoActions.empty() )
     {
         SfxUndoAction* pAction = m_xData->pActUndoArray->maUndoActions.back().pAction.get();
-        aGuard.clear();
+        auto aResetGuard(aGuard.clear());
         if ( pAction->CanRepeat( rTarget ) )
             pAction->Repeat( rTarget );
-        aGuard.reset(); // allow clearing in guard dtor
         return true;
     }
 
@@ -1274,8 +1269,8 @@ struct SfxListUndoAction::Impl
     OUString maComment;
     OUString maRepeatComment;
 
-    Impl( sal_uInt16 nId, ViewShellId nViewShellId, const OUString& rComment, const OUString& rRepeatComment ) :
-        mnId(nId), mnViewShellId(nViewShellId), maComment(rComment), maRepeatComment(rRepeatComment) {}
+    Impl( sal_uInt16 nId, ViewShellId nViewShellId, OUString aComment, OUString aRepeatComment ) :
+        mnId(nId), mnViewShellId(nViewShellId), maComment(std::move(aComment)), maRepeatComment(std::move(aRepeatComment)) {}
 };
 
 sal_uInt16 SfxListUndoAction::GetId() const

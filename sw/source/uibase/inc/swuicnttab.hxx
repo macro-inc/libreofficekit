@@ -117,15 +117,15 @@ public:
 
 class SwTOXSelectTabPage final : public SfxTabPage
 {
-    std::unique_ptr<IndexEntryResource> pIndexRes;
+    std::unique_ptr<IndexEntryResource> m_pIndexRes;
 
-    OUString        aStyleArr[MAXLEVEL];
-    OUString        sAutoMarkURL;
-    OUString        sAutoMarkType;
-    OUString        sAddStyleUser;
-    OUString        sAddStyleContent;
+    OUString        m_aStyleArr[MAXLEVEL];
+    OUString        m_sAutoMarkURL;
+    OUString        m_sAutoMarkType;
+    OUString        m_sAddStyleUser;
+    OUString        m_sAddStyleContent;
 
-    std::unique_ptr<const IndexEntrySupplierWrapper> pIndexEntryWrapper;
+    std::unique_ptr<const IndexEntrySupplierWrapper> m_pIndexEntryWrapper;
 
     bool            m_bWaitingInitialSettings;
 
@@ -304,15 +304,15 @@ private:
 
 class SwTOXEntryTabPage final : public SfxTabPage
 {
-    OUString        sDelimStr;
-    OUString        sLevelStr;
-    OUString        sAuthTypeStr;
+    OUString        m_sDelimStr;
+    OUString        m_sLevelStr;
+    OUString        m_sAuthTypeStr;
 
-    OUString        sNoCharStyle;
+    OUString        m_sNoCharStyle;
     SwForm*         m_pCurrentForm;
 
-    CurTOXType      aLastTOXType;
-    bool            bInLevelHdl;
+    CurTOXType      m_aLastTOXType;
+    bool            m_bInLevelHdl;
 
     std::unique_ptr<weld::Label> m_xTypeFT;
     std::unique_ptr<weld::Label> m_xLevelFT;
@@ -352,14 +352,14 @@ class SwTOXEntryTabPage final : public SfxTabPage
     std::unique_ptr<weld::RadioButton> m_xSortContentRB;
     std::unique_ptr<weld::Widget> m_xSortKeyFrame;
     std::unique_ptr<weld::ComboBox> m_xFirstKeyLB;
-    std::unique_ptr<weld::RadioButton> m_xFirstSortUpRB;
-    std::unique_ptr<weld::RadioButton> m_xFirstSortDownRB;
+    std::unique_ptr<weld::ToggleButton> m_xFirstSortUpRB;
+    std::unique_ptr<weld::ToggleButton> m_xFirstSortDownRB;
     std::unique_ptr<weld::ComboBox> m_xSecondKeyLB;
-    std::unique_ptr<weld::RadioButton> m_xSecondSortUpRB;
-    std::unique_ptr<weld::RadioButton> m_xSecondSortDownRB;
+    std::unique_ptr<weld::ToggleButton> m_xSecondSortUpRB;
+    std::unique_ptr<weld::ToggleButton> m_xSecondSortDownRB;
     std::unique_ptr<weld::ComboBox> m_xThirdKeyLB;
-    std::unique_ptr<weld::RadioButton> m_xThirdSortUpRB;
-    std::unique_ptr<weld::RadioButton> m_xThirdSortDownRB;
+    std::unique_ptr<weld::ToggleButton> m_xThirdSortUpRB;
+    std::unique_ptr<weld::ToggleButton> m_xThirdSortDownRB;
     std::unique_ptr<SwTokenWindow> m_xTokenWIN;
 
     DECL_LINK(StyleSelectHdl, weld::ComboBox&, void);
@@ -375,6 +375,7 @@ class SwTOXEntryTabPage final : public SfxTabPage
     DECL_LINK(ChapterInfoHdl, weld::ComboBox&, void);
     DECL_LINK(ChapterInfoOutlineHdl, weld::SpinButton&, void);
     DECL_LINK(NumberFormatHdl, weld::ComboBox&, void);
+    DECL_LINK(ToggleHdl, weld::Toggleable&, void);
 
     DECL_LINK(AllLevelsHdl, weld::Button&, void);
 

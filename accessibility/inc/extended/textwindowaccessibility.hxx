@@ -24,6 +24,7 @@
 #include <vcl/textdata.hxx>
 #include <vcl/texteng.hxx>
 #include <vcl/textview.hxx>
+#include <vcl/window.hxx>
 #include <com/sun/star/uno/Reference.hxx>
 #include <com/sun/star/accessibility/AccessibleScrollType.hpp>
 #include <com/sun/star/accessibility/XAccessible.hpp>
@@ -131,7 +132,7 @@ class Paragraph final:
     private cppu::BaseMutex, public ParagraphBase, private ::comphelper::OCommonAccessibleText
 {
 public:
-    Paragraph(::rtl::Reference< Document > const & rDocument,
+    Paragraph(::rtl::Reference< Document > xDocument,
                   Paragraphs::size_type nNumber);
 
     // Not thread-safe.
@@ -159,15 +160,15 @@ private:
     virtual css::uno::Reference< css::accessibility::XAccessibleContext >
     SAL_CALL getAccessibleContext() override;
 
-    virtual ::sal_Int32 SAL_CALL getAccessibleChildCount() override;
+    virtual sal_Int64 SAL_CALL getAccessibleChildCount() override;
 
     virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL
-    getAccessibleChild(::sal_Int32 i) override;
+    getAccessibleChild(sal_Int64 i) override;
 
     virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL
     getAccessibleParent() override;
 
-    virtual ::sal_Int32 SAL_CALL getAccessibleIndexInParent() override;
+    virtual sal_Int64 SAL_CALL getAccessibleIndexInParent() override;
 
     virtual ::sal_Int16 SAL_CALL getAccessibleRole() override;
 
@@ -179,9 +180,7 @@ private:
     css::uno::Reference< css::accessibility::XAccessibleRelationSet >
     SAL_CALL getAccessibleRelationSet() override;
 
-    virtual
-    css::uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL
-    getAccessibleStateSet() override;
+    virtual sal_Int64 SAL_CALL getAccessibleStateSet() override;
 
     virtual css::lang::Locale SAL_CALL getLocale() override;
 
@@ -468,17 +467,17 @@ public:
     retrieveParagraphRelationSet( Paragraph const * pParagraph );
 
 private:
-    virtual ::sal_Int32 SAL_CALL getAccessibleChildCount() override;
+    virtual sal_Int64 SAL_CALL getAccessibleChildCount() override;
 
     virtual css::uno::Reference< css::accessibility::XAccessible >
-    SAL_CALL getAccessibleChild(::sal_Int32 i) override;
+    SAL_CALL getAccessibleChild(sal_Int64 i) override;
 
     virtual ::sal_Int16 SAL_CALL getAccessibleRole() override;
 
     virtual css::uno::Reference< css::accessibility::XAccessible >
     SAL_CALL getAccessibleAtPoint(css::awt::Point const & rPoint) override;
 
-    virtual void FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet ) override;
+    virtual void FillAccessibleStateSet( sal_Int64& rStateSet ) override;
     virtual void FillAccessibleRelationSet( utl::AccessibleRelationSetHelper& rRelationSet ) override;
 
     // ??? Will be called with both the external (Solar) and internal mutex

@@ -19,6 +19,7 @@
 
 #include <extended/AccessibleGridControlBase.hxx>
 #include <toolkit/helper/convert.hxx>
+#include <utility>
 #include <vcl/accessibletable.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/window.hxx>
@@ -47,15 +48,13 @@ using namespace com::sun::star::accessibility::AccessibleStateType;
 
 
 AccessibleGridControlBase::AccessibleGridControlBase(
-        const css::uno::Reference< css::accessibility::XAccessible >& rxParent,
+        css::uno::Reference< css::accessibility::XAccessible > xParent,
         ::vcl::table::IAccessibleTable& rTable,
         ::vcl::table::AccessibleTableControlObjType      eObjType ) :
     AccessibleGridControlImplHelper( m_aMutex ),
-    m_xParent( rxParent ),
+    m_xParent(std::move( xParent )),
     m_aTable( rTable),
     m_eObjType( eObjType ),
-    m_aName( rTable.GetAccessibleObjectName( eObjType, 0, 0 ) ),
-    m_aDescription( rTable.GetAccessibleObjectDescription( eObjType ) ),
     m_aClientId(0)
 {
 }
@@ -95,14 +94,14 @@ css::uno::Reference< css::accessibility::XAccessible > SAL_CALL AccessibleGridCo
     return m_xParent;
 }
 
-sal_Int32 SAL_CALL AccessibleGridControlBase::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL AccessibleGridControlBase::getAccessibleIndexInParent()
 {
     SolarMutexGuard g;
 
     ensureIsAlive();
 
     // -1 for child not found/no parent (according to specification)
-    sal_Int32 nRet = -1;
+    sal_Int64 nRet = -1;
 
     css::uno::Reference< uno::XInterface > xMeMyselfAndI( static_cast< css::accessibility::XAccessibleContext* >( this ), uno::UNO_QUERY );
 
@@ -115,8 +114,8 @@ sal_Int32 SAL_CALL AccessibleGridControlBase::getAccessibleIndexInParent()
         {
             css::uno::Reference< uno::XInterface > xChild;
 
-            sal_Int32 nChildCount = xParentContext->getAccessibleChildCount();
-            for( sal_Int32 nChild = 0; nChild < nChildCount; ++nChild )
+            sal_Int64 nChildCount = xParentContext->getAccessibleChildCount();
+            for( sal_Int64 nChild = 0; nChild < nChildCount; ++nChild )
             {
                 xChild.set(xParentContext->getAccessibleChild( nChild ), css::uno::UNO_QUERY);
                 if ( xMeMyselfAndI.get() == xChild.get() )
@@ -135,7 +134,7 @@ OUString SAL_CALL AccessibleGridControlBase::getAccessibleDescription()
     SolarMutexGuard g;
 
     ensureIsAlive();
-    return m_aDescription;
+    return m_aTable.GetAccessibleObjectDescription(m_eObjType);
 }
 
 OUString SAL_CALL AccessibleGridControlBase::getAccessibleName()
@@ -143,7 +142,7 @@ OUString SAL_CALL AccessibleGridControlBase::getAccessibleName()
     SolarMutexGuard g;
 
     ensureIsAlive();
-    return m_aName;
+    return m_aTable.GetAccessibleObjectName(m_eObjType, 0, 0);
 }
 
 css::uno::Reference< css::accessibility::XAccessibleRelationSet > SAL_CALL
@@ -156,13 +155,13 @@ AccessibleGridControlBase::getAccessibleRelationSet()
    return new utl::AccessibleRelationSetHelper;
 }
 
-css::uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL
+sal_Int64 SAL_CALL
 AccessibleGridControlBase::getAccessibleStateSet()
 {
     SolarMutexGuard aSolarGuard;
 
     // don't check whether alive -> StateSet may contain DEFUNC
-    return implCreateStateSetHelper();
+    return implCreateStateSet();
 }
 
 lang::Locale SAL_CALL AccessibleGridControlBase::getLocale()
@@ -279,22 +278,21 @@ bool AccessibleGridControlBase::implIsShowing()
     return bShowing;
 }
 
-rtl::Reference<::utl::AccessibleStateSetHelper> AccessibleGridControlBase::implCreateStateSetHelper()
+sal_Int64 AccessibleGridControlBase::implCreateStateSet()
 {
-    rtl::Reference<::utl::AccessibleStateSetHelper>
-        pStateSetHelper = new ::utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if( isAlive() )
     {
         // SHOWING done with m_xParent
         if( implIsShowing() )
-            pStateSetHelper->AddState( AccessibleStateType::SHOWING );
+            nStateSet |= AccessibleStateType::SHOWING;
         // GridControl fills StateSet with states depending on object type
-        m_aTable.FillAccessibleStateSet( *pStateSetHelper, getType() );
+        m_aTable.FillAccessibleStateSet( nStateSet, getType() );
     }
     else
-        pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
-    return pStateSetHelper;
+        nStateSet |= AccessibleStateType::DEFUNC;
+    return nStateSet;
 }
 
 // internal helper methods

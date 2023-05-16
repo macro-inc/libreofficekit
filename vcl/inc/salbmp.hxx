@@ -27,6 +27,13 @@
 #include <vcl/BitmapBuffer.hxx>
 #include <vcl/bitmap/BitmapTypes.hxx>
 #include <com/sun/star/rendering/XBitmapCanvas.hpp>
+#include <basegfx/utils/systemdependentdata.hxx>
+
+#if defined MACOSX || defined IOS
+#include <premac.h>
+#include <CoreGraphics/CoreGraphics.h>
+#include <postmac.h>
+#endif
 
 struct BitmapBuffer;
 class Color;
@@ -97,23 +104,37 @@ public:
         return false;
     }
 
-    void GetChecksum(BitmapChecksum& rChecksum) const
+#if defined MACOSX || defined IOS
+    // Related: tdf#146842 Eliminate temporary copies of SkiaSalBitmap when
+    // printing
+    // Commit 9eb732a32023e74c44ac8c3b5af9f5424273bb6c fixed crashing when
+    // printing SkiaSalBitmaps to a non-Skia SalGraphics. However, the fix
+    // almost always makes two copies of the SkiaSalBitmap's bitmap data: the
+    // first copy is made in SkiaSalBitmap::AcquireBuffer() and then
+    // QuartzSalBitmap makes a copy of the first copy.
+    // By making QuartzSalBitmap's methods that return a CGImageRef virtual,
+    // a non-Skia SalGraphics can now create a CGImageRef directly from a
+    // SkiaSalBitmap's Skia bitmap data without copying to any intermediate
+    // buffers.
+    // Note: these methods are not pure virtual as the SvpSalBitmap class
+    // extends this class directly.
+    virtual CGImageRef      CreateWithMask( const SalBitmap&, int, int, int, int ) const { return nullptr; }
+    virtual CGImageRef      CreateColorMask( int, int, int, int, Color ) const { return nullptr; }
+    virtual CGImageRef      CreateCroppedImage( int, int, int, int ) const { return nullptr; }
+#endif
+
+    BitmapChecksum GetChecksum() const
     {
         updateChecksum();
         if (!mbChecksumValid)
-            rChecksum = 0; // back-compat
-        else
-            rChecksum = mnChecksum;
+            return 0; // back-compat
+        return mnChecksum;
     }
 
     void InvalidateChecksum()
     {
         mbChecksumValid = false;
     }
-
-protected:
-    BitmapChecksum mnChecksum;
-    bool           mbChecksumValid;
 
 protected:
     void updateChecksum() const;
@@ -128,6 +149,44 @@ protected:
     static std::unique_ptr< sal_uInt8[] > convertDataBitCount( const sal_uInt8* src,
         int width, int height, int bitCount, int bytesPerRow, const BitmapPalette& palette,
         BitConvert type );
+
+public:
+    // access to SystemDependentDataHolder, to support overload in derived class(es)
+    virtual const basegfx::SystemDependentDataHolder* accessSystemDependentDataHolder() const;
+
+    // exclusive management op's for SystemDependentData at SalBitmap
+    template<class T>
+    std::shared_ptr<T> getSystemDependentData() const
+    {
+        const basegfx::SystemDependentDataHolder* pDataHolder(accessSystemDependentDataHolder());
+        if(pDataHolder)
+            return std::static_pointer_cast<T>(pDataHolder->getSystemDependentData(typeid(T).hash_code()));
+        return std::shared_ptr<T>();
+    }
+
+    template<class T, class... Args>
+    std::shared_ptr<T> addOrReplaceSystemDependentData(Args&&... args) const
+    {
+        const basegfx::SystemDependentDataHolder* pDataHolder(accessSystemDependentDataHolder());
+        if(!pDataHolder)
+            return std::shared_ptr<T>();
+
+        std::shared_ptr<T> r = std::make_shared<T>(std::forward<Args>(args)...);
+
+        // tdf#129845 only add to buffer if a relevant buffer time is estimated
+        if(r->calculateCombinedHoldCyclesInSeconds() > 0)
+        {
+            basegfx::SystemDependentData_SharedPtr r2(r);
+            const_cast< basegfx::SystemDependentDataHolder* >(pDataHolder)->addOrReplaceSystemDependentData(r2);
+        }
+
+        return r;
+    }
+
+private:
+    BitmapChecksum mnChecksum;
+    bool           mbChecksumValid;
+
 };
 
 #endif

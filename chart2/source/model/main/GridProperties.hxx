@@ -22,11 +22,9 @@
 #include <comphelper/uno3.hxx>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/util/XCloneable.hpp>
-#include <com/sun/star/util/XModifyBroadcaster.hpp>
-#include <com/sun/star/util/XModifyListener.hpp>
+#include <ModifyListenerHelper.hxx>
 
 #include <OPropertySet.hxx>
-#include <MutexContainer.hxx>
 
 namespace chart
 {
@@ -42,7 +40,6 @@ typedef ::cppu::WeakImplHelper<
 }
 
 class GridProperties final :
-        public MutexContainer,
         public impl::GridProperties_Base,
         public ::property::OPropertySet
 {
@@ -64,7 +61,7 @@ private:
     explicit GridProperties( const GridProperties & rOther );
 
     // ____ OPropertySet ____
-    virtual css::uno::Any GetDefaultValue( sal_Int32 nHandle ) const override;
+    virtual void GetDefaultValue( sal_Int32 nHandle, css::uno::Any& rAny ) const override;
 
     virtual ::cppu::IPropertyArrayHelper & SAL_CALL getInfoHelper() override;
 
@@ -93,7 +90,7 @@ private:
     virtual void firePropertyChangeEvent() override;
     using OPropertySet::disposing;
 
-    css::uno::Reference< css::util::XModifyListener > m_xModifyEventForwarder;
+    rtl::Reference<ModifyEventForwarder> m_xModifyEventForwarder;
 };
 
 } //  namespace chart

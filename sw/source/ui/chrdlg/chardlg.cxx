@@ -47,6 +47,7 @@
 #include <SwStyleNameMapper.hxx>
 #include <sfx2/filedlghelper.hxx>
 #include <sfx2/frame.hxx>
+#include <comphelper/lok.hxx>
 
 #include <svx/svxdlg.hxx>
 #include <svx/flagsdef.hxx>
@@ -137,7 +138,7 @@ void SwCharDlg::PageCreated(const OString& rId, SfxTabPage &rPage)
 
 SwCharURLPage::SwCharURLPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rCoreSet)
     : SfxTabPage(pPage, pController, "modules/swriter/ui/charurlpage.ui", "CharURLPage", &rCoreSet)
-    , bModified(false)
+    , m_bModified(false)
     , m_xURLED(m_xBuilder->weld_entry("urled"))
     , m_xTextFT(m_xBuilder->weld_label("textft"))
     , m_xTextED(m_xBuilder->weld_entry("texted"))
@@ -154,23 +155,30 @@ SwCharURLPage::SwCharURLPage(weld::Container* pPage, weld::DialogController* pCo
     m_xVisitedLB->set_size_request(nMaxWidth , -1);
     m_xNotVisitedLB->set_size_request(nMaxWidth , -1);
 
-    const SfxPoolItem* pItem;
-    SfxObjectShell* pShell;
-    if(SfxItemState::SET == rCoreSet.GetItemState(SID_HTML_MODE, false, &pItem) ||
-        ( nullptr != ( pShell = SfxObjectShell::Current()) &&
-                    nullptr != (pItem = pShell->GetItem(SID_HTML_MODE))))
+    const SfxUInt16Item* pItem = rCoreSet.GetItemIfSet(SID_HTML_MODE, false);
+    if (!pItem)
     {
-        sal_uInt16 nHtmlMode = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        if (SfxObjectShell* pShell = SfxObjectShell::Current())
+            pItem = pShell->GetItem(SID_HTML_MODE);
+    }
+    if (pItem)
+    {
+        sal_uInt16 nHtmlMode = pItem->GetValue();
         if (HTMLMODE_ON & nHtmlMode)
             m_xCharStyleContainer->hide();
     }
 
-    m_xURLPB->connect_clicked(LINK( this, SwCharURLPage, InsertFileHdl));
+    if(comphelper::LibreOfficeKit::isActive())
+        m_xURLPB->hide(); // Hide browse button in online (not supported yet)
+    else
+        m_xURLPB->connect_clicked(LINK( this, SwCharURLPage, InsertFileHdl));
     m_xEventPB->connect_clicked(LINK( this, SwCharURLPage, EventHdl));
 
-    SwView *pView = ::GetActiveView();
-    ::FillCharStyleListBox(*m_xVisitedLB, pView->GetDocShell());
-    ::FillCharStyleListBox(*m_xNotVisitedLB, pView->GetDocShell());
+    if (SwView* pView = GetActiveView())
+    {
+        ::FillCharStyleListBox(*m_xVisitedLB, pView->GetDocShell());
+        ::FillCharStyleListBox(*m_xNotVisitedLB, pView->GetDocShell());
+    }
     m_xVisitedLB->set_active_id(OUString::number(RES_POOLCHR_INET_VISIT));
     m_xVisitedLB->save_value();
     m_xNotVisitedLB->set_active_id(OUString::number(RES_POOLCHR_INET_NORMAL));
@@ -190,15 +198,12 @@ SwCharURLPage::SwCharURLPage(weld::Container* pPage, weld::DialogController* pCo
 
 SwCharURLPage::~SwCharURLPage()
 {
-    pINetItem.reset();
 }
 
 void SwCharURLPage::Reset(const SfxItemSet* rSet)
 {
-    const SfxPoolItem* pItem;
-    if (SfxItemState::SET == rSet->GetItemState(RES_TXTATR_INETFMT, false, &pItem))
+    if (const SwFormatINetFormat* pINetFormat = rSet->GetItemIfSet(RES_TXTATR_INETFMT, false))
     {
-        const SwFormatINetFormat* pINetFormat = static_cast<const SwFormatINetFormat*>( pItem);
         m_xURLED->set_text(INetURLObject::decode(pINetFormat->GetValue(),
             INetURLObject::DecodeMechanism::Unambiguous));
         m_xURLED->save_value();
@@ -225,14 +230,14 @@ void SwCharURLPage::Reset(const SfxItemSet* rSet)
         m_xVisitedLB->save_value();
         m_xNotVisitedLB->save_value();
         m_xTargetFrameLB->save_value();
-        pINetItem.reset( new SvxMacroItem(FN_INET_FIELD_MACRO) );
+        m_oINetMacroTable.emplace();
 
         if( pINetFormat->GetMacroTable() )
-            pINetItem->SetMacroTable(*pINetFormat->GetMacroTable());
+            m_oINetMacroTable = *pINetFormat->GetMacroTable();
     }
-    if (SfxItemState::SET == rSet->GetItemState(FN_PARAM_SELECTION, false, &pItem))
+    if (const SfxStringItem* pItem = rSet->GetItemIfSet(FN_PARAM_SELECTION, false))
     {
-        m_xTextED->set_text(static_cast<const SfxStringItem*>(pItem)->GetValue());
+        m_xTextED->set_text(pItem->GetValue());
         m_xTextFT->set_sensitive(false);
         m_xTextED->set_sensitive(false);
     }
@@ -254,7 +259,7 @@ bool SwCharURLPage::FillItemSet(SfxItemSet* rSet)
     bool bURLModified = m_xURLED->get_value_changed_from_saved();
     bool bNameModified = m_xNameED->get_value_changed_from_saved();
     bool bTargetModified = m_xTargetFrameLB->get_value_changed_from_saved();
-    bModified = bURLModified || bNameModified || bTargetModified;
+    m_bModified = bURLModified || bNameModified || bTargetModified;
 
     // set valid settings first
     OUString sEntry = m_xVisitedLB->get_active_text();
@@ -265,23 +270,23 @@ bool SwCharURLPage::FillItemSet(SfxItemSet* rSet)
     nId = SwStyleNameMapper::GetPoolIdFromUIName( sEntry, SwGetPoolIdFromName::ChrFmt);
     aINetFormat.SetINetFormatAndId( sEntry, nId );
 
-    if (pINetItem && !pINetItem->GetMacroTable().empty())
-        aINetFormat.SetMacroTable(&pINetItem->GetMacroTable());
+    if (m_oINetMacroTable && !m_oINetMacroTable->empty())
+        aINetFormat.SetMacroTable(&*m_oINetMacroTable);
 
     if (m_xVisitedLB->get_value_changed_from_saved())
-        bModified = true;
+        m_bModified = true;
 
     if (m_xNotVisitedLB->get_value_changed_from_saved())
-        bModified = true;
+        m_bModified = true;
 
     if (bNameModified)
     {
-        bModified = true;
+        m_bModified = true;
         rSet->Put(SfxStringItem(FN_PARAM_SELECTION, m_xTextED->get_text()));
     }
-    if(bModified)
+    if(m_bModified)
         rSet->Put(aINetFormat);
-    return bModified;
+    return m_bModified;
 }
 
 std::unique_ptr<SfxTabPage> SwCharURLPage::Create(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet* rAttrSet)
@@ -303,8 +308,9 @@ IMPL_LINK_NOARG(SwCharURLPage, InsertFileHdl, weld::Button&, void)
 
 IMPL_LINK_NOARG(SwCharURLPage, EventHdl, weld::Button&, void)
 {
-    bModified |= SwMacroAssignDlg::INetFormatDlg(GetFrameWeld(),
-                    ::GetActiveView()->GetWrtShell(), pINetItem);
+    if (SwView* pView = GetActiveView())
+        m_bModified |= SwMacroAssignDlg::INetFormatDlg(GetFrameWeld(),
+                        pView->GetWrtShell(), m_oINetMacroTable);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

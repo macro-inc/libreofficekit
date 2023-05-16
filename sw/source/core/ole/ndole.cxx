@@ -31,6 +31,7 @@
 #include <tools/globname.hxx>
 #include <sfx2/linkmgr.hxx>
 #include <unotools/configitem.hxx>
+#include <utility>
 #include <vcl/outdev.hxx>
 #include <fmtanchr.hxx>
 #include <frmfmt.hxx>
@@ -69,8 +70,7 @@ class SwOLELRUCache
     : private utl::ConfigItem
 {
 private:
-    typedef std::deque<SwOLEObj *> OleObjects_t;
-    OleObjects_t m_OleObjects;
+    std::deque<SwOLEObj *> m_OleObjects;
     sal_Int32 m_nLRU_InitSize;
     static uno::Sequence< OUString > GetPropertyNames();
 
@@ -150,6 +150,8 @@ void SAL_CALL SwOLEListener_Impl::disposing( const lang::EventObject& )
 // TODO/LATER: actually SwEmbedObjectLink should be used here, but because different objects are used to control
 //             embedded object different link objects with the same functionality had to be implemented
 
+namespace {
+
 class SwEmbedObjectLink : public sfx2::SvBaseLink
 {
     SwOLENode* m_pOleNode;
@@ -212,7 +214,45 @@ void SwEmbedObjectLink::Closed()
     SvBaseLink::Closed();
 }
 
-SwOLENode::SwOLENode( const SwNodeIndex &rWhere,
+class SwIFrameLink : public sfx2::SvBaseLink
+{
+    SwOLENode* m_pOleNode;
+
+public:
+    explicit SwIFrameLink(SwOLENode* pNode)
+        : ::sfx2::SvBaseLink(::SfxLinkUpdateMode::ONCALL, SotClipboardFormatId::SVXB)
+        , m_pOleNode(pNode)
+    {
+        SetSynchron( false );
+    }
+
+    ::sfx2::SvBaseLink::UpdateResult DataChanged(
+        const OUString&, const uno::Any& )
+    {
+        uno::Reference<embed::XEmbeddedObject> xObject = m_pOleNode->GetOLEObj().GetOleRef();
+        uno::Reference<embed::XCommonEmbedPersist> xPersObj(xObject, uno::UNO_QUERY);
+        if (xPersObj.is())
+        {
+            // let the IFrameObject reload the link
+            try
+            {
+                xPersObj->reload(uno::Sequence<beans::PropertyValue>(), uno::Sequence<beans::PropertyValue>());
+            }
+            catch (const uno::Exception&)
+            {
+            }
+
+            m_pOleNode->SetChanged();
+        }
+
+        return SUCCESS;
+    }
+
+};
+
+}
+
+SwOLENode::SwOLENode( SwNode& rWhere,
                     const svt::EmbeddedObjectRef& xObj,
                     SwGrfFormatColl *pGrfColl,
                     SwAttrSet const * pAutoAttr ) :
@@ -224,7 +264,7 @@ SwOLENode::SwOLENode( const SwNodeIndex &rWhere,
     maOLEObj.SetNode( this );
 }
 
-SwOLENode::SwOLENode( const SwNodeIndex &rWhere,
+SwOLENode::SwOLENode( SwNode& rWhere,
                     const OUString &rString,
                     sal_Int64 nAspect,
                     SwGrfFormatColl *pGrfColl,
@@ -378,7 +418,7 @@ bool SwOLENode::SavePersistentData()
     return true;
 }
 
-SwOLENode * SwNodes::MakeOLENode( const SwNodeIndex & rWhere,
+SwOLENode * SwNodes::MakeOLENode( SwNode& rWhere,
                     const svt::EmbeddedObjectRef& xObj,
                                     SwGrfFormatColl* pGrfColl )
 {
@@ -400,7 +440,7 @@ SwOLENode * SwNodes::MakeOLENode( const SwNodeIndex & rWhere,
     return pNode;
 }
 
-SwOLENode * SwNodes::MakeOLENode( const SwNodeIndex & rWhere,
+SwOLENode * SwNodes::MakeOLENode( SwNode& rWhere,
     const OUString &rName, sal_Int64 nAspect, SwGrfFormatColl* pGrfColl, SwAttrSet const * pAutoAttr )
 {
     OSL_ENSURE( pGrfColl,"SwNodes::MakeOLENode: Formatpointer is 0." );
@@ -427,7 +467,7 @@ Size SwOLENode::GetTwipSize() const
     return const_cast<SwOLENode*>(this)->maOLEObj.GetObject().GetSize( &aMapMode );
 }
 
-SwContentNode* SwOLENode::MakeCopy( SwDoc& rDoc, const SwNodeIndex& rIdx, bool) const
+SwContentNode* SwOLENode::MakeCopy( SwDoc& rDoc, SwNode& rIdx, bool) const
 {
     // If there's already a SvPersist instance, we use it
     SfxObjectShell* pPersistShell = rDoc.GetPersist();
@@ -479,10 +519,10 @@ bool SwOLENode::IsInGlobalDocSection() const
             return false;
 
         const SwFormatAnchor& rAnchor = pFlyFormat->GetAnchor();
-        if( !rAnchor.GetContentAnchor() )
+        if( !rAnchor.GetAnchorNode() )
             return false;
 
-        pAnchorNd = &rAnchor.GetContentAnchor()->nNode.GetNode();
+        pAnchorNd = rAnchor.GetAnchorNode();
     } while( pAnchorNd->GetIndex() < nEndExtraIdx );
 
     const SwSectionNode* pSectNd = pAnchorNd->FindSectionNode();
@@ -610,18 +650,49 @@ void SwOLENode::CheckFileLink_Impl()
 
     try
     {
-        uno::Reference< embed::XLinkageSupport > xLinkSupport( maOLEObj.m_xOLERef.GetObject(), uno::UNO_QUERY_THROW );
-        if ( xLinkSupport->isLink() )
+        uno::Reference<embed::XEmbeddedObject> xObject = maOLEObj.m_xOLERef.GetObject();
+        if (!xObject)
+            return;
+
+        bool bIFrame = false;
+
+        OUString aLinkURL;
+        uno::Reference<embed::XLinkageSupport> xLinkSupport(xObject, uno::UNO_QUERY);
+        if (xLinkSupport)
         {
-            const OUString aLinkURL = xLinkSupport->getLinkURL();
-            if ( !aLinkURL.isEmpty() )
+            if (xLinkSupport->isLink())
+                aLinkURL = xLinkSupport->getLinkURL();
+        }
+        else
+        {
+            // get IFrame (Floating Frames) listed and updatable from the
+            // manage links dialog
+            SvGlobalName aClassId(xObject->getClassID());
+            if (aClassId == SvGlobalName(SO3_IFRAME_CLASSID))
             {
-                // this is a file link so the model link manager should handle it
-                mpObjectLink = new SwEmbedObjectLink( this );
-                maLinkURL = aLinkURL;
-                GetDoc().getIDocumentLinksAdministration().GetLinkManager().InsertFileLink( *mpObjectLink, sfx2::SvBaseLinkObjectType::ClientOle, aLinkURL );
-                mpObjectLink->Connect();
+                uno::Reference<beans::XPropertySet> xSet(xObject->getComponent(), uno::UNO_QUERY);
+                if (xSet.is())
+                    xSet->getPropertyValue("FrameURL") >>= aLinkURL;
+                bIFrame = true;
             }
+        }
+
+        if (!aLinkURL.isEmpty()) // this is a file link so the model link manager should handle it
+        {
+            SwEmbedObjectLink* pEmbedObjectLink = nullptr;
+            if (!bIFrame)
+            {
+                pEmbedObjectLink = new SwEmbedObjectLink(this);
+                mpObjectLink = pEmbedObjectLink;
+            }
+            else
+            {
+                mpObjectLink = new SwIFrameLink(this);
+            }
+            maLinkURL = aLinkURL;
+            GetDoc().getIDocumentLinksAdministration().GetLinkManager().InsertFileLink( *mpObjectLink, sfx2::SvBaseLinkObjectType::ClientOle, aLinkURL );
+            if (pEmbedObjectLink)
+                pEmbedObjectLink->Connect();
         }
     }
     catch( uno::Exception& )
@@ -696,8 +767,8 @@ private:
     std::shared_ptr<comphelper::ThreadTaskTag>          mpTag;
 
 public:
-    explicit DeflateData(const uno::Reference< frame::XModel >& rXModel)
-    :   maXModel(rXModel),
+    explicit DeflateData(uno::Reference< frame::XModel > xXModel)
+    :   maXModel(std::move(xXModel)),
         mbKilled(false),
         mpTag( comphelper::ThreadPool::createThreadTaskTag() )
     {
@@ -773,7 +844,8 @@ private:
 
 SwOLEObj::SwOLEObj( const svt::EmbeddedObjectRef& xObj ) :
     m_pOLENode( nullptr ),
-    m_xOLERef( xObj )
+    m_xOLERef( xObj ),
+    m_nGraphicVersion( 0 )
 {
     m_xOLERef.Lock();
     if ( xObj.is() )
@@ -783,9 +855,10 @@ SwOLEObj::SwOLEObj( const svt::EmbeddedObjectRef& xObj ) :
     }
 }
 
-SwOLEObj::SwOLEObj( const OUString &rString, sal_Int64 nAspect ) :
+SwOLEObj::SwOLEObj( OUString aString, sal_Int64 nAspect ) :
     m_pOLENode( nullptr ),
-    m_aName( rString )
+    m_aName( std::move(aString) ),
+    m_nGraphicVersion( 0 )
 {
     m_xOLERef.Lock();
     m_xOLERef.SetViewAspect( nAspect );
@@ -956,9 +1029,7 @@ uno::Reference < embed::XEmbeddedObject > const & SwOLEObj::GetOleRef()
             if ( pFrame )
             {
                 Size aSz( pFrame->getFrameArea().SSize() );
-                const MapMode aSrc ( MapUnit::MapTwip );
-                const MapMode aDest( MapUnit::Map100thMM );
-                aSz = OutputDevice::LogicToLogic( aSz, aSrc, aDest );
+                aSz = o3tl::convert( aSz, o3tl::Length::twip, o3tl::Length::mm100 );
                 aArea.SetSize( aSz );
             }
             else
@@ -1101,8 +1172,24 @@ drawinglayer::primitive2d::Primitive2DContainer const & SwOLEObj::tryToGetChartC
             // copy the result data and cleanup
             m_aPrimitive2DSequence = m_pDeflateData->getSequence();
             m_aRange = m_pDeflateData->getRange();
+            m_nGraphicVersion = GetObject().getGraphicVersion();
             m_pDeflateData.reset();
         }
+    }
+
+    if(!m_aPrimitive2DSequence.empty() && !m_aRange.isEmpty()
+       && m_nGraphicVersion != GetObject().getGraphicVersion())
+    {
+        // tdf#149189 use getGraphicVersion() from EmbeddedObjectRef
+        // to decide when to reset buffered data. It gets incremented
+        // at all occasions where the graphic changes. An alternative
+        // would be to extend SwOLEListener_Impl with a XModifyListener
+        // as it is done in EmbedEventListener_Impl, that would
+        // require all the (add|remove)ModifyListener calls and
+        // managing these, plus having a 2nd listener to these when
+        // EmbeddedObjectRef already provides that. Tried that this
+        // works also if an alternative would be needed.
+        resetBufferedData();
     }
 
     if(m_aPrimitive2DSequence.empty() && m_aRange.isEmpty() && m_xOLERef.is() && m_xOLERef.IsChart())
@@ -1141,6 +1228,9 @@ drawinglayer::primitive2d::Primitive2DContainer const & SwOLEObj::tryToGetChartC
     {
         // when we have data, also copy the buffered Range data as output
         rRange = m_aRange;
+
+        // tdf#149189 ..and the GraphicVersion number to identify changes
+        m_nGraphicVersion = GetObject().getGraphicVersion();
     }
 
     return m_aPrimitive2DSequence;
@@ -1164,18 +1254,7 @@ void SwOLEObj::dumpAsXml(xmlTextWriterPtr pWriter) const
     (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwOLEObj"));
     (void)xmlTextWriterWriteFormatAttribute(pWriter, BAD_CAST("ptr"), "%p", this);
 
-    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("m_xOLERef"));
-    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("symbol"),
-                                BAD_CAST(typeid(*m_xOLERef.GetObject()).name()));
-
-    uno::Reference<embed::XEmbeddedObject> xIP = m_xOLERef.GetObject();
-    auto pComponent = dynamic_cast<sfx2::XmlDump*>(xIP->getComponent().get());
-    if (pComponent)
-    {
-        pComponent->dumpAsXml(pWriter);
-    }
-
-    (void)xmlTextWriterEndElement(pWriter);
+    m_xOLERef.dumpAsXml(pWriter);
 
     (void)xmlTextWriterEndElement(pWriter);
 }
@@ -1239,16 +1318,14 @@ void SwOLELRUCache::Load()
 void SwOLELRUCache::InsertObj( SwOLEObj& rObj )
 {
     SwOLEObj* pObj = &rObj;
-    OleObjects_t::iterator it =
-        std::find(m_OleObjects.begin(), m_OleObjects.end(), pObj);
-    if (it != m_OleObjects.end() && it != m_OleObjects.begin())
+    if (auto const it = std::find(m_OleObjects.begin(), m_OleObjects.end(), pObj);
+        it != m_OleObjects.end())
     {
+        if (it == m_OleObjects.begin())
+            return; // Everything is already in place
         // object in cache but is currently not the first in cache
         m_OleObjects.erase(it);
-        it = m_OleObjects.end();
     }
-    if (it != m_OleObjects.end())
-        return;
 
     std::shared_ptr<SwOLELRUCache> xKeepAlive(g_pOLELRU_Cache); // prevent delete this
     // try to remove objects if necessary
@@ -1265,8 +1342,7 @@ void SwOLELRUCache::InsertObj( SwOLEObj& rObj )
 
 void SwOLELRUCache::RemoveObj( SwOLEObj& rObj )
 {
-    OleObjects_t::iterator const it =
-        std::find(m_OleObjects.begin(), m_OleObjects.end(), &rObj);
+    auto const it = std::find(m_OleObjects.begin(), m_OleObjects.end(), &rObj);
     if (it != m_OleObjects.end())
     {
         m_OleObjects.erase(it);

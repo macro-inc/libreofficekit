@@ -26,9 +26,9 @@
 #include <com/sun/star/frame/XFrame.hpp>
 #include <com/sun/star/awt/XVclWindowPeer.hpp>
 #include <cppuhelper/implbase.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <osl/mutex.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/dialoghelper.hxx>
 #include <vcl/window.hxx>
@@ -44,9 +44,9 @@ namespace {
 class ODocumentCloser : public ::cppu::WeakImplHelper< css::lang::XComponent,
                                                         css::lang::XServiceInfo >
 {
-    ::osl::Mutex m_aMutex;
+    std::mutex m_aMutex;
     css::uno::Reference< css::frame::XFrame > m_xFrame;
-    std::unique_ptr<::comphelper::OInterfaceContainerHelper2> m_pListenersContainer; // list of listeners
+    ::comphelper::OInterfaceContainerHelper4<lang::XEventListener> m_aListenersContainer; // list of listeners
 
     bool m_bDisposed;
 
@@ -69,8 +69,8 @@ class MainThreadFrameCloserRequest
     uno::Reference< frame::XFrame > m_xFrame;
 
     public:
-        explicit MainThreadFrameCloserRequest( const uno::Reference< frame::XFrame >& xFrame )
-        : m_xFrame( xFrame )
+        explicit MainThreadFrameCloserRequest( uno::Reference< frame::XFrame > xFrame )
+        : m_xFrame(std::move( xFrame ))
         {}
 
         DECL_STATIC_LINK( MainThreadFrameCloserRequest, worker, void*, void );
@@ -113,7 +113,7 @@ IMPL_STATIC_LINK( MainThreadFrameCloserRequest, worker, void*, p, void )
             xWindow->setVisible( false );
 
             // reparent the window
-            xWinPeer->setProperty( "PluginParent", uno::makeAny( sal_Int64(0) ) );
+            xWinPeer->setProperty( "PluginParent", uno::Any( sal_Int64(0) ) );
 
             VclPtr<vcl::Window> pWindow = VCLUnoHelper::GetWindow( xWindow );
             if (pWindow)
@@ -141,7 +141,7 @@ IMPL_STATIC_LINK( MainThreadFrameCloserRequest, worker, void*, p, void )
 ODocumentCloser::ODocumentCloser(const css::uno::Sequence< css::uno::Any >& aArguments)
 : m_bDisposed( false )
 {
-    ::osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
     if ( !m_refCount )
         throw uno::RuntimeException(); // the object must be refcounted already!
 
@@ -164,14 +164,13 @@ ODocumentCloser::ODocumentCloser(const css::uno::Sequence< css::uno::Any >& aArg
 
 void SAL_CALL ODocumentCloser::dispose()
 {
-    ::osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     if ( m_bDisposed )
         throw lang::DisposedException();
 
     lang::EventObject aSource( static_cast< ::cppu::OWeakObject* >(this) );
-    if ( m_pListenersContainer )
-        m_pListenersContainer->disposeAndClear( aSource );
+    m_aListenersContainer.disposeAndClear( aGuard, aSource );
 
     // TODO: trigger a main thread execution to close the frame
     if ( m_xFrame.is() )
@@ -187,22 +186,18 @@ void SAL_CALL ODocumentCloser::dispose()
 
 void SAL_CALL ODocumentCloser::addEventListener( const uno::Reference< lang::XEventListener >& xListener )
 {
-    ::osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
     if ( m_bDisposed )
         throw lang::DisposedException(); // TODO
 
-    if ( !m_pListenersContainer )
-        m_pListenersContainer.reset( new ::comphelper::OInterfaceContainerHelper2( m_aMutex ) );
-
-    m_pListenersContainer->addInterface( xListener );
+    m_aListenersContainer.addInterface( aGuard, xListener );
 }
 
 
 void SAL_CALL ODocumentCloser::removeEventListener( const uno::Reference< lang::XEventListener >& xListener )
 {
-    ::osl::MutexGuard aGuard( m_aMutex );
-    if ( m_pListenersContainer )
-        m_pListenersContainer->removeInterface( xListener );
+    std::unique_lock aGuard( m_aMutex );
+    m_aListenersContainer.removeInterface( aGuard, xListener );
 }
 
 // XServiceInfo

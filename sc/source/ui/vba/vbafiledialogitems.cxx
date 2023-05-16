@@ -16,6 +16,9 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
+
+#include <o3tl/safeint.hxx>
+
 #include "vbafiledialogitems.hxx"
 
 using namespace ::com::sun::star;
@@ -38,7 +41,7 @@ public:
         if( !hasMoreElements() )
             throw container::NoSuchElementException();
         OUString sPath = *mIt++;
-        return uno::makeAny( sPath );
+        return uno::Any( sPath );
     }
 };
 
@@ -71,11 +74,11 @@ ScVbaFileDialogSelectedItems::createCollectionObject( const uno::Any& aSource )
     sal_Int32 nPosition = -1;
     if (!(aSource >>= nPosition))
         throw uno::RuntimeException("not an sal_Int32");
-    if (nPosition < 0 || nPosition >= static_cast<sal_Int32>(m_sItems.size()))
+    if (nPosition < 0 || o3tl::make_unsigned(nPosition) >= m_sItems.size())
         throw uno::RuntimeException("out of range");
 
     OUString sPath = m_sItems[nPosition];
-    return uno::makeAny( sPath );
+    return uno::Any( sPath );
 }
 
 // Methods
@@ -92,7 +95,7 @@ ScVbaFileDialogSelectedItems::Item( const uno::Any& aIndex, const uno::Any& /*aI
         throw uno::RuntimeException();
     }
 
-    return createCollectionObject( uno::makeAny( nPosition ) );
+    return createCollectionObject( uno::Any( nPosition ) );
 }
 
 sal_Int32 ScVbaFileDialogSelectedItems::getCount()

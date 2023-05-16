@@ -25,7 +25,7 @@ public:
     ScPivotFuncData maFunctionData;
     ScItemValue* mpOriginalItemValue;
 
-    ScItemValue(OUString const & aName, SCCOL nColumn, PivotFunc nFunctionMask);
+    ScItemValue(OUString aName, SCCOL nColumn, PivotFunc nFunctionMask);
     ScItemValue(const ScItemValue* pInputItemValue);
 
     ~ScItemValue();
@@ -60,6 +60,7 @@ private:
     std::unique_ptr<weld::CheckButton> mxCheckIdentifyCategories;
     std::unique_ptr<weld::CheckButton> mxCheckTotalRows;
     std::unique_ptr<weld::CheckButton> mxCheckDrillToDetail;
+    std::unique_ptr<weld::CheckButton> mxCheckExpandCollapse;
 
     std::unique_ptr<weld::RadioButton> mxSourceRadioNamedRange;
     std::unique_ptr<weld::RadioButton> mxSourceRadioSelection;
@@ -83,9 +84,6 @@ private:
     std::unique_ptr<weld::Label> mxSourceLabel;
     std::unique_ptr<weld::Frame> mxDestFrame;
     std::unique_ptr<weld::Label> mxDestLabel;
-
-    std::unique_ptr<weld::Expander> mxOptions;
-    std::unique_ptr<weld::Expander> mxMore;
 
     DECL_LINK(CancelClicked, weld::Button&, void);
     DECL_LINK(OKClicked, weld::Button&, void);

@@ -28,7 +28,7 @@
 #include <xmloff/controlpropertyhdl.hxx>
 #include <xmloff/maptype.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include "controlpropertymap.hxx"
 #include <com/sun/star/container/XIndexAccess.hpp>
 #include <com/sun/star/form/XFormsSupplier2.hpp>
@@ -582,7 +582,7 @@ namespace xmloff
                         // TODO: move this to the ctor
                     OSL_ENSURE ( -1 != nStyleMapIndex, "OFormLayerXMLExport_Impl::collectGridColumnStylesAndIds: could not obtain the index for our context id!");
 
-                    XMLPropertyState aNumberStyleState( nStyleMapIndex, makeAny( sColumnNumberStyle ) );
+                    XMLPropertyState aNumberStyleState( nStyleMapIndex, Any( sColumnNumberStyle ) );
                     aPropertyStates.push_back( aNumberStyleState );
                 }
 

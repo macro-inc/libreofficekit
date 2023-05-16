@@ -37,7 +37,6 @@ SvxHyperlinkMailTp::SvxHyperlinkMailTp(weld::Container* pParent, SvxHpLinkDlg* p
     : SvxHyperlinkTabPageBase(pParent, pDlg, "cui/ui/hyperlinkmailpage.ui", "HyperlinkMailPage", pItemSet)
     , m_xCbbReceiver(new SvxHyperURLBox(xBuilder->weld_combo_box("receiver")))
     , m_xBtAdrBook(xBuilder->weld_button("addressbook"))
-    , m_xFtSubject(xBuilder->weld_label("subject_label"))
     , m_xEdSubject(xBuilder->weld_entry("subject"))
 {
     m_xCbbReceiver->SetSmartProtocol(INetProtocol::Mailto);
@@ -120,13 +119,7 @@ void SvxHyperlinkMailTp::GetCurentItemData ( OUString& rStrURL, OUString& aStrNa
 OUString SvxHyperlinkMailTp::CreateAbsoluteURL() const
 {
     OUString aStrURL = m_xCbbReceiver->get_active_text();
-    INetURLObject aURL(aStrURL);
-
-    if( aURL.GetProtocol() == INetProtocol::NotValid )
-    {
-        aURL.SetSmartProtocol( INetProtocol::Mailto );
-        aURL.SetSmartURL(aStrURL);
-    }
+    INetURLObject aURL(aStrURL, INetProtocol::Mailto);
 
     // subject for EMail-url
     if( aURL.GetProtocol() == INetProtocol::Mailto )

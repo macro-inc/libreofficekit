@@ -85,7 +85,7 @@ css::uno::Sequence< OUString >                                                  
 
 #define SC_QUERYINTERFACE(x)    \
     if (rType == cppu::UnoType<x>::get())  \
-    { return uno::makeAny(uno::Reference<x>(this)); }
+    { return uno::Any(uno::Reference<x>(this)); }
 
 // SC_QUERY_MULTIPLE( XElementAccess, XIndexAccess ):
 //  use if interface is used several times in one class
@@ -104,8 +104,8 @@ private:
     sal_Int32               nPos;
 
 public:
-                            ScIndexEnumeration(const css::uno::Reference<
-                                css::container::XIndexAccess>& rInd, const OUString& rServiceName);
+                            ScIndexEnumeration(css::uno::Reference<
+                                css::container::XIndexAccess> xInd, OUString aServiceName);
     virtual                 ~ScIndexEnumeration() override;
 
                             // XEnumeration
@@ -129,7 +129,7 @@ private:
 
 public:
                             ScNameToIndexAccess(
-                                const css::uno::Reference< css::container::XNameAccess>& rNameObj );
+                                css::uno::Reference< css::container::XNameAccess> xNameObj );
     virtual                 ~ScNameToIndexAccess() override;
 
                             // XIndexAccess
@@ -172,6 +172,9 @@ public:
     static void             SetOptionalPropertyValue(
         const css::uno::Reference< css::beans::XPropertySet >& rPropSet,
         const char* pPropName, const css::uno::Any& rVal );
+    static void             SetOptionalPropertyValue(
+        const css::uno::Reference< css::beans::XPropertySet >& rPropSet,
+        const OUString& rPropName, const css::uno::Any& rVal );
 
     template<typename ValueType>
     static void             SetOptionalPropertyValue(
@@ -181,6 +184,15 @@ public:
         css::uno::Any any;
         any <<= rVal;
         SetOptionalPropertyValue(rPropSet, pPropName, any);
+    }
+    template<typename ValueType>
+    static void             SetOptionalPropertyValue(
+        const css::uno::Reference< css::beans::XPropertySet >& rPropSet,
+        const OUString& rPropName, const ValueType& rVal )
+    {
+        css::uno::Any any;
+        any <<= rVal;
+        SetOptionalPropertyValue(rPropSet, rPropName, any);
     }
 
     template<typename ValueType>

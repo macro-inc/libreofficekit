@@ -1,8 +1,11 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
 
 from uitest.framework import UITestCase
 from uitest.uihelper.common import get_state_as_dict
@@ -16,7 +19,6 @@ class formatParagraph(UITestCase):
 
    def test_format_paragraph_tab_indents_spacing(self):
         with self.ui_test.create_doc_in_start_center("writer"):
-            xWriterDoc = self.xUITest.getTopFocusWindow()
 
             with self.ui_test.execute_dialog_through_command(".uno:ParagraphDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
@@ -70,7 +72,6 @@ class formatParagraph(UITestCase):
 
    def test_format_paragraph_tab_alignment(self):
         with self.ui_test.create_doc_in_start_center("writer"):
-            xWriterDoc = self.xUITest.getTopFocusWindow()
 
             with self.ui_test.execute_dialog_through_command(".uno:ParagraphDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
@@ -113,7 +114,6 @@ class formatParagraph(UITestCase):
 
    def test_format_paragraph_tab_text_flow(self):
         with self.ui_test.create_doc_in_start_center("writer"):
-            xWriterDoc = self.xUITest.getTopFocusWindow()
 
             with self.ui_test.execute_dialog_through_command(".uno:ParagraphDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
@@ -184,7 +184,6 @@ class formatParagraph(UITestCase):
 
    def test_format_paragraph_tab_asian_typography(self):
         with self.ui_test.create_doc_in_start_center("writer"):
-            xWriterDoc = self.xUITest.getTopFocusWindow()
 
             with self.ui_test.execute_dialog_through_command(".uno:ParagraphDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
@@ -215,7 +214,6 @@ class formatParagraph(UITestCase):
 
    def test_format_paragraph_tab_outline_numbering(self):
         with self.ui_test.create_doc_in_start_center("writer"):
-            xWriterDoc = self.xUITest.getTopFocusWindow()
 
             with self.ui_test.execute_dialog_through_command(".uno:ParagraphDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
@@ -250,7 +248,6 @@ class formatParagraph(UITestCase):
 
    def test_format_paragraph_tab_tabs(self):
         with self.ui_test.create_doc_in_start_center("writer"):
-            xWriterDoc = self.xUITest.getTopFocusWindow()
 
             change_measurement_unit(self, "Centimeter")
 
@@ -363,7 +360,6 @@ class formatParagraph(UITestCase):
 
    def test_format_paragraph_tab_drop_caps(self):
         with self.ui_test.create_doc_in_start_center("writer"):
-            xWriterDoc = self.xUITest.getTopFocusWindow()
 
             with self.ui_test.execute_dialog_through_command(".uno:ParagraphDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
@@ -403,7 +399,6 @@ class formatParagraph(UITestCase):
 
    def test_format_paragraph_tab_borders(self):
         with self.ui_test.create_doc_in_start_center("writer"):
-            xWriterDoc = self.xUITest.getTopFocusWindow()
 
             change_measurement_unit(self, "Centimeter")
 
@@ -411,7 +406,6 @@ class formatParagraph(UITestCase):
                 xTabs = xDialog.getChild("tabcontrol")
                 select_pos(xTabs, "7")
 
-                xStyle = xDialog.getChild("linestylelb")
                 xwidth = xDialog.getChild("linewidthmf")
                 xSync = xDialog.getChild("sync")
                 xLeft = xDialog.getChild("leftmf")
@@ -434,7 +428,6 @@ class formatParagraph(UITestCase):
                 xTabs = xDialog.getChild("tabcontrol")
                 select_pos(xTabs, "7")
 
-                xStyle = xDialog.getChild("linestylelb")
                 xwidth = xDialog.getChild("linewidthmf")
                 xSync = xDialog.getChild("sync")
                 xLeft = xDialog.getChild("leftmf")
@@ -453,7 +446,6 @@ class formatParagraph(UITestCase):
 
    def test_format_paragraph_area(self):
         with self.ui_test.create_doc_in_start_center("writer"):
-            xWriterDoc = self.xUITest.getTopFocusWindow()
 
             with self.ui_test.execute_dialog_through_command(".uno:ParagraphDialog", close_button="cancel") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
@@ -473,7 +465,6 @@ class formatParagraph(UITestCase):
 
    def test_format_paragraph_transparency(self):
         with self.ui_test.create_doc_in_start_center("writer"):
-            xWriterDoc = self.xUITest.getTopFocusWindow()
 
             with self.ui_test.execute_dialog_through_command(".uno:ParagraphDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")

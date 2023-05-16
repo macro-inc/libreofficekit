@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -33,20 +35,25 @@ class tdf141559(UITestCase):
             #Choose Standard Filter... button
             xMenu = xFloatWindow.getChild("menu")
 
-            # check last item: 'Standard Filter...' (new menu item 'Clear Filter' is optional)
-            nLastIdx = int(get_state_as_dict(xMenu)['Children']) - 1
-            self.assertEqual(10, nLastIdx)
-            self.assertEqual('Standard Filter...', get_state_as_dict(xMenu.getChild(str(nLastIdx)))['Text'])
-
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
-            xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
-            xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
-            xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
-            xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
-            self.assertEqual("Standard Filter...", get_state_as_dict(xMenu)['SelectEntryText'])
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"RETURN"}))
+            xSubFloatWindow = self.xUITest.getFloatWindow()
+            xSubMenu = xSubFloatWindow.getChild("menu")
+
+            nLastIdx = int(get_state_as_dict(xSubMenu)['Children']) - 1
+            self.assertEqual(5, nLastIdx)
+
+            # check last item: 'Standard Filter...' (new menu item 'Clear Filter' is optional)
+            self.assertEqual('Standard Filter...', get_state_as_dict(xSubMenu.getChild(str(nLastIdx)))['Text'])
+
+            xSubMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
+            xSubMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
+            xSubMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
+            xSubMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
+            self.assertEqual("Standard Filter...", get_state_as_dict(xSubMenu)['SelectEntryText'])
+            xSubMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"RETURN"}))
 
             xDialog = self.xUITest.getTopFocusWindow()
             xfield1 = xDialog.getChild("field1")
@@ -69,13 +76,9 @@ class tdf141559(UITestCase):
 
             # check last item: 'Clear Filter'
             nLastIdx = int(get_state_as_dict(xMenu)['Children']) - 1
-            self.assertEqual(11, nLastIdx)
+            self.assertEqual(5, nLastIdx)
             self.assertEqual('Clear Filter', get_state_as_dict(xMenu.getChild(str(nLastIdx)))['Text'])
 
-            xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
-            xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
-            xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
-            xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))

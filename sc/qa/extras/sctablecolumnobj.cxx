@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/beans/xpropertyset.hxx>
 #include <test/container/xnamed.hxx>
 #include <test/lang/xserviceinfo.hxx>
@@ -29,7 +29,7 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScTableColumnObj : public CalcUnoApiTest,
+class ScTableColumnObj : public UnoApiTest,
                          public apitest::TableColumn,
                          public apitest::XCellRange,
                          public apitest::XNamed,
@@ -41,7 +41,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScTableColumnObj);
 
@@ -71,13 +70,10 @@ public:
     CPPUNIT_TEST(testSupportsService);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScTableColumnObj::ScTableColumnObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XCellRange("K1:K1")
     , XNamed("K")
     , XPropertySet({
@@ -121,7 +117,7 @@ ScTableColumnObj::ScTableColumnObj()
 
 uno::Reference<uno::XInterface> ScTableColumnObj::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     uno::Reference<sheet::XSpreadsheets> xSheets(xDoc->getSheets(), uno::UNO_SET_THROW);
     uno::Reference<container::XIndexAccess> xIA(xSheets, uno::UNO_QUERY_THROW);
 
@@ -137,15 +133,9 @@ uno::Reference<uno::XInterface> ScTableColumnObj::init()
 
 void ScTableColumnObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create calc document
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScTableColumnObj::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScTableColumnObj);

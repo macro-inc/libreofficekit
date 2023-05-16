@@ -56,9 +56,6 @@ private:
     OUString            msEstimatedSizeVec;
 
     OUString            ms1BitThreshold;
-    OUString            ms1BitDithered;
-    OUString            ms4BitGrayscale;
-    OUString            ms4BitColorPalette;
     OUString            ms8BitGrayscale;
     OUString            ms8BitColorPalette;
     OUString            ms24BitColor;
@@ -177,7 +174,7 @@ private:
 
 public:
     ExportDialog( FltCallDialogParameter& rPara,
-        const css::uno::Reference< css::uno::XComponentContext >& rxContext,
+        css::uno::Reference< css::uno::XComponentContext > xContext,
         const css::uno::Reference< css::lang::XComponent >& rxSourceDocument,
         bool bExportSelection, bool bIsExportVectorFormat, bool bGraphicsSource,
         const css::uno::Reference< css::graphic::XGraphic >& rxGraphic);

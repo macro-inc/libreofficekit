@@ -116,6 +116,7 @@ ScDBData::ScDBData( const ScDBData& rData ) :
     bAutoFilter         (rData.bAutoFilter),
     bModified           (rData.bModified),
     maTableColumnNames  (rData.maTableColumnNames),
+    maTableColumnAttributes(rData.maTableColumnAttributes),
     mbTableColumnNamesDirty(rData.mbTableColumnNamesDirty),
     nFilteredRowCount   (rData.nFilteredRowCount)
 {
@@ -150,6 +151,7 @@ ScDBData::ScDBData( const OUString& rName, const ScDBData& rData ) :
     bAutoFilter         (rData.bAutoFilter),
     bModified           (rData.bModified),
     maTableColumnNames  (rData.maTableColumnNames),
+    maTableColumnAttributes(rData.maTableColumnAttributes),
     mbTableColumnNamesDirty (rData.mbTableColumnNamesDirty),
     nFilteredRowCount   (rData.nFilteredRowCount)
 {
@@ -199,6 +201,7 @@ ScDBData& ScDBData::operator= (const ScDBData& rData)
         else
         {
             maTableColumnNames  = rData.maTableColumnNames;
+            maTableColumnAttributes = rData.maTableColumnAttributes;
             mbTableColumnNamesDirty = rData.mbTableColumnNamesDirty;
         }
 
@@ -546,44 +549,44 @@ bool ScDBData::HasSubTotalParam() const
 
 void ScDBData::UpdateMoveTab(SCTAB nOldPos, SCTAB nNewPos)
 {
-        ScRange aRange;
-        GetArea( aRange );
-        SCTAB nTab = aRange.aStart.Tab();               // a database range is only on one sheet
+    ScRange aRange;
+    GetArea(aRange);
+    SCTAB nTab = aRange.aStart.Tab(); // a database range is only on one sheet
 
-        //  customize as the current table as ScTablesHint (tabvwsh5.cxx)
+    //  customize as the current table as ScTablesHint (tabvwsh5.cxx)
 
-        if ( nTab == nOldPos )                          // moved sheet
-            nTab = nNewPos;
-        else if ( nOldPos < nNewPos )                   // moved to the back
-        {
-            if ( nTab > nOldPos && nTab <= nNewPos )    // move this sheet
-                --nTab;
-        }
-        else                                            // moved to the front
-        {
-            if ( nTab >= nNewPos && nTab < nOldPos )    // move this sheet
-                ++nTab;
-        }
+    if (nTab == nOldPos) // moved sheet
+        nTab = nNewPos;
+    else if (nOldPos < nNewPos) // moved to the back
+    {
+        if (nTab > nOldPos && nTab <= nNewPos) // move this sheet
+            --nTab;
+    }
+    else // moved to the front
+    {
+        if (nTab >= nNewPos && nTab < nOldPos) // move this sheet
+            ++nTab;
+    }
 
-        bool bChanged = ( nTab != aRange.aStart.Tab() );
-        if (bChanged)
-        {
-            // SetArea() invalidates column names, but it is the same column range
-            // just on a different sheet; remember and set new.
-            ::std::vector<OUString> aNames( maTableColumnNames);
-            bool bTableColumnNamesDirty = mbTableColumnNamesDirty;
-            // Same column range.
-            SetArea( nTab, aRange.aStart.Col(), aRange.aStart.Row(),
-                    aRange.aEnd.Col(),aRange.aEnd.Row() );
-            // Do not use SetTableColumnNames() because that resets mbTableColumnNamesDirty.
-            maTableColumnNames = aNames;
-            mbTableColumnNamesDirty = bTableColumnNamesDirty;
-        }
+    bool bChanged = (nTab != aRange.aStart.Tab());
+    if (bChanged)
+    {
+        // SetArea() invalidates column names, but it is the same column range
+        // just on a different sheet; remember and set new.
+        ::std::vector<OUString> aNames(maTableColumnNames);
+        bool bTableColumnNamesDirty = mbTableColumnNamesDirty;
+        // Same column range.
+        SetArea(nTab, aRange.aStart.Col(), aRange.aStart.Row(), aRange.aEnd.Col(),
+                aRange.aEnd.Row());
+        // Do not use SetTableColumnNames() because that resets mbTableColumnNamesDirty.
+        maTableColumnNames = aNames;
+        maTableColumnAttributes.resize(aNames.size());
+        mbTableColumnNamesDirty = bTableColumnNamesDirty;
+    }
 
-        //  MoveTo() is not necessary if only the sheet changed.
+    //  MoveTo() is not necessary if only the sheet changed.
 
-        SetModified(bChanged);
-
+    SetModified(bChanged);
 }
 
 bool ScDBData::UpdateReference(const ScDocument* pDoc, UpdateRefMode eUpdateRefMode,
@@ -621,6 +624,7 @@ bool ScDBData::UpdateReference(const ScDocument* pDoc, UpdateRefMode eUpdateRefM
             MoveTo( theTab1, theCol1, theRow1, theCol2, theRow2 );
         // Do not use SetTableColumnNames() because that resets mbTableColumnNamesDirty.
         maTableColumnNames = aNames;
+        maTableColumnAttributes.resize(aNames.size());
         mbTableColumnNamesDirty = bTableColumnNamesDirty;
     }
 
@@ -722,7 +726,6 @@ void ScDBData::AdjustTableColumnAttributes( UpdateRefMode eUpdateRefMode, SCCOL 
                 n += nDx;
             aNewNames.resize(n);
             aNewAttributes.resize(n);
-            maTableColumnAttributes.resize(n);
             // Copy head.
             for (size_t i = 0; i < nHead; ++i)
             {
@@ -771,8 +774,8 @@ namespace {
 class TableColumnNameSearch
 {
 public:
-    explicit TableColumnNameSearch( const OUString& rSearchName ) :
-        maSearchName( rSearchName )
+    explicit TableColumnNameSearch( OUString aSearchName ) :
+        maSearchName(std::move( aSearchName ))
     {
     }
 
@@ -825,7 +828,7 @@ void ScDBData::RefreshTableColumnNames( ScDocument* pDoc )
         ScRefCellValue* pCell;
         SCCOL nCol, nLastColFilled = nStartCol - 1;
         SCROW nRow;
-        for (size_t i=0; (pCell = aIter.GetNext( nCol, nRow)) != nullptr; ++i)
+        while ((pCell = aIter.GetNext( nCol, nRow)) != nullptr)
         {
             if (pCell->hasString())
             {
@@ -877,6 +880,7 @@ void ScDBData::RefreshTableColumnNames( ScDocument* pDoc )
     }
 
     aNewNames.swap( maTableColumnNames);
+    maTableColumnAttributes.resize(maTableColumnNames.size());
     mbTableColumnNamesDirty = false;
 }
 
@@ -928,12 +932,9 @@ OUString ScDBData::GetTableColumnName( SCCOL nCol ) const
 
 void ScDBData::Notify( const SfxHint& rHint )
 {
-    const ScHint* pScHint = dynamic_cast<const ScHint*>(&rHint);
-    if (!pScHint)
+    if (rHint.GetId() != SfxHintId::ScDataChanged)
         return;
-
-    if (pScHint->GetId() != SfxHintId::ScDataChanged)
-        return;
+    const ScHint* pScHint = static_cast<const ScHint*>(&rHint);
 
     mbTableColumnNamesDirty = true;
     if (!mpContainer)
@@ -957,7 +958,7 @@ void ScDBData::Notify( const SfxHint& rHint )
                     && aHeaderRange.aStart.Row() < aHintAddress.Row() + pScHint->GetRowCount())
             {
                 aHintAddress.SetRow( aHeaderRange.aStart.Row());
-                if (!aHeaderRange.In( aHintAddress))
+                if (!aHeaderRange.Contains( aHintAddress))
                     mpContainer->GetDirtyTableColumnNames().Join( aHintAddress);
             }
         }
@@ -1021,6 +1022,52 @@ public:
     }
 };
 
+OUString lcl_IncrementNumberInNamedRange(ScDBCollection::NamedDBs& namedDBs,
+                                         std::u16string_view rOldName)
+{
+    // Append or increment a numeric suffix and do not generate names that
+    // could result in a cell reference by ensuring at least one underscore is
+    // present.
+    // "aa"     => "aa_2"
+    // "aaaa1"  => "aaaa1_2"
+    // "aa_a"   => "aa_a_2"
+    // "aa_a_"  => "aa_a__2"
+    // "aa_a1"  => "aa_a1_2"
+    // "aa_1a"  => "aa_1a_2"
+    // "aa_1"   => "aa_2"
+    // "aa_2"   => "aa_3"
+
+    size_t nLastIndex = rOldName.rfind('_');
+    sal_Int32 nOldNumber = 1;
+    OUString aPrefix;
+    if (nLastIndex != std::u16string_view::npos)
+    {
+        ++nLastIndex;
+        std::u16string_view sLastPart(rOldName.substr(nLastIndex));
+        nOldNumber = o3tl::toInt32(sLastPart);
+
+        // If that number is exactly at the end then increment the number; else
+        // append "_" and number.
+        // toInt32() returns 0 on failure and also stops at trailing non-digit
+        // characters (toInt32("1a")==1).
+        if (OUString::number(nOldNumber) == sLastPart)
+            aPrefix = rOldName.substr(0, nLastIndex);
+        else
+        {
+            aPrefix = OUString::Concat(rOldName) + "_";
+            nOldNumber = 1;
+        }
+    }
+    else // No "_" found, append "_" and number.
+        aPrefix = OUString::Concat(rOldName) + "_";
+    OUString sNewName;
+    do
+    {
+        sNewName = aPrefix + OUString::number(++nOldNumber);
+    } while (namedDBs.findByName(sNewName) != nullptr);
+    return sNewName;
+}
+
 class FindByCursor
 {
     SCCOL mnCol;
@@ -1069,6 +1116,17 @@ public:
     bool operator() (std::unique_ptr<ScDBData> const& p) const
     {
         return p->GetUpperName() == mrName;
+    }
+};
+
+class FindByName
+{
+    const OUString& mrName;
+public:
+    explicit FindByName(const OUString& rName) : mrName(rName) {}
+    bool operator() (std::unique_ptr<ScDBData> const& p) const
+    {
+        return p->GetName() == mrName;
     }
 };
 
@@ -1176,6 +1234,12 @@ auto ScDBCollection::NamedDBs::findByUpperName2(const OUString& rName) -> iterat
 {
     return find_if(
         m_DBs.begin(), m_DBs.end(), FindByUpperName(rName));
+}
+
+ScDBData* ScDBCollection::NamedDBs::findByName(const OUString& rName)
+{
+    DBsType::iterator itr = find_if(m_DBs.begin(), m_DBs.end(), FindByName(rName));
+    return itr == m_DBs.end() ? nullptr : itr->get();
 }
 
 bool ScDBCollection::NamedDBs::insert(std::unique_ptr<ScDBData> pData)
@@ -1508,6 +1572,28 @@ void ScDBCollection::UpdateMoveTab( SCTAB nOldPos, SCTAB nNewPos )
     UpdateMoveTabFunc func(nOldPos, nNewPos);
     for_each(maNamedDBs.begin(), maNamedDBs.end(), func);
     for_each(maAnonDBs.begin(), maAnonDBs.end(), func);
+}
+
+void ScDBCollection::CopyToTable(SCTAB nOldPos, SCTAB nNewPos)
+{
+    // Create temporary copy of pointers to not insert in a set we are
+    // iterating over.
+    std::vector<const ScDBData*> aTemp;
+    aTemp.reserve( maNamedDBs.size());
+    for (const auto& rxNamedDB : maNamedDBs)
+    {
+        if (rxNamedDB->GetTab() != nOldPos)
+            continue;
+        aTemp.emplace_back( rxNamedDB.get());
+    }
+    for (const auto& rxNamedDB : aTemp)
+    {
+        const OUString newName( lcl_IncrementNumberInNamedRange( maNamedDBs, rxNamedDB->GetName()));
+        std::unique_ptr<ScDBData> pDataCopy = std::make_unique<ScDBData>(newName, *rxNamedDB);
+        pDataCopy->UpdateMoveTab(nOldPos, nNewPos);
+        pDataCopy->SetIndex(0);
+        maNamedDBs.insert(std::move(pDataCopy));
+    }
 }
 
 ScDBData* ScDBCollection::GetDBNearCursor(SCCOL nCol, SCROW nRow, SCTAB nTab )

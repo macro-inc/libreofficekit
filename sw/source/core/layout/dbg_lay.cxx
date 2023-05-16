@@ -106,6 +106,8 @@
 #include <frame.hxx>
 #include <swtable.hxx>
 #include <ndtxt.hxx>
+#include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <rtl/strbuf.hxx>
 #include <sal/log.hxx>
 #include <tools/stream.hxx>
@@ -330,7 +332,7 @@ void SwImplProtocol::CheckLine( OString& rLine )
         return;
     if( '[' == rLine[0] )   // section: FrameIds, type or function
     {
-        OString aTmp = rLine.getToken(0, ']');
+        std::string_view aTmp = o3tl::getToken(rLine, 0, ']');
         if (aTmp == "[frmid")      // section FrameIds
         {
             m_nInitFile = 1;
@@ -362,23 +364,23 @@ void SwImplProtocol::CheckLine( OString& rLine )
         }
         else
             m_nInitFile = 0; // oops: unknown section?
-        rLine = rLine.copy(aTmp.getLength() + 1);
+        rLine = rLine.copy(aTmp.size() + 1);
     }
 
     // spaces (or tabs) are the delimiter
     sal_Int32 nIndex = 0;
     do
     {
-        OString aTok = rLine.getToken( 0, ' ', nIndex );
+        std::string_view aTok = o3tl::getToken(rLine, 0, ' ', nIndex );
         bool bNo = false;
-        if( !aTok.isEmpty() && '!' == aTok[0] )
+        if( !aTok.empty() && '!' == aTok[0] )
         {
             bNo = true;                 // remove this function/type
-            aTok = aTok.copy(1);
+            aTok = aTok.substr(1);
         }
-        if( !aTok.isEmpty() )
+        if( !aTok.empty() )
         {
-            sal_Int64 nVal = aTok.toInt64();
+            sal_Int64 nVal = o3tl::toInt64(aTok);
             switch (m_nInitFile)
             {
                 case 1: InsertFrame( sal_uInt16( nVal ) );    // add FrameId
@@ -481,7 +483,7 @@ static void lcl_Flags(OStringBuffer& rOut, const SwFrame* pFrame)
 
 static void lcl_Padded(OStringBuffer& rOut, const OString& s, size_t length)
 {
-    if (sal_Int32(length) < s.getLength())
+    if (length < o3tl::make_unsigned(s.getLength()))
         length = s.getLength();
     rOut.append(s);
     for (size_t i = 0; i < length - s.getLength(); i++)
@@ -814,7 +816,7 @@ void SwImplProtocol::Record_( const SwFrame* pFrame, PROT nFunction, DbgAction n
     }
 
     SAL_INFO("sw.layout.debug", aOut.getStr());
-    m_pStream->WriteOString(aOut.makeStringAndClear());
+    m_pStream->WriteOString(aOut);
     (*m_pStream) << endl; // output
     m_pStream->Flush(); // to the disk, so we can read it immediately
     if (++m_nLineCount >= m_nMaxLines) // max number of lines reached?

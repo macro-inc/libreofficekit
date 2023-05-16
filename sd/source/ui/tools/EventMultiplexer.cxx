@@ -19,7 +19,6 @@
 
 #include <EventMultiplexer.hxx>
 
-#include <MutexOwner.hxx>
 #include <ViewShellBase.hxx>
 #include <drawdoc.hxx>
 #include <DrawController.hxx>
@@ -33,7 +32,7 @@
 #include <com/sun/star/lang/DisposedException.hpp>
 #include <com/sun/star/drawing/framework/XConfigurationChangeListener.hpp>
 #include <com/sun/star/drawing/framework/XView.hpp>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 #include <sfx2/viewfrm.hxx>
 
 using namespace ::com::sun::star;
@@ -53,7 +52,7 @@ const sal_Int32 ConfigurationUpdateEvent = 2;
 
 namespace sd::tools {
 
-typedef cppu::WeakComponentImplHelper<
+typedef comphelper::WeakComponentImplHelper<
       css::beans::XPropertyChangeListener,
       css::frame::XFrameActionListener,
       css::view::XSelectionChangeListener,
@@ -61,8 +60,7 @@ typedef cppu::WeakComponentImplHelper<
     > EventMultiplexerImplementationInterfaceBase;
 
 class EventMultiplexer::Implementation
-    : protected MutexOwner,
-      public EventMultiplexerImplementationInterfaceBase,
+    : public EventMultiplexerImplementationInterfaceBase,
       public SfxListener
 {
 public:
@@ -104,7 +102,7 @@ public:
         notifyConfigurationChange (
             const css::drawing::framework::ConfigurationChangeEvent& rEvent) override;
 
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
 protected:
     virtual void Notify (
@@ -186,9 +184,7 @@ void EventMultiplexer::MultiplexEvent(
 //===== EventMultiplexer::Implementation ======================================
 
 EventMultiplexer::Implementation::Implementation (ViewShellBase& rBase)
-    : MutexOwner(),
-      EventMultiplexerImplementationInterfaceBase(maMutex),
-      mrBase (rBase),
+    : mrBase (rBase),
       mbListeningToController (false),
       mbListeningToFrame (false),
       mxControllerWeak(nullptr),
@@ -215,13 +211,10 @@ EventMultiplexer::Implementation::Implementation (ViewShellBase& rBase)
         StartListening (*mpDocument);
 
     // Listen for configuration changes.
-    Reference<XControllerManager> xControllerManager (
-        Reference<XWeak>(&mrBase.GetDrawController()), UNO_QUERY);
-    if (!xControllerManager.is())
-        return;
+    DrawController& rDrawController = mrBase.GetDrawController();
 
     Reference<XConfigurationController> xConfigurationController (
-        xControllerManager->getConfigurationController());
+        rDrawController.getConfigurationController());
     mxConfigurationControllerWeak = xConfigurationController;
     if (!xConfigurationController.is())
         return;
@@ -233,15 +226,15 @@ EventMultiplexer::Implementation::Implementation (ViewShellBase& rBase)
     xConfigurationController->addConfigurationChangeListener(
         this,
         FrameworkHelper::msResourceActivationEvent,
-        makeAny(ResourceActivationEvent));
+        Any(ResourceActivationEvent));
     xConfigurationController->addConfigurationChangeListener(
         this,
         FrameworkHelper::msResourceDeactivationEvent,
-        makeAny(ResourceDeactivationEvent));
+        Any(ResourceDeactivationEvent));
     xConfigurationController->addConfigurationChangeListener(
         this,
         FrameworkHelper::msConfigurationUpdateEndEvent,
-        makeAny(ConfigurationUpdateEvent));
+        Any(ConfigurationUpdateEvent));
 }
 
 EventMultiplexer::Implementation::~Implementation()
@@ -438,7 +431,7 @@ void SAL_CALL EventMultiplexer::Implementation::disposing (
 void SAL_CALL EventMultiplexer::Implementation::propertyChange (
     const beans::PropertyChangeEvent& rEvent)
 {
-    if (rBHelper.bDisposed || rBHelper.bInDispose)
+    if (m_bDisposed)
     {
         throw lang::DisposedException (
             "SlideSorterController object has already been disposed",
@@ -570,9 +563,18 @@ void SAL_CALL EventMultiplexer::Implementation::notifyConfigurationChange (
 
 }
 
-void SAL_CALL EventMultiplexer::Implementation::disposing()
+void EventMultiplexer::Implementation::disposing(std::unique_lock<std::mutex>& rGuard)
 {
-    CallListeners (EventMultiplexerEventId::Disposing);
+    ListenerList aCopyListeners( maListeners );
+
+    rGuard.unlock();
+
+    EventMultiplexerEvent rEvent(EventMultiplexerEventId::Disposing, nullptr);
+    for (const auto& rListener : aCopyListeners)
+        rListener.Call(rEvent);
+
+    rGuard.lock();
+
     ReleaseListeners();
 }
 

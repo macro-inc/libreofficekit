@@ -19,6 +19,7 @@
 
 #include <rangelst.hxx>
 
+#include <o3tl/string_view.hxx>
 #include <sfx2/dispatch.hxx>
 #include <svl/stritem.hxx>
 #include <vcl/svapp.hxx>
@@ -62,8 +63,8 @@ namespace
 
 // global functions (->at the end of the file):
 
-static bool lcl_CheckRepeatString( const OUString& rStr, const ScDocument& rDoc, bool bIsRow, ScRange* pRange );
-static void lcl_GetRepeatRangeString( const ScRange* pRange, const ScDocument& rDoc, bool bIsRow, OUString& rStr );
+static bool lcl_CheckRepeatString( std::u16string_view aStr, const ScDocument& rDoc, bool bIsRow, ScRange* pRange );
+static void lcl_GetRepeatRangeString( std::optional<ScRange> oRange, const ScDocument& rDoc, bool bIsRow, OUString& rStr );
 
 #if 0
 // this method is useful when debugging address flags.
@@ -178,7 +179,7 @@ void ScPrintAreasDlg::SetReference( const ScRange& rRef, ScDocument& /* rDoc */ 
         aStr = rRef.Format(*pDoc, ScRefFlags::RANGE_ABS, eConv);
         OUString aVal = m_xEdPrintArea->GetText();
         Selection aSel = m_xEdPrintArea->GetSelection();
-        aSel.Justify();
+        aSel.Normalize();
         aVal = aVal.replaceAt( aSel.Min(), aSel.Len(), aStr );
         Selection aNewSel( aSel.Min(), aSel.Min()+aStr.getLength() );
         m_xEdPrintArea->SetRefString( aVal );
@@ -187,7 +188,7 @@ void ScPrintAreasDlg::SetReference( const ScRange& rRef, ScDocument& /* rDoc */ 
     else
     {
         bool bRow = ( m_xEdRepeatRow.get() == m_pRefInputEdit );
-        lcl_GetRepeatRangeString(&rRef, *pDoc, bRow, aStr);
+        lcl_GetRepeatRangeString(rRef, *pDoc, bRow, aStr);
         m_pRefInputEdit->SetRefString( aStr );
     }
     Impl_ModifyHdl( *m_pRefInputEdit );
@@ -234,8 +235,8 @@ void ScPrintAreasDlg::SetActive()
 void ScPrintAreasDlg::Impl_Reset()
 {
     OUString        aStrRange;
-    const ScRange*  pRepeatColRange = pDoc->GetRepeatColRange( nCurTab );
-    const ScRange*  pRepeatRowRange = pDoc->GetRepeatRowRange( nCurTab );
+    std::optional<ScRange> oRepeatColRange = pDoc->GetRepeatColRange( nCurTab );
+    std::optional<ScRange> oRepeatRowRange = pDoc->GetRepeatRowRange( nCurTab );
 
     m_xEdPrintArea->SetModifyHdl   (LINK( this, ScPrintAreasDlg, Impl_ModifyHdl));
     m_xEdRepeatRow->SetModifyHdl   (LINK( this, ScPrintAreasDlg, Impl_ModifyHdl));
@@ -274,12 +275,12 @@ void ScPrintAreasDlg::Impl_Reset()
 
     // repeat row
 
-    lcl_GetRepeatRangeString(pRepeatRowRange, *pDoc, true, aStrRange);
+    lcl_GetRepeatRangeString(oRepeatRowRange, *pDoc, true, aStrRange);
     m_xEdRepeatRow->SetText( aStrRange );
 
     // repeat column
 
-    lcl_GetRepeatRangeString(pRepeatColRange, *pDoc, false, aStrRange);
+    lcl_GetRepeatRangeString(oRepeatColRange, *pDoc, false, aStrRange);
     m_xEdRepeatCol->SetText( aStrRange );
 
     Impl_ModifyHdl( *m_xEdPrintArea );
@@ -427,13 +428,13 @@ void ScPrintAreasDlg::Impl_FillLists()
 
             if (rEntry.second->HasType(ScRangeData::Type::RowHeader))
             {
-                lcl_GetRepeatRangeString(&aRange, *pDoc, true, aSymbol);
+                lcl_GetRepeatRangeString(aRange, *pDoc, true, aSymbol);
                 m_xLbRepeatRow->append(aSymbol, aName);
             }
 
             if (rEntry.second->HasType(ScRangeData::Type::ColHeader))
             {
-                lcl_GetRepeatRangeString(&aRange, *pDoc, false, aSymbol);
+                lcl_GetRepeatRangeString(aRange, *pDoc, false, aSymbol);
                 m_xLbRepeatCol->append(aSymbol, aName);
             }
         }
@@ -630,23 +631,23 @@ static bool lcl_CheckOne_XL_A1( const ScDocument& rDoc, const OUString& rStr, bo
     return lcl_CheckOne_OOO(rDoc, rStr, bIsRow, rVal);
 }
 
-static bool lcl_CheckOne_XL_R1C1( const ScDocument& rDoc, const OUString& rStr, bool bIsRow, SCCOLROW& rVal )
+static bool lcl_CheckOne_XL_R1C1( const ScDocument& rDoc, std::u16string_view aStr, bool bIsRow, SCCOLROW& rVal )
 {
-    sal_Int32 nLen = rStr.getLength();
+    sal_Int32 nLen = aStr.size();
     if (nLen <= 1)
         // There must be at least two characters.
         return false;
 
     const sal_Unicode preUpper = bIsRow ? 'R' : 'C';
     const sal_Unicode preLower = bIsRow ? 'r' : 'c';
-    if (rStr[0] != preUpper && rStr[0] != preLower)
+    if (aStr[0] != preUpper && aStr[0] != preLower)
         return false;
 
-    OUString aNumStr = rStr.copy(1);
+    std::u16string_view aNumStr = aStr.substr(1);
     if (!CharClass::isAsciiNumeric(aNumStr))
         return false;
 
-    sal_Int32 nNum = aNumStr.toInt32();
+    sal_Int32 nNum = o3tl::toInt32(aNumStr);
 
     if (nNum <= 0)
         return false;
@@ -677,7 +678,7 @@ static bool lcl_CheckRepeatOne( const ScDocument& rDoc, const OUString& rStr, fo
     return false;
 }
 
-static bool lcl_CheckRepeatString( const OUString& rStr, const ScDocument& rDoc, bool bIsRow, ScRange* pRange )
+static bool lcl_CheckRepeatString( std::u16string_view aStr, const ScDocument& rDoc, bool bIsRow, ScRange* pRange )
 {
     // Row: [valid row] rsep [valid row]
     // Col: [valid col] rsep [valid col]
@@ -696,11 +697,11 @@ static bool lcl_CheckRepeatString( const OUString& rStr, const ScDocument& rDoc,
 
     OUString aBuf;
     SCCOLROW nVal = 0;
-    sal_Int32 nLen = rStr.getLength();
+    sal_Int32 nLen = aStr.size();
     bool bEndPos = false;
     for( sal_Int32 i = 0; i < nLen; ++i )
     {
-        const sal_Unicode c = rStr[i];
+        const sal_Unicode c = aStr[i];
         if (c == rsep)
         {
             if (bEndPos)
@@ -762,15 +763,15 @@ static bool lcl_CheckRepeatString( const OUString& rStr, const ScDocument& rDoc,
     return true;
 }
 
-static void lcl_GetRepeatRangeString( const ScRange* pRange, const ScDocument& rDoc, bool bIsRow, OUString& rStr )
+static void lcl_GetRepeatRangeString( std::optional<ScRange> oRange, const ScDocument& rDoc, bool bIsRow, OUString& rStr )
 {
     rStr.clear();
-    if (!pRange)
+    if (!oRange)
         return;
 
     const formula::FormulaGrammar::AddressConvention eConv = rDoc.GetAddressConvention();
-    const ScAddress& rStart = pRange->aStart;
-    const ScAddress& rEnd   = pRange->aEnd;
+    const ScAddress& rStart = oRange->aStart;
+    const ScAddress& rEnd   = oRange->aEnd;
 
     const ScRefFlags nFmt = bIsRow
                             ? (ScRefFlags::ROW_VALID | ScRefFlags::ROW_ABS)

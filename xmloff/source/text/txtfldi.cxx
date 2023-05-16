@@ -30,6 +30,7 @@
 
 #include <txtfldi.hxx>
 #include <txtvfldi.hxx>
+#include <utility>
 #include <xmloff/xmlimp.hxx>
 #include <xmloff/txtimp.hxx>
 #include <xmloff/xmlnamespace.hxx>
@@ -69,7 +70,7 @@
 #include <rtl/math.hxx>
 #include <tools/debug.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -123,9 +124,9 @@ constexpr OUStringLiteral sAPI_true = u"TRUE";
 
 XMLTextFieldImportContext::XMLTextFieldImportContext(
     SvXMLImport& rImport, XMLTextImportHelper& rHlp,
-    const OUString& pService)
+    OUString aService)
 :   SvXMLImportContext( rImport )
-,   sServiceName(pService)
+,   sServiceName(std::move(aService))
 ,   rTextImportHelper(rHlp)
 ,   sServicePrefix(sAPI_textfield_prefix)
 ,   bValid(false)
@@ -2767,7 +2768,7 @@ void XMLDdeFieldImportContext::endFastElement(sal_Int32 )
     Any aAny = xFieldMasterNameAccess->getByName(sMasterName);
     aAny >>= xMaster;
     //apply the content to the master
-    xMaster->setPropertyValue( sPropertyContent, uno::makeAny( GetContent()));
+    xMaster->setPropertyValue( sPropertyContent, uno::Any( GetContent()));
     // master exists: create text field and attach
     Reference<XPropertySet> xField;
     OUString sFieldName = OUString::Concat(sAPI_textfield_prefix) + sAPI_dde;
@@ -3297,20 +3298,19 @@ void XMLAnnotationImportContext::PrepareField(
 {
     // import (possibly empty) author
     OUString sAuthor( aAuthorBuffer.makeStringAndClear() );
-    xPropertySet->setPropertyValue(sAPI_author, makeAny(sAuthor));
+    xPropertySet->setPropertyValue(sAPI_author, Any(sAuthor));
 
     // import (possibly empty) initials
     OUString sInitials( aInitialsBuffer.makeStringAndClear() );
-    xPropertySet->setPropertyValue("Initials", makeAny(sInitials));
+    xPropertySet->setPropertyValue("Initials", Any(sInitials));
 
     //import resolved flag
     bool bTmp(false);
     (void)::sax::Converter::convertBool(bTmp, aResolved);
-    xPropertySet->setPropertyValue("Resolved", makeAny(bTmp));
+    xPropertySet->setPropertyValue("Resolved", Any(bTmp));
 
     util::DateTime aDateTime;
-    if (::sax::Converter::parseDateTime(aDateTime,
-                                            aDateBuffer.makeStringAndClear()))
+    if (::sax::Converter::parseDateTime(aDateTime, aDateBuffer))
     {
         /*
         Date aDate;
@@ -3320,20 +3320,20 @@ void XMLAnnotationImportContext::PrepareField(
         xPropertySet->setPropertyValue(sPropertyDate, makeAny(aDate));
         */
         // why is there no UNO_NAME_DATE_TIME, but only UNO_NAME_DATE_TIME_VALUE?
-        xPropertySet->setPropertyValue(sAPI_date_time_value, makeAny(aDateTime));
+        xPropertySet->setPropertyValue(sAPI_date_time_value, Any(aDateTime));
     }
+    aDateBuffer.setLength(0);
 
-    OUString sBuffer = aTextBuffer.makeStringAndClear();
-    if ( sBuffer.getLength() )
+    if ( aTextBuffer.getLength() )
     {
         // delete last paragraph mark (if necessary)
-        if (char(0x0a) == sBuffer[sBuffer.getLength()-1])
-            sBuffer = sBuffer.copy(0, sBuffer.getLength()-1);
-        xPropertySet->setPropertyValue(sAPI_content, makeAny(sBuffer));
+        if (char(0x0a) == aTextBuffer[aTextBuffer.getLength()-1])
+            aTextBuffer.setLength(aTextBuffer.getLength()-1);
+        xPropertySet->setPropertyValue(sAPI_content, Any(aTextBuffer.makeStringAndClear()));
     }
 
     if (!aName.isEmpty())
-        xPropertySet->setPropertyValue(sAPI_name, makeAny(aName));
+        xPropertySet->setPropertyValue(sAPI_name, Any(aName));
 }
 
 

@@ -19,17 +19,19 @@
 
 #include <config_features.h>
 
+#include <boost/property_tree/json_parser.hpp>
+
 #include <sal/log.hxx>
-#include <rtl/strbuf.hxx>
 #include <svl/stritem.hxx>
 #include <svl/eitem.hxx>
 #include <svl/whiter.hxx>
-#include <vcl/menu.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/toolbox.hxx>
 #include <vcl/weld.hxx>
 #include <svl/intitem.hxx>
 #include <svtools/langhelp.hxx>
+#include <com/sun/star/awt/XPopupMenu.hpp>
 #include <com/sun/star/frame/XLayoutManager.hpp>
 #include <com/sun/star/frame/ModuleManager.hpp>
 #include <com/sun/star/io/IOException.hpp>
@@ -46,9 +48,23 @@
 #include <com/sun/star/datatransfer/clipboard/XClipboardNotifier.hpp>
 #include <com/sun/star/view/XRenderable.hpp>
 #include <com/sun/star/uno/Reference.hxx>
+#include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
+#include <com/sun/star/accessibility/XAccessibleContext.hpp>
+#include <com/sun/star/accessibility/XAccessibleEventBroadcaster.hpp>
+#include <com/sun/star/accessibility/XAccessibleSelection.hpp>
+#include <com/sun/star/accessibility/AccessibleEventId.hpp>
+#include <com/sun/star/accessibility/AccessibleStateType.hpp>
+#include <com/sun/star/accessibility/XAccessibleText.hpp>
 #include <cppuhelper/implbase.hxx>
+#include <com/sun/star/ui/XAcceleratorConfiguration.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <cppuhelper/weakref.hxx>
+
+#include <com/sun/star/accessibility/XAccessibleTextAttributes.hpp>
+#include <com/sun/star/accessibility/AccessibleTextType.hpp>
+#include <com/sun/star/awt/FontSlant.hpp>
+
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <unotools/tempfile.hxx>
 #include <svtools/soerr.hxx>
@@ -89,6 +105,7 @@
 #include <iostream>
 #include <vector>
 #include <libxml/xmlwriter.h>
+#include <unordered_map>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -105,7 +122,7 @@ class SfxClipboardChangeListener : public ::cppu::WeakImplHelper<
     datatransfer::clipboard::XClipboardListener >
 {
 public:
-    SfxClipboardChangeListener( SfxViewShell* pView, const uno::Reference< datatransfer::clipboard::XClipboardNotifier >& xClpbrdNtfr );
+    SfxClipboardChangeListener( SfxViewShell* pView, uno::Reference< datatransfer::clipboard::XClipboardNotifier > xClpbrdNtfr );
 
     // XEventListener
     virtual void SAL_CALL disposing( const lang::EventObject& rEventObject ) override;
@@ -139,8 +156,8 @@ private:
     DECL_STATIC_LINK( SfxClipboardChangeListener, AsyncExecuteHdl_Impl, void*, void );
 };
 
-SfxClipboardChangeListener::SfxClipboardChangeListener( SfxViewShell* pView, const uno::Reference< datatransfer::clipboard::XClipboardNotifier >& xClpbrdNtfr )
-  : m_pViewShell( nullptr ), m_xClpbrdNtfr( xClpbrdNtfr ), m_xCtrl(pView->GetController())
+SfxClipboardChangeListener::SfxClipboardChangeListener( SfxViewShell* pView, uno::Reference< datatransfer::clipboard::XClipboardNotifier > xClpbrdNtfr )
+  : m_pViewShell( nullptr ), m_xClpbrdNtfr(std::move( xClpbrdNtfr )), m_xCtrl(pView->GetController())
 {
     if ( m_xCtrl.is() )
     {
@@ -218,6 +235,670 @@ void SAL_CALL SfxClipboardChangeListener::changedContents( const datatransfer::c
         delete pInfo;
 }
 
+class LOKDocumentFocusListener :
+    public ::cppu::WeakImplHelper< accessibility::XAccessibleEventListener >
+{
+    static constexpr sal_Int64 MAX_ATTACHABLE_CHILDREN = 30;
+
+    const SfxViewShell* m_pViewShell;
+    std::set< uno::Reference< uno::XInterface > > m_aRefList;
+    OUString m_sFocusedParagraph;
+    bool m_bFocusedParagraphNotified;
+    sal_Int32 m_nCaretPosition;
+    sal_Int32 m_nSelectionStart;
+    sal_Int32 m_nSelectionEnd;
+    OUString m_sSelectedText;
+    bool m_bIsEditingCell;
+    OUString m_sSelectedCellAddress;
+
+public:
+    LOKDocumentFocusListener(const SfxViewShell* pViewShell);
+
+    /// @throws lang::IndexOutOfBoundsException
+    /// @throws uno::RuntimeException
+    void attachRecursive(
+        const uno::Reference< accessibility::XAccessible >& xAccessible
+    );
+
+    /// @throws lang::IndexOutOfBoundsException
+    /// @throws uno::RuntimeException
+    void attachRecursive(
+        const uno::Reference< accessibility::XAccessible >& xAccessible,
+        const uno::Reference< accessibility::XAccessibleContext >& xContext
+    );
+
+    /// @throws lang::IndexOutOfBoundsException
+    /// @throws uno::RuntimeException
+    void attachRecursive(
+        const uno::Reference< accessibility::XAccessible >& xAccessible,
+        const uno::Reference< accessibility::XAccessibleContext >& xContext,
+        const sal_Int64 nStateSet
+    );
+
+    /// @throws lang::IndexOutOfBoundsException
+    /// @throws uno::RuntimeException
+    void detachRecursive(
+        const uno::Reference< accessibility::XAccessible >& xAccessible
+    );
+
+    /// @throws lang::IndexOutOfBoundsException
+    /// @throws uno::RuntimeException
+    void detachRecursive(
+        const uno::Reference< accessibility::XAccessibleContext >& xContext
+    );
+
+    /// @throws lang::IndexOutOfBoundsException
+    /// @throws uno::RuntimeException
+    void detachRecursive(
+        const uno::Reference< accessibility::XAccessibleContext >& xContext,
+        const sal_Int64 nStateSet
+    );
+
+    /// @throws lang::IndexOutOfBoundsException
+    /// @throws uno::RuntimeException
+    static uno::Reference< accessibility::XAccessible > getAccessible(const lang::EventObject& aEvent );
+
+    // XEventListener
+    virtual void SAL_CALL disposing( const lang::EventObject& Source ) override;
+
+    // XAccessibleEventListener
+    virtual void SAL_CALL notifyEvent( const accessibility::AccessibleEventObject& aEvent ) override;
+
+    void notifyFocusedParagraphChanged();
+    void notifyCaretChanged();
+    void notifyTextSelectionChanged();
+
+    OUString getFocusedParagraph() const;
+    int getCaretPosition() const;
+};
+
+LOKDocumentFocusListener::LOKDocumentFocusListener(const SfxViewShell* pViewShell)
+    : m_pViewShell(pViewShell)
+    , m_bFocusedParagraphNotified(false)
+    , m_nCaretPosition(0)
+    , m_nSelectionStart(0)
+    , m_nSelectionEnd(0)
+    , m_bIsEditingCell(false)
+{
+}
+
+OUString LOKDocumentFocusListener::getFocusedParagraph() const
+{
+    SAL_INFO("lok.a11y", "LOKDocumentFocusListener::getFocusedParagraph: " << m_sFocusedParagraph);
+    const_cast<LOKDocumentFocusListener*>(this)->m_bFocusedParagraphNotified = true;
+
+    sal_Int32 nSelectionStart = m_nSelectionStart;
+    sal_Int32 nSelectionEnd = m_nSelectionEnd;
+    if (nSelectionStart < 0 || nSelectionEnd < 0)
+        nSelectionStart = nSelectionEnd = m_nCaretPosition;
+
+    boost::property_tree::ptree aPayloadTree;
+    aPayloadTree.put("content", m_sFocusedParagraph.toUtf8().getStr());
+    aPayloadTree.put("start", nSelectionStart);
+    aPayloadTree.put("end", nSelectionEnd);
+    std::stringstream aStream;
+    boost::property_tree::write_json(aStream, aPayloadTree);
+    std::string aPayload = aStream.str();
+    OUString sRet = OUString::fromUtf8(aPayload);
+    return sRet;
+}
+
+int LOKDocumentFocusListener::getCaretPosition() const
+{
+    SAL_INFO("lok.a11y", "LOKDocumentFocusListener::getCaretPosition: " << m_nCaretPosition);
+    return m_nCaretPosition;
+}
+
+void LOKDocumentFocusListener::notifyFocusedParagraphChanged()
+{
+    boost::property_tree::ptree aPayloadTree;
+    aPayloadTree.put("content", m_sFocusedParagraph.toUtf8().getStr());
+    aPayloadTree.put("position", m_nCaretPosition);
+    std::stringstream aStream;
+    boost::property_tree::write_json(aStream, aPayloadTree);
+    std::string aPayload = aStream.str();
+    if (m_pViewShell)
+    {
+        SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyFocusedParagraphChanged: " << m_sFocusedParagraph);
+        m_bFocusedParagraphNotified = true;
+        m_pViewShell->libreOfficeKitViewCallback(LOK_CALLBACK_A11Y_FOCUS_CHANGED, aPayload.c_str());
+    }
+}
+
+void LOKDocumentFocusListener::notifyCaretChanged()
+{
+    boost::property_tree::ptree aPayloadTree;
+    aPayloadTree.put("position", m_nCaretPosition);
+    std::stringstream aStream;
+    boost::property_tree::write_json(aStream, aPayloadTree);
+    std::string aPayload = aStream.str();
+    if (m_pViewShell)
+    {
+        SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyCaretChanged: " << m_nCaretPosition);
+        m_pViewShell->libreOfficeKitViewCallback(LOK_CALLBACK_A11Y_CARET_CHANGED, aPayload.c_str());
+    }
+}
+
+void LOKDocumentFocusListener::notifyTextSelectionChanged()
+{
+    boost::property_tree::ptree aPayloadTree;
+    aPayloadTree.put("start", m_nSelectionStart);
+    aPayloadTree.put("end", m_nSelectionEnd);
+    std::stringstream aStream;
+    boost::property_tree::write_json(aStream, aPayloadTree);
+    std::string aPayload = aStream.str();
+    if (m_pViewShell)
+    {
+        SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyTextSelectionChanged: "
+                << "start: " << m_nSelectionStart << ", end: " << m_nSelectionEnd);
+        m_pViewShell->libreOfficeKitViewCallback(LOK_CALLBACK_A11Y_TEXT_SELECTION_CHANGED, aPayload.c_str());
+    }
+}
+
+void LOKDocumentFocusListener::disposing( const lang::EventObject& aEvent )
+{
+    // Unref the object here, but do not remove as listener since the object
+    // might no longer be in a state that safely allows this.
+    if( aEvent.Source.is() )
+        m_aRefList.erase(aEvent.Source);
+
+}
+
+namespace
+{
+bool hasState(const accessibility::AccessibleEventObject& aEvent, ::sal_Int64 nState)
+{
+    bool res = false;
+    uno::Reference< accessibility::XAccessibleContext > xContext(aEvent.Source, uno::UNO_QUERY);
+    if (xContext.is())
+    {
+        ::sal_Int64 nStateSet = xContext->getAccessibleStateSet();
+        res = (nStateSet & nState) != 0;
+    }
+    return res;
+}
+
+bool isFocused(const accessibility::AccessibleEventObject& aEvent)
+{
+    return hasState(aEvent, accessibility::AccessibleStateType::FOCUSED);
+}
+} // anonymous namespace
+
+void LOKDocumentFocusListener::notifyEvent( const accessibility::AccessibleEventObject& aEvent )
+{
+    try
+    {
+        switch( aEvent.EventId )
+        {
+            case accessibility::AccessibleEventId::STATE_CHANGED:
+            {
+                uno::Reference< accessibility::XAccessible > xAccStateChanged = getAccessible(aEvent);
+                sal_Int64 nState = accessibility::AccessibleStateType::INVALID;
+                aEvent.NewValue >>= nState;
+                SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: "
+                        << "STATE_CHANGED: XAccessible: " << xAccStateChanged.get() << ", nState: " << nState);
+
+                if( accessibility::AccessibleStateType::FOCUSED == nState )
+                {
+                    SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: FOCUSED");
+
+                    if (m_bIsEditingCell)
+                    {
+                        if (!hasState(aEvent, accessibility::AccessibleStateType::ACTIVE))
+                        {
+                            SAL_WARN("lok.a11y",
+                                    "LOKDocumentFocusListener::notifyEvent: FOCUSED: Cell not ACTIVE for editing yet");
+                            return;
+                        }
+                    }
+                    uno::Reference<css::accessibility::XAccessibleText> xAccText(xAccStateChanged, uno::UNO_QUERY);
+                    if( xAccText.is() )
+                    {
+                        OUString sText = xAccText->getText();
+                        sal_Int32 nLength = sText.getLength();
+                        sal_Int32 nCaretPosition = xAccText->getCaretPosition();
+                        SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: xAccText: " << xAccText.get()
+                                << ", text: >" << sText << "<, caret pos: " << nCaretPosition);
+
+                        if (nLength)
+                        {
+                            css::uno::Reference<css::accessibility::XAccessibleTextAttributes>
+                                xAccTextAttr(xAccText, uno::UNO_QUERY);
+                            css::uno::Sequence< OUString > aRequestedAttributes;
+
+                            sal_Int32 nPos = 0;
+                            while (nPos < nLength)
+                            {
+                                css::accessibility::TextSegment aTextSegment =
+                                        xAccText->getTextAtIndex(nPos, css::accessibility::AccessibleTextType::ATTRIBUTE_RUN);
+                                SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: "
+                                        << "text segment: '" << aTextSegment.SegmentText
+                                        << "', start: " << aTextSegment.SegmentStart
+                                        << ", end: " << aTextSegment.SegmentEnd);
+
+                                css::uno::Sequence< css::beans::PropertyValue > aRunAttributeList;
+                                if (xAccTextAttr.is())
+                                {
+                                    aRunAttributeList = xAccTextAttr->getRunAttributes(nPos, aRequestedAttributes);
+                                }
+                                else
+                                {
+                                    aRunAttributeList = xAccText->getCharacterAttributes(nPos, aRequestedAttributes);
+                                }
+
+                                sal_Int32 nSize = aRunAttributeList.getLength();
+                                SAL_INFO("lok.a11y",
+                                         "LOKDocumentFocusListener::notifyEvent: attribute list size: " << nSize);
+                                if (nSize)
+                                {
+                                    OUString sValue;
+                                    OUString sAttributes = "{ ";
+                                    for (const auto& attribute: aRunAttributeList)
+                                    {
+                                        if (attribute.Name.isEmpty())
+                                            continue;
+
+                                        if (attribute.Name == "CharHeight" || attribute.Name == "CharWeight")
+                                        {
+                                            float fValue;
+                                            attribute.Value >>= fValue;
+                                            sValue = OUString::number(fValue);
+                                        }
+                                        else if (attribute.Name == "CharPosture")
+                                        {
+                                            awt::FontSlant nValue;
+                                            attribute.Value >>= nValue;
+                                            sValue = OUString::number((unsigned int)(nValue));
+                                        }
+                                        else if (attribute.Name == "CharUnderline")
+                                        {
+                                            sal_Int16 nValue;
+                                            attribute.Value >>= nValue;
+                                            sValue = OUString::number(nValue);
+                                        }
+                                        else if (attribute.Name == "CharFontName")
+                                        {
+                                            attribute.Value >>= sValue;
+                                        }
+                                        else if (attribute.Name == "Rsid")
+                                        {
+                                            sal_uInt32 nValue;
+                                            attribute.Value >>= nValue;
+                                            sValue = OUString::number(nValue);
+                                        }
+
+                                        if (!sValue.isEmpty())
+                                        {
+                                            if (sAttributes != "{ ")
+                                                sAttributes += ", ";
+                                            sAttributes += attribute.Name + ": ";
+                                            sAttributes += sValue;
+                                            sValue = "";
+                                        }
+                                    }
+                                    sAttributes += " }";
+                                    SAL_INFO("lok.a11y",
+                                             "LOKDocumentFocusListener::notifyEvent: attributes: " << sAttributes);
+                                    }
+                                nPos = aTextSegment.SegmentEnd + 1;
+                            }
+                        }
+                        if (!m_bFocusedParagraphNotified || m_sFocusedParagraph != sText)
+                        {
+                            m_sFocusedParagraph = sText;
+                            m_nCaretPosition = nCaretPosition;
+                            notifyFocusedParagraphChanged();
+                        }
+                    }
+                }
+
+                break;
+            }
+
+            case accessibility::AccessibleEventId::CARET_CHANGED:
+            {
+                if (!isFocused(aEvent))
+                {
+                    SAL_WARN("lok.a11y",
+                             "LOKDocumentFocusListener::notifyEvent: CARET_CHANGED: skip non focused paragraph");
+                    return;
+                }
+
+                sal_Int32 nNewPos = -1;
+                aEvent.NewValue >>= nNewPos;
+                sal_Int32 nOldPos = -1;
+                aEvent.OldValue >>= nOldPos;
+
+                if (nNewPos >= 0)
+                {
+                    SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: CARET_CHANGED: " <<
+                            "new pos: " << nNewPos << ", nOldPos: " << nOldPos);
+                    uno::Reference<css::accessibility::XAccessibleText>
+                        xAccText(getAccessible(aEvent), uno::UNO_QUERY);
+                    if( xAccText.is() )
+                    {
+                        OUString sText = xAccText->getText();
+                        SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: CARET_CHANGED: "
+                                << "xAccText: " << xAccText.get() << ", text: >" << sText << "<");
+
+                        m_nCaretPosition = nNewPos;
+                        m_nSelectionStart = m_nSelectionEnd = m_nCaretPosition;
+                        notifyCaretChanged();
+                    }
+                }
+
+                break;
+            }
+
+            case accessibility::AccessibleEventId::TEXT_CHANGED:
+            {
+                if (!isFocused(aEvent))
+                {
+                    SAL_WARN("lok.a11y",
+                             "LOKDocumentFocusListener::notifyEvent: TEXT_CHANGED: skip non focused paragraph");
+                    return;
+                }
+
+                accessibility::TextSegment aDeletedText;
+                accessibility::TextSegment aInsertedText;
+
+                if (aEvent.OldValue >>= aDeletedText)
+                {
+                    SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: TEXT_CHANGED: "
+                            << "deleted text: >" << aDeletedText.SegmentText << "<");
+                }
+                if (aEvent.NewValue >>= aInsertedText)
+                {
+                    SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: TEXT_CHANGED: "
+                            << "inserted text: >" << aInsertedText.SegmentText << "<");
+                }
+                uno::Reference<css::accessibility::XAccessibleText> xAccText(getAccessible(aEvent), uno::UNO_QUERY);
+                if (xAccText.is())
+                {
+                    OUString sText = xAccText->getText();
+                    SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: TEXT_CHANGED: "
+                            << "xAccText: " << xAccText.get() << ", text: >" << sText << "<");
+                    m_sFocusedParagraph = sText;
+                    m_bFocusedParagraphNotified = false;
+                }
+
+                break;
+            }
+            case accessibility::AccessibleEventId::TEXT_SELECTION_CHANGED:
+            {
+                if (!isFocused(aEvent))
+                {
+                    SAL_WARN("lok.a11y",
+                          "LOKDocumentFocusListener::notifyEvent: TEXT_SELECTION_CHANGED: skip non focused paragraph");
+                    return;
+                }
+
+                uno::Reference<css::accessibility::XAccessibleText> xAccText(getAccessible(aEvent), uno::UNO_QUERY);
+                if (xAccText.is())
+                {
+                    OUString sText = xAccText->getText();
+                    sal_Int32 nSelectionStart = xAccText->getSelectionStart();
+                    sal_Int32 nSelectionEnd = xAccText->getSelectionEnd();
+                    m_sSelectedText = xAccText->getSelectedText();
+
+                    SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: TEXT_SELECTION_CHANGED: "
+                            << "\n  xAccText: " << xAccText.get() << ", text: >" << sText << "<"
+                            << "\n  start: " << nSelectionStart << ", end: " << nSelectionEnd
+                            << "\n  selected text: >" << m_sSelectedText << "<");
+
+                    // This should not be risky since selection start/end are set also on CARET_CHANGED event
+                    if (nSelectionStart == m_nSelectionStart && nSelectionEnd == m_nSelectionEnd)
+                        return;
+
+                    // We send a message to client also when start/end are -1, in this way the client knows
+                    // if a text selection object exists or not. That's needed because of the odd behavior
+                    // occurring when <backspace>/<delete> are hit and a text selection is empty but it still exists.
+                    // Such keys delete the empty selection instead of the previous/next char.
+                    m_nSelectionStart = nSelectionStart;
+                    m_nSelectionEnd = nSelectionEnd;
+
+                    // Calc: when editing a formula send the update content
+                    if (m_bIsEditingCell && !m_sSelectedCellAddress.isEmpty()
+                            && !m_sSelectedText.isEmpty() && sText.startsWith("="))
+                    {
+                        notifyFocusedParagraphChanged();
+                    }
+                    notifyTextSelectionChanged();
+                }
+
+                break;
+            }
+            case accessibility::AccessibleEventId::SELECTION_CHANGED:
+            {
+                uno::Reference< accessibility::XAccessible > xNewValue;
+                aEvent.NewValue >>= xNewValue;
+                if (xNewValue.is())
+                {
+                    uno::Reference< accessibility::XAccessibleContext > xContext =
+                            xNewValue->getAccessibleContext();
+
+                    if (xContext.is())
+                    {
+                        OUString sName = xContext->getAccessibleName();
+                        SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: SELECTION_CHANGED: this: " << this
+                                << ", selected cell address: >" << sName << "<"
+                                << ", m_bIsEditingCell: " << m_bIsEditingCell);
+                        if (m_bIsEditingCell && !sName.isEmpty())
+                        {
+                            m_sSelectedCellAddress = sName;
+                            // Check cell address: "$Sheet1.A10".
+                            // On cell editing SELECTION_CHANGED is not emitted when selection is expanded.
+                            // So selection can't be a cell range.
+                            sal_Int32 nDotIndex = m_sSelectedText.indexOf('.');
+                            OUString sCellAddress = m_sSelectedText.copy(nDotIndex + 1);
+                            SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: SELECTION_CHANGED: "
+                                    << "cell address: >" << sCellAddress << "<");
+                            if (m_sSelectedCellAddress == sCellAddress)
+                            {
+                                notifyFocusedParagraphChanged();
+                                notifyTextSelectionChanged();
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            case accessibility::AccessibleEventId::CHILD:
+            {
+                uno::Reference< accessibility::XAccessible > xChild;
+                if( (aEvent.OldValue >>= xChild) && xChild.is() )
+                    detachRecursive(xChild);
+
+                if( (aEvent.NewValue >>= xChild) && xChild.is() )
+                    attachRecursive(xChild);
+
+                break;
+            }
+
+            case accessibility::AccessibleEventId::INVALIDATE_ALL_CHILDREN:
+                SAL_INFO("lok.a11y", "Invalidate all children called");
+                break;
+
+            default:
+                break;
+        }
+    }
+    catch( const lang::IndexOutOfBoundsException& )
+    {
+        SAL_WARN("lok.a11y", "Focused object has invalid index in parent");
+    }
+}
+
+uno::Reference< accessibility::XAccessible > LOKDocumentFocusListener::getAccessible(const lang::EventObject& aEvent )
+{
+    uno::Reference< accessibility::XAccessible > xAccessible(aEvent.Source, uno::UNO_QUERY);
+
+    if( xAccessible.is() )
+        return xAccessible;
+
+    uno::Reference< accessibility::XAccessibleContext > xContext(aEvent.Source, uno::UNO_QUERY);
+
+    if( xContext.is() )
+    {
+        uno::Reference< accessibility::XAccessible > xParent( xContext->getAccessibleParent() );
+        if( xParent.is() )
+        {
+            uno::Reference< accessibility::XAccessibleContext > xParentContext( xParent->getAccessibleContext() );
+            if( xParentContext.is() )
+            {
+                return xParentContext->getAccessibleChild( xContext->getAccessibleIndexInParent() );
+            }
+        }
+    }
+
+    return uno::Reference< accessibility::XAccessible >();
+}
+
+void LOKDocumentFocusListener::attachRecursive(
+    const uno::Reference< accessibility::XAccessible >& xAccessible
+)
+{
+    SAL_INFO("lok.a11y", "LOKDocumentFocusListener::attachRecursive(1): xAccessible: " << xAccessible.get());
+
+    uno::Reference< accessibility::XAccessibleContext > xContext =
+        xAccessible->getAccessibleContext();
+
+    if( xContext.is() )
+        attachRecursive(xAccessible, xContext);
+}
+
+void LOKDocumentFocusListener::attachRecursive(
+    const uno::Reference< accessibility::XAccessible >& xAccessible,
+    const uno::Reference< accessibility::XAccessibleContext >& xContext
+)
+{
+    SAL_INFO("lok.a11y", "LOKDocumentFocusListener::attachRecursive(2): xAccessible: " << xAccessible.get()
+            << ", role: " << xContext->getAccessibleRole()
+            << ", name: " << xContext->getAccessibleName()
+            << ", parent: " << xContext->getAccessibleParent().get()
+            << ", child count: " << xContext->getAccessibleChildCount());
+
+    sal_Int64 nStateSet = xContext->getAccessibleStateSet();
+
+    if (!m_bIsEditingCell)
+    {
+        ::rtl::OUString sName = xContext->getAccessibleName();
+        m_bIsEditingCell = sName.startsWith("Cell");
+    }
+
+    attachRecursive(xAccessible, xContext, nStateSet);
+}
+
+void LOKDocumentFocusListener::attachRecursive(
+    const uno::Reference< accessibility::XAccessible >& xAccessible,
+    const uno::Reference< accessibility::XAccessibleContext >& xContext,
+    const sal_Int64 nStateSet
+)
+{
+    SAL_INFO("lok.a11y", "LOKDocumentFocusListener::attachRecursive(3) #1: this: " << this
+            << ", xAccessible: " << xAccessible.get()
+            << ", role: " << xContext->getAccessibleRole()
+            << ", name: " << xContext->getAccessibleName()
+            << ", parent: " << xContext->getAccessibleParent().get()
+            << ", child count: " << xContext->getAccessibleChildCount());
+
+    uno::Reference< accessibility::XAccessibleEventBroadcaster > xBroadcaster =
+        uno::Reference< accessibility::XAccessibleEventBroadcaster >(xContext, uno::UNO_QUERY);
+
+    if (!xBroadcaster.is())
+        return;
+    SAL_INFO("lok.a11y", "LOKDocumentFocusListener::attachRecursive(3) #2: xBroadcaster.is()");
+    // If not already done, add the broadcaster to the list and attach as listener.
+    const uno::Reference< uno::XInterface >& xInterface = xBroadcaster;
+    if( m_aRefList.insert(xInterface).second )
+    {
+        SAL_INFO("lok.a11y", "LOKDocumentFocusListener::attachRecursive(3) #3: m_aRefList.insert(xInterface).second");
+        xBroadcaster->addAccessibleEventListener(static_cast< accessibility::XAccessibleEventListener *>(this));
+
+
+        if( !(nStateSet & accessibility::AccessibleStateType::MANAGES_DESCENDANTS) )
+        {
+            sal_Int64 nmax = xContext->getAccessibleChildCount();
+            if( nmax > MAX_ATTACHABLE_CHILDREN )
+                nmax = MAX_ATTACHABLE_CHILDREN;
+
+            for( sal_Int64 n = 0; n < nmax; n++ )
+            {
+                uno::Reference< accessibility::XAccessible > xChild( xContext->getAccessibleChild( n ) );
+
+                if( xChild.is() )
+                    attachRecursive(xChild);
+            }
+        }
+    }
+}
+
+void LOKDocumentFocusListener::detachRecursive(
+    const uno::Reference< accessibility::XAccessible >& xAccessible
+)
+{
+    uno::Reference< accessibility::XAccessibleContext > xContext =
+        xAccessible->getAccessibleContext();
+
+    if( xContext.is() )
+        detachRecursive(xContext);
+}
+
+void LOKDocumentFocusListener::detachRecursive(
+    const uno::Reference< accessibility::XAccessibleContext >& xContext
+)
+{
+    sal_Int64 nStateSet = xContext->getAccessibleStateSet();
+
+    SAL_INFO("lok.a11y", "LOKDocumentFocusListener::detachRecursive(2): this: " << this
+            << ", name: " << xContext->getAccessibleName()
+            << ", parent: " << xContext->getAccessibleParent().get()
+            << ", child count: " << xContext->getAccessibleChildCount());
+
+    if (m_bIsEditingCell)
+    {
+        ::rtl::OUString sName = xContext->getAccessibleName();
+        m_bIsEditingCell = !sName.startsWith("Cell");
+        if (!m_bIsEditingCell)
+        {
+            m_sFocusedParagraph = "";
+            m_nCaretPosition = 0;
+            notifyFocusedParagraphChanged();
+        }
+    }
+
+    detachRecursive(xContext, nStateSet);
+}
+
+void LOKDocumentFocusListener::detachRecursive(
+    const uno::Reference< accessibility::XAccessibleContext >& xContext,
+    const sal_Int64 nStateSet
+)
+{
+    uno::Reference< accessibility::XAccessibleEventBroadcaster > xBroadcaster =
+        uno::Reference< accessibility::XAccessibleEventBroadcaster >(xContext, uno::UNO_QUERY);
+
+    if( xBroadcaster.is() && 0 < m_aRefList.erase(xBroadcaster) )
+    {
+        xBroadcaster->removeAccessibleEventListener(static_cast< accessibility::XAccessibleEventListener *>(this));
+
+        if( !( nStateSet & accessibility::AccessibleStateType::MANAGES_DESCENDANTS ) )
+        {
+            sal_Int64 nmax = xContext->getAccessibleChildCount();
+            if( nmax > MAX_ATTACHABLE_CHILDREN )
+                nmax = MAX_ATTACHABLE_CHILDREN;
+
+            for( sal_Int64 n = 0; n < nmax; n++ )
+            {
+                uno::Reference< accessibility::XAccessible > xChild( xContext->getAccessibleChild( n ) );
+
+                if( xChild.is() )
+                    detachRecursive(xChild);
+            }
+        }
+    }
+}
+
 sal_uInt32 SfxViewShell_Impl::m_nLastViewShellId = 0;
 
 SfxViewShell_Impl::SfxViewShell_Impl(SfxViewShellFlags const nFlags, ViewShellDocId nDocId)
@@ -256,8 +937,8 @@ static OUString impl_retrieveFilterNameFromTypeAndModule(
 {
     // Retrieve filter from type
     css::uno::Sequence< css::beans::NamedValue > aQuery {
-        { "Type", css::uno::makeAny( rType ) },
-        { "DocumentService", css::uno::makeAny( rModuleIdentifier ) }
+        { "Type", css::uno::Any( rType ) },
+        { "DocumentService", css::uno::Any( rModuleIdentifier ) }
     };
 
     css::uno::Reference< css::container::XEnumeration > xEnumeration =
@@ -616,9 +1297,8 @@ void SfxViewShell::ExecMisc_Impl( SfxRequest &rReq )
                 {
                     SAL_WARN("sfx.view", "cannot create Flatpak html temp dir");
                 }
-                ::utl::TempFile aTempDir( parent, true );
 
-                INetURLObject aFilePathObj( aTempDir.GetURL() );
+                INetURLObject aFilePathObj( ::utl::CreateTempURL(parent, true) );
                 aFilePathObj.insertName( aFileName );
                 aFilePathObj.setExtension( u"htm" );
 
@@ -846,8 +1526,8 @@ void SfxViewShell::Activate( bool bMDI )
     if ( bMDI )
     {
         SfxObjectShell *pSh = GetViewFrame()->GetObjectShell();
-        if ( pSh->GetModel().is() )
-            pSh->GetModel()->setCurrentController( GetViewFrame()->GetFrame().GetController() );
+        if (const auto xModel = pSh->GetModel())
+            xModel->setCurrentController(GetController());
 
         SetCurrentDocument();
     }
@@ -1068,6 +1748,8 @@ SfxViewShell::SfxViewShell
 ,   maLOKLanguageTag(LANGUAGE_NONE)
 ,   maLOKLocale(LANGUAGE_NONE)
 ,   maLOKDeviceFormFactor(LOKDeviceFormFactor::UNKNOWN)
+,   mbLOKAccessibilityEnabled(false)
+,   mpLOKDocumentFocusListener(nullptr)
 {
     SetMargin( pViewFrame->GetMargin_Impl() );
 
@@ -1082,6 +1764,10 @@ SfxViewShell::SfxViewShell
     {
         maLOKLanguageTag = SfxLokHelper::getDefaultLanguage();
         maLOKLocale = SfxLokHelper::getDefaultLanguage();
+
+        const auto [isTimezoneSet, aTimezone] = SfxLokHelper::getDefaultTimezone();
+        maLOKIsTimezoneSet = isTimezoneSet;
+        maLOKTimezone = aTimezone;
 
         maLOKDeviceFormFactor = SfxLokHelper::getDeviceFormFactor();
 
@@ -1115,6 +1801,18 @@ SfxViewShell::~SfxViewShell()
     vcl::Window* pFrameWin = GetViewFrame()->GetWindow().GetFrameWindow();
     if (pFrameWin && pFrameWin->GetLOKNotifier() == this)
         pFrameWin->ReleaseLOKNotifier();
+}
+
+OUString SfxViewShell::getA11yFocusedParagraph() const
+{
+    const LOKDocumentFocusListener& rDocFocusListener = GetLOKDocumentFocusListener();
+    return rDocFocusListener.getFocusedParagraph();
+}
+
+int SfxViewShell::getA11yCaretPosition() const
+{
+    const LOKDocumentFocusListener& rDocFocusListener = GetLOKDocumentFocusListener();
+    return rDocFocusListener.getCaretPosition();
 }
 
 bool SfxViewShell::PrepareClose
@@ -1190,7 +1888,7 @@ SdrView* SfxViewShell::GetDrawView() const
 
 OUString SfxViewShell::GetSelectionText
 (
-    bool /*bCompleteWords*/ /*  FALSE (default)
+    bool /*bCompleteWords*/, /*  FALSE (default)
                                 Only the actual selected text is returned.
 
                                 TRUE
@@ -1199,6 +1897,7 @@ OUString SfxViewShell::GetSelectionText
                                 these are used: white spaces and punctuation
                                 ".,;" and single and double quotes.
                             */
+    bool /*bOnlyASample*/ /* used by some dialogs to avoid constructing monster strings e.g. in calc */
 )
 
 /*  [Description]
@@ -1406,11 +2105,50 @@ void SfxViewShell::Notify( SfxBroadcaster& rBC,
 
 bool SfxViewShell::ExecKey_Impl(const KeyEvent& aKey)
 {
+    bool setModuleConfig = false; // In case libreofficekit is active, we will re-set the module config class.
     if (!pImpl->m_xAccExec)
     {
         pImpl->m_xAccExec = ::svt::AcceleratorExecute::createAcceleratorHelper();
         pImpl->m_xAccExec->init(::comphelper::getProcessComponentContext(),
             pFrame->GetFrame().GetFrameInterface());
+        setModuleConfig = true;
+    }
+
+    if (comphelper::LibreOfficeKit::isActive())
+    {
+        // Get the module name.
+        css::uno::Reference< css::uno::XComponentContext >  xContext      (::comphelper::getProcessComponentContext());
+        css::uno::Reference< css::frame::XModuleManager2 >  xModuleManager(css::frame::ModuleManager::create(xContext));
+        OUString sModule = xModuleManager->identify(pFrame->GetFrame().GetFrameInterface());
+
+        // Get the language name.
+        OUString viewLang = GetLOKLanguageTag().getBcp47();
+
+        // Merge them & have a key.
+        OUString key = sModule + viewLang;
+
+        // Check it in configurations map. Create a configuration manager if there isn't one for the key.
+        std::unordered_map<OUString, css::uno::Reference<com::sun::star::ui::XAcceleratorConfiguration>>& acceleratorConfs = SfxApplication::Get()->GetAcceleratorConfs_Impl();
+        if (acceleratorConfs.find(key) == acceleratorConfs.end())
+        {
+            // Create a new configuration manager for the module.
+
+            OUString actualLang = officecfg::Setup::L10N::ooLocale::get();
+
+            std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
+            officecfg::Setup::L10N::ooLocale::set(viewLang, batch);
+            batch->commit();
+
+            // We have set the language. Time to create the config manager.
+            acceleratorConfs[key] = svt::AcceleratorExecute::lok_createNewAcceleratorConfiguration(::comphelper::getProcessComponentContext(), sModule);
+
+            std::shared_ptr<comphelper::ConfigurationChanges> batch2(comphelper::ConfigurationChanges::create());
+            officecfg::Setup::L10N::ooLocale::set(actualLang, batch2);
+            batch2->commit();
+        }
+
+        if (setModuleConfig)
+            pImpl->m_xAccExec->lok_setModuleConfig(acceleratorConfs[key]);
     }
 
     return pImpl->m_xAccExec->execute(aKey.GetKeyCode());
@@ -1598,6 +2336,61 @@ void SfxViewShell::SetLOKLanguageTag(const OUString& rBcp47LanguageTag)
         maLOKLanguageTag = aFallbackTag;
 }
 
+LOKDocumentFocusListener& SfxViewShell::GetLOKDocumentFocusListener()
+{
+    if (mpLOKDocumentFocusListener)
+        return *mpLOKDocumentFocusListener;
+
+    mpLOKDocumentFocusListener = new LOKDocumentFocusListener(this);
+    return *mpLOKDocumentFocusListener;
+}
+
+const LOKDocumentFocusListener& SfxViewShell::GetLOKDocumentFocusListener() const
+{
+    return const_cast<SfxViewShell*>(this)->GetLOKDocumentFocusListener();
+}
+
+void SfxViewShell::SetLOKAccessibilityState(bool bEnabled)
+{
+    if (bEnabled == mbLOKAccessibilityEnabled)
+        return;
+    mbLOKAccessibilityEnabled = bEnabled;
+
+    LOKDocumentFocusListener& rDocumentFocusListener = GetLOKDocumentFocusListener();
+
+    if (!pWindow)
+        return;
+
+    uno::Reference< accessibility::XAccessible > xAccessible =
+        pWindow->GetAccessible();
+
+    if (!xAccessible.is())
+        return;
+
+    if (mbLOKAccessibilityEnabled)
+    {
+        try
+        {
+            rDocumentFocusListener.attachRecursive(xAccessible);
+        }
+        catch (const uno::Exception&)
+        {
+            SAL_WARN("SetLOKAccessibilityState", "Exception caught processing LOKDocumentFocusListener::attachRecursive");
+        }
+    }
+    else
+    {
+        try
+        {
+            rDocumentFocusListener.detachRecursive(xAccessible);
+        }
+        catch (const uno::Exception&)
+        {
+            SAL_WARN("SetLOKAccessibilityState", "Exception caught processing LOKDocumentFocusListener::detachRecursive");
+        }
+    }
+}
+
 void SfxViewShell::SetLOKLocale(const OUString& rBcp47LanguageTag)
 {
     maLOKLocale = LanguageTag(rBcp47LanguageTag, true).makeFallback();
@@ -1636,6 +2429,11 @@ ViewShellDocId SfxViewShell::GetDocId() const
 {
     assert(pImpl->m_nDocId >= ViewShellDocId(0) && "m_nDocId should have been initialized, but it is invalid.");
     return pImpl->m_nDocId;
+}
+
+void SfxViewShell::notifyInvalidation(tools::Rectangle const* pRect) const
+{
+    SfxLokHelper::notifyInvalidation(this, pRect);
 }
 
 void SfxViewShell::NotifyOtherViews(int nType, const OString& rKey, const OString& rPayload)
@@ -1867,77 +2665,44 @@ SfxBaseController* SfxViewShell::GetBaseController_Impl() const
 
 void SfxViewShell::AddContextMenuInterceptor_Impl( const uno::Reference< ui::XContextMenuInterceptor >& xInterceptor )
 {
-    pImpl->aInterceptorContainer.addInterface( xInterceptor );
+    std::unique_lock g(pImpl->aMutex);
+    pImpl->aInterceptorContainer.addInterface( g, xInterceptor );
 }
 
 void SfxViewShell::RemoveContextMenuInterceptor_Impl( const uno::Reference< ui::XContextMenuInterceptor >& xInterceptor )
 {
-    pImpl->aInterceptorContainer.removeInterface( xInterceptor );
+    std::unique_lock g(pImpl->aMutex);
+    pImpl->aInterceptorContainer.removeInterface( g, xInterceptor );
 }
 
-static void Change( Menu* pMenu, SfxViewShell* pView )
+bool SfxViewShell::TryContextMenuInterception(const css::uno::Reference<css::awt::XPopupMenu>& rIn,
+                                              const OUString& rMenuIdentifier,
+                                              css::uno::Reference<css::awt::XPopupMenu>& rOut,
+                                              ui::ContextMenuExecuteEvent aEvent)
 {
-    SfxDispatcher *pDisp = pView->GetViewFrame()->GetDispatcher();
-    sal_uInt16 nCount = pMenu->GetItemCount();
-    for ( sal_uInt16 nPos=0; nPos<nCount; ++nPos )
-    {
-        sal_uInt16 nId = pMenu->GetItemId(nPos);
-        OUString aCmd = pMenu->GetItemCommand(nId);
-        PopupMenu* pPopup = pMenu->GetPopupMenu(nId);
-        if ( pPopup )
-        {
-            Change( pPopup, pView );
-        }
-        else if ( nId < 5000 )
-        {
-            if ( aCmd.startsWith(".uno:") )
-            {
-                for (sal_uInt16 nIdx=0;;)
-                {
-                    SfxShell *pShell=pDisp->GetShell(nIdx++);
-                    if (pShell == nullptr)
-                        break;
-                    const SfxInterface *pIFace = pShell->GetInterface();
-                    const SfxSlot* pSlot = pIFace->GetSlot( aCmd );
-                    if ( pSlot )
-                    {
-                        pMenu->InsertItem( pSlot->GetSlotId(), pMenu->GetItemText( nId ),
-                            pMenu->GetItemBits( nId ), OString(), nPos );
-                        pMenu->SetItemCommand( pSlot->GetSlotId(), aCmd );
-                        pMenu->RemoveItem( nPos+1 );
-                        break;
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-bool SfxViewShell::TryContextMenuInterception( const Menu& rIn, const OUString& rMenuIdentifier, VclPtr<Menu>& rpOut, ui::ContextMenuExecuteEvent aEvent )
-{
-    rpOut = nullptr;
+    rOut.clear();
     bool bModified = false;
 
     // create container from menu
     aEvent.ActionTriggerContainer = ::framework::ActionTriggerHelper::CreateActionTriggerContainerFromMenu(
-        &rIn, &rMenuIdentifier );
+        rIn, &rMenuIdentifier);
 
     // get selection from controller
     aEvent.Selection.set( GetController(), uno::UNO_QUERY );
 
     // call interceptors
     std::unique_lock g(pImpl->aMutex);
-    ::comphelper::OInterfaceIteratorHelper4 aIt( pImpl->aInterceptorContainer );
+    std::vector<uno::Reference< ui::XContextMenuInterceptor>> aInterceptors =
+        pImpl->aInterceptorContainer.getElements(g);
     g.unlock();
-    while( aIt.hasMoreElements() )
+    for (const auto & rListener : aInterceptors )
     {
         try
         {
             ui::ContextMenuInterceptorAction eAction;
             {
                 SolarMutexReleaser rel;
-                eAction = aIt.next()->notifyContextMenuExecute( aEvent );
+                eAction = rListener->notifyContextMenuExecute( aEvent );
             }
             switch ( eAction )
             {
@@ -1962,46 +2727,50 @@ bool SfxViewShell::TryContextMenuInterception( const Menu& rIn, const OUString& 
         }
         catch (...)
         {
-            aIt.remove();
+            g.lock();
+            pImpl->aInterceptorContainer.removeInterface(g, rListener);
+            g.unlock();
         }
 
         break;
     }
 
-    if ( bModified )
+    if (bModified)
     {
-        // container was modified, create a new window out of it
-        rpOut = VclPtr<PopupMenu>::Create();
-        ::framework::ActionTriggerHelper::CreateMenuFromActionTriggerContainer( rpOut, aEvent.ActionTriggerContainer );
-
-        Change( rpOut, this );
+        // container was modified, create a new menu out of it
+        css::uno::Reference<uno::XComponentContext> xContext(::comphelper::getProcessComponentContext(), css::uno::UNO_SET_THROW);
+        rOut.set(xContext->getServiceManager()->createInstanceWithContext("com.sun.star.awt.PopupMenu", xContext), css::uno::UNO_QUERY_THROW);
+        ::framework::ActionTriggerHelper::CreateMenuFromActionTriggerContainer(rOut, aEvent.ActionTriggerContainer);
     }
 
     return true;
 }
 
-bool SfxViewShell::TryContextMenuInterception( Menu& rMenu, const OUString& rMenuIdentifier, css::ui::ContextMenuExecuteEvent aEvent )
+bool SfxViewShell::TryContextMenuInterception(const css::uno::Reference<css::awt::XPopupMenu>& rPopupMenu,
+                                              const OUString& rMenuIdentifier, css::ui::ContextMenuExecuteEvent aEvent)
 {
     bool bModified = false;
 
     // create container from menu
-    aEvent.ActionTriggerContainer = ::framework::ActionTriggerHelper::CreateActionTriggerContainerFromMenu( &rMenu, &rMenuIdentifier );
+    aEvent.ActionTriggerContainer = ::framework::ActionTriggerHelper::CreateActionTriggerContainerFromMenu(
+        rPopupMenu, &rMenuIdentifier);
 
     // get selection from controller
     aEvent.Selection = css::uno::Reference< css::view::XSelectionSupplier >( GetController(), css::uno::UNO_QUERY );
 
     // call interceptors
     std::unique_lock g(pImpl->aMutex);
-    ::comphelper::OInterfaceIteratorHelper4 aIt( pImpl->aInterceptorContainer );
+    std::vector<uno::Reference< ui::XContextMenuInterceptor>> aInterceptors =
+        pImpl->aInterceptorContainer.getElements(g);
     g.unlock();
-    while( aIt.hasMoreElements() )
+    for (const auto & rListener : aInterceptors )
     {
         try
         {
             css::ui::ContextMenuInterceptorAction eAction;
             {
                 SolarMutexReleaser rel;
-                eAction = aIt.next()->notifyContextMenuExecute( aEvent );
+                eAction = rListener->notifyContextMenuExecute( aEvent );
             }
             switch ( eAction )
             {
@@ -2026,7 +2795,9 @@ bool SfxViewShell::TryContextMenuInterception( Menu& rMenu, const OUString& rMen
         }
         catch (...)
         {
-            aIt.remove();
+            g.lock();
+            pImpl->aInterceptorContainer.removeInterface(g, rListener);
+            g.unlock();
         }
 
         break;
@@ -2034,8 +2805,8 @@ bool SfxViewShell::TryContextMenuInterception( Menu& rMenu, const OUString& rMen
 
     if ( bModified )
     {
-        rMenu.Clear();
-        ::framework::ActionTriggerHelper::CreateMenuFromActionTriggerContainer( &rMenu, aEvent.ActionTriggerContainer );
+        rPopupMenu->clear();
+        ::framework::ActionTriggerHelper::CreateMenuFromActionTriggerContainer(rPopupMenu, aEvent.ActionTriggerContainer);
     }
 
     return true;

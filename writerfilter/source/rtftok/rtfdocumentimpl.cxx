@@ -17,6 +17,7 @@
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/text/TextContentAnchorType.hpp>
+#include <com/sun/star/text/XDependentTextField.hpp>
 #include <i18nlangtag/languagetag.hxx>
 #include <unotools/ucbstreamhelper.hxx>
 #include <unotools/streamwrap.hxx>
@@ -24,7 +25,7 @@
 #include <filter/msfilter/util.hxx>
 #include <filter/msfilter/rtfutil.hxx>
 #include <comphelper/string.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/globname.hxx>
 #include <tools/datetimeutils.hxx>
 #include <comphelper/classids.hxx>
@@ -57,20 +58,20 @@ using namespace com::sun::star;
 namespace
 {
 /// Returns an util::DateTime from a 'YYYY. MM. DD.' string.
-util::DateTime getDateTimeFromUserProp(const OUString& rString)
+util::DateTime getDateTimeFromUserProp(std::u16string_view rString)
 {
     util::DateTime aRet;
-    sal_Int32 nLen = rString.getLength();
+    size_t nLen = rString.size();
     if (nLen >= 4)
     {
-        aRet.Year = rString.copy(0, 4).toInt32();
+        aRet.Year = o3tl::toInt32(rString.substr(0, 4));
 
-        if (nLen >= 8 && rString.match(". ", 4))
+        if (nLen >= 8 && o3tl::starts_with(rString.substr(4), u". "))
         {
-            aRet.Month = rString.copy(6, 2).toInt32();
+            aRet.Month = o3tl::toInt32(rString.substr(6, 2));
 
-            if (nLen >= 12 && rString.match(". ", 8))
-                aRet.Day = rString.copy(10, 2).toInt32();
+            if (nLen >= 12 && o3tl::starts_with(rString.substr(8), u". "))
+                aRet.Day = o3tl::toInt32(rString.substr(10, 2));
         }
     }
     return aRet;
@@ -186,6 +187,21 @@ void putBorderProperty(RTFStack& aStates, Id nId, const RTFValue::Pointer_t& pVa
     else if (aStates.top().getBorderState() == RTFBorderState::PAGE)
         pAttributes = &getLastAttributes(aStates.top().getSectionSprms(),
                                          NS_ooxml::LN_EG_SectPrContents_pgBorders);
+    else if (aStates.top().getBorderState() == RTFBorderState::NONE)
+    {
+        // this is invalid, but Word apparently clears or overrides all paragraph borders now
+        for (int i = 0; i < 4; ++i)
+        {
+            auto const nBorder = getParagraphBorder(i);
+            RTFSprms aAttributes;
+            RTFSprms aSprms;
+            aAttributes.set(NS_ooxml::LN_CT_Border_val,
+                            new RTFValue(NS_ooxml::LN_Value_ST_Border_none));
+            putNestedSprm(aStates.top().getParagraphSprms(), NS_ooxml::LN_CT_PrBase_pBdr, nBorder,
+                          new RTFValue(aAttributes, aSprms), RTFOverwrite::YES);
+        }
+    }
+
     if (pAttributes)
         pAttributes->set(nId, pValue);
 }
@@ -293,6 +309,7 @@ RTFDocumentImpl::RTFDocumentImpl(uno::Reference<uno::XComponentContext> const& x
     , m_nCurrentFontIndex(0)
     , m_nCurrentEncoding(-1)
     , m_nDefaultFontIndex(-1)
+    , m_pStyleTableEntries(new RTFReferenceTable::Entries_t)
     , m_nCurrentStyleIndex(0)
     , m_bFormField(false)
     , m_bMathNor(false)
@@ -326,8 +343,6 @@ RTFDocumentImpl::RTFDocumentImpl(uno::Reference<uno::XComponentContext> const& x
 
     m_pTokenizer = new RTFTokenizer(*this, m_pInStream.get(), m_xStatusIndicator);
     m_pSdrImport = new RTFSdrImport(*this, m_xDstDoc);
-
-    m_pStyleTableEntries = std::make_shared<RTFReferenceTable::Entries_t>();
 }
 
 RTFDocumentImpl::~RTFDocumentImpl() = default;
@@ -384,7 +399,8 @@ void RTFDocumentImpl::outputSettingsTable()
         = new RTFReferenceProperties(m_aSettingsTableAttributes, m_aSettingsTableSprms);
     RTFReferenceTable::Entries_t aSettingsTableEntries;
     aSettingsTableEntries.insert(std::make_pair(0, pProp));
-    writerfilter::Reference<Table>::Pointer_t pTable = new RTFReferenceTable(aSettingsTableEntries);
+    writerfilter::Reference<Table>::Pointer_t pTable
+        = new RTFReferenceTable(std::move(aSettingsTableEntries));
     Mapper().table(NS_ooxml::LN_settings_settings, pTable);
 }
 
@@ -540,16 +556,15 @@ RTFDocumentImpl::getProperties(const RTFSprms& rAttributes, RTFSprms const& rSpr
         }
 
         // Get rid of direct formatting what is already in the style.
-        RTFSprms const sprms(aSprms.cloneAndDeduplicate(aStyleSprms, nStyleType, true, &aSprms));
-        RTFSprms const attributes(
-            rAttributes.cloneAndDeduplicate(aStyleAttributes, nStyleType, true));
-        return new RTFReferenceProperties(attributes, sprms);
+        RTFSprms sprms(aSprms.cloneAndDeduplicate(aStyleSprms, nStyleType, true, &aSprms));
+        RTFSprms attributes(rAttributes.cloneAndDeduplicate(aStyleAttributes, nStyleType, true));
+        return new RTFReferenceProperties(std::move(attributes), std::move(sprms));
     }
 
     if (pAbstractList)
         aSprms.duplicateList(pAbstractList);
     writerfilter::Reference<Properties>::Pointer_t pRet
-        = new RTFReferenceProperties(rAttributes, aSprms);
+        = new RTFReferenceProperties(rAttributes, std::move(aSprms));
     return pRet;
 }
 
@@ -610,7 +625,8 @@ void RTFDocumentImpl::runProps()
     {
         auto pValue = new RTFValue(m_aStates.top().getCharacterAttributes(),
                                    m_aStates.top().getCharacterSprms());
-        bufferProperties(*m_aStates.top().getCurrentBuffer(), pValue, nullptr);
+        bufferProperties(*m_aStates.top().getCurrentBuffer(), pValue, nullptr,
+                         NS_ooxml::LN_Value_ST_StyleType_character);
     }
 
     // Delete the sprm, so the trackchange range will be started only once.
@@ -660,10 +676,7 @@ void RTFDocumentImpl::sectBreak(bool bFinal)
     bool bNeedSect = m_bNeedSect;
     RTFValue::Pointer_t pBreak
         = m_aStates.top().getSectionSprms().find(NS_ooxml::LN_EG_SectPrContents_type);
-    bool bContinuous
-        = pBreak
-          && pBreak->getInt()
-                 == static_cast<sal_Int32>(NS_ooxml::LN_Value_ST_SectionMark_continuous);
+    bool bContinuous = pBreak && pBreak->getInt() == NS_ooxml::LN_Value_ST_SectionMark_continuous;
     // If there is no paragraph in this section, then insert a dummy one, as required by Writer,
     // unless this is the end of the doc, we had nothing since the last section break and this is not a continuous one.
     // Also, when pasting, it's fine to not have any paragraph inside the document at all.
@@ -699,7 +712,7 @@ void RTFDocumentImpl::sectBreak(bool bFinal)
     RTFSprms aSprms;
     aSprms.set(NS_ooxml::LN_CT_PPr_sectPr, pValue);
     writerfilter::Reference<Properties>::Pointer_t pProperties
-        = new RTFReferenceProperties(aAttributes, aSprms);
+        = new RTFReferenceProperties(std::move(aAttributes), std::move(aSprms));
 
     if (bFinal && !m_pSuperstream)
         // This is the end of the document, not just the end of e.g. a header.
@@ -859,8 +872,9 @@ void RTFDocumentImpl::resolvePict(bool const bInline, uno::Reference<drawing::XS
         int count = 2;
 
         // Feed the destination text to a stream.
-        OString aStr = OUStringToOString(m_aStates.top().getDestinationText().makeStringAndClear(),
-                                         RTL_TEXTENCODING_ASCII_US);
+        auto& rDestinationTextBuffer = m_aStates.top().getDestinationText();
+        OString aStr = OUStringToOString(rDestinationTextBuffer, RTL_TEXTENCODING_ASCII_US);
+        rDestinationTextBuffer.setLength(0);
         for (int i = 0; i < aStr.getLength(); ++i)
         {
             char ch = aStr[i];
@@ -948,8 +962,23 @@ void RTFDocumentImpl::resolvePict(bool const bInline, uno::Reference<drawing::XS
         m_aStates.top().getPicture().nHeight = aSize.Height();
     }
 
-    // Wrap it in an XShape.
     uno::Reference<drawing::XShape> xShape(rShape);
+    if (m_aStates.top().getInShape() && xShape.is())
+    {
+        awt::Size aSize = xShape->getSize();
+        if (aSize.Width || aSize.Height)
+        {
+            // resolvePict() is processing pib structure inside shape
+            // So if shape has dimensions we should use them instead of
+            // \picwN, \pichN, \picscalexN, \picscaleyN given with picture
+            m_aStates.top().getPicture().nGoalWidth = aSize.Width;
+            m_aStates.top().getPicture().nGoalHeight = aSize.Height;
+            m_aStates.top().getPicture().nScaleX = 100;
+            m_aStates.top().getPicture().nScaleY = 100;
+        }
+    }
+
+    // Wrap it in an XShape.
     if (xShape.is())
     {
         uno::Reference<lang::XServiceInfo> xSI(xShape, uno::UNO_QUERY_THROW);
@@ -999,7 +1028,7 @@ void RTFDocumentImpl::resolvePict(bool const bInline, uno::Reference<drawing::XS
 
         // Replacement graphic is inline by default, see oox::vml::SimpleShape::implConvertAndInsert().
         xPropertySet->setPropertyValue("AnchorType",
-                                       uno::makeAny(text::TextContentAnchorType_AS_CHARACTER));
+                                       uno::Any(text::TextContentAnchorType_AS_CHARACTER));
 
         auto pShapeValue = new RTFValue(xShape);
         m_aObjectAttributes.set(NS_ooxml::LN_shape, pShapeValue);
@@ -1049,12 +1078,6 @@ void RTFDocumentImpl::resolvePict(bool const bInline, uno::Reference<drawing::XS
                  * (nYExt
                     - (m_aStates.top().getPicture().nCropT + m_aStates.top().getPicture().nCropB)))
                 / 100L;
-    if (m_aStates.top().getInShape())
-    {
-        // Picture in shape: it looks like pib picture, so we will stretch the picture to shape size (tdf#49893)
-        nXExt = m_aStates.top().getShape().getRight() - m_aStates.top().getShape().getLeft();
-        nYExt = m_aStates.top().getShape().getBottom() - m_aStates.top().getShape().getTop();
-    }
     auto pXExtValue = new RTFValue(oox::drawingml::convertHmmToEmu(nXExt));
     auto pYExtValue = new RTFValue(oox::drawingml::convertHmmToEmu(nYExt));
     aExtentAttributes.set(NS_ooxml::LN_CT_PositiveSize2D_cx, pXExtValue);
@@ -1164,12 +1187,12 @@ void RTFDocumentImpl::resolvePict(bool const bInline, uno::Reference<drawing::XS
         auto pValue = new RTFValue(m_aStates.top().getShape().getAnchorAttributes(), aAnchorSprms);
         aSprms.set(NS_ooxml::LN_anchor_anchor, pValue);
     }
-    writerfilter::Reference<Properties>::Pointer_t pProperties
-        = new RTFReferenceProperties(aAttributes, aSprms);
     checkFirstRun();
 
     if (!m_aStates.top().getCurrentBuffer())
     {
+        writerfilter::Reference<Properties>::Pointer_t pProperties
+            = new RTFReferenceProperties(std::move(aAttributes), std::move(aSprms));
         Mapper().props(pProperties);
         // Make sure we don't lose these properties with a too early reset.
         m_bHadPicture = true;
@@ -1318,15 +1341,23 @@ void RTFDocumentImpl::singleChar(sal_uInt8 nValue, bool bRunProps)
     if (!pCurrentBuffer)
     {
         Mapper().startCharacterGroup();
-        // Should we send run properties?
-        if (bRunProps)
-            runProps();
+    }
+    else
+    {
+        pCurrentBuffer->push_back(Buf_t(BUFFER_STARTRUN, nullptr, nullptr));
+    }
+
+    // Should we send run properties?
+    if (bRunProps)
+        runProps();
+
+    if (!pCurrentBuffer)
+    {
         Mapper().text(sValue, 1);
         Mapper().endCharacterGroup();
     }
     else
     {
-        pCurrentBuffer->push_back(Buf_t(BUFFER_STARTRUN, nullptr, nullptr));
         auto pValue = new RTFValue(*sValue);
         pCurrentBuffer->push_back(Buf_t(BUFFER_TEXT, pValue, nullptr));
         pCurrentBuffer->push_back(Buf_t(BUFFER_ENDRUN, nullptr, nullptr));
@@ -1469,6 +1500,11 @@ void RTFDocumentImpl::text(OUString& rString)
                 resetAttributes();
                 resetSprms();
             }
+        }
+        break;
+        case Destination::DOCVAR:
+        {
+            m_aStates.top().appendDocVar(rString);
         }
         break;
         case Destination::FONTTABLE:
@@ -1658,20 +1694,20 @@ void RTFDocumentImpl::sendProperties(
     tableBreak();
 }
 
-void RTFDocumentImpl::replayRowBuffer(RTFBuffer_t& rBuffer, ::std::deque<RTFSprms>& rCellsSrpms,
+void RTFDocumentImpl::replayRowBuffer(RTFBuffer_t& rBuffer, ::std::deque<RTFSprms>& rCellsSprms,
                                       ::std::deque<RTFSprms>& rCellsAttributes, int const nCells)
 {
     for (int i = 0; i < nCells; ++i)
     {
-        replayBuffer(rBuffer, &rCellsSrpms.front(), &rCellsAttributes.front());
-        rCellsSrpms.pop_front();
+        replayBuffer(rBuffer, &rCellsSprms.front(), &rCellsAttributes.front());
+        rCellsSprms.pop_front();
         rCellsAttributes.pop_front();
     }
     for (Buf_t& i : rBuffer)
     {
         SAL_WARN_IF(BUFFER_CELLEND == std::get<0>(i), "writerfilter.rtf", "dropping table cell!");
     }
-    assert(rCellsSrpms.empty());
+    assert(rCellsSprms.empty());
     assert(rCellsAttributes.empty());
 }
 
@@ -1682,11 +1718,13 @@ void RTFDocumentImpl::replayBuffer(RTFBuffer_t& rBuffer, RTFSprms* const pSprms,
     {
         Buf_t aTuple(rBuffer.front());
         rBuffer.pop_front();
-        if (std::get<0>(aTuple) == BUFFER_PROPS)
+        if (std::get<0>(aTuple) == BUFFER_PROPS || std::get<0>(aTuple) == BUFFER_PROPS_CHAR)
         {
             // Construct properties via getProperties() and not directly, to take care of deduplication.
             writerfilter::Reference<Properties>::Pointer_t const pProp(getProperties(
-                std::get<1>(aTuple)->getAttributes(), std::get<1>(aTuple)->getSprms(), 0));
+                std::get<1>(aTuple)->getAttributes(), std::get<1>(aTuple)->getSprms(),
+                std::get<0>(aTuple) == BUFFER_PROPS_CHAR ? NS_ooxml::LN_Value_ST_StyleType_character
+                                                         : 0));
             Mapper().props(pProp);
         }
         else if (std::get<0>(aTuple) == BUFFER_NESTROW)
@@ -1738,9 +1776,11 @@ void RTFDocumentImpl::replayBuffer(RTFBuffer_t& rBuffer, RTFSprms* const pSprms,
 
             // Set current shape during replay, needed by e.g. wrap in
             // background.
+            RTFShape aShape = m_aStates.top().getShape();
             m_aStates.top().getShape() = std::get<1>(aTuple)->getShape();
 
             m_pSdrImport->resolve(std::get<1>(aTuple)->getShape(), true, RTFSdrImport::SHAPE);
+            m_aStates.top().getShape() = aShape;
             m_aStates.top().setCurrentBuffer(pCurrentBuffer);
         }
         else if (std::get<0>(aTuple) == BUFFER_ENDSHAPE)
@@ -2181,18 +2221,18 @@ RTFReferenceTable::Entries_t RTFDocumentImpl::deduplicateStyleTable()
                         NS_ooxml::LN_CT_Style_type));
                 assert(pStyleType);
                 int const nStyleType(pStyleType->getInt());
-                RTFSprms const sprms(
+                RTFSprms sprms(
                     static_cast<RTFReferenceProperties&>(*pStyle).getSprms().cloneAndDeduplicate(
                         static_cast<RTFReferenceProperties&>(*itParent->second).getSprms(),
                         nStyleType));
-                RTFSprms const attributes(
+                RTFSprms attributes(
                     static_cast<RTFReferenceProperties&>(*pStyle)
                         .getAttributes()
                         .cloneAndDeduplicate(
                             static_cast<RTFReferenceProperties&>(*itParent->second).getAttributes(),
                             nStyleType));
 
-                ret[it.first] = new RTFReferenceProperties(attributes, sprms);
+                ret[it.first] = new RTFReferenceProperties(std::move(attributes), std::move(sprms));
             }
             else
             {
@@ -2254,9 +2294,9 @@ RTFError RTFDocumentImpl::beforePopState(RTFParserState& rState)
         break;
         case Destination::STYLESHEET:
         {
-            RTFReferenceTable::Entries_t const pStyleTableDeduplicated(deduplicateStyleTable());
+            RTFReferenceTable::Entries_t pStyleTableDeduplicated(deduplicateStyleTable());
             writerfilter::Reference<Table>::Pointer_t const pTable(
-                new RTFReferenceTable(pStyleTableDeduplicated));
+                new RTFReferenceTable(std::move(pStyleTableDeduplicated)));
             Mapper().table(NS_ooxml::LN_STYLESHEET, pTable);
         }
         break;
@@ -2264,11 +2304,11 @@ RTFError RTFDocumentImpl::beforePopState(RTFParserState& rState)
         {
             RTFSprms aListTableAttributes;
             writerfilter::Reference<Properties>::Pointer_t pProp
-                = new RTFReferenceProperties(aListTableAttributes, m_aListTableSprms);
+                = new RTFReferenceProperties(std::move(aListTableAttributes), m_aListTableSprms);
             RTFReferenceTable::Entries_t aListTableEntries;
             aListTableEntries.insert(std::make_pair(0, pProp));
             writerfilter::Reference<Table>::Pointer_t const pTable(
-                new RTFReferenceTable(aListTableEntries));
+                new RTFReferenceTable(std::move(aListTableEntries)));
             Mapper().table(NS_ooxml::LN_NUMBERING, pTable);
         }
         break;
@@ -2286,7 +2326,7 @@ RTFError RTFDocumentImpl::beforePopState(RTFParserState& rState)
             if (!m_aStates.top().getCurrentBuffer())
             {
                 writerfilter::Reference<Properties>::Pointer_t pProperties
-                    = new RTFReferenceProperties(aFFAttributes, aFFSprms);
+                    = new RTFReferenceProperties(std::move(aFFAttributes), std::move(aFFSprms));
                 Mapper().props(pProperties);
             }
             else
@@ -2548,19 +2588,22 @@ RTFError RTFDocumentImpl::beforePopState(RTFParserState& rState)
                 break; // not for nested group
             auto pValue
                 = new RTFValue(m_aStates.top().getCurrentDestinationText()->makeStringAndClear());
-            m_aFormfieldSprms.set(NS_ooxml::LN_CT_FFDDList_listEntry, pValue);
+            // OOXML puts these into a LN_CT_FFData_ddList but FFDataHandler should handle this too
+            m_aFormfieldSprms.set(NS_ooxml::LN_CT_FFDDList_listEntry, pValue,
+                                  RTFOverwrite::NO_APPEND);
         }
         break;
         case Destination::DATAFIELD:
         {
             if (m_bFormField)
             {
-                if (&m_aStates.top().getDestinationText()
-                    != m_aStates.top().getCurrentDestinationText())
+                OUStringBuffer* pCurrentDestinationText
+                    = m_aStates.top().getCurrentDestinationText();
+                if (&m_aStates.top().getDestinationText() != pCurrentDestinationText)
                     break; // not for nested group
-                OString aStr = OUStringToOString(
-                    m_aStates.top().getCurrentDestinationText()->makeStringAndClear(),
-                    rState.getCurrentEncoding());
+                OString aStr
+                    = OUStringToOString(*pCurrentDestinationText, rState.getCurrentEncoding());
+                pCurrentDestinationText->setLength(0);
                 // decode hex dump
                 OStringBuffer aBuf;
                 int b = 0;
@@ -2642,8 +2685,13 @@ RTFError RTFDocumentImpl::beforePopState(RTFParserState& rState)
                 != m_aStates.top().getCurrentDestinationText())
                 break; // not for nested group
             if (m_xDocumentProperties.is())
-                m_xDocumentProperties->setKeywords(comphelper::string::convertCommaSeparated(
-                    m_aStates.top().getCurrentDestinationText()->makeStringAndClear()));
+            {
+                OUStringBuffer* pCurrentDestinationText
+                    = m_aStates.top().getCurrentDestinationText();
+                m_xDocumentProperties->setKeywords(
+                    comphelper::string::convertCommaSeparated(*pCurrentDestinationText));
+                pCurrentDestinationText->setLength(0);
+            }
             break;
         case Destination::COMMENT:
             if (&m_aStates.top().getDestinationText()
@@ -2688,8 +2736,7 @@ RTFError RTFDocumentImpl::beforePopState(RTFParserState& rState)
                 break; // not for nested group
             OUString aName = rState.getDestination() == Destination::OPERATOR ? OUString("Operator")
                                                                               : OUString("Company");
-            uno::Any aValue
-                = uno::makeAny(m_aStates.top().getCurrentDestinationText()->makeStringAndClear());
+            uno::Any aValue(m_aStates.top().getCurrentDestinationText()->makeStringAndClear());
             if (m_xDocumentProperties.is())
             {
                 uno::Reference<beans::XPropertyContainer> xUserDefinedProperties
@@ -2743,7 +2790,7 @@ RTFError RTFDocumentImpl::beforePopState(RTFParserState& rState)
             auto pValue = new RTFValue(m_aObjectAttributes, aObjectSprms);
             aObjSprms.set(NS_ooxml::LN_object, pValue);
             writerfilter::Reference<Properties>::Pointer_t pProperties
-                = new RTFReferenceProperties(aObjAttributes, aObjSprms);
+                = new RTFReferenceProperties(std::move(aObjAttributes), std::move(aObjSprms));
             uno::Reference<drawing::XShape> xShape;
             RTFValue::Pointer_t pShape = m_aObjectAttributes.find(NS_ooxml::LN_shape);
             OSL_ASSERT(pShape);
@@ -2762,18 +2809,17 @@ RTFError RTFDocumentImpl::beforePopState(RTFParserState& rState)
         break;
         case Destination::ANNOTATIONDATE:
         {
-            if (&m_aStates.top().getDestinationText()
-                != m_aStates.top().getCurrentDestinationText())
+            OUStringBuffer* pCurrentDestinationText = m_aStates.top().getCurrentDestinationText();
+            if (&m_aStates.top().getDestinationText() != pCurrentDestinationText)
                 break; // not for nested group
-            OUString aStr(OStringToOUString(
-                DTTM22OString(
-                    m_aStates.top().getCurrentDestinationText()->makeStringAndClear().toInt32()),
-                rState.getCurrentEncoding()));
+            OUString aStr(OStringToOUString(DTTM22OString(o3tl::toInt32(*pCurrentDestinationText)),
+                                            rState.getCurrentEncoding()));
+            pCurrentDestinationText->setLength(0);
             auto pValue = new RTFValue(aStr);
             RTFSprms aAnnAttributes;
             aAnnAttributes.set(NS_ooxml::LN_CT_TrackChange_date, pValue);
             writerfilter::Reference<Properties>::Pointer_t pProperties
-                = new RTFReferenceProperties(aAnnAttributes);
+                = new RTFReferenceProperties(std::move(aAnnAttributes));
             Mapper().props(pProperties);
         }
         break;
@@ -2802,10 +2848,10 @@ RTFError RTFDocumentImpl::beforePopState(RTFParserState& rState)
                 aAttributes.set(NS_ooxml::LN_EG_RangeMarkupElements_commentRangeStart, pValue);
             else
                 aAttributes.set(NS_ooxml::LN_EG_RangeMarkupElements_commentRangeEnd, pValue);
-            writerfilter::Reference<Properties>::Pointer_t pProperties
-                = new RTFReferenceProperties(aAttributes);
             if (!m_aStates.top().getCurrentBuffer())
             {
+                writerfilter::Reference<Properties>::Pointer_t pProperties
+                    = new RTFReferenceProperties(std::move(aAttributes));
                 Mapper().props(pProperties);
             }
             else
@@ -2823,7 +2869,7 @@ RTFError RTFDocumentImpl::beforePopState(RTFParserState& rState)
             OUString aStr = m_aStates.top().getCurrentDestinationText()->makeStringAndClear();
             RTFSprms aAnnAttributes;
             aAnnAttributes.set(NS_ooxml::LN_CT_Markup_id, new RTFValue(aStr.toInt32()));
-            Mapper().props(new RTFReferenceProperties(aAnnAttributes));
+            Mapper().props(new RTFReferenceProperties(std::move(aAnnAttributes)));
         }
         break;
         case Destination::FALT:
@@ -2847,15 +2893,15 @@ RTFError RTFDocumentImpl::beforePopState(RTFParserState& rState)
                 bool bTextFrame = xServiceInfo->supportsService("com.sun.star.text.TextFrame");
 
                 // The default is certainly not inline, but then what Word supports is just at-character.
-                xPropertySet->setPropertyValue(
-                    "AnchorType", uno::makeAny(text::TextContentAnchorType_AT_CHARACTER));
+                xPropertySet->setPropertyValue("AnchorType",
+                                               uno::Any(text::TextContentAnchorType_AT_CHARACTER));
 
                 if (bTextFrame)
                 {
                     xPropertySet->setPropertyValue("HoriOrientPosition",
-                                                   uno::makeAny(rDrawing.getLeft()));
+                                                   uno::Any(rDrawing.getLeft()));
                     xPropertySet->setPropertyValue("VertOrientPosition",
-                                                   uno::makeAny(rDrawing.getTop()));
+                                                   uno::Any(rDrawing.getTop()));
                 }
                 else
                 {
@@ -2865,22 +2911,21 @@ RTFError RTFDocumentImpl::beforePopState(RTFParserState& rState)
 
                 if (rDrawing.getHasLineColor())
                 {
-                    uno::Any aLineColor = uno::makeAny(sal_uInt32((rDrawing.getLineColorR() << 16)
-                                                                  + (rDrawing.getLineColorG() << 8)
-                                                                  + rDrawing.getLineColorB()));
+                    uno::Any aLineColor(sal_uInt32((rDrawing.getLineColorR() << 16)
+                                                   + (rDrawing.getLineColorG() << 8)
+                                                   + rDrawing.getLineColorB()));
                     uno::Any aLineWidth;
                     RTFSdrImport::resolveLineColorAndWidth(bTextFrame, xPropertySet, aLineColor,
                                                            aLineWidth);
                 }
                 if (rDrawing.getHasFillColor())
                     xPropertySet->setPropertyValue(
-                        "FillColor", uno::makeAny(sal_uInt32((rDrawing.getFillColorR() << 16)
-                                                             + (rDrawing.getFillColorG() << 8)
-                                                             + rDrawing.getFillColorB())));
+                        "FillColor", uno::Any(sal_uInt32((rDrawing.getFillColorR() << 16)
+                                                         + (rDrawing.getFillColorG() << 8)
+                                                         + rDrawing.getFillColorB())));
                 else if (!bTextFrame)
                     // If there is no fill, the Word default is 100% transparency.
-                    xPropertySet->setPropertyValue("FillTransparence",
-                                                   uno::makeAny(sal_Int32(100)));
+                    xPropertySet->setPropertyValue("FillTransparence", uno::Any(sal_Int32(100)));
 
                 RTFSdrImport::resolveFLine(xPropertySet, rDrawing.getFLine());
 
@@ -2936,7 +2981,7 @@ RTFError RTFDocumentImpl::beforePopState(RTFParserState& rState)
                 RTFSprms aMathAttributes;
                 aMathAttributes.set(NS_ooxml::LN_starmath, pValue);
                 writerfilter::Reference<Properties>::Pointer_t pProperties
-                    = new RTFReferenceProperties(aMathAttributes);
+                    = new RTFReferenceProperties(std::move(aMathAttributes));
                 Mapper().props(pProperties);
             }
 
@@ -3330,20 +3375,20 @@ void RTFDocumentImpl::afterPopState(RTFParserState& rState)
 
                 // Table
                 RTFSprms aListTableAttributes;
-                writerfilter::Reference<Properties>::Pointer_t pProp
-                    = new RTFReferenceProperties(aListTableAttributes, aListTableSprms);
+                writerfilter::Reference<Properties>::Pointer_t pProp = new RTFReferenceProperties(
+                    std::move(aListTableAttributes), std::move(aListTableSprms));
 
                 RTFReferenceTable::Entries_t aListTableEntries;
                 aListTableEntries.insert(std::make_pair(0, pProp));
                 writerfilter::Reference<Table>::Pointer_t const pTable(
-                    new RTFReferenceTable(aListTableEntries));
+                    new RTFReferenceTable(std::move(aListTableEntries)));
                 Mapper().table(NS_ooxml::LN_NUMBERING, pTable);
 
                 // Use it
                 putNestedSprm(m_aStates.top().getParagraphSprms(), NS_ooxml::LN_CT_PPrBase_numPr,
-                              NS_ooxml::LN_CT_NumPr_ilvl, pIlvlValue);
+                              NS_ooxml::LN_CT_NumPr_ilvl, pIlvlValue, RTFOverwrite::YES_PREPEND);
                 putNestedSprm(m_aStates.top().getParagraphSprms(), NS_ooxml::LN_CT_PPrBase_numPr,
-                              NS_ooxml::LN_CT_NumPr_numId, pIdValue);
+                              NS_ooxml::LN_CT_NumPr_numId, pIdValue, RTFOverwrite::YES_PREPEND);
             }
         }
         break;
@@ -3439,6 +3484,30 @@ void RTFDocumentImpl::afterPopState(RTFParserState& rState)
         case Destination::FIELD:
             if (rState.getFieldStatus() == RTFFieldStatus::INSTRUCTION)
                 singleChar(cFieldEnd);
+            break;
+        case Destination::DOCVAR:
+            if (!m_aStates.empty())
+            {
+                OUString docvar(rState.getDocVar());
+                if (m_aStates.top().getDocVarName().isEmpty())
+                {
+                    m_aStates.top().setDocVarName(docvar);
+                }
+                else
+                {
+                    uno::Reference<beans::XPropertySet> xMaster(
+                        m_xModelFactory->createInstance("com.sun.star.text.FieldMaster.User"),
+                        uno::UNO_QUERY_THROW);
+                    xMaster->setPropertyValue("Name", uno::Any(m_aStates.top().getDocVarName()));
+                    uno::Reference<text::XDependentTextField> xField(
+                        m_xModelFactory->createInstance("com.sun.star.text.TextField.User"),
+                        uno::UNO_QUERY);
+                    xField->attachTextFieldMaster(xMaster);
+                    xField->getTextFieldMaster()->setPropertyValue("Content", uno::Any(docvar));
+
+                    m_aStates.top().clearDocVarName();
+                }
+            }
             break;
         case Destination::SHAPEPROPERTYVALUEPICT:
             if (!m_aStates.empty())
@@ -3573,7 +3642,7 @@ RTFError RTFDocumentImpl::popState()
         auto pValue = new RTFValue(0);
         aTCSprms.set(NS_ooxml::LN_endtrackchange, pValue);
         if (!m_aStates.top().getCurrentBuffer())
-            Mapper().props(new RTFReferenceProperties(RTFSprms(), aTCSprms));
+            Mapper().props(new RTFReferenceProperties(RTFSprms(), std::move(aTCSprms)));
         else
             bufferProperties(*m_aStates.top().getCurrentBuffer(),
                              new RTFValue(RTFSprms(), aTCSprms), nullptr);
@@ -3626,9 +3695,9 @@ RTFError RTFDocumentImpl::popState()
 
 RTFError RTFDocumentImpl::handleEmbeddedObject()
 {
-    OString aStr
-        = OUStringToOString(m_aStates.top().getCurrentDestinationText()->makeStringAndClear(),
-                            RTL_TEXTENCODING_ASCII_US);
+    OUStringBuffer* pCurrentDestinationText = m_aStates.top().getCurrentDestinationText();
+    OString aStr = OUStringToOString(*pCurrentDestinationText, RTL_TEXTENCODING_ASCII_US);
+    pCurrentDestinationText->setLength(0);
     std::unique_ptr<SvStream> pStream(new SvMemoryStream());
     if (!msfilter::rtfutil::ExtractOLE2FromObjdata(aStr, *pStream))
         return RTFError::HEX_INVALID;
@@ -3706,7 +3775,7 @@ void RTFDocumentImpl::checkUnicode(bool bUnicode, bool bHex)
         if (m_aStates.top().getDestination() == Destination::FONTENTRY
             && m_aStates.top().getCurrentEncoding() == RTL_TEXTENCODING_SYMBOL)
             nEncoding = RTL_TEXTENCODING_MS_1252;
-        OUString aString = OStringToOUString(m_aHexBuffer.toString(), nEncoding);
+        OUString aString = OStringToOUString(m_aHexBuffer, nEncoding);
         m_aHexBuffer.setLength(0);
         aString = FilterControlChars(m_aStates.top().getDestination(), aString);
         text(aString);
@@ -3751,11 +3820,15 @@ RTFParserState::RTFParserState(RTFDocumentImpl* pDocumentImpl)
 void RTFDocumentImpl::resetFrame() { m_aStates.top().getFrame() = RTFFrame(&m_aStates.top()); }
 
 void RTFDocumentImpl::bufferProperties(RTFBuffer_t& rBuffer, const RTFValue::Pointer_t& pValue,
-                                       const tools::SvRef<TableRowBuffer>& pTableProperties)
+                                       const tools::SvRef<TableRowBuffer>& pTableProperties,
+                                       Id const nStyleType)
 {
     rBuffer.emplace_back(BUFFER_SETSTYLE, new RTFValue(m_aStates.top().getCurrentStyleIndex()),
                          nullptr);
-    rBuffer.emplace_back(BUFFER_PROPS, pValue, pTableProperties);
+    assert(nStyleType == 0 || nStyleType == NS_ooxml::LN_Value_ST_StyleType_character);
+    rBuffer.emplace_back(nStyleType == NS_ooxml::LN_Value_ST_StyleType_character ? BUFFER_PROPS_CHAR
+                                                                                 : BUFFER_PROPS,
+                         pValue, pTableProperties);
 }
 
 RTFShape::RTFShape() = default;

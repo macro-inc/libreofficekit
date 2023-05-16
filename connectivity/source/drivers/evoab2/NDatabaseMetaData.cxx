@@ -253,8 +253,14 @@ OEvoabDatabaseMetaData::~OEvoabDatabaseMetaData()
 }
 
 
-ODatabaseMetaDataResultSet::ORows OEvoabDatabaseMetaData::getColumnRows( const OUString& columnNamePattern )
+Reference< XResultSet > SAL_CALL OEvoabDatabaseMetaData::getColumns(
+    const Any& /*catalog*/, const OUString& /*schemaPattern*/, const OUString& /*tableNamePattern*/,
+    const OUString& columnNamePattern )
 {
+    // this returns an empty resultset where the column-names are already set
+    // in special the metadata of the resultset already returns the right columns
+    rtl::Reference<ODatabaseMetaDataResultSet> pResultSet = new ODatabaseMetaDataResultSet( ODatabaseMetaDataResultSet::eColumns );
+
     ODatabaseMetaDataResultSet::ORows aRows;
     ODatabaseMetaDataResultSet::ORow  aRow(19);
 
@@ -294,7 +300,7 @@ ODatabaseMetaDataResultSet::ORows OEvoabDatabaseMetaData::getColumnRows( const O
     ::osl::MutexGuard aGuard( m_aMutex );
 
     initFields();
-    for (sal_Int32 i = 0; i < static_cast<sal_Int32>(nFields); i++)
+    for (guint i = 0; i < nFields; i++)
     {
         if( match( columnNamePattern, getFieldName( i ), '\0' ) )
         {
@@ -304,12 +310,14 @@ ODatabaseMetaDataResultSet::ORows OEvoabDatabaseMetaData::getColumnRows( const O
             // COLUMN_NAME
             aRow[4] = new ORowSetValueDecorator( getFieldName( i ) );
             // ORDINAL_POSITION
-            aRow[17] = new ORowSetValueDecorator( i );
+            aRow[17] = new ORowSetValueDecorator( sal_Int32(i) );
             aRows.push_back( aRow );
         }
     }
 
-    return aRows ;
+    pResultSet->setRows(std::move(aRows));
+
+    return pResultSet;
 }
 
 OUString OEvoabDatabaseMetaData::impl_getCatalogSeparator_throw(  )
@@ -988,7 +996,7 @@ Reference< XResultSet > SAL_CALL OEvoabDatabaseMetaData::getTableTypes(  )
     rtl::Reference<::connectivity::ODatabaseMetaDataResultSet> pResult = new ::connectivity::ODatabaseMetaDataResultSet(::connectivity::ODatabaseMetaDataResultSet::eTableTypes);
 
     // here we fill the rows which should be visible when ask for data from the resultset returned here
-    auto nNbTypes = SAL_N_ELEMENTS(sTableTypes);
+    auto nNbTypes = std::size(sTableTypes);
     ODatabaseMetaDataResultSet::ORows aRows;
     for(std::size_t i=0;i < nNbTypes;++i)
     {
@@ -1046,18 +1054,6 @@ Reference< XResultSet > OEvoabDatabaseMetaData::impl_getTypeInfo_throw(  )
     return pResultSet;
 }
 
-Reference< XResultSet > SAL_CALL OEvoabDatabaseMetaData::getColumns(
-    const Any& /*catalog*/, const OUString& /*schemaPattern*/, const OUString& /*tableNamePattern*/,
-    const OUString& columnNamePattern )
-{
-    // this returns an empty resultset where the column-names are already set
-    // in special the metadata of the resultset already returns the right columns
-    rtl::Reference<ODatabaseMetaDataResultSet> pResultSet = new ODatabaseMetaDataResultSet( ODatabaseMetaDataResultSet::eColumns );
-    pResultSet->setRows( getColumnRows( columnNamePattern ) );
-    return pResultSet;
-}
-
-
 bool isSourceBackend(ESource *pSource, const char *backendname)
 {
     if (!pSource || !e_source_has_extension (pSource, E_SOURCE_EXTENSION_ADDRESS_BOOK))
@@ -1073,7 +1069,7 @@ Reference< XResultSet > SAL_CALL OEvoabDatabaseMetaData::getTables(
 {
     ::osl::MutexGuard aGuard( m_aMutex );
 
-    rtl::Reference<ODatabaseMetaDataResultSet> pResult = new ODatabaseMetaDataResultSet(ODatabaseMetaDataResultSet::eTableTypes);
+    rtl::Reference<ODatabaseMetaDataResultSet> pResult = new ODatabaseMetaDataResultSet(ODatabaseMetaDataResultSet::eTables);
 
     // check if any type is given
     // when no types are given then we have to return all tables e.g. TABLE

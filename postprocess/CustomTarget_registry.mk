@@ -116,7 +116,6 @@ postprocess_DEPS_lingucomponent := main
 postprocess_FILES_lingucomponent := \
 	$(SRCDIR)/lingucomponent/config/Linguistic-lingucomponent-hyphenator.xcu \
 	$(SRCDIR)/lingucomponent/config/Linguistic-lingucomponent-spellchecker.xcu \
-	$(SRCDIR)/lingucomponent/config/Linguistic-lingucomponent-grammarchecker.xcu \
 	$(SRCDIR)/lingucomponent/config/Linguistic-lingucomponent-thesaurus.xcu \
 
 postprocess_FILES_main := \
@@ -323,7 +322,7 @@ else
 postprocess_FILES_main += $(postprocess_MOD)/org/openoffice/Office/Paths-internallibnumbertextdata.xcu
 endif
 
-ifneq ($(filter POWERPC INTEL ARM HPPA GODSON M68K SPARC S390,$(CPUNAME)),)
+ifneq ($(filter POWERPC INTEL ARM HPPA MIPS M68K SPARC S390,$(CPUNAME)),)
 postprocess_FILES_main += \
 	$(postprocess_MOD)/org/openoffice/Office/Common-32bit.xcu
 endif
@@ -624,7 +623,7 @@ $(call gb_CustomTarget_get_workdir,postprocess/registry)/fcfg_langpack_%.list :
 	$(call gb_Trace_StartRange,$(subst $(WORKDIR)/,,$@),AWK)
 	$(call gb_Helper_abbreviate_dirs,\
 	    $(FIND) $(call gb_XcuResTarget_get_target,fcfg_langpack/$*/) \
-	         -name *.xcu -size +0c \
+	         -name "*.xcu" -size +0c \
 		| LC_ALL=C $(SORT) \
 	        | $(gb_AWK) 'BEGIN{print "<list>"} \
 	                    {print "<filename>"$$0"</filename>"} \
@@ -642,7 +641,7 @@ $(call gb_CustomTarget_get_workdir,postprocess/registry)/registry_%.list :
 	                 $(call gb_XcuResTarget_get_target,$(driver)/$*/)))\
 	         $(if $(filter TRUE,$(ENABLE_ONLINE_UPDATE)),\
 	             $(call gb_XcuResTarget_get_target,updchk/$*/))\
-	         -name *.xcu \
+	         -name "*.xcu" \
 		| LC_ALL=C $(SORT) \
 	        | $(gb_AWK) 'BEGIN{print "<list>"} \
 	                    {print "<filename>"$$0"</filename>"} \
@@ -653,10 +652,9 @@ $(call gb_CustomTarget_get_workdir,postprocess/registry)/registry_%.list :
 $(call gb_CustomTarget_get_workdir,postprocess/registry)/%.list :
 	$(call gb_Output_announce,$(subst $(WORKDIR)/,,$@),$(true),ECH,2)
 	$(call gb_Trace_StartRange,$(subst $(WORKDIR)/,,$@),ECH)
-	mv $(call gb_var2file,$@.tmp,70,<list> $(foreach i,$(postprocess_DEPS_$*), <dependency file='$i'/>) \
+	$(file >$@,<list> $(foreach i,$(postprocess_DEPS_$*), <dependency file='$i'/>) \
 		   $(foreach i,$(postprocess_OPTDEPS_$*), <dependency file='$i' optional='true'/>) \
-		   $(foreach i,$(postprocess_FILES_$*), <filename>$(i)</filename>) </list>) \
-	   $@
+		   $(foreach i,$(postprocess_FILES_$*), <filename>$(i)</filename>) </list>)
 	$(call gb_Trace_EndRange,$(subst $(WORKDIR)/,,$@),ECH)
 
 # vim: set noet sw=4 ts=4:

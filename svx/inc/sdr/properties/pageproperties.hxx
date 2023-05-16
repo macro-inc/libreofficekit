@@ -20,21 +20,16 @@
 #ifndef INCLUDED_SVX_INC_SDR_PROPERTIES_PAGEPROPERTIES_HXX
 #define INCLUDED_SVX_INC_SDR_PROPERTIES_PAGEPROPERTIES_HXX
 
-#include <sdr/properties/emptyproperties.hxx>
-
+#include <svx/sdr/properties/properties.hxx>
+#include <svl/itemset.hxx>
+#include <optional>
 
 namespace sdr::properties
     {
-        class PageProperties final : public EmptyProperties
+        class PageProperties final : public BaseProperties
         {
-            // create a new object specific itemset with object specific ranges.
-            virtual SfxItemSet CreateObjectSpecificItemSet(SfxItemPool& pPool) override;
-
-            // Do the ItemChange, may do special handling
-            virtual void ItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr) override;
-
-            // Called after ItemChange() is done for all items.
-            virtual void PostItemChange(const sal_uInt16 nWhich) override;
+            // the to be used ItemSet
+            mutable std::optional<SfxItemSet> mxEmptyItemSet;
 
         public:
             // basic constructor
@@ -46,21 +41,36 @@ namespace sdr::properties
             // destructor
             virtual ~PageProperties() override;
 
+            // create a new object specific itemset with object specific ranges.
+            virtual SfxItemSet CreateObjectSpecificItemSet(SfxItemPool& pPool) override;
+
             // Clone() operator, normally just calls the local copy constructor
             virtual std::unique_ptr<BaseProperties> Clone(SdrObject& rObj) const override;
 
-            // get itemset. Override here to allow creating the empty itemset
-            // without asserting
             virtual const SfxItemSet& GetObjectItemSet() const override;
 
             // get the installed StyleSheet
             virtual SfxStyleSheet* GetStyleSheet() const override;
 
             // set the installed StyleSheet
-            virtual void SetStyleSheet(SfxStyleSheet* pStyleSheet, bool bDontRemoveHardAttr) override;
+            virtual void SetStyleSheet(SfxStyleSheet* pStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast) override;
 
             // clear single item
             virtual void ClearObjectItem(const sal_uInt16 nWhich = 0) override;
+
+            // set single item
+            virtual void SetObjectItem(const SfxPoolItem& rItem) override;
+
+            // set single item direct, do not do any notifies or things like that
+            virtual void SetObjectItemDirect(const SfxPoolItem& rItem) override;
+
+            // clear single item direct, do not do any notifies or things like that.
+            // Also supports complete deletion of items when default parameter 0 is used.
+            virtual void ClearObjectItemDirect(const sal_uInt16 nWhich) override;
+
+            // set complete item set
+            virtual void SetObjectItemSet(const SfxItemSet& rSet) override;
         };
 } // end of namespace sdr::properties
 

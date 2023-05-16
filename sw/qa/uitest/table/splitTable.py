@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -12,7 +14,6 @@ from uitest.uihelper.common import get_url_for_data_file
 class splitTable(UITestCase):
     def test_split_table(self):
         with self.ui_test.load_file(get_url_for_data_file("splitTable.odt")) as writer_doc:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
             #go to row 2
             self.xUITest.executeCommand(".uno:GoDown")
             self.xUITest.executeCommand(".uno:GoDown")
@@ -31,7 +32,6 @@ class splitTable(UITestCase):
 
         #dialog Split table, check Custom heading, OK -> verify 2 tables, 1st has 2 rows, second has 4 rows
         with self.ui_test.load_file(get_url_for_data_file("splitTable.odt")) as writer_doc:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
             #go to row 2
             self.xUITest.executeCommand(".uno:GoDown")
             self.xUITest.executeCommand(".uno:GoDown")
@@ -49,7 +49,6 @@ class splitTable(UITestCase):
 
         #dialog Split table, check No heading, OK -> verify 2 tables, 1st has 2 rows, second has 4 rows
         with self.ui_test.load_file(get_url_for_data_file("splitTable.odt")) as writer_doc:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
             #go to row 2
             self.xUITest.executeCommand(".uno:GoDown")
             self.xUITest.executeCommand(".uno:GoDown")

@@ -34,15 +34,20 @@
 #else
 #include <CoreGraphics/CoreGraphics.h>
 #include <CoreText/CoreText.h>
-#include "salgeom.hxx"
 #endif
 #include <postmac.h>
+
+#ifdef IOS
+// iOS defines a different Point class so include salgeom.hxx after postmac.h
+// so that it will use the Point class in tools/gen.hxx
+#include "salgeom.hxx"
+#endif
 
 #include <vcl/fontcapabilities.hxx>
 #include <vcl/metric.hxx>
 
 
-#include <fontinstance.hxx>
+#include <font/LogicalFontInstance.hxx>
 #include <impfontmetricdata.hxx>
 #include <font/PhysicalFontFace.hxx>
 #include <salgdi.hxx>
@@ -58,57 +63,49 @@ class FontAttributes;
 class XorEmulation;
 
 // CoreText-specific physically available font face
-class CoreTextFontFace : public vcl::font::PhysicalFontFace
+class CoreTextFontFace final : public vcl::font::PhysicalFontFace
 {
 public:
-                                    CoreTextFontFace( const FontAttributes&, sal_IntPtr nFontID );
-    virtual                         ~CoreTextFontFace() override;
+                                    CoreTextFontFace( const FontAttributes&, CTFontDescriptorRef xRef );
+                                    ~CoreTextFontFace() override;
 
     sal_IntPtr                      GetFontId() const override;
 
-    int                             GetFontTable( uint32_t nTagCode, unsigned char* ) const;
-    int                             GetFontTable( const char pTagName[5], unsigned char* ) const;
-
-    FontCharMapRef GetFontCharMap() const override;
-    bool GetFontCapabilities(vcl::FontCapabilities&) const override;
-    bool                            HasChar( sal_uInt32 cChar ) const;
+    CTFontDescriptorRef             GetFontDescriptorRef() const { return mxFontDescriptor; }
 
     rtl::Reference<LogicalFontInstance> CreateFontInstance(const vcl::font::FontSelectPattern&) const override;
 
+    hb_blob_t* GetHbTable(hb_tag_t nTag) const override;
+
+    const std::vector<hb_variation_t>& GetVariations(const LogicalFontInstance&) const override;
+
 private:
-    const sal_IntPtr                mnFontId;
-    mutable FontCharMapRef          mxCharMap;
-    mutable vcl::FontCapabilities   maFontCapabilities;
-    mutable bool                    mbFontCapabilitiesRead;
+    CTFontDescriptorRef             mxFontDescriptor;
 };
 
-class CoreTextStyle final : public LogicalFontInstance
+class CoreTextFont final : public LogicalFontInstance
 {
     friend rtl::Reference<LogicalFontInstance> CoreTextFontFace::CreateFontInstance(const vcl::font::FontSelectPattern&) const;
 
 public:
-    ~CoreTextStyle() override;
+    ~CoreTextFont() override;
 
     void       GetFontMetric( ImplFontMetricDataRef const & );
     bool GetGlyphOutline(sal_GlyphId, basegfx::B2DPolyPolygon&, bool) const override;
 
-    CFMutableDictionaryRef  GetStyleDict( void ) const { return mpStyleDict; }
+    CTFontRef GetCTFont() const { return mpCTFont; }
 
     /// <1.0: font is squeezed, >1.0 font is stretched, else 1.0
     float mfFontStretch;
     /// text rotation in radian
     float mfFontRotation;
-    /// faux bold - true, if font doesn't have proper bold variants
-    bool mbFauxBold;
 
 private:
-    explicit CoreTextStyle(const vcl::font::PhysicalFontFace&, const vcl::font::FontSelectPattern&);
+    explicit CoreTextFont(const CoreTextFontFace&, const vcl::font::FontSelectPattern&);
 
-    hb_font_t* ImplInitHbFont() override;
     bool ImplGetGlyphBoundRect(sal_GlyphId, tools::Rectangle&, bool) const override;
 
-    /// CoreText text style object
-    CFMutableDictionaryRef  mpStyleDict;
+    CTFontRef mpCTFont;
 };
 
 // TODO: move into cross-platform headers
@@ -137,6 +134,7 @@ private:
 namespace sal::aqua
 {
 float getWindowScaling();
+void resetWindowScaling();
 }
 
 struct AquaSharedAttributes
@@ -280,15 +278,10 @@ struct AquaSharedAttributes
 class AquaGraphicsBackendBase
 {
 public:
-    AquaGraphicsBackendBase(AquaSharedAttributes& rShared)
-        : mrShared( rShared )
-    {}
     virtual ~AquaGraphicsBackendBase() = 0;
     AquaSharedAttributes& GetShared() { return mrShared; }
     SalGraphicsImpl* GetImpl()
     {
-        if(mpImpl == nullptr)
-            mpImpl = dynamic_cast<SalGraphicsImpl*>(this);
         return mpImpl;
     }
     virtual void UpdateGeometryProvider(SalGeometryProvider*) {};
@@ -300,7 +293,11 @@ public:
     virtual void drawTextLayout(const GenericSalLayout& layout, bool bTextRenderModeForResolutionIndependentLayout) = 0;
     virtual void Flush() {}
     virtual void Flush( const tools::Rectangle& ) {}
+    virtual void WindowBackingPropertiesChanged() {};
 protected:
+    AquaGraphicsBackendBase(AquaSharedAttributes& rShared, SalGraphicsImpl * impl)
+        : mrShared( rShared ), mpImpl(impl)
+    {}
     static bool performDrawNativeControl(ControlType nType,
                                          ControlPart nPart,
                                          const tools::Rectangle &rControlRegion,
@@ -310,7 +307,7 @@ protected:
                                          AquaSalFrame* mpFrame);
     AquaSharedAttributes& mrShared;
 private:
-    SalGraphicsImpl* mpImpl = nullptr;
+    SalGraphicsImpl* mpImpl;
 };
 
 inline AquaGraphicsBackendBase::~AquaGraphicsBackendBase() {}
@@ -461,10 +458,10 @@ class AquaSalGraphics : public SalGraphicsAutoDelegateToImpl
     sal_Int32                               mnRealDPIY;
 
     // Device Font settings
-    rtl::Reference<CoreTextStyle>           mpTextStyle[MAX_FALLBACK];
+    rtl::Reference<CoreTextFont>            mpFont[MAX_FALLBACK];
 
 public:
-                            AquaSalGraphics();
+                            AquaSalGraphics(bool bPrinter = false);
     virtual                 ~AquaSalGraphics() override;
 
     void                    SetVirDevGraphics(SalVirtualDevice* pVirDev,CGLayerHolder const &rLayer, CGContextRef, int nBitDepth = 0);
@@ -492,6 +489,7 @@ public:
 
     void                    Flush();
     void                    Flush( const tools::Rectangle& );
+    void                    WindowBackingPropertiesChanged();
 
     void                    UnsetState();
     // InvalidateContext does an UnsetState and sets mrContext to 0
@@ -539,40 +537,6 @@ public:
     // graphics must drop any cached font info
     virtual void            ClearDevFontCache() override;
     virtual bool            AddTempDevFont( vcl::font::PhysicalFontCollection*, const OUString& rFileURL, const OUString& rFontName ) override;
-    // CreateFontSubset: a method to get a subset of glyhps of a font
-    // inside a new valid font file
-    // returns TRUE if creation of subset was successful
-    // parameters: rToFile: contains an osl file URL to write the subset to
-    //             pFont: describes from which font to create a subset
-    //             pGlyphIDs: the glyph ids to be extracted
-    //             pEncoding: the character code corresponding to each glyph
-    //             pWidths: the advance widths of the corresponding glyphs (in PS font units)
-    //             nGlyphs: the number of glyphs
-    //             rInfo: additional outgoing information
-    // implementation note: encoding 0 with glyph id 0 should be added implicitly
-    // as "undefined character"
-    virtual bool            CreateFontSubset( const OUString& rToFile,
-                                                  const vcl::font::PhysicalFontFace* pFont,
-                                                  const sal_GlyphId* pGlyphIds,
-                                                  const sal_uInt8* pEncoding,
-                                                  sal_Int32* pWidths,
-                                                  int nGlyphs,
-                                                  FontSubsetInfo& rInfo // out parameter
-                                                  ) override;
-
-    // GetEmbedFontData: gets the font data for a font marked
-    // embeddable by GetDevFontList or NULL in case of error
-    // parameters: pFont: describes the font in question
-    //             pDataLen: out parameter, contains the byte length of the returned buffer
-    virtual const void*     GetEmbedFontData(const vcl::font::PhysicalFontFace*, tools::Long* pDataLen)
-        override;
-    // frees the font data again
-    virtual void            FreeEmbedFontData( const void* pData, tools::Long nDataLen ) override;
-
-    virtual void            GetGlyphWidths( const vcl::font::PhysicalFontFace*,
-                                            bool bVertical,
-                                            std::vector< sal_Int32 >& rWidths,
-                                            Ucs2UIntMap& rUnicodeEnc ) override;
 
     virtual std::unique_ptr<GenericSalLayout>
                             GetTextLayout(int nFallbackLevel) override;
@@ -580,11 +544,6 @@ public:
 
     virtual SystemGraphicsData
                             GetGraphicsData() const override;
-
-private:
-    static bool             GetRawFontData( const vcl::font::PhysicalFontFace* pFontData,
-                                std::vector<unsigned char>& rBuffer,
-                                bool* pJustCFF );
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

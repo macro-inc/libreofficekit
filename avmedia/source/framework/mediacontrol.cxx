@@ -49,8 +49,6 @@ MediaControl::MediaControl( vcl::Window* pParent, MediaControlStyle eControlStyl
     mxTimeEdit = m_xBuilder->weld_entry("timeedit");
     mxMediaPath = m_xBuilder->weld_label("url");
 
-    // TODO SetParentClipMode( ParentClipMode::NoClip );
-
     InitializeWidgets();
 
     mxPlayToolBox->connect_clicked( LINK( this, MediaControl, implSelectHdl ) );
@@ -88,9 +86,7 @@ void MediaControl::InitializeWidgets()
     if( meControlStyle != MediaControlStyle::SingleLine )
     {
         mxPlayToolBox->set_item_help_id("open", HID_AVMEDIA_TOOLBOXITEM_OPEN);
-        mxPlayToolBox->set_item_label("open", AvmResId(AVMEDIA_STR_OPEN));
         mxPlayToolBox->set_item_help_id("apply", HID_AVMEDIA_TOOLBOXITEM_INSERT);
-        mxPlayToolBox->set_item_label("apply", AvmResId(AVMEDIA_STR_INSERT));
     }
     avmedia::MediaControlBase::InitializeWidgets();
 }

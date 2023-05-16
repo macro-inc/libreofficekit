@@ -23,7 +23,6 @@
 #include <drawingml/textbody.hxx>
 #include <drawingml/textparagraph.hxx>
 #include <drawingml/textfield.hxx>
-#include <drawingml/table/tableproperties.hxx>
 #include <editeng/flditem.hxx>
 
 #include <com/sun/star/text/XTextField.hpp>
@@ -43,6 +42,7 @@
 #include <oox/ppt/slidepersist.hxx>
 #include <oox/token/tokens.hxx>
 #include <oox/token/properties.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace ::oox::core;
 using namespace ::oox::drawingml;
@@ -343,9 +343,9 @@ void PPTShape::addShape(
 
         SAL_INFO("oox.ppt","shape service: " << sServiceName);
 
-        if (mnSubType && getSubTypeIndex().has() && meShapeLocation == Layout)
+        if (mnSubType && getSubTypeIndex().has_value() && meShapeLocation == Layout)
         {
-            oox::drawingml::ShapePtr pPlaceholder = PPTShape::findPlaceholderByIndex( getSubTypeIndex().get(), rSlidePersist.getShapes()->getChildren(), true );
+            oox::drawingml::ShapePtr pPlaceholder = PPTShape::findPlaceholderByIndex( getSubTypeIndex().value(), rSlidePersist.getShapes()->getChildren(), true );
             if (!pPlaceholder)
                 pPlaceholder = PPTShape::findPlaceholder( mnSubType, 0, getSubTypeIndex(), rSlidePersist.getShapes()->getChildren(), true );
 
@@ -370,15 +370,15 @@ void PPTShape::addShape(
         }
 
         // use placeholder index if possible
-        if (mnSubType && getSubTypeIndex().has() && rSlidePersist.getMasterPersist())
+        if (mnSubType && getSubTypeIndex().has_value() && rSlidePersist.getMasterPersist())
         {
-            oox::drawingml::ShapePtr pPlaceholder = PPTShape::findPlaceholderByIndex(getSubTypeIndex().get(), rSlidePersist.getMasterPersist()->getShapes()->getChildren());
+            oox::drawingml::ShapePtr pPlaceholder = PPTShape::findPlaceholderByIndex(getSubTypeIndex().value(), rSlidePersist.getMasterPersist()->getShapes()->getChildren());
             // TODO: Check if this is required for non-notes slides as well...
             if (rSlidePersist.isNotesPage() && pPlaceholder && pPlaceholder->getSubType() != getSubType())
                 pPlaceholder.reset();
 
             if (pPlaceholder) {
-                SAL_INFO("oox.ppt","found placeholder with index: " << getSubTypeIndex().get() << " and type: " << lclDebugSubType( mnSubType ));
+                SAL_INFO("oox.ppt","found placeholder with index: " << getSubTypeIndex().value() << " and type: " << lclDebugSubType( mnSubType ));
                 PPTShape* pPPTPlaceholder = dynamic_cast< PPTShape* >( pPlaceholder.get() );
                 TextListStylePtr pNewTextListStyle = std::make_shared<TextListStyle>();
 
@@ -398,7 +398,7 @@ void PPTShape::addShape(
                     // aMasterTextListStyle->dump();
                 }
                 if (pPPTPlaceholder && pPPTPlaceholder->mpPlaceholder) {
-                    SAL_INFO("oox.ppt","placeholder has parent placeholder: " << pPPTPlaceholder->mpPlaceholder->getId() << " type: " << lclDebugSubType( pPPTPlaceholder->mpPlaceholder->getSubType() ) << " index: " << pPPTPlaceholder->mpPlaceholder->getSubTypeIndex().get() );
+                    SAL_INFO("oox.ppt","placeholder has parent placeholder: " << pPPTPlaceholder->mpPlaceholder->getId() << " type: " << lclDebugSubType( pPPTPlaceholder->mpPlaceholder->getSubType() ) << " index: " << pPPTPlaceholder->mpPlaceholder->getSubTypeIndex().value() );
                     SAL_INFO("oox.ppt","has textbody " << (pPPTPlaceholder->mpPlaceholder->getTextBody() != nullptr) );
                     TextListStylePtr pPlaceholderStyle = getSubTypeTextListStyle( rSlidePersist, pPPTPlaceholder->mpPlaceholder->getSubType() );
                     if (pPPTPlaceholder->mpPlaceholder->getTextBody())
@@ -447,47 +447,6 @@ void PPTShape::addShape(
                 setMasterTextListStyle( aMasterTextListStyle );
 
             Reference< XShape > xShape( createAndInsert( rFilterBase, sServiceName, pTheme, rxShapes, bClearText, bool(mpPlaceholder), aTransformation, getFillProperties() ) );
-            // if exists and not duplicated, try to use the title text as slide name to help its re-use on UI
-            if (!rSlidePersist.isMasterPage() && rSlidePersist.getPage().is() && (mnSubType == XML_title || mnSubType == XML_ctrTitle))
-            {
-                try
-                {
-                    sal_Int32 nCount = 1;
-                    OUString aTitleText;
-                    Reference<XTextRange> xText(xShape, UNO_QUERY_THROW);
-                    aTitleText = xText->getString();
-                    Reference<drawing::XDrawPagesSupplier> xDPS(rFilterBase.getModel(), uno::UNO_QUERY_THROW);
-                    Reference<drawing::XDrawPages> xDrawPages(xDPS->getDrawPages(), uno::UNO_SET_THROW);
-                    sal_uInt32 nMaxPages = xDrawPages->getCount();
-                    // just a magic value but we don't want to drop out slide names which are too long
-                    if (aTitleText.getLength() > 63)
-                        aTitleText = aTitleText.copy(0, 63);
-                    bool bUseTitleAsSlideName = !aTitleText.isEmpty();
-                    // check duplicated title name
-                    if (bUseTitleAsSlideName)
-                    {
-                        for (sal_uInt32 nPage = 0; nPage < nMaxPages; ++nPage)
-                        {
-                            Reference<XDrawPage> xDrawPage(xDrawPages->getByIndex(nPage), uno::UNO_QUERY);
-                            Reference<container::XNamed> xNamed(xDrawPage, UNO_QUERY_THROW);
-                            OUString sRest;
-                            if (xNamed->getName().startsWith(aTitleText, &sRest)
-                                && (sRest.isEmpty()
-                                    || (sRest.startsWith(" (") && sRest.endsWith(")")
-                                        && sRest.copy(2, sRest.getLength() - 3).toInt32() > 0)))
-                                nCount++;
-                        }
-                        Reference<container::XNamed> xName(rSlidePersist.getPage(), UNO_QUERY_THROW);
-                        xName->setName(
-                            aTitleText
-                            + (nCount == 1 ? OUString("") : " (" + OUString::number(nCount) + ")"));
-                    }
-                }
-                catch (uno::Exception&)
-                {
-
-                }
-            }
 
             // Apply text properties on placeholder text inside this placeholder shape
             if (meShapeLocation == Slide && mpPlaceholder && getTextBody() && getTextBody()->isEmpty())
@@ -539,15 +498,19 @@ void PPTShape::addShape(
             Reference<XShapes> xShapes(xShape, UNO_QUERY);
             if (xShapes.is())
             {
-                if (meFrameType == FRAMETYPE_DIAGRAM)
-                {
-                    rFilterBase.setDiagramFontHeights(&getDiagramFontHeights());
-                }
-                addChildren( rFilterBase, *this, pTheme, xShapes, pShapeMap, aTransformation );
-                if (meFrameType == FRAMETYPE_DIAGRAM)
-                {
+                // temporarily remember setting
+                NamedShapePairs* pDiagramFontHeights(rFilterBase.getDiagramFontHeights());
+
+                // for shapes unequal to FRAMETYPE_DIAGRAM do
+                // disable DiagramFontHeights recording
+                if (meFrameType != FRAMETYPE_DIAGRAM)
                     rFilterBase.setDiagramFontHeights(nullptr);
-                }
+
+                addChildren( rFilterBase, *this, pTheme, xShapes, pShapeMap, aTransformation );
+
+                // restore remembered setting
+                rFilterBase.setDiagramFontHeights(pDiagramFontHeights);
+
                 for (size_t i = 0; i < this->getChildren().size(); i++)
                 {
                     this->getChildren()[i]->getShapeProperties().getProperty(PROP_URL) >>= sURL;
@@ -562,7 +525,12 @@ void PPTShape::addShape(
             if (meFrameType == FRAMETYPE_DIAGRAM)
             {
                 keepDiagramCompatibilityInfo();
-                syncDiagramFontHeights();
+            }
+
+            // Support advanced DiagramHelper
+            if (FRAMETYPE_DIAGRAM == meFrameType)
+            {
+                propagateDiagramHelper();
             }
 
             getShapeProperties().getProperty(PROP_URL) >>= sURL;
@@ -608,23 +576,8 @@ void PPTShape::addShape(
                             meClickAction = ClickAction_DOCUMENT;
                         else
                         {
-                            sURL = sURL.copy(1);
-                            sal_Int32 nPageNumber = 0;
-                            static const OUStringLiteral sSlide = u"Slide ";
-                            if (sURL.match(sSlide))
-                                nPageNumber = sURL.copy(sSlide.getLength()).toInt32();
-                            Reference<drawing::XDrawPagesSupplier> xDPS(rFilterBase.getModel(),
-                                                                        uno::UNO_QUERY_THROW);
-                            Reference<drawing::XDrawPages> xDrawPages(xDPS->getDrawPages(),
-                                                                      uno::UNO_SET_THROW);
-                            sal_Int32 nMaxPages = xDrawPages->getCount();
-                            if (nPageNumber && nPageNumber <= nMaxPages)
-                            {
-                                Reference<XDrawPage> xDrawPage;
-                                xDrawPages->getByIndex(nPageNumber - 1) >>= xDrawPage;
-                                Reference<container::XNamed> xNamed(xDrawPage, UNO_QUERY);
-                                sURL = xNamed->getName();
-                            }
+                            sURL = OUString::Concat("page")
+                                   + sURL.subView(sURL.lastIndexOf(' ') + 1);
                         }
                         nPropertyCount += 1;
                     }
@@ -678,7 +631,8 @@ namespace
 }
 
 // Function to find placeholder (ph) for a shape. No idea how MSO implements this, but
-// this order seems to work quite well (probably it's unnecessary complicated / wrong):
+// this order seems to work quite well
+// (probably it's unnecessary complicated / wrong. i.e. tdf#104202):
 // 1. ph with nFirstSubType and the same oSubTypeIndex
 // 2. ph with nFirstSubType
 // 3. ph with nSecondSubType and the same oSubTypeIndex
@@ -686,7 +640,7 @@ namespace
 // 5. ph with the same oSubTypeIndex
 
 oox::drawingml::ShapePtr PPTShape::findPlaceholder( sal_Int32 nFirstSubType, sal_Int32 nSecondSubType,
-    const OptValue< sal_Int32 >& oSubTypeIndex, std::vector< oox::drawingml::ShapePtr >& rShapes, bool bMasterOnly )
+    const std::optional< sal_Int32 >& oSubTypeIndex, std::vector< oox::drawingml::ShapePtr >& rShapes, bool bMasterOnly )
 {
     class Placeholders
     {
@@ -696,7 +650,7 @@ oox::drawingml::ShapePtr PPTShape::findPlaceholder( sal_Int32 nFirstSubType, sal
         {
         }
 
-        void add(const oox::drawingml::ShapePtr& aShape, sal_Int32 nFirstSubType, sal_Int32 nSecondSubType, const OptValue< sal_Int32 >& oSubTypeIndex)
+        void add(const oox::drawingml::ShapePtr& aShape, sal_Int32 nFirstSubType, sal_Int32 nSecondSubType, const std::optional< sal_Int32 >& oSubTypeIndex)
         {
             if (!aShape)
                 return;
@@ -792,7 +746,7 @@ oox::drawingml::ShapePtr PPTShape::findPlaceholderByIndex( const sal_Int32 nIdx,
     std::vector< oox::drawingml::ShapePtr >::reverse_iterator aRevIter( rShapes.rbegin() );
     while( aRevIter != rShapes.rend() )
     {
-        if ( (*aRevIter)->getSubTypeIndex().has() && (*aRevIter)->getSubTypeIndex().get() == nIdx &&
+        if ( (*aRevIter)->getSubTypeIndex().has_value() && (*aRevIter)->getSubTypeIndex().value() == nIdx &&
              ( !bMasterOnly || ShapeLocationIsMaster((*aRevIter).get()) ) )
         {
             aShapePtr = *aRevIter;

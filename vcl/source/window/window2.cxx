@@ -30,10 +30,12 @@
 #include <vcl/layout.hxx>
 #include <vcl/timer.hxx>
 #include <vcl/window.hxx>
-#include <vcl/scrbar.hxx>
+#include <vcl/scrollable.hxx>
+#include <vcl/toolkit/scrbar.hxx>
 #include <vcl/dockwin.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/builder.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <window.h>
 #include <svdata.hxx>
@@ -164,7 +166,7 @@ void Window::InvertTracking( const tools::Rectangle& rRect, ShowTrackFlags nFlag
 
     if ( aRect.IsEmpty() )
         return;
-    aRect.Justify();
+    aRect.Normalize();
 
     SalGraphics* pGraphics;
 
@@ -337,9 +339,17 @@ void Window::EndTracking( TrackingEventFlags nFlags )
 
 bool Window::IsTracking() const
 {
-    return (mpWindowImpl->mbUseFrameData ?
-            mpWindowImpl->mpFrameData->mpTrackWin == this :
-            ImplGetSVData()->mpWinData->mpTrackWin == this);
+    if (!mpWindowImpl)
+        return false;
+    if (mpWindowImpl->mbUseFrameData && mpWindowImpl->mpFrameData)
+    {
+        return mpWindowImpl->mpFrameData->mpTrackWin == this;
+    }
+    if (!mpWindowImpl->mbUseFrameData && ImplGetSVData()->mpWinData)
+    {
+        return ImplGetSVData()->mpWinData->mpTrackWin == this;
+    }
+    return false;
 }
 
 void Window::StartAutoScroll( StartAutoScrollFlags nFlags )
@@ -596,12 +606,14 @@ tools::Long Window::GetDrawPixel( OutputDevice const * pDev, tools::Long nPixels
     return nP;
 }
 
-static void lcl_HandleScrollHelper( ScrollBar* pScrl, double nN, bool isMultiplyByLineSize )
+// returns how much was actually scrolled (so that abs(retval) <= abs(nN))
+static double lcl_HandleScrollHelper( Scrollable* pScrl, double nN, bool isMultiplyByLineSize )
 {
-    if ( !pScrl || !nN || !pScrl->IsEnabled() || !pScrl->IsInputEnabled() || pScrl->IsInModalMode() )
-        return;
+    if (!pScrl || !nN || pScrl->Inactive())
+        return 0.0;
 
     tools::Long nNewPos = pScrl->GetThumbPos();
+    double scrolled = nN;
 
     if ( nN == double(-LONG_MAX) )
         nNewPos += pScrl->GetPageSize();
@@ -614,17 +626,26 @@ static void lcl_HandleScrollHelper( ScrollBar* pScrl, double nN, bool isMultiply
             nN*=pScrl->GetLineSize();
         }
 
-        const double fVal = nNewPos - nN;
+        // compute how many quantized units to scroll
+        tools::Long magnitude = o3tl::saturating_cast<tools::Long>(abs(nN));
+        tools::Long change = copysign(magnitude, nN);
 
-        nNewPos = o3tl::saturating_cast<tools::Long>(fVal);
+        nNewPos = nNewPos - change;
+
+        scrolled = double(change);
+        // convert back to chunked/continuous
+        if(isMultiplyByLineSize){
+            scrolled /= pScrl->GetLineSize();
+        }
     }
 
     pScrl->DoScroll( nNewPos );
 
+    return scrolled;
 }
 
 bool Window::HandleScrollCommand( const CommandEvent& rCmd,
-                                  ScrollBar* pHScrl, ScrollBar* pVScrl )
+                                  Scrollable* pHScrl, Scrollable* pVScrl )
 {
     bool bRet = false;
 
@@ -638,13 +659,13 @@ bool Window::HandleScrollCommand( const CommandEvent& rCmd,
                 if ( pHScrl )
                 {
                     if ( (pHScrl->GetVisibleSize() < pHScrl->GetRangeMax()) &&
-                         pHScrl->IsEnabled() && pHScrl->IsInputEnabled() && ! pHScrl->IsInModalMode() )
+                         !pHScrl->Inactive() )
                         nFlags |= StartAutoScrollFlags::Horz;
                 }
                 if ( pVScrl )
                 {
                     if ( (pVScrl->GetVisibleSize() < pVScrl->GetRangeMax()) &&
-                         pVScrl->IsEnabled() && pVScrl->IsInputEnabled() && ! pVScrl->IsInModalMode() )
+                         !pVScrl->Inactive() )
                         nFlags |= StartAutoScrollFlags::Vert;
                 }
 
@@ -666,6 +687,9 @@ bool Window::HandleScrollCommand( const CommandEvent& rCmd,
                     {
                         double nScrollLines = pData->GetScrollLines();
                         double nLines;
+                        double* partialScroll = pData->IsHorz()
+                            ? &mpWindowImpl->mfPartialScrollX
+                            : &mpWindowImpl->mfPartialScrollY;
                         if ( nScrollLines == COMMAND_WHEEL_PAGESCROLL )
                         {
                             if ( pData->GetDelta() < 0 )
@@ -674,13 +698,12 @@ bool Window::HandleScrollCommand( const CommandEvent& rCmd,
                                 nLines = double(LONG_MAX);
                         }
                         else
-                            nLines = pData->GetNotchDelta() * nScrollLines;
+                            nLines = *partialScroll + pData->GetNotchDelta() * nScrollLines;
                         if ( nLines )
                         {
-                            ImplHandleScroll( nullptr,
-                                          0L,
-                                          pData->IsHorz() ? pHScrl : pVScrl,
-                                          nLines );
+                            Scrollable* pScrl = pData->IsHorz() ? pHScrl : pVScrl;
+                            double scrolled = lcl_HandleScrollHelper( pScrl, nLines, true );
+                            *partialScroll = nLines - scrolled;
                             bRet = true;
                         }
                     }
@@ -761,21 +784,21 @@ bool Window::HandleScrollCommand( const CommandEvent& rCmd,
             }
             break;
 
-            case CommandEventId::Gesture:
+            case CommandEventId::GesturePan:
             {
                 if (pVScrl)
                 {
-                    const CommandGestureData* pData = rCmd.GetGestureData();
-                    if (pData->meEventType == GestureEventType::PanningBegin)
+                    const CommandGesturePanData* pData = rCmd.GetGesturePanData();
+                    if (pData->meEventType == GestureEventPanType::Begin)
                     {
                         mpWindowImpl->mpFrameData->mnTouchPanPosition = pVScrl->GetThumbPos();
                     }
-                    else if(pData->meEventType == GestureEventType::PanningUpdate)
+                    else if(pData->meEventType == GestureEventPanType::Update)
                     {
                         tools::Long nOriginalPosition = mpWindowImpl->mpFrameData->mnTouchPanPosition;
                         pVScrl->DoScroll(nOriginalPosition + (pData->mfOffset / pVScrl->GetVisibleSize()));
                     }
-                    if (pData->meEventType == GestureEventType::PanningEnd)
+                    if (pData->meEventType == GestureEventPanType::End)
                     {
                         mpWindowImpl->mpFrameData->mnTouchPanPosition = -1;
                     }
@@ -804,14 +827,8 @@ bool Window::HandleScrollCommand( const CommandEvent& rCmd,
     return bRet;
 }
 
-// Note that when called for CommandEventId::Wheel above, despite its name,
-// pVScrl isn't necessarily the vertical scroll bar. Depending on
-// whether the scroll is horizontal or vertical, it is either the
-// horizontal or vertical scroll bar. nY is correspondingly either
-// the horizontal or vertical scroll amount.
-
-void Window::ImplHandleScroll( ScrollBar* pHScrl, double nX,
-                               ScrollBar* pVScrl, double nY )
+void Window::ImplHandleScroll( Scrollable* pHScrl, double nX,
+                               Scrollable* pVScrl, double nY )
 {
     lcl_HandleScrollHelper( pHScrl, nX, true );
     lcl_HandleScrollHelper( pVScrl, nY, true );
@@ -1405,28 +1422,28 @@ namespace
     }
 }
 
-bool Window::set_font_attribute(const OString &rKey, const OUString &rValue)
+bool Window::set_font_attribute(const OString &rKey, std::u16string_view rValue)
 {
     if (rKey == "weight")
     {
         vcl::Font aFont(GetControlFont());
-        if (rValue == "thin")
+        if (rValue == u"thin")
             aFont.SetWeight(WEIGHT_THIN);
-        else if (rValue == "ultralight")
+        else if (rValue == u"ultralight")
             aFont.SetWeight(WEIGHT_ULTRALIGHT);
-        else if (rValue == "light")
+        else if (rValue == u"light")
             aFont.SetWeight(WEIGHT_LIGHT);
-        else if (rValue == "book")
+        else if (rValue == u"book")
             aFont.SetWeight(WEIGHT_SEMILIGHT);
-        else if (rValue == "normal")
+        else if (rValue == u"normal")
             aFont.SetWeight(WEIGHT_NORMAL);
-        else if (rValue == "medium")
+        else if (rValue == u"medium")
             aFont.SetWeight(WEIGHT_MEDIUM);
-        else if (rValue == "semibold")
+        else if (rValue == u"semibold")
             aFont.SetWeight(WEIGHT_SEMIBOLD);
-        else if (rValue == "bold")
+        else if (rValue == u"bold")
             aFont.SetWeight(WEIGHT_BOLD);
-        else if (rValue == "ultrabold")
+        else if (rValue == u"ultrabold")
             aFont.SetWeight(WEIGHT_ULTRABOLD);
         else
             aFont.SetWeight(WEIGHT_BLACK);
@@ -1435,11 +1452,11 @@ bool Window::set_font_attribute(const OString &rKey, const OUString &rValue)
     else if (rKey == "style")
     {
         vcl::Font aFont(GetControlFont());
-        if (rValue == "normal")
+        if (rValue == u"normal")
             aFont.SetItalic(ITALIC_NONE);
-        else if (rValue == "oblique")
+        else if (rValue == u"oblique")
             aFont.SetItalic(ITALIC_OBLIQUE);
-        else if (rValue == "italic")
+        else if (rValue == u"italic")
             aFont.SetItalic(ITALIC_NORMAL);
         SetControlFont(aFont);
     }
@@ -1449,10 +1466,17 @@ bool Window::set_font_attribute(const OString &rKey, const OUString &rValue)
         aFont.SetUnderline(toBool(rValue) ? LINESTYLE_SINGLE : LINESTYLE_NONE);
         SetControlFont(aFont);
     }
+    else if (rKey == "scale")
+    {
+        // if no control font was set yet, take the underlying font from the device
+        vcl::Font aFont(IsControlFont() ? GetControlFont() : GetPointFont(*GetOutDev()));
+        aFont.SetFontHeight(aFont.GetFontHeight() * o3tl::toDouble(rValue));
+        SetControlFont(aFont);
+    }
     else if (rKey == "size")
     {
         vcl::Font aFont(GetControlFont());
-        sal_Int32 nHeight = rValue.toInt32() / 1000;
+        sal_Int32 nHeight = o3tl::toInt32(rValue) / 1000;
         aFont.SetFontHeight(nHeight);
         SetControlFont(aFont);
     }

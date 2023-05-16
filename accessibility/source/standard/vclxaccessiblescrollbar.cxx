@@ -23,12 +23,11 @@
 #include <helper/accresmgr.hxx>
 #include <strings.hrc>
 
-#include <unotools/accessiblestatesethelper.hxx>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/accessibility/AccessibleEventId.hpp>
 #include <com/sun/star/awt/ScrollBarOrientation.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
-#include <vcl/scrbar.hxx>
+#include <vcl/toolkit/scrbar.hxx>
 #include <vcl/vclevent.hxx>
 #include <strings.hxx>
 
@@ -59,7 +58,7 @@ void VCLXAccessibleScrollBar::ProcessWindowEvent( const VclWindowEvent& rVclWind
 }
 
 
-void VCLXAccessibleScrollBar::FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet )
+void VCLXAccessibleScrollBar::FillAccessibleStateSet( sal_Int64& rStateSet )
 {
     VCLXAccessibleComponent::FillAccessibleStateSet( rStateSet );
 
@@ -69,9 +68,9 @@ void VCLXAccessibleScrollBar::FillAccessibleStateSet( utl::AccessibleStateSetHel
         // IA2 CWS: scroll bar should not have FOCUSABLE state.
         // rStateSet.AddState( AccessibleStateType::FOCUSABLE );
         if ( pVCLXScrollBar->getOrientation() == ScrollBarOrientation::HORIZONTAL )
-            rStateSet.AddState( AccessibleStateType::HORIZONTAL );
+            rStateSet |= AccessibleStateType::HORIZONTAL;
         else if ( pVCLXScrollBar->getOrientation() == ScrollBarOrientation::VERTICAL )
-            rStateSet.AddState( AccessibleStateType::VERTICAL );
+            rStateSet |= AccessibleStateType::VERTICAL;
     }
 }
 

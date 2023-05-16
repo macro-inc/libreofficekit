@@ -27,20 +27,19 @@
 #include <com/sun/star/lang/XEventListener.hpp>
 #include <com/sun/star/accessibility/XAccessibleEventBroadcaster.hpp>
 #include <comphelper/accessibleeventnotifier.hxx>
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <rtl/ref.hxx>
 #include <tools/color.hxx>
+#include <unotools/weakref.hxx>
 
 #include <map>
 #include <vector>
 #include <memory>
 
-#include <MutexContainer.hxx>
-
 namespace com::sun::star::awt { class XWindow; }
 namespace com::sun::star::chart2 { class XChartDocument; }
 namespace com::sun::star::view { class XSelectionSupplier; }
-namespace utl { class AccessibleStateSetHelper; }
 
 
 class SdrView;
@@ -62,7 +61,7 @@ struct AccessibleElementInfo
 {
     AccessibleUniqueId m_aOID;
 
-    css::uno::WeakReference< css::chart2::XChartDocument > m_xChartDocument;
+    unotools::WeakReference< ::chart::ChartModel > m_xChartDocument;
     css::uno::WeakReference< css::view::XSelectionSupplier > m_xSelectionSupplier;
     css::uno::WeakReference< css::uno::XInterface >   m_xView;
     css::uno::WeakReference< css::awt::XWindow >      m_xWindow;
@@ -89,7 +88,7 @@ typedef ::cppu::WeakComponentImplHelper<
 /** Base class for all Chart Accessibility objects
  */
 class AccessibleBase :
-    public MutexContainer,
+    public cppu::BaseMutex,
     public impl::AccessibleBase_Base
 {
 public:
@@ -99,7 +98,7 @@ public:
         LOST_SELECTION
     };
 
-    AccessibleBase( const AccessibleElementInfo & rAccInfo,
+    AccessibleBase( AccessibleElementInfo aAccInfo,
                     bool bMayHaveChildren,
                     bool bAlwaysTransparent );
     virtual ~AccessibleBase() override;
@@ -135,14 +134,14 @@ protected:
 
         @throws css::uno::RuntimeException
     */
-    void             AddState( sal_Int16 aState );
+    void             AddState( sal_Int64 aState );
 
     /** Removes a state from the set if the set contains the state, otherwise
         nothing is done.
 
         @throws css::uno::RuntimeException
     */
-    void             RemoveState( sal_Int16 aState );
+    void             RemoveState( sal_Int64 aState );
 
     /** has to be overridden by derived classes that support child elements.
         With this method a rescan is initiated that should result in a correct
@@ -185,14 +184,10 @@ protected:
 
     /** This method creates an AccessibleEventObject and sends it to all
         listeners that are currently listening to this object
-
-        If bSendGlobally is true, the event is also broadcast via
-        vcl::unohelper::NotifyAccessibleStateEventGlobally()
      */
     void         BroadcastAccEvent( sal_Int16 nId,
                                     const css::uno::Any & rNew,
-                                    const css::uno::Any & rOld,
-                                    bool bSendGlobally = false ) const;
+                                    const css::uno::Any & rOld ) const;
 
     /** Removes all children from the internal lists and broadcasts child remove
         events.
@@ -209,14 +204,14 @@ protected:
         @throws css::uno::RuntimeException
      */
     virtual css::uno::Reference< css::accessibility::XAccessible >
-        ImplGetAccessibleChildById( sal_Int32 i ) const;
+        ImplGetAccessibleChildById( sal_Int64 i ) const;
 
     /** Is called from getAccessibleChildCount(). Before this method is called,
         an update of children is done if necessary.
 
         @throws css::uno::RuntimeException
      */
-    virtual sal_Int32 ImplGetAccessibleChildCount() const;
+    virtual sal_Int64 ImplGetAccessibleChildCount() const;
 
     const AccessibleElementInfo& GetInfo() const { return m_aAccInfo;}
     void SetInfo( const AccessibleElementInfo & rNewInfo );
@@ -229,12 +224,12 @@ protected:
     virtual css::uno::Reference< css::accessibility::XAccessibleContext > SAL_CALL getAccessibleContext() override;
 
     // ________ XAccessibleContext ________
-    virtual sal_Int32 SAL_CALL getAccessibleChildCount() override;
+    virtual sal_Int64 SAL_CALL getAccessibleChildCount() override;
     virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL
-        getAccessibleChild( sal_Int32 i ) override;
+        getAccessibleChild( sal_Int64 i ) override;
     virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL
         getAccessibleParent() override;
-    virtual sal_Int32 SAL_CALL getAccessibleIndexInParent() override;
+    virtual sal_Int64 SAL_CALL getAccessibleIndexInParent() override;
     /// @return AccessibleRole.SHAPE
     virtual sal_Int16 SAL_CALL getAccessibleRole() override;
     // has to be implemented by derived classes
@@ -242,8 +237,7 @@ protected:
 //         throw (css::uno::RuntimeException);
     virtual css::uno::Reference< css::accessibility::XAccessibleRelationSet > SAL_CALL
         getAccessibleRelationSet() override;
-    virtual css::uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL
-        getAccessibleStateSet() override;
+    virtual sal_Int64 SAL_CALL getAccessibleStateSet() override;
     virtual css::lang::Locale SAL_CALL getLocale() override;
     // has to be implemented by derived classes
 //     virtual OUString SAL_CALL getAccessibleDescription()
@@ -305,11 +299,9 @@ private:
 
     ::comphelper::AccessibleEventNotifier::TClientId      m_nEventNotifierId;
 
-    /** Implementation helper for getAccessibleStateSet()
-
-        Note: This member must come before m_aStateSet!
+    /** for getAccessibleStateSet()
      */
-    rtl::Reference<::utl::AccessibleStateSetHelper>     m_xStateSetHelper;
+    sal_Int64     m_nStateSet;
 
     AccessibleElementInfo  m_aAccInfo;
     const bool             m_bAlwaysTransparent;

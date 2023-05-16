@@ -146,11 +146,6 @@ void SwFieldType::PutValue( const uno::Any& , sal_uInt16 )
 {
 }
 
-void SwFieldType::UpdateFields() const
-{
-    const_cast<SwFieldType*>(this)->SwClientNotify(*this, sw::LegacyModifyHint(nullptr, nullptr));
-}
-
 void SwFieldType::PrintHiddenPara()
 {
     const SwMsgPoolItem aHint(RES_HIDDENPARA_PRINT);
@@ -360,6 +355,11 @@ bool  SwField::QueryValue( uno::Any& rVal, sal_uInt16 nWhichId ) const
         case FIELD_PROP_BOOL4:
             rVal <<= !m_bIsAutomaticLanguage;
         break;
+        case FIELD_PROP_TITLE:
+        {
+            rVal <<= m_aTitle;
+        }
+        break;
         default:
             assert(false);
     }
@@ -375,6 +375,15 @@ bool SwField::PutValue( const uno::Any& rVal, sal_uInt16 nWhichId )
             bool bFixed = false;
             if(rVal >>= bFixed)
                 m_bIsAutomaticLanguage = !bFixed;
+        }
+        break;
+        case FIELD_PROP_TITLE:
+        {
+            OUString aTitle;
+            if (rVal >>= aTitle)
+            {
+                m_aTitle = aTitle;
+            }
         }
         break;
         default:
@@ -518,6 +527,37 @@ OUString FormatNumber(sal_uInt32 nNum, SvxNumType nFormat, LanguageType nLang)
         return aNumber.GetNumStr(nNum);
     else
         return aNumber.GetNumStr(nNum, LanguageTag::convertToLocale(nLang));
+}
+
+SwFieldTypesEnum SwFieldTypeFromString(std::u16string_view rString)
+{
+    if (rString == u"Date")
+        return SwFieldTypesEnum::Date;
+    if (rString == u"Time")
+        return SwFieldTypesEnum::Time;
+    if (rString == u"Filename")
+        return SwFieldTypesEnum::Filename;
+    if (rString == u"DatabaseName")
+        return SwFieldTypesEnum::DatabaseName;
+    if (rString == u"Chapter")
+        return SwFieldTypesEnum::Chapter;
+    if (rString == u"PageNumber")
+        return SwFieldTypesEnum::PageNumber;
+    if (rString == u"DocumentStatistics")
+        return SwFieldTypesEnum::DocumentStatistics;
+    if (rString == u"Author")
+        return SwFieldTypesEnum::Author;
+    if (rString == u"Set")
+        return SwFieldTypesEnum::Set;
+    if (rString == u"Get")
+        return SwFieldTypesEnum::Get;
+    if (rString == u"Formel")
+        return SwFieldTypesEnum::Formel;
+    if (rString == u"HiddenText")
+        return SwFieldTypesEnum::HiddenText;
+    if (rString == u"SetRef")
+        return SwFieldTypesEnum::SetRef;
+    return SwFieldTypesEnum::Unknown;
 }
 
 SwValueFieldType::SwValueFieldType(SwDoc *const pDoc, SwFieldIds const nWhichId)
@@ -769,6 +809,7 @@ void SwFormulaField::SetFormula(const OUString& rStr)
     {
         sal_Int32 nPos = 0;
         double fTmpValue;
+        // Uses the SwCalc document locale.
         if( SwCalc::Str2Double( rStr, nPos, fTmpValue, GetDoc() ) )
             SwValueField::SetValue( fTmpValue );
     }
@@ -786,7 +827,10 @@ void SwFormulaField::SetExpandedFormula( const OUString& rStr )
         {
             SwValueField::SetValue(fTmpValue);
 
-            m_sFormula = static_cast<SwValueFieldType *>(GetTyp())->DoubleToString(fTmpValue, nFormat);
+            // Will get reinterpreted by SwCalc when updating fields, so use
+            // the proper locale.
+            m_sFormula = static_cast<SwValueFieldType *>(GetTyp())->DoubleToString( fTmpValue,
+                    SwCalc::GetDocAppScriptLang( *GetDoc()));
             return;
         }
     }
@@ -848,6 +892,7 @@ void SwField::dumpAsXml(xmlTextWriterPtr pWriter) const
     (void)xmlTextWriterWriteFormatAttribute(pWriter, BAD_CAST("ptr"), "%p", this);
     (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("m_nFormat"), BAD_CAST(OString::number(m_nFormat).getStr()));
     (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("m_nLang"), BAD_CAST(OString::number(m_nLang.get()).getStr()));
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("m_aTitle"), BAD_CAST(m_aTitle.toUtf8().getStr()));
 
     (void)xmlTextWriterEndElement(pWriter);
 }

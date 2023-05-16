@@ -23,19 +23,18 @@
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/lang/XSingleServiceFactory.hpp>
-#include <com/sun/star/container/XIndexAccess.hpp>
+#include <com/sun/star/container/XIndexReplace.hpp>
 #include <com/sun/star/container/XNameContainer.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/util/XModifyBroadcaster.hpp>
+#include <com/sun/star/util/XModifiable.hpp>
 #include <com/sun/star/util/XModifyListener.hpp>
+#include <com/sun/star/form/XReset.hpp>
 
-#include <osl/mutex.hxx>
 #include <vcl/svapp.hxx>
 
-#include <cppuhelper/basemutex.hxx>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <cppuhelper/implbase.hxx>
-#include <cppuhelper/interfacecontainer.h>
 #include <cppuhelper/supportsservice.hxx>
 #include <comphelper/sequence.hxx>
 
@@ -49,6 +48,7 @@
 #include <map>
 
 
+using namespace css;
 using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star::style;
 using namespace ::com::sun::star::lang;
@@ -56,19 +56,15 @@ using namespace ::com::sun::star::beans;
 using namespace ::com::sun::star::util;
 using namespace ::com::sun::star::container;
 
-using ::osl::MutexGuard;
-using ::osl::ClearableMutexGuard;
-using ::cppu::OInterfaceContainerHelper;
-
 namespace sdr::table {
 
 typedef std::map< OUString, sal_Int32 > CellStyleNameMap;
 
-typedef ::cppu::WeakComponentImplHelper< XStyle, XNameReplace, XServiceInfo, XIndexAccess, XModifyBroadcaster, XModifyListener > TableDesignStyleBase;
+typedef ::comphelper::WeakComponentImplHelper< XStyle, XNameReplace, XServiceInfo, XIndexReplace, XModifiable, XModifyListener, XPropertySet > TableDesignStyleBase;
 
 namespace {
 
-class TableDesignStyle : private ::cppu::BaseMutex, public TableDesignStyleBase
+class TableDesignStyle : public TableDesignStyleBase
 {
 public:
     TableDesignStyle();
@@ -101,8 +97,24 @@ public:
     virtual sal_Int32 SAL_CALL getCount() override ;
     virtual Any SAL_CALL getByIndex( sal_Int32 Index ) override;
 
+    // XIndexReplace
+    virtual void SAL_CALL replaceByIndex( sal_Int32 Index, const Any& Element ) override;
+
     // XNameReplace
     virtual void SAL_CALL replaceByName( const OUString& aName, const Any& aElement ) override;
+
+    // XPropertySet
+    virtual Reference<XPropertySetInfo> SAL_CALL getPropertySetInfo() override;
+    virtual void SAL_CALL setPropertyValue( const OUString& aPropertyName, const Any& aValue ) override;
+    virtual Any SAL_CALL getPropertyValue( const OUString& PropertyName ) override;
+    virtual void SAL_CALL addPropertyChangeListener( const OUString& aPropertyName, const Reference<XPropertyChangeListener>& xListener ) override;
+    virtual void SAL_CALL removePropertyChangeListener( const OUString& aPropertyName, const Reference<XPropertyChangeListener>& aListener ) override;
+    virtual void SAL_CALL addVetoableChangeListener(const OUString& PropertyName, const Reference<XVetoableChangeListener>& aListener ) override;
+    virtual void SAL_CALL removeVetoableChangeListener(const OUString& PropertyName,const Reference<XVetoableChangeListener>&aListener ) override;
+
+    // XModifiable
+    virtual sal_Bool SAL_CALL isModified() override;
+    virtual void SAL_CALL setModified( sal_Bool bModified ) override;
 
     // XModifyBroadcaster
     virtual void SAL_CALL addModifyListener( const Reference< XModifyListener >& aListener ) override;
@@ -113,14 +125,17 @@ public:
     virtual void SAL_CALL disposing( const css::lang::EventObject& Source ) override;
 
     void notifyModifyListener();
+    void resetUserDefined();
 
     // this function is called upon disposing the component
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>& aGuard) override;
 
     static const CellStyleNameMap& getCellStyleNameMap();
 
+    bool mbUserDefined, mbModified;
     OUString msName;
     Reference< XStyle > maCellStyles[style_count];
+    comphelper::OInterfaceContainerHelper4<XModifyListener> maModifyListeners;
 };
 
 }
@@ -129,7 +144,7 @@ typedef std::vector< Reference< XStyle > > TableDesignStyleVector;
 
 namespace {
 
-class TableDesignFamily : public ::cppu::WeakImplHelper< XNameContainer, XNamed, XIndexAccess, XSingleServiceFactory,  XServiceInfo, XComponent, XPropertySet >
+class TableDesignFamily : public ::cppu::WeakImplHelper< XNameContainer, XNamed, XIndexAccess, XSingleServiceFactory,  XServiceInfo, XComponent, XPropertySet, form::XReset >
 {
 public:
     // XServiceInfo
@@ -179,13 +194,19 @@ public:
     virtual void SAL_CALL addVetoableChangeListener(const OUString& PropertyName, const Reference<XVetoableChangeListener>& aListener ) override;
     virtual void SAL_CALL removeVetoableChangeListener(const OUString& PropertyName,const Reference<XVetoableChangeListener>&aListener ) override;
 
+    // XReset
+    virtual void SAL_CALL reset() override;
+    virtual void SAL_CALL addResetListener( const Reference<form::XResetListener>& aListener ) override;
+    virtual void SAL_CALL removeResetListener( const Reference<form::XResetListener>& aListener ) override;
+
     TableDesignStyleVector  maDesigns;
 };
 
 }
 
 TableDesignStyle::TableDesignStyle()
-: TableDesignStyleBase(m_aMutex)
+    : mbUserDefined(true)
+    , mbModified(false)
 {
 }
 
@@ -227,22 +248,23 @@ Sequence< OUString > SAL_CALL TableDesignStyle::getSupportedServiceNames()
 // XStyle
 sal_Bool SAL_CALL TableDesignStyle::isUserDefined()
 {
-    return false;
+    return mbUserDefined;
+}
+
+void TableDesignStyle::resetUserDefined()
+{
+    mbUserDefined = false;
 }
 
 sal_Bool SAL_CALL TableDesignStyle::isInUse()
 {
-    ClearableMutexGuard aGuard( rBHelper.rMutex );
-    OInterfaceContainerHelper * pContainer = rBHelper.getContainer( cppu::UnoType<XModifyListener>::get() );
-    if( pContainer )
+    std::unique_lock aGuard( m_aMutex );
+    if (maModifyListeners.getLength(aGuard))
     {
-        Sequence< Reference< XInterface > > aListener( pContainer->getElements() );
-        aGuard.clear();
-
-        sal_Int32 nIndex = aListener.getLength();
-        while( --nIndex >= 0 )
+        comphelper::OInterfaceIteratorHelper4 it(aGuard, maModifyListeners);
+        while ( it.hasMoreElements() )
         {
-            TableDesignUser* pUser = dynamic_cast< TableDesignUser* >( aListener[nIndex].get() );
+            TableDesignUser* pUser = dynamic_cast< TableDesignUser* >( it.next().get() );
             if( pUser && pUser->isInUse() )
                 return true;
         }
@@ -282,8 +304,6 @@ void SAL_CALL TableDesignStyle::setName( const OUString& rName )
 
 Any SAL_CALL TableDesignStyle::getByName( const OUString& rName )
 {
-    SolarMutexGuard aGuard;
-
     const CellStyleNameMap& rMap = getCellStyleNameMap();
 
     CellStyleNameMap::const_iterator iter = rMap.find( rName );
@@ -296,16 +316,12 @@ Any SAL_CALL TableDesignStyle::getByName( const OUString& rName )
 
 Sequence< OUString > SAL_CALL TableDesignStyle::getElementNames()
 {
-    SolarMutexGuard aGuard;
-
     return comphelper::mapKeysToSequence( getCellStyleNameMap() );
 }
 
 
 sal_Bool SAL_CALL TableDesignStyle::hasByName( const OUString& rName )
 {
-    SolarMutexGuard aGuard;
-
     const CellStyleNameMap& rMap = getCellStyleNameMap();
 
     CellStyleNameMap::const_iterator iter = rMap.find( rName );
@@ -339,12 +355,26 @@ sal_Int32 SAL_CALL TableDesignStyle::getCount()
 
 Any SAL_CALL TableDesignStyle::getByIndex( sal_Int32 Index )
 {
-    SolarMutexGuard aGuard;
-
     if( (Index < 0) || (Index >= style_count) )
         throw IndexOutOfBoundsException();
 
+    std::unique_lock aGuard( m_aMutex );
     return Any( maCellStyles[Index] );
+}
+
+
+// XIndexReplace
+
+void SAL_CALL TableDesignStyle::replaceByIndex( sal_Int32 Index, const Any& aElement )
+{
+    if( (Index < 0) || (Index >= style_count) )
+        throw IndexOutOfBoundsException();
+
+    const CellStyleNameMap& rMap = getCellStyleNameMap();
+    auto iter = std::find_if(rMap.begin(), rMap.end(),
+        [&Index](const auto& item) { return Index == item.second; });
+    if (iter != rMap.end())
+        replaceByName(iter->first, aElement);
 }
 
 
@@ -353,8 +383,6 @@ Any SAL_CALL TableDesignStyle::getByIndex( sal_Int32 Index )
 
 void SAL_CALL TableDesignStyle::replaceByName( const OUString& rName, const Any& aElement )
 {
-    SolarMutexGuard aGuard;
-
     const CellStyleNameMap& rMap = getCellStyleNameMap();
     CellStyleNameMap::const_iterator iter = rMap.find( rName );
     if( iter == rMap.end() )
@@ -366,6 +394,8 @@ void SAL_CALL TableDesignStyle::replaceByName( const OUString& rName, const Any&
         throw IllegalArgumentException();
 
     const sal_Int32 nIndex = (*iter).second;
+
+    std::unique_lock aGuard( m_aMutex );
 
     Reference< XStyle > xOldStyle( maCellStyles[nIndex] );
 
@@ -384,6 +414,9 @@ void SAL_CALL TableDesignStyle::replaceByName( const OUString& rName, const Any&
     if( xNewBroadcaster.is() )
         xNewBroadcaster->addModifyListener( xListener );
 
+    if (xNewStyle && xNewStyle->isUserDefined())
+        mbModified = true;
+
     maCellStyles[nIndex] = xNewStyle;
 }
 
@@ -391,10 +424,65 @@ void SAL_CALL TableDesignStyle::replaceByName( const OUString& rName, const Any&
 // XComponent
 
 
-void SAL_CALL TableDesignStyle::disposing()
+void TableDesignStyle::disposing(std::unique_lock<std::mutex>& aGuard)
 {
+    maModifyListeners.disposeAndClear(aGuard, EventObject(Reference<XComponent>(this)));
+
     for(Reference<XStyle> & rCellStyle : maCellStyles)
+    {
+        Reference<XModifyBroadcaster> xBroadcaster(rCellStyle, UNO_QUERY);
+        if (xBroadcaster)
+            xBroadcaster->removeModifyListener(this);
         rCellStyle.clear();
+    }
+}
+
+// XPropertySet
+
+Reference<XPropertySetInfo> TableDesignStyle::getPropertySetInfo()
+{
+    return {};
+}
+
+void TableDesignStyle::setPropertyValue( const OUString&, const Any& )
+{
+}
+
+Any TableDesignStyle::getPropertyValue( const OUString& PropertyName )
+{
+    if (PropertyName != "IsPhysical")
+        throw UnknownPropertyException("unknown property: " + PropertyName, static_cast<OWeakObject *>(this));
+
+    return Any(mbModified || mbUserDefined);
+}
+
+void TableDesignStyle::addPropertyChangeListener( const OUString&, const Reference<XPropertyChangeListener>& )
+{
+}
+
+void TableDesignStyle::removePropertyChangeListener( const OUString&, const Reference<XPropertyChangeListener>& )
+{
+}
+
+void TableDesignStyle::addVetoableChangeListener( const OUString&, const Reference<XVetoableChangeListener>& )
+{
+}
+
+void TableDesignStyle::removeVetoableChangeListener( const OUString&,const Reference<XVetoableChangeListener>& )
+{
+}
+
+// XModifiable
+
+sal_Bool TableDesignStyle::isModified()
+{
+    return mbModified;
+}
+
+void TableDesignStyle::setModified( sal_Bool bModified )
+{
+    mbModified = bModified;
+    notifyModifyListener();
 }
 
 
@@ -403,35 +491,35 @@ void SAL_CALL TableDesignStyle::disposing()
 
 void SAL_CALL TableDesignStyle::addModifyListener( const Reference< XModifyListener >& xListener )
 {
-    ClearableMutexGuard aGuard( rBHelper.rMutex );
-    if (rBHelper.bDisposed || rBHelper.bInDispose)
+    std::unique_lock aGuard( m_aMutex );
+    if (m_bDisposed)
     {
-        aGuard.clear();
+        aGuard.unlock();
         EventObject aEvt( static_cast< OWeakObject * >( this ) );
         xListener->disposing( aEvt );
     }
     else
     {
-        rBHelper.addListener( cppu::UnoType<XModifyListener>::get(), xListener );
+        maModifyListeners.addInterface( aGuard, xListener );
     }
 }
 
 
 void SAL_CALL TableDesignStyle::removeModifyListener( const Reference< XModifyListener >& xListener )
 {
-    rBHelper.removeListener( cppu::UnoType<XModifyListener>::get(), xListener );
+    std::unique_lock aGuard( m_aMutex );
+    maModifyListeners.removeInterface( aGuard, xListener );
 }
 
 
 void TableDesignStyle::notifyModifyListener()
 {
-    MutexGuard aGuard( rBHelper.rMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    OInterfaceContainerHelper * pContainer = rBHelper.getContainer( cppu::UnoType<XModifyListener>::get() );
-    if( pContainer )
+    if( maModifyListeners.getLength(aGuard) )
     {
         EventObject aEvt( static_cast< OWeakObject * >( this ) );
-        pContainer->forEach<XModifyListener>(
+        maModifyListeners.forEach(aGuard,
             [&] (Reference<XModifyListener> const& xListener)
                 { return xListener->modified(aEvt); });
     }
@@ -586,6 +674,9 @@ void SAL_CALL TableDesignFamily::removeByName( const OUString& rName )
         [&rName](const Reference<XStyle>& rpStyle) { return rpStyle->getName() == rName; });
     if (iter != maDesigns.end())
     {
+        Reference<XComponent> xComponent(*iter, UNO_QUERY);
+        if (xComponent)
+            xComponent->dispose();
         maDesigns.erase( iter );
         return;
     }
@@ -609,6 +700,12 @@ void SAL_CALL TableDesignFamily::replaceByName( const OUString& rName, const Any
         [&rName](const Reference<XStyle>& rpStyle) { return rpStyle->getName() == rName; });
     if (iter != maDesigns.end())
     {
+        if (!(*iter)->isUserDefined())
+            static_cast<TableDesignStyle*>(xStyle.get())->resetUserDefined();
+
+        Reference<XComponent> xComponent(*iter, UNO_QUERY);
+        if (xComponent)
+            xComponent->dispose();
         (*iter) = xStyle;
         xStyle->setName( rName );
         return;
@@ -623,8 +720,6 @@ void SAL_CALL TableDesignFamily::replaceByName( const OUString& rName, const Any
 
 Reference< XInterface > SAL_CALL TableDesignFamily::createInstance()
 {
-    SolarMutexGuard aGuard;
-
     return Reference< XInterface >( static_cast< XStyle* >( new TableDesignStyle ) );
 }
 
@@ -713,6 +808,25 @@ void TableDesignFamily::removeVetoableChangeListener( const OUString& , const Re
     OSL_FAIL( "###unexpected!" );
 }
 
+// XReset
+
+void TableDesignFamily::reset()
+{
+    for (const auto& aDesign : maDesigns)
+    {
+        auto aStyle = static_cast<TableDesignStyle*>(aDesign.get());
+        aStyle->resetUserDefined();
+        aStyle->setModified(false);
+    }
+}
+
+void TableDesignFamily::addResetListener( const Reference<form::XResetListener>& )
+{
+}
+
+void TableDesignFamily::removeResetListener( const Reference<form::XResetListener>& )
+{
+}
 
 Reference< XNameAccess > CreateTableDesignFamily()
 {

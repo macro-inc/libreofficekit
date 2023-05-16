@@ -22,43 +22,52 @@ class SwTextNode;
 
 namespace sw
 {
-/// Contains the content node and tracks if the node
-/// gets deleted.
-class WeakContentNodeContainer : public SvtListener
+/// Contains the node and tracks if the node gets deleted.
+/// Note: the node needs to extend sw::BroadcastingModify.
+class WeakNodeContainer : public SvtListener
 {
 private:
-    SwContentNode* m_pNode;
+    SwNode* m_pNode;
 
 public:
-    WeakContentNodeContainer(SwContentNode* pNode);
-    ~WeakContentNodeContainer();
+    WeakNodeContainer(SwNode* pNode);
+    ~WeakNodeContainer();
 
     /// Is the node still alive or it was deleted?
     bool isAlive();
 
-    /// Returns the pointer of the content node or nullptr if the node
+    /// Returns the pointer of the node or nullptr if the node
     /// got deleted.
-    SwContentNode* getNode();
+    SwNode* getNode();
 };
 
-class OnlineAccessibilityCheck : public SvtListener
+class OnlineAccessibilityCheck
 {
 private:
-    std::map<SwContentNode*, std::unique_ptr<WeakContentNodeContainer>> m_aNodes;
+    std::map<SwNode*, std::unique_ptr<WeakNodeContainer>> m_aNodes;
 
     SwDoc& m_rDocument;
     sw::AccessibilityCheck m_aAccessibilityCheck;
-    SwContentNode* m_pPreviousNode;
+    std::unique_ptr<WeakNodeContainer> m_pPreviousNode;
     SwNodeOffset m_nPreviousNodeIndex;
     sal_Int32 m_nAccessibilityIssues;
+    bool m_bInitialCheck;
+    bool m_bOnlineCheckStatus;
+    std::unique_ptr<sfx::AccessibilityIssueCollection> m_pDocumentAccessibilityIssues;
 
-    void runCheck(SwContentNode* pNode);
+    void runAccessibilityCheck(SwNode* pNode);
     void updateStatusbar();
-    void updateNodeStatus(SwContentNode* pContentNode);
+    void updateNodeStatus(SwNode* pContentNode);
+    void initialCheck();
+    void lookForPreviousNodeAndUpdate(SwPosition const& rNewPos);
+    void clearAccessibilityIssuesFromAllNodes();
+    void runDocumentLevelAccessibilityCheck();
 
 public:
     OnlineAccessibilityCheck(SwDoc& rDocument);
-    void update(const SwPosition& rNewPos);
+    void update(SwPosition const& rNewPos);
+    void resetAndQueue(SwNode* pNode);
+    void updateCheckerActivity();
     sal_Int32 getNumberOfAccessibilityIssues() { return m_nAccessibilityIssues; }
 };
 

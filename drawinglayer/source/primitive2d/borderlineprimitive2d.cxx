@@ -21,11 +21,12 @@
 #include <drawinglayer/primitive2d/borderlineprimitive2d.hxx>
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokePrimitive2D.hxx>
 #include <rtl/math.hxx>
 
 #include <algorithm>
+#include <utility>
 
 
 namespace drawinglayer::primitive2d
@@ -87,14 +88,14 @@ namespace drawinglayer::primitive2d
             {
                 rContainer.push_back(
                     new PolygonStrokePrimitive2D(
-                        aPolygon,
+                        std::move(aPolygon),
                         rLineAttribute));
             }
             else
             {
                 rContainer.push_back(
                     new PolygonStrokePrimitive2D(
-                        aPolygon,
+                        std::move(aPolygon),
                         rLineAttribute,
                         rStrokeAttribute));
             }
@@ -266,32 +267,32 @@ namespace drawinglayer::primitive2d
             const basegfx::B2DPoint& rStart,
             const basegfx::B2DPoint& rEnd,
             std::vector< BorderLine >&& rBorderLines,
-            const drawinglayer::attribute::StrokeAttribute& rStrokeAttribute)
+            drawinglayer::attribute::StrokeAttribute aStrokeAttribute)
         :   maStart(rStart),
             maEnd(rEnd),
             maBorderLines(std::move(rBorderLines)),
-            maStrokeAttribute(rStrokeAttribute)
+            maStrokeAttribute(std::move(aStrokeAttribute))
         {
         }
 
         bool BorderLinePrimitive2D::operator==(const BasePrimitive2D& rPrimitive) const
         {
-            if(BufferedDecompositionPrimitive2D::operator==(rPrimitive))
-            {
-                const BorderLinePrimitive2D& rCompare = static_cast<const BorderLinePrimitive2D&>(rPrimitive);
+            if(!BufferedDecompositionPrimitive2D::operator==(rPrimitive))
+                return false;
 
-                if (getStart() == rCompare.getStart()
-                    && getEnd() == rCompare.getEnd()
-                    && getStrokeAttribute() == rCompare.getStrokeAttribute())
+            const BorderLinePrimitive2D& rCompare = static_cast<const BorderLinePrimitive2D&>(rPrimitive);
+
+            if (getStart() == rCompare.getStart()
+                && getEnd() == rCompare.getEnd()
+                && getStrokeAttribute() == rCompare.getStrokeAttribute())
+            {
+                if (getBorderLines().size() == rCompare.getBorderLines().size())
                 {
-                    if (getBorderLines().size() == rCompare.getBorderLines().size())
+                    for (size_t a(0); a < getBorderLines().size(); a++)
                     {
-                        for (size_t a(0); a < getBorderLines().size(); a++)
+                        if (!(getBorderLines()[a] == rCompare.getBorderLines()[a]))
                         {
-                            if (!(getBorderLines()[a] == rCompare.getBorderLines()[a]))
-                            {
-                                return false;
-                            }
+                            return false;
                         }
                     }
                 }

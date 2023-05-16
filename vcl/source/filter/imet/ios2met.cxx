@@ -29,8 +29,9 @@
 #include <vcl/lineinfo.hxx>
 #include <vcl/gdimtf.hxx>
 #include <filter/MetReader.hxx>
+#include <basegfx/numeric/ftools.hxx>
 
-#include <math.h>
+#include <cmath>
 #include <memory>
 
 class FilterConfigItem;
@@ -312,7 +313,7 @@ struct OSAttr
     RasterOp eImgBgMix;
     sal_Int32 nArcP, nArcQ, nArcR, nArcS;
     Degree10  nChrAng;
-    Size     aChrCellSize;
+    sal_Int32 nChrCellHeight;
     sal_uInt32 nChrSet;
     Point    aCurPos;
     PenStyle eLinStyle;
@@ -344,6 +345,7 @@ struct OSAttr
         , nArcR(0)
         , nArcS(0)
         , nChrAng(0)
+        , nChrCellHeight(0)
         , nChrSet(0)
         , eLinStyle(PEN_NULL)
         , nLinWidth(0)
@@ -1034,7 +1036,7 @@ void OS2METReader::ReadChrStr(bool bGivenPos, bool bMove, bool bExtra, sal_uInt1
     if (pF!=nullptr)
         aFont = pF->aFont;
     aFont.SetColor(aAttr.aChrCol);
-    aFont.SetFontSize(Size(0,aAttr.aChrCellSize.Height()));
+    aFont.SetFontSize(Size(0,aAttr.nChrCellHeight));
     if ( aAttr.nChrAng )
         aFont.SetOrientation(aAttr.nChrAng);
 
@@ -1222,8 +1224,8 @@ void OS2METReader::ReadPartialArc(bool bGivenPos, sal_uInt16 nOrderSize)
 
     sal_Int32 nStart(0), nSweep(0);
     pOS2MET->ReadInt32( nStart ).ReadInt32( nSweep );
-    double fStart = static_cast<double>(nStart)/65536.0/180.0*3.14159265359;
-    double fEnd = fStart+ static_cast<double>(nSweep)/65536.0/180.0*3.14159265359;
+    double fStart = basegfx::deg2rad<65536>(static_cast<double>(nStart));
+    double fEnd = fStart+ basegfx::deg2rad<65536>(static_cast<double>(nSweep));
     aPStart=Point(aCenter.X()+static_cast<sal_Int32>( cos(fStart)*nP),
                   aCenter.Y()+static_cast<sal_Int32>(-sin(fStart)*nQ));
     aPEnd=  Point(aCenter.X()+static_cast<sal_Int32>( cos(fEnd)*nP),
@@ -1375,17 +1377,26 @@ void OS2METReader::ReadFillet(bool bGivenPos, sal_uInt16 nOrderLen)
 
 void OS2METReader::ReadFilletSharp(bool bGivenPos, sal_uInt16 nOrderLen)
 {
-    sal_uInt16 i,nNumPoints;
-
     if (bGivenPos) {
         aAttr.aCurPos=ReadPoint();
         if (bCoord32) nOrderLen-=8; else nOrderLen-=4;
     }
+
+    sal_uInt16 nNumPoints;
     if (bCoord32) nNumPoints=1+nOrderLen/10;
     else nNumPoints=1+nOrderLen/6;
+
     tools::Polygon aPolygon(nNumPoints);
-    aPolygon.SetPoint(aAttr.aCurPos,0);
-    for (i=1; i<nNumPoints; i++) aPolygon.SetPoint(ReadPoint(),i);
+    aPolygon.SetPoint(aAttr.aCurPos, 0);
+    for (sal_uInt16 i = 1; i <nNumPoints; ++i)
+        aPolygon.SetPoint(ReadPoint(), i);
+
+    if (!pOS2MET->good())
+    {
+        SAL_WARN("filter.os2met", "OS2METReader::ReadFilletSharp: short read");
+        return;
+    }
+
     aAttr.aCurPos=aPolygon.GetPoint(nNumPoints-1);
     if (pAreaStack!=nullptr) AddPointsToArea(aPolygon);
     else if (pPathStack!=nullptr) AddPointsToPath(aPolygon);
@@ -2062,7 +2073,7 @@ void OS2METReader::ReadOrder(sal_uInt16 nOrderID, sal_uInt16 nOrderLen)
             sal_Int32 nY = ReadCoord(bCoord32);
             if (nX>=0 && nY==0) aAttr.nChrAng=0_deg10;
             else {
-                aAttr.nChrAng = Degree10(static_cast<short>(atan2(static_cast<double>(nY),static_cast<double>(nX))/3.1415926539*1800.0));
+                aAttr.nChrAng = Degree10(static_cast<short>(basegfx::rad2deg<10>(atan2(static_cast<double>(nY),static_cast<double>(nX)))));
                 while (aAttr.nChrAng < 0_deg10) aAttr.nChrAng += 3600_deg10;
                 aAttr.nChrAng %= 3600_deg10;
             }
@@ -2077,12 +2088,15 @@ void OS2METReader::ReadOrder(sal_uInt16 nOrderID, sal_uInt16 nOrderLen)
             [[fallthrough]];
         case GOrdSChCel: {
             sal_uInt16 nLen=nOrderLen;
-            auto nWidth = ReadCoord(bCoord32);
+            (void) ReadCoord(bCoord32); // Width, unused
             auto nHeight = ReadCoord(bCoord32);
-            if (nWidth < 0 || nHeight < 0)
-                aAttr.aChrCellSize = aDefAttr.aChrCellSize;
+            if (nHeight < 0 || nHeight > SAL_MAX_INT16)
+            {
+                SAL_WARN("filter.os2met", "ignoring out of sane range font height: " << nHeight);
+                aAttr.nChrCellHeight = aDefAttr.nChrCellHeight;
+            }
             else
-                aAttr.aChrCellSize = Size(nWidth, nHeight);
+                aAttr.nChrCellHeight = nHeight;
             if (bCoord32) nLen-=8; else nLen-=4;
             if (nLen>=4) {
                 pOS2MET->SeekRel(4); nLen-=4;
@@ -2090,8 +2104,8 @@ void OS2METReader::ReadOrder(sal_uInt16 nOrderID, sal_uInt16 nOrderLen)
             if (nLen>=2) {
                 sal_uInt8 nbyte(0);
                 pOS2MET->ReadUChar( nbyte );
-                if ((nbyte&0x80)==0 && aAttr.aChrCellSize==Size(0,0))
-                    aAttr.aChrCellSize = aDefAttr.aChrCellSize;
+                if ((nbyte&0x80)==0 && aAttr.nChrCellHeight == 0)
+                    aAttr.nChrCellHeight = aDefAttr.nChrCellHeight;
             }
             break;
         }
@@ -2747,7 +2761,7 @@ void OS2METReader::ReadOS2MET( SvStream & rStreamOS2MET, GDIMetaFile & rGDIMetaF
     aDefAttr.nArcR       =0;
     aDefAttr.nArcS       =0;
     aDefAttr.nChrAng     =0_deg10;
-    aDefAttr.aChrCellSize=Size(12,12);
+    aDefAttr.nChrCellHeight = 12;
     aDefAttr.nChrSet     =0;
     aDefAttr.aCurPos     =Point(0,0);
     aDefAttr.eLinStyle   =PEN_SOLID;

@@ -113,22 +113,22 @@ void ImpXPolygon::Resize( sal_uInt16 nNewSize, bool bDeletePoints )
     memset( pFlagAry.get(), 0, nSize );
 
     // copy if needed
-    if( !nOldSize )
-        return;
-
-    if( nOldSize < nSize )
+    if (nOldSize)
     {
-        memcpy( pPointAry.get(), pOldPointAry, nOldSize*sizeof( Point ) );
-        memcpy( pFlagAry.get(),  pOldFlagAry, nOldSize );
-    }
-    else
-    {
-        memcpy( pPointAry.get(), pOldPointAry, nSize*sizeof( Point ) );
-        memcpy( pFlagAry.get(), pOldFlagAry, nSize );
+        if( nOldSize < nSize )
+        {
+            memcpy( pPointAry.get(), pOldPointAry, nOldSize*sizeof( Point ) );
+            memcpy( pFlagAry.get(),  pOldFlagAry, nOldSize );
+        }
+        else
+        {
+            memcpy( pPointAry.get(), pOldPointAry, nSize*sizeof( Point ) );
+            memcpy( pFlagAry.get(), pOldFlagAry, nSize );
 
-        // adjust number of valid points
-        if( nPoints > nSize )
-            nPoints = nSize;
+            // adjust number of valid points
+            if( nPoints > nSize )
+                nPoints = nSize;
+        }
     }
     if ( bDeletePoints )
     {
@@ -322,7 +322,7 @@ XPolygon::~XPolygon() = default;
 
 void XPolygon::SetPointCount( sal_uInt16 nPoints )
 {
-    std::as_const(*pImpXPolygon).CheckPointDelete();
+    std::as_const(pImpXPolygon)->CheckPointDelete();
 
     if( pImpXPolygon->nSize < nPoints )
         pImpXPolygon->Resize( nPoints );
@@ -425,7 +425,7 @@ const Point& XPolygon::operator[]( sal_uInt16 nPos ) const
 
 Point& XPolygon::operator[]( sal_uInt16 nPos )
 {
-    std::as_const(*pImpXPolygon).CheckPointDelete();
+    std::as_const(pImpXPolygon)->CheckPointDelete();
 
     if( nPos >= pImpXPolygon->nSize )
     {
@@ -458,7 +458,7 @@ PolyFlags XPolygon::GetFlags( sal_uInt16 nPos ) const
 /// set the flags for the point at the given position
 void XPolygon::SetFlags( sal_uInt16 nPos, PolyFlags eFlags )
 {
-    std::as_const(*pImpXPolygon).CheckPointDelete();
+    std::as_const(pImpXPolygon)->CheckPointDelete();
     pImpXPolygon->pFlagAry[nPos] = eFlags;
 }
 
@@ -486,7 +486,7 @@ double XPolygon::CalcDistance(sal_uInt16 nP1, sal_uInt16 nP2)
     const Point& rP2 = pImpXPolygon->pPointAry[nP2];
     double fDx = rP2.X() - rP1.X();
     double fDy = rP2.Y() - rP1.Y();
-    return sqrt(fDx * fDx + fDy * fDy);
+    return std::hypot(fDx, fDy);
 }
 
 void XPolygon::SubdivideBezier(sal_uInt16 nPos, bool bCalcFirst, double fT)
@@ -617,11 +617,7 @@ void XPolygon::CalcSmoothJoin(sal_uInt16 nCenter, sal_uInt16 nDrag, sal_uInt16 n
     // If nPoint is no control point, i.e. cannot be moved, then
     // move nDrag instead on the line between nCenter and nPnt
     if ( !IsControl(nPnt) )
-    {
-        sal_uInt16 nTmp = nDrag;
-        nDrag = nPnt;
-        nPnt = nTmp;
-    }
+        std::swap( nDrag, nPnt );
     Point*  pPoints = pImpXPolygon->pPointAry.get();
     Point   aDiff   = pPoints[nDrag] - pPoints[nCenter];
     double  fDiv    = CalcDistance(nCenter, nDrag);
@@ -741,7 +737,7 @@ void XPolygon::PointsToBezier(sal_uInt16 nFirst)
 /// scale in X- and/or Y-direction
 void XPolygon::Scale(double fSx, double fSy)
 {
-    std::as_const(*pImpXPolygon).CheckPointDelete();
+    std::as_const(pImpXPolygon)->CheckPointDelete();
 
     sal_uInt16 nPntCnt = pImpXPolygon->nPoints;
 
@@ -766,7 +762,7 @@ void XPolygon::Scale(double fSx, double fSy)
 void XPolygon::Distort(const tools::Rectangle& rRefRect,
                        const XPolygon& rDistortedRect)
 {
-    std::as_const(*pImpXPolygon).CheckPointDelete();
+    std::as_const(pImpXPolygon)->CheckPointDelete();
 
     tools::Long    Xr, Wr;
     tools::Long    Yr, Hr;

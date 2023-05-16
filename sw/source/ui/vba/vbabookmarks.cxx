@@ -26,6 +26,7 @@
 #include "vbarange.hxx"
 #include "wordvbahelper.hxx"
 #include <cppuhelper/implbase.hxx>
+#include <utility>
 
 using namespace ::ooo::vba;
 using namespace ::com::sun::star;
@@ -37,13 +38,13 @@ class BookmarksEnumeration : public EnumerationHelperImpl
     uno::Reference< frame::XModel > mxModel;
 public:
     /// @throws uno::RuntimeException
-    BookmarksEnumeration( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, const uno::Reference< container::XEnumeration >& xEnumeration,  const uno::Reference< frame::XModel >& xModel  ) : EnumerationHelperImpl( xParent, xContext, xEnumeration ), mxModel( xModel ) {}
+    BookmarksEnumeration( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, const uno::Reference< container::XEnumeration >& xEnumeration,  uno::Reference< frame::XModel > xModel  ) : EnumerationHelperImpl( xParent, xContext, xEnumeration ), mxModel(std::move( xModel )) {}
 
     virtual uno::Any SAL_CALL nextElement(  ) override
     {
         uno::Reference< container::XNamed > xNamed( m_xEnumeration->nextElement(), uno::UNO_QUERY_THROW );
         OUString aName = xNamed->getName();
-        return uno::makeAny( uno::Reference< word::XBookmark > ( new SwVbaBookmark( m_xParent, m_xContext, mxModel, aName ) ) );
+        return uno::Any( uno::Reference< word::XBookmark > ( new SwVbaBookmark( m_xParent, m_xContext, mxModel, aName ) ) );
     }
 
 };
@@ -58,7 +59,7 @@ private:
     uno::Any cachePos;
 public:
     /// @throws uno::RuntimeException
-    explicit BookmarkCollectionHelper( const uno::Reference< container::XIndexAccess >& xIndexAccess ) : mxIndexAccess( xIndexAccess )
+    explicit BookmarkCollectionHelper( uno::Reference< container::XIndexAccess >  xIndexAccess ) : mxIndexAccess(std::move( xIndexAccess ))
     {
         mxNameAccess.set( mxIndexAccess, uno::UNO_QUERY_THROW );
     }
@@ -111,7 +112,7 @@ public:
 
 }
 
-SwVbaBookmarks::SwVbaBookmarks( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< css::uno::XComponentContext > & xContext, const uno::Reference< container::XIndexAccess >& xBookmarks, const uno::Reference< frame::XModel >& xModel ): SwVbaBookmarks_BASE( xParent, xContext, uno::Reference< container::XIndexAccess >( new BookmarkCollectionHelper( xBookmarks ) ) ), mxModel( xModel )
+SwVbaBookmarks::SwVbaBookmarks( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< css::uno::XComponentContext > & xContext, const uno::Reference< container::XIndexAccess >& xBookmarks, uno::Reference< frame::XModel > xModel ): SwVbaBookmarks_BASE( xParent, xContext, uno::Reference< container::XIndexAccess >( new BookmarkCollectionHelper( xBookmarks ) ) ), mxModel(std::move( xModel ))
 {
     mxBookmarksSupplier.set( mxModel, uno::UNO_QUERY_THROW );
     uno::Reference< text::XTextDocument > xDocument( mxModel, uno::UNO_QUERY_THROW );
@@ -134,7 +135,7 @@ SwVbaBookmarks::createCollectionObject( const css::uno::Any& aSource )
 {
     uno::Reference< container::XNamed > xNamed( aSource, uno::UNO_QUERY_THROW );
     OUString aName = xNamed->getName();
-    return uno::makeAny( uno::Reference< word::XBookmark > ( new SwVbaBookmark( getParent(), mxContext, mxModel, aName ) ) );
+    return uno::Any( uno::Reference< word::XBookmark > ( new SwVbaBookmark( getParent(), mxContext, mxModel, aName ) ) );
 }
 
 void SwVbaBookmarks::removeBookmarkByName( const OUString& rName )
@@ -175,7 +176,7 @@ SwVbaBookmarks::Add( const OUString& rName, const uno::Any& rRange )
 
     addBookmarkByName( mxModel, rName, xTextRange );
 
-    return uno::makeAny( uno::Reference< word::XBookmark >( new SwVbaBookmark( getParent(), mxContext, mxModel, rName ) ) );
+    return uno::Any( uno::Reference< word::XBookmark >( new SwVbaBookmark( getParent(), mxContext, mxModel, rName ) ) );
 }
 
 sal_Int32 SAL_CALL

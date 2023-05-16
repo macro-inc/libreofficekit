@@ -1345,7 +1345,6 @@ SAL_DLLPUBLIC void SAL_CALL rtl_uString_newFromStr_WithLength(
     @param[in]     from         the String to take the substring from.
     @param[in]     beginIndex   the beginning index, inclusive.
     @param[in]     count        the number of characters.
-    @return    the specified substring.
 
     @since LibreOffice 4.0
  */
@@ -2094,7 +2093,7 @@ SAL_DLLPUBLIC void SAL_CALL rtl_uString_newToAsciiUpperCase(
     The new string results from removing all characters with values less than
     or equal to 32 (the space character), and also Unicode General Punctuation
     area Space and some Control characters, form both ends of str (see
-    rtl_ImplIsWhitespace).
+    implIsWhitespace).
 
     This function cannot be used for language-specific conversion.  The new
     string does not necessarily have a reference count of 1 (in cases where

@@ -18,7 +18,7 @@
  */
 #pragma once
 
-#include "ChartType.hxx"
+#include <ChartType.hxx>
 
 namespace chart
 {
@@ -36,6 +36,8 @@ public:
     virtual css::uno::Sequence< OUString > SAL_CALL
         getSupportedServiceNames() override;
 
+    virtual rtl::Reference<ChartType> cloneChartType() const override;
+
 private:
     explicit ScatterChartType( const ScatterChartType & rOther );
 
@@ -43,11 +45,9 @@ private:
     virtual OUString SAL_CALL getChartType() override;
     virtual css::uno::Sequence< OUString > SAL_CALL
         getSupportedMandatoryRoles() override;
-    virtual css::uno::Reference< css::chart2::XCoordinateSystem > SAL_CALL
-        createCoordinateSystem( ::sal_Int32 DimensionCount ) override;
 
     // ____ OPropertySet ____
-    virtual css::uno::Any GetDefaultValue( sal_Int32 nHandle ) const override;
+    virtual void GetDefaultValue( sal_Int32 nHandle, css::uno::Any& rAny ) const override;
 
     // ____ OPropertySet ____
     virtual ::cppu::IPropertyArrayHelper & SAL_CALL getInfoHelper() override;
@@ -58,6 +58,9 @@ private:
 
     // ____ XCloneable ____
     virtual css::uno::Reference< css::util::XCloneable > SAL_CALL createClone() override;
+
+    virtual rtl::Reference< ::chart::BaseCoordinateSystem >
+        createCoordinateSystem2( sal_Int32 DimensionCount ) override;
 };
 
 } //  namespace chart

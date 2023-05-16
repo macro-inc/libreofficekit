@@ -23,10 +23,11 @@
 #include <com/sun/star/lang/IllegalArgumentException.hpp>
 #include <comphelper/sequence.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 #include <iterator>
+#include <utility>
 
 
 namespace pcr
@@ -48,7 +49,7 @@ namespace pcr
         {
             OUString sPropertyName;
             const Any&      rValue;
-            SetPropertyValue( const OUString& _rPropertyName, const Any& _rValue ) : sPropertyName( _rPropertyName ), rValue( _rValue ) { }
+            SetPropertyValue( OUString _aPropertyName, const Any& _rValue ) : sPropertyName(std::move( _aPropertyName )), rValue( _rValue ) { }
             void operator()( const Reference< XPropertyHandler >& _rHandler )
             {
                 _rHandler->setPropertyValue( sPropertyName, rValue );
@@ -186,14 +187,14 @@ namespace pcr
     void SAL_CALL PropertyComposer::addPropertyChangeListener( const Reference< XPropertyChangeListener >& _rxListener )
     {
         MethodGuard aGuard( *this );
-        m_aPropertyListeners.addListener( _rxListener );
+        m_aPropertyListeners.addInterface( _rxListener );
     }
 
 
     void SAL_CALL PropertyComposer::removePropertyChangeListener( const Reference< XPropertyChangeListener >& _rxListener )
     {
         MethodGuard aGuard( *this );
-        m_aPropertyListeners.removeListener( _rxListener );
+        m_aPropertyListeners.removeInterface( _rxListener );
     }
 
 
@@ -432,14 +433,14 @@ namespace pcr
         {
             DBG_UNHANDLED_EXCEPTION("extensions.propctrlr");
         }
-        m_aPropertyListeners.notify( aTranslatedEvent, &XPropertyChangeListener::propertyChange );
+        m_aPropertyListeners.notifyEach( &XPropertyChangeListener::propertyChange, aTranslatedEvent );
     }
 
 
     void SAL_CALL PropertyComposer::disposing( const EventObject& Source )
     {
         MethodGuard aGuard( *this );
-        m_aPropertyListeners.disposing( Source );
+        m_aPropertyListeners.disposeAndClear( Source );
     }
 
 

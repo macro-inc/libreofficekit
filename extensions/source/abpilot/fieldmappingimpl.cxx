@@ -24,7 +24,7 @@
 #include <com/sun/star/awt/XWindow.hpp>
 #include <com/sun/star/sdb/CommandType.hpp>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/weld.hxx>
 #include <com/sun/star/util/AliasProgrammaticPair.hpp>
 #include <strings.hrc>
@@ -162,10 +162,10 @@ namespace abp
                     _rxContext, sDriverAliasesNodeName, -1, OConfigurationTreeRoot::CM_READONLY);
 
                 // loop through all programmatic pairs
-                DBG_ASSERT( 0 == SAL_N_ELEMENTS( pMappingProgrammatics ) % 2,
+                DBG_ASSERT( 0 == std::size( pMappingProgrammatics ) % 2,
                     "fieldmapping::defaultMapping: invalid programmatic map!" );
                 // number of pairs
-                sal_Int32 const nIntersectedProgrammatics = SAL_N_ELEMENTS( pMappingProgrammatics ) / 2;
+                sal_Int32 const nIntersectedProgrammatics =  std::size( pMappingProgrammatics ) / 2;
 
                 const char** pProgrammatic = pMappingProgrammatics;
                 OUString sAddressProgrammatic;
@@ -238,7 +238,7 @@ namespace abp
                 {   // yes
                     // -> set a new value
                     OConfigurationNode aExistentField = aFields.openNode( *pExistentFields );
-                    aExistentField.setNodeValue( sAssignedNodeName, makeAny( aPos->second ) );
+                    aExistentField.setNodeValue( sAssignedNodeName, Any( aPos->second ) );
                     // and remove the mapping entry
                     aFieldAssignment.erase( *pExistentFields );
                 }
@@ -258,8 +258,8 @@ namespace abp
                     // in case the config node for the fields already has the node named <aNewMapping->first>,
                     // the entry should have been removed from aNewMapping (in the above loop)
                 OConfigurationNode aNewField =  aFields.createNode( elem.first );
-                aNewField.setNodeValue( sProgrammaticNodeName, makeAny( elem.first ) );
-                aNewField.setNodeValue( sAssignedNodeName, makeAny( elem.second ) );
+                aNewField.setNodeValue( sProgrammaticNodeName, Any( elem.first ) );
+                aNewField.setNodeValue( sAssignedNodeName, Any( elem.second ) );
             }
 
             // commit the changes done
@@ -283,9 +283,9 @@ namespace abp
             OConfigurationTreeRoot aAddressBookSettings = OConfigurationTreeRoot::createWithComponentContext(
                 _rxContext, sAddressBookNodeName);
 
-            aAddressBookSettings.setNodeValue( OUString( "DataSourceName" ), makeAny( _rDataSourceName ) );
-            aAddressBookSettings.setNodeValue( OUString( "Command" ), makeAny( _rTableName ) );
-            aAddressBookSettings.setNodeValue( OUString( "CommandType" ), makeAny( sal_Int16(CommandType::TABLE) ) );
+            aAddressBookSettings.setNodeValue( OUString( "DataSourceName" ), Any( _rDataSourceName ) );
+            aAddressBookSettings.setNodeValue( OUString( "Command" ), Any( _rTableName ) );
+            aAddressBookSettings.setNodeValue( OUString( "CommandType" ), Any( sal_Int16(CommandType::TABLE) ) );
 
             // commit the changes done
             aAddressBookSettings.commit();
@@ -301,7 +301,7 @@ namespace abp
                 _rxContext, sAddressBookNodeName);
 
             // set the flag
-            aAddressBookSettings.setNodeValue( OUString( "AutoPilotCompleted" ), makeAny( true ) );
+            aAddressBookSettings.setNodeValue( OUString( "AutoPilotCompleted" ), Any( true ) );
 
             // commit the changes done
             aAddressBookSettings.commit();

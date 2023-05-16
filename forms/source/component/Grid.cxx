@@ -22,6 +22,7 @@
 #include "Grid.hxx"
 #include <property.hxx>
 #include <services.hxx>
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/form/FormComponentType.hpp>
 #include <com/sun/star/io/XMarkableStream.hpp>
 #include <com/sun/star/text/WritingMode2.hpp>
@@ -31,7 +32,8 @@
 #include <comphelper/types.hxx>
 #include <vcl/unohelp.hxx>
 #include <vcl/svapp.hxx>
-#include <tools/diagnose_ex.h>
+#include <tools/debug.hxx>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star::uno;
 
@@ -291,7 +293,7 @@ sal_Bool SAL_CALL OGridControlModel::select(const Any& rElement)
 }
 Any SAL_CALL OGridControlModel::getSelection()
 {
-    return makeAny(m_xSelection);
+    return Any(m_xSelection);
 }
 
 void OGridControlModel::addSelectionChangeListener(const Reference< XSelectionChangeListener >& _rxListener)
@@ -340,11 +342,11 @@ css::uno::Sequence<OUString> SAL_CALL OGridControlModel::getColumnTypes()
 // XReset
 void SAL_CALL OGridControlModel::reset()
 {
-    ::comphelper::OInterfaceIteratorHelper2 aIter(m_aResetListeners);
+    ::comphelper::OInterfaceIteratorHelper3 aIter(m_aResetListeners);
     EventObject aEvt(static_cast<XWeak*>(this));
     bool bContinue = true;
     while (aIter.hasMoreElements() && bContinue)
-        bContinue = static_cast<XResetListener*>(aIter.next())->approveReset(aEvt);
+        bContinue = aIter.next()->approveReset(aEvt);
     if (bContinue)
     {
         _reset();

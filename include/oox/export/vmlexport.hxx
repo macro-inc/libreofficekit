@@ -65,10 +65,6 @@ public:
     virtual oox::drawingml::DrawingML& GetDrawingML() = 0;
     /// Write the contents of the textbox that is associated to this shape in VML format.
     virtual void WriteVMLTextBox(css::uno::Reference<css::drawing::XShape> xShape) = 0;
-    /// Look up the RelId of a graphic based on its checksum.
-    virtual OUString FindRelId(BitmapChecksum nChecksum) = 0;
-    /// Store the RelId and filename of a graphic based on its checksum.
-    virtual void CacheRelId(BitmapChecksum nChecksum, const OUString& rRelId, const OUString& rFileName) = 0;
 protected:
     VMLTextExport() {}
     virtual ~VMLTextExport() {}
@@ -130,7 +126,7 @@ class OOX_DLLPUBLIC VMLExport : public EscherEx
     sal_uInt64 m_nShapeIDCounter;
 
 public:
-                        VMLExport( ::sax_fastparser::FSHelperPtr const & pSerializer, VMLTextExport* pTextExport = nullptr);
+                        VMLExport( ::sax_fastparser::FSHelperPtr pSerializer, VMLTextExport* pTextExport = nullptr);
     virtual             ~VMLExport() override;
 
     const ::sax_fastparser::FSHelperPtr&
@@ -149,7 +145,7 @@ public:
             const bool bOOxmlExport = false );
     OString const & AddInlineSdrObject( const SdrObject& rObj, const bool bOOxmlExport );
     virtual void  AddSdrObjectVMLObject( const SdrObject& rObj) override;
-    static bool IsWaterMarkShape(const OUString& rStr);
+    static bool IsWaterMarkShape(std::u16string_view rStr);
 
     void    SetSkipwzName(bool bSkipwzName) { m_bSkipwzName = bSkipwzName; }
     void    SetHashMarkForType(bool bUseHashMarkForType) { m_bUseHashMarkForType = bUseHashMarkForType; }

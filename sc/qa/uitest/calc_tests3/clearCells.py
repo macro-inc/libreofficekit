@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -173,7 +175,7 @@ class clearCells(UITestCase):
 
 
     def test_clear_cells_formats(self):
-        with self.ui_test.create_doc_in_start_center("calc") as document:
+        with self.ui_test.create_doc_in_start_center("calc"):
             xCalcDoc = self.xUITest.getTopFocusWindow()
             gridwin = xCalcDoc.getChild("grid_window")
             enter_text_to_cell(gridwin, "A1", "aa")
@@ -214,7 +216,7 @@ class clearCells(UITestCase):
                 xTabs = xDialog.getChild("tabcontrol")
                 select_pos(xTabs, "1")  #tab Font
 
-                xstylelb = xDialog.getChild("weststylelb-cjk")
+                xstylelb = xDialog.getChild("cbWestStyle")
                 self.assertEqual(get_state_as_dict(xstylelb)["Text"], "Regular")
 
     def test_clear_cells_all(self):
@@ -228,13 +230,6 @@ class clearCells(UITestCase):
             self.xUITest.executeCommand(".uno:Bold")
             with self.ui_test.execute_dialog_through_command(".uno:Delete") as xDialog:
                 xdeleteall = xDialog.getChild("deleteall")
-                xtext = xDialog.getChild("text")
-                xdatetime = xDialog.getChild("datetime")
-                xcomments = xDialog.getChild("comments")
-                xobjects = xDialog.getChild("objects")
-                xnumbers = xDialog.getChild("numbers")
-                xformulas = xDialog.getChild("formulas")
-                xformats = xDialog.getChild("formats")
 
                 if (get_state_as_dict(xdeleteall)["Selected"]) == "false":
                     xdeleteall.executeAction("CLICK", tuple())

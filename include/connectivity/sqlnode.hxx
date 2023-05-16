@@ -87,7 +87,7 @@ namespace connectivity
             const css::uno::Reference< css::sdbc::XConnection >& _rxConnection,
             const css::uno::Reference< css::util::XNumberFormatter >& _xFormatter,
             const css::uno::Reference< css::beans::XPropertySet >& _xField,
-            const OUString &_sPredicateTableAlias,
+            OUString _sPredicateTableAlias,
             const css::lang::Locale& _rLocale,
             const IParseContext* _pContext,
             bool _bIntl,
@@ -235,7 +235,7 @@ namespace connectivity
                       SQLNodeType eNewNodeType,
                       sal_uInt32 nNewNodeID=0);
 
-        OSQLParseNode(const OUString& _rValue,
+        OSQLParseNode(OUString _sValue,
                       SQLNodeType _eNodeType,
                       sal_uInt32 _nNodeID = 0);
 
@@ -258,7 +258,7 @@ namespace connectivity
         void append(OSQLParseNode* pNewSubTree);
         void insert(sal_uInt32 nPos, OSQLParseNode* pNewSubTree);
 
-        OSQLParseNode* replace(OSQLParseNode* pOldSubTree, OSQLParseNode* pNewSubTree);
+        void replaceAndDelete(OSQLParseNode* pOldSubTree, OSQLParseNode* pNewSubTree);
 
         OSQLParseNode* removeAt(sal_uInt32 nPos);
 
@@ -425,8 +425,8 @@ namespace connectivity
 
         bool addDateValue(OUStringBuffer& rString, const SQLParseNodeParameter& rParam) const;
         static OUString convertDateTimeString(const SQLParseNodeParameter& rParam, const OUString& rString);
-        static OUString convertDateString(const SQLParseNodeParameter& rParam, const OUString& rString);
-        static OUString convertTimeString(const SQLParseNodeParameter& rParam, const OUString& rString);
+        static OUString convertDateString(const SQLParseNodeParameter& rParam, std::u16string_view rString);
+        static OUString convertTimeString(const SQLParseNodeParameter& rParam, std::u16string_view rString);
         void parseLeaf(OUStringBuffer& rString, const SQLParseNodeParameter& rParam) const;
     };
 

@@ -18,7 +18,6 @@
  */
 
 #include <ChartController.hxx>
-#include <ChartWindow.hxx>
 #include <chartview/DrawModelWrapper.hxx>
 #include <chartview/ChartSfxItemIds.hxx>
 #include <ObjectIdentifier.hxx>
@@ -39,11 +38,16 @@
 #include <RegressionEquationItemConverter.hxx>
 #include <ErrorBarItemConverter.hxx>
 #include <ChartModelHelper.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <TitleHelper.hxx>
+#include <ChartType.hxx>
 #include <ChartTypeHelper.hxx>
+#include <ChartModel.hxx>
 #include <ColorPerPointHelper.hxx>
+#include <DataSeries.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
 #include <ControllerLockGuard.hxx>
 #include "UndoGuard.hxx"
 #include <ObjectNameProvider.hxx>
@@ -51,16 +55,16 @@
 #include <strings.hrc>
 #include <ReferenceSizeProvider.hxx>
 #include <RegressionCurveHelper.hxx>
-#include <com/sun/star/chart2/XChartDocument.hpp>
+#include <RegressionCurveModel.hxx>
 #include <com/sun/star/util/CloseVetoException.hpp>
-#include <com/sun/star/chart2/XRegressionCurveContainer.hpp>
 #include <comphelper/servicehelper.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <memory>
 
 #include <vcl/svapp.hxx>
 #include <svx/ActionDescriptionProvider.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace chart
 {
@@ -72,7 +76,7 @@ namespace
 {
 
 wrapper::ItemConverter* createItemConverter(
-    const OUString & aObjectCID, const uno::Reference<frame::XModel>& xChartModel,
+    std::u16string_view aObjectCID, const rtl::Reference<::chart::ChartModel>& xChartModel,
     const uno::Reference<uno::XComponentContext>& xContext, SdrModel& rDrawModel,
     ExplicitValueProvider* pExplicitValueProvider, ReferenceSizeProvider const * pRefSizeProvider )
 {
@@ -86,8 +90,8 @@ wrapper::ItemConverter* createItemConverter(
         return nullptr;
     }
 
-    OUString aParticleID = ObjectIdentifier::getParticleID( aObjectCID );
-    bool bAffectsMultipleObjects = aParticleID == "ALLELEMENTS";
+    std::u16string_view aParticleID = ObjectIdentifier::getParticleID( aObjectCID );
+    bool bAffectsMultipleObjects = aParticleID == u"ALLELEMENTS";
     if( !bAffectsMultipleObjects )
     {
         uno::Reference< beans::XPropertySet > xObjectProperties =
@@ -100,7 +104,7 @@ wrapper::ItemConverter* createItemConverter(
             case OBJECTTYPE_PAGE:
                 pItemConverter =  new wrapper::GraphicPropertyItemConverter(
                                         xObjectProperties, rDrawModel.GetItemPool(),
-                                        rDrawModel, uno::Reference< lang::XMultiServiceFactory >( xChartModel, uno::UNO_QUERY ),
+                                        rDrawModel, xChartModel,
                                         wrapper::GraphicObjectType::LineAndFillProperties );
                     break;
             case OBJECTTYPE_TITLE:
@@ -111,7 +115,7 @@ wrapper::ItemConverter* createItemConverter(
 
                 pItemConverter = new wrapper::TitleItemConverter(
                     xObjectProperties, rDrawModel.GetItemPool(), rDrawModel,
-                    uno::Reference<lang::XMultiServiceFactory>(xChartModel, uno::UNO_QUERY),
+                    xChartModel,
                     pRefSize.get());
             }
             break;
@@ -123,7 +127,7 @@ wrapper::ItemConverter* createItemConverter(
 
                 pItemConverter = new wrapper::LegendItemConverter(
                     xObjectProperties, rDrawModel.GetItemPool(), rDrawModel,
-                    uno::Reference<lang::XMultiServiceFactory>(xChartModel, uno::UNO_QUERY),
+                    xChartModel,
                     pRefSize.get());
             }
             break;
@@ -135,7 +139,7 @@ wrapper::ItemConverter* createItemConverter(
             case OBJECTTYPE_DIAGRAM_FLOOR:
                 pItemConverter =  new wrapper::GraphicPropertyItemConverter(
                                         xObjectProperties, rDrawModel.GetItemPool(),
-                                        rDrawModel, uno::Reference< lang::XMultiServiceFactory >( xChartModel, uno::UNO_QUERY ),
+                                        rDrawModel, xChartModel,
                                         wrapper::GraphicObjectType::LineAndFillProperties );
                     break;
             case OBJECTTYPE_AXIS:
@@ -143,9 +147,6 @@ wrapper::ItemConverter* createItemConverter(
                 std::unique_ptr<awt::Size> pRefSize;
                 if (pRefSizeProvider)
                     pRefSize.reset( new awt::Size( pRefSizeProvider->getPageSize()));
-
-                uno::Reference< beans::XPropertySet > xDiaProp;
-                xDiaProp.set( ChartModelHelper::findDiagram( xChartModel ), uno::UNO_QUERY );
 
                 // the second property set contains the property CoordinateOrigin
                 // nOriginIndex is the index of the corresponding index of the
@@ -161,7 +162,7 @@ wrapper::ItemConverter* createItemConverter(
                 pItemConverter =  new wrapper::AxisItemConverter(
                     xObjectProperties, rDrawModel.GetItemPool(),
                     rDrawModel,
-                    uno::Reference< chart2::XChartDocument >( xChartModel, uno::UNO_QUERY ),
+                    xChartModel,
                     &aExplicitScale, &aExplicitIncrement,
                     pRefSize.get() );
             }
@@ -175,13 +176,13 @@ wrapper::ItemConverter* createItemConverter(
                 if (pRefSizeProvider)
                     pRefSize.reset( new awt::Size( pRefSizeProvider->getPageSize()));
 
-                uno::Reference<XDataSeries> xSeries = ObjectIdentifier::getDataSeriesForCID(aObjectCID, xChartModel);
+                rtl::Reference<DataSeries> xSeries = ObjectIdentifier::getDataSeriesForCID(aObjectCID, xChartModel);
 
                 bool bDataSeries = eObjectType == OBJECTTYPE_DATA_LABELS;
 
                 sal_Int32 nNumberFormat = ExplicitValueProvider::getExplicitNumberFormatKeyForDataLabel( xObjectProperties );
                 sal_Int32 nPercentNumberFormat = ExplicitValueProvider::getExplicitPercentageNumberFormatKeyForDataLabel(
-                    xObjectProperties,uno::Reference<util::XNumberFormatsSupplier>(xChartModel, uno::UNO_QUERY));
+                    xObjectProperties, xChartModel);
 
                 pItemConverter = new wrapper::TextLabelItemConverter(
                     xChartModel, xObjectProperties, xSeries,
@@ -199,10 +200,10 @@ wrapper::ItemConverter* createItemConverter(
                 wrapper::GraphicObjectType eMapTo =
                     wrapper::GraphicObjectType::FilledDataPoint;
 
-                uno::Reference< XDataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( aObjectCID, xChartModel );
-                uno::Reference< XChartType > xChartType = ChartModelHelper::getChartTypeOfSeries( xChartModel, xSeries );
+                rtl::Reference< DataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( aObjectCID, xChartModel );
+                rtl::Reference< ChartType > xChartType = ChartModelHelper::getChartTypeOfSeries( xChartModel, xSeries );
 
-                uno::Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
+                rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram( xChartModel );
                 sal_Int32 nDimensionCount = DiagramHelper::getDimension( xDiagram );
                 if( !ChartTypeHelper::isSupportingAreaProperties( xChartType, nDimensionCount ) )
                     eMapTo = wrapper::GraphicObjectType::LineDataPoint;
@@ -215,14 +216,13 @@ wrapper::ItemConverter* createItemConverter(
                 sal_Int32 nPointIndex = -1; /*-1 for whole series*/
                 if(!bDataSeries)
                 {
-                    nPointIndex = aParticleID.toInt32();
-                    uno::Reference< beans::XPropertySet > xSeriesProp( xSeries, uno::UNO_QUERY );
+                    nPointIndex = o3tl::toInt32(aParticleID);
                     bool bVaryColorsByPoint = false;
-                    if( xSeriesProp.is() &&
-                        (xSeriesProp->getPropertyValue("VaryColorsByPoint") >>= bVaryColorsByPoint) &&
+                    if( xSeries.is() &&
+                        (xSeries->getPropertyValue("VaryColorsByPoint") >>= bVaryColorsByPoint) &&
                         bVaryColorsByPoint )
                     {
-                        if( !ColorPerPointHelper::hasPointOwnColor( xSeriesProp, nPointIndex, xObjectProperties ) )
+                        if( !ColorPerPointHelper::hasPointOwnColor( xSeries, nPointIndex, xObjectProperties ) )
                         {
                             bUseSpecialFillColor = true;
                             OSL_ASSERT( xDiagram.is());
@@ -234,11 +234,11 @@ wrapper::ItemConverter* createItemConverter(
                 }
                 sal_Int32 nNumberFormat=ExplicitValueProvider::getExplicitNumberFormatKeyForDataLabel( xObjectProperties );
                 sal_Int32 nPercentNumberFormat=ExplicitValueProvider::getExplicitPercentageNumberFormatKeyForDataLabel(
-                        xObjectProperties,uno::Reference< util::XNumberFormatsSupplier >(xChartModel, uno::UNO_QUERY));
+                        xObjectProperties, xChartModel);
 
                 pItemConverter =  new wrapper::DataPointItemConverter( xChartModel, xContext,
                                         xObjectProperties, xSeries, rDrawModel.GetItemPool(), rDrawModel,
-                                        uno::Reference< lang::XMultiServiceFactory >( xChartModel, uno::UNO_QUERY ),
+                                        xChartModel,
                                         eMapTo, pRefSize.get(), bDataSeries, bUseSpecialFillColor, nSpecialFillColor, true,
                                         nNumberFormat, nPercentNumberFormat, nPointIndex );
                 break;
@@ -248,7 +248,7 @@ wrapper::ItemConverter* createItemConverter(
             case OBJECTTYPE_DATA_AVERAGE_LINE:
                 pItemConverter =  new wrapper::GraphicPropertyItemConverter(
                                         xObjectProperties, rDrawModel.GetItemPool(),
-                                        rDrawModel, uno::Reference< lang::XMultiServiceFactory >( xChartModel, uno::UNO_QUERY ),
+                                        rDrawModel, xChartModel,
                                         wrapper::GraphicObjectType::LineProperties );
                     break;
 
@@ -257,15 +257,15 @@ wrapper::ItemConverter* createItemConverter(
             case OBJECTTYPE_DATA_ERRORS_Z:
                 pItemConverter =  new wrapper::ErrorBarItemConverter(
                     xChartModel, xObjectProperties, rDrawModel.GetItemPool(),
-                    rDrawModel, uno::Reference< lang::XMultiServiceFactory >( xChartModel, uno::UNO_QUERY ));
+                    rDrawModel, xChartModel);
                 break;
 
             case OBJECTTYPE_DATA_CURVE:
                 pItemConverter =  new wrapper::RegressionCurveItemConverter(
-                    xObjectProperties, uno::Reference< chart2::XRegressionCurveContainer >(
-                        ObjectIdentifier::getDataSeriesForCID( aObjectCID, xChartModel ), uno::UNO_QUERY ),
-                    rDrawModel.GetItemPool(), rDrawModel,
-                    uno::Reference< lang::XMultiServiceFactory >( xChartModel, uno::UNO_QUERY ));
+                        xObjectProperties,
+                        ObjectIdentifier::getDataSeriesForCID( aObjectCID, xChartModel ),
+                        rDrawModel.GetItemPool(), rDrawModel,
+                        xChartModel);
                 break;
             case OBJECTTYPE_DATA_CURVE_EQUATION:
             {
@@ -275,7 +275,7 @@ wrapper::ItemConverter* createItemConverter(
 
                 pItemConverter =  new wrapper::RegressionEquationItemConverter(
                                         xObjectProperties, rDrawModel.GetItemPool(), rDrawModel,
-                                        uno::Reference< lang::XMultiServiceFactory >( xChartModel, uno::UNO_QUERY ),
+                                        xChartModel,
                                         pRefSize.get());
                 break;
             }
@@ -285,14 +285,14 @@ wrapper::ItemConverter* createItemConverter(
             case OBJECTTYPE_DATA_STOCK_GAIN:
                 pItemConverter =  new wrapper::GraphicPropertyItemConverter(
                                         xObjectProperties, rDrawModel.GetItemPool(),
-                                        rDrawModel, uno::Reference< lang::XMultiServiceFactory >( xChartModel, uno::UNO_QUERY ),
+                                        rDrawModel, xChartModel,
                                         wrapper::GraphicObjectType::LineAndFillProperties );
                     break;
             case OBJECTTYPE_DATA_TABLE:
             {
                 pItemConverter =  new wrapper::DataTableItemConverter(
                                         xObjectProperties, rDrawModel.GetItemPool(),
-                                        rDrawModel, uno::Reference<lang::XMultiServiceFactory>(xChartModel, uno::UNO_QUERY));
+                                        rDrawModel, xChartModel);
             }
             break;
             default: //OBJECTTYPE_UNKNOWN
@@ -306,7 +306,7 @@ wrapper::ItemConverter* createItemConverter(
         {
             case OBJECTTYPE_TITLE:
                 pItemConverter =  new wrapper::AllTitleItemConverter( xChartModel, rDrawModel.GetItemPool(),
-                                                                     rDrawModel, uno::Reference< lang::XMultiServiceFactory >( xChartModel, uno::UNO_QUERY ));
+                                                                     rDrawModel, xChartModel);
                 break;
             case OBJECTTYPE_AXIS:
             {
@@ -322,7 +322,7 @@ wrapper::ItemConverter* createItemConverter(
             case OBJECTTYPE_GRID:
             case OBJECTTYPE_SUBGRID:
                 pItemConverter =  new wrapper::AllGridItemConverter( xChartModel, rDrawModel.GetItemPool(),
-                                                                     rDrawModel, uno::Reference< lang::XMultiServiceFactory >( xChartModel, uno::UNO_QUERY ));
+                                                                     rDrawModel, xChartModel);
                 break;
             default: //for this type it is not supported to change all elements at once
                 break;
@@ -332,7 +332,7 @@ wrapper::ItemConverter* createItemConverter(
     return pItemConverter;
 }
 
-OUString lcl_getTitleCIDForCommand( std::string_view rDispatchCommand, const uno::Reference< frame::XModel > & xChartModel )
+OUString lcl_getTitleCIDForCommand( std::string_view rDispatchCommand, const rtl::Reference<::chart::ChartModel> & xChartModel )
 {
     if( rDispatchCommand == "AllTitles")
         return ObjectIdentifier::createClassifiedIdentifier( OBJECTTYPE_TITLE, u"ALLELEMENTS" );
@@ -355,7 +355,7 @@ OUString lcl_getTitleCIDForCommand( std::string_view rDispatchCommand, const uno
     return ObjectIdentifier::createClassifiedIdentifierForObject( xTitle, xChartModel );
 }
 
-OUString lcl_getAxisCIDForCommand( std::string_view rDispatchCommand, const uno::Reference< frame::XModel >& xChartModel )
+OUString lcl_getAxisCIDForCommand( std::string_view rDispatchCommand, const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
     if( rDispatchCommand == "DiagramAxisAll")
         return ObjectIdentifier::createClassifiedIdentifier( OBJECTTYPE_AXIS, u"ALLELEMENTS" );
@@ -383,14 +383,14 @@ OUString lcl_getAxisCIDForCommand( std::string_view rDispatchCommand, const uno:
         nDimensionIndex=1; bMainAxis=false;
     }
 
-    uno::Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
-    uno::Reference< XAxis > xAxis( AxisHelper::getAxis( nDimensionIndex, bMainAxis, xDiagram ) );
+    rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram( xChartModel );
+    rtl::Reference< Axis > xAxis = AxisHelper::getAxis( nDimensionIndex, bMainAxis, xDiagram );
     return ObjectIdentifier::createClassifiedIdentifierForObject( xAxis, xChartModel );
 }
 
-OUString lcl_getGridCIDForCommand( std::string_view rDispatchCommand, const uno::Reference< frame::XModel >& xChartModel )
+OUString lcl_getGridCIDForCommand( std::string_view rDispatchCommand, const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
-    uno::Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
+    rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram( xChartModel );
 
     if( rDispatchCommand == "DiagramGridAll")
         return ObjectIdentifier::createClassifiedIdentifier( OBJECTTYPE_GRID, u"ALLELEMENTS" );
@@ -425,7 +425,7 @@ OUString lcl_getGridCIDForCommand( std::string_view rDispatchCommand, const uno:
         nDimensionIndex=2; bMainGrid=false;
     }
 
-    uno::Reference< XAxis > xAxis( AxisHelper::getAxis( nDimensionIndex, true/*bMainAxis*/, xDiagram ) );
+    rtl::Reference< Axis > xAxis = AxisHelper::getAxis( nDimensionIndex, true/*bMainAxis*/, xDiagram );
 
     sal_Int32   nSubGridIndex= bMainGrid ? -1 : 0;
     OUString aCID( ObjectIdentifier::createClassifiedIdentifierForGrid( xAxis, xChartModel, nSubGridIndex ) );
@@ -440,14 +440,12 @@ OUString lcl_getErrorCIDForCommand( const ObjectType eDispatchType, const Object
     return ObjectIdentifier::createClassifiedIdentifierWithParent( eDispatchType, u"", rSelectedCID );
 }
 
-OUString lcl_getObjectCIDForCommand( std::string_view rDispatchCommand, const uno::Reference< XChartDocument > & xChartDocument, const OUString& rSelectedCID )
+OUString lcl_getObjectCIDForCommand( std::string_view rDispatchCommand, const rtl::Reference<::chart::ChartModel> & xChartDocument, const OUString& rSelectedCID )
 {
     ObjectType eObjectType = OBJECTTYPE_UNKNOWN;
 
-    uno::Reference< frame::XModel > xChartModel = xChartDocument;
     const ObjectType eSelectedType = ObjectIdentifier::getObjectType( rSelectedCID );
-    uno::Reference< XDataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( rSelectedCID, xChartModel );
-    uno::Reference< chart2::XRegressionCurveContainer > xRegCurveCnt( xSeries, uno::UNO_QUERY );
+    rtl::Reference< DataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( rSelectedCID, xChartDocument );
 
     //legend
     if( rDispatchCommand == "Legend" || rDispatchCommand == "FormatLegend" )
@@ -482,7 +480,7 @@ OUString lcl_getObjectCIDForCommand( std::string_view rDispatchCommand, const un
         || rDispatchCommand == "AllTitles"
         )
     {
-        return lcl_getTitleCIDForCommand( rDispatchCommand, xChartModel );
+        return lcl_getTitleCIDForCommand( rDispatchCommand, xChartDocument );
     }
     //axis
     else if( rDispatchCommand == "DiagramAxisX"
@@ -493,7 +491,7 @@ OUString lcl_getObjectCIDForCommand( std::string_view rDispatchCommand, const un
         || rDispatchCommand == "DiagramAxisAll"
         )
     {
-        return lcl_getAxisCIDForCommand( rDispatchCommand, xChartModel );
+        return lcl_getAxisCIDForCommand( rDispatchCommand, xChartDocument );
     }
     //grid
     else if( rDispatchCommand == "DiagramGridYMain"
@@ -505,7 +503,7 @@ OUString lcl_getObjectCIDForCommand( std::string_view rDispatchCommand, const un
         || rDispatchCommand == "DiagramGridAll"
         )
     {
-        return lcl_getGridCIDForCommand( rDispatchCommand, xChartModel );
+        return lcl_getGridCIDForCommand( rDispatchCommand, xChartDocument );
     }
     //data series
     else if( rDispatchCommand == "FormatDataSeries" )
@@ -537,7 +535,7 @@ OUString lcl_getObjectCIDForCommand( std::string_view rDispatchCommand, const un
             return rSelectedCID;
         else
         {
-            sal_Int32 nPointIndex = ObjectIdentifier::getParticleID( rSelectedCID ).toInt32();
+            sal_Int32 nPointIndex = o3tl::toInt32(ObjectIdentifier::getParticleID( rSelectedCID ));
             if( nPointIndex>=0 )
             {
                 OUString aSeriesParticle = ObjectIdentifier::getSeriesParticleFromCID( rSelectedCID );
@@ -558,8 +556,8 @@ OUString lcl_getObjectCIDForCommand( std::string_view rDispatchCommand, const un
         else
             return ObjectIdentifier::createDataCurveCID(
                 ObjectIdentifier::getSeriesParticleFromCID( rSelectedCID ),
-                    RegressionCurveHelper::getRegressionCurveIndex( xRegCurveCnt,
-                        RegressionCurveHelper::getMeanValueLine( xRegCurveCnt ) ), true );
+                    RegressionCurveHelper::getRegressionCurveIndex( xSeries,
+                        RegressionCurveHelper::getMeanValueLine( xSeries ) ), true );
     }
     //trend line
     else if( rDispatchCommand == "FormatTrendline" )
@@ -569,8 +567,8 @@ OUString lcl_getObjectCIDForCommand( std::string_view rDispatchCommand, const un
         else
             return ObjectIdentifier::createDataCurveCID(
                 ObjectIdentifier::getSeriesParticleFromCID( rSelectedCID ),
-                    RegressionCurveHelper::getRegressionCurveIndex( xRegCurveCnt,
-                        RegressionCurveHelper::getFirstCurveNotMeanValueLine( xRegCurveCnt ) ), false );
+                    RegressionCurveHelper::getRegressionCurveIndex( xSeries,
+                        RegressionCurveHelper::getFirstCurveNotMeanValueLine( xSeries ) ), false );
     }
     //trend line equation
     else if( rDispatchCommand == "FormatTrendlineEquation" )
@@ -580,8 +578,8 @@ OUString lcl_getObjectCIDForCommand( std::string_view rDispatchCommand, const un
         else
             return ObjectIdentifier::createDataCurveEquationCID(
                 ObjectIdentifier::getSeriesParticleFromCID( rSelectedCID ),
-                    RegressionCurveHelper::getRegressionCurveIndex( xRegCurveCnt,
-                        RegressionCurveHelper::getFirstCurveNotMeanValueLine( xRegCurveCnt ) ) );
+                    RegressionCurveHelper::getRegressionCurveIndex( xSeries,
+                        RegressionCurveHelper::getFirstCurveNotMeanValueLine( xSeries ) ) );
     }
     // y error bars
     else if( rDispatchCommand == "FormatXErrorBars" )
@@ -600,8 +598,8 @@ OUString lcl_getObjectCIDForCommand( std::string_view rDispatchCommand, const un
             return rSelectedCID;
         else
         {
-            Reference< XAxis > xAxis = ObjectIdentifier::getAxisForCID( rSelectedCID, xChartModel );
-            return ObjectIdentifier::createClassifiedIdentifierForObject( xAxis , xChartModel );
+            rtl::Reference< Axis > xAxis = ObjectIdentifier::getAxisForCID( rSelectedCID, xChartDocument );
+            return ObjectIdentifier::createClassifiedIdentifierForObject( xAxis , xChartDocument );
         }
     }
     // major grid
@@ -611,8 +609,8 @@ OUString lcl_getObjectCIDForCommand( std::string_view rDispatchCommand, const un
             return rSelectedCID;
         else
         {
-            Reference< XAxis > xAxis = ObjectIdentifier::getAxisForCID( rSelectedCID, xChartModel );
-            return ObjectIdentifier::createClassifiedIdentifierForGrid( xAxis, xChartModel );
+            rtl::Reference< Axis > xAxis = ObjectIdentifier::getAxisForCID( rSelectedCID, xChartDocument );
+            return ObjectIdentifier::createClassifiedIdentifierForGrid( xAxis, xChartDocument );
         }
 
     }
@@ -623,8 +621,8 @@ OUString lcl_getObjectCIDForCommand( std::string_view rDispatchCommand, const un
             return rSelectedCID;
         else
         {
-            Reference< XAxis > xAxis = ObjectIdentifier::getAxisForCID( rSelectedCID, xChartModel );
-            return ObjectIdentifier::createClassifiedIdentifierForGrid( xAxis, xChartModel, 0 /*sub grid index*/ );
+            rtl::Reference< Axis > xAxis = ObjectIdentifier::getAxisForCID( rSelectedCID, xChartDocument );
+            return ObjectIdentifier::createClassifiedIdentifierForGrid( xAxis, xChartDocument, 0 /*sub grid index*/ );
         }
     }
     // title
@@ -660,7 +658,7 @@ OUString lcl_getObjectCIDForCommand( std::string_view rDispatchCommand, const un
 
 void ChartController::executeDispatch_FormatObject(std::u16string_view rDispatchCommand)
 {
-    uno::Reference< XChartDocument > xChartDocument( getModel(), uno::UNO_QUERY );
+    rtl::Reference<::chart::ChartModel> xChartDocument( getChartModel() );
     OString aCommand( OUStringToOString( rDispatchCommand, RTL_TEXTENCODING_ASCII_US ) );
     OUString rObjectCID = lcl_getObjectCIDForCommand( aCommand, xChartDocument, m_aSelection.getSelectedCID() );
     executeDlg_ObjectProperties( rObjectCID );
@@ -684,7 +682,7 @@ OUString lcl_getFormatCIDforSelectedCID( const OUString& rSelectedCID )
     // some legend entries are handled as if they were data series
     if( eObjectType==OBJECTTYPE_LEGEND_ENTRY )
     {
-        OUString aParentParticle( ObjectIdentifier::getFullParentParticle( rSelectedCID ) );
+        std::u16string_view aParentParticle( ObjectIdentifier::getFullParentParticle( rSelectedCID ) );
         aFormatCID  = ObjectIdentifier::createClassifiedIdentifierForParticle( aParentParticle );
     }
 
@@ -730,7 +728,7 @@ bool ChartController::executeDlg_ObjectProperties_withoutUndoGuard(
         }
         if( eObjectType==OBJECTTYPE_DIAGRAM_WALL || eObjectType==OBJECTTYPE_DIAGRAM_FLOOR )
         {
-            if( !DiagramHelper::isSupportingFloorAndWall( ChartModelHelper::findDiagram( getModel() ) ) )
+            if( !DiagramHelper::isSupportingFloorAndWall( getFirstDiagram() ) )
                 return bRet;
         }
 
@@ -739,7 +737,7 @@ bool ChartController::executeDlg_ObjectProperties_withoutUndoGuard(
         std::unique_ptr<ReferenceSizeProvider> pRefSizeProv(impl_createReferenceSizeProvider());
 
         std::unique_ptr<wrapper::ItemConverter> pItemConverter(
-            createItemConverter( rObjectCID, getModel(), m_xCC,
+            createItemConverter( rObjectCID, getChartModel(), m_xCC,
                                  m_pDrawModelWrapper->getSdrModel(),
                                  comphelper::getFromUnoTunnel<ExplicitValueProvider>(m_xChartView),
                                  pRefSizeProv.get()));
@@ -756,39 +754,38 @@ bool ChartController::executeDlg_ObjectProperties_withoutUndoGuard(
 
         //prepare dialog
         ObjectPropertiesDialogParameter aDialogParameter( rObjectCID );
-        aDialogParameter.init( getModel() );
+        aDialogParameter.init( getChartModel() );
         ViewElementListProvider aViewElementListProvider( m_pDrawModelWrapper.get() );
 
         SolarMutexGuard aGuard;
         SchAttribTabDlg aDlg(
                 GetChartFrame(), &aItemSet, &aDialogParameter,
                 &aViewElementListProvider,
-                uno::Reference< util::XNumberFormatsSupplier >(
-                        getModel(), uno::UNO_QUERY ) );
+                getChartModel() );
 
         if(aDialogParameter.HasSymbolProperties())
         {
             uno::Reference< beans::XPropertySet > xObjectProperties =
-                ObjectIdentifier::getObjectPropertySet( rObjectCID, getModel() );
-            wrapper::DataPointItemConverter aSymbolItemConverter( getModel(), m_xCC
-                                        , xObjectProperties, ObjectIdentifier::getDataSeriesForCID( rObjectCID, getModel() )
+                ObjectIdentifier::getObjectPropertySet( rObjectCID, getChartModel() );
+            wrapper::DataPointItemConverter aSymbolItemConverter( getChartModel(), m_xCC
+                                        , xObjectProperties, ObjectIdentifier::getDataSeriesForCID( rObjectCID, getChartModel() )
                                         , m_pDrawModelWrapper->getSdrModel().GetItemPool()
                                         , m_pDrawModelWrapper->getSdrModel()
-                                        , uno::Reference< lang::XMultiServiceFactory >( getModel(), uno::UNO_QUERY )
+                                        , getChartModel()
                                         , wrapper::GraphicObjectType::FilledDataPoint );
 
             SfxItemSet aSymbolShapeProperties(aSymbolItemConverter.CreateEmptyItemSet() );
             aSymbolItemConverter.FillItemSet( aSymbolShapeProperties );
 
             sal_Int32 const nStandardSymbol=0;//@todo get from somewhere
-            std::unique_ptr<Graphic> pAutoSymbolGraphic(new Graphic( aViewElementListProvider.GetSymbolGraphic( nStandardSymbol, &aSymbolShapeProperties ) ));
+            std::optional<Graphic> oAutoSymbolGraphic(std::in_place, aViewElementListProvider.GetSymbolGraphic( nStandardSymbol, &aSymbolShapeProperties ) );
             // note: the dialog takes the ownership of pSymbolShapeProperties and pAutoSymbolGraphic
-            aDlg.setSymbolInformation( std::move(aSymbolShapeProperties), std::move(pAutoSymbolGraphic) );
+            aDlg.setSymbolInformation( std::move(aSymbolShapeProperties), std::move(oAutoSymbolGraphic) );
         }
         if( aDialogParameter.HasStatisticProperties() )
         {
             aDlg.SetAxisMinorStepWidthForErrorBarDecimals(
-                InsertErrorBarsDialog::getAxisMinorStepWidthForErrorBarDecimals( getModel(), m_xChartView, rObjectCID ) );
+                InsertErrorBarsDialog::getAxisMinorStepWidthForErrorBarDecimals( getChartModel(), m_xChartView, rObjectCID ) );
         }
 
         //open the dialog
@@ -797,7 +794,7 @@ bool ChartController::executeDlg_ObjectProperties_withoutUndoGuard(
             const SfxItemSet* pOutItemSet = aDlg.GetOutputItemSet();
             if(pOutItemSet)
             {
-                ControllerLockGuardUNO aCLGuard( getModel());
+                ControllerLockGuardUNO aCLGuard( getChartModel());
                 (void)pItemConverter->ApplyItemSet(*pOutItemSet); //model should be changed now
                 bRet = true;
             }
@@ -822,7 +819,7 @@ void ChartController::executeDispatch_View3D()
 
         //open dialog
         SolarMutexGuard aSolarGuard;
-        View3DDialog aDlg(GetChartFrame(), getModel());
+        View3DDialog aDlg(GetChartFrame(), getChartModel());
         if (aDlg.run() == RET_OK)
             aUndoGuard.commit();
     }

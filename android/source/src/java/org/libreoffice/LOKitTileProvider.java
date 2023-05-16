@@ -120,27 +120,9 @@ class LOKitTileProvider implements TileProvider {
     private void postLoad() {
         mDocument.setMessageCallback(mMessageCallback);
 
-        int parts = mDocument.getParts();
-        Log.i(LOGTAG, "Document parts: " + parts);
-        mContext.getDocumentPartView().clear();
-
+        resetParts();
         // Writer documents always have one part, so hide the navigation drawer.
-        if (mDocument.getDocumentType() != Document.DOCTYPE_TEXT) {
-            for (int i = 0; i < parts; i++) {
-                String partName = mDocument.getPartName(i);
-                if (partName.isEmpty()) {
-                    partName = getGenericPartName(i);
-                }else if (partName.startsWith("Slide") || partName.startsWith("Sheet") || partName.startsWith("Part")) {
-                    partName = getGenericPartName(i);
-                }
-                Log.i(LOGTAG, "Document part " + i + " name:'" + partName + "'");
-
-                mDocument.setPart(i);
-                resetDocumentSize();
-                final DocumentPartView partView = new DocumentPartView(i, partName);
-                mContext.getDocumentPartView().add(partView);
-            }
-        } else {
+        if (mDocument.getDocumentType() == Document.DOCTYPE_TEXT) {
             mContext.disableNavigationDrawer();
             mContext.getToolbarController().hideItem(R.id.action_parts);
         }
@@ -194,9 +176,9 @@ class LOKitTileProvider implements TileProvider {
     }
 
     public void resetParts(){
-        int parts = mDocument.getParts();
         mContext.getDocumentPartView().clear();
         if (mDocument.getDocumentType() != Document.DOCTYPE_TEXT) {
+            int parts = mDocument.getParts();
             for (int i = 0; i < parts; i++) {
                 String partName = mDocument.getPartName(i);
 
@@ -210,7 +192,9 @@ class LOKitTileProvider implements TileProvider {
                 mContext.getDocumentPartView().add(partView);
             }
         }
-    } public void renamePart(String partName) {
+    }
+
+    public void renamePart(String partName) {
         try{
             for(int i=0; i<mDocument.getParts(); i++){
                 if(mContext.getDocumentPartView().get(i).partName.equals(partName)){

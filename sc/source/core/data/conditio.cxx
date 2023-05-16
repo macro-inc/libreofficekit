@@ -19,7 +19,6 @@
 
 #include <scitems.hxx>
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <rtl/math.hxx>
 #include <sal/log.hxx>
 #include <unotools/collatorwrapper.hxx>
@@ -45,6 +44,7 @@
 #include <svl/sharedstringpool.hxx>
 #include <memory>
 #include <numeric>
+#include <utility>
 
 using namespace formula;
 
@@ -498,7 +498,7 @@ void ScConditionEntry::UpdateReference( sc::RefUpdateContext& rCxt )
         aSrcPos = pCondFormat->GetRange().Combine().aStart;
     ScAddress aOldSrcPos = aSrcPos;
     bool bChangedPos = false;
-    if (rCxt.meMode == URM_INSDEL && rCxt.maRange.In(aSrcPos))
+    if (rCxt.meMode == URM_INSDEL && rCxt.maRange.Contains(aSrcPos))
     {
         ScAddress aErrorPos( ScAddress::UNINITIALIZED );
         if (!aSrcPos.Move(rCxt.mnColDelta, rCxt.mnRowDelta, rCxt.mnTabDelta, aErrorPos, *mpDoc))
@@ -734,27 +734,27 @@ static bool lcl_GetCellContent( ScRefCellValue& rCell, bool bIsStr1, double& rAr
 
     bool bVal = true;
 
-    switch (rCell.meType)
+    switch (rCell.getType())
     {
         case CELLTYPE_VALUE:
-            rArg = rCell.mfValue;
+            rArg = rCell.getDouble();
         break;
         case CELLTYPE_FORMULA:
         {
-            bVal = rCell.mpFormula->IsValue();
+            bVal = rCell.getFormula()->IsValue();
             if (bVal)
-                rArg = rCell.mpFormula->GetValue();
+                rArg = rCell.getFormula()->GetValue();
             else
-                rArgStr = rCell.mpFormula->GetString().getString();
+                rArgStr = rCell.getFormula()->GetString().getString();
         }
         break;
         case CELLTYPE_STRING:
         case CELLTYPE_EDIT:
             bVal = false;
-            if (rCell.meType == CELLTYPE_STRING)
-                rArgStr = rCell.mpString->getString();
-            else if (rCell.mpEditText)
-                rArgStr = ScEditUtil::GetString(*rCell.mpEditText, pDoc);
+            if (rCell.getType() == CELLTYPE_STRING)
+                rArgStr = rCell.getSharedString()->getString();
+            else if (rCell.getEditText())
+                rArgStr = ScEditUtil::GetString(*rCell.getEditText(), pDoc);
         break;
         default:
             ;
@@ -956,9 +956,9 @@ bool ScConditionEntry::IsError( const ScAddress& rPos ) const
 {
     ScRefCellValue rCell(*mpDoc, rPos);
 
-    if (rCell.meType == CELLTYPE_FORMULA)
+    if (rCell.getType() == CELLTYPE_FORMULA)
     {
-        if (rCell.mpFormula->GetErrCode() != FormulaError::NONE)
+        if (rCell.getFormula()->GetErrCode() != FormulaError::NONE)
             return true;
     }
 
@@ -993,10 +993,8 @@ bool ScConditionEntry::IsValid( double nArg, const ScAddress& rPos ) const
 
     if ( eOp == ScConditionMode::Between || eOp == ScConditionMode::NotBetween )
         if ( nComp1 > nComp2 )
-        {
             // Right order for value range
-            double nTemp = nComp1; nComp1 = nComp2; nComp2 = nTemp;
-        }
+            std::swap( nComp1, nComp2 );
 
     // All corner cases need to be tested with ::rtl::math::approxEqual!
     bool bValid = false;
@@ -1136,8 +1134,13 @@ bool ScConditionEntry::IsValidStr( const OUString& rArg, const ScAddress& rPos )
         }
     }
 
+    if (eOp == ScConditionMode::Error)
+        return IsError(rPos);
+    if (eOp == ScConditionMode::NoError)
+        return !IsError(rPos);
+
     // If number contains condition, always false, except for "not equal".
-    if ( !bIsStr1 && (eOp != ScConditionMode::Error && eOp != ScConditionMode::NoError) )
+    if (!bIsStr1)
         return ( eOp == ScConditionMode::NotEqual );
     if ( eOp == ScConditionMode::Between || eOp == ScConditionMode::NotBetween )
         if ( !bIsStr2 )
@@ -1146,22 +1149,13 @@ bool ScConditionEntry::IsValidStr( const OUString& rArg, const ScAddress& rPos )
     OUString aUpVal1( aStrVal1 ); //TODO: As a member? (Also set in Interpret)
     OUString aUpVal2( aStrVal2 );
 
-    if ( eOp == ScConditionMode::Between || eOp == ScConditionMode::NotBetween )
-        if (ScGlobal::GetCollator().compareString( aUpVal1, aUpVal2 ) > 0)
-        {
-            // Right order for value range
-            OUString aTemp( aUpVal1 ); aUpVal1 = aUpVal2; aUpVal2 = aTemp;
-        }
-
     switch ( eOp )
     {
         case ScConditionMode::Equal:
-            bValid = (ScGlobal::GetCollator().compareString(
-                rArg, aUpVal1 ) == 0);
+            bValid = ScGlobal::GetTransliteration().isEqual(aUpVal1, rArg);
         break;
         case ScConditionMode::NotEqual:
-            bValid = (ScGlobal::GetCollator().compareString(
-                rArg, aUpVal1 ) != 0);
+            bValid = !ScGlobal::GetTransliteration().isEqual(aUpVal1, rArg);
         break;
         case ScConditionMode::TopPercent:
         case ScConditionMode::BottomPercent:
@@ -1170,12 +1164,6 @@ bool ScConditionEntry::IsValidStr( const OUString& rArg, const ScAddress& rPos )
         case ScConditionMode::AboveAverage:
         case ScConditionMode::BelowAverage:
             return false;
-        case ScConditionMode::Error:
-        case ScConditionMode::NoError:
-            bValid = IsError( rPos );
-            if(eOp == ScConditionMode::NoError)
-                bValid = !bValid;
-        break;
         case ScConditionMode::BeginsWith:
             bValid = ScGlobal::GetTransliteration().isMatch(aUpVal1, rArg);
         break;
@@ -1225,14 +1213,14 @@ bool ScConditionEntry::IsValidStr( const OUString& rArg, const ScAddress& rPos )
                     break;
                 case ScConditionMode::Between:
                 case ScConditionMode::NotBetween:
+                {
+                    const sal_Int32 nCompare2 = ScGlobal::GetCollator().compareString(rArg, aUpVal2);
                     //  Test for NOTBETWEEN:
-                    bValid = ( nCompare < 0 ||
-                        ScGlobal::GetCollator().compareString( rArg,
-                        aUpVal2 ) > 0 );
+                    bValid = (nCompare > 0 && nCompare2 > 0) || (nCompare < 0 && nCompare2 < 0);
                     if ( eOp == ScConditionMode::Between )
                         bValid = !bValid;
                     break;
-                //  ScConditionMode::Direct already handled above
+                }
                 default:
                     SAL_WARN("sc", "unknown operation in ScConditionEntry");
                     bValid = false;
@@ -1482,13 +1470,13 @@ bool ScConditionEntry::NeedsRepaint() const
 ScCondFormatEntry::ScCondFormatEntry( ScConditionMode eOper,
                                         const OUString& rExpr1, const OUString& rExpr2,
                                         ScDocument& rDocument, const ScAddress& rPos,
-                                        const OUString& rStyle,
+                                        OUString aStyle,
                                         const OUString& rExprNmsp1, const OUString& rExprNmsp2,
                                         FormulaGrammar::Grammar eGrammar1,
                                         FormulaGrammar::Grammar eGrammar2,
                                         ScFormatEntry::Type eType ) :
     ScConditionEntry( eOper, rExpr1, rExpr2, rDocument, rPos, rExprNmsp1, rExprNmsp2, eGrammar1, eGrammar2, eType ),
-    aStyleName( rStyle ),
+    aStyleName(std::move( aStyle )),
     eCondFormatType( eType )
 {
 }
@@ -1496,9 +1484,9 @@ ScCondFormatEntry::ScCondFormatEntry( ScConditionMode eOper,
 ScCondFormatEntry::ScCondFormatEntry( ScConditionMode eOper,
                                         const ScTokenArray* pArr1, const ScTokenArray* pArr2,
                                         ScDocument& rDocument, const ScAddress& rPos,
-                                        const OUString& rStyle ) :
+                                        OUString aStyle ) :
     ScConditionEntry( eOper, pArr1, pArr2, rDocument, rPos ),
-    aStyleName( rStyle )
+    aStyleName(std::move( aStyle ))
 {
 }
 

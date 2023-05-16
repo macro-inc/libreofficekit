@@ -20,6 +20,8 @@
 
 #include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/frame/XDesktop2.hpp>
+#include <com/sun/star/uno/Any.h>
+#include <utility>
 
 struct TestMacroInfo
 {
@@ -36,7 +38,16 @@ class Directories;
 }
 namespace utl
 {
-class TempFile;
+class TempFileNamed;
+}
+
+namespace com::sun::star::security
+{
+class XCertificate;
+}
+namespace com::sun::star::xml::crypto
+{
+class XSecurityEnvironment;
 }
 
 namespace unotest
@@ -50,8 +61,8 @@ public:
         std::function<void()> m_Func;
 
     public:
-        Resetter(std::function<void()> const& rFunc)
-            : m_Func(rFunc)
+        Resetter(std::function<void()> aFunc)
+            : m_Func(std::move(aFunc))
         {
         }
         ~Resetter()
@@ -76,17 +87,24 @@ public:
                     const css::uno::Sequence<css::beans::PropertyValue>& rExtra_args
                     = css::uno::Sequence<css::beans::PropertyValue>());
 
-    static void
+    static css::uno::Any
     dispatchCommand(const css::uno::Reference<css::lang::XComponent>& xComponent,
                     const OUString& rCommand,
                     const css::uno::Sequence<css::beans::PropertyValue>& rPropertyValues);
 
     /// Opens rStreamName from rTempFile, assuming it's a ZIP storage.
-    static std::unique_ptr<SvStream> parseExportStream(const utl::TempFile& rTempFile,
+    static std::unique_ptr<SvStream> parseExportStream(const OUString& url,
                                                        const OUString& rStreamName);
 
     void setUpNssGpg(const test::Directories& rDirectories, const OUString& rTestName);
     void tearDownNssGpg();
+
+    static bool IsValid(const css::uno::Reference<css::security::XCertificate>& cert,
+                        const css::uno::Reference<css::xml::crypto::XSecurityEnvironment>& env);
+    static css::uno::Reference<css::security::XCertificate> GetValidCertificate(
+        const css::uno::Sequence<css::uno::Reference<css::security::XCertificate>>& certs,
+        const css::uno::Reference<css::xml::crypto::XSecurityEnvironment>& env,
+        const css::uno::Sequence<css::beans::PropertyValue>& rFilterData = {});
 
 protected:
     css::uno::Reference<css::frame::XDesktop2> mxDesktop;

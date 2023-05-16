@@ -57,7 +57,7 @@
 #include <toolkit/helper/vclunohelper.hxx>
 #include <toolkit/helper/convert.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/fract.hxx>
 #include <tools/gen.hxx>
 #include <svtools/soerr.hxx>
@@ -256,7 +256,7 @@ void SAL_CALL SfxInPlaceClient_Impl::saveObject()
             try
             {
                 xStatusIndicator = xStatusIndicatorFactory->createStatusIndicator();
-                xPropSet->setPropertyValue( "IndicatorInterception" , uno::makeAny( xStatusIndicator ));
+                xPropSet->setPropertyValue( "IndicatorInterception" , uno::Any( xStatusIndicator ));
             }
             catch ( const uno::RuntimeException& )
             {
@@ -285,7 +285,7 @@ void SAL_CALL SfxInPlaceClient_Impl::saveObject()
         if ( xPropSet.is() )
         {
             xStatusIndicator.clear();
-            xPropSet->setPropertyValue( "IndicatorInterception" , uno::makeAny( xStatusIndicator ));
+            xPropSet->setPropertyValue( "IndicatorInterception" , uno::Any( xStatusIndicator ));
         }
     }
     catch ( const uno::RuntimeException& )

@@ -21,6 +21,7 @@
 #include <cmath>
 #include <string.h>
 
+#include <o3tl/intcmp.hxx>
 #include <osl/diagnose.h>
 #include <rtl/ustring.hxx>
 
@@ -294,20 +295,26 @@ inline bool _equalData(
         switch (eSourceTypeClass)
         {
         case typelib_TypeClass_BYTE:
-            return (*static_cast<sal_Int8 *>(pDest) == *static_cast<sal_Int8 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int8 *>(pDest), *static_cast<sal_Int8 *>(pSource));
         case typelib_TypeClass_SHORT:
-            return (static_cast<sal_Int16>(*static_cast<sal_Int8 *>(pDest)) == *static_cast<sal_Int16 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int8 *>(pDest), *static_cast<sal_Int16 *>(pSource));
         case typelib_TypeClass_UNSIGNED_SHORT:
-            return (static_cast<sal_Int32>(*static_cast<sal_Int8 *>(pDest)) == static_cast<sal_Int32>(*static_cast<sal_uInt16 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int8 *>(pDest), *static_cast<sal_uInt16 *>(pSource));
         case typelib_TypeClass_LONG:
-            return (static_cast<sal_Int32>(*static_cast<sal_Int8 *>(pDest)) == *static_cast<sal_Int32 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int8 *>(pDest), *static_cast<sal_Int32 *>(pSource));
         case typelib_TypeClass_UNSIGNED_LONG:
-            return (static_cast<sal_Int64>(*static_cast<sal_Int8 *>(pDest)) == static_cast<sal_Int64>(*static_cast<sal_uInt32 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int8 *>(pDest), *static_cast<sal_uInt32 *>(pSource));
         case typelib_TypeClass_HYPER:
-            return (static_cast<sal_Int64>(*static_cast<sal_Int8 *>(pDest)) == *static_cast<sal_Int64 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int8 *>(pDest), *static_cast<sal_Int64 *>(pSource));
         case typelib_TypeClass_UNSIGNED_HYPER:
-            return (*static_cast<sal_Int8 *>(pDest) >= 0 &&
-                    static_cast<sal_Int64>(*static_cast<sal_Int8 *>(pDest)) == *static_cast<sal_Int64 *>(pSource)); // same size
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int8 *>(pDest), *static_cast<sal_Int64 *>(pSource));
         case typelib_TypeClass_FLOAT:
             return (static_cast<float>(*static_cast<sal_Int8 *>(pDest)) == *static_cast<float *>(pSource));
         case typelib_TypeClass_DOUBLE:
@@ -319,20 +326,26 @@ inline bool _equalData(
         switch (eSourceTypeClass)
         {
         case typelib_TypeClass_BYTE:
-            return (*static_cast<sal_Int16 *>(pDest) == static_cast<sal_Int16>(*static_cast<sal_Int8 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int16 *>(pDest), *static_cast<sal_Int8 *>(pSource));
         case typelib_TypeClass_SHORT:
-            return (*static_cast<sal_Int16 *>(pDest) == *static_cast<sal_Int16 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int16 *>(pDest), *static_cast<sal_Int16 *>(pSource));
         case typelib_TypeClass_UNSIGNED_SHORT:
-            return (static_cast<sal_Int32>(*static_cast<sal_Int16 *>(pDest)) == static_cast<sal_Int32>(*static_cast<sal_uInt16 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int16 *>(pDest), *static_cast<sal_uInt16 *>(pSource));
         case typelib_TypeClass_LONG:
-            return (static_cast<sal_Int32>(*static_cast<sal_Int16 *>(pDest)) == *static_cast<sal_Int32 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int16 *>(pDest), *static_cast<sal_Int32 *>(pSource));
         case typelib_TypeClass_UNSIGNED_LONG:
-            return (static_cast<sal_Int64>(*static_cast<sal_Int16 *>(pDest)) == static_cast<sal_Int64>(*static_cast<sal_uInt32 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int16 *>(pDest), *static_cast<sal_uInt32 *>(pSource));
         case typelib_TypeClass_HYPER:
-            return (static_cast<sal_Int64>(*static_cast<sal_Int16 *>(pDest)) == *static_cast<sal_Int64 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int16 *>(pDest), *static_cast<sal_Int64 *>(pSource));
         case typelib_TypeClass_UNSIGNED_HYPER:
-            return (*static_cast<sal_Int16 *>(pDest) >= 0 &&
-                    static_cast<sal_Int64>(*static_cast<sal_Int16 *>(pDest)) == *static_cast<sal_Int64 *>(pSource)); // same size
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int16 *>(pDest), *static_cast<sal_Int64 *>(pSource));
         case typelib_TypeClass_FLOAT:
             return (static_cast<float>(*static_cast<sal_Int16 *>(pDest)) == *static_cast<float *>(pSource));
         case typelib_TypeClass_DOUBLE:
@@ -344,19 +357,26 @@ inline bool _equalData(
         switch (eSourceTypeClass)
         {
         case typelib_TypeClass_BYTE:
-            return (static_cast<sal_Int32>(*static_cast<sal_uInt16 *>(pDest)) == static_cast<sal_Int32>(*static_cast<sal_Int8 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt16 *>(pDest), *static_cast<sal_Int8 *>(pSource));
         case typelib_TypeClass_SHORT:
-            return (static_cast<sal_Int32>(*static_cast<sal_uInt16 *>(pDest)) == static_cast<sal_Int32>(*static_cast<sal_Int16 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt16 *>(pDest), *static_cast<sal_Int16 *>(pSource));
         case typelib_TypeClass_UNSIGNED_SHORT:
-            return (*static_cast<sal_uInt16 *>(pDest) == *static_cast<sal_uInt16 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt16 *>(pDest), *static_cast<sal_uInt16 *>(pSource));
         case typelib_TypeClass_LONG:
-            return (static_cast<sal_Int32>(*static_cast<sal_uInt16 *>(pDest)) == *static_cast<sal_Int32 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt16 *>(pDest), *static_cast<sal_Int32 *>(pSource));
         case typelib_TypeClass_UNSIGNED_LONG:
-            return (static_cast<sal_uInt32>(*static_cast<sal_uInt16 *>(pDest)) == *static_cast<sal_uInt32 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt16 *>(pDest), *static_cast<sal_uInt32 *>(pSource));
         case typelib_TypeClass_HYPER:
-            return (static_cast<sal_Int64>(*static_cast<sal_uInt16 *>(pDest)) == *static_cast<sal_Int64 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt16 *>(pDest), *static_cast<sal_Int64 *>(pSource));
         case typelib_TypeClass_UNSIGNED_HYPER:
-            return (static_cast<sal_uInt64>(*static_cast<sal_uInt16 *>(pDest)) == *static_cast<sal_uInt64 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt16 *>(pDest), *static_cast<sal_uInt64 *>(pSource));
         case typelib_TypeClass_FLOAT:
             return (static_cast<float>(*static_cast<sal_uInt16 *>(pDest)) == *static_cast<float *>(pSource));
         case typelib_TypeClass_DOUBLE:
@@ -368,20 +388,26 @@ inline bool _equalData(
         switch (eSourceTypeClass)
         {
         case typelib_TypeClass_BYTE:
-            return (*static_cast<sal_Int32 *>(pDest) == static_cast<sal_Int32>(*static_cast<sal_Int8 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int32 *>(pDest), *static_cast<sal_Int8 *>(pSource));
         case typelib_TypeClass_SHORT:
-            return (*static_cast<sal_Int32 *>(pDest) == static_cast<sal_Int32>(*static_cast<sal_Int16 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int32 *>(pDest), *static_cast<sal_Int16 *>(pSource));
         case typelib_TypeClass_UNSIGNED_SHORT:
-            return (*static_cast<sal_Int32 *>(pDest) == static_cast<sal_Int32>(*static_cast<sal_uInt16 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int32 *>(pDest), *static_cast<sal_uInt16 *>(pSource));
         case typelib_TypeClass_LONG:
-            return (*static_cast<sal_Int32 *>(pDest) == *static_cast<sal_Int32 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int32 *>(pDest), *static_cast<sal_Int32 *>(pSource));
         case typelib_TypeClass_UNSIGNED_LONG:
-            return (static_cast<sal_Int64>(*static_cast<sal_Int32 *>(pDest)) == static_cast<sal_Int64>(*static_cast<sal_uInt32 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int32 *>(pDest), *static_cast<sal_uInt32 *>(pSource));
         case typelib_TypeClass_HYPER:
-            return (static_cast<sal_Int64>(*static_cast<sal_Int32 *>(pDest)) == *static_cast<sal_Int64 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int32 *>(pDest), *static_cast<sal_Int64 *>(pSource));
         case typelib_TypeClass_UNSIGNED_HYPER:
-            return (*static_cast<sal_Int32 *>(pDest) >= 0 &&
-                    static_cast<sal_Int64>(*static_cast<sal_Int32 *>(pDest)) == *static_cast<sal_Int64 *>(pSource)); // same size
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int32 *>(pDest), *static_cast<sal_Int64 *>(pSource));
         case typelib_TypeClass_FLOAT:
             return (static_cast<float>(*static_cast<sal_Int32 *>(pDest)) == *static_cast<float *>(pSource));
         case typelib_TypeClass_DOUBLE:
@@ -393,19 +419,26 @@ inline bool _equalData(
         switch (eSourceTypeClass)
         {
         case typelib_TypeClass_BYTE:
-            return (static_cast<sal_Int64>(*static_cast<sal_uInt32 *>(pDest)) == static_cast<sal_Int64>(*static_cast<sal_Int8 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt32 *>(pDest), *static_cast<sal_Int8 *>(pSource));
         case typelib_TypeClass_SHORT:
-            return (static_cast<sal_Int64>(*static_cast<sal_uInt32 *>(pDest)) == static_cast<sal_Int64>(*static_cast<sal_Int16 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt32 *>(pDest), *static_cast<sal_Int16 *>(pSource));
         case typelib_TypeClass_UNSIGNED_SHORT:
-            return (*static_cast<sal_uInt32 *>(pDest) == static_cast<sal_uInt32>(*static_cast<sal_uInt16 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt32 *>(pDest), *static_cast<sal_uInt16 *>(pSource));
         case typelib_TypeClass_LONG:
-            return (static_cast<sal_Int64>(*static_cast<sal_uInt32 *>(pDest)) == static_cast<sal_Int64>(*static_cast<sal_Int32 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt32 *>(pDest), *static_cast<sal_Int32 *>(pSource));
         case typelib_TypeClass_UNSIGNED_LONG:
-            return (*static_cast<sal_uInt32 *>(pDest) == *static_cast<sal_uInt32 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt32 *>(pDest), *static_cast<sal_uInt32 *>(pSource));
         case typelib_TypeClass_HYPER:
-            return (static_cast<sal_Int64>(*static_cast<sal_uInt32 *>(pDest)) == *static_cast<sal_Int64 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt32 *>(pDest), *static_cast<sal_Int64 *>(pSource));
         case typelib_TypeClass_UNSIGNED_HYPER:
-            return (static_cast<sal_uInt64>(*static_cast<sal_uInt32 *>(pDest)) == *static_cast<sal_uInt64 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt32 *>(pDest), *static_cast<sal_uInt64 *>(pSource));
         case typelib_TypeClass_FLOAT:
             return (static_cast<float>(*static_cast<sal_uInt32 *>(pDest)) == *static_cast<float *>(pSource));
         case typelib_TypeClass_DOUBLE:
@@ -417,20 +450,26 @@ inline bool _equalData(
         switch (eSourceTypeClass)
         {
         case typelib_TypeClass_BYTE:
-            return (*static_cast<sal_Int64 *>(pDest) == static_cast<sal_Int64>(*static_cast<sal_Int8 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int64 *>(pDest), *static_cast<sal_Int8 *>(pSource));
         case typelib_TypeClass_SHORT:
-            return (*static_cast<sal_Int64 *>(pDest) == static_cast<sal_Int64>(*static_cast<sal_Int16 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int64 *>(pDest), *static_cast<sal_Int16 *>(pSource));
         case typelib_TypeClass_UNSIGNED_SHORT:
-            return (*static_cast<sal_Int64 *>(pDest) == static_cast<sal_Int64>(*static_cast<sal_uInt16 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int64 *>(pDest), *static_cast<sal_uInt16 *>(pSource));
         case typelib_TypeClass_LONG:
-            return (*static_cast<sal_Int64 *>(pDest) == static_cast<sal_Int64>(*static_cast<sal_Int32 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int64 *>(pDest), *static_cast<sal_Int32 *>(pSource));
         case typelib_TypeClass_UNSIGNED_LONG:
-            return (*static_cast<sal_Int64 *>(pDest) == static_cast<sal_Int64>(*static_cast<sal_uInt32 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int64 *>(pDest), *static_cast<sal_uInt32 *>(pSource));
         case typelib_TypeClass_HYPER:
-            return (*static_cast<sal_Int64 *>(pDest) == *static_cast<sal_Int64 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int64 *>(pDest), *static_cast<sal_Int64 *>(pSource));
         case typelib_TypeClass_UNSIGNED_HYPER:
-            return (*static_cast<sal_Int64 *>(pDest) >= 0 &&
-                    *static_cast<sal_Int64 *>(pDest) == *static_cast<sal_Int64 *>(pSource)); // same size
+            return o3tl::cmp_equal(
+                *static_cast<sal_Int64 *>(pDest), *static_cast<sal_Int64 *>(pSource));
         case typelib_TypeClass_FLOAT:
             return (static_cast<float>(*static_cast<sal_Int64 *>(pDest)) == *static_cast<float *>(pSource));
         case typelib_TypeClass_DOUBLE:
@@ -442,23 +481,26 @@ inline bool _equalData(
         switch (eSourceTypeClass)
         {
         case typelib_TypeClass_BYTE:
-            return (*static_cast<sal_Int8 *>(pSource) >= 0 &&
-                    *static_cast<sal_uInt64 *>(pDest) == static_cast<sal_uInt64>(*static_cast<sal_Int8 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt64 *>(pDest), *static_cast<sal_Int8 *>(pSource));
         case typelib_TypeClass_SHORT:
-            return (*static_cast<sal_Int16 *>(pSource) >= 0 &&
-                    *static_cast<sal_uInt64 *>(pDest) == static_cast<sal_uInt64>(*static_cast<sal_Int16 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt64 *>(pDest), *static_cast<sal_Int16 *>(pSource));
         case typelib_TypeClass_UNSIGNED_SHORT:
-            return (*static_cast<sal_uInt64 *>(pDest) == static_cast<sal_uInt64>(*static_cast<sal_uInt16 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt64 *>(pDest), *static_cast<sal_uInt16 *>(pSource));
         case typelib_TypeClass_LONG:
-            return (*static_cast<sal_Int32 *>(pSource) >= 0 &&
-                    *static_cast<sal_uInt64 *>(pDest) == static_cast<sal_uInt64>(*static_cast<sal_Int32 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt64 *>(pDest), *static_cast<sal_Int32 *>(pSource));
         case typelib_TypeClass_UNSIGNED_LONG:
-            return (*static_cast<sal_uInt64 *>(pDest) == static_cast<sal_uInt64>(*static_cast<sal_uInt32 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt64 *>(pDest), *static_cast<sal_uInt32 *>(pSource));
         case typelib_TypeClass_HYPER:
-            return (*static_cast<sal_Int64 *>(pSource) >= 0 &&
-                    *static_cast<sal_uInt64 *>(pDest) == static_cast<sal_uInt64>(*static_cast<sal_Int64 *>(pSource)));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt64 *>(pDest), *static_cast<sal_Int64 *>(pSource));
         case typelib_TypeClass_UNSIGNED_HYPER:
-            return (*static_cast<sal_uInt64 *>(pDest) == *static_cast<sal_uInt64 *>(pSource));
+            return o3tl::cmp_equal(
+                *static_cast<sal_uInt64 *>(pDest), *static_cast<sal_uInt64 *>(pSource));
         case typelib_TypeClass_FLOAT:
             if (::floor( *static_cast<float *>(pSource) ) != *static_cast<float *>(pSource) || *static_cast<float *>(pSource) < 0)
                 return false;

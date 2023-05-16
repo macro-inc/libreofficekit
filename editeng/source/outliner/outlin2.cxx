@@ -30,7 +30,7 @@
 
 #include <editeng/outliner.hxx>
 #include "paralist.hxx"
-#include "outleeng.hxx"
+#include <outleeng.hxx>
 #include <editeng/editstat.hxx>
 
 
@@ -482,9 +482,8 @@ void Outliner::QuickFormatDoc()
     pEditEngine->QuickFormatDoc();
 }
 
-void Outliner::SetGlobalCharStretching( sal_uInt16 nX, sal_uInt16 nY )
+void Outliner::setGlobalScale(double rFontX, double rFontY, double rSpacingX, double rSpacingY)
 {
-
     // reset bullet size
     sal_Int32 nParagraphs = pParaList->GetParagraphCount();
     for ( sal_Int32 nPara = 0; nPara < nParagraphs; nPara++ )
@@ -494,12 +493,18 @@ void Outliner::SetGlobalCharStretching( sal_uInt16 nX, sal_uInt16 nY )
             pPara->aBulSize.setWidth( -1 );
     }
 
-    pEditEngine->SetGlobalCharStretching( nX, nY );
+    pEditEngine->setGlobalScale(rFontX, rFontY, rSpacingX, rSpacingY);
 }
 
-void Outliner::GetGlobalCharStretching( sal_uInt16& rX, sal_uInt16& rY ) const
+void Outliner::getGlobalScale(double& rFontX, double& rFontY, double& rSpacingX, double& rSpacingY) const
 {
-    pEditEngine->GetGlobalCharStretching( rX, rY );
+    pEditEngine->getGlobalFontScale(rFontX, rFontY);
+    pEditEngine->getGlobalSpacingScale(rSpacingX, rSpacingY);
+}
+
+void Outliner::setRoundFontSizeToPt(bool bRound) const
+{
+    pEditEngine->setRoundFontSizeToPt(bRound);
 }
 
 void Outliner::EraseVirtualDevice()
@@ -559,7 +564,7 @@ EEHorizontalTextDirection Outliner::GetDefaultHorizontalTextDirection() const
 
 LanguageType Outliner::GetLanguage( sal_Int32 nPara, sal_Int32 nPos ) const
 {
-    return pEditEngine->GetLanguage( nPara, nPos );
+    return pEditEngine->GetLanguage( nPara, nPos ).nLang;
 }
 
 void Outliner::RemoveAttribs( const ESelection& rSelection, bool bRemoveParaAttribs, sal_uInt16 nWhich )

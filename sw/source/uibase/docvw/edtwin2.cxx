@@ -51,7 +51,6 @@
 #include <IDocumentRedlineAccess.hxx>
 #include <txtfrm.hxx>
 #include <ndtxt.hxx>
-#include <FrameControlsManager.hxx>
 #include <comphelper/lok.hxx>
 #include <authfld.hxx>
 
@@ -157,9 +156,12 @@ void SwEditWin::RequestHelp(const HelpEvent &rEvt)
 #ifdef DBG_UTIL
             case IsAttrAtPos::TableBoxValue:
             {
-                sText = OStringToOUString(OString::number(
-                            static_cast<const SwTableBoxValue*>(aContentAtPos.aFnd.pAttr)->GetValue()),
-                            osl_getThreadTextEncoding());
+                if(aContentAtPos.aFnd.pAttr)
+                {
+                    sText = OStringToOUString(OString::number(
+                                static_cast<const SwTableBoxValue*>(aContentAtPos.aFnd.pAttr)->GetValue()),
+                                osl_getThreadTextEncoding());
+                }
                 break;
             }
             case IsAttrAtPos::CurrAttrs:
@@ -177,15 +179,15 @@ void SwEditWin::RequestHelp(const HelpEvent &rEvt)
                 sal_Int32 nFound = sText.indexOf(cMarkSeparator);
                 if( nFound != -1 && (++nFound) < sText.getLength() )
                 {
-                    OUString sSuffix( sText.copy(nFound) );
-                    if( sSuffix == "table" ||
-                        sSuffix == "frame" ||
-                        sSuffix == "region" ||
-                        sSuffix == "outline" ||
-                        sSuffix == "text" ||
-                        sSuffix == "graphic" ||
-                        sSuffix == "ole" ||
-                        sSuffix == "drawingobject" )
+                    std::u16string_view sSuffix( sText.subView(nFound) );
+                    if( sSuffix == u"table" ||
+                        sSuffix == u"frame" ||
+                        sSuffix == u"region" ||
+                        sSuffix == u"outline" ||
+                        sSuffix == u"text" ||
+                        sSuffix == u"graphic" ||
+                        sSuffix == u"ole" ||
+                        sSuffix == u"drawingobject" )
                         sText = sText.copy( 0, nFound - 1);
                 }
                 // #i104300#
@@ -199,7 +201,7 @@ void SwEditWin::RequestHelp(const HelpEvent &rEvt)
                          IDocumentMarkAccess::GetType(**ppBkmk)
                             == IDocumentMarkAccess::MarkType::CROSSREF_HEADING_BOOKMARK )
                     {
-                        SwTextNode* pTextNode = (*ppBkmk)->GetMarkStart().nNode.GetNode().GetTextNode();
+                        SwTextNode* pTextNode = (*ppBkmk)->GetMarkStart().GetNode().GetTextNode();
                         if ( pTextNode )
                         {
                             sText = sw::GetExpandTextMerged(rSh.GetLayout(), *pTextNode, true, false, ExpandMode(0));
@@ -321,6 +323,18 @@ void SwEditWin::RequestHelp(const HelpEvent &rEvt)
                             break;
 
                         case SwFieldIds::User:
+                        {
+                            OUString aTitle = pField->GetTitle();
+                            if (!aTitle.isEmpty())
+                            {
+                                sText = aTitle;
+                            }
+                            else
+                            {
+                                sText = pField->GetPar1();
+                            }
+                            break;
+                        }
                         case SwFieldIds::HiddenText:
                             sText = pField->GetPar1();
                             break;
@@ -427,12 +441,8 @@ void SwEditWin::RequestHelp(const HelpEvent &rEvt)
 
 void SwEditWin::PrePaint(vcl::RenderContext& /*rRenderContext*/)
 {
-    SwWrtShell* pWrtShell = GetView().GetWrtShellPtr();
-
-    if(pWrtShell)
-    {
+    if (SwWrtShell* pWrtShell = GetView().GetWrtShellPtr())
         pWrtShell->PrePaint();
-    }
 }
 
 void SwEditWin::Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle& rRect)

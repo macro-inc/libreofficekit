@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <vector>
+#include <i18nlangtag/lang.h>
 #include <basic/sbxvar.hxx>
 #include <unotools/syslocale.hxx>
 #include <rtl/ustrbuf.hxx>
@@ -57,7 +58,8 @@ enum SwCalcOper
     CALC_ACOS=278,          CALC_ATAN=279,          CALC_TDIF=280,
     CALC_ROUND=281,         CALC_DATE=282,          CALC_MONTH=283,
     CALC_DAY=284,           CALC_PRODUCT=285,       CALC_AVERAGE=286,
-    CALC_COUNT=287,         CALC_SIGN=288,          CALC_ABS=289
+    CALC_COUNT=287,         CALC_SIGN=288,          CALC_ABS=289,
+    CALC_INT=290
 };
 
 // Calculate Operations Strings
@@ -95,6 +97,7 @@ extern const char sCalc_Round[];
 extern const char sCalc_Date[];
 extern const char sCalc_Sign[];
 extern const char sCalc_Abs[];
+extern const char sCalc_Int[];
 
 //  Calculate ErrorCodes
 enum class SwCalcError
@@ -131,7 +134,7 @@ public:
 // Calculate HashTables for VarTable and Operations
 struct SwHash
 {
-    SwHash( const OUString& rStr );
+    SwHash( OUString aStr );
     virtual ~SwHash();
     OUString aStr;
     std::unique_ptr<SwHash> pNext;
@@ -142,7 +145,7 @@ struct SwCalcExp final : public SwHash
     SwSbxValue  nValue;
     const SwFieldType* pFieldType;
 
-    SwCalcExp( const OUString& rStr, const SwSbxValue& rVal,
+    SwCalcExp( const OUString& rStr, SwSbxValue aVal,
                 const SwFieldType* pFieldType );
 };
 
@@ -152,27 +155,31 @@ class SwHashTable
 {
     std::vector<std::unique_ptr<T>> m_aData;
 public:
-    SwHashTable(size_t nSize) : m_aData(nSize) {}
+    SwHashTable(size_t nSize) : m_aData(nSize)
+    {
+        assert(nSize < SAL_MAX_UINT32);
+    }
     std::unique_ptr<T> & operator[](size_t idx) { return m_aData[idx]; }
     std::unique_ptr<T> const & operator[](size_t idx) const { return m_aData[idx]; }
     void resize(size_t nSize) { m_aData.resize(nSize); }
 
-    T* Find( const OUString& rStr, sal_uInt16* pPos = nullptr ) const
+    T* Find( std::u16string_view aStr, sal_uInt32* pPos = nullptr ) const
     {
         size_t nTableSize = m_aData.size();
-        sal_uLong ii = 0;
-        for( sal_Int32 n = 0; n < rStr.getLength(); ++n )
+        assert(nTableSize < SAL_MAX_UINT32);
+        sal_uInt32 ii = 0;
+        for( size_t n = 0; n < aStr.size(); ++n )
         {
-            ii = ii << 1 ^ rStr[n];
+            ii = ii << 1 ^ aStr[n];
         }
         ii %= nTableSize;
 
         if( pPos )
-            *pPos = o3tl::narrowing<sal_uInt16>(ii);
+            *pPos = ii;
 
         for( T* pEntry = m_aData[ii].get(); pEntry; pEntry = static_cast<T*>(pEntry->pNext.get()) )
         {
-            if( rStr == pEntry->aStr )
+            if( aStr == pEntry->aStr )
             {
                 return pEntry;
             }
@@ -219,14 +226,16 @@ class SwCalc
     SwSbxValue  StdFunc(pfCalc pFnc, bool bChkTrig);
 
     static OUString  GetColumnName( const OUString& rName );
-    OUString  GetDBName( const OUString& rName );
+    OUString  GetDBName( std::u16string_view rName );
 
     SwCalc( const SwCalc& ) = delete;
     SwCalc& operator=( const SwCalc& ) = delete;
 
+    void ImplDestroy();
+
 public:
     SwCalc(SwDoc& rD);
-    ~SwCalc() COVERITY_NOEXCEPT_FALSE;
+    ~SwCalc();
 
     SwSbxValue  Calculate( const OUString &rStr );
     OUString    GetStrResult( const SwSbxValue& rValue );
@@ -251,6 +260,8 @@ public:
                                 double& rVal );
     static bool Str2Double( const OUString& rStr, sal_Int32& rPos,
                                 double& rVal, SwDoc const *const pDoc );
+
+    static LanguageType GetDocAppScriptLang( SwDoc const & rDoc );
 
     SW_DLLPUBLIC static bool IsValidVarName( const OUString& rStr,
                                     OUString* pValidName = nullptr );

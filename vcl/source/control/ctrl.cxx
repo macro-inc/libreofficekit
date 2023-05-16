@@ -17,12 +17,16 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <comphelper/lok.hxx>
+#include <o3tl/safeint.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/event.hxx>
 #include <vcl/ctrl.hxx>
 #include <vcl/decoview.hxx>
+#include <vcl/mnemonic.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/uitest/logger.hxx>
+#include <vcl/DocWindow.hxx>
 #include <sal/log.hxx>
 
 #include <textlayout.hxx>
@@ -103,7 +107,7 @@ ControlLayoutData::ControlLayoutData() : m_pParent( nullptr )
 
 tools::Rectangle ControlLayoutData::GetCharacterBounds( tools::Long nIndex ) const
 {
-    return (nIndex >= 0 && nIndex < static_cast<tools::Long>(m_aUnicodeBoundRects.size())) ? m_aUnicodeBoundRects[ nIndex ] : tools::Rectangle();
+    return (nIndex >= 0 && o3tl::make_unsigned(nIndex) < m_aUnicodeBoundRects.size()) ? m_aUnicodeBoundRects[ nIndex ] : tools::Rectangle();
 }
 
 tools::Rectangle Control::GetCharacterBounds( tools::Long nIndex ) const
@@ -221,9 +225,14 @@ OUString Control::GetDisplayText() const
     return mxLayoutData ? mxLayoutData->m_aDisplayText : GetText();
 }
 
+bool Control::FocusWindowBelongsToControl(const vcl::Window* pFocusWin) const
+{
+    return ImplIsWindowOrChild(pFocusWin);
+}
+
 bool Control::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if ( rNEvt.GetType() == NotifyEventType::GETFOCUS )
     {
         if ( !mbHasControlFocus )
         {
@@ -236,10 +245,10 @@ bool Control::EventNotify( NotifyEvent& rNEvt )
     }
     else
     {
-        if ( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+        if ( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
         {
             vcl::Window* pFocusWin = Application::GetFocusWindow();
-            if ( !pFocusWin || !ImplIsWindowOrChild( pFocusWin ) )
+            if ( !pFocusWin || !FocusWindowBelongsToControl(pFocusWin) )
             {
                 mbHasControlFocus = false;
                 CompatStateChanged( StateChangedType::ControlFocus );
@@ -434,7 +443,7 @@ tools::Rectangle Control::DrawControlText( OutputDevice& _rTargetDevice, const t
 
     if (autoacc && !mbShowAccelerator)
     {
-        rPStr = GetNonMnemonicString( _rStr );
+        rPStr = removeMnemonicFromString( _rStr );
         nPStyle &= ~DrawTextFlags::HideMnemonic;
     }
 
@@ -459,7 +468,7 @@ tools::Rectangle Control::GetControlTextRect( OutputDevice& _rTargetDevice, cons
 
     if (autoacc && !mbShowAccelerator)
     {
-        rPStr = GetNonMnemonicString( _rStr );
+        rPStr = removeMnemonicFromString( _rStr );
         nPStyle &= ~DrawTextFlags::HideMnemonic;
     }
 
@@ -484,6 +493,36 @@ Control::GetUnzoomedControlPointFont() const
     if (IsControlFont())
         aFont.Merge(GetControlFont());
     return aFont;
+}
+
+void Control::LogicInvalidate(const tools::Rectangle* pRectangle)
+{
+    VclPtr<vcl::Window> pParent = GetParentWithLOKNotifier();
+    if (!pParent || !dynamic_cast<vcl::DocWindow*>(GetParent()))
+    {
+        // if control doesn't belong to a DocWindow, the overriden base class
+        // method has to be invoked
+        Window::LogicInvalidate(pRectangle);
+        return;
+    }
+
+    // avoid endless paint/invalidate loop in Impress
+    if (comphelper::LibreOfficeKit::isTiledPainting())
+        return;
+
+    tools::Rectangle aResultRectangle;
+    if (!pRectangle)
+    {
+        // we have to invalidate the whole control area not the whole document
+        aResultRectangle = tools::Rectangle(GetPosPixel(), GetSizePixel());
+    }
+    else
+    {
+        aResultRectangle = *pRectangle;
+    }
+
+    aResultRectangle = PixelToLogic(aResultRectangle, MapMode(MapUnit::MapTwip));
+    pParent->GetLOKNotifier()->notifyInvalidation(&aResultRectangle);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

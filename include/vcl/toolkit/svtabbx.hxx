@@ -46,7 +46,7 @@ private:
     OUString                    aCurEntry;
 
 protected:
-    static OUString             GetToken( const OUString &sStr, sal_Int32 &nIndex );
+    static std::u16string_view  GetToken( std::u16string_view sStr, sal_Int32 &nIndex );
 
     virtual void                SetTabs() override;
     virtual void                InitEntry(SvTreeListEntry*, const OUString&, const Image&, const Image&) override;
@@ -184,8 +184,8 @@ public:
     virtual OUString                GetAccessibleObjectDescription( AccessibleBrowseBoxObjType _eType, sal_Int32 _nPos = -1 ) const override;
     virtual vcl::Window*                 GetWindowInstance() override;
 
-    virtual void                    FillAccessibleStateSet( ::utl::AccessibleStateSetHelper& _rStateSet, AccessibleBrowseBoxObjType _eType ) const override;
-    virtual void                    FillAccessibleStateSetForCell( ::utl::AccessibleStateSetHelper& _rStateSet, sal_Int32 _nRow, sal_uInt16 _nColumn ) const override;
+    virtual void                    FillAccessibleStateSet( sal_Int64& _rStateSet, AccessibleBrowseBoxObjType _eType ) const override;
+    virtual void                    FillAccessibleStateSetForCell( sal_Int64& _rStateSet, sal_Int32 _nRow, sal_uInt16 _nColumn ) const override;
     virtual void                    GrabTableFocus() override;
 
     // OutputDevice

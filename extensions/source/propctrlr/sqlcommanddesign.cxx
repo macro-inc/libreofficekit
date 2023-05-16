@@ -38,7 +38,8 @@
 #include <com/sun/star/sdb/CommandType.hpp>
 
 #include <comphelper/propertyvalue.hxx>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 
 
@@ -90,9 +91,9 @@ namespace pcr
 
     SQLCommandDesigner::SQLCommandDesigner( const Reference< XComponentContext >& _rxContext,
             const ::rtl::Reference< ISQLCommandAdapter >& _rxPropertyAdapter,
-            const ::dbtools::SharedConnection& _rConnection, const Link<SQLCommandDesigner&,void>& _rCloseLink )
+            ::dbtools::SharedConnection _aConnection, const Link<SQLCommandDesigner&,void>& _rCloseLink )
         :m_xContext( _rxContext )
-        ,m_xConnection( _rConnection )
+        ,m_xConnection(std::move( _aConnection ))
         ,m_xObjectAdapter( _rxPropertyAdapter )
         ,m_aCloseLink( _rCloseLink )
     {

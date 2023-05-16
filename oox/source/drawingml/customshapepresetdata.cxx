@@ -20,6 +20,7 @@
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/drawing/EnhancedCustomShapeTextFrame.hpp>
 #include <com/sun/star/drawing/EnhancedCustomShapeAdjustmentValue.hpp>
+#include <o3tl/string_view.hxx>
 
 using namespace ::com::sun::star;
 
@@ -28,28 +29,28 @@ namespace
 // Parses a string like: Value = (any) { (long) 19098 }, State = (com.sun.star.beans.PropertyState) DIRECT_VALUE, Name = "adj"
 void lcl_parseAdjustmentValue(
     std::vector<drawing::EnhancedCustomShapeAdjustmentValue>& rAdjustmentValues,
-    const OString& rValue)
+    std::string_view rValue)
 {
     sal_Int32 nIndex = 0;
     drawing::EnhancedCustomShapeAdjustmentValue aAdjustmentValue;
     do
     {
-        OString aToken = rValue.getToken(0, ',', nIndex).trim();
+        OString aToken(o3tl::trim(o3tl::getToken(rValue, 0, ',', nIndex)));
         static const char aNamePrefix[] = "Name = \"";
         static const char aValuePrefix[] = "Value = (any) { (long) ";
-        if (aToken.startsWith(aNamePrefix))
+        if (o3tl::starts_with(aToken, aNamePrefix))
         {
             OString aName = aToken.copy(strlen(aNamePrefix),
                                         aToken.getLength() - strlen(aNamePrefix) - strlen("\""));
             aAdjustmentValue.Name = OUString::fromUtf8(aName);
         }
-        else if (aToken.startsWith(aValuePrefix))
+        else if (o3tl::starts_with(aToken, aValuePrefix))
         {
             OString aValue = aToken.copy(strlen(aValuePrefix),
                                          aToken.getLength() - strlen(aValuePrefix) - strlen(" }"));
             aAdjustmentValue.Value <<= aValue.toInt32();
         }
-        else if (!aToken.startsWith("State = "))
+        else if (!o3tl::starts_with(aToken, "State = "))
             SAL_WARN("oox", "lcl_parseAdjustmentValue: unexpected prefix: " << aToken);
     } while (nIndex >= 0);
     rAdjustmentValues.push_back(aAdjustmentValue);
@@ -58,11 +59,11 @@ void lcl_parseAdjustmentValue(
 // Parses a string like: { Value = (any) { (long) 19098 }, State = (com.sun.star.beans.PropertyState) DIRECT_VALUE, Name = "adj" }, { Value = ..., State = ..., Name = ... }
 void lcl_parseAdjustmentValues(
     std::vector<drawing::EnhancedCustomShapeAdjustmentValue>& rAdjustmentValues,
-    const OString& rValue)
+    std::string_view rValue)
 {
     sal_Int32 nLevel = 0;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -77,109 +78,114 @@ void lcl_parseAdjustmentValues(
             {
                 lcl_parseAdjustmentValue(
                     rAdjustmentValues,
-                    rValue.copy(nStart + strlen("{ "), i - nStart - strlen(" },")));
+                    rValue.substr(nStart + strlen("{ "), i - nStart - strlen(" },")));
             }
         }
     }
 }
 
 drawing::EnhancedCustomShapeParameterPair
-lcl_parseEnhancedCustomShapeParameterPair(const OString& rValue)
+lcl_parseEnhancedCustomShapeParameterPair(std::string_view rValue)
 {
     drawing::EnhancedCustomShapeParameterPair aPair;
     // We expect the following here: First.Value, First.Type, Second.Value, Second.Type
     static const char aExpectedFVPrefix[]
         = "First = (com.sun.star.drawing.EnhancedCustomShapeParameter) { Value = (any) { (long) ";
-    assert(rValue.startsWith(aExpectedFVPrefix));
+    assert(o3tl::starts_with(rValue, aExpectedFVPrefix));
     sal_Int32 nIndex = strlen(aExpectedFVPrefix);
-    aPair.First.Value <<= static_cast<sal_uInt32>(rValue.getToken(0, '}', nIndex).toInt32());
+    aPair.First.Value
+        <<= static_cast<sal_uInt32>(o3tl::toInt32(o3tl::getToken(rValue, 0, '}', nIndex)));
 
     static const char aExpectedFTPrefix[] = ", Type = (short) ";
-    assert(nIndex >= 0 && rValue.match(aExpectedFTPrefix, nIndex));
+    assert(nIndex >= 0 && o3tl::starts_with(rValue.substr(nIndex), aExpectedFTPrefix));
     nIndex += strlen(aExpectedFTPrefix);
-    aPair.First.Type = static_cast<sal_uInt16>(rValue.getToken(0, '}', nIndex).toInt32());
+    aPair.First.Type
+        = static_cast<sal_uInt16>(o3tl::toInt32(o3tl::getToken(rValue, 0, '}', nIndex)));
 
     static const char aExpectedSVPrefix[] = ", Second = "
                                             "(com.sun.star.drawing.EnhancedCustomShapeParameter) { "
                                             "Value = (any) { (long) ";
-    assert(nIndex >= 0 && rValue.match(aExpectedSVPrefix, nIndex));
+    assert(nIndex >= 0 && o3tl::starts_with(rValue.substr(nIndex), aExpectedSVPrefix));
     nIndex += strlen(aExpectedSVPrefix);
-    aPair.Second.Value <<= static_cast<sal_uInt32>(rValue.getToken(0, '}', nIndex).toInt32());
+    aPair.Second.Value
+        <<= static_cast<sal_uInt32>(o3tl::toInt32(o3tl::getToken(rValue, 0, '}', nIndex)));
 
     static const char aExpectedSTPrefix[] = ", Type = (short) ";
-    assert(nIndex >= 0 && rValue.match(aExpectedSTPrefix, nIndex));
+    assert(nIndex >= 0 && o3tl::starts_with(rValue.substr(nIndex), aExpectedSTPrefix));
     nIndex += strlen(aExpectedSTPrefix);
-    aPair.Second.Type = static_cast<sal_uInt16>(rValue.getToken(0, '}', nIndex).toInt32());
+    aPair.Second.Type
+        = static_cast<sal_uInt16>(o3tl::toInt32(o3tl::getToken(rValue, 0, '}', nIndex)));
     return aPair;
 }
 
-drawing::EnhancedCustomShapeSegment lcl_parseEnhancedCustomShapeSegment(const OString& rValue)
+drawing::EnhancedCustomShapeSegment lcl_parseEnhancedCustomShapeSegment(std::string_view rValue)
 {
     drawing::EnhancedCustomShapeSegment aSegment;
     // We expect the following here: Command, Count
     static const char aExpectedCommandPrefix[] = "Command = (short) ";
-    assert(rValue.startsWith(aExpectedCommandPrefix));
+    assert(o3tl::starts_with(rValue, aExpectedCommandPrefix));
     sal_Int32 nIndex = strlen(aExpectedCommandPrefix);
-    aSegment.Command = static_cast<sal_Int16>(rValue.getToken(0, ',', nIndex).toInt32());
+    aSegment.Command
+        = static_cast<sal_Int16>(o3tl::toInt32(o3tl::getToken(rValue, 0, ',', nIndex)));
 
     static const char aExpectedCountPrefix[] = " Count = (short) ";
-    assert(nIndex >= 0 && rValue.match(aExpectedCountPrefix, nIndex));
+    assert(nIndex >= 0 && o3tl::starts_with(rValue.substr(nIndex), aExpectedCountPrefix));
     nIndex += strlen(aExpectedCountPrefix);
-    aSegment.Count = static_cast<sal_Int16>(rValue.getToken(0, '}', nIndex).toInt32());
+    aSegment.Count = static_cast<sal_Int16>(o3tl::toInt32(o3tl::getToken(rValue, 0, '}', nIndex)));
     return aSegment;
 }
 
-awt::Rectangle lcl_parseRectangle(const OString& rValue)
+awt::Rectangle lcl_parseRectangle(std::string_view rValue)
 {
     awt::Rectangle aRectangle;
     // We expect the following here: X, Y, Width, Height
     static const char aExpectedXPrefix[] = "X = (long) ";
-    assert(rValue.startsWith(aExpectedXPrefix));
+    assert(o3tl::starts_with(rValue, aExpectedXPrefix));
     sal_Int32 nIndex = strlen(aExpectedXPrefix);
-    aRectangle.X = rValue.getToken(0, ',', nIndex).toInt32();
+    aRectangle.X = o3tl::toInt32(o3tl::getToken(rValue, 0, ',', nIndex));
 
     static const char aExpectedYPrefix[] = " Y = (long) ";
-    assert(nIndex >= 0 && rValue.match(aExpectedYPrefix, nIndex));
+    assert(nIndex >= 0 && o3tl::starts_with(rValue.substr(nIndex), aExpectedYPrefix));
     nIndex += strlen(aExpectedYPrefix);
-    aRectangle.Y = rValue.getToken(0, ',', nIndex).toInt32();
+    aRectangle.Y = o3tl::toInt32(o3tl::getToken(rValue, 0, ',', nIndex));
 
     static const char aExpectedWidthPrefix[] = " Width = (long) ";
-    assert(nIndex >= 0 && rValue.match(aExpectedWidthPrefix, nIndex));
+    assert(nIndex >= 0 && o3tl::starts_with(rValue.substr(nIndex), aExpectedWidthPrefix));
     nIndex += strlen(aExpectedWidthPrefix);
-    aRectangle.Width = rValue.getToken(0, ',', nIndex).toInt32();
+    aRectangle.Width = o3tl::toInt32(o3tl::getToken(rValue, 0, ',', nIndex));
 
     static const char aExpectedHeightPrefix[] = " Height = (long) ";
-    assert(nIndex >= 0 && rValue.match(aExpectedHeightPrefix, nIndex));
+    assert(nIndex >= 0 && o3tl::starts_with(rValue.substr(nIndex), aExpectedHeightPrefix));
     nIndex += strlen(aExpectedHeightPrefix);
-    aRectangle.Height = rValue.copy(nIndex).toInt32();
+    aRectangle.Height = o3tl::toInt32(rValue.substr(nIndex));
 
     return aRectangle;
 }
 
-awt::Size lcl_parseSize(const OString& rValue)
+awt::Size lcl_parseSize(std::string_view rValue)
 {
     awt::Size aSize;
     // We expect the following here: Width, Height
     static const char aExpectedWidthPrefix[] = "Width = (long) ";
-    assert(rValue.startsWith(aExpectedWidthPrefix));
+    assert(o3tl::starts_with(rValue, aExpectedWidthPrefix));
     sal_Int32 nIndex = strlen(aExpectedWidthPrefix);
-    aSize.Width = rValue.getToken(0, ',', nIndex).toInt32();
+    aSize.Width = o3tl::toInt32(o3tl::getToken(rValue, 0, ',', nIndex));
 
     static const char aExpectedHeightPrefix[] = " Height = (long) ";
-    assert(nIndex >= 0 && rValue.match(aExpectedHeightPrefix, nIndex));
+    assert(nIndex >= 0 && o3tl::starts_with(rValue.substr(nIndex), aExpectedHeightPrefix));
     nIndex += strlen(aExpectedHeightPrefix);
-    aSize.Height = rValue.copy(nIndex).toInt32();
+    aSize.Height = o3tl::toInt32(rValue.substr(nIndex));
 
     return aSize;
 }
 
-drawing::EnhancedCustomShapeTextFrame lcl_parseEnhancedCustomShapeTextFrame(const OString& rValue)
+drawing::EnhancedCustomShapeTextFrame lcl_parseEnhancedCustomShapeTextFrame(std::string_view rValue)
 {
     drawing::EnhancedCustomShapeTextFrame aTextFrame;
     sal_Int32 nLevel = 0;
     bool bIgnore = false;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -195,13 +201,13 @@ drawing::EnhancedCustomShapeTextFrame lcl_parseEnhancedCustomShapeTextFrame(cons
         }
         else if (rValue[i] == ',' && !bIgnore)
         {
-            OString aToken = rValue.copy(nStart, i - nStart);
+            std::string_view aToken = rValue.substr(nStart, i - nStart);
             static const char aExpectedPrefix[]
                 = "TopLeft = (com.sun.star.drawing.EnhancedCustomShapeParameterPair) { ";
-            if (aToken.startsWith(aExpectedPrefix))
+            if (o3tl::starts_with(aToken, aExpectedPrefix))
             {
-                aToken = aToken.copy(strlen(aExpectedPrefix),
-                                     aToken.getLength() - strlen(aExpectedPrefix) - strlen(" }"));
+                aToken = aToken.substr(strlen(aExpectedPrefix),
+                                       aToken.size() - strlen(aExpectedPrefix) - strlen(" }"));
                 aTextFrame.TopLeft = lcl_parseEnhancedCustomShapeParameterPair(aToken);
             }
             else
@@ -211,13 +217,13 @@ drawing::EnhancedCustomShapeTextFrame lcl_parseEnhancedCustomShapeTextFrame(cons
         }
     }
 
-    OString aToken = rValue.copy(nStart);
+    std::string_view aToken = rValue.substr(nStart);
     static const char aExpectedPrefix[]
         = "BottomRight = (com.sun.star.drawing.EnhancedCustomShapeParameterPair) { ";
-    if (aToken.startsWith(aExpectedPrefix))
+    if (o3tl::starts_with(aToken, aExpectedPrefix))
     {
-        aToken = aToken.copy(strlen(aExpectedPrefix),
-                             aToken.getLength() - strlen(aExpectedPrefix) - strlen(" }"));
+        aToken = aToken.substr(strlen(aExpectedPrefix),
+                               aToken.size() - strlen(aExpectedPrefix) - strlen(" }"));
         aTextFrame.BottomRight = lcl_parseEnhancedCustomShapeParameterPair(aToken);
     }
     else
@@ -229,12 +235,12 @@ drawing::EnhancedCustomShapeTextFrame lcl_parseEnhancedCustomShapeTextFrame(cons
 
 // Parses a string like: Name = "Position", Handle = (long) 0, Value = (any) { ... }, State = (com.sun.star.beans.PropertyState) DIRECT_VALUE
 // where "{ ... }" may contain "," as well.
-void lcl_parseHandlePosition(std::vector<beans::PropertyValue>& rHandle, const OString& rValue)
+void lcl_parseHandlePosition(std::vector<beans::PropertyValue>& rHandle, std::string_view rValue)
 {
     sal_Int32 nLevel = 0;
     bool bIgnore = false;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -250,20 +256,20 @@ void lcl_parseHandlePosition(std::vector<beans::PropertyValue>& rHandle, const O
         }
         else if (rValue[i] == ',' && !bIgnore)
         {
-            OString aToken = rValue.copy(nStart, i - nStart);
+            std::string_view aToken = rValue.substr(nStart, i - nStart);
             static const char aExpectedPrefix[]
                 = "Value = (any) { (com.sun.star.drawing.EnhancedCustomShapeParameterPair) { ";
-            if (aToken.startsWith(aExpectedPrefix))
+            if (o3tl::starts_with(aToken, aExpectedPrefix))
             {
-                aToken = aToken.copy(strlen(aExpectedPrefix),
-                                     aToken.getLength() - strlen(aExpectedPrefix) - strlen(" } }"));
+                aToken = aToken.substr(strlen(aExpectedPrefix),
+                                       aToken.size() - strlen(aExpectedPrefix) - strlen(" } }"));
 
                 beans::PropertyValue aPropertyValue;
                 aPropertyValue.Name = "Position";
                 aPropertyValue.Value <<= lcl_parseEnhancedCustomShapeParameterPair(aToken);
                 rHandle.push_back(aPropertyValue);
             }
-            else if (!aToken.startsWith("Name =") && !aToken.startsWith("Handle ="))
+            else if (!o3tl::starts_with(aToken, "Name =") && !o3tl::starts_with(aToken, "Handle ="))
                 SAL_WARN("oox", "lcl_parseHandlePosition: unexpected token: " << aToken);
             nStart = i + strlen(", ");
         }
@@ -272,13 +278,13 @@ void lcl_parseHandlePosition(std::vector<beans::PropertyValue>& rHandle, const O
 
 // Parses a string like: Name = "RangeYMaximum", Handle = (long) 0, Value = (any) { ... }, State = (com.sun.star.beans.PropertyState) DIRECT_VALUE
 // where "{ ... }" may contain "," as well.
-void lcl_parseHandleRange(std::vector<beans::PropertyValue>& rHandle, const OString& rValue,
+void lcl_parseHandleRange(std::vector<beans::PropertyValue>& rHandle, std::string_view rValue,
                           const OUString& rName)
 {
     sal_Int32 nLevel = 0;
     bool bIgnore = false;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -296,61 +302,62 @@ void lcl_parseHandleRange(std::vector<beans::PropertyValue>& rHandle, const OStr
         {
             static const char aExpectedPrefix[]
                 = "Value = (any) { (com.sun.star.drawing.EnhancedCustomShapeParameter) { ";
-            if (rValue.match(aExpectedPrefix, nStart))
+            if (o3tl::starts_with(rValue.substr(nStart), aExpectedPrefix))
             {
                 drawing::EnhancedCustomShapeParameter aParameter;
                 sal_Int32 nIndex{ nStart + static_cast<sal_Int32>(strlen(aExpectedPrefix)) };
                 // We expect the following here: Value and Type
                 static const char aExpectedVPrefix[] = "Value = (any) { (long) ";
-                assert(rValue.match(aExpectedVPrefix, nIndex));
+                assert(o3tl::starts_with(rValue.substr(nIndex), aExpectedVPrefix));
                 nIndex += strlen(aExpectedVPrefix);
-                aParameter.Value <<= rValue.getToken(0, '}', nIndex).toInt32();
+                aParameter.Value <<= o3tl::toInt32(o3tl::getToken(rValue, 0, '}', nIndex));
 
                 static const char aExpectedTPrefix[] = ", Type = (short) ";
-                assert(nIndex >= 0 && rValue.match(aExpectedTPrefix, nIndex));
+                assert(nIndex >= 0 && o3tl::starts_with(rValue.substr(nIndex), aExpectedTPrefix));
                 nIndex += strlen(aExpectedTPrefix);
-                aParameter.Type = static_cast<sal_Int16>(rValue.getToken(0, '}', nIndex).toInt32());
+                aParameter.Type
+                    = static_cast<sal_Int16>(o3tl::toInt32(o3tl::getToken(rValue, 0, '}', nIndex)));
 
                 beans::PropertyValue aPropertyValue;
                 aPropertyValue.Name = rName;
                 aPropertyValue.Value <<= aParameter;
                 rHandle.push_back(aPropertyValue);
             }
-            else if (!rValue.match("Name =", nStart) && !rValue.match("Handle =", nStart))
+            else if (!o3tl::starts_with(rValue.substr(nStart), "Name =")
+                     && !o3tl::starts_with(rValue.substr(nStart), "Handle ="))
                 SAL_WARN("oox", "lcl_parseHandleRange: unexpected token: "
-                                    << rValue.copy(nStart, i - nStart));
+                                    << rValue.substr(nStart, i - nStart));
             nStart = i + strlen(", ");
         }
     }
 }
 
 // Parses a string like: Name = "RefY", Handle = (long) 0, Value = (any) { (long) 0 }, State = (com.sun.star.beans.PropertyState) DIRECT_VALUE
-void lcl_parseHandleRef(std::vector<beans::PropertyValue>& rHandle, const OString& rValue,
+void lcl_parseHandleRef(std::vector<beans::PropertyValue>& rHandle, std::string_view rValue,
                         const OUString& rName)
 {
-    static const char aPrefix[] = "\", Handle = (long) 0, Value = (any) { (long) ";
-    const sal_Int32 nCheck = SAL_N_ELEMENTS(aPrefix) - 1;
+    static constexpr std::string_view aPrefix = "\", Handle = (long) 0, Value = (any) { (long) ";
     const sal_Int32 nStart = SAL_N_ELEMENTS("Name = \"") - 1 + rName.getLength();
 
-    if (rValue.copy(nStart, nCheck).equalsL(aPrefix, nCheck))
+    if (rValue.substr(nStart, aPrefix.size()) == aPrefix)
     {
-        sal_Int32 nIndex = nStart + nCheck;
+        sal_Int32 nIndex = nStart + aPrefix.size();
         beans::PropertyValue aPropertyValue;
         aPropertyValue.Name = rName;
         // We only expect a Value here
-        aPropertyValue.Value <<= rValue.getToken(0, '}', nIndex).toInt32();
+        aPropertyValue.Value <<= o3tl::toInt32(o3tl::getToken(rValue, 0, '}', nIndex));
         rHandle.push_back(aPropertyValue);
     }
     else
         SAL_WARN("oox", "lcl_parseHandleRef: unexpected value: " << rValue);
 }
 
-uno::Sequence<beans::PropertyValue> lcl_parseHandle(const OString& rValue)
+uno::Sequence<beans::PropertyValue> lcl_parseHandle(std::string_view rValue)
 {
     std::vector<beans::PropertyValue> aRet;
     sal_Int32 nLevel = 0;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -363,28 +370,29 @@ uno::Sequence<beans::PropertyValue> lcl_parseHandle(const OString& rValue)
             nLevel--;
             if (!nLevel)
             {
-                OString aToken = rValue.copy(nStart + strlen("{ "), i - nStart - strlen(" },"));
-                if (aToken.startsWith("Name = \"Position\""))
+                std::string_view aToken
+                    = rValue.substr(nStart + strlen("{ "), i - nStart - strlen(" },"));
+                if (o3tl::starts_with(aToken, "Name = \"Position\""))
                     lcl_parseHandlePosition(aRet, aToken);
-                else if (aToken.startsWith("Name = \"RangeXMaximum\""))
+                else if (o3tl::starts_with(aToken, "Name = \"RangeXMaximum\""))
                     lcl_parseHandleRange(aRet, aToken, "RangeXMaximum");
-                else if (aToken.startsWith("Name = \"RangeXMinimum\""))
+                else if (o3tl::starts_with(aToken, "Name = \"RangeXMinimum\""))
                     lcl_parseHandleRange(aRet, aToken, "RangeXMinimum");
-                else if (aToken.startsWith("Name = \"RangeYMaximum\""))
+                else if (o3tl::starts_with(aToken, "Name = \"RangeYMaximum\""))
                     lcl_parseHandleRange(aRet, aToken, "RangeYMaximum");
-                else if (aToken.startsWith("Name = \"RangeYMinimum\""))
+                else if (o3tl::starts_with(aToken, "Name = \"RangeYMinimum\""))
                     lcl_parseHandleRange(aRet, aToken, "RangeYMinimum");
-                else if (aToken.startsWith("Name = \"RadiusRangeMaximum\""))
+                else if (o3tl::starts_with(aToken, "Name = \"RadiusRangeMaximum\""))
                     lcl_parseHandleRange(aRet, aToken, "RadiusRangeMaximum");
-                else if (aToken.startsWith("Name = \"RadiusRangeMinimum\""))
+                else if (o3tl::starts_with(aToken, "Name = \"RadiusRangeMinimum\""))
                     lcl_parseHandleRange(aRet, aToken, "RadiusRangeMinimum");
-                else if (aToken.startsWith("Name = \"RefX\""))
+                else if (o3tl::starts_with(aToken, "Name = \"RefX\""))
                     lcl_parseHandleRef(aRet, aToken, "RefX");
-                else if (aToken.startsWith("Name = \"RefY\""))
+                else if (o3tl::starts_with(aToken, "Name = \"RefY\""))
                     lcl_parseHandleRef(aRet, aToken, "RefY");
-                else if (aToken.startsWith("Name = \"RefR\""))
+                else if (o3tl::starts_with(aToken, "Name = \"RefR\""))
                     lcl_parseHandleRef(aRet, aToken, "RefR");
-                else if (aToken.startsWith("Name = \"RefAngle\""))
+                else if (o3tl::starts_with(aToken, "Name = \"RefAngle\""))
                     lcl_parseHandleRef(aRet, aToken, "RefAngle");
                 else
                     SAL_WARN("oox", "lcl_parseHandle: unexpected token: " << aToken);
@@ -395,11 +403,11 @@ uno::Sequence<beans::PropertyValue> lcl_parseHandle(const OString& rValue)
 }
 
 void lcl_parseHandles(std::vector<uno::Sequence<beans::PropertyValue>>& rHandles,
-                      const OString& rValue)
+                      std::string_view rValue)
 {
     sal_Int32 nLevel = 0;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -413,18 +421,18 @@ void lcl_parseHandles(std::vector<uno::Sequence<beans::PropertyValue>>& rHandles
             if (!nLevel)
             {
                 uno::Sequence<beans::PropertyValue> aHandle = lcl_parseHandle(
-                    rValue.copy(nStart + strlen("{ "), i - nStart - strlen(" },")));
+                    rValue.substr(nStart + strlen("{ "), i - nStart - strlen(" },")));
                 rHandles.push_back(aHandle);
             }
         }
     }
 }
 
-void lcl_parseEquations(std::vector<OUString>& rEquations, const OString& rValue)
+void lcl_parseEquations(std::vector<OUString>& rEquations, std::string_view rValue)
 {
     bool bInString = false;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '"' && !bInString)
         {
@@ -435,17 +443,18 @@ void lcl_parseEquations(std::vector<OUString>& rEquations, const OString& rValue
         {
             bInString = false;
             rEquations.push_back(OUString::fromUtf8(
-                rValue.subView(nStart + strlen("\""), i - nStart - strlen("\""))));
+                rValue.substr(nStart + strlen("\""), i - nStart - strlen("\""))));
         }
     }
 }
 
-void lcl_parsePathCoordinateValues(std::vector<beans::PropertyValue>& rPath, const OString& rValue)
+void lcl_parsePathCoordinateValues(std::vector<beans::PropertyValue>& rPath,
+                                   std::string_view rValue)
 {
     std::vector<drawing::EnhancedCustomShapeParameterPair> aPairs;
     sal_Int32 nLevel = 0;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -458,7 +467,7 @@ void lcl_parsePathCoordinateValues(std::vector<beans::PropertyValue>& rPath, con
             nLevel--;
             if (!nLevel)
                 aPairs.push_back(lcl_parseEnhancedCustomShapeParameterPair(
-                    rValue.copy(nStart + strlen("{ "), i - nStart - strlen(" },"))));
+                    rValue.substr(nStart + strlen("{ "), i - nStart - strlen(" },"))));
         }
     }
 
@@ -470,12 +479,12 @@ void lcl_parsePathCoordinateValues(std::vector<beans::PropertyValue>& rPath, con
 
 // Parses a string like: Name = "Coordinates", Handle = (long) 0, Value = (any) { ... }, State = (com.sun.star.beans.PropertyState) DIRECT_VALUE
 // where "{ ... }" may contain "," as well.
-void lcl_parsePathCoordinates(std::vector<beans::PropertyValue>& rPath, const OString& rValue)
+void lcl_parsePathCoordinates(std::vector<beans::PropertyValue>& rPath, std::string_view rValue)
 {
     sal_Int32 nLevel = 0;
     bool bIgnore = false;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -491,28 +500,94 @@ void lcl_parsePathCoordinates(std::vector<beans::PropertyValue>& rPath, const OS
         }
         else if (rValue[i] == ',' && !bIgnore)
         {
-            OString aToken = rValue.copy(nStart, i - nStart);
+            std::string_view aToken = rValue.substr(nStart, i - nStart);
             static const char aExpectedPrefix[]
                 = "Value = (any) { ([]com.sun.star.drawing.EnhancedCustomShapeParameterPair) { ";
-            if (aToken.startsWith(aExpectedPrefix))
+            if (o3tl::starts_with(aToken, aExpectedPrefix))
             {
-                aToken = aToken.copy(strlen(aExpectedPrefix),
-                                     aToken.getLength() - strlen(aExpectedPrefix) - strlen(" } }"));
+                aToken = aToken.substr(strlen(aExpectedPrefix),
+                                       aToken.size() - strlen(aExpectedPrefix) - strlen(" } }"));
                 lcl_parsePathCoordinateValues(rPath, aToken);
             }
-            else if (!aToken.startsWith("Name =") && !aToken.startsWith("Handle ="))
+            else if (!o3tl::starts_with(aToken, "Name =") && !o3tl::starts_with(aToken, "Handle ="))
                 SAL_WARN("oox", "lcl_parsePathCoordinates: unexpected token: " << aToken);
             nStart = i + strlen(", ");
         }
     }
 }
 
-void lcl_parsePathSegmentValues(std::vector<beans::PropertyValue>& rPath, const OString& rValue)
+void lcl_parsePathGluePointsValues(std::vector<beans::PropertyValue>& rPath,
+                                   std::string_view rValue)
+{
+    std::vector<drawing::EnhancedCustomShapeParameterPair> aPairs;
+    sal_Int32 nLevel = 0;
+    sal_Int32 nStart = 0;
+    for (size_t i = 0; i < rValue.size(); ++i)
+    {
+        if (rValue[i] == '{')
+        {
+            if (!nLevel)
+                nStart = i;
+            nLevel++;
+        }
+        else if (rValue[i] == '}')
+        {
+            nLevel--;
+            if (!nLevel)
+                aPairs.push_back(lcl_parseEnhancedCustomShapeParameterPair(
+                    rValue.substr(nStart + strlen("{ "), i - nStart - strlen(" },"))));
+        }
+    }
+
+    beans::PropertyValue aPropertyValue;
+    aPropertyValue.Name = "GluePoints";
+    aPropertyValue.Value <<= comphelper::containerToSequence(aPairs);
+    rPath.push_back(aPropertyValue);
+}
+
+void lcl_parsePathGluePoints(std::vector<beans::PropertyValue>& rPath, std::string_view rValue)
+{
+    sal_Int32 nLevel = 0;
+    bool bIgnore = false;
+    sal_Int32 nStart = 0;
+    for (size_t i = 0; i < rValue.size(); ++i)
+    {
+        if (rValue[i] == '{')
+        {
+            if (!nLevel)
+                bIgnore = true;
+            nLevel++;
+        }
+        else if (rValue[i] == '}')
+        {
+            nLevel--;
+            if (!nLevel)
+                bIgnore = false;
+        }
+        else if (rValue[i] == ',' && !bIgnore)
+        {
+            std::string_view aToken = rValue.substr(nStart, i - nStart);
+            static const char aExpectedPrefix[]
+                = "Value = (any) { ([]com.sun.star.drawing.EnhancedCustomShapeParameterPair) { ";
+            if (o3tl::starts_with(aToken, aExpectedPrefix))
+            {
+                aToken = aToken.substr(strlen(aExpectedPrefix),
+                                       aToken.size() - strlen(aExpectedPrefix) - strlen(" } }"));
+                lcl_parsePathGluePointsValues(rPath, aToken);
+            }
+            else if (!o3tl::starts_with(aToken, "Name =") && !o3tl::starts_with(aToken, "Handle ="))
+                SAL_WARN("oox", "lcl_parsePathGluePoints: unexpected token: " << aToken);
+            nStart = i + strlen(", ");
+        }
+    }
+}
+
+void lcl_parsePathSegmentValues(std::vector<beans::PropertyValue>& rPath, std::string_view rValue)
 {
     std::vector<drawing::EnhancedCustomShapeSegment> aSegments;
     sal_Int32 nLevel = 0;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -525,7 +600,7 @@ void lcl_parsePathSegmentValues(std::vector<beans::PropertyValue>& rPath, const 
             nLevel--;
             if (!nLevel)
                 aSegments.push_back(lcl_parseEnhancedCustomShapeSegment(
-                    rValue.copy(nStart + strlen("{ "), i - nStart - strlen(" },"))));
+                    rValue.substr(nStart + strlen("{ "), i - nStart - strlen(" },"))));
         }
     }
 
@@ -537,12 +612,12 @@ void lcl_parsePathSegmentValues(std::vector<beans::PropertyValue>& rPath, const 
 
 // Parses a string like: Name = "Segments", Handle = (long) 0, Value = (any) { ... }, State = (com.sun.star.beans.PropertyState) DIRECT_VALUE
 // where "{ ... }" may contain "," as well.
-void lcl_parsePathSegments(std::vector<beans::PropertyValue>& rPath, const OString& rValue)
+void lcl_parsePathSegments(std::vector<beans::PropertyValue>& rPath, std::string_view rValue)
 {
     sal_Int32 nLevel = 0;
     bool bIgnore = false;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -558,28 +633,28 @@ void lcl_parsePathSegments(std::vector<beans::PropertyValue>& rPath, const OStri
         }
         else if (rValue[i] == ',' && !bIgnore)
         {
-            OString aToken = rValue.copy(nStart, i - nStart);
+            std::string_view aToken = rValue.substr(nStart, i - nStart);
             static const char aExpectedPrefix[]
                 = "Value = (any) { ([]com.sun.star.drawing.EnhancedCustomShapeSegment) { ";
-            if (aToken.startsWith(aExpectedPrefix))
+            if (o3tl::starts_with(aToken, aExpectedPrefix))
             {
-                aToken = aToken.copy(strlen(aExpectedPrefix),
-                                     aToken.getLength() - strlen(aExpectedPrefix) - strlen(" } }"));
+                aToken = aToken.substr(strlen(aExpectedPrefix),
+                                       aToken.size() - strlen(aExpectedPrefix) - strlen(" } }"));
                 lcl_parsePathSegmentValues(rPath, aToken);
             }
-            else if (!aToken.startsWith("Name =") && !aToken.startsWith("Handle ="))
+            else if (!o3tl::starts_with(aToken, "Name =") && !o3tl::starts_with(aToken, "Handle ="))
                 SAL_WARN("oox", "lcl_parsePathSegments: unexpected token: " << aToken);
             nStart = i + strlen(", ");
         }
     }
 }
 
-void lcl_parsePathTextFrameValues(std::vector<beans::PropertyValue>& rPath, const OString& rValue)
+void lcl_parsePathTextFrameValues(std::vector<beans::PropertyValue>& rPath, std::string_view rValue)
 {
     std::vector<drawing::EnhancedCustomShapeTextFrame> aTextFrames;
     sal_Int32 nLevel = 0;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -592,7 +667,7 @@ void lcl_parsePathTextFrameValues(std::vector<beans::PropertyValue>& rPath, cons
             nLevel--;
             if (!nLevel)
                 aTextFrames.push_back(lcl_parseEnhancedCustomShapeTextFrame(
-                    rValue.copy(nStart + strlen("{ "), i - nStart - strlen(" },"))));
+                    rValue.substr(nStart + strlen("{ "), i - nStart - strlen(" },"))));
         }
     }
 
@@ -604,12 +679,12 @@ void lcl_parsePathTextFrameValues(std::vector<beans::PropertyValue>& rPath, cons
 
 // Parses a string like: Name = "TextFrames", Handle = (long) 0, Value = (any) { ... }, State = (com.sun.star.beans.PropertyState) DIRECT_VALUE
 // where "{ ... }" may contain "," as well.
-void lcl_parsePathTextFrames(std::vector<beans::PropertyValue>& rPath, const OString& rValue)
+void lcl_parsePathTextFrames(std::vector<beans::PropertyValue>& rPath, std::string_view rValue)
 {
     sal_Int32 nLevel = 0;
     bool bIgnore = false;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -625,28 +700,29 @@ void lcl_parsePathTextFrames(std::vector<beans::PropertyValue>& rPath, const OSt
         }
         else if (rValue[i] == ',' && !bIgnore)
         {
-            OString aToken = rValue.copy(nStart, i - nStart);
+            std::string_view aToken = rValue.substr(nStart, i - nStart);
             static const char aExpectedPrefix[]
                 = "Value = (any) { ([]com.sun.star.drawing.EnhancedCustomShapeTextFrame) { ";
-            if (aToken.startsWith(aExpectedPrefix))
+            if (o3tl::starts_with(aToken, aExpectedPrefix))
             {
-                aToken = aToken.copy(strlen(aExpectedPrefix),
-                                     aToken.getLength() - strlen(aExpectedPrefix) - strlen(" } }"));
+                aToken = aToken.substr(strlen(aExpectedPrefix),
+                                       aToken.size() - strlen(aExpectedPrefix) - strlen(" } }"));
                 lcl_parsePathTextFrameValues(rPath, aToken);
             }
-            else if (!aToken.startsWith("Name =") && !aToken.startsWith("Handle ="))
+            else if (!o3tl::starts_with(aToken, "Name =") && !o3tl::starts_with(aToken, "Handle ="))
                 SAL_WARN("oox", "lcl_parsePathTextFrames: unexpected token: " << aToken);
             nStart = i + strlen(", ");
         }
     }
 }
 
-void lcl_parsePathSubViewSizeValues(std::vector<beans::PropertyValue>& rPath, const OString& rValue)
+void lcl_parsePathSubViewSizeValues(std::vector<beans::PropertyValue>& rPath,
+                                    std::string_view rValue)
 {
     std::vector<awt::Size> aSizes;
     sal_Int32 nLevel = 0;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -658,8 +734,8 @@ void lcl_parsePathSubViewSizeValues(std::vector<beans::PropertyValue>& rPath, co
         {
             nLevel--;
             if (!nLevel)
-                aSizes.push_back(
-                    lcl_parseSize(rValue.copy(nStart + strlen("{ "), i - nStart - strlen(" },"))));
+                aSizes.push_back(lcl_parseSize(
+                    rValue.substr(nStart + strlen("{ "), i - nStart - strlen(" },"))));
         }
     }
 
@@ -669,12 +745,12 @@ void lcl_parsePathSubViewSizeValues(std::vector<beans::PropertyValue>& rPath, co
     rPath.push_back(aPropertyValue);
 }
 
-void lcl_parsePathSubViewSize(std::vector<beans::PropertyValue>& rPath, const OString& rValue)
+void lcl_parsePathSubViewSize(std::vector<beans::PropertyValue>& rPath, std::string_view rValue)
 {
     sal_Int32 nLevel = 0;
     bool bIgnore = false;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -690,26 +766,26 @@ void lcl_parsePathSubViewSize(std::vector<beans::PropertyValue>& rPath, const OS
         }
         else if (rValue[i] == ',' && !bIgnore)
         {
-            OString aToken = rValue.copy(nStart, i - nStart);
+            std::string_view aToken = rValue.substr(nStart, i - nStart);
             static const char aExpectedPrefix[] = "Value = (any) { ([]com.sun.star.awt.Size) { ";
-            if (aToken.startsWith(aExpectedPrefix))
+            if (o3tl::starts_with(aToken, aExpectedPrefix))
             {
-                aToken = aToken.copy(strlen(aExpectedPrefix),
-                                     aToken.getLength() - strlen(aExpectedPrefix) - strlen(" } }"));
+                aToken = aToken.substr(strlen(aExpectedPrefix),
+                                       aToken.size() - strlen(aExpectedPrefix) - strlen(" } }"));
                 lcl_parsePathSubViewSizeValues(rPath, aToken);
             }
-            else if (!aToken.startsWith("Name =") && !aToken.startsWith("Handle ="))
+            else if (!o3tl::starts_with(aToken, "Name =") && !o3tl::starts_with(aToken, "Handle ="))
                 SAL_WARN("oox", "lcl_parsePathSubViewSize: unexpected token: " << aToken);
             nStart = i + strlen(", ");
         }
     }
 }
 
-void lcl_parsePath(std::vector<beans::PropertyValue>& rPath, const OString& rValue)
+void lcl_parsePath(std::vector<beans::PropertyValue>& rPath, std::string_view rValue)
 {
     sal_Int32 nLevel = 0;
     sal_Int32 nStart = 0;
-    for (sal_Int32 i = 0; i < rValue.getLength(); ++i)
+    for (size_t i = 0; i < rValue.size(); ++i)
     {
         if (rValue[i] == '{')
         {
@@ -722,14 +798,17 @@ void lcl_parsePath(std::vector<beans::PropertyValue>& rPath, const OString& rVal
             nLevel--;
             if (!nLevel)
             {
-                OString aToken = rValue.copy(nStart + strlen("{ "), i - nStart - strlen(" },"));
-                if (aToken.startsWith("Name = \"Coordinates\""))
+                std::string_view aToken
+                    = rValue.substr(nStart + strlen("{ "), i - nStart - strlen(" },"));
+                if (o3tl::starts_with(aToken, "Name = \"Coordinates\""))
                     lcl_parsePathCoordinates(rPath, aToken);
-                else if (aToken.startsWith("Name = \"Segments\""))
+                else if (o3tl::starts_with(aToken, "Name = \"GluePoints\""))
+                    lcl_parsePathGluePoints(rPath, aToken);
+                else if (o3tl::starts_with(aToken, "Name = \"Segments\""))
                     lcl_parsePathSegments(rPath, aToken);
-                else if (aToken.startsWith("Name = \"TextFrames\""))
+                else if (o3tl::starts_with(aToken, "Name = \"TextFrames\""))
                     lcl_parsePathTextFrames(rPath, aToken);
-                else if (aToken.startsWith("Name = \"SubViewSize\""))
+                else if (o3tl::starts_with(aToken, "Name = \"SubViewSize\""))
                     lcl_parsePathSubViewSize(rPath, aToken);
                 else
                     SAL_WARN("oox", "lcl_parsePath: unexpected token: " << aToken);
@@ -748,7 +827,7 @@ void CustomShapeProperties::initializePresetDataMap()
     SvFileStream aStream(aPath, StreamMode::READ);
     if (aStream.GetError() != ERRCODE_NONE)
         SAL_WARN("oox", "failed to open oox-drawingml-cs-presets");
-    OString aLine;
+    OStringBuffer aLine;
     OUString aName;
     bool bNotDone = aStream.ReadLine(aLine);
     PropertyMap aPropertyMap;
@@ -756,31 +835,32 @@ void CustomShapeProperties::initializePresetDataMap()
     while (bNotDone)
     {
         static const char aCommentPrefix[] = "/* ";
-        if (aLine.startsWith(aCommentPrefix))
+        if (o3tl::starts_with(aLine, aCommentPrefix))
         {
             if (bFirst)
                 bFirst = false;
             else
                 maPresetDataMap[TokenMap::getTokenFromUnicode(aName)] = aPropertyMap;
-            aName = OUString::fromUtf8(
-                aLine.subView(strlen(aCommentPrefix),
-                              aLine.getLength() - strlen(aCommentPrefix) - strlen(" */")));
+            aName = OUString::fromUtf8(std::string_view(aLine).substr(
+                strlen(aCommentPrefix),
+                aLine.getLength() - strlen(aCommentPrefix) - strlen(" */")));
         }
         else
         {
-            if (aLine == "AdjustmentValues")
+            if (std::string_view(aLine) == "AdjustmentValues")
             {
                 aStream.ReadLine(aLine);
-                if (aLine != "([]com.sun.star.drawing.EnhancedCustomShapeAdjustmentValue) {}")
+                if (std::string_view(aLine)
+                    != "([]com.sun.star.drawing.EnhancedCustomShapeAdjustmentValue) {}")
                 {
                     std::vector<drawing::EnhancedCustomShapeAdjustmentValue> aAdjustmentValues;
-                    OString aExpectedPrefix(
+                    static constexpr std::string_view aExpectedPrefix(
                         "([]com.sun.star.drawing.EnhancedCustomShapeAdjustmentValue) { ");
-                    assert(aLine.startsWith(aExpectedPrefix));
+                    assert(o3tl::starts_with(aLine, aExpectedPrefix));
 
-                    OString aValue = aLine.copy(aExpectedPrefix.getLength(),
-                                                aLine.getLength() - aExpectedPrefix.getLength()
-                                                    - strlen(" }"));
+                    std::string_view aValue = std::string_view(aLine).substr(
+                        aExpectedPrefix.size(),
+                        aLine.getLength() - aExpectedPrefix.size() - strlen(" }"));
                     lcl_parseAdjustmentValues(aAdjustmentValues, aValue);
                     aPropertyMap.setProperty(PROP_AdjustmentValues,
                                              comphelper::containerToSequence(aAdjustmentValues));
@@ -788,18 +868,18 @@ void CustomShapeProperties::initializePresetDataMap()
                 else
                     aPropertyMap.setProperty(PROP_AdjustmentValues, uno::Sequence<OUString>(0));
             }
-            else if (aLine == "Equations")
+            else if (std::string_view(aLine) == "Equations")
             {
                 aStream.ReadLine(aLine);
-                if (aLine != "([]string) {}")
+                if (std::string_view(aLine) != "([]string) {}")
                 {
                     std::vector<OUString> aEquations;
-                    OString aExpectedPrefix("([]string) { ");
-                    assert(aLine.startsWith(aExpectedPrefix));
+                    static constexpr std::string_view aExpectedPrefix("([]string) { ");
+                    assert(o3tl::starts_with(aLine, aExpectedPrefix));
 
-                    OString aValue = aLine.copy(aExpectedPrefix.getLength(),
-                                                aLine.getLength() - aExpectedPrefix.getLength()
-                                                    - strlen(" }"));
+                    std::string_view aValue = std::string_view(aLine).substr(
+                        aExpectedPrefix.size(),
+                        aLine.getLength() - aExpectedPrefix.size() - strlen(" }"));
                     lcl_parseEquations(aEquations, aValue);
                     aPropertyMap.setProperty(PROP_Equations,
                                              comphelper::containerToSequence(aEquations));
@@ -807,18 +887,19 @@ void CustomShapeProperties::initializePresetDataMap()
                 else
                     aPropertyMap.setProperty(PROP_Equations, uno::Sequence<OUString>(0));
             }
-            else if (aLine == "Handles")
+            else if (std::string_view(aLine) == "Handles")
             {
                 aStream.ReadLine(aLine);
-                if (aLine != "([][]com.sun.star.beans.PropertyValue) {}")
+                if (std::string_view(aLine) != "([][]com.sun.star.beans.PropertyValue) {}")
                 {
                     std::vector<uno::Sequence<beans::PropertyValue>> aHandles;
-                    OString aExpectedPrefix("([][]com.sun.star.beans.PropertyValue) { ");
-                    assert(aLine.startsWith(aExpectedPrefix));
+                    static constexpr std::string_view aExpectedPrefix(
+                        "([][]com.sun.star.beans.PropertyValue) { ");
+                    assert(o3tl::starts_with(aLine, aExpectedPrefix));
 
-                    OString aValue = aLine.copy(aExpectedPrefix.getLength(),
-                                                aLine.getLength() - aExpectedPrefix.getLength()
-                                                    - strlen(" }"));
+                    std::string_view aValue = std::string_view(aLine).substr(
+                        aExpectedPrefix.size(),
+                        aLine.getLength() - aExpectedPrefix.size() - strlen(" }"));
                     lcl_parseHandles(aHandles, aValue);
                     aPropertyMap.setProperty(PROP_Handles,
                                              comphelper::containerToSequence(aHandles));
@@ -826,61 +907,63 @@ void CustomShapeProperties::initializePresetDataMap()
                 else
                     aPropertyMap.setProperty(PROP_Handles, uno::Sequence<OUString>(0));
             }
-            else if (aLine == "MirroredX")
+            else if (std::string_view(aLine) == "MirroredX")
             {
                 aStream.ReadLine(aLine);
-                if (aLine == "true" || aLine == "false")
+                if (std::string_view(aLine) == "true" || std::string_view(aLine) == "false")
                 {
-                    aPropertyMap.setProperty(PROP_MirroredX, aLine == "true");
+                    aPropertyMap.setProperty(PROP_MirroredX, std::string_view(aLine) == "true");
                 }
                 else
                     SAL_WARN("oox", "CustomShapeProperties::initializePresetDataMap: unexpected "
                                     "MirroredX parameter");
             }
-            else if (aLine == "MirroredY")
+            else if (std::string_view(aLine) == "MirroredY")
             {
                 aStream.ReadLine(aLine);
-                if (aLine == "true" || aLine == "false")
+                if (std::string_view(aLine) == "true" || std::string_view(aLine) == "false")
                 {
-                    aPropertyMap.setProperty(PROP_MirroredY, aLine == "true");
+                    aPropertyMap.setProperty(PROP_MirroredY, std::string_view(aLine) == "true");
                 }
                 else
                     SAL_WARN("oox", "CustomShapeProperties::initializePresetDataMap: unexpected "
                                     "MirroredY parameter");
             }
-            else if (aLine == "Path")
+            else if (std::string_view(aLine) == "Path")
             {
                 aStream.ReadLine(aLine);
-                OString aExpectedPrefix("([]com.sun.star.beans.PropertyValue) { ");
-                assert(aLine.startsWith(aExpectedPrefix));
+                static constexpr std::string_view aExpectedPrefix(
+                    "([]com.sun.star.beans.PropertyValue) { ");
+                assert(o3tl::starts_with(aLine, aExpectedPrefix));
 
                 std::vector<beans::PropertyValue> aPathValue;
-                OString aValue
-                    = aLine.copy(aExpectedPrefix.getLength(),
-                                 aLine.getLength() - aExpectedPrefix.getLength() - strlen(" }"));
+                std::string_view aValue = std::string_view(aLine).substr(
+                    aExpectedPrefix.size(),
+                    aLine.getLength() - aExpectedPrefix.size() - strlen(" }"));
                 lcl_parsePath(aPathValue, aValue);
                 aPropertyMap.setProperty(PROP_Path, comphelper::containerToSequence(aPathValue));
             }
-            else if (aLine == "Type")
+            else if (std::string_view(aLine) == "Type")
             {
                 // Just ignore the line here, we already know the correct type.
                 aStream.ReadLine(aLine);
                 aPropertyMap.setProperty(PROP_Type, "ooxml-" + aName);
             }
-            else if (aLine == "ViewBox")
+            else if (std::string_view(aLine) == "ViewBox")
             {
                 aStream.ReadLine(aLine);
-                OString aExpectedPrefix("(com.sun.star.awt.Rectangle) { ");
-                assert(aLine.startsWith(aExpectedPrefix));
+                static constexpr std::string_view aExpectedPrefix(
+                    "(com.sun.star.awt.Rectangle) { ");
+                assert(o3tl::starts_with(aLine, aExpectedPrefix));
 
-                OString aValue
-                    = aLine.copy(aExpectedPrefix.getLength(),
-                                 aLine.getLength() - aExpectedPrefix.getLength() - strlen(" }"));
+                std::string_view aValue = std::string_view(aLine).substr(
+                    aExpectedPrefix.size(),
+                    aLine.getLength() - aExpectedPrefix.size() - strlen(" }"));
                 aPropertyMap.setProperty(PROP_ViewBox, lcl_parseRectangle(aValue));
             }
             else
                 SAL_WARN("oox", "CustomShapeProperties::initializePresetDataMap: unhandled line: "
-                                    << aLine);
+                                    << std::string_view(aLine));
         }
         bNotDone = aStream.ReadLine(aLine);
     }

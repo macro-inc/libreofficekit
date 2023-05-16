@@ -22,10 +22,10 @@
 #include <sal/config.h>
 
 #include <deque>
+#include <mutex>
 #include <vector>
 
 #include <osl/conditn.hxx>
-#include <osl/mutex.hxx>
 #include <rtl/byteseq.hxx>
 #include <rtl/ref.hxx>
 #include <rtl/ustring.hxx>
@@ -104,18 +104,17 @@ private:
 
         // Request:
         Item(
-            rtl::ByteSequence const & theTid, OUString const & theOid,
-            com::sun::star::uno::TypeDescription const & theType,
-            com::sun::star::uno::TypeDescription const & theMember,
+            rtl::ByteSequence theTid, OUString theOid,
+            com::sun::star::uno::TypeDescription theType,
+            com::sun::star::uno::TypeDescription theMember,
             std::vector< BinaryAny >&& inArguments,
-            com::sun::star::uno::UnoInterfaceReference const &
-                theCurrentContext);
+            com::sun::star::uno::UnoInterfaceReference theCurrentContext);
 
         // Reply:
         Item(
-            rtl::ByteSequence const & theTid,
-            com::sun::star::uno::TypeDescription const & theMember,
-            bool theSetter, bool theException, BinaryAny const & theReturnValue,
+            rtl::ByteSequence theTid,
+            com::sun::star::uno::TypeDescription theMember,
+            bool theSetter, bool theException, BinaryAny theReturnValue,
             std::vector< BinaryAny >&& outArguments,
             bool theSetCurrentContextMode);
 
@@ -141,7 +140,7 @@ private:
     osl::Condition unblocked_;
     osl::Condition items_;
 
-    osl::Mutex mutex_;
+    std::mutex mutex_;
     std::deque< Item > queue_;
     bool stop_;
 };

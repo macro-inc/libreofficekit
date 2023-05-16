@@ -19,8 +19,6 @@
 
 #include <sal/config.h>
 
-#include <string_view>
-
 #include <sfx2/objsh.hxx>
 #include <svx/strings.hrc>
 #include <svx/svxids.hrc>
@@ -141,10 +139,10 @@ static sal_Int64 lcl_GetMinLineWidth(SvxBorderLineStyle aStyle)
 }
 
 // number of preset images to show
-const sal_uInt16 SVX_BORDER_PRESET_COUNT = 5;
+const sal_uInt16 BORDER_PRESET_COUNT = 5;
 
 // number of shadow images to show
-const sal_uInt16 SVX_BORDER_SHADOW_COUNT = 5;
+const sal_uInt16 BORDER_SHADOW_COUNT = 5;
 
 ShadowControlsWrapper::ShadowControlsWrapper(ValueSet& rVsPos, weld::MetricSpinButton& rMfSize, ColorListBox& rLbColor)
     : mrVsPos(rVsPos)
@@ -413,7 +411,7 @@ SvxBorderTabPage::SvxBorderTabPage(weld::Container* pPage, weld::DialogControlle
     for (auto const & rImageId : aShadowImageIds)
         m_aShadowImgVec.emplace_back(StockImage::Yes, rImageId);
 
-    assert(m_aShadowImgVec.size() == SVX_BORDER_SHADOW_COUNT);
+    assert(m_aShadowImgVec.size() == BORDER_SHADOW_COUNT);
 
     // this page needs ExchangeSupport
     SetExchangeSupport();
@@ -423,19 +421,16 @@ SvxBorderTabPage::SvxBorderTabPage(weld::Container* pPage, weld::DialogControlle
             is needed across various functions... */
     mbUseMarginItem = rCoreAttrs.GetItemState(GetWhich(SID_ATTR_ALIGN_MARGIN)) != SfxItemState::UNKNOWN;
 
-    const SfxPoolItem* pItem = nullptr;
-    if (rCoreAttrs.HasItem(SID_ATTR_BORDER_STYLES, &pItem))
+    if (const SfxIntegerListItem* p = rCoreAttrs.GetItemIfSet(SID_ATTR_BORDER_STYLES))
     {
-        const SfxIntegerListItem* p = static_cast<const SfxIntegerListItem*>(pItem);
         std::vector<sal_Int32> aUsedStyles = p->GetList();
         for (int aUsedStyle : aUsedStyles)
             maUsedBorderStyles.insert(static_cast<SvxBorderLineStyle>(aUsedStyle));
     }
 
-    if (rCoreAttrs.HasItem(SID_ATTR_BORDER_DEFAULT_WIDTH, &pItem))
+    if (const SfxInt64Item* p = rCoreAttrs.GetItemIfSet(SID_ATTR_BORDER_DEFAULT_WIDTH))
     {
         // The caller specifies default line width.  Honor it.
-        const SfxInt64Item* p = static_cast<const SfxInt64Item*>(pItem);
         SetLineWidth(p->GetValue());
     }
 
@@ -548,6 +543,7 @@ SvxBorderTabPage::SvxBorderTabPage(weld::Container* pPage, weld::DialogControlle
     SetLineWidth(m_xLineWidthMF->get_value(FieldUnit::NONE));
 
     // connections
+    const SfxPoolItem* pItem = nullptr;
     if (rCoreAttrs.HasItem(GetWhich(SID_ATTR_PARA_GRABBAG), &pItem))
     {
         const SfxGrabBagItem* pGrabBag = static_cast<const SfxGrabBagItem*>(pItem);
@@ -578,8 +574,7 @@ SvxBorderTabPage::SvxBorderTabPage(weld::Container* pPage, weld::DialogControlle
     // checkbox "Merge adjacent line styles" only visible for Writer dialog format.table
     m_xMergeAdjacentBordersCB->hide();
 
-    SfxObjectShell* pDocSh = SfxObjectShell::Current();
-    if (pDocSh)
+    if (SfxObjectShell* pDocSh = SfxObjectShell::Current())
     {
         Reference< XServiceInfo > xSI( pDocSh->GetModel(), UNO_QUERY );
         if ( xSI.is() )
@@ -847,13 +842,15 @@ void SvxBorderTabPage::Reset( const SfxItemSet* rSet )
         SelStyleHdl_Impl(*m_xLbLineStyle);
     }
 
-    const SfxPoolItem* pItem;
-    SfxObjectShell* pShell;
-    if(SfxItemState::SET == rSet->GetItemState(SID_HTML_MODE, false, &pItem) ||
-        ( nullptr != (pShell = SfxObjectShell::Current()) &&
-                    nullptr != (pItem = pShell->GetItem(SID_HTML_MODE))))
+    const SfxUInt16Item* pHtmlModeItem = rSet->GetItemIfSet(SID_HTML_MODE, false);
+    if(!pHtmlModeItem)
     {
-        sal_uInt16 nHtmlMode = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        if (SfxObjectShell* pShell = SfxObjectShell::Current())
+            pHtmlModeItem = pShell->GetItem(SID_HTML_MODE);
+    }
+    if(pHtmlModeItem)
+    {
+        sal_uInt16 nHtmlMode = pHtmlModeItem->GetValue();
         if(nHtmlMode & HTMLMODE_ON)
         {
             // there are no shadows in Html-mode and only complete borders
@@ -1244,8 +1241,12 @@ IMPL_LINK(SvxBorderTabPage, SelColHdl_Impl, ColorListBox&, rColorBox, void)
 IMPL_LINK_NOARG(SvxBorderTabPage, ModifyWidthLBHdl_Impl, weld::ComboBox&, void)
 {
     sal_Int32 nPos = m_xLineWidthLB->get_active();
+    sal_Int32 nRemovedType = 0;
+    if (m_xLineWidthLB->get_values_changed_from_saved()) {
+        nRemovedType = m_aLineWidths.size() - m_xLineWidthLB->get_count();
+    }
 
-    SetLineWidth(m_aLineWidths[nPos]);
+    SetLineWidth(m_aLineWidths[nPos + nRemovedType], nRemovedType);
 
     // Call the spinner handler to trigger all related modifications
     ModifyWidthMFHdl_Impl(*m_xLineWidthMF);
@@ -1254,6 +1255,13 @@ IMPL_LINK_NOARG(SvxBorderTabPage, ModifyWidthLBHdl_Impl, weld::ComboBox&, void)
 IMPL_LINK_NOARG(SvxBorderTabPage, ModifyWidthMFHdl_Impl, weld::MetricSpinButton&, void)
 {
     sal_Int64 nVal = m_xLineWidthMF->get_value(FieldUnit::NONE);
+
+    // for DOUBLE_THIN line style we cannot allow thinner line width then 1.10pt
+    if (m_xLbLineStyle->GetSelectEntryStyle() == SvxBorderLineStyle::DOUBLE_THIN)
+        m_xLineWidthMF->set_min(110, FieldUnit::NONE);
+    else
+        m_xLineWidthMF->set_min(5, FieldUnit::NONE);
+
     nVal = static_cast<sal_Int64>(vcl::ConvertDoubleValue(
                 nVal,
                 m_xLineWidthMF->get_digits(),
@@ -1267,6 +1275,13 @@ IMPL_LINK_NOARG(SvxBorderTabPage, ModifyWidthMFHdl_Impl, weld::MetricSpinButton&
 IMPL_LINK_NOARG(SvxBorderTabPage, SelStyleHdl_Impl, SvtLineListBox&, void)
 {
     sal_Int64 nOldWidth = m_xLineWidthMF->get_value(FieldUnit::NONE);
+
+    // for DOUBLE_THIN line style we cannot allow thinner line width then 1.10pt
+    if (m_xLbLineStyle->GetSelectEntryStyle() == SvxBorderLineStyle::DOUBLE_THIN)
+        m_xLineWidthMF->set_min(110, FieldUnit::NONE);
+    else
+        m_xLineWidthMF->set_min(5, FieldUnit::NONE);
+
     nOldWidth = static_cast<sal_Int64>(vcl::ConvertDoubleValue(
         nOldWidth,
         m_xLineWidthMF->get_digits(),
@@ -1278,7 +1293,14 @@ IMPL_LINK_NOARG(SvxBorderTabPage, SelStyleHdl_Impl, SvtLineListBox&, void)
 
     // auto change line-width if it doesn't correspond to minimal value
     // let's change only in case when user has not changed the line-width into some custom value
-    const sal_Int64 nNewWidth = (nOldMinWidth == nOldWidth)? nNewMinWidth : nOldWidth;
+    sal_Int64 nNewWidth = (nOldMinWidth == nOldWidth) ? nNewMinWidth : nOldWidth;
+
+    // if we had selected a predefined border width under SvxBorderLineWidth::Medium set the Medium as default
+    // otherwise if we had a custom border width under 1.10pt then set the spinner to the maximum allowed value for double border styles
+    bool bNewDoubleHairline = m_xLbLineStyle->GetSelectEntryStyle() == SvxBorderLineStyle::DOUBLE_THIN && !m_xLineWidthMF->get_visible() &&
+        (nOldWidth == SvxBorderLineWidth::Hairline || nOldWidth == SvxBorderLineWidth::VeryThin || nOldWidth == SvxBorderLineWidth::Thin);
+    if (bNewDoubleHairline && nNewWidth < SvxBorderLineWidth::Medium)
+        nNewWidth = SvxBorderLineWidth::Medium;
 
     // set value inside edit box
     if (nOldWidth != nNewWidth)
@@ -1291,6 +1313,26 @@ IMPL_LINK_NOARG(SvxBorderTabPage, SelStyleHdl_Impl, SvtLineListBox&, void)
         SetLineWidth(nNewWidthPt);
     }
 
+    if (m_xLbLineStyle->GetSelectEntryStyle() == SvxBorderLineStyle::DOUBLE_THIN)
+    {
+        for (size_t i = 0; i < 3; i++)
+        {
+            m_xLineWidthLB->save_values_by_id(OUString::number(i));
+            m_xLineWidthLB->remove_id(OUString::number(i));
+        }
+        if (m_xLineWidthLB->get_active_id().isEmpty())
+            m_xLineWidthLB->set_active_id("3");
+    }
+    else
+    {
+        if (m_xLineWidthLB->get_values_changed_from_saved())
+        {
+            for (size_t i = 0; i < 3; i++)
+                m_xLineWidthLB->append(i, OUString::number(i), m_xLineWidthLB->get_saved_values(i));
+            m_xLineWidthLB->removeSavedValues();
+        }
+    }
+
     // set value inside style box
     m_aFrameSel.SetStyleToSelection( nNewWidth,
         m_xLbLineStyle->GetSelectEntryStyle() );
@@ -1301,7 +1343,7 @@ IMPL_LINK_NOARG(SvxBorderTabPage, SelStyleHdl_Impl, SvtLineListBox&, void)
 sal_uInt16 SvxBorderTabPage::GetPresetImageId( sal_uInt16 nValueSetIdx ) const
 {
     // table with all sets of predefined border styles
-    static const sal_uInt16 ppnImgIds[][ SVX_BORDER_PRESET_COUNT ] =
+    static const sal_uInt16 ppnImgIds[][ BORDER_PRESET_COUNT ] =
     {
         // simple cell without diagonal frame borders
         {   IID_PRE_CELL_NONE,  IID_PRE_CELL_ALL,       IID_PRE_CELL_LR,        IID_PRE_CELL_TB,    IID_PRE_CELL_L          },
@@ -1326,7 +1368,7 @@ sal_uInt16 SvxBorderTabPage::GetPresetImageId( sal_uInt16 nValueSetIdx ) const
     else
         nLine = 4;
 
-    DBG_ASSERT( (1 <= nValueSetIdx) && (nValueSetIdx <= SVX_BORDER_PRESET_COUNT),
+    DBG_ASSERT( (1 <= nValueSetIdx) && (nValueSetIdx <= BORDER_PRESET_COUNT),
         "SvxBorderTabPage::GetPresetImageId - wrong index" );
     return ppnImgIds[ nLine ][ nValueSetIdx - 1 ];
 }
@@ -1368,10 +1410,10 @@ void SvxBorderTabPage::FillPresetVS()
 {
     // basic initialization of the ValueSet
     m_xWndPresets->SetStyle( m_xWndPresets->GetStyle() | WB_ITEMBORDER | WB_DOUBLEBORDER );
-    m_xWndPresets->SetColCount( SVX_BORDER_PRESET_COUNT );
+    m_xWndPresets->SetColCount( BORDER_PRESET_COUNT );
 
     // insert images and help texts
-    for( sal_uInt16 nVSIdx = 1; nVSIdx <= SVX_BORDER_PRESET_COUNT; ++nVSIdx )
+    for( sal_uInt16 nVSIdx = 1; nVSIdx <= BORDER_PRESET_COUNT; ++nVSIdx )
     {
         m_xWndPresets->InsertItem( nVSIdx );
         m_xWndPresets->SetItemImage(nVSIdx, m_aBorderImgVec[GetPresetImageId(nVSIdx) - 1]);
@@ -1388,14 +1430,14 @@ void SvxBorderTabPage::FillShadowVS()
 {
     // basic initialization of the ValueSet
     m_xWndShadows->SetStyle( m_xWndShadows->GetStyle() | WB_ITEMBORDER | WB_DOUBLEBORDER );
-    m_xWndShadows->SetColCount( SVX_BORDER_SHADOW_COUNT );
+    m_xWndShadows->SetColCount( BORDER_SHADOW_COUNT );
 
     // string resource IDs for each image
-    static const TranslateId pnStrIds[ SVX_BORDER_SHADOW_COUNT ] =
-        { RID_SVXSTR_SHADOW_STYLE_NONE, RID_SVXSTR_SHADOW_STYLE_BOTTOMRIGHT, RID_SVXSTR_SHADOW_STYLE_TOPRIGHT, RID_SVXSTR_SHADOW_STYLE_BOTTOMLEFT, RID_SVXSTR_SHADOW_STYLE_TOPLEFT };
+    static const TranslateId pnStrIds[ BORDER_SHADOW_COUNT ] =
+        { RID_CUISTR_SHADOW_STYLE_NONE, RID_CUISTR_SHADOW_STYLE_BOTTOMRIGHT, RID_CUISTR_SHADOW_STYLE_TOPRIGHT, RID_CUISTR_SHADOW_STYLE_BOTTOMLEFT, RID_CUISTR_SHADOW_STYLE_TOPLEFT };
 
     // insert images and help texts
-    for( sal_uInt16 nVSIdx = 1; nVSIdx <= SVX_BORDER_SHADOW_COUNT; ++nVSIdx )
+    for( sal_uInt16 nVSIdx = 1; nVSIdx <= BORDER_SHADOW_COUNT; ++nVSIdx )
     {
         m_xWndShadows->InsertItem( nVSIdx );
         m_xWndShadows->SetItemImage(nVSIdx, m_aShadowImgVec[nVSIdx-1]);
@@ -1415,7 +1457,7 @@ void SvxBorderTabPage::FillValueSets()
     FillShadowVS();
 }
 
-void SvxBorderTabPage::SetLineWidth( sal_Int64 nWidth )
+void SvxBorderTabPage::SetLineWidth( sal_Int64 nWidth, sal_Int32 nRemovedType )
 {
     if ( nWidth >= 0 )
         m_xLineWidthMF->set_value( nWidth, FieldUnit::POINT );
@@ -1427,12 +1469,12 @@ void SvxBorderTabPage::SetLineWidth( sal_Int64 nWidth )
     {
         // Select predefined value in combobox
         m_xLineWidthMF->hide();
-        m_xLineWidthLB->set_active(std::distance(m_aLineWidths.begin(), it));
+        m_xLineWidthLB->set_active(std::distance(m_aLineWidths.begin(), it) - nRemovedType);
     }
     else
     {
         // This is not one of predefined values. Show spinner
-        m_xLineWidthLB->set_active(m_aLineWidths.size()-1);
+        m_xLineWidthLB->set_active(m_aLineWidths.size() - nRemovedType -1);
         m_xLineWidthMF->show();
     }
 }
@@ -1479,7 +1521,7 @@ void SvxBorderTabPage::FillLineListBox_Impl()
 
     m_xLbLineStyle->SetSourceUnit( FieldUnit::TWIP );
 
-    for (size_t i = 0; i < SAL_N_ELEMENTS(aLines); ++i)
+    for (size_t i = 0; i < std::size(aLines); ++i)
     {
         if (!IsBorderLineStyleAllowed(aLines[i].mnStyle))
             continue;
@@ -1604,7 +1646,7 @@ void SvxBorderTabPage::UpdateRemoveAdjCellBorderCB( sal_uInt16 nPreset )
 
     // Check if current selection involves deletion of at least one border
     bool bBorderDeletionReq = false;
-    for ( size_t i=0; i < SAL_N_ELEMENTS( eTypes1 ); ++i )
+    for ( size_t i=0; i < std::size( eTypes1 ); ++i )
     {
         if( pOldBoxItem->GetLine( eTypes2[i] ) || !( pOldBoxInfoItem->IsValid( eTypes1[i].second ) ) )
         {

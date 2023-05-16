@@ -29,6 +29,7 @@
 #include <com/sun/star/document/XEventsSupplier.hpp>
 
 #include <cppuhelper/implbase.hxx>
+#include <sal/types.h>
 #include <svl/listener.hxx>
 
 #include "flyenum.hxx"
@@ -44,7 +45,7 @@ class SfxItemPropertySet;
 namespace com::sun::star::frame { class XModel; }
 
 class BaseFrameProperties_Impl;
-class SwXFrame : public cppu::WeakImplHelper
+class SAL_DLLPUBLIC_RTTI SwXFrame : public cppu::WeakImplHelper
 <
     css::lang::XServiceInfo,
     css::lang::XUnoTunnel,
@@ -75,11 +76,12 @@ private:
     sal_Int64                       m_nVisibleAreaWidth;
     sal_Int64                       m_nVisibleAreaHeight;
     css::uno::Reference<css::text::XText> m_xParentText;
+    css::uno::Reference< css::beans::XPropertySet > mxStyleData;
+    css::uno::Reference< css::container::XNameAccess >  mxStyleFamily;
+
     void DisposeInternal();
 
 protected:
-    css::uno::Reference< css::beans::XPropertySet > mxStyleData;
-    css::uno::Reference< css::container::XNameAccess >  mxStyleFamily;
     virtual void Notify(const SfxHint&) override;
 
     virtual ~SwXFrame() override;
@@ -90,8 +92,8 @@ protected:
     SwXFrame(SwFrameFormat& rFrameFormat, FlyCntType eSet,
                 const SfxItemPropertySet*    pPropSet);
 
-    template<class Interface, class Impl>
-    static css::uno::Reference<Interface>
+    template<class Impl>
+    static rtl::Reference<Impl>
     CreateXFrame(SwDoc & rDoc, SwFrameFormat *const pFrameFormat);
 
 public:
@@ -171,7 +173,7 @@ typedef cppu::ImplInheritanceHelper
 >
 SwXTextFrameBaseClass;
 
-class SwXTextFrame final : public SwXTextFrameBaseClass,
+class SAL_DLLPUBLIC_RTTI SwXTextFrame final : public SwXTextFrameBaseClass,
     public SwXText
 {
     friend class SwXFrame; // just for CreateXFrame
@@ -187,7 +189,7 @@ class SwXTextFrame final : public SwXTextFrameBaseClass,
     SwXTextFrame(SwFrameFormat& rFormat);
 
 public:
-    static SW_DLLPUBLIC css::uno::Reference<css::text::XTextFrame>
+    static SW_DLLPUBLIC rtl::Reference<SwXTextFrame>
             CreateXTextFrame(SwDoc & rDoc, SwFrameFormat * pFrameFormat);
 
     // FIXME: EVIL HACK:  make available for SwXFrame::attachToRange
@@ -195,14 +197,14 @@ public:
 
     virtual css::uno::Any SAL_CALL queryInterface( const css::uno::Type& aType ) override;
     virtual void SAL_CALL acquire(  ) noexcept override;
-    virtual void SAL_CALL release(  ) noexcept override;
+    virtual SW_DLLPUBLIC void SAL_CALL release(  ) noexcept override;
 
     //XTypeProvider
     virtual css::uno::Sequence< css::uno::Type > SAL_CALL getTypes(  ) override;
     virtual css::uno::Sequence< sal_Int8 > SAL_CALL getImplementationId(  ) override;
 
     //XTextFrame
-    virtual css::uno::Reference< css::text::XText >  SAL_CALL getText() override;
+    virtual SW_DLLPUBLIC css::uno::Reference< css::text::XText >  SAL_CALL getText() override;
 
     //XText
     virtual css::uno::Reference< css::text::XTextCursor >  SAL_CALL createTextCursor() override;
@@ -236,7 +238,8 @@ public:
     virtual sal_Int64 SAL_CALL getSomething( const css::uno::Sequence< sal_Int8 >& aIdentifier ) override;
 
     //XPropertySet
-    virtual css::uno::Any SAL_CALL getPropertyValue( const OUString& PropertyName ) override;
+    virtual SW_DLLPUBLIC css::uno::Any SAL_CALL getPropertyValue( const OUString& PropertyName ) override;
+    using SwXFrame::setPropertyValue;
 };
 
 typedef cppu::ImplInheritanceHelper
@@ -255,7 +258,7 @@ class SwXTextGraphicObject final : public SwXTextGraphicObjectBaseClass
 
 public:
 
-    static css::uno::Reference<css::text::XTextContent>
+    static rtl::Reference<SwXTextGraphicObject>
         CreateXTextGraphicObject(SwDoc & rDoc, SwFrameFormat * pFrameFormat);
 
     //XServiceInfo
@@ -286,7 +289,7 @@ class SwXTextEmbeddedObject final : public SwXTextEmbeddedObjectBaseClass
 
 public:
 
-    static css::uno::Reference<css::text::XTextContent>
+    static rtl::Reference<SwXTextEmbeddedObject>
         CreateXTextEmbeddedObject(SwDoc & rDoc, SwFrameFormat * pFrameFormat);
 
     //XEmbeddedObjectSupplier2
@@ -311,7 +314,7 @@ class SwXOLEListener final : public cppu::WeakImplHelper<css::util::XModifyListe
     css::uno::Reference<css::frame::XModel> m_xOLEModel;
 
 public:
-    SwXOLEListener(SwFormat& rOLEFormat, css::uno::Reference< css::frame::XModel > const & xOLE);
+    SwXOLEListener(SwFormat& rOLEFormat, css::uno::Reference< css::frame::XModel > xOLE);
     virtual ~SwXOLEListener() override;
 
 // css::lang::XEventListener

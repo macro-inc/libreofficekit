@@ -10,6 +10,8 @@
 #include <sal/config.h>
 #include <config_oox.h>
 
+#include <test/unoapi_test.hxx>
+
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/frame/XStorable.hpp>
 #include <com/sun/star/lang/XComponent.hpp>
@@ -17,9 +19,7 @@
 #include <com/sun/star/table/XCellRange.hpp>
 #include <com/sun/star/view/XSelectionSupplier.hpp>
 #include <comphelper/propertysequence.hxx>
-#include <test/bootstrapfixture.hxx>
 #include <unotools/tempfile.hxx>
-#include <unotest/macros_test.hxx>
 #include <docsh.hxx>
 #include <editutil.hxx>
 #include <editeng/eeitem.hxx>
@@ -38,27 +38,19 @@ using namespace css::lang;
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
 
-class ScPDFExportTest : public test::BootstrapFixture, public unotest::MacrosTest
+class ScPDFExportTest : public UnoApiTest
 {
-    Reference<XComponent> mxComponent;
-    Reference<frame::XFrame> xTargetFrame;
-
 public:
-    ScPDFExportTest() {}
+    ScPDFExportTest();
     ~ScPDFExportTest();
-
-    virtual void setUp() override final;
-    virtual void tearDown() override final;
 
     // helpers
 private:
-    std::shared_ptr<utl::TempFile> exportToPDF(const uno::Reference<frame::XModel>& xModel,
-                                               const ScRange& range);
+    void exportToPDF(const uno::Reference<frame::XModel>& xModel, const ScRange& range);
 
-    std::shared_ptr<utl::TempFile> exportToPDFWithUnoCommands(const OUString& rRange);
+    void exportToPDFWithUnoCommands(const OUString& rRange);
 
-    static bool hasTextInPdf(const std::shared_ptr<utl::TempFile>& pPDFFile, const char* sText,
-                             bool& bFound);
+    bool hasTextInPdf(const char* sText, bool& bFound);
 
     void setFont(ScFieldEditEngine& rEE, sal_Int32 nStart, sal_Int32 nEnd,
                  const OUString& rFontName);
@@ -86,7 +78,10 @@ public:
     CPPUNIT_TEST_SUITE_END();
 };
 
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sc/qa/extras/testdocuments/";
+ScPDFExportTest::ScPDFExportTest()
+    : UnoApiTest("sc/qa/extras/testdocuments/")
+{
+}
 
 ScPDFExportTest::~ScPDFExportTest()
 {
@@ -95,57 +90,9 @@ ScPDFExportTest::~ScPDFExportTest()
 #endif
 }
 
-void ScPDFExportTest::setUp()
+bool ScPDFExportTest::hasTextInPdf(const char* sText, bool& bFound)
 {
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set(
-        css::frame::Desktop::create(comphelper::getComponentContext(getMultiServiceFactory())));
-
-    {
-        uno::Reference<frame::XDesktop2> xDesktop = mxDesktop;
-        CPPUNIT_ASSERT(xDesktop.is());
-
-        // Create spreadsheet
-        uno::Sequence<beans::PropertyValue> args{ comphelper::makePropertyValue("Hidden", true) };
-        mxComponent = xDesktop->loadComponentFromURL("private:factory/scalc", "_blank", 0, args);
-        CPPUNIT_ASSERT(mxComponent.is());
-
-        // create a frame
-        xTargetFrame = xDesktop->findFrame("_blank", 0);
-        CPPUNIT_ASSERT(xTargetFrame.is());
-
-        uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
-        uno::Reference<frame::XModel2> xModel2(xModel, UNO_QUERY);
-        CPPUNIT_ASSERT(xModel2.is());
-
-        Reference<frame::XController2> xController
-            = xModel2->createDefaultViewController(xTargetFrame);
-        CPPUNIT_ASSERT(xController.is());
-
-        // introduce model/view/controller to each other
-        xController->attachModel(xModel2);
-        xModel2->connectController(xController);
-
-        xTargetFrame->setComponent(xController->getComponentWindow(), xController);
-        xController->attachFrame(xTargetFrame);
-
-        xModel2->setCurrentController(xController);
-    }
-}
-
-void ScPDFExportTest::tearDown()
-{
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
-}
-
-bool ScPDFExportTest::hasTextInPdf(const std::shared_ptr<utl::TempFile>& pPDFFile,
-                                   const char* sText, bool& bFound)
-{
-    SvStream* pStream = pPDFFile->GetStream(StreamMode::STD_READ);
+    SvStream* pStream = maTempFile.GetStream(StreamMode::STD_READ);
     CPPUNIT_ASSERT(pStream);
 
     // get file size
@@ -168,21 +115,12 @@ bool ScPDFExportTest::hasTextInPdf(const std::shared_ptr<utl::TempFile>& pPDFFil
 
     // close and return the status
     pStream = nullptr;
-    pPDFFile->CloseStream();
+    maTempFile.CloseStream();
     return (nRead == nFileSize);
 }
 
-std::shared_ptr<utl::TempFile>
-ScPDFExportTest::exportToPDF(const uno::Reference<frame::XModel>& xModel, const ScRange& range)
+void ScPDFExportTest::exportToPDF(const uno::Reference<frame::XModel>& xModel, const ScRange& range)
 {
-    // create temp file name
-    auto pTempFile = std::make_shared<utl::TempFile>();
-    pTempFile->EnableKillingFile();
-    OUString sFileURL = pTempFile->GetURL();
-    // Note: under Windows path path should be with "/" delimiters instead of "\\"
-    // due to usage of INetURLObject() that converts "\\" to hexadecimal notation.
-    ::osl::FileBase::getFileURLFromSystemPath(sFileURL, sFileURL);
-
     // get XSpreadsheet
     uno::Reference<sheet::XSpreadsheetDocument> xDoc(xModel, uno::UNO_QUERY_THROW);
     uno::Reference<sheet::XSpreadsheets> xSheets(xDoc->getSheets(), UNO_SET_THROW);
@@ -215,30 +153,19 @@ ScPDFExportTest::exportToPDF(const uno::Reference<frame::XModel>& xModel, const 
     css::uno::Sequence<css::beans::PropertyValue> seqArguments{
         comphelper::makePropertyValue("FilterData", aFilterData),
         comphelper::makePropertyValue("FilterName", OUString("calc_pdf_Export")),
-        comphelper::makePropertyValue("URL", sFileURL)
+        comphelper::makePropertyValue("URL", maTempFile.GetURL())
     };
 
     // call storeToURL()
     uno::Reference<lang::XComponent> xComponent(mxComponent, UNO_SET_THROW);
     uno::Reference<css::frame::XStorable> xStorable(xComponent, UNO_QUERY);
-    xStorable->storeToURL(sFileURL, seqArguments);
-
-    // return file object with generated PDF
-    return pTempFile;
+    xStorable->storeToURL(maTempFile.GetURL(), seqArguments);
 }
 
-std::shared_ptr<utl::TempFile> ScPDFExportTest::exportToPDFWithUnoCommands(const OUString& rRange)
+void ScPDFExportTest::exportToPDFWithUnoCommands(const OUString& rRange)
 {
-    // create temp file name
-    auto pTempFile = std::make_shared<utl::TempFile>();
-    pTempFile->EnableKillingFile();
-    OUString sFileURL = pTempFile->GetURL();
-    // Note: under Windows path path should be with "/" delimiters instead of "\\"
-    // due to usage of INetURLObject() that converts "\\" to hexadecimal notation.
-    ::osl::FileBase::getFileURLFromSystemPath(sFileURL, sFileURL);
-
     uno::Sequence<beans::PropertyValue> aArgs
-        = comphelper::InitPropertySequence({ { "ToPoint", uno::makeAny(rRange) } });
+        = comphelper::InitPropertySequence({ { "ToPoint", uno::Any(rRange) } });
     dispatchCommand(mxComponent, ".uno:GoToCell", aArgs);
 
     dispatchCommand(mxComponent, ".uno:DefinePrintArea", {});
@@ -249,12 +176,9 @@ std::shared_ptr<utl::TempFile> ScPDFExportTest::exportToPDFWithUnoCommands(const
     uno::Sequence<beans::PropertyValue> aDescriptor(
         comphelper::InitPropertySequence({ { "FilterName", uno::Any(OUString("calc_pdf_Export")) },
                                            { "FilterData", uno::Any(aFilterData) },
-                                           { "URL", uno::Any(sFileURL) } }));
+                                           { "URL", uno::Any(maTempFile.GetURL()) } }));
 
     dispatchCommand(mxComponent, ".uno:ExportToPDF", aDescriptor);
-
-    // return file object with generated PDF
-    return pTempFile;
 }
 
 void ScPDFExportTest::setFont(ScFieldEditEngine& rEE, sal_Int32 nStart, sal_Int32 nEnd,
@@ -276,6 +200,7 @@ void ScPDFExportTest::setFont(ScFieldEditEngine& rEE, sal_Int32 nStart, sal_Int3
 void ScPDFExportTest::testExportRange_Tdf120161()
 {
     // create test document
+    mxComponent = loadFromDesktop("private:factory/scalc");
     uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
     uno::Reference<sheet::XSpreadsheetDocument> xDoc(xModel, uno::UNO_QUERY_THROW);
     uno::Reference<sheet::XSpreadsheets> xSheets(xDoc->getSheets(), UNO_SET_THROW);
@@ -307,27 +232,27 @@ void ScPDFExportTest::testExportRange_Tdf120161()
     // A1:G1
     {
         ScRange range1(0, 0, 0, 6, 0, 0);
-        std::shared_ptr<utl::TempFile> pPDFFile = exportToPDF(xModel, range1);
+        exportToPDF(xModel, range1);
         bool bFound = false;
-        CPPUNIT_ASSERT(hasTextInPdf(pPDFFile, "DejaVuSans", bFound));
+        CPPUNIT_ASSERT(hasTextInPdf("DejaVuSans", bFound));
         CPPUNIT_ASSERT_EQUAL(false, bFound);
     }
 
     // G1:H1
     {
         ScRange range1(6, 0, 0, 7, 0, 0);
-        std::shared_ptr<utl::TempFile> pPDFFile = exportToPDF(xModel, range1);
+        exportToPDF(xModel, range1);
         bool bFound = false;
-        CPPUNIT_ASSERT(hasTextInPdf(pPDFFile, "DejaVuSans", bFound));
+        CPPUNIT_ASSERT(hasTextInPdf("DejaVuSans", bFound));
         CPPUNIT_ASSERT_EQUAL(true, bFound);
     }
 
     // H1:I1
     {
         ScRange range1(7, 0, 0, 8, 0, 0);
-        std::shared_ptr<utl::TempFile> pPDFFile = exportToPDF(xModel, range1);
+        exportToPDF(xModel, range1);
         bool bFound = false;
-        CPPUNIT_ASSERT(hasTextInPdf(pPDFFile, "DejaVuSans", bFound));
+        CPPUNIT_ASSERT(hasTextInPdf("DejaVuSans", bFound));
         CPPUNIT_ASSERT_EQUAL(true, bFound);
     }
 }
@@ -335,6 +260,7 @@ void ScPDFExportTest::testExportRange_Tdf120161()
 void ScPDFExportTest::testExportFitToPage_Tdf103516()
 {
     // create test document
+    mxComponent = loadFromDesktop("private:factory/scalc");
     uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
     uno::Reference<sheet::XSpreadsheetDocument> xDoc(xModel, uno::UNO_QUERY_THROW);
     uno::Reference<sheet::XSpreadsheets> xSheets(xDoc->getSheets(), UNO_SET_THROW);
@@ -359,18 +285,18 @@ void ScPDFExportTest::testExportFitToPage_Tdf103516()
     // A1:G50: 2-page export
     {
         ScRange range1(0, 0, 0, 6, 49, 0);
-        std::shared_ptr<utl::TempFile> pPDFFile = exportToPDF(xModel, range1);
+        exportToPDF(xModel, range1);
         bool bFound = false;
-        CPPUNIT_ASSERT(hasTextInPdf(pPDFFile, "/Count 2>>", bFound));
+        CPPUNIT_ASSERT(hasTextInPdf("/Count 2>>", bFound));
         CPPUNIT_ASSERT_EQUAL(true, bFound);
     }
 
     // A1:L80: 4-page export
     {
         ScRange range1(0, 0, 0, 11, 79, 0);
-        std::shared_ptr<utl::TempFile> pPDFFile = exportToPDF(xModel, range1);
+        exportToPDF(xModel, range1);
         bool bFound = false;
-        CPPUNIT_ASSERT(hasTextInPdf(pPDFFile, "/Count 4>>", bFound));
+        CPPUNIT_ASSERT(hasTextInPdf("/Count 4>>", bFound));
         CPPUNIT_ASSERT_EQUAL(true, bFound);
     }
 
@@ -398,65 +324,63 @@ void ScPDFExportTest::testExportFitToPage_Tdf103516()
     // A1:G50 with fit to page width=1: slightly smaller zoom results only 1-page export
     {
         ScRange range1(0, 0, 0, 6, 49, 0);
-        std::shared_ptr<utl::TempFile> pPDFFile = exportToPDF(xModel, range1);
+        exportToPDF(xModel, range1);
         bool bFound = false;
-        CPPUNIT_ASSERT(hasTextInPdf(pPDFFile, "/Count 1>>", bFound));
+        CPPUNIT_ASSERT(hasTextInPdf("/Count 1>>", bFound));
         CPPUNIT_ASSERT_EQUAL(true, bFound);
     }
 
     // A1:L80 with fit to page width=1: slightly smaller zoom results only 1-page export
     {
         ScRange range1(0, 0, 0, 11, 79, 0);
-        std::shared_ptr<utl::TempFile> pPDFFile = exportToPDF(xModel, range1);
+        exportToPDF(xModel, range1);
         bool bFound = false;
-        CPPUNIT_ASSERT(hasTextInPdf(pPDFFile, "/Count 1>>", bFound));
+        CPPUNIT_ASSERT(hasTextInPdf("/Count 1>>", bFound));
         CPPUNIT_ASSERT_EQUAL(true, bFound);
     }
 }
 
 void ScPDFExportTest::testUnoCommands_Tdf120161()
 {
-    mxComponent = loadFromDesktop(m_directories.getURLFromSrc(DATA_DIRECTORY) + "tdf120161.ods",
-                                  "com.sun.star.sheet.SpreadsheetDocument");
+    loadFromURL(u"tdf120161.ods");
 
     // A1:G1
     {
-        std::shared_ptr<utl::TempFile> pPDFFile = exportToPDFWithUnoCommands("A1:G1");
+        exportToPDFWithUnoCommands("A1:G1");
         bool bFound = false;
-        CPPUNIT_ASSERT(hasTextInPdf(pPDFFile, "DejaVuSans", bFound));
+        CPPUNIT_ASSERT(hasTextInPdf("DejaVuSans", bFound));
         CPPUNIT_ASSERT_EQUAL(false, bFound);
     }
 
     // G1:H1
     {
-        std::shared_ptr<utl::TempFile> pPDFFile = exportToPDFWithUnoCommands("G1:H1");
+        exportToPDFWithUnoCommands("G1:H1");
         bool bFound = false;
-        CPPUNIT_ASSERT(hasTextInPdf(pPDFFile, "DejaVuSans", bFound));
+        CPPUNIT_ASSERT(hasTextInPdf("DejaVuSans", bFound));
         CPPUNIT_ASSERT_EQUAL(true, bFound);
     }
 
     // H1:I1
     {
-        std::shared_ptr<utl::TempFile> pPDFFile = exportToPDFWithUnoCommands("H1:I1");
+        exportToPDFWithUnoCommands("H1:I1");
         bool bFound = false;
-        CPPUNIT_ASSERT(hasTextInPdf(pPDFFile, "DejaVuSans", bFound));
+        CPPUNIT_ASSERT(hasTextInPdf("DejaVuSans", bFound));
         CPPUNIT_ASSERT_EQUAL(true, bFound);
     }
 }
 
 void ScPDFExportTest::testTdf64703_hiddenPageBreak()
 {
-    mxComponent = loadFromDesktop(m_directories.getURLFromSrc(DATA_DIRECTORY)
-                                      + "tdf64703_hiddenPageBreak.ods",
-                                  "com.sun.star.sheet.SpreadsheetDocument");
+    loadFromURL(u"tdf64703_hiddenPageBreak.ods");
+
     uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
 
     // A1:A11: 4-page export
     {
         ScRange range1(0, 0, 0, 0, 10, 0);
-        std::shared_ptr<utl::TempFile> pPDFFile = exportToPDF(xModel, range1);
+        exportToPDF(xModel, range1);
         bool bFound = false;
-        CPPUNIT_ASSERT(hasTextInPdf(pPDFFile, "/Count 4>>", bFound));
+        CPPUNIT_ASSERT(hasTextInPdf("/Count 4>>", bFound));
         CPPUNIT_ASSERT_EQUAL(true, bFound);
     }
 }
@@ -469,20 +393,14 @@ void ScPDFExportTest::testTdf143978()
         return;
     }
 
-    mxComponent = loadFromDesktop(m_directories.getURLFromSrc(DATA_DIRECTORY) + "tdf143978.ods",
-                                  "com.sun.star.sheet.SpreadsheetDocument");
+    loadFromURL(u"tdf143978.ods");
     uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
 
     // A1:A2
     ScRange range1(0, 0, 0, 0, 1, 0);
-    std::shared_ptr<utl::TempFile> pPDFFile = exportToPDF(xModel, range1);
+    exportToPDF(xModel, range1);
     // Parse the export result with pdfium.
-    SvFileStream aFile(pPDFFile->GetURL(), StreamMode::READ);
-    SvMemoryStream aMemory;
-    aMemory.WriteStream(aFile);
-    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument
-        = pPDFium->openDocument(aMemory.GetData(), aMemory.GetSize(), OString());
-    CPPUNIT_ASSERT(pPdfDocument);
+    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument = parsePDFExport();
     CPPUNIT_ASSERT_EQUAL(1, pPdfDocument->getPageCount());
 
     // Get the first page
@@ -516,20 +434,14 @@ void ScPDFExportTest::testTdf84012()
         return;
     }
 
-    mxComponent = loadFromDesktop(m_directories.getURLFromSrc(DATA_DIRECTORY) + "tdf84012.ods",
-                                  "com.sun.star.sheet.SpreadsheetDocument");
+    loadFromURL(u"tdf84012.ods");
     uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
 
     // A1
     ScRange range1(0, 0, 0, 0, 0, 0);
-    std::shared_ptr<utl::TempFile> pPDFFile = exportToPDF(xModel, range1);
+    exportToPDF(xModel, range1);
     // Parse the export result with pdfium.
-    SvFileStream aFile(pPDFFile->GetURL(), StreamMode::READ);
-    SvMemoryStream aMemory;
-    aMemory.WriteStream(aFile);
-    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument
-        = pPDFium->openDocument(aMemory.GetData(), aMemory.GetSize(), OString());
-    CPPUNIT_ASSERT(pPdfDocument);
+    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument = parsePDFExport();
     CPPUNIT_ASSERT_EQUAL(1, pPdfDocument->getPageCount());
 
     // Get the first page
@@ -557,20 +469,14 @@ void ScPDFExportTest::testTdf78897()
         return;
     }
 
-    mxComponent = loadFromDesktop(m_directories.getURLFromSrc(DATA_DIRECTORY) + "tdf78897.xls",
-                                  "com.sun.star.sheet.SpreadsheetDocument");
+    loadFromURL(u"tdf78897.xls");
     uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
 
     // C3:D3
     ScRange range1(2, 2, 0, 3, 2, 0);
-    std::shared_ptr<utl::TempFile> pPDFFile = exportToPDF(xModel, range1);
+    exportToPDF(xModel, range1);
     // Parse the export result with pdfium.
-    SvFileStream aFile(pPDFFile->GetURL(), StreamMode::READ);
-    SvMemoryStream aMemory;
-    aMemory.WriteStream(aFile);
-    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument
-        = pPDFium->openDocument(aMemory.GetData(), aMemory.GetSize(), OString());
-    CPPUNIT_ASSERT(pPdfDocument);
+    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument = parsePDFExport();
     CPPUNIT_ASSERT_EQUAL(1, pPdfDocument->getPageCount());
 
     // Get the first page
@@ -593,13 +499,12 @@ void ScPDFExportTest::testTdf78897()
 // just needs to not crash on export to pdf
 void ScPDFExportTest::testForcepoint97()
 {
-    mxComponent = loadFromDesktop(m_directories.getURLFromSrc(DATA_DIRECTORY) + "forcepoint97.xlsx",
-                                  "com.sun.star.sheet.SpreadsheetDocument");
+    loadFromURL(u"forcepoint97.xlsx");
     uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
 
     // A1:H81
     ScRange range1(0, 0, 0, 7, 81, 0);
-    std::shared_ptr<utl::TempFile> pPDFFile = exportToPDF(xModel, range1);
+    exportToPDF(xModel, range1);
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScPDFExportTest);

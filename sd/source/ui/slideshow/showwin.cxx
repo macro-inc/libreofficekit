@@ -35,6 +35,7 @@
 #include <strings.hrc>
 
 #include <sal/log.hxx>
+#include <utility>
 #include <vcl/settings.hxx>
 #include <vcl/virdev.hxx>
 
@@ -45,7 +46,7 @@ namespace sd {
 const sal_uInt64 HIDE_MOUSE_TIMEOUT = 10000;
 const sal_uInt64 SHOW_MOUSE_TIMEOUT = 1000;
 
-ShowWindow::ShowWindow( const ::rtl::Reference< SlideshowImpl >& xController, vcl::Window* pParent )
+ShowWindow::ShowWindow( ::rtl::Reference< SlideshowImpl > xController, vcl::Window* pParent )
 : ::sd::Window( pParent )
 , maPauseTimer("sd ShowWindow maPauseTimer")
 , maMouseTimer("sd ShowWindow maMouseTimer")
@@ -56,7 +57,7 @@ ShowWindow::ShowWindow( const ::rtl::Reference< SlideshowImpl >& xController, vc
 , mbMouseAutoHide(true)
 , mbMouseCursorHidden(false)
 , mnFirstMouseMove(0)
-, mxController( xController )
+, mxController(std::move( xController ))
 {
     GetOutDev()->SetOutDevViewType( OutDevViewType::SlideShow );
 
@@ -432,7 +433,7 @@ void ShowWindow::RestartShow( sal_Int32 nPageIndexToRestart )
         {
             AddWindowToPaintView();
 
-            if( SHOWWINDOWMODE_BLANK == eOldShowWindowMode )
+            if( SHOWWINDOWMODE_BLANK == eOldShowWindowMode || SHOWWINDOWMODE_END == eOldShowWindowMode )
             {
                 xSlideShow->pause(false);
                 Invalidate();
@@ -586,7 +587,7 @@ IMPL_LINK( ShowWindow, EventHdl, VclWindowEvent&, rEvent, void )
 void ShowWindow::DeleteWindowFromPaintView()
 {
     if( mpViewShell->GetView() )
-        mpViewShell->GetView()->DeleteWindowFromPaintView( GetOutDev() );
+        mpViewShell->GetView()->DeleteDeviceFromPaintView( *GetOutDev() );
 
     sal_uInt16 nChild = GetChildCount();
     while( nChild-- )
@@ -596,7 +597,7 @@ void ShowWindow::DeleteWindowFromPaintView()
 void ShowWindow::AddWindowToPaintView()
 {
     if( mpViewShell->GetView() )
-        mpViewShell->GetView()->AddWindowToPaintView( GetOutDev(), nullptr );
+        mpViewShell->GetView()->AddDeviceToPaintView( *GetOutDev(), nullptr );
 
     sal_uInt16 nChild = GetChildCount();
     while( nChild-- )

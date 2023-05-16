@@ -27,6 +27,16 @@ public:
 
     static void trigger_changed(weld::IconView& rIconView) { rIconView.signal_selection_changed(); }
 
+    static void trigger_scrollv(weld::ScrolledWindow& rScrolledWindow)
+    {
+        rScrolledWindow.signal_vadjustment_changed();
+    }
+
+    static void trigger_scrollh(weld::ScrolledWindow& rScrolledWindow)
+    {
+        rScrolledWindow.signal_hadjustment_changed();
+    }
+
     static void trigger_toggled(weld::Toggleable& rButton) { rButton.signal_toggled(); }
 
     static void trigger_row_activated(weld::TreeView& rTreeView)
@@ -49,6 +59,31 @@ public:
     static void trigger_click(weld::DrawingArea& rDrawingArea, const Point& rPos)
     {
         rDrawingArea.click(rPos);
+    }
+
+    static void trigger_dblclick(weld::DrawingArea& rDrawingArea, const Point& rPos)
+    {
+        rDrawingArea.dblclick(rPos);
+    }
+
+    static void trigger_mouse_up(weld::DrawingArea& rDrawingArea, const Point& rPos)
+    {
+        rDrawingArea.mouse_up(rPos);
+    }
+
+    static void trigger_mouse_down(weld::DrawingArea& rDrawingArea, const Point& rPos)
+    {
+        rDrawingArea.mouse_down(rPos);
+    }
+
+    static void trigger_mouse_move(weld::DrawingArea& rDrawingArea, const Point& rPos)
+    {
+        rDrawingArea.mouse_move(rPos);
+    }
+
+    static void trigger_selected(weld::MenuButton& rButton, const OString& rIdent)
+    {
+        rButton.signal_selected(rIdent);
     }
 
     static void trigger_value_changed(weld::SpinButton& rSpinButton)

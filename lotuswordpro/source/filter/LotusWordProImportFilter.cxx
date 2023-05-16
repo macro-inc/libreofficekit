@@ -41,6 +41,7 @@
 #include <cppuhelper/weak.hxx>
 
 #include <osl/file.hxx>
+#include <utility>
 #endif
 
 using namespace com::sun::star;
@@ -61,9 +62,9 @@ namespace
 class DebugDocumentHandler final : public cppu::WeakImplHelper< XDocumentHandler >
 {
 public:
-    DebugDocumentHandler(const uno::Reference< XDocumentHandler >& handler, const uno::Reference< XDocumentHandler >& debug)
-        : m_handler(handler)
-        , m_debug(debug)
+    DebugDocumentHandler(uno::Reference< XDocumentHandler > handler, uno::Reference< XDocumentHandler > debug)
+        : m_handler(std::move(handler))
+        , m_debug(std::move(debug))
     {
     }
 
@@ -148,8 +149,8 @@ private:
 }
 #endif
 
-//                                 W     o     r     d     P     r     o
-const sal_Int8 header[] = { 0x57, 0x6f, 0x72, 0x64, 0x50, 0x72, 0x6f };
+//                                W     o     r     d     P     r     o
+constexpr sal_Int8 header[] = { 0x57, 0x6f, 0x72, 0x64, 0x50, 0x72, 0x6f };
 
 bool LotusWordProImportFilter::importImpl( const Sequence< css::beans::PropertyValue >& aDescriptor )
 {
@@ -254,7 +255,7 @@ OUString SAL_CALL LotusWordProImportFilter::detect( css::uno::Sequence< Property
     }
 
     Sequence< ::sal_Int8 > aData;
-    sal_Int32 nLen = SAL_N_ELEMENTS( header );
+    constexpr sal_Int32 nLen = SAL_N_ELEMENTS( header );
     if ( ( nLen != xInputStream->readBytes( aData, nLen ) )
             || ( memcmp( static_cast<void const *>(header), static_cast<void const *>(aData.getConstArray()), nLen ) != 0 ) )
         sTypeName.clear();

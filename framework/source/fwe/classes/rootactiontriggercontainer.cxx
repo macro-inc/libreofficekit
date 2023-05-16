@@ -26,6 +26,7 @@
 #include <cppuhelper/queryinterface.hxx>
 #include <cppuhelper/typeprovider.hxx>
 #include <framework/actiontriggerhelper.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 using namespace cppu;
@@ -44,10 +45,11 @@ const css::uno::Sequence<sal_Int8>& RootActionTriggerContainer::getUnoTunnelId()
     return seqID;
 }
 
-RootActionTriggerContainer::RootActionTriggerContainer( const Menu* pMenu, const OUString* pMenuIdentifier ) :
-        m_bContainerCreated( false )
-    ,   m_pMenu( pMenu )
-    ,   m_pMenuIdentifier( pMenuIdentifier )
+RootActionTriggerContainer::RootActionTriggerContainer(css::uno::Reference<css::awt::XPopupMenu> xMenu,
+                                                       const OUString* pMenuIdentifier)
+    : m_bContainerCreated(false)
+    , m_xMenu(std::move(xMenu))
+    , m_pMenuIdentifier(pMenuIdentifier)
 {
 }
 
@@ -149,11 +151,8 @@ sal_Int32 SAL_CALL RootActionTriggerContainer::getCount()
 
     if ( !m_bContainerCreated )
     {
-        if ( m_pMenu )
-        {
-            SolarMutexGuard aSolarMutexGuard;
-            return m_pMenu->GetItemCount();
-        }
+        if ( m_xMenu )
+            return m_xMenu->getItemCount();
         else
             return 0;
     }
@@ -181,12 +180,8 @@ Type SAL_CALL RootActionTriggerContainer::getElementType()
 
 sal_Bool SAL_CALL RootActionTriggerContainer::hasElements()
 {
-    if ( m_pMenu )
-    {
-        SolarMutexGuard aSolarMutexGuard;
-        return ( m_pMenu->GetItemCount() > 0 );
-    }
-
+    if (m_xMenu)
+        return m_xMenu->getItemCount() > 0;
     return false;
 }
 
@@ -237,8 +232,7 @@ void RootActionTriggerContainer::FillContainer()
 {
     m_bContainerCreated = true;
     ActionTriggerHelper::FillActionTriggerContainerFromMenu(
-        this,
-        m_pMenu );
+        this, m_xMenu);
 }
 OUString RootActionTriggerContainer::getName()
 {

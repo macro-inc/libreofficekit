@@ -43,28 +43,27 @@ namespace drawinglayer::texture
             virtual void modifyOpacity(const basegfx::B2DPoint& rUV, double& rfOpacity) const;
         };
 
-        /// helper class for processing equal number of matrices and colors
-        /// for texture processing
-        struct B2DHomMatrixAndBColor
-        {
-            basegfx::B2DHomMatrix   maB2DHomMatrix;
-            basegfx::BColor         maBColor;
-        };
-
         class GeoTexSvxGradient : public GeoTexSvx
         {
         protected:
             basegfx::ODFGradientInfo            maGradientInfo;
             basegfx::B2DRange                   maDefinitionRange;
-            basegfx::BColor                     maStart;
-            basegfx::BColor                     maEnd;
+            sal_uInt32                          mnRequestedSteps;
+            basegfx::ColorStops                 mnColorStops;
             double                              mfBorder;
+
+            // provide a single buffer entry used for gradient texture
+            // mapping, see ::modifyBColor implementations
+            mutable basegfx::ColorStopRange     maLastColorStopRange;
+
+            // check if we need last-ColorStop-correction
+            bool checkPenultimate();
 
         public:
             GeoTexSvxGradient(
                 const basegfx::B2DRange& rDefinitionRange,
-                const basegfx::BColor& rStart,
-                const basegfx::BColor& rEnd,
+                sal_uInt32 nRequestedSteps,
+                const basegfx::ColorStops& rColorStops,
                 double fBorder);
             virtual ~GeoTexSvxGradient() override;
 
@@ -73,8 +72,7 @@ namespace drawinglayer::texture
 
             // virtual base methods
             virtual void appendTransformationsAndColors(
-                std::vector< B2DHomMatrixAndBColor >& rEntries,
-                basegfx::BColor& rOuterColor) = 0;
+                std::function<void(const basegfx::B2DHomMatrix& rMatrix, const basegfx::BColor& rColor)> aCallback) = 0;
         };
 
         class GeoTexSvxGradientLinear final : public GeoTexSvxGradient
@@ -87,16 +85,14 @@ namespace drawinglayer::texture
             GeoTexSvxGradientLinear(
                 const basegfx::B2DRange& rDefinitionRange,
                 const basegfx::B2DRange& rOutputRange,
-                const basegfx::BColor& rStart,
-                const basegfx::BColor& rEnd,
-                sal_uInt32 nSteps,
+                sal_uInt32 nRequestedSteps,
+                const basegfx::ColorStops& rColorStops,
                 double fBorder,
                 double fAngle);
             virtual ~GeoTexSvxGradientLinear() override;
 
             virtual void appendTransformationsAndColors(
-                std::vector< B2DHomMatrixAndBColor >& rEntries,
-                basegfx::BColor& rOuterColor) override;
+                std::function<void(const basegfx::B2DHomMatrix& rMatrix, const basegfx::BColor& rColor)> aCallback) override;
             virtual void modifyBColor(const basegfx::B2DPoint& rUV, basegfx::BColor& rBColor, double& rfOpacity) const override;
         };
 
@@ -109,16 +105,14 @@ namespace drawinglayer::texture
             GeoTexSvxGradientAxial(
                 const basegfx::B2DRange& rDefinitionRange,
                 const basegfx::B2DRange& rOutputRange,
-                const basegfx::BColor& rStart,
-                const basegfx::BColor& rEnd,
-                sal_uInt32 nSteps,
+                sal_uInt32 nRequestedSteps,
+                const basegfx::ColorStops& rColorStops,
                 double fBorder,
                 double fAngle);
             virtual ~GeoTexSvxGradientAxial() override;
 
             virtual void appendTransformationsAndColors(
-                std::vector< B2DHomMatrixAndBColor >& rEntries,
-                basegfx::BColor& rOuterColor) override;
+                std::function<void(const basegfx::B2DHomMatrix& rMatrix, const basegfx::BColor& rColor)> aCallback) override;
             virtual void modifyBColor(const basegfx::B2DPoint& rUV, basegfx::BColor& rBColor, double& rfOpacity) const override;
         };
 
@@ -127,17 +121,15 @@ namespace drawinglayer::texture
         public:
             GeoTexSvxGradientRadial(
                 const basegfx::B2DRange& rDefinitionRange,
-                const basegfx::BColor& rStart,
-                const basegfx::BColor& rEnd,
-                sal_uInt32 nSteps,
+                sal_uInt32 nRequestedSteps,
+                const basegfx::ColorStops& rColorStops,
                 double fBorder,
                 double fOffsetX,
                 double fOffsetY);
             virtual ~GeoTexSvxGradientRadial() override;
 
             virtual void appendTransformationsAndColors(
-                std::vector< B2DHomMatrixAndBColor >& rEntries,
-                basegfx::BColor& rOuterColor) override;
+                std::function<void(const basegfx::B2DHomMatrix& rMatrix, const basegfx::BColor& rColor)> aCallback) override;
             virtual void modifyBColor(const basegfx::B2DPoint& rUV, basegfx::BColor& rBColor, double& rfOpacity) const override;
         };
 
@@ -146,9 +138,8 @@ namespace drawinglayer::texture
         public:
             GeoTexSvxGradientElliptical(
                 const basegfx::B2DRange& rDefinitionRange,
-                const basegfx::BColor& rStart,
-                const basegfx::BColor& rEnd,
-                sal_uInt32 nSteps,
+                sal_uInt32 nRequestedSteps,
+                const basegfx::ColorStops& rColorStops,
                 double fBorder,
                 double fOffsetX,
                 double fOffsetY,
@@ -156,8 +147,7 @@ namespace drawinglayer::texture
             virtual ~GeoTexSvxGradientElliptical() override;
 
             virtual void appendTransformationsAndColors(
-                std::vector< B2DHomMatrixAndBColor >& rEntries,
-                basegfx::BColor& rOuterColor) override;
+                std::function<void(const basegfx::B2DHomMatrix& rMatrix, const basegfx::BColor& rColor)> aCallback) override;
             virtual void modifyBColor(const basegfx::B2DPoint& rUV, basegfx::BColor& rBColor, double& rfOpacity) const override;
         };
 
@@ -166,9 +156,8 @@ namespace drawinglayer::texture
         public:
             GeoTexSvxGradientSquare(
                 const basegfx::B2DRange& rDefinitionRange,
-                const basegfx::BColor& rStart,
-                const basegfx::BColor& rEnd,
-                sal_uInt32 nSteps,
+                sal_uInt32 nRequestedSteps,
+                const basegfx::ColorStops& rColorStops,
                 double fBorder,
                 double fOffsetX,
                 double fOffsetY,
@@ -176,8 +165,7 @@ namespace drawinglayer::texture
             virtual ~GeoTexSvxGradientSquare() override;
 
             virtual void appendTransformationsAndColors(
-                std::vector< B2DHomMatrixAndBColor >& rEntries,
-                basegfx::BColor& rOuterColor) override;
+                std::function<void(const basegfx::B2DHomMatrix& rMatrix, const basegfx::BColor& rColor)> aCallback) override;
             virtual void modifyBColor(const basegfx::B2DPoint& rUV, basegfx::BColor& rBColor, double& rfOpacity) const override;
         };
 
@@ -186,9 +174,8 @@ namespace drawinglayer::texture
         public:
             GeoTexSvxGradientRect(
                 const basegfx::B2DRange& rDefinitionRange,
-                const basegfx::BColor& rStart,
-                const basegfx::BColor& rEnd,
-                sal_uInt32 nSteps,
+                sal_uInt32 nRequestedSteps,
+                const basegfx::ColorStops& rColorStops,
                 double fBorder,
                 double fOffsetX,
                 double fOffsetY,
@@ -196,8 +183,7 @@ namespace drawinglayer::texture
             virtual ~GeoTexSvxGradientRect() override;
 
             virtual void appendTransformationsAndColors(
-                std::vector< B2DHomMatrixAndBColor >& rEntries,
-                basegfx::BColor& rOuterColor) override;
+                std::function<void(const basegfx::B2DHomMatrix& rMatrix, const basegfx::BColor& rColor)> aCallback) override;
             virtual void modifyBColor(const basegfx::B2DPoint& rUV, basegfx::BColor& rBColor, double& rfOpacity) const override;
         };
 

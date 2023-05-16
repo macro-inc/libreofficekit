@@ -85,7 +85,7 @@ namespace sdr::properties
                         // and always equal.
                         if(nWhich <= SDRATTR_3DSCENE_FIRST || nWhich >= SDRATTR_3DSCENE_LAST)
                         {
-                            if(SfxItemState::DONTCARE == rSet.GetItemState(nWhich, false))
+                            if(SfxItemState::DONTCARE == aIter.GetItemState(false))
                             {
                                 mxItemSet->InvalidateItem(nWhich);
                             }
@@ -115,15 +115,14 @@ namespace sdr::properties
             {
                 // Generate filtered ItemSet which contains all but the SDRATTR_3DSCENE items.
                 // #i50808# Leak fix, Clone produces a new instance and we get ownership here
-                std::unique_ptr<SfxItemSet> pNewSet(rSet.Clone());
-                DBG_ASSERT(pNewSet, "E3dSceneProperties::SetMergedItemSet(): Could not clone ItemSet (!)");
+                std::unique_ptr<SfxItemSet> xNewSet(rSet.Clone());
 
                 for(sal_uInt16 b(SDRATTR_3DSCENE_FIRST); b <= SDRATTR_3DSCENE_LAST; b++)
                 {
-                    pNewSet->ClearItem(b);
+                    xNewSet->ClearItem(b);
                 }
 
-                if(pNewSet->Count())
+                if(xNewSet->Count())
                 {
                     for(size_t a = 0; a < nCount; ++a)
                     {
@@ -132,7 +131,7 @@ namespace sdr::properties
                         if(dynamic_cast<const E3dCompoundObject* >(pObj))
                         {
                             // set merged ItemSet at contained 3d object.
-                            pObj->SetMergedItemSet(*pNewSet, bClearAllItems);
+                            pObj->SetMergedItemSet(*xNewSet, bClearAllItems);
                         }
                     }
                 }
@@ -230,7 +229,8 @@ namespace sdr::properties
             }
         }
 
-        void E3dSceneProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr)
+        void E3dSceneProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast)
         {
             const SdrObjList* pSub(static_cast<const E3dScene&>(GetSdrObject()).GetSubList());
             OSL_ENSURE(nullptr != pSub, "Children of SdrObject expected (!)");
@@ -238,7 +238,10 @@ namespace sdr::properties
 
             for(size_t a = 0; a < nCount; ++a)
             {
-                pSub->GetObj(a)->SetStyleSheet(pNewStyleSheet, bDontRemoveHardAttr);
+                if(bBroadcast)
+                    pSub->GetObj(a)->SetStyleSheet(pNewStyleSheet, bDontRemoveHardAttr);
+                else
+                    pSub->GetObj(a)->NbcSetStyleSheet(pNewStyleSheet, bDontRemoveHardAttr);
             }
         }
 

@@ -17,17 +17,16 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_SW_SOURCE_FILTER_HTML_HTMLFLY_HXX
-#define INCLUDED_SW_SOURCE_FILTER_HTML_HTMLFLY_HXX
+#pragma once
 
 #include <o3tl/sorted_vector.hxx>
 #include <o3tl/typed_flags_set.hxx>
 #include <sal/types.h>
+#include <ndindex.hxx>
 #include <memory>
 
 class SdrObject;
 class SwFrameFormat;
-class SwNodeIndex;
 class SwPosFlyFrame;
 
 // ATTENTION: The values of this enum are used directly in the output table!!!
@@ -98,7 +97,7 @@ class SwHTMLPosFlyFrame
 {
     const SwFrameFormat    *m_pFrameFormat;  // the frame
     const SdrObject        *m_pSdrObject;    // maybe Sdr-Object
-    std::unique_ptr<SwNodeIndex> m_pNodeIdex;        // Node-Index
+    SwNodeIndex             m_aNodeIndex;    // Node-Index
     sal_uInt32              m_nOrdNum;       // from SwPosFlyFrame
     sal_Int32               m_nContentIndex;   // its position in content
     AllHtmlFlags            m_nAllFlags;
@@ -115,7 +114,7 @@ public:
 
     const SwFrameFormat& GetFormat() const       { return *m_pFrameFormat; }
     const SdrObject*     GetSdrObject() const    { return m_pSdrObject; }
-    const SwNodeIndex&   GetNdIndex() const      { return *m_pNodeIdex; }
+    const SwNodeIndex&   GetNdIndex() const      { return m_aNodeIndex; }
     sal_Int32            GetContentIndex() const { return m_nContentIndex; }
     AllHtmlFlags const & GetOutMode() const      { return m_nAllFlags; }
     HtmlOut              GetOutFn() const        { return m_nAllFlags.nOut; }
@@ -127,7 +126,5 @@ class SwHTMLPosFlyFrames
                 o3tl::less_uniqueptr_to<SwHTMLPosFlyFrame>,
                 o3tl::find_partialorder_ptrequals>
 {};
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

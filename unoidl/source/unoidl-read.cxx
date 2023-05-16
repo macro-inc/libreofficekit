@@ -26,13 +26,14 @@
 #include <sal/main.h>
 #include <sal/types.h>
 #include <unoidl/unoidl.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace {
 
 void badUsage() {
     std::cerr
         << "Usage:" << std::endl << std::endl
-        << "  unoidl-read [--published] [<extra registries>] <registry>"
+        << "  unoidl-read [--published] [--summary] [<extra registries>] <registry>"
         << std::endl << std::endl
         << ("where each <registry> is either a new- or legacy-format .rdb file,"
             " a single .idl")
@@ -46,7 +47,10 @@ void badUsage() {
         << ("published entities (plus any non-published entities referenced"
             " from published")
         << std::endl
-        << "via any unpublished optional bases) are written out." << std::endl;
+        << "via any unpublished optional bases) are written out.  If --summary is specified,"
+        << std::endl
+        << "only a short summary is written, with the type and name of one entity per line."
+        << std::endl;
     std::exit(EXIT_FAILURE);
 }
 
@@ -80,26 +84,26 @@ OUString getArgumentUri(sal_uInt32 argument) {
     return abs;
 }
 
-OUString decomposeType(
-    OUString const & type, std::size_t * rank,
+std::u16string_view decomposeType(
+    std::u16string_view type, std::size_t * rank,
     std::vector<OUString> * typeArguments, bool * entity)
 {
     assert(rank != nullptr);
     assert(typeArguments != nullptr);
     assert(entity != nullptr);
-    OUString nucl(type);
+    std::u16string_view nucl(type);
     *rank = 0;
     typeArguments->clear();
-    while (nucl.startsWith("[]", &nucl)) {
+    while (o3tl::starts_with(nucl, u"[]", &nucl)) {
         ++*rank;
     }
-    sal_Int32 i = nucl.indexOf('<');
-    if (i != -1) {
-        OUString tmpl(nucl.copy(0, i));
+    size_t i = nucl.find('<');
+    if (i != std::u16string_view::npos) {
+        std::u16string_view tmpl(nucl.substr(0, i));
         do {
             ++i; // skip '<' or ','
-            sal_Int32 j = i;
-            for (sal_Int32 level = 0; j != nucl.getLength(); ++j) {
+            size_t j = i;
+            for (size_t level = 0; j != nucl.size(); ++j) {
                 sal_Unicode c = nucl[j];
                 if (c == ',') {
                     if (level == 0) {
@@ -114,22 +118,22 @@ OUString decomposeType(
                     --level;
                 }
             }
-            if (j != nucl.getLength()) {
-                typeArguments->push_back(nucl.copy(i, j - i));
+            if (j != nucl.size()) {
+                typeArguments->push_back(OUString(nucl.substr(i, j - i)));
             }
             i = j;
-        } while (i != nucl.getLength() && nucl[i] != '>');
-        assert(i == nucl.getLength() - 1 && nucl[i] == '>');
+        } while (i != nucl.size() && nucl[i] != '>');
+        assert(i == nucl.size() - 1 && nucl[i] == '>');
         assert(!typeArguments->empty());
         nucl = tmpl;
     }
-    assert(!nucl.isEmpty());
-    *entity = nucl != "void" && nucl != "boolean" && nucl != "byte"
-        && nucl != "short" && nucl != "unsigned short" && nucl != "long"
-        && nucl != "unsigned long" && nucl != "hyper"
-        && nucl != "unsigned hyper" && nucl != "float" && nucl != "double"
-        && nucl != "char" && nucl != "string" && nucl != "type"
-        && nucl != "any";
+    assert(!nucl.empty());
+    *entity = nucl != u"void" && nucl != u"boolean" && nucl != u"byte"
+        && nucl != u"short" && nucl != u"unsigned short" && nucl != u"long"
+        && nucl != u"unsigned long" && nucl != u"hyper"
+        && nucl != u"unsigned hyper" && nucl != u"float" && nucl != u"double"
+        && nucl != u"char" && nucl != u"string" && nucl != u"type"
+        && nucl != u"any";
     assert(*entity || typeArguments->empty());
     return nucl;
 }
@@ -139,9 +143,9 @@ struct Entity {
     enum class Written { NO, DECLARATION, DEFINITION };
 
     explicit Entity(
-        rtl::Reference<unoidl::Entity> const & theEntity, bool theRelevant):
-        entity(theEntity), relevant(theRelevant), sorted(Sorted::NO),
-        written(Written::NO)
+        rtl::Reference<unoidl::Entity> theEntity, bool theRelevant, Entity * theParent):
+        entity(std::move(theEntity)), relevant(theRelevant), sorted(Sorted::NO),
+        written(Written::NO), parent(theParent)
     {}
 
     rtl::Reference<unoidl::Entity> const entity;
@@ -150,6 +154,7 @@ struct Entity {
     bool relevant;
     Sorted sorted;
     Written written;
+    Entity * parent;
 };
 
 void insertEntityDependency(
@@ -199,7 +204,7 @@ void insertEntityDependencies(
 void insertTypeDependency(
     rtl::Reference<unoidl::Manager> const & manager,
     std::map<OUString, Entity>::iterator const & iterator,
-    OUString const & type)
+    std::u16string_view type)
 {
     std::size_t rank;
     std::vector<OUString> args;
@@ -215,8 +220,8 @@ void insertTypeDependency(
 
 void scanMap(
     rtl::Reference<unoidl::Manager> const & manager,
-    rtl::Reference<unoidl::MapCursor> const & cursor, bool published,
-    std::u16string_view prefix, std::map<OUString, Entity> & entities)
+    rtl::Reference<unoidl::MapCursor> const & cursor, bool modules, bool published,
+    std::u16string_view prefix, Entity * parent, std::map<OUString, Entity> & entities)
 {
     assert(cursor.is());
     for (;;) {
@@ -227,11 +232,17 @@ void scanMap(
         }
         OUString name(prefix + id);
         if (ent->getSort() == unoidl::Entity::SORT_MODULE) {
+            Entity * p = nullptr;
+            if (modules) {
+                p = &entities.insert(std::make_pair(name, Entity(ent, !published, parent))).first
+                    ->second;
+            }
             scanMap(
                 manager,
-                static_cast<unoidl::ModuleEntity *>(ent.get())->createCursor(),
-                published, OUStringConcatenation(name + "."), entities);
+                static_cast<unoidl::ModuleEntity *>(ent.get())->createCursor(), modules,
+                published, Concat2View(name + "."), p, entities);
         } else {
+            auto const pub = static_cast<unoidl::PublishableEntity *>(ent.get())->isPublished();
             std::map<OUString, Entity>::iterator i(
                 entities.insert(
                     std::make_pair(
@@ -239,10 +250,14 @@ void scanMap(
                         Entity(
                             ent,
                             (!published
-                             || (static_cast<unoidl::PublishableEntity *>(
-                                     ent.get())
-                                 ->isPublished())))))
+                             || pub),
+                            parent)))
                 .first);
+            if (modules && published && pub) {
+                for (auto j = parent; j; j = j->parent) {
+                    j->relevant = true;
+                }
+            }
             switch (ent->getSort()) {
             case unoidl::Entity::SORT_ENUM_TYPE:
             case unoidl::Entity::SORT_CONSTANT_GROUP:
@@ -444,11 +459,11 @@ void closeModules(
     }
 }
 
-OUString openModulesFor(std::vector<OUString> & modules, OUString const & name)
+OUString openModulesFor(std::vector<OUString> & modules, std::u16string_view name)
 {
     std::vector<OUString>::iterator i(modules.begin());
     for (sal_Int32 j = 0;;) {
-        OUString id(name.getToken(0, '.', j));
+        OUString id(o3tl::getToken(name, 0, '.', j));
         if (j == -1) {
             closeModules(
                 modules,
@@ -505,7 +520,7 @@ void writeAnnotationsPublished(
     writePublished(entity);
 }
 
-void writeType(OUString const & type) {
+void writeType(std::u16string_view type) {
     std::size_t rank;
     std::vector<OUString> args;
     bool entity;
@@ -1016,23 +1031,76 @@ void writeEntity(
     }
 }
 
+void writeSummary(OUString const & name, Entity const & entity) {
+    if (!entity.relevant) {
+        return;
+    }
+    switch (entity.entity->getSort()) {
+    case unoidl::Entity::SORT_ENUM_TYPE:
+        std::cout << "enum";
+        break;
+    case unoidl::Entity::SORT_PLAIN_STRUCT_TYPE:
+    case unoidl::Entity::SORT_POLYMORPHIC_STRUCT_TYPE_TEMPLATE:
+        std::cout << "struct";
+        break;
+    case unoidl::Entity::SORT_EXCEPTION_TYPE:
+        std::cout << "exception";
+        break;
+    case unoidl::Entity::SORT_INTERFACE_TYPE:
+        std::cout << "interface";
+        break;
+    case unoidl::Entity::SORT_TYPEDEF:
+        std::cout << "typedef";
+        break;
+    case unoidl::Entity::SORT_CONSTANT_GROUP:
+        std::cout << "constants";
+        break;
+    case unoidl::Entity::SORT_SINGLE_INTERFACE_BASED_SERVICE:
+    case unoidl::Entity::SORT_ACCUMULATION_BASED_SERVICE:
+        std::cout << "service";
+        break;
+    case unoidl::Entity::SORT_INTERFACE_BASED_SINGLETON:
+    case unoidl::Entity::SORT_SERVICE_BASED_SINGLETON:
+        std::cout << "singleton";
+        break;
+    case unoidl::Entity::SORT_MODULE:
+        std::cout << "module";
+        break;
+    }
+    std::cout << ' ' << name << '\n';
+}
+
 }
 
 SAL_IMPLEMENT_MAIN() {
     try {
         sal_uInt32 args = rtl_getAppCommandArgCount();
-        if (args == 0) {
-            badUsage();
-        }
-        OUString arg;
-        rtl_getAppCommandArg(0, &arg.pData);
-        bool published = arg == "--published";
-        if (published && args == 1) {
-            badUsage();
+        sal_uInt32 i = 0;
+        bool published = false;
+        bool summary = false;
+        for (;; ++i) {
+            if (i == args) {
+                badUsage();
+            }
+            OUString arg;
+            rtl_getAppCommandArg(i, &arg.pData);
+            if (arg == "--published") {
+                if (published) {
+                    badUsage();
+                }
+                published = true;
+            } else if (arg == "--summary") {
+                if (summary) {
+                    badUsage();
+                }
+                summary = true;
+            } else {
+                break;
+            }
         }
         rtl::Reference<unoidl::Manager> mgr(new unoidl::Manager);
         rtl::Reference<unoidl::Provider> prov;
-        for (sal_uInt32 i = (published ? 1 : 0); i != args; ++i) {
+        for (; i != args; ++i) {
             OUString uri(getArgumentUri(i));
             try {
                 prov = mgr->addProvider(uri);
@@ -1043,13 +1111,19 @@ SAL_IMPLEMENT_MAIN() {
             }
         }
         std::map<OUString, Entity> ents;
-        scanMap(mgr, prov->createRootCursor(), published, u"", ents);
-        std::vector<OUString> sorted(sort(ents));
-        std::vector<OUString> mods;
-        for (const auto & i: sorted) {
-            writeEntity(ents, mods, i);
+        scanMap(mgr, prov->createRootCursor(), summary, published, u"", nullptr, ents);
+        if (summary) {
+            for (auto const & j: ents) {
+                writeSummary(j.first, j.second);
+            }
+        } else {
+            std::vector<OUString> sorted(sort(ents));
+            std::vector<OUString> mods;
+            for (const auto & j: sorted) {
+                writeEntity(ents, mods, j);
+            }
+            closeModules(mods, mods.size());
         }
-        closeModules(mods, mods.size());
         return EXIT_SUCCESS;
     } catch (unoidl::FileFormatException & e1) {
         std::cerr

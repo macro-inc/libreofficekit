@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <utility>
 #include <vcl/errinf.hxx>
 #include <tools/stream.hxx>
 #include <sot/storage.hxx>
@@ -27,10 +28,11 @@
 #include <sot/storinfo.hxx>
 #include <unotools/pathoptions.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <basic/sbmod.hxx>
 #include <unotools/transliterationwrapper.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <basic/sberrors.hxx>
 #include <basic/sbuno.hxx>
@@ -38,6 +40,8 @@
 #include <global.hxx>
 #include <com/sun/star/script/XLibraryContainer.hpp>
 #include <com/sun/star/script/XPersistentLibraryContainer.hpp>
+
+#include <scriptcont.hxx>
 
 #include <memory>
 #include <vector>
@@ -106,9 +110,9 @@ class BasMgrContainerListenerImpl: public ContainerListenerHelper
     OUString maLibName;      // empty -> no lib, but lib container
 
 public:
-    BasMgrContainerListenerImpl( BasicManager* pMgr, const OUString& aLibName )
+    BasMgrContainerListenerImpl( BasicManager* pMgr, OUString aLibName )
         : mpMgr( pMgr )
-        , maLibName( aLibName ) {}
+        , maLibName(std::move( aLibName )) {}
 
     static void insertLibraryImpl( const uno::Reference< script::XLibraryContainer >& xScriptCont, BasicManager* pMgr,
                                    const uno::Any& aLibAny, const OUString& aLibName );
@@ -420,7 +424,7 @@ BasicLibInfo* BasicLibInfo::Create( SotStorageStream& rSStream )
     return pInfo;
 }
 
-BasicManager::BasicManager( SotStorage& rStorage, const OUString& rBaseURL, StarBASIC* pParentFromStdLib, OUString const * pLibPath, bool bDocMgr ) : mbDocMgr( bDocMgr )
+BasicManager::BasicManager( SotStorage& rStorage, std::u16string_view rBaseURL, StarBASIC* pParentFromStdLib, OUString const * pLibPath, bool bDocMgr ) : mbDocMgr( bDocMgr )
 {
     if( pLibPath )
     {
@@ -565,7 +569,7 @@ void BasicManager::SetLibraryContainerInfo( const LibraryContainerInfo& rInfo )
                     copyToLibraryContainer( pLib, maContainerInfo );
                     if (rpBasLibInfo->HasPassword())
                     {
-                        OldBasicPassword* pOldBasicPassword =
+                        basic::SfxScriptLibraryContainer* pOldBasicPassword =
                             maContainerInfo.mpOldBasicPassword;
                         if( pOldBasicPassword )
                         {
@@ -629,7 +633,7 @@ void BasicManager::ImpCreateStdLib( StarBASIC* pParentFromStdLib )
     pStdLib->SetFlag( SbxFlagBits::DontStore | SbxFlagBits::ExtSearch );
 }
 
-void BasicManager::LoadBasicManager( SotStorage& rStorage, const OUString& rBaseURL )
+void BasicManager::LoadBasicManager( SotStorage& rStorage, std::u16string_view rBaseURL )
 {
     tools::SvRef<SotStorageStream> xManagerStream = rStorage.OpenSotStream( szManagerStream, eStreamReadMode );
 
@@ -647,7 +651,7 @@ void BasicManager::LoadBasicManager( SotStorage& rStorage, const OUString& rBase
 
     OUString aRealStorageName = maStorageName;  // for relative paths, can be modified through BaseURL
 
-    if ( !rBaseURL.isEmpty() )
+    if ( !rBaseURL.empty() )
     {
         INetURLObject aObj( rBaseURL );
         if ( aObj.GetProtocol() == INetProtocol::File )
@@ -1366,25 +1370,24 @@ bool BasicManager::GetGlobalUNOConstant( const OUString& rName, uno::Any& aOut )
     return bRes;
 }
 
-uno::Any BasicManager::SetGlobalUNOConstant( const OUString& rName, const uno::Any& _rValue )
+void BasicManager::SetGlobalUNOConstant( const OUString& rName, const uno::Any& _rValue, css::uno::Any* pOldValue )
 {
-    uno::Any aOldValue;
-
     StarBASIC* pStandardLib = GetStdLib();
     OSL_PRECOND( pStandardLib, "BasicManager::SetGlobalUNOConstant: no lib to insert into!" );
     if ( !pStandardLib )
-        return aOldValue;
+        return;
 
-    // obtain the old value
-    SbxVariable* pVariable = pStandardLib->Find( rName, SbxClassType::Object );
-    if ( pVariable )
-        aOldValue = sbxToUnoValue( pVariable );
+    if (pOldValue)
+    {
+        // obtain the old value
+        SbxVariable* pVariable = pStandardLib->Find( rName, SbxClassType::Object );
+        if ( pVariable )
+            *pOldValue = sbxToUnoValue( pVariable );
+    }
     SbxObjectRef xUnoObj = GetSbUnoObject( _rValue.getValueType ().getTypeName () , _rValue );
     xUnoObj->SetName(rName);
     xUnoObj->SetFlag( SbxFlagBits::DontStore );
     pStandardLib->Insert( xUnoObj.get() );
-
-    return aOldValue;
 }
 
 bool BasicManager::LegacyPsswdBinaryLimitExceeded( std::vector< OUString >& _out_rModuleNames )
@@ -1538,7 +1541,7 @@ ErrCode BasicManager::ExecuteMacro( OUString const& i_fullyQualifiedName, std::u
             for (;;)
             {
                 aBuff.append( "\"" );
-                aBuff.append( sArgs2.getToken(0, ',', nPos) );
+                aBuff.append( o3tl::getToken(sArgs2, 0, ',', nPos) );
                 aBuff.append( "\"" );
                 if (nPos<0)
                     break;
@@ -1573,8 +1576,8 @@ class ModuleInfo_Impl : public ModuleInfoHelper
     OUString maSource;
 
 public:
-    ModuleInfo_Impl( const OUString& aName, const OUString& aLanguage, const OUString& aSource )
-        : maName( aName ), maLanguage( aLanguage), maSource( aSource ) {}
+    ModuleInfo_Impl( OUString aName, OUString aLanguage, OUString aSource )
+        : maName(std::move( aName )), maLanguage(std::move( aLanguage)), maSource(std::move( aSource )) {}
 
     // Methods XStarBasicModuleInfo
     virtual OUString SAL_CALL getName() override
@@ -1592,8 +1595,8 @@ class DialogInfo_Impl : public WeakImplHelper< script::XStarBasicDialogInfo >
     uno::Sequence< sal_Int8 > mData;
 
 public:
-    DialogInfo_Impl( const OUString& aName, const uno::Sequence< sal_Int8 >& Data )
-        : maName( aName ), mData( Data ) {}
+    DialogInfo_Impl( OUString aName, const uno::Sequence< sal_Int8 >& Data )
+        : maName(std::move( aName )), mData( Data ) {}
 
     // Methods XStarBasicDialogInfo
     virtual OUString SAL_CALL getName() override
@@ -1615,19 +1618,19 @@ class LibraryInfo_Impl : public WeakImplHelper< script::XStarBasicLibraryInfo >
 public:
     LibraryInfo_Impl
     (
-        const OUString& aName,
-        uno::Reference< container::XNameContainer > const & xModuleContainer,
-        uno::Reference< container::XNameContainer > const & xDialogContainer,
-        const OUString& aPassword,
-        const OUString& aExternaleSourceURL,
-        const OUString& aLinkTargetURL
+        OUString aName,
+        uno::Reference< container::XNameContainer > xModuleContainer,
+        uno::Reference< container::XNameContainer > xDialogContainer,
+        OUString aPassword,
+        OUString aExternaleSourceURL,
+        OUString aLinkTargetURL
     )
-        : maName( aName )
-        , mxModuleContainer( xModuleContainer )
-        , mxDialogContainer( xDialogContainer )
-        , maPassword( aPassword )
-        , maExternaleSourceURL( aExternaleSourceURL )
-        , maLinkTargetURL( aLinkTargetURL )
+        : maName(std::move( aName ))
+        , mxModuleContainer(std::move( xModuleContainer ))
+        , mxDialogContainer(std::move( xDialogContainer ))
+        , maPassword(std::move( aPassword ))
+        , maExternaleSourceURL(std::move( aExternaleSourceURL ))
+        , maLinkTargetURL(std::move( aLinkTargetURL ))
     {}
 
     // Methods XStarBasicLibraryInfo

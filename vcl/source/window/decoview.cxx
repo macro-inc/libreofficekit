@@ -23,11 +23,6 @@
 #include <vcl/window.hxx>
 #include <vcl/ctrl.hxx>
 
-constexpr auto BUTTON_DRAW_FLATTEST = DrawButtonFlags::Flat |
-                                 DrawButtonFlags::Pressed |
-                                 DrawButtonFlags::Checked |
-                                 DrawButtonFlags::Highlight;
-
 namespace {
 
 tools::Long AdjustRectToSquare( tools::Rectangle &rRect )
@@ -481,6 +476,9 @@ void ImplDrawButton( OutputDevice *const pDev, tools::Rectangle aFillRect,
     }
     else
     {
+        const bool bFlat(nStyle & DrawButtonFlags::Flat);
+        const bool bDepressed(nStyle & (DrawButtonFlags::Pressed | DrawButtonFlags::Checked));
+
         if ( nStyle & DrawButtonFlags::Default )
         {
             const Color aDefBtnColor = rStyleSettings.GetDarkShadowColor();
@@ -495,30 +493,28 @@ void ImplDrawButton( OutputDevice *const pDev, tools::Rectangle aFillRect,
             aFillRect.AdjustLeft( 1 );
         }
 
+        bool bNoFace = false;
         Color aColor1;
         Color aColor2;
-        if ( nStyle & (DrawButtonFlags::Pressed | DrawButtonFlags::Checked) )
+        if (!bFlat)
         {
-            aColor1 = rStyleSettings.GetDarkShadowColor();
-            aColor2 = rStyleSettings.GetLightColor();
-        }
-        else
-        {
-            if ( nStyle & DrawButtonFlags::NoLightBorder )
-                aColor1 = rStyleSettings.GetLightBorderColor();
+            if (bDepressed)
+            {
+                aColor1 = rStyleSettings.GetDarkShadowColor();
+                aColor2 = rStyleSettings.GetLightColor();
+            }
             else
-                aColor1 = rStyleSettings.GetLightColor();
-            if ( (nStyle & BUTTON_DRAW_FLATTEST) == DrawButtonFlags::Flat )
-                aColor2 = rStyleSettings.GetShadowColor();
-            else
+            {
+                if ( nStyle & DrawButtonFlags::NoLightBorder )
+                    aColor1 = rStyleSettings.GetLightBorderColor();
+                else
+                    aColor1 = rStyleSettings.GetLightColor();
                 aColor2 = rStyleSettings.GetDarkShadowColor();
-        }
+            }
 
-        ImplDraw2ColorFrame( pDev, aFillRect, aColor1, aColor2 );
+            ImplDraw2ColorFrame( pDev, aFillRect, aColor1, aColor2 );
 
-        if ( (nStyle & BUTTON_DRAW_FLATTEST) != DrawButtonFlags::Flat )
-        {
-            if ( nStyle & (DrawButtonFlags::Pressed | DrawButtonFlags::Checked) )
+            if (bDepressed)
             {
                 aColor1 = rStyleSettings.GetShadowColor();
                 aColor2 = rStyleSettings.GetLightBorderColor();
@@ -533,11 +529,22 @@ void ImplDrawButton( OutputDevice *const pDev, tools::Rectangle aFillRect,
             }
             ImplDraw2ColorFrame( pDev, aFillRect, aColor1, aColor2 );
         }
+        else // flat buttons
+        {
+            // draw a border if the flat button is highlighted
+            if (nStyle & DrawButtonFlags::Highlight)
+            {
+                aColor1 = rStyleSettings.GetShadowColor();
+                ImplDraw2ColorFrame(pDev, aFillRect, aColor1, aColor1);
+            }
+            // fill in the button if it is pressed in
+            bNoFace = !bDepressed;
+        }
 
         pDev->SetLineColor();
         if ( nStyle & (DrawButtonFlags::Checked | DrawButtonFlags::DontKnow) )
             pDev->SetFillColor( rStyleSettings.GetCheckedColor() );
-        else
+        else if (!bNoFace)
             pDev->SetFillColor( rStyleSettings.GetFaceColor() );
         pDev->DrawRect( aFillRect );
     }
@@ -853,11 +860,7 @@ void DecorationView::DrawHighlightFrame( const tools::Rectangle& rRect,
     }
 
     if ( nStyle == DrawHighlightFrameStyle::In )
-    {
-        Color aTempColor = aLightColor;
-        aLightColor = aShadowColor;
-        aShadowColor = aTempColor;
-    }
+        std::swap( aLightColor, aShadowColor );
 
     DrawFrame( rRect, aLightColor, aShadowColor );
 }
@@ -993,24 +996,10 @@ void DecorationView::DrawSeparator( const Point& rStart, const Point& rStop, boo
     if ( rStyleSettings.GetOptions() & StyleSettingsOptions::Mono )
         mpOutDev->SetLineColor( COL_BLACK );
     else
-        mpOutDev->SetLineColor( rStyleSettings.GetShadowColor() );
+        mpOutDev->SetLineColor( rStyleSettings.GetSeparatorColor() );
 
     mpOutDev->DrawLine( aStart, aStop );
-    if ( !(rStyleSettings.GetOptions() & StyleSettingsOptions::Mono) )
-    {
-        mpOutDev->SetLineColor( rStyleSettings.GetLightColor() );
-        if( bVertical )
-        {
-            aStart.AdjustX( 1 );
-            aStop.AdjustX( 1 );
-        }
-        else
-        {
-            aStart.AdjustY( 1 );
-            aStop.AdjustY( 1 );
-        }
-        mpOutDev->DrawLine( aStart, aStop );
-    }
+
     mpOutDev->Pop();
 }
 

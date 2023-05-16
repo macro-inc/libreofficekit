@@ -16,12 +16,11 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-
-#ifndef INCLUDED_COMPHELPER_STRING_HXX
-#define INCLUDED_COMPHELPER_STRING_HXX
+#pragma once
 
 #include <sal/config.h>
 
+#include <algorithm>
 #include <vector>
 #include <comphelper/comphelperdllapi.h>
 #include <sal/types.h>
@@ -70,7 +69,9 @@ inline OUStringBuffer& remove(OUStringBuffer &rIn,
 
     @return         The resulting OString
  */
-COMPHELPER_DLLPUBLIC OString stripStart(std::string_view rIn,
+COMPHELPER_DLLPUBLIC OString stripStart(const OString& rIn,
+    char c);
+COMPHELPER_DLLPUBLIC std::string_view stripStart(std::string_view rIn,
     char c);
 
 /** Strips occurrences of a character from the start of the source string
@@ -80,7 +81,9 @@ COMPHELPER_DLLPUBLIC OString stripStart(std::string_view rIn,
 
     @return         The resulting OUString
  */
-COMPHELPER_DLLPUBLIC OUString stripStart(std::u16string_view rIn,
+COMPHELPER_DLLPUBLIC OUString stripStart(const OUString& rIn,
+    sal_Unicode c);
+COMPHELPER_DLLPUBLIC std::u16string_view stripStart(std::u16string_view rIn,
     sal_Unicode c);
 
 /** Strips occurrences of a character from the end of the source string
@@ -90,7 +93,9 @@ COMPHELPER_DLLPUBLIC OUString stripStart(std::u16string_view rIn,
 
     @return         The resulting OString
  */
-COMPHELPER_DLLPUBLIC OString stripEnd(std::string_view rIn,
+COMPHELPER_DLLPUBLIC OString stripEnd(const OString& rIn,
+    char c);
+COMPHELPER_DLLPUBLIC std::string_view stripEnd(std::string_view rIn,
     char c);
 
 /** Strips occurrences of a character from the end of the source string
@@ -100,7 +105,9 @@ COMPHELPER_DLLPUBLIC OString stripEnd(std::string_view rIn,
 
     @return         The resulting OUString
  */
-COMPHELPER_DLLPUBLIC OUString stripEnd(std::u16string_view rIn,
+COMPHELPER_DLLPUBLIC OUString stripEnd(const OUString& rIn,
+    sal_Unicode c);
+COMPHELPER_DLLPUBLIC std::u16string_view stripEnd(std::u16string_view rIn,
     sal_Unicode c);
 
 /** Strips occurrences of a character from the start and end of the source string
@@ -110,7 +117,9 @@ COMPHELPER_DLLPUBLIC OUString stripEnd(std::u16string_view rIn,
 
     @return         The resulting OString
  */
-COMPHELPER_DLLPUBLIC OString strip(std::string_view rIn,
+COMPHELPER_DLLPUBLIC OString strip(const OString& rIn,
+    char c);
+COMPHELPER_DLLPUBLIC std::string_view strip(std::string_view rIn,
     char c);
 
 /** Strips occurrences of a character from the start and end of the source string
@@ -120,7 +129,9 @@ COMPHELPER_DLLPUBLIC OString strip(std::string_view rIn,
 
     @return         The resulting OUString
  */
-COMPHELPER_DLLPUBLIC OUString strip(std::u16string_view rIn,
+COMPHELPER_DLLPUBLIC OUString strip(const OUString& rIn,
+    sal_Unicode c);
+COMPHELPER_DLLPUBLIC std::u16string_view strip(std::u16string_view rIn,
     sal_Unicode c);
 
 /** Returns number of tokens in an OUString
@@ -139,19 +150,16 @@ COMPHELPER_DLLPUBLIC sal_Int32 getTokenCount(std::string_view rIn, char cTok);
 */
 COMPHELPER_DLLPUBLIC sal_Int32 getTokenCount(std::u16string_view rIn, sal_Unicode cTok);
 
-/** Reverse an OUString
+/** Reverse an OUString's UTF-16 code units.
 
   @param    rIn     the input OUString
   @return   the reversed input
 */
 COMPHELPER_DLLPUBLIC OUString reverseString(std::u16string_view rStr);
 
-/** Reverse an OString
-
-  @param    rIn     the input OString
-  @return   the reversed input
+/** Reverse an OUString's Unicode code points.
 */
-COMPHELPER_DLLPUBLIC OString reverseString(std::string_view rStr);
+COMPHELPER_DLLPUBLIC OUString reverseCodePoints(OUString const & str);
 
 
 namespace detail
@@ -159,7 +167,7 @@ namespace detail
     template<typename B> B& truncateToLength(B& rBuffer, sal_Int32 nLen)
     {
         if (nLen < rBuffer.getLength())
-            rBuffer.remove(nLen, rBuffer.getLength()-nLen);
+            rBuffer.setLength(nLen);
         return rBuffer;
     }
 }
@@ -184,16 +192,11 @@ inline OUStringBuffer& truncateToLength(
 
 namespace detail
 {
-    template<typename B, typename U> B& padToLength(B& rBuffer, sal_Int32 nLen,
-        U cFill = '\0')
+    template<typename B, typename U> B& padToLength(B& rBuffer, sal_Int32 nLen, U cFill)
     {
-        sal_Int32 nOrigLen = rBuffer.getLength();
-        if (nLen > nOrigLen)
-        {
-            rBuffer.setLength(nLen);
-            for (sal_Int32 i = nOrigLen; i < nLen; ++i)
-                rBuffer[i] = cFill;
-        }
+        const sal_Int32 nPadLen = nLen - rBuffer.getLength();
+        if (nPadLen > 0)
+            std::fill_n(rBuffer.appendUninitialized(nPadLen), nPadLen, cFill);
         return rBuffer;
     }
 }
@@ -224,6 +227,13 @@ inline OUStringBuffer& padToLength(
 {
     return detail::padToLength(rBuffer, nLength, cFill);
 }
+
+/** Similar to OUString::replaceAt, but for an OUStringBuffer.
+
+    Replace n = count characters
+    from position index in this string with newStr.
+ */
+COMPHELPER_DLLPUBLIC void replaceAt(OUStringBuffer& rIn, sal_Int32 index, sal_Int32 count, std::u16string_view newStr );
 
 /** Replace a token in a string
     @param rIn       OUString in which the token is to be replaced
@@ -293,7 +303,7 @@ COMPHELPER_DLLPUBLIC sal_uInt32 decimalStringToNumber(
     OUString const & str );
 
 COMPHELPER_DLLPUBLIC std::vector<OUString>
-    split(const OUString& rString, const sal_Unicode cSeparator);
+    split(std::u16string_view rString, const sal_Unicode cSeparator);
 
 /** Convert a single comma separated string to a sequence of strings.
 
@@ -305,7 +315,7 @@ COMPHELPER_DLLPUBLIC std::vector<OUString>
                     string at ',' tokens and stripping whitespace.
  */
 COMPHELPER_DLLPUBLIC css::uno::Sequence< OUString >
-    convertCommaSeparated( OUString const & i_rString );
+    convertCommaSeparated( std::u16string_view i_rString );
 
 /**
   Compares two strings using natural order.
@@ -337,7 +347,7 @@ private:
 public:
     NaturalStringSorter(
         const css::uno::Reference< css::uno::XComponentContext > &rContext,
-        const css::lang::Locale &rLocale);
+        css::lang::Locale aLocale);
     sal_Int32 compare(const OUString &rLHS, const OUString &rRHS) const
     {
         return compareNatural(rLHS, rRHS, m_xCollator, m_xBI, m_aLocale);
@@ -365,8 +375,15 @@ COMPHELPER_DLLPUBLIC bool isdigitAsciiString(std::string_view rString);
  */
 COMPHELPER_DLLPUBLIC bool isdigitAsciiString(std::u16string_view rString);
 
-}
+/** Santitize an OUString to not have invalid surrogates
 
-#endif
+    @param rString  An OUString
+
+    @return         same string if no surrogates or surrogates are valid.
+                    Otherwise the string truncated to the valid sequence.
+ */
+COMPHELPER_DLLPUBLIC OUString sanitizeStringSurrogates(const OUString& rString);
+
+} // namespace comphelper::string
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

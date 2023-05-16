@@ -22,10 +22,16 @@
 #include <MediaDescriptorHelper.hxx>
 #include <ChartViewHelper.hxx>
 #include <ChartModelHelper.hxx>
+#include <ChartTypeManager.hxx>
+#include <ChartTypeTemplate.hxx>
 #include <DataSourceHelper.hxx>
 #include <AxisHelper.hxx>
 #include <ThreeDHelper.hxx>
+#include <Diagram.hxx>
 #include <DiagramHelper.hxx>
+#include <BaseCoordinateSystem.hxx>
+#include <Legend.hxx>
+#include <XMLFilter.hxx>
 
 #include <com/sun/star/chart2/LegendPosition.hpp>
 #include <com/sun/star/container/XNameAccess.hpp>
@@ -50,12 +56,14 @@
 
 #include <ucbhelper/content.hxx>
 #include <unotools/ucbstreamhelper.hxx>
+#include <unotools/tempfile.hxx>
+#include <utility>
 #include <vcl/cvtgrf.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/storagehelper.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 #include <sfx2/objsh.hxx>
 
@@ -71,8 +79,8 @@ namespace
 {
 struct lcl_PropNameEquals
 {
-    explicit lcl_PropNameEquals( const OUString & rStrToCompareWith ) :
-            m_aStr( rStrToCompareWith )
+    explicit lcl_PropNameEquals( OUString aStrToCompareWith ) :
+            m_aStr(std::move( aStrToCompareWith ))
     {}
     bool operator() ( const beans::PropertyValue & rProp )
     {
@@ -195,10 +203,7 @@ Reference< document::XFilter > ChartModel::impl_createFilter(
     if( ! xFilter.is())
     {
         SAL_WARN("chart2", "No FilterName passed in MediaDescriptor" );
-        xFilter.set(
-            m_xContext->getServiceManager()->createInstanceWithContext(
-                "com.sun.star.comp.chart2.XMLFilter", m_xContext ),
-            uno::UNO_QUERY_THROW );
+        xFilter = new XMLFilter(m_xContext);
     }
 
     return xFilter;
@@ -299,8 +304,7 @@ void SAL_CALL ChartModel::storeToURL(
         {
             if( m_xContext.is() && aMediaDescriptorHelper.ISSET_OutputStream )
             {
-                Reference< io::XStream > xStream(
-                    io::TempFile::create(m_xContext), uno::UNO_QUERY_THROW );
+                rtl::Reference< utl::TempFileFastService > xStream = new utl::TempFileFastService;
                 Reference< io::XInputStream > xInputStream( xStream->getInputStream());
 
                 Reference< embed::XStorage > xStorage(
@@ -309,8 +313,7 @@ void SAL_CALL ChartModel::storeToURL(
                 {
                     impl_store( aReducedMediaDescriptor, xStorage );
 
-                    Reference< io::XSeekable > xSeekable( xStream, uno::UNO_QUERY_THROW );
-                    xSeekable->seek( 0 );
+                    xStream->seek( 0 );
                     ::comphelper::OStorageHelper::CopyInputToOutput( xInputStream, aMediaDescriptorHelper.OutputStream );
                 }
             }
@@ -384,7 +387,7 @@ void ChartModel::insertDefaultChart()
     try
     {
         // create default chart
-        Reference< chart2::XChartTypeTemplate > xTemplate( impl_createDefaultChartTypeTemplate() );
+        rtl::Reference< ::chart::ChartTypeTemplate > xTemplate( impl_createDefaultChartTypeTemplate() );
         if( xTemplate.is())
         {
             try
@@ -399,7 +402,7 @@ void ChartModel::insertDefaultChart()
                                                      beans::PropertyState_DIRECT_VALUE ) };
                 }
 
-                Reference< chart2::XDiagram > xDiagram( xTemplate->createDiagramByDataSource( xDataSource, aParam ) );
+                rtl::Reference< Diagram > xDiagram( xTemplate->createDiagramByDataSource2( xDataSource, aParam ) );
 
                 setFirstDiagram( xDiagram );
 
@@ -409,29 +412,22 @@ void ChartModel::insertDefaultChart()
                     AxisHelper::setRTLAxisLayout( AxisHelper::getCoordinateSystemByIndex( xDiagram, 0 ) );
 
                 // create and attach legend
-                Reference< chart2::XLegend > xLegend(
-                    m_xContext->getServiceManager()->createInstanceWithContext(
-                        "com.sun.star.chart2.Legend", m_xContext ), uno::UNO_QUERY_THROW );
-                Reference< beans::XPropertySet > xLegendProperties( xLegend, uno::UNO_QUERY );
-                if( xLegendProperties.is() )
-                {
-                    xLegendProperties->setPropertyValue( "FillStyle", uno::Any( drawing::FillStyle_NONE ));
-                    xLegendProperties->setPropertyValue( "LineStyle", uno::Any( drawing::LineStyle_NONE ));
-                    xLegendProperties->setPropertyValue( "LineColor", uno::Any( static_cast< sal_Int32 >( 0xb3b3b3 ) ));  // gray30
-                    xLegendProperties->setPropertyValue( "FillColor", uno::Any( static_cast< sal_Int32 >( 0xe6e6e6 ) ) ); // gray10
+                rtl::Reference< Legend > xLegend = new Legend();
+                xLegend->setPropertyValue( "FillStyle", uno::Any( drawing::FillStyle_NONE ));
+                xLegend->setPropertyValue( "LineStyle", uno::Any( drawing::LineStyle_NONE ));
+                xLegend->setPropertyValue( "LineColor", uno::Any( static_cast< sal_Int32 >( 0xb3b3b3 ) ));  // gray30
+                xLegend->setPropertyValue( "FillColor", uno::Any( static_cast< sal_Int32 >( 0xe6e6e6 ) ) ); // gray10
 
-                    if( bIsRTL )
-                        xLegendProperties->setPropertyValue( "AnchorPosition", uno::Any( chart2::LegendPosition_LINE_START ));
-                }
+                if( bIsRTL )
+                    xLegend->setPropertyValue( "AnchorPosition", uno::Any( chart2::LegendPosition_LINE_START ));
                 if(xDiagram.is())
                     xDiagram->setLegend( xLegend );
 
                 // set simple 3D look
-                Reference< beans::XPropertySet > xDiagramProperties( xDiagram, uno::UNO_QUERY );
-                if( xDiagramProperties.is() )
+                if( xDiagram.is() )
                 {
-                    xDiagramProperties->setPropertyValue( "RightAngledAxes", uno::Any( true ));
-                    xDiagramProperties->setPropertyValue( "D3DScenePerspective", uno::Any( drawing::ProjectionMode_PARALLEL ));
+                    xDiagram->setPropertyValue( "RightAngledAxes", uno::Any( true ));
+                    xDiagram->setPropertyValue( "D3DScenePerspective", uno::Any( drawing::ProjectionMode_PARALLEL ));
                     ThreeDHelper::setScheme( xDiagram, ThreeDLookScheme::ThreeDLookScheme_Realistic );
                 }
 
@@ -724,12 +720,11 @@ void SAL_CALL ChartModel::modified( const lang::EventObject& rEvenObject)
                 DataSourceHelper::createArguments("PivotChart", uno::Sequence<sal_Int32>(), true, true, true);
 
             Reference<chart2::data::XDataSource> xDataSource(xDataProvider->createDataSource(aArguments));
-            Reference<lang::XMultiServiceFactory> xFactory(getChartTypeManager(), uno::UNO_QUERY);
-            Reference<chart2::XDiagram> xDiagram(getFirstDiagram());
+            rtl::Reference< ::chart::ChartTypeManager > xChartTypeManager = getTypeManager();
+            rtl::Reference<Diagram> xDiagram(getFirstChartDiagram());
 
-            DiagramHelper::tTemplateWithServiceName aTemplateAndService = DiagramHelper::getTemplateForDiagram(xDiagram, xFactory);
-            css::uno::Reference<css::chart2::XChartTypeTemplate> xChartTypeTemplate(aTemplateAndService.first);
-            xChartTypeTemplate->changeDiagramData(xDiagram, xDataSource, aArguments);
+            DiagramHelper::tTemplateWithServiceName aTemplateAndService = DiagramHelper::getTemplateForDiagram(xDiagram, xChartTypeManager);
+            aTemplateAndService.xChartTypeTemplate->changeDiagramData(xDiagram, xDataSource, aArguments);
         }
         catch (const uno::Exception &)
         {

@@ -291,8 +291,6 @@ ScRefUpdateRes ScRefUpdate::Update( const ScDocument* pDoc, UpdateRefMode eUpdat
                 eRet = UR_INVALID;
                 theTab2 = theTab1;
             }
-            else if (bCut2 && theTab2 == 0)
-                eRet = UR_INVALID;
             else if ( bCut1 || bCut2 )
                 eRet = UR_UPDATED;
             if ( bExp )
@@ -427,7 +425,7 @@ ScRefUpdateRes ScRefUpdate::Update( UpdateRefMode eUpdateRefMode,
     }
     else if (eUpdateRefMode == URM_MOVE)
     {
-        if ( rWhere.In( rWhat ) )
+        if ( rWhere.Contains( rWhat ) )
         {
             if ( nDx && (theCol1 != ScBigRange::nRangeMin || theCol2 != ScBigRange::nRangeMax) )
             {
@@ -541,7 +539,7 @@ ScRefUpdateRes ScRefUpdate::UpdateTranspose(
     ScRefUpdateRes eRet = UR_NOTHING;
     // Only references in source range must be updated, i.e. no references in destination area.
     // Otherwise existing references pointing to destination area will be wrongly transposed.
-    if (rSource.In(rRef))
+    if (rSource.Contains(rRef))
     {
         // Source range contains the reference range.
         SCCOL nCol1 = rRef.aStart.Col(), nCol2 = rRef.aEnd.Col();

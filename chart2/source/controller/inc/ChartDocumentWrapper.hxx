@@ -26,11 +26,13 @@
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <cppuhelper/implbase.hxx>
 #include <unotools/eventlisteneradapter.hxx>
-
+#include <rtl/ref.hxx>
+#include <svx/unopage.hxx>
 #include <memory>
 
 namespace com::sun::star::uno { class XComponentContext; }
 namespace com::sun::star::util { class XRefreshable; }
+namespace chart { class ChartView; }
 
 namespace chart::wrapper
 {
@@ -48,7 +50,7 @@ class ChartDocumentWrapper_Base : public ::cppu::ImplInheritanceHelper
 {
 };
 
-class ChartDocumentWrapper : public ChartDocumentWrapper_Base
+class ChartDocumentWrapper final : public ChartDocumentWrapper_Base
                            , public ::utl::OEventListenerAdapter
 {
 public:
@@ -72,7 +74,7 @@ public:
     css::uno::Reference< css::drawing::XShapes > getAdditionalShapes() const;
 
     /// @throws css::uno::RuntimeException
-    css::uno::Reference< css::drawing::XDrawPage > impl_getDrawPage() const;
+    rtl::Reference<SvxDrawPage> impl_getDrawPage() const;
 
 protected:
 
@@ -156,7 +158,7 @@ private: //member
     OUString   m_aBaseDiagram;
     bool        m_bUpdateAddIn;
 
-    css::uno::Reference< css::uno::XInterface >   m_xChartView;
+    rtl::Reference< ChartView >                   m_xChartView;
     css::uno::Reference< css::lang::XMultiServiceFactory>
                                                   m_xShapeFactory;
 

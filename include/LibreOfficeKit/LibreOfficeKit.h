@@ -119,9 +119,18 @@ struct _LibreOfficeKitClass
     /// @see lok::Office::setOption
     void (*setOption) (LibreOfficeKit* pThis, const char* pOption, const char* pValue);
 
-    /// @see lok::Document::dumpState
+    /// @see lok::Office::dumpState
     /// @since LibreOffice 7.5
     void (*dumpState) (LibreOfficeKit* pThis, const char* pOptions, char** pState);
+
+    /** @see lok::Office::extractRequest.
+     */
+    char* (*extractRequest) (LibreOfficeKit* pThis,
+                           const char* pFilePath);
+
+    /// @see lok::Office::trimMemory
+    /// @since LibreOffice 7.6
+    void (*trimMemory) (LibreOfficeKit* pThis, int nTarget);
 };
 
 #define LIBREOFFICEKIT_DOCUMENT_HAS(pDoc,member) LIBREOFFICEKIT_HAS_MEMBER(LibreOfficeKitDocumentClass,member,(pDoc)->pClass->nSize)
@@ -347,18 +356,6 @@ struct _LibreOfficeKitDocumentClass
                             const int width, const int height,
                             const double dpiscale);
 
-#ifdef IOS
-    /// @see lok::Document::paintTileToCGContext().
-    void (*paintTileToCGContext) (LibreOfficeKitDocument* pThis,
-                                  void* rCGContext,
-                                  const int nCanvasWidth,
-                                  const int nCanvasHeight,
-                                  const int nTilePosX,
-                                  const int nTilePosY,
-                                  const int nTileWidth,
-                                  const int nTileHeight);
-#endif // IOS
-
 // CERTIFICATE AND SIGNING
 
     /// @see lok::Document::insertCertificate().
@@ -492,6 +489,18 @@ struct _LibreOfficeKitDocumentClass
 
     /// @see lok::Document::getEditMode().
     int (*getEditMode) (LibreOfficeKitDocument* pThis);
+
+    /// @see lok::Document::setViewTimezone().
+    void (*setViewTimezone) (LibreOfficeKitDocument* pThis, int nId, const char* timezone);
+
+    /// @see lok::Document::setAccessibilityState().
+    void (*setAccessibilityState) (LibreOfficeKitDocument* pThis, int nId, bool nEnabled);
+
+    /// @see lok::Document::getA11yFocusedParagraph.
+    char* (*getA11yFocusedParagraph) (LibreOfficeKitDocument* pThis);
+
+    /// @see lok::Document::getA11yCaretPosition.
+    int (*getA11yCaretPosition) (LibreOfficeKitDocument* pThis);
 
 #endif // defined LOK_USE_UNSTABLE_API || defined LIBO_INTERNAL_ONLY
 };

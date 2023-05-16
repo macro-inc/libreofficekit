@@ -28,6 +28,7 @@
 #include <com/sun/star/uno/XComponentContext.hpp>
 
 #include <cppuhelper/implbase.hxx>
+#include <mutex>
 
 namespace framework{
 
@@ -50,7 +51,7 @@ class Oxt_Handler final  :  public  ::cppu::WeakImplHelper<
 
     public:
 
-                 Oxt_Handler( const css::uno::Reference< css::uno::XComponentContext >&  );
+                 Oxt_Handler( css::uno::Reference< css::uno::XComponentContext > );
         virtual ~Oxt_Handler(                                                                        ) override;
 
         /* interface XServiceInfo */
@@ -78,7 +79,7 @@ class Oxt_Handler final  :  public  ::cppu::WeakImplHelper<
         virtual OUString SAL_CALL detect     (        css::uno::Sequence< css::beans::PropertyValue >&    lDescriptor ) override;
 
     private:
-        osl::Mutex m_mutex;
+        std::mutex m_mutex;
 
         css::uno::Reference< css::uno::XComponentContext >     m_xContext;   /// global uno service factory to create new services
 

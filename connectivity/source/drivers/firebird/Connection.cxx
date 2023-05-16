@@ -22,7 +22,6 @@
 #include "Clob.hxx"
 #include "Connection.hxx"
 #include "DatabaseMetaData.hxx"
-#include "Driver.hxx"
 #include "PreparedStatement.hxx"
 #include "Statement.hxx"
 #include "Util.hxx"
@@ -48,7 +47,6 @@
 #include <comphelper/storagehelper.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <unotools/tempfile.hxx>
-#include <unotools/localfilehelper.hxx>
 
 #include <osl/file.hxx>
 #include <rtl/strbuf.hxx>
@@ -163,7 +161,7 @@ void Connection::construct(const OUString& url, const Sequence< PropertyValue >&
 
             bIsNewDatabase = !m_xEmbeddedStorage->hasElements();
 
-            m_pDatabaseFileDir.reset(new ::utl::TempFile(nullptr, true));
+            m_pDatabaseFileDir.reset(new ::utl::TempFileNamed(nullptr, true));
             m_pDatabaseFileDir->EnableKillingFile();
             m_sFirebirdURL = m_pDatabaseFileDir->GetFileName() + "/firebird.fdb";
             m_sFBKPath = m_pDatabaseFileDir->GetFileName() + "/firebird.fbk";
@@ -219,7 +217,7 @@ void Connection::construct(const OUString& url, const Sequence< PropertyValue >&
             dpbBuffer.push_back(isc_dpb_version1);
             dpbBuffer.push_back(isc_dpb_sql_dialect);
             dpbBuffer.push_back(1); // 1 byte long
-            dpbBuffer.push_back(FIREBIRD_SQL_DIALECT);
+            dpbBuffer.push_back(SQL_DIALECT_CURRENT);
 
             // set UTF8 as default character set of the database
             const char sCharset[] = "UTF8";
@@ -385,7 +383,7 @@ sal_Int64 SAL_CALL Connection::getSomething(const css::uno::Sequence<sal_Int8>& 
 }
 
 // static
-css::uno::Sequence<sal_Int8> Connection::getUnoTunnelId()
+const css::uno::Sequence<sal_Int8> & Connection::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit implId;
     return implId.getSeq();

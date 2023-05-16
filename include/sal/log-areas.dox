@@ -171,7 +171,6 @@ certain functionality.
 @li @c desktop.lib
 @li @c desktop.migration
 @li @c desktop.offacc
-@li @c desktop.opengl
 @li @c desktop.splash
 @li @c desktop.test
 @li @c desktop.updater
@@ -228,6 +227,7 @@ certain functionality.
 
 @li @c filter.config
 @li @c filter.eps
+@li @c filter.hwp - Hangul word processor import
 @li @c filter.icgm
 @li @c filter.ms - escher import/export
 @li @c filter.odfflatxml
@@ -318,6 +318,7 @@ certain functionality.
 @section LibreOfficeKit
 
 @li @c lok
+@li @c lok.fontsubst
 @li @c lok.tiledrendering
 @li @c lok.dialog
 
@@ -392,6 +393,7 @@ certain functionality.
 
 @li @c svx
 @li @c svx.chaining
+@li @c svx.diagram - Diagram ModelData
 @li @c svx.dialog
 @li @c svx.fmcomp
 @li @c svx.form
@@ -431,6 +433,7 @@ certain functionality.
 @li @c ucb.ucp.file
 @li @c ucb.ucp.ftp
 @li @c ucb.ucp.gio
+@li @c ucb.ucp.tdoc
 @li @c ucb.ucp.webdav
 @li @c ucb.ucp.webdav.curl
 
@@ -455,6 +458,7 @@ certain functionality.
 @section stoc
 
 @li @c stoc.corerefl - CoreReflection
+@li @c stoc.java - javaloader and javavm
 
 @section VCL
 
@@ -536,9 +540,9 @@ certain functionality.
 @li @c sw.idle
 @li @c sw.layout - Writer core view: document layout
 @li @c sw.layout.debug - Writer layout dbg_lay output
-@li @c sw.level2
 @li @c sw.mailmerge - Writer mail merge
 @li @c sw.pageframe - debug lifecycle of SwPageFrame
+@li @c sw.qa
 @li @c sw.rtf - .rtf export filter
 @li @c sw.tiled
 @li @c sw.ui
@@ -602,6 +606,7 @@ certain functionality.
 
 @li @c avmedia
 @li @c avmedia.gstreamer
+@li @c avmedia.gtk
 @li @c avmedia.quicktime
 
 @section other
@@ -632,6 +637,7 @@ certain functionality.
 @li @c scripting
 @li @c scripting.provider
 @li @c shell
+@li @c shell.jumplist
 @li @c stoc
 @li @c store
 @li @c svg
@@ -643,6 +649,7 @@ certain functionality.
 @li @c unoxml
 @li @c uui
 @li @c vbahelper
+@li @c wasm
 @li @c xmlhelp
 @li @c xmlreader
 

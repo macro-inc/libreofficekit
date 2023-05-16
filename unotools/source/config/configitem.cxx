@@ -38,8 +38,7 @@
 #include <osl/diagnose.h>
 #include <comphelper/sequence.hxx>
 #include <comphelper/solarmutex.hxx>
-#include <rtl/ref.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace utl;
 using namespace com::sun::star::uno;
@@ -50,6 +49,7 @@ using namespace com::sun::star::container;
 using namespace com::sun::star::configuration;
 
 #include <cppuhelper/implbase.hxx>
+#include <utility>
 
 /*
     The ConfigChangeListener_Impl receives notifications from the configuration about changes that
@@ -138,8 +138,8 @@ void ConfigChangeListener_Impl::disposing( const EventObject& /*rSource*/ )
     pParent->RemoveChangesListener();
 }
 
-ConfigItem::ConfigItem(const OUString &rSubTree, ConfigItemMode nSetMode ) :
-    sSubTree(rSubTree),
+ConfigItem::ConfigItem(OUString aSubTree, ConfigItemMode nSetMode ) :
+    sSubTree(std::move(aSubTree)),
     m_nMode(nSetMode),
     m_bIsModified(false),
     m_bEnableInternalNotification(false),
@@ -819,14 +819,14 @@ bool ConfigItem::ClearNodeElements(const OUString& rNode, Sequence< OUString > c
     return bRet;
 }
 
-static OUString lcl_extractSetPropertyName( const OUString& rInPath, const OUString& rPrefix )
+static OUString lcl_extractSetPropertyName( const OUString& rInPath, std::u16string_view rPrefix )
 {
     OUString const sSubPath = dropPrefixFromConfigurationPath( rInPath, rPrefix);
     return extractFirstFromConfigurationPath( sSubPath );
 }
 
 static
-Sequence< OUString > lcl_extractSetPropertyNames( const Sequence< PropertyValue >& rValues, const OUString& rPrefix )
+Sequence< OUString > lcl_extractSetPropertyNames( const Sequence< PropertyValue >& rValues, std::u16string_view rPrefix )
 {
     Sequence< OUString > aSubNodeNames(rValues.getLength());
     OUString* pSubNodeNames = aSubNodeNames.getArray();

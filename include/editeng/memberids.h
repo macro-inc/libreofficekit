@@ -40,6 +40,7 @@
 // SvxTabStop
 #define MID_TABSTOPS            0
 #define MID_STD_TAB             1
+#define MID_TABSTOP_DEFAULT_DISTANCE 2
 
 //SvxHyphenZoneItem
 #define MID_IS_HYPHEN           0
@@ -47,6 +48,9 @@
 #define MID_HYPHEN_MIN_TRAIL    2
 #define MID_HYPHEN_MAX_HYPHENS  3
 #define MID_HYPHEN_NO_CAPS      4
+#define MID_HYPHEN_NO_LAST_WORD 5
+#define MID_HYPHEN_MIN_WORD_LENGTH 6
+#define MID_HYPHEN_ZONE         7
 
 // SvxBoxInfoItem
 #define MID_HORIZONTAL          1
@@ -185,6 +189,8 @@
 #define MID_COLOR_TINT_OR_SHADE 5
 #define MID_COLOR_LUM_MOD       6
 #define MID_COLOR_LUM_OFF       7
+#define MID_COLOR_THEME_REFERENCE 8
+#define MID_COLOR_THEME_REFERENCE_JSON 9
 
 
 #endif

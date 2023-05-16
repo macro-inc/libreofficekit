@@ -104,30 +104,29 @@ namespace svgio::svgreader
         bool readNumber(std::u16string_view rCandidate, sal_Int32& nPos, double& fNum, const sal_Int32 nLen);
         SvgUnit readUnit(std::u16string_view rCandidate, sal_Int32& nPos, const sal_Int32 nLen);
         bool readNumberAndUnit(std::u16string_view rCandidate, sal_Int32& nPos, SvgNumber& aNum, const sal_Int32 nLen);
-        bool readAngle(const OUString& rCandidate, sal_Int32& nPos, double& fAngle, const sal_Int32 nLen);
+        bool readAngle(std::u16string_view rCandidate, sal_Int32& nPos, double& fAngle, const sal_Int32 nLen);
         sal_Int32 read_hex(sal_Unicode aChar);
         bool match_colorKeyword(basegfx::BColor& rColor, const OUString& rName);
         bool read_color(const OUString& rCandidate, basegfx::BColor& rColor, SvgNumber& rOpacity);
-        basegfx::B2DRange readViewBox(const OUString& rCandidate, InfoProvider const & rInfoProvider);
-        basegfx::B2DHomMatrix readTransform(const OUString& rCandidate, InfoProvider const & rInfoProvider);
-        bool readSingleNumber(const OUString& rCandidate, SvgNumber& aNum);
+        basegfx::B2DRange readViewBox(std::u16string_view rCandidate, InfoProvider const & rInfoProvider);
+        basegfx::B2DHomMatrix readTransform(std::u16string_view rCandidate, InfoProvider const & rInfoProvider);
+        bool readSingleNumber(std::u16string_view rCandidate, SvgNumber& aNum);
+        bool readLocalLink(std::u16string_view rCandidate, OUString& rURL);
         bool readLocalUrl(const OUString& rCandidate, OUString& rURL);
         bool readSvgPaint(const OUString& rCandidate, SvgPaint& rSvgPaint, OUString& rURL, SvgNumber& rOpacity);
 
-        bool readSvgNumberVector(const OUString& rCandidate, SvgNumberVector& rSvgNumberVector);
+        bool readSvgNumberVector(std::u16string_view rCandidate, SvgNumberVector& rSvgNumberVector);
         ::std::vector< double > solveSvgNumberVector(const SvgNumberVector& rInput, const InfoProvider& rInfoProvider);
 
-        SvgAspectRatio readSvgAspectRatio(const OUString& rCandidate);
+        SvgAspectRatio readSvgAspectRatio(std::u16string_view rCandidate);
 
         typedef ::std::vector< OUString > SvgStringVector;
-        bool readSvgStringVector(const OUString& rCandidate, SvgStringVector& rSvgStringVector);
+        bool readSvgStringVector(std::u16string_view rCandidate, SvgStringVector& rSvgStringVector);
 
         void readImageLink(const OUString& rCandidate, OUString& rXLink, OUString& rUrl, OUString& rMimeType, OUString& rData);
 
-        OUString convert(const OUString& rCandidate, sal_Unicode nPattern, sal_Unicode nNew, bool bRemove);
         OUString consolidateContiguousSpace(const OUString& rCandidate);
-        OUString whiteSpaceHandlingDefault(const OUString& rCandidate);
-        OUString whiteSpaceHandlingPreserve(const OUString& rCandidate);
+        OUString xmlSpaceHandling(const OUString& rCandidate, bool bIsDefault);
 
         // #125325# removes block comment of the general form '/* ... */', returns
         // an adapted string or the original if no comments included

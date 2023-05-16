@@ -26,7 +26,6 @@
 #include <vcl/rendercontext/State.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/polygon/b2dpolypolygon.hxx>
-#include <memory>
 
 // predefines
 namespace drawinglayer::geometry { class ViewInformation2D; }
@@ -44,7 +43,7 @@ namespace wmfemfhelper
     class TargetHolder
     {
     private:
-        std::vector< rtl::Reference<drawinglayer::primitive2d::BasePrimitive2D> > aTargets;
+        drawinglayer::primitive2d::Primitive2DContainer aTargets;
 
     public:
         TargetHolder();
@@ -53,6 +52,10 @@ namespace wmfemfhelper
         void append(const rtl::Reference<drawinglayer::primitive2d::BasePrimitive2D> & pCandidate)
         {
             append(pCandidate.get());
+        }
+        void append(drawinglayer::primitive2d::Primitive2DContainer xCandidate)
+        {
+            aTargets.append(std::move(xCandidate));
         }
         void append(drawinglayer::primitive2d::BasePrimitive2D* pCandidate);
         drawinglayer::primitive2d::Primitive2DContainer getPrimitive2DSequence(const PropertyHolder& rPropertyHolder);

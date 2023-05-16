@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <jpeglib.h>
+#include <jerror.h>
 
 #include <com/sun/star/task/XStatusIndicator.hpp>
 
@@ -78,22 +79,26 @@ static void outputMessage (j_common_ptr cinfo)
 
 }
 
-static int GetWarningLimit()
-{
-    return utl::ConfigManager::IsFuzzing() ? 5 : 1000;
-}
-
 extern "C" {
 
 static void emitMessage (j_common_ptr cinfo, int msg_level)
 {
     if (msg_level < 0)
     {
-        // ofz#3002 try to retain some degree of recoverability up to some
-        // reasonable limit (initially using ImageMagick's current limit of
-        // 1000), then bail.
         // https://libjpeg-turbo.org/pmwiki/uploads/About/TwoIssueswiththeJPEGStandard.pdf
-        if (++cinfo->err->num_warnings > GetWarningLimit())
+        // try to retain some degree of recoverability up to some reasonable
+        // limit (initially using ImageMagick's current limit of 1000), then
+        // bail.
+        constexpr int WarningLimit = 1000;
+        static bool bFuzzing = utl::ConfigManager::IsFuzzing();
+        // ofz#50452 due to Timeouts, just abandon fuzzing on any
+        // JWRN_NOT_SEQUENTIAL
+        if (bFuzzing && cinfo->err->msg_code == JWRN_NOT_SEQUENTIAL)
+        {
+            cinfo->err->error_exit(cinfo);
+            return;
+        }
+        if (++cinfo->err->num_warnings > WarningLimit)
             cinfo->err->error_exit(cinfo);
         else
             cinfo->err->output_message(cinfo);
@@ -145,12 +150,30 @@ private:
 struct JpegStuff
 {
     jpeg_decompress_struct cinfo;
+    jpeg_progress_mgr progress;
     ErrorManagerStruct jerr;
     JpegDecompressOwner aOwner;
     std::unique_ptr<BitmapScopedWriteAccess> pScopedAccess;
     std::vector<sal_uInt8> pScanLineBuffer;
     std::vector<sal_uInt8> pCYMKBuffer;
 };
+
+// https://github.com/libjpeg-turbo/libjpeg-turbo/issues/284
+// https://libjpeg-turbo.org/pmwiki/uploads/About/TwoIssueswiththeJPEGStandard.pdf
+#define LIMITSCANS 100
+
+void progress_monitor(j_common_ptr cinfo)
+{
+    if (cinfo->is_decompressor)
+    {
+        jpeg_decompress_struct* decompressor = reinterpret_cast<j_decompress_ptr>(cinfo);
+        if (decompressor->input_scan_number >= LIMITSCANS)
+        {
+            SAL_WARN("vcl.filter", "too many progressive scans, cancelling import after: " << decompressor->input_scan_number << " scans");
+            errorExit(cinfo);
+        }
+    }
+}
 
 }
 
@@ -171,6 +194,8 @@ static void ReadJPEG(JpegStuff& rContext, JPEGReader* pJPEGReader, void* pInputS
     jpeg_create_decompress(&rContext.cinfo);
     rContext.aOwner.set(&rContext.cinfo);
     jpeg_svstream_src(&rContext.cinfo, pInputStream);
+    rContext.cinfo.progress = &rContext.progress;
+    rContext.progress.progress_monitor = progress_monitor;
     SourceManagerStruct *source = reinterpret_cast<SourceManagerStruct*>(rContext.cinfo.src);
     jpeg_read_header(&rContext.cinfo, TRUE);
 
@@ -185,9 +210,14 @@ static void ReadJPEG(JpegStuff& rContext, JPEGReader* pJPEGReader, void* pInputS
     tools::Long nWidth = rContext.cinfo.output_width;
     tools::Long nHeight = rContext.cinfo.output_height;
 
-    tools::Long nResult = 0;
-    if (utl::ConfigManager::IsFuzzing() && (o3tl::checked_multiply(nWidth, nHeight, nResult) || nResult > 4000000))
-        return;
+    if (utl::ConfigManager::IsFuzzing())
+    {
+        tools::Long nResult = 0;
+        if (o3tl::checked_multiply(nWidth, nHeight, nResult) || nResult > 4000000)
+            return;
+        if (rContext.cinfo.err->num_warnings && (nWidth > 8192 || nHeight > 8192))
+            return;
+    }
 
     bool bGray = (rContext.cinfo.output_components == 1);
 
@@ -374,15 +404,15 @@ bool WriteJPEG( JPEGWriter* pJPEGWriter, void* pOutputStream,
     jpeg_set_defaults( &cinfo );
     jpeg_set_quality( &cinfo, static_cast<int>(nQualityPercent), FALSE );
 
-    if (o3tl::convertsToAtMost(rPPI.getX(), 65535) && o3tl::convertsToAtMost(rPPI.getY(), 65535))
+    if (o3tl::convertsToAtMost(rPPI.getWidth(), 65535) && o3tl::convertsToAtMost(rPPI.getHeight(), 65535))
     {
         cinfo.density_unit = 1;
-        cinfo.X_density = rPPI.getX();
-        cinfo.Y_density = rPPI.getY();
+        cinfo.X_density = rPPI.getWidth();
+        cinfo.Y_density = rPPI.getHeight();
     }
     else
     {
-        SAL_WARN("vcl.filter", "ignoring too large PPI " << rPPI);
+        SAL_WARN("vcl.filter", "ignoring too large PPI (" << rPPI.getWidth() << ", " << rPPI.getHeight() << ")");
     }
 
     if ( ( nWidth > 128 ) || ( nHeight > 128 ) )

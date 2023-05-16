@@ -47,24 +47,24 @@ namespace dbaui
         m_pTableView = nullptr;
     }
     // XAccessibleContext
-    sal_Int32 SAL_CALL OJoinDesignViewAccess::getAccessibleChildCount(  )
+    sal_Int64 SAL_CALL OJoinDesignViewAccess::getAccessibleChildCount(  )
     {
         // TODO may be this will change to only visible windows
         // this is the same assumption mt implements
         ::osl::MutexGuard aGuard( m_aMutex  );
-        sal_Int32 nChildCount = 0;
+        sal_Int64 nChildCount = 0;
         if ( m_pTableView )
             nChildCount = m_pTableView->GetTabWinCount() + m_pTableView->getTableConnections().size();
         return nChildCount;
     }
-    Reference< XAccessible > SAL_CALL OJoinDesignViewAccess::getAccessibleChild( sal_Int32 i )
+    Reference< XAccessible > SAL_CALL OJoinDesignViewAccess::getAccessibleChild( sal_Int64 i )
     {
         Reference< XAccessible > aRet;
         ::osl::MutexGuard aGuard( m_aMutex  );
         if(i < 0 || i >= getAccessibleChildCount() || !m_pTableView)
             throw IndexOutOfBoundsException();
         // check if we should return a table window or a connection
-        sal_Int32 nTableWindowCount = m_pTableView->GetTabWinCount();
+        sal_Int64 nTableWindowCount = m_pTableView->GetTabWinCount();
         if( i < nTableWindowCount )
         {
             OJoinTableView::OTableWindowMap::const_iterator aIter = std::next(m_pTableView->GetTabWinMap().begin(), i);

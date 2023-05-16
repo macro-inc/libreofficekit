@@ -12,6 +12,7 @@
 
 #include <string_view>
 
+#include <osl/endian.h>
 #include <test/bootstrapfixture.hxx>
 #include <test/xmltesttools.hxx>
 #include <vcl/gdimtf.hxx>
@@ -19,7 +20,7 @@
 #include <vcl/hatch.hxx>
 #include <vcl/lineinfo.hxx>
 #include <vcl/virdev.hxx>
-#include <vcl/pngwrite.hxx>
+#include <vcl/filter/PngImageWriter.hxx>
 #include <tools/fract.hxx>
 #include <vcl/metaact.hxx>
 #include <vcl/filter/SvmReader.hxx>
@@ -31,6 +32,7 @@
 #include <basegfx/polygon/b2dpolypolygon.hxx>
 
 #include <config_features.h>
+#include <config_fonts.h>
 #include <vcl/skia/SkiaHelper.hxx>
 
 using namespace css;
@@ -278,18 +280,18 @@ void SvmTest::checkRendering(ScopedVclPtrInstance<VirtualDevice> const & pVirtua
 
     if (bWriteCompareBitmap)
     {
-        utl::TempFile aTempFile;
+        utl::TempFileNamed aTempFile;
         aTempFile.EnableKillingFile();
 
         {
             SvFileStream aStream(aTempFile.GetURL() + ".source.png", StreamMode::WRITE | StreamMode::TRUNC);
-            vcl::PNGWriter aPNGWriter(aSourceBitmapEx);
-            aPNGWriter.Write(aStream);
+            vcl::PngImageWriter aPNGWriter(aStream);
+            aPNGWriter.write(aSourceBitmapEx);
         }
         {
             SvFileStream aStream(aTempFile.GetURL() + ".result.png", StreamMode::WRITE | StreamMode::TRUNC);
-            vcl::PNGWriter aPNGWriter(aResultBitmapEx);
-            aPNGWriter.Write(aStream);
+            vcl::PngImageWriter aPNGWriter(aStream);
+            aPNGWriter.write(aResultBitmapEx);
         }
     }
     CPPUNIT_ASSERT_EQUAL(aSourceBitmapEx.GetChecksum(), aResultBitmapEx.GetChecksum());
@@ -858,7 +860,7 @@ void SvmTest::testTextArray()
     ScopedVclPtrInstance<VirtualDevice> pVirtualDev;
     setupBaseVirtualDevice(*pVirtualDev, aGDIMetaFile);
     sal_Int32 const aDX[] = { 10, 15, 20, 25, 30, 35 };
-    pVirtualDev->DrawTextArray(Point(4,6), "123456", aDX, 1, 4);
+    pVirtualDev->DrawTextArray(Point(4,6), "123456", KernArraySpan(aDX), {}, 1, 4);
 
     checkTextArray(writeAndReadStream(aGDIMetaFile));
     checkTextArray(readFile(u"textarray.svm"));
@@ -936,14 +938,26 @@ void SvmTest::checkBitmaps(const GDIMetaFile& rMetaFile)
     if (SkiaHelper::isVCLSkiaEnabled())
         return; // TODO SKIA using CRCs is broken (the idea of it)
 
-    assertXPathAttrs(pDoc, "/metafile/bmp[1]", {{"x", "1"}, {"y", "2"}, {"crc", "b8dee5da"}});
+    assertXPathAttrs(pDoc, "/metafile/bmp[1]", {{"x", "1"}, {"y", "2"}, {"crc",
+#if defined OSL_BIGENDIAN
+        "5e01ddcc"
+#else
+        "b8dee5da"
+#endif
+        }});
     assertXPathAttrs(pDoc, "/metafile/bmpscale[1]", {
         {"x", "1"}, {"y", "2"}, {"width", "3"}, {"height", "4"}, {"crc", "281fc589"}
     });
     assertXPathAttrs(pDoc, "/metafile/bmpscalepart[1]", {
         {"destx", "1"}, {"desty", "2"}, {"destwidth", "3"}, {"destheight", "4"},
         {"srcx", "2"},  {"srcy", "1"},  {"srcwidth", "4"},  {"srcheight", "3"},
-        {"crc", "5e01ddcc"}
+        {"crc",
+#if defined OSL_BIGENDIAN
+         "b8dee5da"
+#else
+         "5e01ddcc"
+#endif
+        }
     });
 }
 
@@ -994,6 +1008,16 @@ void SvmTest::checkBitmapExs(const GDIMetaFile& rMetaFile)
     std::vector<OUString> aExpectedCRC;
     aExpectedCRC.insert(aExpectedCRC.end(),
     {
+#if defined OSL_BIGENDIAN
+        "08feb5d3",
+        "281fc589",
+        "b8dee5da",
+        "4df0e464",
+        "186ff868",
+        "33b4a07c", // 4-bit color bitmap - same as 8-bit color bitmap
+        "33b4a07c",
+        "742c3e35",
+#else
         "d8377d4f",
         "281fc589",
         "5e01ddcc",
@@ -1002,6 +1026,7 @@ void SvmTest::checkBitmapExs(const GDIMetaFile& rMetaFile)
         "3c80d829", // 4-bit color bitmap - same as 8-bit color bitmap
         "3c80d829",
         "71efc447",
+#endif
     });
 
     assertXPathAttrs(pDoc, "/metafile/bmpex[1]", {
@@ -1246,13 +1271,13 @@ void SvmTest::testGradient()
 
     tools::Rectangle aRectangle(Point(1, 2), Size(4,5));
 
-    Gradient aGradient(GradientStyle::Linear, COL_WHITE, COL_BLACK);
+    Gradient aGradient(css::awt::GradientStyle_LINEAR, COL_WHITE, COL_BLACK);
     pVirtualDev->DrawGradient(aRectangle, aGradient);
 
     tools::Rectangle aRectangle2(Point(3, 4), Size(1,2));
 
     Gradient aGradient2;
-    aGradient2.SetStyle(GradientStyle::Radial);
+    aGradient2.SetStyle(css::awt::GradientStyle_RADIAL);
     aGradient2.SetStartColor(COL_LIGHTRED);
     aGradient2.SetEndColor(COL_LIGHTGREEN);
     aGradient2.SetAngle(Degree10(55));
@@ -1340,7 +1365,7 @@ void SvmTest::testGradientEx()
     tools::PolyPolygon aPolyPolygon(1);
     aPolyPolygon.Insert(aPolygon);
 
-    Gradient aGradient(GradientStyle::Linear, COL_WHITE, COL_BLACK);
+    Gradient aGradient(css::awt::GradientStyle_LINEAR, COL_WHITE, COL_BLACK);
     pVirtualDev->DrawGradient(aPolyPolygon, aGradient);
 
     tools::Polygon aPolygon2(2);
@@ -1356,7 +1381,7 @@ void SvmTest::testGradientEx()
     aPolyPolygon2.Insert(aPolygon3);
 
     Gradient aGradient2;
-    aGradient2.SetStyle(GradientStyle::Axial);
+    aGradient2.SetStyle(css::awt::GradientStyle_AXIAL);
     aGradient2.SetStartColor(COL_LIGHTMAGENTA);
     aGradient2.SetEndColor(COL_CYAN);
     aGradient2.SetAngle(Degree10(55));
@@ -2090,7 +2115,7 @@ void SvmTest::testFloatTransparent()
     pVirtualDev1->DrawPixel(Point(1, 8));
     pVirtualDev1->DrawPixel(Point(2, 7));
 
-    Gradient aGradient(GradientStyle::Linear, COL_WHITE, COL_BLACK);
+    Gradient aGradient(css::awt::GradientStyle_LINEAR, COL_WHITE, COL_BLACK);
 
     pVirtualDev->DrawTransparent(aGDIMetaFile1, Point(1, 2), Size(3, 4), aGradient);
 
@@ -2146,11 +2171,9 @@ void SvmTest::testEPS()
     ScopedVclPtrInstance<VirtualDevice> pVirtualDev;
     setupBaseVirtualDevice(*pVirtualDev, aGDIMetaFile);
 
-    sal_uInt32 nDataSize = 3;
-    std::unique_ptr<sal_uInt8[]> pBuffer (new sal_uInt8[nDataSize]);
-    pBuffer[0] = 'a';
-    pBuffer[1] = 'b';
-    pBuffer[2] = 'c';
+    sal_uInt8 aBuffer[] = { 'a','b','c' };
+    SvMemoryStream stream(aBuffer, std::size(aBuffer), StreamMode::READ);
+    BinaryDataContainer aContainer(stream, std::size(aBuffer));
 
     MapMode aMapMode1(MapUnit::Map100thInch);
     aMapMode1.SetOrigin(Point(0, 1));
@@ -2164,7 +2187,7 @@ void SvmTest::testEPS()
     pVirtualDev1->DrawPixel(Point(1, 8));
     pVirtualDev1->DrawPixel(Point(2, 7));
 
-    GfxLink aGfxLink(std::move(pBuffer), nDataSize, GfxLinkType::EpsBuffer);
+    GfxLink aGfxLink(aContainer, GfxLinkType::EpsBuffer);
     aGfxLink.SetPrefMapMode(aMapMode1);
     aGfxLink.SetUserId(12345);
     aGfxLink.SetPrefSize(Size(3, 6));
@@ -2219,15 +2242,9 @@ void SvmTest::checkComment(const GDIMetaFile& rMetafile)
         {"datasize", "48"}
     });
 
-#ifdef OSL_LITENDIAN
     assertXPathAttrs(pDoc, "/metafile/comment[2]", {
         {"data", "540068006500730065002000610072006500200073006f006d0065002000740065007300740020006400610074006100"}
     });
-#else
-    assertXPathAttrs(pDoc, "/metafile/comment[2]", {
-        {"data", "00540068006500730065002000610072006500200073006f006d00650020007400650073007400200064006100740061"}
-    });
-#endif
 
     assertXPathAttrs(pDoc, "/metafile/comment[2]", {
         {"value", "4"}
@@ -2244,11 +2261,13 @@ void SvmTest::testComment()
 
     aGDIMetaFile.AddAction(new MetaCommentAction("Test comment"));
 
-    OUString aString = "These are some test data";
+    using namespace std::literals::string_view_literals;
+    static constexpr auto aString
+        = "T\0h\0e\0s\0e\0 \0a\0r\0e\0 \0s\0o\0m\0e\0 \0t\0e\0s\0t\0 \0d\0a\0t\0a\0"sv;
     aGDIMetaFile.AddAction(new MetaCommentAction("This is a test comment", \
                                                     4, \
-                                                    reinterpret_cast<const sal_uInt8*>(aString.getStr()), \
-                                                    2*aString.getLength() ));
+                                                    reinterpret_cast<const sal_uInt8*>(aString.data()), \
+                                                    aString.length() ));
 
     checkComment(writeAndReadStream(aGDIMetaFile));
     checkComment(readFile(u"comment.svm"));

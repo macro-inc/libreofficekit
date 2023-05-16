@@ -29,6 +29,8 @@
 #include <PackageConstants.hxx>
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/packages/zip/ZipConstants.hpp>
+#include <com/sun/star/packages/zip/ZipException.hpp>
+#include <com/sun/star/packages/zip/ZipIOException.hpp>
 #include <com/sun/star/packages/manifest/ManifestReader.hpp>
 #include <com/sun/star/packages/manifest/ManifestWriter.hpp>
 #include <com/sun/star/io/TempFile.hpp>
@@ -37,41 +39,33 @@
 #include <com/sun/star/io/XOutputStream.hpp>
 #include <com/sun/star/io/XTruncate.hpp>
 #include <com/sun/star/io/XSeekable.hpp>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/lang/WrappedTargetRuntimeException.hpp>
 #include <com/sun/star/container/XNameContainer.hpp>
-#include <com/sun/star/ucb/IOErrorCode.hpp>
 #include <comphelper/fileurl.hxx>
 #include <ucbhelper/content.hxx>
-#include <cppuhelper/factory.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <com/sun/star/ucb/ContentCreationException.hpp>
 #include <com/sun/star/ucb/TransferInfo.hpp>
 #include <com/sun/star/ucb/NameClash.hpp>
 #include <com/sun/star/ucb/OpenCommandArgument2.hpp>
 #include <com/sun/star/ucb/OpenMode.hpp>
-#include <com/sun/star/ucb/XProgressHandler.hpp>
 #include <com/sun/star/ucb/SimpleFileAccess.hpp>
 #include <com/sun/star/io/XActiveDataStreamer.hpp>
-#include <com/sun/star/embed/XTransactedObject.hpp>
 #include <com/sun/star/embed/UseBackupException.hpp>
 #include <com/sun/star/embed/StorageFormats.hpp>
 #include <com/sun/star/beans/NamedValue.hpp>
 #include <com/sun/star/xml/crypto/DigestID.hpp>
-#include <com/sun/star/xml/crypto/CipherID.hpp>
 #include <cppuhelper/implbase.hxx>
 #include <rtl/uri.hxx>
 #include <rtl/random.h>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <sal/log.hxx>
+#include <unotools/tempfile.hxx>
 #include <com/sun/star/io/XAsyncOutputMonitor.hpp>
 
-#include <cstring>
-#include <memory>
 #include <string_view>
-#include <vector>
 
-#include <comphelper/processfactory.hxx>
 #include <comphelper/seekableinput.hxx>
 #include <comphelper/storagehelper.hxx>
 #include <comphelper/ofopxmlhelper.hxx>
@@ -80,6 +74,7 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/servicehelper.hxx>
+#include <utility>
 
 using namespace osl;
 using namespace cppu;
@@ -138,7 +133,7 @@ class DummyInputStream : public ::cppu::WeakImplHelper< XInputStream >
 
 }
 
-ZipPackage::ZipPackage ( const uno::Reference < XComponentContext > &xContext )
+ZipPackage::ZipPackage ( uno::Reference < XComponentContext > xContext )
 : m_aMutexHolder( new comphelper::RefCountedMutex )
 , m_nStartKeyGenerationID( xml::crypto::DigestID::SHA1 )
 , m_nChecksumDigestID( xml::crypto::DigestID::SHA1_1K )
@@ -151,7 +146,7 @@ ZipPackage::ZipPackage ( const uno::Reference < XComponentContext > &xContext )
 , m_nFormat( embed::StorageFormats::PACKAGE ) // package is the default format
 , m_bAllowRemoveOnInsert( true )
 , m_eMode ( e_IMode_None )
-, m_xContext( xContext )
+, m_xContext(std::move( xContext ))
 {
     m_xRootFolder = new ZipPackageFolder( m_xContext, m_nFormat, m_bAllowRemoveOnInsert );
 }
@@ -610,24 +605,24 @@ void SAL_CALL ZipPackage::initialize( const uno::Sequence< Any >& aArguments )
                 if ( nParam >= 0 )
                 {
                     m_aURL = aParamUrl.copy( 0, nParam );
-                    OUString aParam = aParamUrl.copy( nParam + 1 );
+                    std::u16string_view aParam = aParamUrl.subView( nParam + 1 );
 
                     sal_Int32 nIndex = 0;
                     do
                     {
-                        OUString aCommand = aParam.getToken( 0, '&', nIndex );
-                        if ( aCommand == "repairpackage" )
+                        std::u16string_view aCommand = o3tl::getToken(aParam, 0, '&', nIndex );
+                        if ( aCommand == u"repairpackage" )
                         {
                             m_bForceRecovery = true;
                             break;
                         }
-                        else if ( aCommand == "purezip" )
+                        else if ( aCommand == u"purezip" )
                         {
                             m_nFormat = embed::StorageFormats::ZIP;
                             m_xRootFolder->setPackageFormat_Impl( m_nFormat );
                             break;
                         }
-                        else if ( aCommand == "ofopxml" )
+                        else if ( aCommand == u"ofopxml" )
                         {
                             m_nFormat = embed::StorageFormats::OFOPXML;
                             m_xRootFolder->setPackageFormat_Impl( m_nFormat );
@@ -805,7 +800,7 @@ Any SAL_CALL ZipPackage::getByHierarchicalName( const OUString& aName )
 
     if (aName == "/")
         // root directory.
-        return makeAny ( uno::Reference < XUnoTunnel > ( m_xRootFolder ) );
+        return Any ( uno::Reference < XUnoTunnel > ( m_xRootFolder ) );
 
     nStreamIndex = aName.lastIndexOf ( '/' );
     bool bFolder = nStreamIndex == nIndex-1; // last character is '/'.
@@ -828,7 +823,7 @@ Any SAL_CALL ZipPackage::getByHierarchicalName( const OUString& aName )
                 sTemp = aName.copy ( nDirIndex == -1 ? 0 : nDirIndex+1, nStreamIndex-nDirIndex-1 );
 
                 if (pFolder && sTemp == pFolder->getName())
-                    return makeAny(uno::Reference<XUnoTunnel>(pFolder));
+                    return Any(uno::Reference<XUnoTunnel>(pFolder));
             }
             else
             {
@@ -874,7 +869,7 @@ Any SAL_CALL ZipPackage::getByHierarchicalName( const OUString& aName )
     {
         if ( nStreamIndex != -1 )
             m_aRecent[sDirName] = pPrevious; // cache it.
-        return makeAny ( uno::Reference < XUnoTunnel > ( pCurrent ) );
+        return Any ( uno::Reference < XUnoTunnel > ( pCurrent ) );
     }
 
     sTemp = aName.copy( nOldIndex );
@@ -1202,9 +1197,9 @@ uno::Reference< io::XInputStream > ZipPackage::writeTempFile()
     if( bUseTemp )
     {
         // create temporary file
-        uno::Reference < io::XTempFile > xTempFile( io::TempFile::create(m_xContext) );
-        xTempOut.set( xTempFile->getOutputStream(), UNO_SET_THROW );
-        xTempIn.set( xTempFile->getInputStream(), UNO_SET_THROW );
+        rtl::Reference < utl::TempFileFastService > xTempFile( new utl::TempFileFastService );
+        xTempOut.set( xTempFile );
+        xTempIn.set( xTempFile );
     }
 
     // Hand it to the ZipOutputStream:
@@ -1345,7 +1340,7 @@ uno::Reference< io::XInputStream > ZipPackage::writeTempFile()
             embed::UseBackupException aException( aErrTxt, uno::Reference< uno::XInterface >(), OUString() );
             throw WrappedTargetException( aErrTxt,
                                             static_cast < OWeakObject * > ( this ),
-                                            makeAny ( aException ) );
+                                            Any ( aException ) );
         }
     }
 
@@ -1369,7 +1364,7 @@ uno::Reference< XActiveDataStreamer > ZipPackage::openOriginalForOutput()
             try
             {
                 Exception aDetect;
-                Any aAny = aOriginalContent.setPropertyValue("Size", makeAny( sal_Int64(0) ) );
+                Any aAny = aOriginalContent.setPropertyValue("Size", Any( sal_Int64(0) ) );
                 if( !( aAny >>= aDetect ) )
                     bTruncSuccess = true;
             }
@@ -1392,7 +1387,7 @@ uno::Reference< XActiveDataStreamer > ZipPackage::openOriginalForOutput()
             aArg.Sink       = xSink;
             aArg.Properties = uno::Sequence< Property >( 0 ); // unused
 
-            aOriginalContent.executeCommand("open", makeAny( aArg ) );
+            aOriginalContent.executeCommand("open", Any( aArg ) );
         }
         catch( Exception& )
         {
@@ -1413,7 +1408,7 @@ void SAL_CALL ZipPackage::commitChanges()
     {
         IOException aException;
         throw WrappedTargetException(THROW_WHERE "This package is read only!",
-                static_cast < OWeakObject * > ( this ), makeAny ( aException ) );
+                static_cast < OWeakObject * > ( this ), Any ( aException ) );
     }
     // first the writeTempFile is called, if it returns a stream the stream should be written to the target
     // if no stream was returned, the file was written directly, nothing should be done
@@ -1606,7 +1601,7 @@ void ZipPackage::DisconnectFromTargetAndThrowException_Impl( const uno::Referenc
         uno::Any aUrl = xTempFile->getPropertyValue("Uri");
         aUrl >>= aTempURL;
         xTempFile->setPropertyValue("RemoveFile",
-                                     uno::makeAny( false ) );
+                                     uno::Any( false ) );
     }
     catch ( uno::Exception& )
     {
@@ -1617,7 +1612,7 @@ void ZipPackage::DisconnectFromTargetAndThrowException_Impl( const uno::Referenc
     embed::UseBackupException aException( aErrTxt, uno::Reference< uno::XInterface >(), aTempURL );
     throw WrappedTargetException( aErrTxt,
                                     static_cast < OWeakObject * > ( this ),
-                                    makeAny ( aException ) );
+                                    Any ( aException ) );
 }
 
 uno::Sequence< sal_Int8 > ZipPackage::GetEncryptionKey()
@@ -1669,7 +1664,7 @@ sal_Bool SAL_CALL ZipPackage::supportsService( OUString const & rServiceName )
     return cppu::supportsService(this, rServiceName);
 }
 
-Sequence< sal_Int8 > ZipPackage::getUnoTunnelId()
+const Sequence< sal_Int8 > & ZipPackage::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit implId;
     return implId.getSeq();

@@ -20,6 +20,7 @@
 #include <vcl/builder.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/help.hxx>
+#include <vcl/kernarray.hxx>
 #include <vcl/menu.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/event.hxx>
@@ -259,6 +260,9 @@ void Calendar::ImplFormat()
             nDay++;
             nDay %= 7;
         }
+
+        // header position for the last day of week
+        mnDayOfWeekAry[7] = mnMonthWidth;
 
         mbCalc = false;
     }
@@ -525,7 +529,7 @@ void Calendar::ImplDrawDate(vcl::RenderContext& rRenderContext,
                             bool bOther, sal_Int32 nToday )
 {
     Color const * pTextColor = nullptr;
-    const OUString& rDay = maDayTexts[nDay - 1];
+    const OUString& rDay = maDayTexts[(nDay - 1) % std::size(maDayTexts)];
     tools::Rectangle aDateRect(nX, nY, nX + mnDayWidth - 1, nY + mnDayHeight - 1);
 
     bool bSel = false;
@@ -704,10 +708,10 @@ void Calendar::ImplDraw(vcl::RenderContext& rRenderContext)
             rRenderContext.SetLineColor(rStyleSettings.GetWindowTextColor());
             Point aStartPos(nDayX, nDeltaY);
             rRenderContext.DrawLine(aStartPos, Point(nDayX + (7 * mnDayWidth), nDeltaY));
-            std::vector<sal_Int32> aTmp;
-            for (int k=0; k<6; ++k)
+            KernArray aTmp;
+            for (int k=0; k<7; ++k)
                 aTmp.push_back(mnDayOfWeekAry[k+1]);
-            rRenderContext.DrawTextArray(Point(nDayX + mnDayOfWeekAry[0], nDayY), maDayOfWeekText, aTmp);
+            rRenderContext.DrawTextArray(Point(nDayX + mnDayOfWeekAry[0], nDayY), maDayOfWeekText, aTmp, {}, 0, aTmp.size());
 
             // display days
             sal_uInt16 nDaysInMonth = aDate.GetDaysInMonth();
@@ -861,7 +865,7 @@ void Calendar::ImplUpdate( bool bCalcNew )
     mbFormat = true;
 }
 
-void Calendar::ImplScroll( bool bPrev )
+void Calendar::ImplScrollCalendar( bool bPrev )
 {
     Date aNewFirstMonth = GetFirstMonth();
     if ( bPrev )
@@ -940,7 +944,7 @@ void Calendar::ImplTracking( const Point& rPos, bool bRepeat )
 
         if ( bRepeat && (mbPrevIn || mbNextIn) )
         {
-            ImplScroll( mbPrevIn );
+            ImplScrollCalendar( mbPrevIn );
         }
     }
     else
@@ -989,9 +993,9 @@ void Calendar::ImplEndTracking( bool bCancel )
             Date aFirstSelDate( *mpSelectTable->begin() );
             Date aLastSelDate( *mpSelectTable->rbegin() );
             if ( aLastSelDate < GetFirstMonth() )
-                ImplScroll( true );
+                ImplScrollCalendar( true );
             else if ( GetLastMonth() < aFirstSelDate )
-                ImplScroll( false );
+                ImplScrollCalendar( false );
         }
     }
 
@@ -1023,7 +1027,7 @@ void Calendar::MouseButtonDown( const MouseEvent& rMEvt )
                 if ( mbPrevIn || mbNextIn )
                 {
                     mbSpinDown = true;
-                    ImplScroll( mbPrevIn );
+                    ImplScrollCalendar( mbPrevIn );
                     // it should really read BUTTONREPEAT, therefore do not
                     // change it to SCROLLREPEAT, check with TH,
                     // why it could be different (71775)
@@ -1221,7 +1225,7 @@ void Calendar::Command( const CommandEvent& rCEvt )
             {
                 while ( nNotchDelta < 0 )
                 {
-                    ImplScroll( true );
+                    ImplScrollCalendar( true );
                     nNotchDelta++;
                 }
             }
@@ -1229,7 +1233,7 @@ void Calendar::Command( const CommandEvent& rCEvt )
             {
                 while ( nNotchDelta > 0 )
                 {
-                    ImplScroll( false );
+                    ImplScrollCalendar( false );
                     nNotchDelta--;
                 }
             }
@@ -1718,6 +1722,13 @@ void CalendarField::StateChanged( StateChangedType nStateChange )
         WinBits nMyAlignment = GetStyle() & nAllAlignmentBits;
         GetSubEdit()->SetStyle( ( GetSubEdit()->GetStyle() & ~nAllAlignmentBits ) | nMyAlignment );
     }
+}
+
+// tdf#142783 consider the Edit and its DropDown as one compound control for the purpose of
+// notification of loss of focus from the control
+bool CalendarField::FocusWindowBelongsToControl(const vcl::Window* pFocusWin) const
+{
+    return DateField::FocusWindowBelongsToControl(pFocusWin) || (mpFloatWin && mpFloatWin->ImplIsWindowOrChild(pFocusWin));
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -83,11 +83,13 @@ public:
     SwFont* GetFont() const { return m_pFnt.get(); }
     void IncLineNr() { ++m_nLineNr; }
     bool HasNumber() const {
+        assert( m_rLineInf.GetCountBy() != 0 );
         if( m_rLineInf.GetCountBy() == 0 )
             return false;
         return !( m_nLineNr % m_rLineInf.GetCountBy() );
     }
     bool HasDivider() const {
+        assert( m_rLineInf.GetDividerCountBy() != 0 );
         if( !m_nDivider || m_rLineInf.GetDividerCountBy() == 0 )
             return false;
         return !(m_nLineNr % m_rLineInf.GetDividerCountBy());
@@ -537,13 +539,13 @@ bool SwTextFrame::PaintEmpty( const SwRect &rRect, bool bCheck ) const
                     SwRedlineItr aRedln(rTextNode, *pFnt, aAttrHandler, nRedlPos, SwRedlineItr::Mode::Show);
                     const SwRangeRedline* pRedline = rIDRA.GetRedlineTable()[nRedlPos];
                     // show redlining only on the inserted/deleted empty paragraph, but not on the next one
-                    if ( rTextNode.GetIndex() != pRedline->End()->nNode.GetIndex() )
+                    if ( rTextNode.GetIndex() != pRedline->End()->GetNodeIndex() )
                         eRedline = pRedline->GetType();
                     // except if the next empty paragraph starts a new redline (e.g. deletion after insertion)
                     else if ( nRedlPos + 1 < rIDRA.GetRedlineTable().size() )
                     {
                         const SwRangeRedline* pNextRedline = rIDRA.GetRedlineTable()[nRedlPos + 1];
-                        if ( rTextNode.GetIndex() == pNextRedline->Start()->nNode.GetIndex() )
+                        if ( rTextNode.GetIndex() == pNextRedline->Start()->GetNodeIndex() )
                             eRedline = pNextRedline->GetType();
                     }
                 }
@@ -599,7 +601,8 @@ bool SwTextFrame::PaintEmpty( const SwRect &rRect, bool bCheck ) const
                 }
 
                 // Don't show the paragraph mark for collapsed paragraphs, when they are hidden
-                if ( EmptyHeight( ) > 1 )
+                // No paragraph marker in the non-last part of a split fly anchor, either.
+                if ( EmptyHeight( ) > 1 && !HasNonLastSplitFlyDrawObj() )
                 {
                     SwDrawTextInfo aDrawInf( pSh, *pSh->GetOut(), CH_PAR, 0, 1 );
                     aDrawInf.SetPos( aPos );

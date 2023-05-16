@@ -20,7 +20,6 @@
 #define INCLUDED_PACKAGE_INC_ZIPPACKAGESTREAM_HXX
 
 #include <com/sun/star/io/XActiveDataSink.hpp>
-#include <com/sun/star/io/XSeekable.hpp>
 #include <com/sun/star/beans/NamedValue.hpp>
 #include <com/sun/star/packages/XDataSinkEncrSupport.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
@@ -138,7 +137,7 @@ public:
     void setZipEntryOnLoading( const ZipEntry &rInEntry);
     void successfullyWritten( ZipEntry const *pEntry );
 
-    static css::uno::Sequence < sal_Int8 > getUnoTunnelId();
+    static const css::uno::Sequence < sal_Int8 > & getUnoTunnelId();
 
     // XActiveDataSink
     virtual void SAL_CALL setInputStream( const css::uno::Reference< css::io::XInputStream >& aStream ) override;

@@ -18,11 +18,13 @@
  */
 #pragma once
 
-#include "MutexContainer.hxx"
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/implbase.hxx>
 
 #include <com/sun/star/chart2/data/XLabeledDataSequence2.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
+#include "ModifyListenerHelper.hxx"
+#include "charttoolsdllapi.hxx"
 
 namespace com::sun::star::chart2::data { class XDataSequence; }
 namespace com::sun::star::util { class XCloneable; }
@@ -39,17 +41,18 @@ typedef cppu::WeakImplHelper<
     LabeledDataSequence_Base;
 }
 
-class LabeledDataSequence :
-        public MutexContainer,
+class OOO_DLLPUBLIC_CHARTTOOLS LabeledDataSequence final :
+        public cppu::BaseMutex,
         public impl::LabeledDataSequence_Base
 {
 public:
     explicit LabeledDataSequence();
+    explicit LabeledDataSequence(const LabeledDataSequence &);
     explicit LabeledDataSequence(
-        const css::uno::Reference< css::chart2::data::XDataSequence > & rValues );
+        css::uno::Reference< css::chart2::data::XDataSequence > xValues );
     explicit LabeledDataSequence(
-        const css::uno::Reference< css::chart2::data::XDataSequence > & rValues,
-        const css::uno::Reference< css::chart2::data::XDataSequence > & rLabels );
+        css::uno::Reference< css::chart2::data::XDataSequence > xValues,
+        css::uno::Reference< css::chart2::data::XDataSequence > xLabels );
 
     virtual ~LabeledDataSequence() override;
 
@@ -58,7 +61,6 @@ public:
     virtual sal_Bool SAL_CALL supportsService( const OUString& ServiceName ) override;
     virtual css::uno::Sequence< OUString > SAL_CALL getSupportedServiceNames() override;
 
-protected:
     // ____ XLabeledDataSequence ____
     virtual css::uno::Reference< css::chart2::data::XDataSequence > SAL_CALL getValues() override;
     virtual void SAL_CALL setValues(
@@ -80,7 +82,7 @@ private:
     css::uno::Reference< css::chart2::data::XDataSequence > m_xData;
     css::uno::Reference< css::chart2::data::XDataSequence > m_xLabel;
 
-    css::uno::Reference< css::util::XModifyListener >       m_xModifyEventForwarder;
+    rtl::Reference<ModifyEventForwarder> m_xModifyEventForwarder;
 };
 
 } //  namespace chart

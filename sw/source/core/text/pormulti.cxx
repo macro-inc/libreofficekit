@@ -134,15 +134,26 @@ void SwMultiPortion::HandlePortion( SwPortionHandler& rPH ) const
     rPH.Text( GetLen(), GetWhichPor() );
 }
 
-void SwMultiPortion::dumpAsXml(xmlTextWriterPtr pWriter) const
+void SwMultiPortion::dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText,
+                               TextFrameIndex& nOffset) const
 {
     (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwMultiPortion"));
-    (void)xmlTextWriterWriteFormatAttribute(pWriter, BAD_CAST("ptr"), "%p", this);
-    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("symbol"),  BAD_CAST(typeid(*this).name()));
+    dumpAsXmlAttributes(pWriter, rText, nOffset);
+    // Intentionally not incrementing nOffset here, one of the child portions will do that.
 
-    for (const SwLineLayout* pLine = &GetRoot(); pLine; pLine = pLine->GetNext())
+    const SwLineLayout* pLine = &GetRoot();
+    while (pLine)
     {
-        pLine->dumpAsXml(pWriter);
+        (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwLineLayout"));
+        pLine->dumpAsXmlAttributes(pWriter, rText, nOffset);
+        const SwLinePortion* pPor = pLine->GetFirstPortion();
+        while (pPor)
+        {
+            pPor->dumpAsXml(pWriter, rText, nOffset);
+            pPor = pPor->GetNextPortion();
+        }
+        (void)xmlTextWriterEndElement(pWriter);
+        pLine = pLine->GetNext();
     }
 
     (void)xmlTextWriterEndElement(pWriter);
@@ -969,9 +980,9 @@ std::optional<SwMultiCreator> SwTextSizeInfo::GetMultiCreator(TextFrameIndex &rP
     // need the node that contains input rPos
     std::pair<SwTextNode const*, sal_Int32> startPos(m_pFrame->MapViewToModel(rPos));
     const SvxCharRotateItem* pActiveRotateItem(nullptr);
-    const SfxPoolItem* pNodeRotateItem(nullptr);
+    const SvxCharRotateItem* pNodeRotateItem(nullptr);
     const SvxTwoLinesItem* pActiveTwoLinesItem(nullptr);
-    const SfxPoolItem* pNodeTwoLinesItem(nullptr);
+    const SvxTwoLinesItem* pNodeTwoLinesItem(nullptr);
     SwTextAttr const* pActiveTwoLinesHint(nullptr);
     SwTextAttr const* pActiveRotateHint(nullptr);
     const SwTextAttr *pRuby = nullptr;
@@ -1031,9 +1042,9 @@ std::optional<SwMultiCreator> SwTextSizeInfo::GetMultiCreator(TextFrameIndex &rP
                 iterAtStartOfNode.Assign(iter);
                 if (SfxItemState::SET == pNode->GetSwAttrSet().GetItemState(
                             RES_CHRATR_ROTATE, true, &pNodeRotateItem) &&
-                    static_cast<const SvxCharRotateItem*>(pNodeRotateItem)->GetValue())
+                    pNodeRotateItem->GetValue())
                 {
-                    pActiveRotateItem = static_cast<const SvxCharRotateItem*>(pNodeRotateItem);
+                    pActiveRotateItem = pNodeRotateItem;
                 }
                 else
                 {
@@ -1041,9 +1052,9 @@ std::optional<SwMultiCreator> SwTextSizeInfo::GetMultiCreator(TextFrameIndex &rP
                 }
                 if (SfxItemState::SET == startPos.first->GetSwAttrSet().GetItemState(
                             RES_CHRATR_TWO_LINES, true, &pNodeTwoLinesItem) &&
-                    static_cast<const SvxTwoLinesItem*>(pNodeTwoLinesItem)->GetValue())
+                    pNodeTwoLinesItem->GetValue())
                 {
-                    pActiveTwoLinesItem = static_cast<const SvxTwoLinesItem*>(pNodeTwoLinesItem);
+                    pActiveTwoLinesItem = pNodeTwoLinesItem;
                 }
                 else
                 {
@@ -1090,9 +1101,9 @@ std::optional<SwMultiCreator> SwTextSizeInfo::GetMultiCreator(TextFrameIndex &rP
             if (pNodeTwoLinesItem)
             {
                 aEnd.push_front(m_pFrame->MapModelToView(startPos.first, startPos.first->Len()));
-                bOn = static_cast<const SvxTwoLinesItem*>(pNodeTwoLinesItem)->GetEndBracket() ==
+                bOn = pNodeTwoLinesItem->GetEndBracket() ==
                         pActiveTwoLinesItem->GetEndBracket() &&
-                      static_cast<const SvxTwoLinesItem*>(pNodeTwoLinesItem)->GetStartBracket() ==
+                      pNodeTwoLinesItem->GetStartBracket() ==
                         pActiveTwoLinesItem->GetStartBracket();
             }
             else
@@ -1150,9 +1161,8 @@ std::optional<SwMultiCreator> SwTextSizeInfo::GetMultiCreator(TextFrameIndex &rP
             }
             else
             {
-                pNodeTwoLinesItem = nullptr;
-                pNode->GetSwAttrSet().GetItemState(
-                            RES_CHRATR_TWO_LINES, true, &pNodeTwoLinesItem);
+                pNodeTwoLinesItem = pNode->GetSwAttrSet().GetItemIfSet(
+                            RES_CHRATR_TWO_LINES);
                 nTmpStart = m_pFrame->MapModelToView(pNode, 0);
                 nTmpEnd = m_pFrame->MapModelToView(pNode, pNode->Len());
                 assert(rPos <= nTmpEnd); // next node must not have smaller index
@@ -1255,9 +1265,8 @@ std::optional<SwMultiCreator> SwTextSizeInfo::GetMultiCreator(TextFrameIndex &rP
             }
             else
             {
-                pNodeTwoLinesItem = nullptr;
-                pNode->GetSwAttrSet().GetItemState(
-                            RES_CHRATR_TWO_LINES, true, &pNodeTwoLinesItem);
+                pNodeTwoLinesItem = pNode->GetSwAttrSet().GetItemIfSet(
+                            RES_CHRATR_TWO_LINES);
                 nTmpStart = m_pFrame->MapModelToView(pNode, 0);
                 nTmpEnd = m_pFrame->MapModelToView(pNode, pNode->Len());
                 assert(n2Start <= nTmpEnd); // next node must not have smaller index
@@ -1321,7 +1330,7 @@ std::optional<SwMultiCreator> SwTextSizeInfo::GetMultiCreator(TextFrameIndex &rP
             if (pNodeRotateItem)
             {
                 aEnd.push_front(m_pFrame->MapModelToView(startPos.first, startPos.first->Len()));
-                bOn = static_cast<const SvxCharRotateItem*>(pNodeRotateItem)->GetValue() ==
+                bOn = pNodeRotateItem->GetValue() ==
                         pActiveRotateItem->GetValue();
             }
             else
@@ -1356,9 +1365,8 @@ std::optional<SwMultiCreator> SwTextSizeInfo::GetMultiCreator(TextFrameIndex &rP
             }
             else
             {
-                pNodeRotateItem = nullptr;
-                pNode->GetSwAttrSet().GetItemState(
-                            RES_CHRATR_ROTATE, true, &pNodeRotateItem);
+                pNodeRotateItem = pNode->GetSwAttrSet().GetItemIfSet(
+                            RES_CHRATR_ROTATE);
                 nTmpStart = m_pFrame->MapModelToView(pNode, 0);
                 nTmpEnd = m_pFrame->MapModelToView(pNode, pNode->Len());
                 assert(rPos <= nTmpEnd); // next node must not have smaller index
@@ -1573,7 +1581,7 @@ void SwTextPainter::PaintMultiPortion( const SwRect &rPaint,
 
     SwSpaceManipulator aManip( GetInfo(), rMulti );
 
-    std::unique_ptr<SwFontSave> pFontSave;
+    std::optional<SwFontSave> oFontSave;
     std::unique_ptr<SwFont> pTmpFnt;
 
     if( rMulti.IsDouble() )
@@ -1584,11 +1592,10 @@ void SwTextPainter::PaintMultiPortion( const SwRect &rPaint,
             SetPropFont( 50 );
             pTmpFnt->SetProportion( GetPropFont() );
         }
-        pFontSave.reset(new SwFontSave( GetInfo(), pTmpFnt.get(), this ));
+        oFontSave.emplace( GetInfo(), pTmpFnt.get(), this );
     }
     else
     {
-        pFontSave = nullptr;
         pTmpFnt = nullptr;
     }
 
@@ -1844,7 +1851,7 @@ void SwTextPainter::PaintMultiPortion( const SwRect &rPaint,
     // Restore the saved values
     GetInfo().X( nOldX );
     GetInfo().SetLen( nOldLen );
-    pFontSave.reset();
+    oFontSave.reset();
     pTmpFnt.reset();
     SetPropFont( 0 );
 }
@@ -1914,7 +1921,7 @@ bool SwTextFormatter::BuildMultiPortion( SwTextFormatInfo &rInf,
     }
 
     SeekAndChg( rInf );
-    std::unique_ptr<SwFontSave> xFontSave;
+    std::optional<SwFontSave> oFontSave;
     std::unique_ptr<SwFont> xTmpFont;
     if( rMulti.IsDouble() )
     {
@@ -1924,7 +1931,7 @@ bool SwTextFormatter::BuildMultiPortion( SwTextFormatInfo &rInf,
             SetPropFont( 50 );
             xTmpFont->SetProportion( GetPropFont() );
         }
-        xFontSave.reset(new SwFontSave(rInf, xTmpFont.get(), this));
+        oFontSave.emplace(rInf, xTmpFont.get(), this);
     }
 
     SwLayoutModeModifier aLayoutModeModifier( *GetInfo().GetOut() );
@@ -2012,7 +2019,7 @@ bool SwTextFormatter::BuildMultiPortion( SwTextFormatInfo &rInf,
     // save some values
     const OUString* pOldText = &(rInf.GetText());
     const SwTwips nOldPaintOfst = rInf.GetPaintOfst();
-    std::shared_ptr<vcl::text::TextLayoutCache> const pOldCachedVclData(rInf.GetCachedVclData());
+    std::shared_ptr<const vcl::text::TextLayoutCache> const pOldCachedVclData(rInf.GetCachedVclData());
     rInf.SetCachedVclData(nullptr);
 
     OUString const aMultiStr( rInf.GetText().copy(0, sal_Int32(nMultiLen + rInf.GetIdx())) );
@@ -2371,7 +2378,7 @@ bool SwTextFormatter::BuildMultiPortion( SwTextFormatInfo &rInf,
     SeekAndChg( rInf );
     delete pFirstRest;
     delete pSecondRest;
-    xFontSave.reset();
+    oFontSave.reset();
     return bRet;
 }
 

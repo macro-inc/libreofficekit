@@ -36,8 +36,9 @@
 #include <comphelper/types.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
+#include <unotools/fcm.hxx>
 #include <vcl/svapp.hxx>
 
 using namespace ::com::sun::star;
@@ -113,22 +114,17 @@ void SAL_CALL DBContentLoader::load(const Reference< XFrame > & rFrame, const OU
     m_xListener = rListener;
     m_aArgs     = rArgs;
 
-    static const struct ServiceNameToImplName
+    static constexpr struct ServiceNameToImplName
     {
-        const char*     pAsciiServiceName;
+        rtl::OUStringConstExpr     sServiceName;
         const char*     pAsciiImplementationName;
-        ServiceNameToImplName( const char* _pService, const char* _pImpl )
-            :pAsciiServiceName( _pService )
-            ,pAsciiImplementationName( _pImpl )
-        {
-        }
     } aImplementations[] = {
-        ServiceNameToImplName( URL_COMPONENT_FORMGRIDVIEW,      "org.openoffice.comp.dbu.OFormGridView"        ),
-        ServiceNameToImplName( URL_COMPONENT_DATASOURCEBROWSER, "org.openoffice.comp.dbu.ODatasourceBrowser"   ),
-        ServiceNameToImplName( URL_COMPONENT_QUERYDESIGN,       "org.openoffice.comp.dbu.OQueryDesign"         ),
-        ServiceNameToImplName( URL_COMPONENT_TABLEDESIGN,       "org.openoffice.comp.dbu.OTableDesign"         ),
-        ServiceNameToImplName( URL_COMPONENT_RELATIONDESIGN,    "org.openoffice.comp.dbu.ORelationDesign"      ),
-        ServiceNameToImplName( URL_COMPONENT_VIEWDESIGN,        "org.openoffice.comp.dbu.OViewDesign"          )
+        { URL_COMPONENT_FORMGRIDVIEW,      "org.openoffice.comp.dbu.OFormGridView"        },
+        { URL_COMPONENT_DATASOURCEBROWSER, "org.openoffice.comp.dbu.ODatasourceBrowser"   },
+        { URL_COMPONENT_QUERYDESIGN,       "org.openoffice.comp.dbu.OQueryDesign"         },
+        { URL_COMPONENT_TABLEDESIGN,       "org.openoffice.comp.dbu.OTableDesign"         },
+        { URL_COMPONENT_RELATIONDESIGN,    "org.openoffice.comp.dbu.ORelationDesign"      },
+        { URL_COMPONENT_VIEWDESIGN,        "org.openoffice.comp.dbu.OViewDesign"          }
     };
 
     INetURLObject aParser( rURL );
@@ -137,7 +133,7 @@ void SAL_CALL DBContentLoader::load(const Reference< XFrame > & rFrame, const OU
     const OUString sComponentURL( aParser.GetMainURL( INetURLObject::DecodeMechanism::ToIUri ) );
     for (const ServiceNameToImplName& aImplementation : aImplementations)
     {
-        if ( sComponentURL.equalsAscii( aImplementation.pAsciiServiceName ) )
+        if ( sComponentURL == aImplementation.sServiceName )
         {
             xController.set( m_xContext->getServiceManager()->
                createInstanceWithContext( OUString::createFromAscii( aImplementation.pAsciiImplementationName ), m_xContext), UNO_QUERY_THROW );
@@ -182,9 +178,7 @@ void SAL_CALL DBContentLoader::load(const Reference< XFrame > & rFrame, const OU
         if ( xReportModel.is() )
         {
             xController.set( ReportDesign::create( m_xContext ) );
-            xController->attachModel( xReportModel );
-            xReportModel->connectController( xController );
-            xReportModel->setCurrentController( xController );
+            utl::ConnectModelController(xReportModel, xController);
         }
     }
 
@@ -221,7 +215,7 @@ void SAL_CALL DBContentLoader::load(const Reference< XFrame > & rFrame, const OU
         try
         {
             Reference<XInitialization > xIni(xController,UNO_QUERY);
-            PropertyValue aFrame("Frame",0,makeAny(rFrame),PropertyState_DIRECT_VALUE);
+            PropertyValue aFrame("Frame",0,Any(rFrame),PropertyState_DIRECT_VALUE);
             Sequence< Any > aInitArgs(m_aArgs.getLength()+1);
 
             Any* pBegin = aInitArgs.getArray();

@@ -17,7 +17,7 @@ gb_Gallery_INSTDIR := $(LIBO_SHARE_FOLDER)/gallery
 define gb_Gallery__command
 $(call gb_Helper_abbreviate_dirs,\
 	rm -f $(call gb_Gallery_get_workdir,$(2))/* && \
-	RESPONSEFILE=$(call gb_var2file,$(shell $(call gb_MKTEMP)),100,$(GALLERY_FILES)) && \
+	RESPONSEFILE=$(call gb_var2file,$(shell $(call gb_MKTEMP)),$(GALLERY_FILES)) && \
 	$(call gb_Helper_print_on_error,\
 		$(call gb_Executable_get_command,gengal,$(ICECREAM_RUN)) \
 			--build-tree \
@@ -37,7 +37,7 @@ define gb_Gallery__command_str
 cp -f $(GALLERY_STRFILE) $@ && \
 $(call gb_ExternalExecutable_get_command,python) \
 		$(gb_Gallery_TRANSLATE) \
-		--ext "str" --key "name" \
+		--ext "str" \
 		-d $(GALLERY_WORKDIR) \
 		$(GALLERY_ULFFILE)
 endef
@@ -50,8 +50,8 @@ $(dir $(call gb_Gallery_get_target,$(1))).dir :
 $(dir $(call gb_Gallery_get_target,$(1)))%/.dir :
 	$(if $(wildcard $(dir $@)),,mkdir -p $(dir $@))
 
-$(call gb_Gallery_get_target,%) : \
-		$(call gb_Executable_get_runtime_dependencies,gengal)
+$(call gb_Gallery_get_target,%) : $(call gb_Executable_get_target,gengal) \
+        | $(call gb_Executable_get_runtime_dependencies,gengal)
 	$(call gb_Output_announce,$*,$(true),GAL,1)
 	$(call gb_Trace_StartRange,$*,GAL)
 	$(call gb_Gallery__command,$@,$*)
@@ -73,14 +73,6 @@ $(call gb_Gallery_get_workdir,%).str : $(gb_Gallery_TRANSLATE) \
 	$(call gb_Trace_StartRange,$*,STR)
 	$(call gb_Gallery__command_str,$@,$*)
 	$(call gb_Trace_EndRange,$*,STR)
-
-# there must be a rule for these since they are targets due to Package
-$(call gb_Gallery_get_workdir,%).sdg :
-	touch $@
-$(call gb_Gallery_get_workdir,%).sdv :
-	touch $@
-$(call gb_Gallery_get_workdir,%).thm :
-	touch $@
 
 .PHONY : $(call gb_Gallery_get_clean_target,%)
 $(call gb_Gallery_get_clean_target,%) :
@@ -144,9 +136,8 @@ $(call gb_Gallery_get_workdir,$(1))/$(1).ulf : \
 
 $(call gb_Gallery_get_workdir,$(1))/$(1).str : $(call gb_Gallery_get_workdir,$(1))/$(1).ulf
 
-$(call gb_Gallery_get_workdir,$(1))/$(1).sdg \
-$(call gb_Gallery_get_workdir,$(1))/$(1).sdv \
-$(call gb_Gallery_get_workdir,$(1))/$(1).thm : $(call gb_Gallery_get_target,$(1))
+# order-only, the Gallery-Target also makes those files
+$(addprefix $(call gb_Gallery_get_workdir,$(1))/$(1),.sdg .sdv .thm): | $(call gb_Gallery_get_target,$(1))
 $(call gb_Gallery__get_final_target,$(1)) : $(call gb_Package_get_target,$(2))
 
 $(call gb_Gallery_get_clean_target,$(1)) : $(call gb_Package_get_clean_target,$(2))

@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xenumeration.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -34,15 +34,13 @@ using namespace com::sun::star;
 
 namespace sc_apitest
 {
-class ScIndexEnumeration_DataPilotItemsEnumeration : public CalcUnoApiTest,
-                                                     public apitest::XEnumeration
+class ScIndexEnumeration_DataPilotItemsEnumeration : public UnoApiTest, public apitest::XEnumeration
 {
 public:
     ScIndexEnumeration_DataPilotItemsEnumeration();
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScIndexEnumeration_DataPilotItemsEnumeration);
 
@@ -54,11 +52,10 @@ public:
 
 private:
     static const int m_nMaxFieldIndex = 6;
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScIndexEnumeration_DataPilotItemsEnumeration::ScIndexEnumeration_DataPilotItemsEnumeration()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
 {
 }
 
@@ -67,7 +64,7 @@ uno::Reference<uno::XInterface> ScIndexEnumeration_DataPilotItemsEnumeration::in
     table::CellRangeAddress aCellRangeAddress(0, 1, 0, m_nMaxFieldIndex - 1, m_nMaxFieldIndex - 1);
     table::CellAddress aCellAddress(0, 7, 8);
 
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     CPPUNIT_ASSERT_MESSAGE("no document", xDoc.is());
     uno::Reference<sheet::XSpreadsheets> xSheets(xDoc->getSheets(), uno::UNO_SET_THROW);
 
@@ -122,15 +119,9 @@ uno::Reference<uno::XInterface> ScIndexEnumeration_DataPilotItemsEnumeration::in
 
 void ScIndexEnumeration_DataPilotItemsEnumeration::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScIndexEnumeration_DataPilotItemsEnumeration::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScIndexEnumeration_DataPilotItemsEnumeration);

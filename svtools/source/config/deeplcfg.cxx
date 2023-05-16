@@ -41,7 +41,7 @@ const Sequence<OUString>& SvxDeeplOptions::GetPropertyNames()
     return aNames;
 }
 
-const OUString SvxDeeplOptions::getAPIUrl() const { return pImpl->sAPIUrl; }
+const OUString& SvxDeeplOptions::getAPIUrl() const { return pImpl->sAPIUrl; }
 
 void SvxDeeplOptions::setAPIUrl(const OUString& rVal)
 {
@@ -59,8 +59,7 @@ void SvxDeeplOptions::setAuthKey(const OUString& rVal)
 
 namespace
 {
-class theSvxDeeplOptions
-    : public rtl::Static<SvxDeeplOptions, theSvxDeeplOptions>
+class theSvxDeeplOptions : public rtl::Static<SvxDeeplOptions, theSvxDeeplOptions>
 {
 };
 }
@@ -75,10 +74,7 @@ SvxDeeplOptions::SvxDeeplOptions()
 }
 
 SvxDeeplOptions::~SvxDeeplOptions() {}
-void SvxDeeplOptions::Notify(const css::uno::Sequence<OUString>&)
-{
-    Load(GetPropertyNames());
-}
+void SvxDeeplOptions::Notify(const css::uno::Sequence<OUString>&) { Load(GetPropertyNames()); }
 
 void SvxDeeplOptions::Load(const css::uno::Sequence<OUString>& aNames)
 {

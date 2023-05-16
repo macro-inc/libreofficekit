@@ -36,6 +36,7 @@
 #include <osl/diagnose.h>
 #include <rtl/tencinfo.h>
 #include <sal/log.hxx>
+#include <comphelper/diagnose_ex.hxx>
 #include <oox/helper/binaryinputstream.hxx>
 #include <oox/helper/propertyset.hxx>
 #include <oox/helper/textinputstream.hxx>
@@ -45,6 +46,7 @@
 #include <oox/ole/vbainputstream.hxx>
 #include <oox/ole/vbamodule.hxx>
 #include <oox/token/properties.hxx>
+#include <utility>
 
 namespace oox::ole {
 
@@ -90,6 +92,7 @@ VbaFilterConfig::VbaFilterConfig( const Reference< XComponentContext >& rxContex
     }
     catch(const Exception& )
     {
+        TOOLS_WARN_EXCEPTION("oox", "");
     }
     OSL_ENSURE( mxConfigAccess.is(), "VbaFilterConfig::VbaFilterConfig - cannot open configuration" );
 }
@@ -113,8 +116,8 @@ bool VbaFilterConfig::isExportVba() const
     return lclReadConfigItem( mxConfigAccess, "Save" );
 }
 
-VbaMacroAttacherBase::VbaMacroAttacherBase( const OUString& rMacroName ) :
-    maMacroName( rMacroName )
+VbaMacroAttacherBase::VbaMacroAttacherBase( OUString aMacroName ) :
+    maMacroName(std::move( aMacroName ))
 {
     OSL_ENSURE( !maMacroName.isEmpty(), "VbaMacroAttacherBase::VbaMacroAttacherBase - empty macro name" );
 }
@@ -131,6 +134,7 @@ void VbaMacroAttacherBase::resolveAndAttachMacro( const Reference< XVBAMacroReso
     }
     catch(const Exception& )
     {
+        TOOLS_WARN_EXCEPTION("oox", "");
     }
 }
 
@@ -233,6 +237,7 @@ Reference< XNameContainer > VbaProject::openLibrary( sal_Int32 nPropId )
     }
     catch(const Exception& )
     {
+        TOOLS_WARN_EXCEPTION("oox", "");
     }
     OSL_ENSURE( xLibrary.is(), "VbaProject::openLibrary - cannot create library" );
     return xLibrary;
@@ -412,6 +417,8 @@ void VbaProject::readVbaModules( StorageBase& rVbaPrjStrg )
             xVBACompat->setVBACompatibilityMode( true );
             xVBACompat->setProjectName( maPrjName );
 
+            uno::Reference<beans::XPropertySet> xProps(xVBACompat, uno::UNO_QUERY_THROW);
+            xProps->setPropertyValue("VBATextEncoding", uno::Any(eTextEnc));
         }
         catch(const Exception& )
         {
@@ -419,6 +426,7 @@ void VbaProject::readVbaModules( StorageBase& rVbaPrjStrg )
     }
     catch(const Exception& )
     {
+        TOOLS_WARN_EXCEPTION("oox", "");
     }
 }
 
@@ -508,6 +516,7 @@ void VbaProject::importModulesAndForms( StorageBase& rVbaPrjStrg, const GraphicH
             }
             catch(const Exception& )
             {
+                TOOLS_WARN_EXCEPTION("oox", "");
             }
         }
     }
@@ -531,6 +540,7 @@ void VbaProject::attachMacros()
     }
     catch(const Exception& )
     {
+        TOOLS_WARN_EXCEPTION("oox", "");
     }
 }
 

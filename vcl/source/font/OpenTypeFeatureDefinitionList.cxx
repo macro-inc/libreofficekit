@@ -45,10 +45,7 @@ void OpenTypeFeatureDefinitionListPrivate::init()
         { featureCode("dpng"), STR_FONT_FEATURE_ID_DPNG },
         { featureCode("expt"), STR_FONT_FEATURE_ID_EXPT },
         { featureCode("falt"), STR_FONT_FEATURE_ID_FALT },
-        { featureCode("frac"), STR_FONT_FEATURE_ID_FRAC,
-          std::vector<FeatureParameter>{ { 0, STR_FONT_FEATURE_ID_FRAC_PARAM_0 },
-                                         { 1, STR_FONT_FEATURE_ID_FRAC_PARAM_1 },
-                                         { 2, STR_FONT_FEATURE_ID_FRAC_PARAM_2 } } },
+        { featureCode("frac"), STR_FONT_FEATURE_ID_FRAC },
         { featureCode("fwid"), STR_FONT_FEATURE_ID_FWID },
         { featureCode("halt"), STR_FONT_FEATURE_ID_HALT },
         { featureCode("hist"), STR_FONT_FEATURE_ID_HIST },
@@ -128,62 +125,21 @@ void OpenTypeFeatureDefinitionListPrivate::init()
     });
 }
 
-namespace
+FeatureDefinition OpenTypeFeatureDefinitionListPrivate::getDefinition(vcl::font::Feature& rFeature)
 {
-bool isCharacterVariantCode(sal_uInt32 nFeatureCode)
-{
-    return char((sal_uInt32(nFeatureCode) >> 24) & 0xFF) == 'c'
-           && char((sal_uInt32(nFeatureCode) >> 16) & 0xFF) == 'v';
-}
-
-bool isStylisticSetCode(sal_uInt32 nFeatureCode)
-{
-    return char((sal_uInt32(nFeatureCode) >> 24) & 0xFF) == 's'
-           && char((sal_uInt32(nFeatureCode) >> 16) & 0xFF) == 's';
-}
-
-OUString getNumericLowerPart(sal_uInt32 nFeatureCode)
-{
-    char cChar1((sal_uInt32(nFeatureCode) >> 8) & 0xFF);
-    char cChar2((sal_uInt32(nFeatureCode) >> 0) & 0xFF);
-
-    if (rtl::isAsciiDigit(static_cast<unsigned char>(cChar1))
-        && rtl::isAsciiDigit(static_cast<unsigned char>(cChar2)))
+    if (rFeature.isCharacterVariant() || rFeature.isStylisticSet())
     {
-        return OUStringChar(cChar1) + OUStringChar(cChar2);
-    }
-    return OUString();
-}
-
-} // end anonymous namespace
-
-bool OpenTypeFeatureDefinitionListPrivate::isSpecialFeatureCode(sal_uInt32 nFeatureCode)
-{
-    return isCharacterVariantCode(nFeatureCode) || isStylisticSetCode(nFeatureCode);
-}
-
-FeatureDefinition
-OpenTypeFeatureDefinitionListPrivate::handleSpecialFeatureCode(sal_uInt32 nFeatureCode)
-{
-    FeatureDefinition aFeatureDefinition;
-    OUString sNumericPart = getNumericLowerPart(nFeatureCode);
-    if (!sNumericPart.isEmpty())
-    {
-        if (isCharacterVariantCode(nFeatureCode))
-            aFeatureDefinition = { nFeatureCode, STR_FONT_FEATURE_ID_CVXX, sNumericPart };
-        else if (isStylisticSetCode(nFeatureCode))
-            aFeatureDefinition = { nFeatureCode, STR_FONT_FEATURE_ID_SSXX, sNumericPart };
-    }
-    return aFeatureDefinition;
-}
-
-FeatureDefinition OpenTypeFeatureDefinitionListPrivate::getDefinition(sal_uInt32 nFeatureCode)
-{
-    if (isSpecialFeatureCode(nFeatureCode))
-    {
-        return handleSpecialFeatureCode(nFeatureCode);
+        FeatureDefinition aFeatureDefinition;
+        OUString sNumericPart = OUStringChar(char((rFeature.m_nCode >> 8) & 0xFF))
+                                + OUStringChar(char((rFeature.m_nCode >> 0) & 0xFF));
+        if (rFeature.isCharacterVariant())
+            aFeatureDefinition = { rFeature.m_nCode, STR_FONT_FEATURE_ID_CVXX, sNumericPart };
+        else if (rFeature.isStylisticSet())
+            aFeatureDefinition = { rFeature.m_nCode, STR_FONT_FEATURE_ID_SSXX, sNumericPart };
+        return aFeatureDefinition;
     }
 
+    auto nFeatureCode = rFeature.m_nCode;
     if (m_aCodeToIndex.find(nFeatureCode) != m_aCodeToIndex.end())
     {
         size_t nIndex = m_aCodeToIndex.at(nFeatureCode);

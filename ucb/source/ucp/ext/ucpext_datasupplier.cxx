@@ -24,18 +24,18 @@
 
 #include <com/sun/star/deployment/PackageInformationProvider.hpp>
 #include <com/sun/star/ucb/IllegalIdentifierException.hpp>
-#include <com/sun/star/ucb/ResultSetException.hpp>
 #include <o3tl/string_view.hxx>
 #include <ucbhelper/contentidentifier.hxx>
 #include <ucbhelper/providerhelper.hxx>
 #include <ucbhelper/content.hxx>
 #include <ucbhelper/propertyvalueset.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
 
 #include <memory>
 #include <string_view>
+#include <utility>
 
 
 namespace ucb::ucp::ext
@@ -78,8 +78,8 @@ namespace ucb::ucp::ext
 
 
     DataSupplier::DataSupplier( const Reference< XComponentContext >& rxContext,
-                                const ::rtl::Reference< Content >& i_rContent )
-        :m_xContent( i_rContent )
+                                ::rtl::Reference< Content > i_xContent )
+        :m_xContent(std::move( i_xContent ))
         ,m_xContext( rxContext )
     {
     }

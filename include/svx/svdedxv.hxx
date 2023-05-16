@@ -26,6 +26,7 @@
 #include <svx/svdglev.hxx>
 #include <svx/selectioncontroller.hxx>
 #include <editeng/editview.hxx>
+#include <unotools/weakref.hxx>
 #include <memory>
 
 class SdrOutliner;
@@ -60,8 +61,8 @@ enum class SdrEndTextEditKind
 
 class SVXCORE_DLLPUBLIC SdrObjEditView : public SdrGlueEditView, public EditViewCallbacks
 {
-    friend class                SdrPageView;
-    friend class                ImpSdrEditPara;
+    friend class SdrPageView;
+    friend class ImpSdrEditPara;
 
     // Now derived from EditViewCallbacks and overriding these callbacks to
     // allow own EditText visualization
@@ -80,7 +81,7 @@ class SVXCORE_DLLPUBLIC SdrObjEditView : public SdrGlueEditView, public EditView
 
 protected:
     // TextEdit
-    tools::WeakReference<SdrTextObj> mxWeakTextEditObj; // current object in TextEdit
+    unotools::WeakReference<SdrTextObj> mxWeakTextEditObj; // current object in TextEdit
     SdrPageView* mpTextEditPV;
     std::unique_ptr<SdrOutliner> mpTextEditOutliner; // outliner for the TextEdit
     OutlinerView* mpTextEditOutlinerView; // current view of the outliners
@@ -230,7 +231,7 @@ public:
     bool IsTextEditInSelectionMode() const;
 
     // If sb needs the object out of the TextEdit:
-    SdrTextObj* GetTextEditObject() const { return mxWeakTextEditObj.get(); }
+    SdrTextObj* GetTextEditObject() const { return mxWeakTextEditObj.get().get(); }
 
     // info about TextEditPageView. Default is 0L.
     SdrPageView* GetTextEditPageView() const;
@@ -274,8 +275,8 @@ public:
     void SetStyleSheet(SfxStyleSheet* pStyleSheet, bool bDontRemoveHardAttr);
 
     // Intern: at mounting new OutlinerView...
-    virtual void AddWindowToPaintView(OutputDevice* pNewWin, vcl::Window* pWindow) override;
-    virtual void DeleteWindowFromPaintView(OutputDevice* pOldWin) override;
+    virtual void AddDeviceToPaintView(OutputDevice& rNewDev, vcl::Window* pWindow) override;
+    virtual void DeleteDeviceFromPaintView(OutputDevice& rOldWin) override;
 
     sal_uInt16 GetSelectionLevel() const;
 
@@ -298,7 +299,7 @@ public:
     const rtl::Reference< sdr::SelectionController >& getSelectionController() const { return mxSelectionController; }
 
     /** returns true if the shape identified by its inventor and identifier supports format paint brush operation */
-    static bool SupportsFormatPaintbrush( SdrInventor nObjectInventor, sal_uInt16 nObjectIdentifier );
+    static bool SupportsFormatPaintbrush( SdrInventor nObjectInventor, SdrObjKind nObjectIdentifier );
 
     /** returns a format paint brush set from the current selection */
     void TakeFormatPaintBrush( std::shared_ptr< SfxItemSet >& rFormatSet  );

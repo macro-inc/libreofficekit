@@ -13,7 +13,8 @@ $(eval $(call gb_Module_add_targets,avmedia,\
 	Library_avmedia \
 ))
 
-ifneq ($(USE_AVMEDIA_DUMMY),TRUE)
+ifneq (,$(filter AVMEDIA,$(BUILD_TYPE)))
+
 $(eval $(call gb_Module_add_l10n_targets,avmedia,\
     AllLangMoTarget_avmedia \
 ))
@@ -21,6 +22,12 @@ $(eval $(call gb_Module_add_l10n_targets,avmedia,\
 ifeq ($(ENABLE_GSTREAMER_1_0),TRUE)
 $(eval $(call gb_Module_add_targets,avmedia,\
 	Library_avmediagst \
+))
+endif
+
+ifneq ($(ENABLE_GTK4),)
+$(eval $(call gb_Module_add_targets,avmedia,\
+	Library_avmediagtk \
 ))
 endif
 
@@ -36,6 +43,6 @@ $(eval $(call gb_Module_add_targets,avmedia,\
 ))
 endif
 
-endif
+endif # AVMEDIA
 
 # vim: set noet sw=4 ts=4:

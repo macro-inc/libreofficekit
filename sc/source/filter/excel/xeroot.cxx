@@ -23,7 +23,7 @@
 #include <sfx2/docfile.hxx>
 #include <sfx2/frame.hxx>
 #include <sfx2/sfxsids.hrc>
-#include <unotools/saveopt.hxx>
+#include <sot/storage.hxx>
 #include <svl/itemset.hxx>
 #include <svl/stritem.hxx>
 #include <xecontent.hxx>
@@ -47,7 +47,6 @@
 
 #include <formulabase.hxx>
 #include <com/sun/star/sheet/FormulaOpCodeMapEntry.hpp>
-#include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 
 using namespace ::com::sun::star;
@@ -277,6 +276,7 @@ void XclExpRoot::InitializeSave()
 {
     GetPalette().Finalize();
     GetXFBuffer().Finalize();
+    GetDxfs().Finalize();
 }
 
 XclExpRecordRef XclExpRoot::CreateRecord( sal_uInt16 nRecId ) const
@@ -308,11 +308,11 @@ bool XclExpRoot::IsDocumentEncrypted() const
     return GetEncryptionData().hasElements();
 }
 
-uno::Sequence< beans::NamedValue > XclExpRoot::GenerateEncryptionData( const OUString& aPass )
+uno::Sequence< beans::NamedValue > XclExpRoot::GenerateEncryptionData( std::u16string_view aPass )
 {
     uno::Sequence< beans::NamedValue > aEncryptionData;
 
-    if ( !aPass.isEmpty() && aPass.getLength() < 16 )
+    if ( !aPass.empty() && aPass.size() < 16 )
     {
         rtlRandomPool aRandomPool = rtl_random_createPool ();
         sal_uInt8 pnDocId[16];
@@ -321,7 +321,7 @@ uno::Sequence< beans::NamedValue > XclExpRoot::GenerateEncryptionData( const OUS
         rtl_random_destroyPool( aRandomPool );
 
         sal_uInt16 pnPasswd[16] = {};
-        for( sal_Int32 nChar = 0; nChar < aPass.getLength(); ++nChar )
+        for( size_t nChar = 0; nChar < aPass.size(); ++nChar )
             pnPasswd[nChar] = aPass[nChar];
 
         ::msfilter::MSCodec_Std97 aCodec;

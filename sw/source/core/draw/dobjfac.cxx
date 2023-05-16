@@ -24,12 +24,12 @@
 SwObjectFactory aSwObjectFactory;
 
 IMPL_STATIC_LINK(
-    SwObjectFactory, MakeObject, SdrObjCreatorParams, aParams, SdrObject* )
+    SwObjectFactory, MakeObject, SdrObjCreatorParams, aParams, rtl::Reference<SdrObject> )
 {
     if ( aParams.nInventor == SdrInventor::Swg )
     {
         // No switch, there's only one at the moment
-        OSL_ENSURE( aParams.nObjIdentifier == SwFlyDrawObjIdentifier,
+        OSL_ENSURE( aParams.nObjIdentifier == SdrObjKind::SwFlyDrawObjIdentifier,
                                         "Wrong inventor or identifier" );
         return new SwFlyDrawObj(aParams.rSdrModel);
     }

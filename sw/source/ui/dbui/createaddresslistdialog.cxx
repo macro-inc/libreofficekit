@@ -26,14 +26,15 @@
 #include "createaddresslistdialog.hxx"
 #include "customizeaddresslistdialog.hxx"
 #include <mmconfigitem.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
-#include <unotools/pathoptions.hxx>
 #include <sfx2/filedlghelper.hxx>
 #include <sfx2/docfile.hxx>
 #include <rtl/textenc.h>
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
 #include <com/sun/star/ui/dialogs/XFilePicker3.hpp>
 #include <tools/urlobj.hxx>
+#include <o3tl/string_view.hxx>
 #include <strings.hrc>
 #include <map>
 
@@ -211,10 +212,10 @@ void SwAddressControl_Impl::SetCursorTo(std::size_t nElement)
 }
 
 SwCreateAddressListDialog::SwCreateAddressListDialog(
-        weld::Window* pParent, const OUString& rURL, SwMailMergeConfigItem const & rConfig)
+        weld::Window* pParent, OUString aURL, SwMailMergeConfigItem const & rConfig)
     : SfxDialogController(pParent, "modules/swriter/ui/createaddresslist.ui", "CreateAddressList")
     , m_sAddressListFilterName(SwResId(ST_FILTERNAME))
-    , m_sURL(rURL)
+    , m_sURL(std::move(aURL))
     , m_pCSVData(new SwCSVData)
     , m_xAddressControl(new SwAddressControl_Impl(*m_xBuilder))
     , m_xNewPB(m_xBuilder->weld_button("NEW"))
@@ -263,13 +264,13 @@ SwCreateAddressListDialog::SwCreateAddressListDialog(
                 sal_Int32 nIndex = 0;
                 do
                 {
-                    const OUString sHeader = sLine.getToken( 0, '\t', nIndex );
-                    OSL_ENSURE(sHeader.getLength() > 2 &&
-                            sHeader.startsWith("\"") && sHeader.endsWith("\""),
+                    const std::u16string_view sHeader = o3tl::getToken(sLine, 0, '\t', nIndex );
+                    OSL_ENSURE(sHeader.size() > 2 &&
+                            o3tl::starts_with(sHeader, u"\"") && o3tl::ends_with(sHeader, u"\""),
                             "Wrong format of header");
-                    if(sHeader.getLength() > 2)
+                    if(sHeader.size() > 2)
                     {
-                        m_pCSVData->aDBColumnHeaders.push_back( sHeader.copy(1, sHeader.getLength() -2));
+                        m_pCSVData->aDBColumnHeaders.push_back( OUString(sHeader.substr(1, sHeader.size() -2)));
                     }
                 }
                 while (nIndex > 0);
@@ -409,7 +410,7 @@ void lcl_WriteValues(const std::vector<OUString> *pFields, SvStream* pStream)
             sLine.append("\t\"" + *aIter + "\"");
         }
     }
-    pStream->WriteByteStringLine( sLine.makeStringAndClear(), RTL_TEXTENCODING_UTF8 );
+    pStream->WriteByteStringLine( sLine, RTL_TEXTENCODING_UTF8 );
 }
 
 }

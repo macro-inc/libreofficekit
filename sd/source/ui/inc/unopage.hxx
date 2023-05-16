@@ -56,13 +56,12 @@ private:
     SdrModel* mpSdrModel;
     bool      mbIsImpressDocument;
     sal_Int16 mnTempPageNumber; // for printing handouts
+    const SvxItemPropertySet*   mpPropSet;
 
     void UpdateModel();
 
 protected:
     friend class SdXImpressDocument;
-
-    const SvxItemPropertySet*   mpPropSet;
 
     /// @throws css::lang::IllegalArgumentException
     virtual void setBackground( const css::uno::Any& rValue );
@@ -70,7 +69,7 @@ protected:
     virtual void getBackground( css::uno::Any& rValue );
 
     OUString getBookmarkURL() const;
-    void setBookmarkURL( OUString const & rURL );
+    void setBookmarkURL( std::u16string_view rURL );
 
     void SetLeftBorder( sal_Int32 nValue );
     void SetRightBorder( sal_Int32 nValue );
@@ -104,7 +103,7 @@ public:
     virtual sal_Int64 SAL_CALL getSomething( const css::uno::Sequence< sal_Int8 >& aIdentifier ) override;
 
     // this is called whenever a SdrObject must be created for an empty api shape wrapper
-    virtual SdrObject *CreateSdrObject_( const css::uno::Reference< css::drawing::XShape >& xShape ) override;
+    virtual rtl::Reference<SdrObject> CreateSdrObject_( const css::uno::Reference< css::drawing::XShape >& xShape ) override;
 
     // SvxFmDrawPage
     virtual css::uno::Reference<css::drawing::XShape>  CreateShape(SdrObject *pObj) const override;

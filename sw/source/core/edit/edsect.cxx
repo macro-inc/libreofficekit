@@ -88,7 +88,7 @@ SwSection* SwEditShell::GetAnySection( bool bOutOfTab, const Point* pPt )
         SwPosition aPos( *GetCursor()->GetPoint() );
         Point aPt( *pPt );
         GetLayout()->GetModelPositionForViewPoint( &aPos, aPt );
-        SwContentNode *pNd = aPos.nNode.GetNode().GetContentNode();
+        SwContentNode *pNd = aPos.GetNode().GetContentNode();
         std::pair<Point, bool> const tmp(*pPt, true);
         pFrame = pNd->getLayoutFrame(GetLayout(), nullptr, &tmp);
     }
@@ -179,11 +179,10 @@ void SwEditShell::SetSectionAttr( const SfxItemSet& rSet,
 
         for(SwPaM& rPaM : GetCursor()->GetRingContainer())
         {
-            const SwPosition* pStt = rPaM.Start(),
-                            * pEnd = rPaM.End();
+            auto [pStt, pEnd] = rPaM.StartEnd(); // SwPosition*
 
-            SwSectionNode* pSttSectNd = pStt->nNode.GetNode().FindSectionNode(),
-                               * pEndSectNd = pEnd->nNode.GetNode().FindSectionNode();
+            SwSectionNode* pSttSectNd = pStt->GetNode().FindSectionNode(),
+                               * pEndSectNd = pEnd->GetNode().FindSectionNode();
 
             if( pSttSectNd || pEndSectNd )
             {
@@ -196,8 +195,8 @@ void SwEditShell::SetSectionAttr( const SfxItemSet& rSet,
 
                 if( pSttSectNd && pEndSectNd )
                 {
-                    SwNodeIndex aSIdx( pStt->nNode );
-                    SwNodeIndex aEIdx( pEnd->nNode );
+                    SwNodeIndex aSIdx( pStt->GetNode() );
+                    SwNodeIndex aEIdx( pEnd->GetNode() );
                     if( pSttSectNd->EndOfSectionIndex() <
                         pEndSectNd->GetIndex() )
                     {
@@ -250,13 +249,12 @@ sal_uInt16 SwEditShell::GetFullSelectedSectionCount() const
     for(SwPaM& rPaM : GetCursor()->GetRingContainer())
     {
 
-        const SwPosition* pStt = rPaM.Start(),
-                        * pEnd = rPaM.End();
+        auto [pStt, pEnd] = rPaM.StartEnd(); // SwPosition*
         const SwContentNode* pCNd;
         // check the selection, if Start at Node begin and End at Node end
-        if( pStt->nContent.GetIndex() ||
-            ( nullptr == ( pCNd = pEnd->nNode.GetNode().GetContentNode() )) ||
-            pCNd->Len() != pEnd->nContent.GetIndex() )
+        if( pStt->GetContentIndex() ||
+            ( nullptr == ( pCNd = pEnd->GetNode().GetContentNode() )) ||
+            pCNd->Len() != pEnd->GetContentIndex() )
         {
             nRet = 0;
             break;
@@ -268,7 +266,7 @@ sal_uInt16 SwEditShell::GetFullSelectedSectionCount() const
 // What about only a table inside the section ?
 //      There is only a table selection possible!
 
-        SwNodeIndex aSIdx( pStt->nNode, -1 ), aEIdx( pEnd->nNode, +1 );
+        SwNodeIndex aSIdx( pStt->GetNode(), -1 ), aEIdx( pEnd->GetNode(), +1 );
         if( !aSIdx.GetNode().IsSectionNode() ||
             !aEIdx.GetNode().IsEndNode() ||
             !aEIdx.GetNode().StartOfSectionNode()->IsSectionNode() )
@@ -304,7 +302,7 @@ static const SwNode* lcl_SpecialInsertNode(const SwPosition* pCurrentPos)
 
     // the current position
     OSL_ENSURE( pCurrentPos != nullptr, "Strange, we have no position!" );
-    const SwNode& rCurrentNode = pCurrentPos->nNode.GetNode();
+    const SwNode& rCurrentNode = pCurrentPos->GetNode();
 
     // find innermost section or table.  At the end of this scope,
     // pInnermostNode contains the section/table before/after which we should
@@ -346,9 +344,9 @@ static const SwNode* lcl_SpecialInsertNode(const SwPosition* pCurrentPos)
         // we found a start if
         // - we're at or just before a start node
         // - there are only start nodes between the current and pInnermostNode
-        SwNodeIndex aBegin( pCurrentPos->nNode );
+        SwNodeIndex aBegin( pCurrentPos->GetNode() );
         if( rCurrentNode.IsContentNode() &&
-            (pCurrentPos->nContent.GetIndex() == 0))
+            (pCurrentPos->GetContentIndex() == 0))
             --aBegin;
         while( (aBegin != pInnermostNode->GetIndex()) &&
                aBegin.GetNode().IsStartNode() )
@@ -359,9 +357,9 @@ static const SwNode* lcl_SpecialInsertNode(const SwPosition* pCurrentPos)
         // - we're at or just before an end node
         // - there are only end nodes between the current node and
         //   pInnermostNode's end node
-        SwNodeIndex aEnd( pCurrentPos->nNode );
+        SwNodeIndex aEnd( pCurrentPos->GetNode() );
         if( rCurrentNode.IsContentNode() &&
-            ( pCurrentPos->nContent.GetIndex() ==
+            ( pCurrentPos->GetContentIndex() ==
               rCurrentNode.GetContentNode()->Len() ) )
             ++aEnd;
         while( (aEnd != pInnermostNode->EndOfSectionNode()->GetIndex()) &&

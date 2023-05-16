@@ -7,8 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "helper/qahelper.hxx"
-#include "helper/xpath.hxx"
+#include <test/unoapixml_test.hxx>
 
 #include <com/sun/star/lang/XComponent.hpp>
 #include <docsh.hxx>
@@ -18,32 +17,12 @@
 using namespace css;
 
 /** Test import, export or roundtrip of sparklines for ODF and OOXML */
-class SparklineImportExportTest : public ScBootstrapFixture, public XmlTestTools
+class SparklineImportExportTest : public UnoApiXmlTest
 {
-private:
-    uno::Reference<uno::XInterface> m_xCalcComponent;
-
 public:
     SparklineImportExportTest()
-        : ScBootstrapFixture("sc/qa/unit/data")
+        : UnoApiXmlTest("sc/qa/unit/data")
     {
-    }
-
-    virtual void setUp() override
-    {
-        test::BootstrapFixture::setUp();
-
-        // This is a bit of a fudge, we do this to ensure that ScGlobals::ensure,
-        // which is a private symbol to us, gets called
-        m_xCalcComponent = getMultiServiceFactory()->createInstance(
-            "com.sun.star.comp.Calc.SpreadsheetDocument");
-        CPPUNIT_ASSERT_MESSAGE("no calc component!", m_xCalcComponent.is());
-    }
-
-    virtual void tearDown() override
-    {
-        uno::Reference<lang::XComponent>(m_xCalcComponent, uno::UNO_QUERY_THROW)->dispose();
-        test::BootstrapFixture::tearDown();
     }
 
     virtual void registerNamespaces(xmlXPathContextPtr& pXmlXPathContextPtr) override
@@ -81,8 +60,8 @@ void checkSparklines(ScDocument& rDocument)
 
         CPPUNIT_ASSERT_EQUAL(Color(0x376092), rAttributes.getColorSeries());
         CPPUNIT_ASSERT_EQUAL(Color(0x00b050), rAttributes.getColorNegative());
-        CPPUNIT_ASSERT_EQUAL(Color(0x000000), rAttributes.getColorAxis());
-        CPPUNIT_ASSERT_EQUAL(Color(0x000000), rAttributes.getColorMarkers());
+        CPPUNIT_ASSERT_EQUAL(COL_BLACK, rAttributes.getColorAxis());
+        CPPUNIT_ASSERT_EQUAL(COL_BLACK, rAttributes.getColorMarkers());
         CPPUNIT_ASSERT_EQUAL(Color(0x7030a0), rAttributes.getColorFirst());
         CPPUNIT_ASSERT_EQUAL(Color(0xff0000), rAttributes.getColorLast());
         CPPUNIT_ASSERT_EQUAL(Color(0x92d050), rAttributes.getColorHigh());
@@ -114,7 +93,7 @@ void checkSparklines(ScDocument& rDocument)
 
         CPPUNIT_ASSERT_EQUAL(Color(0x376092), rAttributes.getColorSeries());
         CPPUNIT_ASSERT_EQUAL(Color(0xff0000), rAttributes.getColorNegative());
-        CPPUNIT_ASSERT_EQUAL(Color(0x000000), rAttributes.getColorAxis());
+        CPPUNIT_ASSERT_EQUAL(COL_BLACK, rAttributes.getColorAxis());
         CPPUNIT_ASSERT_EQUAL(Color(0xd00000), rAttributes.getColorMarkers());
         CPPUNIT_ASSERT_EQUAL(Color(0x92d050), rAttributes.getColorFirst());
         CPPUNIT_ASSERT_EQUAL(Color(0x00b0f0), rAttributes.getColorLast());
@@ -169,29 +148,29 @@ void checkSparklines(ScDocument& rDocument)
 
 void SparklineImportExportTest::testSparklinesRoundtripXLSX()
 {
-    ScDocShellRef xDocSh = loadDoc(u"Sparklines.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xDocSh);
+    loadFromURL(u"xlsx/Sparklines.xlsx");
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    CPPUNIT_ASSERT(pModelObj);
 
-    checkSparklines(xDocSh->GetDocument());
+    checkSparklines(*pModelObj->GetDocument());
 
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLSX);
+    saveAndReload("Calc Office Open XML");
+    pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    CPPUNIT_ASSERT(pModelObj);
 
-    checkSparklines(xDocSh->GetDocument());
-
-    xDocSh->DoClose();
+    checkSparklines(*pModelObj->GetDocument());
 }
 
 void SparklineImportExportTest::testSparklinesExportODS()
 {
     // Load the document containing sparklines
-    ScDocShellRef xDocSh = loadDoc(u"Sparklines.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xDocSh);
+    loadFromURL(u"xlsx/Sparklines.xlsx");
 
     // Save as ODS and check content.xml with XPath
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xDocSh, FORMAT_ODS);
-    xmlDocUniquePtr pXmlDoc = XPathHelper::parseExport(pXPathFile, m_xSFactory, "content.xml");
+    save("calc8");
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
 
-    // We have 3 sparkline groups = 3 tables that contain spakrlines
+    // We have 3 sparkline groups = 3 tables that contain sparklines
     assertXPath(pXmlDoc, "//table:table/calcext:sparkline-groups", 3);
 
     // Check the number of sparkline groups in table[1]
@@ -232,17 +211,18 @@ void SparklineImportExportTest::testSparklinesExportODS()
 
 void SparklineImportExportTest::testSparklinesRoundtripODS()
 {
-    ScDocShellRef xDocSh = loadDoc(u"Sparklines.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xDocSh);
+    loadFromURL(u"xlsx/Sparklines.xlsx");
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    CPPUNIT_ASSERT(pModelObj);
 
-    checkSparklines(xDocSh->GetDocument());
+    checkSparklines(*pModelObj->GetDocument());
 
     // Trigger export and import of sparklines
-    xDocSh = saveAndReload(*xDocSh, FORMAT_ODS);
+    saveAndReload("calc8");
+    pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    CPPUNIT_ASSERT(pModelObj);
 
-    checkSparklines(xDocSh->GetDocument());
-
-    xDocSh->DoClose();
+    checkSparklines(*pModelObj->GetDocument());
 }
 
 void SparklineImportExportTest::testNoSparklinesInDocumentXLSX()
@@ -251,11 +231,10 @@ void SparklineImportExportTest::testNoSparklinesInDocumentXLSX()
     // Check no sparkline elements are written when there is none in the document
 
     // Load the document containing NO sparklines
-    ScDocShellRef xDocSh = loadDoc(u"empty.", FORMAT_XLSX);
+    loadFromURL(u"xlsx/empty.xlsx");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xDocSh, FORMAT_XLSX);
-    xmlDocUniquePtr pXmlDoc
-        = XPathHelper::parseExport(pXPathFile, m_xSFactory, "xl/worksheets/sheet1.xml");
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pXmlDoc = parseExport("xl/worksheets/sheet1.xml");
     CPPUNIT_ASSERT(pXmlDoc);
 
     assertXPath(pXmlDoc, "/x:worksheet", 1);

@@ -25,19 +25,17 @@
 #include <com/sun/star/lang/XUnoTunnel.hpp>
 #include <com/sun/star/style/HorizontalAlignment.hpp>
 
-#include <cppuhelper/basemutex.hxx>
-#include <cppuhelper/compbase.hxx>
-#include <comphelper/componentguard.hxx>
+#include <comphelper/compbase.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 
 namespace toolkit
 {
 
-typedef ::cppu::WeakComponentImplHelper    <   css::awt::grid::XGridColumn
+typedef comphelper::WeakComponentImplHelper    <   css::awt::grid::XGridColumn
                                             ,   css::lang::XServiceInfo
                                             ,   css::lang::XUnoTunnel
                                             >   GridColumn_Base;
-class GridColumn    :public ::cppu::BaseMutex
-                    ,public GridColumn_Base
+class GridColumn final : public GridColumn_Base
 {
 public:
     GridColumn();
@@ -70,7 +68,7 @@ public:
     virtual void SAL_CALL removeGridColumnListener( const css::uno::Reference< css::awt::grid::XGridColumnListener >& xListener ) override;
 
     // OComponentHelper
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
     // XCloneable (base of XGridColumn)
     virtual css::uno::Reference< css::util::XCloneable > SAL_CALL createClone(  ) override;
@@ -82,7 +80,7 @@ public:
 
     // XUnoTunnel and friends
     virtual sal_Int64 SAL_CALL getSomething( const css::uno::Sequence< sal_Int8 >& i_identifier ) override;
-    static css::uno::Sequence< sal_Int8 > getUnoTunnelId() noexcept;
+    static const css::uno::Sequence< sal_Int8 > & getUnoTunnelId() noexcept;
 
     // attribute access
     void setIndex( sal_Int32 const i_index );
@@ -92,19 +90,21 @@ private:
             char const * const i_asciiAttributeName,
             const css::uno::Any& i_oldValue,
             const css::uno::Any& i_newValue,
-            ::comphelper::ComponentGuard& i_Guard
+            std::unique_lock<std::mutex>& i_Guard
         );
 
     template< class TYPE >
     void impl_set( TYPE & io_attribute, TYPE const & i_newValue, char const * i_attributeName )
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard(m_aMutex);
+        if (m_bDisposed)
+            throw css::lang::DisposedException( OUString(), static_cast<cppu::OWeakObject*>(this) );
         if ( io_attribute == i_newValue )
             return;
 
         TYPE const aOldValue( io_attribute );
         io_attribute = i_newValue;
-        broadcast_changed( i_attributeName, css::uno::makeAny( aOldValue ), css::uno::makeAny( io_attribute ), aGuard );
+        broadcast_changed( i_attributeName, css::uno::Any( aOldValue ), css::uno::Any( io_attribute ), aGuard );
     }
 
     css::uno::Any                      m_aIdentifier;
@@ -118,6 +118,7 @@ private:
     OUString                           m_sTitle;
     OUString                           m_sHelpText;
     css::style::HorizontalAlignment    m_eHorizontalAlign;
+    comphelper::OInterfaceContainerHelper4<css::awt::grid::XGridColumnListener> maGridColumnListeners;
 };
 
 }

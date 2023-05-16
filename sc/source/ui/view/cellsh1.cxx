@@ -94,6 +94,7 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <cppuhelper/bootstrap.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <memory>
 
@@ -149,7 +150,7 @@ OUString FlagsToString( InsertDeleteFlags nFlags,
     return aFlagsStr;
 }
 
-void SetTabNoAndCursor( const ScViewData& rViewData, const OUString& rCellId )
+void SetTabNoAndCursor( const ScViewData& rViewData, std::u16string_view rCellId )
 {
     ScTabViewShell* pTabViewShell = rViewData.GetViewShell();
     assert(pTabViewShell);
@@ -157,7 +158,7 @@ void SetTabNoAndCursor( const ScViewData& rViewData, const OUString& rCellId )
     std::vector<sc::NoteEntry> aNotes;
     rDoc.GetAllNoteEntries(aNotes);
 
-    sal_uInt32 nId = rCellId.toUInt32();
+    sal_uInt32 nId = o3tl::toUInt32(rCellId);
     auto lComp = [nId](const sc::NoteEntry& rNote) { return rNote.mpNote->GetId() == nId; };
 
     const auto& aFoundNoteIt = std::find_if(aNotes.begin(), aNotes.end(), lComp);
@@ -676,12 +677,13 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                         double fInputEndVal = 0.0;
                         OUString aEndStr;
 
-                        aStartStr = rDoc.GetInputString( nStartCol, nStartRow, nStartTab );
+                        const bool forceSystemLocale = true;
+                        aStartStr = rDoc.GetInputString( nStartCol, nStartRow, nStartTab, forceSystemLocale );
                         fStartVal = rDoc.GetValue( nStartCol, nStartRow, nStartTab );
 
                         if(eFillDir==FILL_TO_BOTTOM && nStartRow < nEndRow )
                         {
-                            aEndStr = rDoc.GetInputString( nStartCol, nStartRow+1, nStartTab );
+                            aEndStr = rDoc.GetInputString( nStartCol, nStartRow+1, nStartTab, forceSystemLocale );
                             if(!aEndStr.isEmpty())
                             {
                                 fInputEndVal = rDoc.GetValue( nStartCol, nStartRow+1, nStartTab );
@@ -692,7 +694,7 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                         {
                             if(nStartCol < nEndCol)
                             {
-                                aEndStr = rDoc.GetInputString( nStartCol+1, nStartRow, nStartTab );
+                                aEndStr = rDoc.GetInputString( nStartCol+1, nStartRow, nStartTab, forceSystemLocale );
                                 if(!aEndStr.isEmpty())
                                 {
                                     fInputEndVal = rDoc.GetValue( nStartCol+1, nStartRow, nStartTab );
@@ -830,12 +832,10 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
 
                 if( pReqArgs != nullptr )
                 {
-                    const SfxPoolItem* pItem;
-
-                    if( pReqArgs->HasItem( FID_FILL_AUTO, &pItem ) )
+                    if( const SfxStringItem* pItem = pReqArgs->GetItemIfSet( FID_FILL_AUTO ) )
                     {
                         ScAddress aScAddress;
-                        OUString aArg = static_cast<const SfxStringItem*>(pItem)->GetValue();
+                        OUString aArg = pItem->GetValue();
 
                         if( aScAddress.Parse( aArg, rDoc, rDoc.GetAddressConvention() ) & ScRefFlags::VALID )
                         {
@@ -1520,15 +1520,17 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                                         CellShiftDisabledFlags nDisableShiftY = CellShiftDisabledFlags::NONE;
 
                                         //check if horizontal shift will fit
-                                        if ( !rData.GetDocument().IsBlockEmpty( nStartTab,
+                                        if ( !rData.GetDocument().IsBlockEmpty(
                                                     rDoc.MaxCol() - nRangeSizeX, nStartY,
-                                                    rDoc.MaxCol(), nStartY + nRangeSizeY ) )
+                                                    rDoc.MaxCol(), nStartY + nRangeSizeY,
+                                                    nStartTab ) )
                                             nDisableShiftX = CellShiftDisabledFlags::Right;
 
                                         //check if vertical shift will fit
-                                        if ( !rData.GetDocument().IsBlockEmpty( nStartTab,
+                                        if ( !rData.GetDocument().IsBlockEmpty(
                                                     nStartX, rDoc.MaxRow() - nRangeSizeY,
-                                                    nStartX + nRangeSizeX, rDoc.MaxRow() ) )
+                                                    nStartX + nRangeSizeX, rDoc.MaxRow(),
+                                                    nStartTab ) )
                                             nDisableShiftY = CellShiftDisabledFlags::Down;
 
                                         if ( nDisableShiftX != CellShiftDisabledFlags::NONE || nDisableShiftY != CellShiftDisabledFlags::NONE)
@@ -1971,7 +1973,7 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                                                     DefaultFontType::CJK_SPREADSHEET,
                                                     eTargetLang, GetDefaultFontFlags::OnlyOne );
                                 ScConversionParam aConvParam( SC_CONVERSION_CHINESE_TRANSL,
-                                    eSourceLang, eTargetLang, aTargetFont, nOptions, false );
+                                    eSourceLang, eTargetLang, std::move(aTargetFont), nOptions, false );
                                 pTabViewShell->DoSheetConversion( aConvParam );
                             }
                         }
@@ -2021,12 +2023,11 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
 
         case SID_CONSOLIDATE:
             {
-                const SfxPoolItem* pItem;
-                if ( pReqArgs && SfxItemState::SET ==
-                        pReqArgs->GetItemState( SCITEM_CONSOLIDATEDATA, true, &pItem ) )
+                const ScConsolidateItem* pItem;
+                if ( pReqArgs && (pItem =
+                        pReqArgs->GetItemIfSet( SCITEM_CONSOLIDATEDATA )) )
                 {
-                    const ScConsolidateParam& rParam =
-                            static_cast<const ScConsolidateItem*>(pItem)->GetData();
+                    const ScConsolidateParam& rParam = pItem->GetData();
 
                     pTabViewShell->Consolidate( rParam );
                     GetViewData().GetDocument().SetConsolidateDlgData( std::unique_ptr<ScConsolidateParam>(new ScConsolidateParam(rParam)) );
@@ -2047,7 +2048,7 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                 if ( pOkItem->GetValue() )      // OK
                 {
                     OUString             aFormula;
-                    const SfxStringItem* pSItem      = static_cast<const SfxStringItem*>(&pReqArgs->Get( SCITEM_STRING ));
+                    const SfxStringItem* pSItem      = &pReqArgs->Get( SCITEM_STRING );
                     const SfxBoolItem*   pMatrixItem = static_cast<const SfxBoolItem*>(&pReqArgs->Get( SID_DLG_MATRIX ));
 
                     aFormula += pSItem->GetValue();
@@ -2232,6 +2233,7 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                         {
                             pCondFormat = pList->GetFormat(rCondFormats[0]);
                             assert(pCondFormat);
+                            nIndex = pCondFormat->GetKey();
                             bCondFormatDlg = true;
                         }
                         else
@@ -2244,7 +2246,9 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                     else
                     {
                         // define an overlapping conditional format
-                        // does not need to be handled here
+                        pCondFormat = pList->GetFormat(rCondFormats[0]);
+                        assert(pCondFormat);
+                        bCondFormatDlg = true;
                     }
                 }
 
@@ -2341,8 +2345,7 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
             if (pReqArgs)
             {
                 const ScSolveItem& rItem =
-                        static_cast<const ScSolveItem&>(
-                            pReqArgs->Get( SCITEM_SOLVEDATA ));
+                            pReqArgs->Get( SCITEM_SOLVEDATA );
 
                 pTabViewShell->Solve( rItem.GetData() );
 
@@ -2400,16 +2403,14 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
         case SID_INSERT_POSTIT:
         case SID_EDIT_POSTIT:
             {
-                const SfxPoolItem* pText;
-                if ( pReqArgs && pReqArgs->HasItem( SID_ATTR_POSTIT_TEXT, &pText) )
+                const SvxPostItTextItem* pTextItem;
+                if ( pReqArgs && (pTextItem = pReqArgs->GetItemIfSet( SID_ATTR_POSTIT_TEXT )) )
                 {
-                    const SfxPoolItem* pCellId;
                     OUString aCellId;
                     // SID_ATTR_POSTIT_ID only argument for SID_EDIT_POSTIT
-                    if (pReqArgs->HasItem( SID_ATTR_POSTIT_ID, &pCellId ))
-                        aCellId = static_cast<const SvxPostItIdItem*>(pCellId)->GetValue();
+                    if (const SvxPostItIdItem* pCellId = pReqArgs->GetItemIfSet( SID_ATTR_POSTIT_ID ))
+                        aCellId = pCellId->GetValue();
 
-                    const SvxPostItTextItem*    pTextItem   = static_cast<const SvxPostItTextItem*>( pText );
                     const SvxPostItAuthorItem*  pAuthorItem = pReqArgs->GetItem( SID_ATTR_POSTIT_AUTHOR );
                     const SvxPostItDateItem*    pDateItem   = pReqArgs->GetItem( SID_ATTR_POSTIT_DATE );
 
@@ -2586,11 +2587,10 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
 
         case SID_DELETE_NOTE:
         {
-            const SfxPoolItem* pId;
+            const SvxPostItIdItem* pIdItem;
             // If Id is mentioned, select the appropriate cell first
-            if ( pReqArgs && pReqArgs->HasItem( SID_ATTR_POSTIT_ID, &pId) )
+            if ( pReqArgs && (pIdItem = pReqArgs->GetItemIfSet( SID_ATTR_POSTIT_ID )) )
             {
-                const SvxPostItIdItem* pIdItem = static_cast<const SvxPostItIdItem*>(pId);
                 const OUString& aCellId = pIdItem->GetValue();
                 if (!aCellId.isEmpty())
                 {
@@ -2628,15 +2628,14 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                 const SfxItemSet *pArgs = rReq.GetArgs();
                 const SfxPoolItem* pItem = nullptr;
                 if ( pArgs )
-                    pArgs->GetItemState(GetPool().GetWhich(SID_CHARMAP), false, &pItem);
+                    pArgs->GetItemState(SID_CHARMAP, false, &pItem);
                 if ( pItem )
                 {
                     const SfxStringItem* pStringItem = dynamic_cast<const SfxStringItem*>( pItem  );
                     if ( pStringItem )
                         aChars = pStringItem->GetValue();
-                    const SfxPoolItem* pFtItem = nullptr;
-                    pArgs->GetItemState( GetPool().GetWhich(SID_ATTR_SPECIALCHAR), false, &pFtItem);
-                    const SfxStringItem* pFontItem = dynamic_cast<const SfxStringItem*>( pFtItem  );
+                    const SfxStringItem* pFontItem =
+                        pArgs->GetItemIfSet( SID_ATTR_SPECIALCHAR, false);
                     if ( pFontItem )
                         aFontName = pFontItem->GetValue();
                 }
@@ -2791,7 +2790,7 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                     OUString aFilter;
                     OUString aOptions;
                     OUString aSource;
-                    sal_uLong nRefresh=0;
+                    sal_Int32 nRefreshDelaySeconds=0;
 
                     aFile = pFile->GetValue();
                     aSource = pSource->GetValue();
@@ -2803,9 +2802,9 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                         aOptions = pOptions->GetValue();
                     const SfxUInt32Item* pRefresh = rReq.GetArg<SfxUInt32Item>(FN_PARAM_2);
                     if ( pRefresh )
-                        nRefresh = pRefresh->GetValue();
+                        nRefreshDelaySeconds = pRefresh->GetValue();
 
-                    ExecuteExternalSource( aFile, aFilter, aOptions, aSource, nRefresh, rReq );
+                    ExecuteExternalSource( aFile, aFilter, aOptions, aSource, nRefreshDelaySeconds, rReq );
                 }
                 else
                 {
@@ -2817,14 +2816,14 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                     delete pImpl->m_pRequest;
                     pImpl->m_pRequest = new SfxRequest( rReq );
                     OUString sFile, sFilter, sOptions, sSource;
-                    sal_uLong nRefresh = 0;
+                    sal_Int32 nRefreshDelaySeconds = 0;
                     if (pImpl->m_pLinkedDlg->Execute() == RET_OK)
                     {
                         sFile = pImpl->m_pLinkedDlg->GetURL();
                         sFilter = pImpl->m_pLinkedDlg->GetFilter();
                         sOptions = pImpl->m_pLinkedDlg->GetOptions();
                         sSource = pImpl->m_pLinkedDlg->GetSource();
-                        nRefresh = pImpl->m_pLinkedDlg->GetRefresh();
+                        nRefreshDelaySeconds = pImpl->m_pLinkedDlg->GetRefreshDelaySeconds();
                         if ( !sFile.isEmpty() )
                             pImpl->m_pRequest->AppendItem( SfxStringItem( SID_FILE_NAME, sFile ) );
                         if ( !sFilter.isEmpty() )
@@ -2833,11 +2832,11 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                             pImpl->m_pRequest->AppendItem( SfxStringItem( SID_FILE_FILTEROPTIONS, sOptions ) );
                         if ( !sSource.isEmpty() )
                             pImpl->m_pRequest->AppendItem( SfxStringItem( FN_PARAM_1, sSource ) );
-                        if ( nRefresh )
-                            pImpl->m_pRequest->AppendItem( SfxUInt32Item( FN_PARAM_2, nRefresh ) );
+                        if ( nRefreshDelaySeconds )
+                            pImpl->m_pRequest->AppendItem( SfxUInt32Item( FN_PARAM_2, nRefreshDelaySeconds ) );
                     }
 
-                    ExecuteExternalSource( sFile, sFilter, sOptions, sSource, nRefresh, *(pImpl->m_pRequest) );
+                    ExecuteExternalSource( sFile, sFilter, sOptions, sSource, nRefreshDelaySeconds, *(pImpl->m_pRequest) );
                 }
             }
             break;
@@ -3052,7 +3051,7 @@ void ScCellShell::ExecuteRotateTrans( const SfxRequest& rReq )
 
 void ScCellShell::ExecuteExternalSource(
     const OUString& _rFile, const OUString& _rFilter, const OUString& _rOptions,
-    const OUString& _rSource, sal_uLong _nRefresh, SfxRequest& _rRequest )
+    const OUString& _rSource, sal_Int32 _nRefreshDelaySeconds, SfxRequest& _rRequest )
 {
     if ( !_rFile.isEmpty() && !_rSource.isEmpty() )         // filter may be empty
     {
@@ -3071,7 +3070,7 @@ void ScCellShell::ExecuteExternalSource(
             aLinkRange = ScRange( rData.GetCurX(), rData.GetCurY(), rData.GetTabNo() );
 
         rData.GetDocFunc().InsertAreaLink( _rFile, _rFilter, _rOptions, _rSource,
-                                            aLinkRange, _nRefresh, bMove, false );
+                                            aLinkRange, _nRefreshDelaySeconds, bMove, false );
         _rRequest.Done();
     }
     else
@@ -3240,9 +3239,7 @@ void ScCellShell::ExecuteDataPilotDialog()
                                     pServDlg->GetParPass() );
                             std::unique_ptr<ScDPObject> pNewDPObject(new ScDPObject(&rDoc));
                             pNewDPObject->SetServiceData( aServDesc );
-
-                            if ( pNewDPObject )
-                                pNewDPObject->SetOutRange( aDestPos );
+                            pNewDPObject->SetOutRange(aDestPos);
 
                             RunPivotLayoutDialog(pScMod, pTabViewShell, pNewDPObject);
                         }
@@ -3265,9 +3262,7 @@ void ScCellShell::ExecuteDataPilotDialog()
                             pDataDlg->GetValues( aImpDesc );
                             std::unique_ptr<ScDPObject> pNewDPObject(new ScDPObject(&rDoc));
                             pNewDPObject->SetImportDesc( aImpDesc );
-
-                            if ( pNewDPObject )
-                                pNewDPObject->SetOutRange( aDestPos );
+                            pNewDPObject->SetOutRange(aDestPos);
 
                             RunPivotLayoutDialog(pScMod, pTabViewShell, pNewDPObject);
                         }
@@ -3370,7 +3365,7 @@ void ScCellShell::ExecuteSubtotals(SfxRequest& rReq)
     const SfxItemSet* pArgs = rReq.GetArgs();
     if ( pArgs )
     {
-        pTabViewShell->DoSubTotals( static_cast<const ScSubTotalItem&>( pArgs->Get( SCITEM_SUBTDATA )).
+        pTabViewShell->DoSubTotals( pArgs->Get( SCITEM_SUBTDATA ).
                         GetSubTotalData() );
         rReq.Done();
         return;
@@ -3422,9 +3417,7 @@ void ScCellShell::ExecuteSubtotals(SfxRequest& rReq)
         {
             pOutSet = pDlg->GetOutputItemSet();
             aSubTotalParam =
-                static_cast<const ScSubTotalItem&>(
-                    pOutSet->Get( SCITEM_SUBTDATA )).
-                        GetSubTotalData();
+                    pOutSet->Get( SCITEM_SUBTDATA ).GetSubTotalData();
         }
         else // if (bResult == SCRET_REMOVE)
         {
@@ -3458,10 +3451,10 @@ void ScCellShell::ExecuteFillSingleEdit()
         aPrevPos.IncRow(-1);
         ScRefCellValue aCell(rDoc, aPrevPos);
 
-        if (aCell.meType == CELLTYPE_FORMULA)
+        if (aCell.getType() == CELLTYPE_FORMULA)
         {
             aInit = "=";
-            const ScTokenArray* pCode = aCell.mpFormula->GetCode();
+            const ScTokenArray* pCode = aCell.getFormula()->GetCode();
             sc::TokenStringContext aCxt(rDoc, rDoc.GetGrammar());
             aInit += pCode->CreateString(aCxt, aCurPos);
         }

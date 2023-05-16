@@ -30,7 +30,7 @@
 #include <svx/framelinkarray.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
-#include <drawinglayer/processor2d/processorfromoutputdevice.hxx>
+#include <drawinglayer/processor2d/processor2dtools.hxx>
 #include <vcl/lineinfo.hxx>
 #include <vcl/gradient.hxx>
 #include <vcl/settings.hxx>
@@ -635,7 +635,7 @@ void ScOutputData::SetCellRotations()
 
             for (SCCOL nX=0; nX<=nRotMax; nX++)
             {
-                CellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
+                ScCellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
                 const ScPatternAttr* pPattern = pInfo->pPatternAttr;
                 const SfxItemSet* pCondSet = pInfo->pConditionSet;
 
@@ -650,7 +650,7 @@ void ScOutputData::SetCellRotations()
                     ScRotateDir nDir = pPattern->GetRotateDir( pCondSet );
                     if (nDir != ScRotateDir::NONE)
                     {
-                        // Needed for CellInfo internal decisions (bg fill, ...)
+                        // Needed for ScCellInfo internal decisions (bg fill, ...)
                         pInfo->nRotateDir = nDir;
 
                         // create target coordinates
@@ -869,7 +869,7 @@ void drawDataBars(vcl::RenderContext& rRenderContext, const ScDataBarInfo* pOldD
     if(pOldDataBarInfo->mbGradient)
     {
         rRenderContext.SetLineColor(pOldDataBarInfo->maColor);
-        Gradient aGradient(GradientStyle::Linear, pOldDataBarInfo->maColor, COL_TRANSPARENT);
+        Gradient aGradient(css::awt::GradientStyle_LINEAR, pOldDataBarInfo->maColor, COL_TRANSPARENT);
         aGradient.SetSteps(255);
 
         if(pOldDataBarInfo->mnLength < 0)
@@ -932,7 +932,7 @@ void drawIconSets(vcl::RenderContext& rRenderContext, const ScIconSetInfo* pOldI
     }
 
     Size aSize = rIcon.GetSizePixel();
-    double fRatio = aSize.Width() / aSize.Height();
+    double fRatio = static_cast<double>(aSize.Width()) / aSize.Height();
     tools::Long aWidth = fRatio * aHeight;
 
     rRenderContext.Push();
@@ -1099,7 +1099,7 @@ void ScOutputData::DrawBackground(vcl::RenderContext& rRenderContext)
 
                 for (SCCOL nX=nX1; nX + nMergedCols <= nX2 + 1; nX += nOldMerged)
                 {
-                    CellInfo* pInfo = &pThisRowInfo->cellInfo(nX-1+nMergedCols);
+                    ScCellInfo* pInfo = &pThisRowInfo->cellInfo(nX-1+nMergedCols);
 
                     nOldMerged = nMergedCols;
 
@@ -1490,7 +1490,6 @@ void ScOutputData::DrawFrame(vcl::RenderContext& rRenderContext)
     std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> pProcessor(CreateProcessor2D());
     if (!pProcessor)
         return;
-    drawinglayer::primitive2d::Primitive2DContainer aPrimitives;
     while( nRow1 <= nLastRow )
     {
         while( (nRow1 <= nLastRow) && !pRowInfo[ nRow1 ].bChanged ) ++nRow1;
@@ -1498,13 +1497,12 @@ void ScOutputData::DrawFrame(vcl::RenderContext& rRenderContext)
         {
             size_t nRow2 = nRow1;
             while( (nRow2 + 1 <= nLastRow) && pRowInfo[ nRow2 + 1 ].bChanged ) ++nRow2;
-            aPrimitives.append(
-                rArray.CreateB2DPrimitiveRange(
-                    nFirstCol, nRow1, nLastCol, nRow2, pForceColor ));
+            auto xPrimitive = rArray.CreateB2DPrimitiveRange(
+                    nFirstCol, nRow1, nLastCol, nRow2, pForceColor );
+            pProcessor->process(xPrimitive);
             nRow1 = nRow2 + 1;
         }
     }
-    pProcessor->process(aPrimitives);
     pProcessor.reset();
 
     rRenderContext.SetDrawMode(nOldDrawMode);
@@ -1564,7 +1562,7 @@ void ScOutputData::DrawRotatedFrame(vcl::RenderContext& rRenderContext)
             {
                 if (nX==nX1) nPosX = nInitPosX;     // calculated individually for preceding positions
 
-                CellInfo* pInfo = &rThisRowInfo.cellInfo(nX);
+                ScCellInfo* pInfo = &rThisRowInfo.cellInfo(nX);
                 tools::Long nColWidth = pRowInfo[0].basicCellInfo(nX).nWidth;
                 if ( pInfo->nRotateDir > ScRotateDir::Standard &&
                         !pInfo->bHOverlapped && !pInfo->bVOverlapped )
@@ -1718,14 +1716,12 @@ std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> ScOutputData::Create
 
     basegfx::B2DRange aViewRange;
     SdrPage *pDrawPage = pDrawLayer->GetPage( static_cast< sal_uInt16 >( nTab ) );
-    const drawinglayer::geometry::ViewInformation2D aNewViewInfos(
-            basegfx::B2DHomMatrix(  ),
-            mpDev->GetViewTransformation(),
-            aViewRange,
-            GetXDrawPageForSdrPage( pDrawPage ),
-            0.0);
+    drawinglayer::geometry::ViewInformation2D aNewViewInfos;
+    aNewViewInfos.setViewTransformation(mpDev->GetViewTransformation());
+    aNewViewInfos.setViewport(aViewRange);
+    aNewViewInfos.setVisualizedPage(GetXDrawPageForSdrPage( pDrawPage ));
 
-    return drawinglayer::processor2d::createBaseProcessor2DFromOutputDevice(
+    return drawinglayer::processor2d::createProcessor2DFromOutputDevice(
                     *mpDev, aNewViewInfos );
 }
 
@@ -1836,10 +1832,10 @@ void ScOutputData::FindChanged()
         {
             const ScRefCellValue& rCell = pThisRowInfo->cellInfo(nX).maCell;
 
-            if (rCell.meType != CELLTYPE_FORMULA)
+            if (rCell.getType() != CELLTYPE_FORMULA)
                 continue;
 
-            ScFormulaCell* pFCell = rCell.mpFormula;
+            ScFormulaCell* pFCell = rCell.getFormula();
             if (pFCell->IsRunning())
                 // still being interpreted. Skip it.
                 continue;
@@ -1885,10 +1881,10 @@ void ScOutputData::FindChanged()
             {
                 const ScRefCellValue& rCell = pThisRowInfo->cellInfo(nX).maCell;
 
-                if (rCell.meType != CELLTYPE_FORMULA)
+                if (rCell.getType() != CELLTYPE_FORMULA)
                     continue;
 
-                ScFormulaCell* pFCell = rCell.mpFormula;
+                ScFormulaCell* pFCell = rCell.getFormula();
                 if (pFCell->IsRunning())
                     // still being interpreted. Skip it.
                     continue;
@@ -1937,11 +1933,7 @@ ReferenceMark ScOutputData::FillReferenceMark( SCCOL nRefStartX, SCROW nRefStart
         tools::Long nMaxX = nScrX + nScrW - 1;
         tools::Long nMaxY = nScrY + nScrH - 1;
         if ( bLayoutRTL )
-        {
-            tools::Long nTemp = nMinX;
-            nMinX = nMaxX;
-            nMaxX = nTemp;
-        }
+            std::swap( nMinX, nMaxX );
         tools::Long nLayoutSign = bLayoutRTL ? -1 : 1;
 
         bool bTop    = false;
@@ -2029,11 +2021,7 @@ void ScOutputData::DrawRefMark( SCCOL nRefStartX, SCROW nRefStartY,
     tools::Long nMaxX = nScrX + nScrW - 1;
     tools::Long nMaxY = nScrY + nScrH - 1;
     if ( bLayoutRTL )
-    {
-        tools::Long nTemp = nMinX;
-        nMinX = nMaxX;
-        nMaxX = nTemp;
-    }
+        std::swap( nMinX, nMaxX );
     tools::Long nLayoutSign = bLayoutRTL ? -1 : 1;
 
     bool bTop    = false;
@@ -2156,11 +2144,7 @@ void ScOutputData::DrawOneChange( SCCOL nRefStartX, SCROW nRefStartY,
     tools::Long nMaxX = nScrX+nScrW-1;
     tools::Long nMaxY = nScrY+nScrH-1;
     if ( bLayoutRTL )
-    {
-        tools::Long nTemp = nMinX;
-        nMinX = nMaxX;
-        nMaxX = nTemp;
-    }
+        std::swap( nMinX, nMaxX );
     tools::Long nLayoutSign = bLayoutRTL ? -1 : 1;
 
     bool bTop    = false;
@@ -2352,7 +2336,7 @@ void ScOutputData::DrawSparklines(vcl::RenderContext& rRenderContext)
             tools::Long nPosX = nInitPosX;
             for (SCCOL nX=nX1; nX<=nX2; nX++)
             {
-                CellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
+                ScCellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
                 bool bIsMerged = false;
 
                 if ( nX==nX1 && pInfo->bHOverlapped && !pInfo->bVOverlapped )
@@ -2409,7 +2393,7 @@ void ScOutputData::DrawNoteMarks(vcl::RenderContext& rRenderContext)
             tools::Long nPosX = nInitPosX;
             for (SCCOL nX=nX1; nX<=nX2; nX++)
             {
-                CellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
+                ScCellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
                 bool bIsMerged = false;
 
                 if ( nX==nX1 && pInfo->bHOverlapped && !pInfo->bVOverlapped )
@@ -2484,7 +2468,7 @@ void ScOutputData::AddPDFNotes()
             tools::Long nPosX = nInitPosX;
             for (SCCOL nX=nX1; nX<=nX2; nX++)
             {
-                CellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
+                ScCellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
                 bool bIsMerged = false;
                 SCROW nY = pRowInfo[nArrY].nRowNo;
                 SCCOL nMergeX = nX;
@@ -2575,7 +2559,7 @@ void ScOutputData::DrawClipMarks()
             tools::Long nPosX = nInitPosX;
             for (SCCOL nX=nX1; nX<=nX2; nX++)
             {
-                CellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
+                ScCellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
                 if (pInfo->nClipMark != ScClipMark::NONE)
                 {
                     if (pInfo->bHOverlapped || pInfo->bVOverlapped)

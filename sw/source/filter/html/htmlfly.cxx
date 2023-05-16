@@ -35,7 +35,7 @@ SwHTMLPosFlyFrame::SwHTMLPosFlyFrame( const SwPosFlyFrame& rPosFly,
                                   AllHtmlFlags nFlags ) :
     m_pFrameFormat( &rPosFly.GetFormat() ),
     m_pSdrObject( pSdrObj ),
-    m_pNodeIdex( new SwNodeIndex( rPosFly.GetNdIndex() ) ),
+    m_aNodeIndex( rPosFly.GetNode() ),
     m_nOrdNum( rPosFly.GetOrdNum() ),
     m_nContentIndex( 0 ),
     m_nAllFlags( nFlags )
@@ -47,16 +47,16 @@ SwHTMLPosFlyFrame::SwHTMLPosFlyFrame( const SwPosFlyFrame& rPosFly,
 
     // Output of auto-bound frames will be a character farther back,
     // because then the position aligns with Netscape.
-    OSL_ENSURE( rAnchor.GetContentAnchor(), "No anchor position?" );
-    if( !rAnchor.GetContentAnchor() )
+    OSL_ENSURE( rAnchor.GetAnchorNode(), "No anchor position?" );
+    if( !rAnchor.GetAnchorNode() )
         return;
 
-    m_nContentIndex = rAnchor.GetContentAnchor()->nContent.GetIndex();
+    m_nContentIndex = rAnchor.GetAnchorContentOffset();
     sal_Int16 eHoriRel = rPosFly.GetFormat().GetHoriOrient().
                                         GetRelationOrient();
     if( text::RelOrientation::FRAME == eHoriRel || text::RelOrientation::PRINT_AREA == eHoriRel )
     {
-        const SwContentNode *pCNd = m_pNodeIdex->GetNode().GetContentNode();
+        const SwContentNode *pCNd = m_aNodeIndex.GetNode().GetContentNode();
         OSL_ENSURE( pCNd, "No Content-Node at PaM position" );
         if( pCNd && m_nContentIndex < pCNd->Len() )
             m_nContentIndex++;
@@ -65,7 +65,7 @@ SwHTMLPosFlyFrame::SwHTMLPosFlyFrame( const SwPosFlyFrame& rPosFly,
 
 bool SwHTMLPosFlyFrame::operator<( const SwHTMLPosFlyFrame& rFrame ) const
 {
-    if( m_pNodeIdex->GetIndex() == rFrame.m_pNodeIdex->GetIndex() )
+    if( m_aNodeIndex.GetIndex() == rFrame.m_aNodeIndex.GetIndex() )
     {
         if( m_nContentIndex == rFrame.m_nContentIndex )
         {
@@ -78,7 +78,7 @@ bool SwHTMLPosFlyFrame::operator<( const SwHTMLPosFlyFrame& rFrame ) const
             return m_nContentIndex < rFrame.m_nContentIndex;
     }
     else
-        return m_pNodeIdex->GetIndex() < rFrame.m_pNodeIdex->GetIndex();
+        return m_aNodeIndex.GetIndex() < rFrame.m_aNodeIndex.GetIndex();
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

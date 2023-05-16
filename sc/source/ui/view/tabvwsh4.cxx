@@ -133,7 +133,7 @@ void ScTabViewShell::Activate(bool bMDI)
                 ScInputWindow* pWin = static_cast<ScInputWindow*>(pChild->GetWindow());
                 if (pWin && pWin->IsVisible())
                 {
-
+                    pWin->NumLinesChanged(); // tdf#150664
                     ScInputHandler* pOldHdl=pWin->GetInputHandler();
 
                     SfxViewShell* pSh = SfxViewShell::GetFirst( true, checkSfxViewShell<ScTabViewShell> );
@@ -535,7 +535,7 @@ void ScTabViewShell::DoReadUserDataSequence( const uno::Sequence < beans::Proper
 
 // DoReadUserData is also called from ctor when switching from print preview
 
-void ScTabViewShell::DoReadUserData( const OUString& rData )
+void ScTabViewShell::DoReadUserData( std::u16string_view rData )
 {
     vcl::Window* pOldWin = GetActiveWin();
     bool bFocus = pOldWin && pOldWin->HasFocus();

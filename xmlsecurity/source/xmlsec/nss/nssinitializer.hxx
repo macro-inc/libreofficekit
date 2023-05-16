@@ -26,7 +26,7 @@
 
 namespace com::sun::star::uno { class XComponentContext; }
 
-#define NSS_SERVICE_NAME "com.sun.star.xml.crypto.NSSInitializer"
+inline constexpr OUStringLiteral NSS_SERVICE_NAME = u"com.sun.star.xml.crypto.NSSInitializer";
 
 class ONSSInitializer : public cppu::WeakImplHelper
 <
@@ -42,7 +42,7 @@ protected:
     ONSSInitializer();
 
 public:
-    explicit ONSSInitializer(const css::uno::Reference<css::uno::XComponentContext> &rxContext);
+    explicit ONSSInitializer(css::uno::Reference<css::uno::XComponentContext> xContext);
     virtual ~ONSSInitializer() override;
 
     static bool initNSS( const css::uno::Reference< css::uno::XComponentContext > &rxContext );

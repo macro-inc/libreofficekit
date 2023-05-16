@@ -20,7 +20,6 @@
 #define INCLUDED_SW_INC_DOC_HXX
 
 // SwDoc interfaces
-#include <o3tl/deleter.hxx>
 #include <o3tl/typed_flags_set.hxx>
 #include <o3tl/sorted_vector.hxx>
 #include <vcl/idle.hxx>
@@ -143,6 +142,7 @@ namespace sw::mark { class MarkManager; }
 namespace sw {
     enum class RedlineMode;
     enum class FieldmarkMode;
+    enum class ParagraphBreakMode;
     class MetaFieldManager;
     class UndoManager;
     class IShellCursorSupplier;
@@ -176,6 +176,10 @@ namespace com::sun::star {
     namespace linguistic2 { class XProofreadingIterator; }
     namespace linguistic2 { class XSpellChecker1; }
     namespace script::vba { class XVBAEventProcessor; }
+}
+
+namespace ooo::vba::word {
+    class XFind;
 }
 
 namespace sfx2 {
@@ -286,6 +290,7 @@ class SW_DLLPUBLIC SwDoc final
     std::unique_ptr<sw::OnlineAccessibilityCheck> mpOnlineAccessibilityCheck;
 
     css::uno::Reference< css::script::vba::XVBAEventProcessor > mxVbaEvents;
+    css::uno::Reference< ooo::vba::word::XFind > mxVbaFind;
     css::uno::Reference<css::container::XNameContainer> m_xTemplateToProjectCache;
 
     /// Table styles (autoformats that are applied with table changes).
@@ -664,7 +669,7 @@ public:
 
     void ChangeAuthorityData(const SwAuthEntry* pNewData);
 
-    bool IsInHeaderFooter( const SwNodeIndex& rIdx ) const;
+    bool IsInHeaderFooter( const SwNode& ) const;
     SvxFrameDirection GetTextDirection( const SwPosition& rPos,
                             const Point* pPt = nullptr ) const;
     bool IsInVerticalText( const SwPosition& rPos ) const;
@@ -684,7 +689,7 @@ public:
     SwDBData const & GetDBData();
 
     // Some helper functions
-    OUString GetUniqueGrfName() const;
+    OUString GetUniqueGrfName(std::u16string_view rPrefix = std::u16string_view()) const;
     OUString GetUniqueOLEName() const;
     OUString GetUniqueFrameName() const;
     OUString GetUniqueShapeName() const;
@@ -858,7 +863,7 @@ public:
     bool IsUsed( const sw::BroadcastingModify& ) const;
     /// Query if table style is used.
     bool IsUsed( const SwTableAutoFormat& ) const;
-    bool IsUsed( const SwNumRule& );
+    bool IsUsed( const SwNumRule& ) const;
 
     // Set name of newly loaded document template.
     size_t SetDocPattern(const OUString& rPatternName);
@@ -999,7 +1004,7 @@ public:
 
     // Set everything in rOldNode on rNewPos + Offset.
     void CorrAbs(
-        const SwNodeIndex& rOldNode,
+        const SwNode& rOldNode,
         const SwPosition& rNewPos,
         const sal_Int32 nOffset = 0,
         bool bMoveCursor = false );
@@ -1019,7 +1024,7 @@ public:
 
     // Set everything in rOldNode to relative Pos.
     void CorrRel(
-        const SwNodeIndex& rOldNode,
+        const SwNode& rOldNode,
         const SwPosition& rNewPos,
         const sal_Int32 nOffset = 0,
         bool bMoveCursor = false );
@@ -1151,7 +1156,7 @@ public:
     bool MoveParagraph(SwPaM&, SwNodeOffset nOffset, bool bIsOutlMv = false);
     bool MoveParagraphImpl(SwPaM&, SwNodeOffset nOffset, bool bIsOutlMv, SwRootFrame const*);
 
-    bool NumOrNoNum( const SwNodeIndex& rIdx, bool bDel = false);
+    bool NumOrNoNum( SwNode& rIdx, bool bDel = false);
 
     void StopNumRuleAnimations( const OutputDevice* );
 
@@ -1171,11 +1176,12 @@ public:
                                 const SwTableAutoFormat* pTAFormat = nullptr,
                                 const std::vector<sal_uInt16> *pColArr = nullptr,
                                 bool bCalledFromShell = false,
-                                bool bNewModel = true );
+                                bool bNewModel = true,
+                                const OUString& rTableName = {} );
 
     // If index is in a table, return TableNode, else 0.
-                 SwTableNode* IsIdxInTable( const SwNodeIndex& rIdx );
-    inline const SwTableNode* IsIdxInTable( const SwNodeIndex& rIdx ) const;
+    static SwTableNode* IsIdxInTable( const SwNodeIndex& rIdx );
+    static SwTableNode* IsInTable( const SwNode& );
 
     // Create a balanced table out of the selected range.
     const SwTable* TextToTable( const SwInsertTableOptions& rInsTableOpts, // HeadlineNoBorder,
@@ -1263,11 +1269,11 @@ public:
     SwTableLineFormat* MakeTableLineFormat();
 
     // helper function: cleanup before checking number value
-    bool IsNumberFormat( const OUString& rString, sal_uInt32& F_Index, double& fOutNumber);
+    bool IsNumberFormat( std::u16string_view aString, sal_uInt32& F_Index, double& fOutNumber);
     // Check if box has numerical value. Change format of box if required.
     void ChkBoxNumFormat( SwTableBox& rCurrentBox, bool bCallUpdate );
     void SetTableBoxFormulaAttrs( SwTableBox& rBox, const SfxItemSet& rSet );
-    void ClearBoxNumAttrs( const SwNodeIndex& rNode );
+    void ClearBoxNumAttrs( SwNode& rNode );
     void ClearLineNumAttrs( SwPosition const & rPos );
 
     bool InsCopyOfTable( SwPosition& rInsPos, const SwSelBoxes& rBoxes,
@@ -1287,8 +1293,7 @@ public:
 
     /** And vice versa: rPos must be in the table that remains. The flag indicates
      whether the current table is merged with the one before or behind it. */
-    bool MergeTable( const SwPosition& rPos, bool bWithPrev,
-                        sal_uInt16 nMode = 0 );
+    bool MergeTable( const SwPosition& rPos, bool bWithPrev );
 
     // Make charts of given table update.
     void UpdateCharts( const OUString& rName ) const;
@@ -1308,6 +1313,8 @@ public:
     /** @return names of all references that are set in document.
      If array pointer is 0 return only whether a RefMark is set in document. */
     sal_uInt16 GetRefMarks( std::vector<OUString>* = nullptr ) const;
+
+    void DeleteFormatRefMark(const SwFormatRefMark* pFormatRefMark);
 
     // Insert label. If a FlyFormat is created, return it.
     SwFlyFrameFormat* InsertLabel( const SwLabelType eType, const OUString &rText, const OUString& rSeparator,
@@ -1334,7 +1341,7 @@ public:
 
     // insert section (the ODF kind of section, not the nodesarray kind)
     SwSection * InsertSwSection(SwPaM const& rRange, SwSectionData &,
-            std::tuple<SwTOXBase const*, sw::RedlineMode, sw::FieldmarkMode> const* pTOXBase,
+            std::tuple<SwTOXBase const*, sw::RedlineMode, sw::FieldmarkMode, sw::ParagraphBreakMode> const* pTOXBase,
             SfxItemSet const*const pAttr, bool const bUpdate = true);
     static sal_uInt16 IsInsRegionAvailable( const SwPaM& rRange,
                                 const SwNode** ppSttNd = nullptr );
@@ -1389,7 +1396,7 @@ public:
     // Query if URL was visited.
     // Query via Doc, if only a Bookmark has been given.
     // In this case the document name has to be set in front.
-    bool IsVisitedURL( const OUString& rURL );
+    bool IsVisitedURL( std::u16string_view rURL );
 
     // Save current values for automatic registration of exceptions in Autocorrection.
     void SetAutoCorrExceptWord( std::unique_ptr<SwAutoCorrExceptWord> pNew );
@@ -1494,7 +1501,9 @@ public:
     static bool GetRowBackground( const SwCursor& rCursor, std::unique_ptr<SvxBrushItem>& rToFill );
     /// rNotTracked = false means that the row was deleted or inserted with its tracked cell content
     /// bAll: delete all table rows without selection
-    void SetRowNotTracked( const SwCursor& rCursor, const SvxPrintItem &rNotTracked, bool bAll = false );
+    /// bIns: insert table row
+    void SetRowNotTracked( const SwCursor& rCursor,
+                        const SvxPrintItem &rNotTracked, bool bAll = false, bool bIns = false );
     /// don't call SetRowNotTracked() for rows with tracked row change
     static bool HasRowNotTracked( const SwCursor& rCursor );
     void SetTabBorders( const SwCursor& rCursor, const SfxItemSet& rSet );
@@ -1526,7 +1535,7 @@ public:
     void Unchain( SwFrameFormat &rFormat );
 
     // For Copy/Move from FrameShell.
-    SdrObject* CloneSdrObj( const SdrObject&, bool bMoveWithinDoc = false,
+    rtl::Reference<SdrObject> CloneSdrObj( const SdrObject&, bool bMoveWithinDoc = false,
                             bool bInsInPage = true );
 
     // FeShell - Interface end
@@ -1628,7 +1637,10 @@ public:
     void SetDefaultPageMode(bool bSquaredPageMode);
     bool IsSquaredPageMode() const;
 
+    const css::uno::Reference< ooo::vba::word::XFind >& getVbaFind() const { return mxVbaFind; }
+    void setVbaFind( const css::uno::Reference< ooo::vba::word::XFind > &xFind) { mxVbaFind = xFind; }
     css::uno::Reference< css::script::vba::XVBAEventProcessor > const & GetVbaEventProcessor();
+    void SetVbaEventProcessor();
     void SetVBATemplateToProjectCache( css::uno::Reference< css::container::XNameContainer > const & xCache ) { m_xTemplateToProjectCache = xCache; };
     const css::uno::Reference< css::container::XNameContainer >& GetVBATemplateToProjectCache() const { return m_xTemplateToProjectCache; };
     ::sfx2::IXmlIdRegistry& GetXmlIdRegistry();
@@ -1688,11 +1700,6 @@ namespace o3tl {
 
 // This method is called in Dtor of SwDoc and deletes cache of ContourObjects.
 void ClrContourCache();
-
-inline const SwTableNode* SwDoc::IsIdxInTable( const SwNodeIndex& rIdx ) const
-{
-    return const_cast<SwDoc*>(this)->IsIdxInTable( rIdx );
-}
 
 inline void SwDoc::SetOLEPrtNotifyPending( bool bSet )
 {

@@ -58,6 +58,7 @@ public:
     std::shared_ptr< ::oox::drawingml::Color > maBulletColorPtr;
     css::uno::Any               mbBulletColorFollowText;
     css::uno::Any               mbBulletFontFollowText;
+    css::uno::Any               mbBulletSizeFollowText;
     ::oox::drawingml::TextFont  maBulletFont;
     css::uno::Any               msBulletChar;
     css::uno::Any               mnStartAt;
@@ -88,6 +89,7 @@ public:
     TextSpacing&                        getParaBottomMargin() { return maParaBottomMargin; }
     std::optional< sal_Int32 >&       getParaLeftMargin(){ return moParaLeftMargin; }
     std::optional< sal_Int32 >&       getFirstLineIndentation(){ return moFirstLineIndentation; }
+    std::optional<sal_Int32>&         getDefaultTabSize() { return moDefaultTabSize; }
 
     std::optional< css::style::ParagraphAdjust >&       getParaAdjust() { return moParaAdjust; }
     void                                setParaAdjust( css::style::ParagraphAdjust nParaAdjust ) { moParaAdjust = nParaAdjust; }
@@ -123,6 +125,7 @@ private:
     std::optional< sal_Int32 >    moParaLeftMargin;
     std::optional< sal_Int32 >    moFirstLineIndentation;
     std::optional< css::style::ParagraphAdjust >    moParaAdjust;
+    std::optional< sal_Int32 >      moDefaultTabSize;
     sal_Int16                       mnLevel;
     TextSpacing                     maLineSpacing;
 };

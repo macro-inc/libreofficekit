@@ -18,21 +18,21 @@
  */
 
 #include <ByteChucker.hxx>
-#include <PackageConstants.hxx>
 #include <com/sun/star/io/XSeekable.hpp>
 #include <com/sun/star/io/XOutputStream.hpp>
 
 using namespace ::com::sun::star::io;
 using namespace ::com::sun::star::uno;
-using namespace ::com::sun::star::lang;
 
 ByteChucker::ByteChucker(Reference<XOutputStream> const & xOstream)
 : xStream(xOstream)
 , xSeek (xOstream, UNO_QUERY )
 , a2Sequence ( 2 )
 , a4Sequence ( 4 )
+, a8Sequence ( 8 )
 , p2Sequence ( a2Sequence.getArray() )
 , p4Sequence ( a4Sequence.getArray() )
+, p8Sequence ( a8Sequence.getArray() )
 {
 }
 

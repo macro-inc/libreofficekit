@@ -78,7 +78,7 @@
 #include <toolkit/controls/unocontrol.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/localedatawrapper.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
@@ -454,7 +454,7 @@ public:
     {
     }
 
-    virtual OUString GetComponentServiceName() override {return "Edit";}
+    virtual OUString GetComponentServiceName() const override {return "Edit";}
     virtual void SAL_CALL createPeer( const Reference< XToolkit > & rxToolkit, const Reference< XWindowPeer >  & rParentPeer ) override;
 
 protected:
@@ -1067,10 +1067,10 @@ Any SAL_CALL FormController::getByIndex(sal_Int32 Index)
 {
     ::osl::MutexGuard aGuard( m_aMutex );
     if (Index < 0 ||
-        Index >= static_cast<sal_Int32>(m_aChildren.size()))
+        o3tl::make_unsigned(Index) >= m_aChildren.size())
         throw IndexOutOfBoundsException();
 
-    return makeAny( m_aChildren[ Index ] );
+    return Any( m_aChildren[ Index ] );
 }
 
 //  EventListener
@@ -1302,7 +1302,7 @@ bool FormController::replaceControl( const Reference< XControl >& _rxExistentCon
                 // carry over the model
                 _rxNewControl->setModel( _rxExistentControl->getModel() );
 
-                xContainer->replaceByIdentifer( *pIdentifiers, makeAny( _rxNewControl ) );
+                xContainer->replaceByIdentifer( *pIdentifiers, Any( _rxNewControl ) );
                 bSuccess = true;
 
                 if ( bReplacedWasActive )
@@ -1915,7 +1915,7 @@ void FormController::addToEventAttacher(const Reference< XControl > & xControl)
         m_xModelAsIndex->getByIndex(--nPos) >>= xTemp;
         if (xComp.get() == xTemp.get())
         {
-            m_xModelAsManager->attach( nPos, Reference<XInterface>( xControl, UNO_QUERY ), makeAny(xControl) );
+            m_xModelAsManager->attach( nPos, Reference<XInterface>( xControl, UNO_QUERY ), Any(xControl) );
             break;
         }
     }
@@ -2923,7 +2923,7 @@ void SAL_CALL FormController::addChildController( const Reference< XFormControll
         m_xModelAsIndex->getByIndex(--nPos) >>= xTemp;
         if ( xFormOfChild == xTemp )
         {
-            m_xModelAsManager->attach( nPos, Reference<XInterface>( ChildController, UNO_QUERY ), makeAny( ChildController) );
+            m_xModelAsManager->attach( nPos, Reference<XInterface>( ChildController, UNO_QUERY ), Any( ChildController) );
             break;
         }
     }
@@ -3589,13 +3589,13 @@ sal_Bool SAL_CALL FormController::approveRowChange(const RowChangeEvent& _rEvent
     ::osl::ClearableMutexGuard aGuard( m_aMutex );
     impl_checkDisposed_throw();
 
-    ::comphelper::OInterfaceIteratorHelper2 aIter(m_aRowSetApproveListeners);
+    ::comphelper::OInterfaceIteratorHelper3 aIter(m_aRowSetApproveListeners);
     bool bValid = true;
     if (aIter.hasMoreElements())
     {
         RowChangeEvent aEvt( _rEvent );
         aEvt.Source = *this;
-        bValid = static_cast<XRowSetApproveListener*>(aIter.next())->approveRowChange(aEvt);
+        bValid = aIter.next()->approveRowChange(aEvt);
     }
 
     if ( !bValid )
@@ -3677,12 +3677,12 @@ sal_Bool SAL_CALL FormController::approveCursorMove(const EventObject& event)
     ::osl::MutexGuard aGuard( m_aMutex );
     impl_checkDisposed_throw();
 
-    ::comphelper::OInterfaceIteratorHelper2 aIter(m_aRowSetApproveListeners);
+    ::comphelper::OInterfaceIteratorHelper3 aIter(m_aRowSetApproveListeners);
     if (aIter.hasMoreElements())
     {
         EventObject aEvt(event);
         aEvt.Source = *this;
-        return static_cast<XRowSetApproveListener*>(aIter.next())->approveCursorMove(aEvt);
+        return aIter.next()->approveCursorMove(aEvt);
     }
 
     return true;
@@ -3694,12 +3694,12 @@ sal_Bool SAL_CALL FormController::approveRowSetChange(const EventObject& event)
     ::osl::MutexGuard aGuard( m_aMutex );
     impl_checkDisposed_throw();
 
-    ::comphelper::OInterfaceIteratorHelper2 aIter(m_aRowSetApproveListeners);
+    ::comphelper::OInterfaceIteratorHelper3 aIter(m_aRowSetApproveListeners);
     if (aIter.hasMoreElements())
     {
         EventObject aEvt(event);
         aEvt.Source = *this;
-        return static_cast<XRowSetApproveListener*>(aIter.next())->approveRowSetChange(aEvt);
+        return aIter.next()->approveRowSetChange(aEvt);
     }
 
     return true;
@@ -3731,12 +3731,12 @@ void SAL_CALL FormController::errorOccured(const SQLErrorEvent& aEvent)
     ::osl::ClearableMutexGuard aGuard( m_aMutex );
     impl_checkDisposed_throw();
 
-    ::comphelper::OInterfaceIteratorHelper2 aIter(m_aErrorListeners);
+    ::comphelper::OInterfaceIteratorHelper3 aIter(m_aErrorListeners);
     if (aIter.hasMoreElements())
     {
         SQLErrorEvent aEvt(aEvent);
         aEvt.Source = *this;
-        static_cast<XSQLErrorListener*>(aIter.next())->errorOccured(aEvt);
+        aIter.next()->errorOccured(aEvt);
     }
     else
     {
@@ -3804,12 +3804,12 @@ sal_Bool SAL_CALL FormController::approveParameter(const DatabaseParameterEvent&
     ::osl::MutexGuard aGuard( m_aMutex );
     impl_checkDisposed_throw();
 
-    ::comphelper::OInterfaceIteratorHelper2 aIter(m_aParameterListeners);
+    ::comphelper::OInterfaceIteratorHelper3 aIter(m_aParameterListeners);
     if (aIter.hasMoreElements())
     {
         DatabaseParameterEvent aEvt(aEvent);
         aEvt.Source = *this;
-        return static_cast<XDatabaseParameterListener*>(aIter.next())->approveParameter(aEvt);
+        return aIter.next()->approveParameter(aEvt);
     }
     else
     {
@@ -3826,7 +3826,7 @@ sal_Bool SAL_CALL FormController::approveParameter(const DatabaseParameterEvent&
             ParametersRequest aRequest;
             aRequest.Parameters = aEvent.Parameters;
             aRequest.Connection = getConnection(Reference< XRowSet >(aEvent.Source, UNO_QUERY));
-            rtl::Reference<OInteractionRequest> pParamRequest = new OInteractionRequest(makeAny(aRequest));
+            rtl::Reference<OInteractionRequest> pParamRequest = new OInteractionRequest(Any(aRequest));
             // some knittings
             pParamRequest->addContinuation(pParamValues);
             pParamRequest->addContinuation(pAbort);
@@ -3899,12 +3899,12 @@ sal_Bool SAL_CALL FormController::confirmDelete(const RowChangeEvent& aEvent)
     ::osl::MutexGuard aGuard( m_aMutex );
     impl_checkDisposed_throw();
 
-    ::comphelper::OInterfaceIteratorHelper2 aIter(m_aDeleteListeners);
+    ::comphelper::OInterfaceIteratorHelper3 aIter(m_aDeleteListeners);
     if (aIter.hasMoreElements())
     {
         RowChangeEvent aEvt(aEvent);
         aEvt.Source = *this;
-        return static_cast<XConfirmDeleteListener*>(aIter.next())->confirmDelete(aEvt);
+        return aIter.next()->confirmDelete(aEvt);
     }
     // default handling: instantiate an interaction handler and let it handle the request
 
@@ -3934,7 +3934,7 @@ sal_Bool SAL_CALL FormController::confirmDelete(const RowChangeEvent& aEvent)
         aDetails.Message = SvxResId(RID_STR_DELETECONFIRM);
         aWarning.NextException <<= aDetails;
 
-        rtl::Reference<OInteractionRequest> pRequest = new OInteractionRequest( makeAny( aWarning ) );
+        rtl::Reference<OInteractionRequest> pRequest = new OInteractionRequest( Any( aWarning ) );
 
         // some knittings
         pRequest->addContinuation( pApprove );

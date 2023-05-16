@@ -56,7 +56,7 @@ public:
     E3dExtrudeObj(
         SdrModel& rSdrModel,
         const E3dDefaultAttributes& rDefault,
-        const basegfx::B2DPolyPolygon& rPP,
+        basegfx::B2DPolyPolygon aPP,
         double fDepth);
     E3dExtrudeObj(SdrModel& rSdrModel, E3dExtrudeObj const & rSource);
     E3dExtrudeObj(SdrModel& rSdrModel);
@@ -95,7 +95,7 @@ public:
 
     virtual SdrObjKind GetObjIdentifier() const override;
 
-    virtual E3dExtrudeObj* CloneSdrObject(SdrModel& rTargetModel) const override;
+    virtual rtl::Reference<SdrObject> CloneSdrObject(SdrModel& rTargetModel) const override;
 
     // TakeObjName...() is for the display in the UI (for example "3 frames selected")
     virtual OUString TakeObjNameSingul() const override;
@@ -106,7 +106,7 @@ public:
     const basegfx::B2DPolyPolygon &GetExtrudePolygon() const { return maExtrudePolygon; }
 
     virtual bool IsBreakObjPossible() override;
-    virtual std::unique_ptr<SdrAttrObj,SdrObjectFreeOp> GetBreakObj() override;
+    virtual rtl::Reference<SdrAttrObj> GetBreakObj() override;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

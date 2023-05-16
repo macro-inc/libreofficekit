@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/sheet/xsheetoutline.hxx>
 
 #include <com/sun/star/lang/XComponent.hpp>
@@ -19,13 +19,12 @@ using namespace css::uno;
 
 namespace sc_apitest
 {
-class ScOutlineObj : public CalcUnoApiTest, public apitest::XSheetOutline
+class ScOutlineObj : public UnoApiTest, public apitest::XSheetOutline
 {
 public:
     ScOutlineObj();
 
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     virtual uno::Reference<uno::XInterface> init() override;
 
@@ -41,13 +40,10 @@ public:
     CPPUNIT_TEST(testClearOutline);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScOutlineObj::ScOutlineObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
 {
 }
 
@@ -64,17 +60,9 @@ uno::Reference<uno::XInterface> ScOutlineObj::init()
 
 void ScOutlineObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
-    OUString aFileURL;
-    createFileURL(u"ScOutlineObj.ods", aFileURL);
-    mxComponent = loadFromDesktop(aFileURL);
-}
-
-void ScOutlineObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
+    loadFromURL(u"ScOutlineObj.ods");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScOutlineObj);

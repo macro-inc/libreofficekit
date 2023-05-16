@@ -48,6 +48,7 @@
 #include <libxml/xmlstring.h>
 #include <libxml/xmlwriter.h>
 #include <comphelper/lok.hxx>
+#include <strings.hrc>
 
 constexpr OUStringLiteral S_ANNOTATION_BOOKMARK = u"____";
 
@@ -84,10 +85,6 @@ auto IDocumentMarkAccess::iterator::operator=(iterator && rOther) noexcept -> it
 {
     m_pIter = std::move(rOther.m_pIter);
     return *this;
-}
-
-IDocumentMarkAccess::iterator::~iterator()
-{
 }
 
 // ARGH why does it *need* to return const& ?
@@ -189,34 +186,41 @@ bool IDocumentMarkAccess::iterator::operator>=(iterator const& rOther) const
 
 namespace
 {
-    bool lcl_GreaterThan( const SwPosition& rPos, const SwNodeIndex& rNdIdx, const SwIndex* pIdx )
+    bool lcl_GreaterThan( const SwPosition& rPos, const SwNode& rNdIdx, std::optional<sal_Int32> oContentIdx )
     {
-        return pIdx != nullptr
-               ? ( rPos.nNode > rNdIdx
-                   || ( rPos.nNode == rNdIdx
-                        && rPos.nContent >= pIdx->GetIndex() ) )
-               : rPos.nNode >= rNdIdx;
+        return oContentIdx.has_value()
+               ? ( rPos.GetNode() > rNdIdx
+                   || ( rPos.GetNode() == rNdIdx
+                        && rPos.GetContentIndex() >= *oContentIdx ) )
+               : rPos.GetNode() >= rNdIdx;
     }
 
-    bool lcl_Lower( const SwPosition& rPos, const SwNodeIndex& rNdIdx, const SwIndex* pIdx )
+    bool lcl_Lower( const SwPosition& rPos, const SwNode& rNdIdx, std::optional<sal_Int32> oContentIdx )
     {
-        return rPos.nNode < rNdIdx
-               || ( pIdx != nullptr
-                    && rPos.nNode == rNdIdx
-                    && rPos.nContent < pIdx->GetIndex() );
+        if (rPos.GetNode() < rNdIdx)
+            return true;
+
+        if (rPos.GetNode() != rNdIdx || !oContentIdx)
+            return false;
+
+        if (rPos.GetContentIndex() < *oContentIdx)
+            return true;
+
+        // paragraph end selected?
+        return rNdIdx.IsTextNode() && *oContentIdx == rNdIdx.GetTextNode()->Len();
     }
 
     bool lcl_MarkOrderingByStart(const ::sw::mark::MarkBase *const pFirst,
                                  const ::sw::mark::MarkBase *const pSecond)
     {
-        auto const& rFirstStart(pFirst->GetMarkStart());
-        auto const& rSecondStart(pSecond->GetMarkStart());
-        if (rFirstStart.nNode != rSecondStart.nNode)
+        SwPosition const& rFirstStart(pFirst->GetMarkStart());
+        SwPosition const& rSecondStart(pSecond->GetMarkStart());
+        if (rFirstStart.GetNode() != rSecondStart.GetNode())
         {
-            return rFirstStart.nNode < rSecondStart.nNode;
+            return rFirstStart.GetNode() < rSecondStart.GetNode();
         }
-        const sal_Int32 nFirstContent = rFirstStart.nContent.GetIndex();
-        const sal_Int32 nSecondContent = rSecondStart.nContent.GetIndex();
+        const sal_Int32 nFirstContent = rFirstStart.GetContentIndex();
+        const sal_Int32 nSecondContent = rSecondStart.GetContentIndex();
         if (nFirstContent != 0 || nSecondContent != 0)
         {
             return nFirstContent < nSecondContent;
@@ -248,44 +252,45 @@ namespace
             pMark);
     }
 
-    std::unique_ptr<SwPosition> lcl_PositionFromContentNode(
-        SwContentNode * const pContentNode,
+    void lcl_PositionFromContentNode(
+        std::optional<SwPosition>& rFoundPos,
+        const SwContentNode * const pContentNode,
         const bool bAtEnd)
     {
-        std::unique_ptr<SwPosition> pResult(new SwPosition(*pContentNode));
-        pResult->nContent.Assign(pContentNode, bAtEnd ? pContentNode->Len() : 0);
-        return pResult;
+        rFoundPos.emplace(*pContentNode, bAtEnd ? pContentNode->Len() : 0);
     }
 
     // return a position at the begin of rEnd, if it is a ContentNode
     // else set it to the begin of the Node after rEnd, if there is one
     // else set it to the end of the node before rStt
     // else set it to the ContentNode of the Pos outside the Range
-    std::unique_ptr<SwPosition> lcl_FindExpelPosition(
-        const SwNodeIndex& rStt,
-        const SwNodeIndex& rEnd,
+    void lcl_FindExpelPosition(
+        std::optional<SwPosition>& rFoundPos,
+        const SwNode& rStt,
+        const SwNode& rEnd,
         const SwPosition& rOtherPosition)
     {
-        SwContentNode * pNode = rEnd.GetNode().GetContentNode();
+        const SwContentNode * pNode = rEnd.GetContentNode();
         bool bPosAtEndOfNode = false;
         if ( pNode == nullptr)
         {
-            SwNodeIndex aEnd = rEnd;
+            SwNodeIndex aEnd(rEnd);
             pNode = rEnd.GetNodes().GoNext( &aEnd );
             bPosAtEndOfNode = false;
         }
         if ( pNode == nullptr )
         {
-            SwNodeIndex aStt = rStt;
+            SwNodeIndex aStt(rStt);
             pNode = SwNodes::GoPrevious(&aStt);
             bPosAtEndOfNode = true;
         }
         if ( pNode != nullptr )
         {
-            return lcl_PositionFromContentNode( pNode, bPosAtEndOfNode );
+            lcl_PositionFromContentNode( rFoundPos, pNode, bPosAtEndOfNode );
+            return;
         }
 
-        return std::make_unique<SwPosition>(rOtherPosition);
+        rFoundPos = rOtherPosition;
     }
 
     struct CompareIMarkStartsBefore
@@ -314,7 +319,8 @@ namespace
     };
 
 
-    IMark* lcl_getMarkAfter(const MarkManager::container_t& rMarks, const SwPosition& rPos)
+    IMark* lcl_getMarkAfter(const MarkManager::container_t& rMarks, const SwPosition& rPos,
+                            bool bLoop)
     {
         auto const pMarkAfter = upper_bound(
             rMarks.begin(),
@@ -322,11 +328,17 @@ namespace
             rPos,
             CompareIMarkStartsAfter());
         if(pMarkAfter == rMarks.end())
+        {
+            if (bLoop && rMarks.begin() != rMarks.end())
+                return *rMarks.begin();
+
             return nullptr;
+        }
         return *pMarkAfter;
     };
 
-    IMark* lcl_getMarkBefore(const MarkManager::container_t& rMarks, const SwPosition& rPos)
+    IMark* lcl_getMarkBefore(const MarkManager::container_t& rMarks, const SwPosition& rPos,
+                             bool bLoop)
     {
         // candidates from which to choose the mark before
         MarkManager::container_t vCandidates;
@@ -344,7 +356,13 @@ namespace
             back_inserter(vCandidates),
             [&rPos] (const ::sw::mark::MarkBase *const pMark) { return !(pMark->GetMarkEnd() < rPos); } );
         // no candidate left => we are in front of the first mark or there are none
-        if(vCandidates.empty()) return nullptr;
+        if(vCandidates.empty())
+        {
+            if (bLoop && rMarks.begin() != rMarks.end())
+                return *(rMarks.end() - 1);
+
+            return nullptr;
+        }
         // return the highest (last) candidate using mark end ordering
         return *max_element(vCandidates.begin(), vCandidates.end(), &lcl_MarkOrderingByEnd);
     }
@@ -363,8 +381,8 @@ namespace
 
         if ( ( bChangedPos || bChangedOPos )
              && io_pMark->IsExpanded()
-             && io_pMark->GetOtherMarkPos().nNode.GetNode().FindTableBoxStartNode() !=
-                    io_pMark->GetMarkPos().nNode.GetNode().FindTableBoxStartNode() )
+             && io_pMark->GetOtherMarkPos().GetNode().FindTableBoxStartNode() !=
+                    io_pMark->GetMarkPos().GetNode().FindTableBoxStartNode() )
         {
             if ( !bChangedOPos )
             {
@@ -461,10 +479,10 @@ namespace
             const SwPosition* const pStPos = &pMark->GetMarkStart();
             const SwPosition* const pEndPos = &pMark->GetMarkEnd();
             SAL_INFO("sw.core",
-                sal_Int32(pStPos->nNode.GetIndex()) << "," <<
-                pStPos->nContent.GetIndex() << " " <<
-                sal_Int32(pEndPos->nNode.GetIndex()) << "," <<
-                pEndPos->nContent.GetIndex() << " " <<
+                sal_Int32(pStPos->GetNodeIndex()) << "," <<
+                pStPos->GetContentIndex() << " " <<
+                sal_Int32(pEndPos->GetNodeIndex()) << "," <<
+                pEndPos->GetContentIndex() << " " <<
                 typeid(*pMark).name() << " " <<
                 pMark->GetName());
         }
@@ -516,11 +534,11 @@ OUString IDocumentMarkAccess::GetCrossRefHeadingBookmarkNamePrefix()
 
 bool IDocumentMarkAccess::IsLegalPaMForCrossRefHeadingBookmark( const SwPaM& rPaM )
 {
-    return rPaM.Start()->nNode.GetNode().IsTextNode() &&
-           rPaM.Start()->nContent.GetIndex() == 0 &&
+    return rPaM.Start()->GetNode().IsTextNode() &&
+           rPaM.Start()->GetContentIndex() == 0 &&
            ( !rPaM.HasMark() ||
-             ( rPaM.GetMark()->nNode == rPaM.GetPoint()->nNode &&
-               rPaM.End()->nContent.GetIndex() == rPaM.End()->nNode.GetNode().GetTextNode()->Len() ) );
+             ( rPaM.GetMark()->GetNode() == rPaM.GetPoint()->GetNode() &&
+               rPaM.End()->GetContentIndex() == rPaM.End()->GetNode().GetTextNode()->Len() ) );
 }
 
 void IDocumentMarkAccess::DeleteFieldmarkCommand(::sw::mark::IFieldmark const& rMark)
@@ -530,7 +548,7 @@ void IDocumentMarkAccess::DeleteFieldmarkCommand(::sw::mark::IFieldmark const& r
         return; // TODO FORMDATE has no command?
     }
     SwPaM pam(sw::mark::FindFieldSep(rMark), rMark.GetMarkStart());
-    ++pam.GetPoint()->nContent; // skip CH_TXT_ATR_FIELDSTART
+    pam.GetPoint()->AdjustContent(+1); // skip CH_TXT_ATR_FIELDSTART
     pam.GetDoc().getIDocumentContentOperations().DeleteAndJoin(pam);
 }
 
@@ -555,19 +573,19 @@ namespace sw::mark
                 pPos2 = rPaM.GetMark();
             SAL_INFO("sw.core",
                 rName << " " <<
-                sal_Int32(pPos1->nNode.GetIndex() )<< "," <<
-                pPos1->nContent.GetIndex() << " " <<
-                sal_Int32(pPos2->nNode.GetIndex()) << "," <<
-                pPos2->nContent.GetIndex());
+                sal_Int32(pPos1->GetNodeIndex() )<< "," <<
+                pPos1->GetContentIndex() << " " <<
+                sal_Int32(pPos2->GetNodeIndex()) << "," <<
+                pPos2->GetContentIndex());
         }
 #endif
-        if (   (!rPaM.GetPoint()->nNode.GetNode().IsTextNode()
+        if (   (!rPaM.GetPoint()->GetNode().IsTextNode()
                 && (eType != MarkType::UNO_BOOKMARK
                 // SwXTextRange can be on table node or plain start node (FLY_AT_FLY)
-                    || !rPaM.GetPoint()->nNode.GetNode().IsStartNode()))
-            || (!rPaM.GetMark()->nNode.GetNode().IsTextNode()
+                    || !rPaM.GetPoint()->GetNode().IsStartNode()))
+            || (!rPaM.GetMark()->GetNode().IsTextNode()
                 && (eType != MarkType::UNO_BOOKMARK
-                    || !rPaM.GetMark()->nNode.GetNode().IsStartNode())))
+                    || !rPaM.GetMark()->GetNode().IsStartNode())))
         {
             SAL_WARN("sw.core", "MarkManager::makeMark(..)"
                 " - refusing to create mark on non-textnode");
@@ -586,8 +604,8 @@ namespace sw::mark
             && (eMode == InsertMode::New
                 ? *rPaM.GetPoint() != *rPaM.GetMark()
                 // CopyText: pam covers CH_TXT_ATR_FORMELEMENT
-                : (rPaM.GetPoint()->nNode != rPaM.GetMark()->nNode
-                    || rPaM.Start()->nContent.GetIndex() + 1 != rPaM.End()->nContent.GetIndex())))
+                : (rPaM.GetPoint()->GetNode() != rPaM.GetMark()->GetNode()
+                    || rPaM.Start()->GetContentIndex() + 1 != rPaM.End()->GetContentIndex())))
         {
             SAL_WARN("sw.core", "MarkManager::makeMark(..)"
                 " - invalid range on point fieldmark");
@@ -595,8 +613,8 @@ namespace sw::mark
         }
 
         if ((eType == MarkType::TEXT_FIELDMARK || eType == MarkType::DATE_FIELDMARK)
-            && (rPaM.GetPoint()->nNode.GetNode().StartOfSectionNode() != rPaM.GetMark()->nNode.GetNode().StartOfSectionNode()
-                || (pSepPos && rPaM.GetPoint()->nNode.GetNode().StartOfSectionNode() != pSepPos->nNode.GetNode().StartOfSectionNode())))
+            && (rPaM.GetPoint()->GetNode().StartOfSectionNode() != rPaM.GetMark()->GetNode().StartOfSectionNode()
+                || (pSepPos && rPaM.GetPoint()->GetNode().StartOfSectionNode() != pSepPos->GetNode().StartOfSectionNode())))
         {
             SAL_WARN("sw.core", "MarkManager::makeMark(..)"
                 " - invalid range on fieldmark, different nodes array sections");
@@ -691,7 +709,7 @@ namespace sw::mark
             && (eType == IDocumentMarkAccess::MarkType::TEXT_FIELDMARK
                 || eType == IDocumentMarkAccess::MarkType::DATE_FIELDMARK))
         {
-            // due to SwInsText notifications everything is visible now - tell
+            // due to sw::InsertText notifications everything is visible now - tell
             // layout to hide as appropriate
             // note: we don't know how many layouts there are and which
             // parts they hide, so just notify the entire fieldmark, it
@@ -807,7 +825,6 @@ namespace sw::mark
         const IDocumentMarkAccess::MarkType eType )
     {
         SwPosition aPos(rTextNode);
-        aPos.nContent.Assign(&const_cast<SwTextNode&>(rTextNode), 0);
         auto const ppExistingMark = lcl_FindMarkAtPos(m_vBookmarks, aPos, eType);
         if(ppExistingMark != m_vBookmarks.end())
             return *ppExistingMark;
@@ -880,13 +897,13 @@ namespace sw::mark
     }
 
     void MarkManager::correctMarksAbsolute(
-        const SwNodeIndex& rOldNode,
+        const SwNode& rOldNode,
         const SwPosition& rNewPos,
         const sal_Int32 nOffset)
     {
-        const SwNode* const pOldNode = &rOldNode.GetNode();
+        const SwNode* const pOldNode = &rOldNode;
         SwPosition aNewPos(rNewPos);
-        aNewPos.nContent += nOffset;
+        aNewPos.AdjustContent(nOffset);
         bool isSortingNeeded = false;
 
         for (auto ppMark = m_vAllMarks.begin();
@@ -898,7 +915,7 @@ namespace sw::mark
             assert(pMark);
             // is on position ??
             bool bChangedPos = false;
-            if(&pMark->GetMarkPos().nNode.GetNode() == pOldNode)
+            if(&pMark->GetMarkPos().GetNode() == pOldNode)
             {
                 pMark->SetMarkPos(aNewPos);
                 bChangedPos = true;
@@ -906,7 +923,7 @@ namespace sw::mark
             }
             bool bChangedOPos = false;
             if (pMark->IsExpanded() &&
-                &pMark->GetOtherMarkPos().nNode.GetNode() == pOldNode)
+                &pMark->GetOtherMarkPos().GetNode() == pOldNode)
             {
                 // shift the OtherMark to aNewPos
                 pMark->SetOtherMarkPos(aNewPos);
@@ -925,11 +942,11 @@ namespace sw::mark
         lcl_DebugMarks(m_vAllMarks);
     }
 
-    void MarkManager::correctMarksRelative(const SwNodeIndex& rOldNode, const SwPosition& rNewPos, const sal_Int32 nOffset)
+    void MarkManager::correctMarksRelative(const SwNode& rOldNode, const SwPosition& rNewPos, const sal_Int32 nOffset)
     {
-        const SwNode* const pOldNode = &rOldNode.GetNode();
+        const SwNode* const pOldNode = &rOldNode;
         SwPosition aNewPos(rNewPos);
-        aNewPos.nContent += nOffset;
+        aNewPos.AdjustContent(nOffset);
         bool isSortingNeeded = false;
 
         for (auto ppMark = m_vAllMarks.begin();
@@ -941,24 +958,24 @@ namespace sw::mark
             ::sw::mark::MarkBase* const pMark = *ppMark;
             // correction of non-existent non-MarkBase instances cannot be done
             assert(pMark);
-            if(&pMark->GetMarkPos().nNode.GetNode() == pOldNode)
+            if(&pMark->GetMarkPos().GetNode() == pOldNode)
             {
                 SwPosition aNewPosRel(aNewPos);
                 if (dynamic_cast< ::sw::mark::CrossRefBookmark *>(pMark))
                 {
                     // ensure that cross ref bookmark always starts at 0
-                    aNewPosRel.nContent = 0; // HACK for WW8 import
+                    aNewPosRel.SetContent(0); // HACK for WW8 import
                     isSortingNeeded = true; // and sort them to be safe...
                 }
-                aNewPosRel.nContent += pMark->GetMarkPos().nContent.GetIndex();
+                aNewPosRel.AdjustContent(pMark->GetMarkPos().GetContentIndex());
                 pMark->SetMarkPos(aNewPosRel);
                 bChangedPos = true;
             }
             if(pMark->IsExpanded() &&
-                &pMark->GetOtherMarkPos().nNode.GetNode() == pOldNode)
+                &pMark->GetOtherMarkPos().GetNode() == pOldNode)
             {
                 SwPosition aNewPosRel(aNewPos);
-                aNewPosRel.nContent += pMark->GetOtherMarkPos().nContent.GetIndex();
+                aNewPosRel.AdjustContent(pMark->GetOtherMarkPos().GetContentIndex());
                 pMark->SetOtherMarkPos(aNewPosRel);
                 bChangedOPos = true;
             }
@@ -976,10 +993,11 @@ namespace sw::mark
 
     static bool isDeleteMark(
             ::sw::mark::MarkBase const*const pMark,
-            SwNodeIndex const& rStt,
-            SwNodeIndex const& rEnd,
-            SwIndex const*const pSttIdx,
-            SwIndex const*const pEndIdx,
+            bool const isReplace,
+            SwNode const& rStt,
+            SwNode const& rEnd,
+            std::optional<sal_Int32> oStartContentIdx,
+            std::optional<sal_Int32> oEndContentIdx,
             bool & rbIsPosInRange,
             bool & rbIsOtherPosInRange)
     {
@@ -992,20 +1010,22 @@ namespace sw::mark
         }
 
         // on position ??
-        rbIsPosInRange = lcl_GreaterThan(pMark->GetMarkPos(), rStt, pSttIdx)
-                            && lcl_Lower(pMark->GetMarkPos(), rEnd, pEndIdx);
+        rbIsPosInRange = lcl_GreaterThan(pMark->GetMarkPos(), rStt, oStartContentIdx)
+                            && lcl_Lower(pMark->GetMarkPos(), rEnd, oEndContentIdx);
         rbIsOtherPosInRange = pMark->IsExpanded()
-                            && lcl_GreaterThan(pMark->GetOtherMarkPos(), rStt, pSttIdx)
-                            && lcl_Lower(pMark->GetOtherMarkPos(), rEnd, pEndIdx);
+                            && lcl_GreaterThan(pMark->GetOtherMarkPos(), rStt, oStartContentIdx)
+                            && lcl_Lower(pMark->GetOtherMarkPos(), rEnd, oEndContentIdx);
         // special case: completely in range, touching the end?
-        if ( pEndIdx != nullptr
+        if ( oEndContentIdx.has_value()
+             && !(isReplace && IDocumentMarkAccess::GetType(*pMark)
+                                    == IDocumentMarkAccess::MarkType::BOOKMARK)
              && ( ( rbIsOtherPosInRange
-                    && pMark->GetMarkPos().nNode == rEnd
-                    && pMark->GetMarkPos().nContent == *pEndIdx )
+                    && pMark->GetMarkPos().GetNode() == rEnd
+                    && pMark->GetMarkPos().GetContentIndex() == *oEndContentIdx )
                   || ( rbIsPosInRange
                        && pMark->IsExpanded()
-                       && pMark->GetOtherMarkPos().nNode == rEnd
-                       && pMark->GetOtherMarkPos().nContent == *pEndIdx ) ) )
+                       && pMark->GetOtherMarkPos().GetNode() == rEnd
+                       && pMark->GetOtherMarkPos().GetContentIndex() == *oEndContentIdx ) ) )
         {
             rbIsPosInRange = true;
             rbIsOtherPosInRange = true;
@@ -1024,15 +1044,15 @@ namespace sw::mark
                 case IDocumentMarkAccess::MarkType::CROSSREF_HEADING_BOOKMARK:
                 case IDocumentMarkAccess::MarkType::CROSSREF_NUMITEM_BOOKMARK:
                     // no delete of cross-reference bookmarks, if range is inside one paragraph
-                    bDeleteMark = rStt != rEnd;
+                    bDeleteMark = &rStt != &rEnd;
                     break;
                 case IDocumentMarkAccess::MarkType::UNO_BOOKMARK:
                     // no delete of UNO mark, if it is not expanded and only touches the start of the range
                     bDeleteMark = rbIsOtherPosInRange
                                   || pMark->IsExpanded()
-                                  || pSttIdx == nullptr
-                                  || pMark->GetMarkPos().nNode != rStt
-                                  || pMark->GetMarkPos().nContent != *pSttIdx;
+                                  || !oStartContentIdx.has_value()
+                                  || pMark->GetMarkPos().GetNode() != rStt
+                                  || pMark->GetMarkPos().GetContentIndex() != *oStartContentIdx;
                     break;
                 default:
                     bDeleteMark = true;
@@ -1044,7 +1064,7 @@ namespace sw::mark
         return false;
     }
 
-    bool MarkManager::isBookmarkDeleted(SwPaM const& rPaM) const
+    bool MarkManager::isBookmarkDeleted(SwPaM const& rPaM, bool const isReplace) const
     {
         SwPosition const& rStart(*rPaM.Start());
         SwPosition const& rEnd(*rPaM.End());
@@ -1054,8 +1074,8 @@ namespace sw::mark
         {
             bool bIsPosInRange(false);
             bool bIsOtherPosInRange(false);
-            bool const bDeleteMark = isDeleteMark(*ppMark,
-                rStart.nNode, rEnd.nNode, &rStart.nContent, &rEnd.nContent,
+            bool const bDeleteMark = isDeleteMark(*ppMark, isReplace,
+                rStart.GetNode(), rEnd.GetNode(), rStart.GetContentIndex(), rEnd.GetContentIndex(),
                 bIsPosInRange, bIsOtherPosInRange);
             if (bDeleteMark
                 && IDocumentMarkAccess::GetType(**ppMark) == MarkType::BOOKMARK)
@@ -1067,11 +1087,11 @@ namespace sw::mark
     }
 
     void MarkManager::deleteMarks(
-            const SwNodeIndex& rStt,
-            const SwNodeIndex& rEnd,
+            const SwNode& rStt,
+            const SwNode& rEnd,
             std::vector<SaveBookmark>* pSaveBkmk,
-            const SwIndex* pSttIdx,
-            const SwIndex* pEndIdx )
+            std::optional<sal_Int32> oStartContentIdx,
+            std::optional<sal_Int32> oEndContentIdx )
     {
         std::vector<const_iterator_t> vMarksToDelete;
         bool bIsSortingNeeded = false;
@@ -1090,7 +1110,7 @@ namespace sw::mark
             ::sw::mark::MarkBase *const pMark = *ppMark;
             bool bIsPosInRange(false);
             bool bIsOtherPosInRange(false);
-            bool const bDeleteMark = isDeleteMark(pMark, rStt, rEnd, pSttIdx, pEndIdx, bIsPosInRange, bIsOtherPosInRange);
+            bool const bDeleteMark = isDeleteMark(pMark, false, rStt, rEnd, oStartContentIdx, oEndContentIdx, bIsPosInRange, bIsOtherPosInRange);
 
             if ( bIsPosInRange
                  && ( bIsOtherPosInRange
@@ -1100,7 +1120,7 @@ namespace sw::mark
                 {
                     if ( pSaveBkmk )
                     {
-                        pSaveBkmk->push_back( SaveBookmark( *pMark, rStt, pSttIdx ) );
+                        pSaveBkmk->push_back( SaveBookmark( *pMark, rStt, oStartContentIdx ) );
                     }
                     vMarksToDelete.emplace_back(ppMark);
                 }
@@ -1114,17 +1134,14 @@ namespace sw::mark
                 // the bookmark is partially in the range
                 // move position of that is in the range out of it
 
-                std::unique_ptr< SwPosition > pNewPos;
+                std::optional< SwPosition > oNewPos;
+                if ( oEndContentIdx )
                 {
-                    if ( pEndIdx != nullptr )
-                    {
-                        pNewPos = std::make_unique< SwPosition >( rEnd, *pEndIdx );
-                    }
-                    else
-                    {
-                        pNewPos =
-                            lcl_FindExpelPosition( rStt, rEnd, bIsPosInRange ? pMark->GetOtherMarkPos() : pMark->GetMarkPos() );
-                    }
+                    oNewPos.emplace( *rEnd.GetContentNode(), *oEndContentIdx );
+                }
+                else
+                {
+                    lcl_FindExpelPosition( oNewPos, rStt, rEnd, bIsPosInRange ? pMark->GetOtherMarkPos() : pMark->GetMarkPos() );
                 }
 
                 bool bMoveMark = true;
@@ -1134,7 +1151,7 @@ namespace sw::mark
                     case IDocumentMarkAccess::MarkType::CROSSREF_HEADING_BOOKMARK:
                     case IDocumentMarkAccess::MarkType::CROSSREF_NUMITEM_BOOKMARK:
                         // no move of cross-reference bookmarks, if move occurs inside a certain node
-                        bMoveMark = pMark->GetMarkPos().nNode != pNewPos->nNode;
+                        bMoveMark = pMark->GetMarkPos().GetNode() != oNewPos->GetNode();
                         break;
                     case IDocumentMarkAccess::MarkType::ANNOTATIONMARK:
                         // no move of annotation marks, if method is called to collect deleted marks
@@ -1148,9 +1165,9 @@ namespace sw::mark
                 if ( bMoveMark )
                 {
                     if ( bIsPosInRange )
-                        pMark->SetMarkPos(*pNewPos);
+                        pMark->SetMarkPos(*oNewPos);
                     else
-                        pMark->SetOtherMarkPos(*pNewPos);
+                        pMark->SetOtherMarkPos(*oNewPos);
                     bMarksMoved = true;
 
                     // illegal selection? collapse the mark and restore sorting later
@@ -1222,6 +1239,23 @@ namespace sw::mark
         }
     };
 
+    // Call DeregisterFromDoc() lazily, because it can call selection change listeners, which
+    // may mutate the marks container
+    struct LazyDdeBookmarkDeleter : public IDocumentMarkAccess::ILazyDeleter
+    {
+        std::unique_ptr<DdeBookmark> m_pDdeBookmark;
+        SwDoc& m_rDoc;
+        LazyDdeBookmarkDeleter(DdeBookmark *const pDdeBookmark, SwDoc& rDoc)
+            : m_pDdeBookmark(pDdeBookmark), m_rDoc(rDoc)
+        {
+            assert(pDdeBookmark);
+        }
+        virtual ~LazyDdeBookmarkDeleter() override
+        {
+            m_pDdeBookmark->DeregisterFromDoc(m_rDoc);
+        }
+    };
+
     }
 
     std::unique_ptr<IDocumentMarkAccess::ILazyDeleter>
@@ -1235,6 +1269,24 @@ namespace sw::mark
         switch(IDocumentMarkAccess::GetType(*pMark))
         {
             case IDocumentMarkAccess::MarkType::BOOKMARK:
+                {
+                    auto const ppBookmark = lcl_FindMark(m_vBookmarks, *ppMark.get());
+                    if ( ppBookmark != m_vBookmarks.end() )
+                    {
+                        Bookmark* pBookmark = dynamic_cast<Bookmark*>(*ppBookmark);
+
+                        if(pBookmark)
+                            pBookmark->sendLOKDeleteCallback();
+
+                        m_vBookmarks.erase(ppBookmark);
+                    }
+                    else
+                    {
+                        assert(false &&
+                            "<MarkManager::deleteMark(..)> - Bookmark not found in Bookmark container.");
+                    }
+                }
+                break;
             case IDocumentMarkAccess::MarkType::CROSSREF_HEADING_BOOKMARK:
             case IDocumentMarkAccess::MarkType::CROSSREF_NUMITEM_BOOKMARK:
                 {
@@ -1288,13 +1340,15 @@ namespace sw::mark
                 // no special marks container
                 break;
         }
-        DdeBookmark* const pDdeBookmark = dynamic_cast<DdeBookmark*>(pMark);
-        if (pDdeBookmark)
-            pDdeBookmark->DeregisterFromDoc(m_rDoc);
         //Effective STL Item 27, get a non-const iterator aI at the same
         //position as const iterator ppMark was
         auto aI = m_vAllMarks.begin();
         std::advance(aI, std::distance<container_t::const_iterator>(aI, ppMark.get()));
+        DdeBookmark* const pDdeBookmark = dynamic_cast<DdeBookmark*>(pMark);
+        if (pDdeBookmark)
+        {
+            ret.reset(new LazyDdeBookmarkDeleter(pDdeBookmark, m_rDoc));
+        }
 
         m_vAllMarks.erase(aI);
         // If we don't have a lazy deleter
@@ -1372,6 +1426,8 @@ namespace sw::mark
     IDocumentMarkAccess::const_iterator_t MarkManager::getFieldmarksEnd() const
         { return m_vFieldmarks.end(); }
 
+    sal_Int32 MarkManager::getFieldmarksCount() const { return m_vFieldmarks.size(); }
+
 
     // finds the first that is starting after
     IDocumentMarkAccess::const_iterator_t MarkManager::findFirstBookmarkStartsAfter(const SwPosition& rPos) const
@@ -1391,8 +1447,8 @@ namespace sw::mark
             [&rPos] (::sw::mark::MarkBase const*const pMark) {
                     return pMark->GetMarkStart() == rPos
                             // end position includes the CH_TXT_ATR_FIELDEND
-                        || (pMark->GetMarkEnd().nContent.GetIndex() == rPos.nContent.GetIndex() + 1
-                            && pMark->GetMarkEnd().nNode == rPos.nNode);
+                        || (pMark->GetMarkEnd().GetContentIndex() == rPos.GetContentIndex() + 1
+                            && pMark->GetMarkEnd().GetNode() == rPos.GetNode());
                 } );
         return (pFieldmark == m_vFieldmarks.end())
             ? nullptr
@@ -1419,6 +1475,29 @@ namespace sw::mark
             }
         }
         return dynamic_cast<IFieldmark*>(pFieldmark);
+    }
+
+    IMark* MarkManager::getBookmarkFor(const SwPosition& rPos) const
+    {
+        auto it = std::find_if(m_vBookmarks.begin(), m_vBookmarks.end(),
+                               [&rPos](const sw::mark::MarkBase* pMark)
+                               { return pMark->IsCoveringPosition(rPos); });
+        if (it == m_vBookmarks.end())
+        {
+            return nullptr;
+        }
+        sw::mark::IMark* pBookmark = *it;
+        for (; it != m_vBookmarks.end() && (*it)->GetMarkStart() <= rPos; ++it)
+        {
+            // Find the innermost bookmark.
+            if (rPos < (*it)->GetMarkEnd()
+                && (pBookmark->GetMarkStart() < (*it)->GetMarkStart()
+                    || (*it)->GetMarkEnd() < pBookmark->GetMarkEnd()))
+            {
+                pBookmark = *it;
+            }
+        }
+        return pBookmark;
     }
 
     void MarkManager::deleteFieldmarkAt(const SwPosition& rPos)
@@ -1464,13 +1543,13 @@ namespace sw::mark
         // Remove the old fieldmark and create a new one with the new type
         if (rNewType == ODF_FORMDROPDOWN || rNewType == ODF_FORMCHECKBOX)
         {
-            SwPosition aNewPos (aPaM.GetPoint()->nNode, aPaM.GetPoint()->nContent);
+            SwPosition aNewPos (*aPaM.GetPoint());
             deleteFieldmarkAt(aNewPos);
             return makeNoTextFieldBookmark(aPaM, sName, rNewType);
         }
         else if(rNewType == ODF_FORMDATE)
         {
-            SwPosition aPos (aPaM.GetPoint()->nNode, aPaM.GetPoint()->nContent);
+            SwPosition aPos (*aPaM.GetPoint());
             SwPaM aNewPaM(pFieldmark->GetMarkStart(), pFieldmark->GetMarkEnd());
             deleteFieldmarkAt(aPos);
             // HACK: hard-code the separator position here at the start because
@@ -1492,9 +1571,9 @@ namespace sw::mark
         IFieldmark* pFieldBM = getFieldmarkFor(aPos);
         FieldmarkWithDropDownButton* pNewActiveFieldmark = nullptr;
         if ((!pFieldBM || (pFieldBM->GetFieldname() != ODF_FORMDROPDOWN && pFieldBM->GetFieldname() != ODF_FORMDATE))
-            && aPos.nContent.GetIndex() > 0 )
+            && aPos.GetContentIndex() > 0 )
         {
-            --aPos.nContent;
+            aPos.AdjustContent(-1);
             pFieldBM = getFieldmarkFor(aPos);
         }
 
@@ -1597,11 +1676,11 @@ namespace sw::mark
         return aRet;
     }
 
-    IFieldmark* MarkManager::getFieldmarkAfter(const SwPosition& rPos) const
-        { return dynamic_cast<IFieldmark*>(lcl_getMarkAfter(m_vFieldmarks, rPos)); }
+    IFieldmark* MarkManager::getFieldmarkAfter(const SwPosition& rPos, bool bLoop) const
+        { return dynamic_cast<IFieldmark*>(lcl_getMarkAfter(m_vFieldmarks, rPos, bLoop)); }
 
-    IFieldmark* MarkManager::getFieldmarkBefore(const SwPosition& rPos) const
-        { return dynamic_cast<IFieldmark*>(lcl_getMarkBefore(m_vFieldmarks, rPos)); }
+    IFieldmark* MarkManager::getFieldmarkBefore(const SwPosition& rPos, bool bLoop) const
+        { return dynamic_cast<IFieldmark*>(lcl_getMarkBefore(m_vFieldmarks, rPos, bLoop)); }
 
     IDocumentMarkAccess::const_iterator_t MarkManager::getAnnotationMarksBegin() const
     {
@@ -1721,9 +1800,10 @@ namespace sw::mark
         sal_Int32 nCnt = 1;
         MarkBasenameMapUniqueOffset_t::const_iterator aIter = m_aMarkBasenameMapUniqueOffset.find(rName);
         if(aIter != m_aMarkBasenameMapUniqueOffset.end()) nCnt = aIter->second;
+        OUString aPrefix = SwResId(STR_MARK_COPY).replaceFirst("%1", rName);
         while(nCnt < SAL_MAX_INT32)
         {
-            sTmp = rName + OUString::number(nCnt);
+            sTmp = aPrefix + OUString::number(nCnt);
             nCnt++;
             if (lcl_FindMarkByName(sTmp, m_vAllMarks.begin(), m_vAllMarks.end()) == m_vAllMarks.end())
             {
@@ -1742,7 +1822,7 @@ namespace sw::mark
 
     void MarkManager::sortSubsetMarks()
     {
-        sort(m_vBookmarks.begin(), m_vBookmarks.end(), &lcl_MarkOrderingByStart);
+        stable_sort(m_vBookmarks.begin(), m_vBookmarks.end(), &lcl_MarkOrderingByStart);
         sort(m_vFieldmarks.begin(), m_vFieldmarks.end(), &lcl_MarkOrderingByStart);
         sort(m_vAnnotationMarks.begin(), m_vAnnotationMarks.end(), &lcl_MarkOrderingByStart);
     }
@@ -1786,9 +1866,10 @@ void MarkManager::dumpAsXml(xmlTextWriterPtr pWriter) const
 
 namespace
 {
-    bool lcl_Greater( const SwPosition& rPos, const SwNodeIndex& rNdIdx, const SwIndex* pIdx )
+    bool lcl_Greater( const SwPosition& rPos, const SwNode& rNdIdx, std::optional<sal_Int32> oContentIdx )
     {
-        return rPos.nNode > rNdIdx || ( pIdx && rPos.nNode == rNdIdx && rPos.nContent > pIdx->GetIndex() );
+        return rPos.GetNode() > rNdIdx ||
+                ( oContentIdx && rPos.GetNode() == rNdIdx && rPos.GetContentIndex() > *oContentIdx );
     }
 }
 
@@ -1801,8 +1882,8 @@ const IDocumentMarkAccess* SwDoc::getIDocumentMarkAccess() const
 
 SaveBookmark::SaveBookmark(
     const IMark& rBkmk,
-    const SwNodeIndex & rMvPos,
-    const SwIndex* pIdx)
+    const SwNode& rMvPos,
+    std::optional<sal_Int32> oContentIdx)
     : m_aName(rBkmk.GetName())
     , m_bHidden(false)
     , m_eOrigBkmType(IDocumentMarkAccess::GetType(rBkmk))
@@ -1822,21 +1903,21 @@ SaveBookmark::SaveBookmark(
             m_pMetadataUndo = pMetadatable->CreateUndo();
         }
     }
-    m_nNode1 = rBkmk.GetMarkPos().nNode.GetIndex();
-    m_nContent1 = rBkmk.GetMarkPos().nContent.GetIndex();
+    m_nNode1 = rBkmk.GetMarkPos().GetNodeIndex();
+    m_nContent1 = rBkmk.GetMarkPos().GetContentIndex();
 
     m_nNode1 -= rMvPos.GetIndex();
-    if(pIdx && !m_nNode1)
-        m_nContent1 -= pIdx->GetIndex();
+    if(oContentIdx && !m_nNode1)
+        m_nContent1 -= *oContentIdx;
 
     if(rBkmk.IsExpanded())
     {
-        m_nNode2 = rBkmk.GetOtherMarkPos().nNode.GetIndex();
-        m_nContent2 = rBkmk.GetOtherMarkPos().nContent.GetIndex();
+        m_nNode2 = rBkmk.GetOtherMarkPos().GetNodeIndex();
+        m_nContent2 = rBkmk.GetOtherMarkPos().GetContentIndex();
 
         m_nNode2 -= rMvPos.GetIndex();
-        if(pIdx && !m_nNode2)
-            m_nContent2 -= pIdx->GetIndex();
+        if(oContentIdx && !m_nNode2)
+            m_nContent2 -= *oContentIdx;
     }
     else
     {
@@ -1847,33 +1928,46 @@ SaveBookmark::SaveBookmark(
 
 void SaveBookmark::SetInDoc(
     SwDoc* pDoc,
-    const SwNodeIndex& rNewPos,
-    const SwIndex* pIdx)
+    const SwNode& rNewPos,
+    std::optional<sal_Int32> oContentIdx)
 {
-    SwPaM aPam(rNewPos.GetNode());
-    if(pIdx)
-        aPam.GetPoint()->nContent = *pIdx;
+    SwPaM aPam(rNewPos);
+    if(oContentIdx)
+    {
+        if (aPam.GetPoint()->GetNode().IsContentNode())
+            aPam.GetPoint()->SetContent( *oContentIdx );
+        else
+            SAL_WARN("sw", "trying to sent content index, but point node is not a content node");
+    }
 
     if(NODE_OFFSET_MAX != m_nNode2)
     {
         aPam.SetMark();
 
-        aPam.GetMark()->nNode += m_nNode2;
-        if(pIdx && !m_nNode2)
-            aPam.GetMark()->nContent += m_nContent2;
+        aPam.GetMark()->Adjust(m_nNode2);
+        if (aPam.GetMark()->GetNode().IsContentNode())
+        {
+            if(oContentIdx && !m_nNode2)
+                aPam.GetMark()->SetContent(*oContentIdx + m_nContent2);
+            else
+                aPam.GetMark()->SetContent(m_nContent2);
+        }
         else
-            aPam.GetMark()->nContent.Assign(aPam.GetContentNode(false), m_nContent2);
+            SAL_WARN("sw", "trying to sent content index, but mark node is not a content node");
     }
 
-    aPam.GetPoint()->nNode += m_nNode1;
+    aPam.GetPoint()->Adjust(m_nNode1);
 
-    if(pIdx && !m_nNode1)
-        aPam.GetPoint()->nContent += m_nContent1;
-    else
-        aPam.GetPoint()->nContent.Assign(aPam.GetContentNode(), m_nContent1);
+    if (aPam.GetPoint()->GetNode().IsContentNode())
+    {
+        if(oContentIdx && !m_nNode1)
+            aPam.GetPoint()->SetContent(*oContentIdx + m_nContent1);
+        else
+            aPam.GetPoint()->SetContent(m_nContent1);
+    }
 
     if(aPam.HasMark()
-        && !CheckNodesRange(aPam.GetPoint()->nNode, aPam.GetMark()->nNode, true))
+        && !CheckNodesRange(aPam.GetPoint()->GetNode(), aPam.GetMark()->GetNode(), true))
         return;
 
     ::sw::mark::IBookmark* const pBookmark = dynamic_cast<::sw::mark::IBookmark*>(
@@ -1902,19 +1996,21 @@ void SaveBookmark::SetInDoc(
 // DelBookmarks
 
 void DelBookmarks(
-    const SwNodeIndex& rStt,
-    const SwNodeIndex& rEnd,
+    SwNode& rStt,
+    const SwNode& rEnd,
     std::vector<SaveBookmark> * pSaveBkmk,
-    const SwIndex* pSttIdx,
-    const SwIndex* pEndIdx)
+    std::optional<sal_Int32> oStartContentIdx,
+    std::optional<sal_Int32> oEndContentIdx)
 {
     // illegal range ??
     if(rStt.GetIndex() > rEnd.GetIndex()
-        || (rStt == rEnd && (!pSttIdx || !pEndIdx || pSttIdx->GetIndex() >= pEndIdx->GetIndex())))
+        || (&rStt == &rEnd && (!oStartContentIdx || !oEndContentIdx || *oStartContentIdx >= *oEndContentIdx)))
         return;
-    SwDoc& rDoc = rStt.GetNode().GetDoc();
+    SwDoc& rDoc = rStt.GetDoc();
 
-    rDoc.getIDocumentMarkAccess()->deleteMarks(rStt, rEnd, pSaveBkmk, pSttIdx, pEndIdx);
+    rDoc.getIDocumentMarkAccess()->deleteMarks(rStt, rEnd, pSaveBkmk,
+        oStartContentIdx,
+        oEndContentIdx);
 
     // Copy all Redlines which are in the move area into an array
     // which holds all position information as offset.
@@ -1923,57 +2019,58 @@ void DelBookmarks(
     for(SwRangeRedline* pRedl : rTable)
     {
         // Is at position?
-        SwPosition *const pRStt = pRedl->Start();
-        SwPosition *const pREnd = pRedl->End();
+        auto [pRStt, pREnd] = pRedl->StartEnd();
 
-        if( lcl_Greater( *pRStt, rStt, pSttIdx ) && lcl_Lower( *pRStt, rEnd, pEndIdx ))
+        if( lcl_Greater( *pRStt, rStt, oStartContentIdx ) && lcl_Lower( *pRStt, rEnd, oEndContentIdx ))
         {
-            pRStt->nNode = rEnd;
-            if( pEndIdx )
-                pRStt->nContent = *pEndIdx;
+            pRStt->Assign( rEnd );
+            if( oEndContentIdx )
+                pRStt->SetContent( *oEndContentIdx );
             else
             {
                 bool bStt = true;
-                SwContentNode* pCNd = pRStt->nNode.GetNode().GetContentNode();
+                SwContentNode* pCNd = pRStt->GetNode().GetContentNode();
                 if( !pCNd )
-                    pCNd = rDoc.GetNodes().GoNext( &pRStt->nNode );
+                    pCNd = rDoc.GetNodes().GoNext( pRStt );
                 if (!pCNd)
                 {
                     bStt = false;
-                    pRStt->nNode = rStt;
-                    pCNd = SwNodes::GoPrevious( &pRStt->nNode );
+                    pRStt->Assign(rStt);
+                    pCNd = SwNodes::GoPrevious( pRStt );
                     if( !pCNd )
                     {
-                        pRStt->nNode = pREnd->nNode;
-                        pCNd = pRStt->nNode.GetNode().GetContentNode();
+                        *pRStt = *pREnd;
+                        pCNd = pRStt->GetNode().GetContentNode();
                     }
                 }
-                pRStt->nContent.Assign( pCNd, bStt ? 0 : pCNd->Len() );
+                if (pCNd && !bStt)
+                    pRStt->AssignEndIndex( *pCNd );
             }
         }
-        if( lcl_Greater( *pREnd, rStt, pSttIdx ) && lcl_Lower( *pREnd, rEnd, pEndIdx ))
+        if( lcl_Greater( *pREnd, rStt, oStartContentIdx ) && lcl_Lower( *pREnd, rEnd, oEndContentIdx ))
         {
-            pREnd->nNode = rStt;
-            if( pSttIdx )
-                pREnd->nContent = *pSttIdx;
+            pREnd->Assign( rStt );
+            if( oStartContentIdx )
+                pREnd->SetContent( *oStartContentIdx );
             else
             {
                 bool bStt = false;
-                SwContentNode* pCNd = pREnd->nNode.GetNode().GetContentNode();
+                SwContentNode* pCNd = pREnd->GetNode().GetContentNode();
                 if( !pCNd )
-                    pCNd = SwNodes::GoPrevious( &pREnd->nNode );
+                    pCNd = SwNodes::GoPrevious( pREnd );
                 if( !pCNd )
                 {
                     bStt = true;
-                    pREnd->nNode = rEnd;
-                    pCNd = rDoc.GetNodes().GoNext( &pREnd->nNode );
+                    pREnd->Assign(rEnd);
+                    pCNd = rDoc.GetNodes().GoNext( pREnd );
                     if( !pCNd )
                     {
-                        pREnd->nNode = pRStt->nNode;
-                        pCNd = pREnd->nNode.GetNode().GetContentNode();
+                        *pREnd = *pRStt;
+                        pCNd = pREnd->GetNode().GetContentNode();
                     }
                 }
-                pREnd->nContent.Assign( pCNd, bStt ? 0 : pCNd->Len() );
+                if (pCNd && !bStt)
+                    pREnd->AssignEndIndex( *pCNd );
             }
         }
     }
@@ -1981,7 +2078,7 @@ void DelBookmarks(
 
 namespace sw {
 
-SwInsText MakeSwInsText(SwTextNode & rNode, sal_Int32 const nPos, sal_Int32 const nLen)
+InsertText MakeInsertText(SwTextNode& rNode, const sal_Int32 nPos, const sal_Int32 nLen)
 {
     SwCursor cursor(SwPosition(rNode, nPos), nullptr);
     bool isInsideFieldmarkCommand(false);
@@ -2002,7 +2099,7 @@ SwInsText MakeSwInsText(SwTextNode & rNode, sal_Int32 const nPos, sal_Int32 cons
             break;
         }
     }
-    return SwInsText(nPos, nLen, isInsideFieldmarkCommand, isInsideFieldmarkResult);
+    return InsertText(nPos, nLen, isInsideFieldmarkCommand, isInsideFieldmarkResult);
 }
 
 } // namespace sw

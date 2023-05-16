@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xelementaccess.hxx>
 #include <test/container/xindexaccess.hxx>
 #include <test/drawing/xdrawpages.hxx>
@@ -29,7 +29,7 @@ using namespace css::uno;
 
 namespace sc_apitest
 {
-class ScDrawPagesObj : public CalcUnoApiTest,
+class ScDrawPagesObj : public UnoApiTest,
                        public apitest::XDrawPages,
                        public apitest::XElementAccess,
                        public apitest::XIndexAccess,
@@ -40,7 +40,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScDrawPagesObj);
 
@@ -62,13 +61,10 @@ public:
     CPPUNIT_TEST(testSupportsService);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScDrawPagesObj::ScDrawPagesObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XElementAccess(cppu::UnoType<drawing::XDrawPage>::get())
     , XIndexAccess(3)
     , XServiceInfo("ScDrawPagesObj", "com.sun.star.drawing.DrawPages")
@@ -77,7 +73,7 @@ ScDrawPagesObj::ScDrawPagesObj()
 
 uno::Reference<uno::XInterface> ScDrawPagesObj::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
 
     uno::Reference<drawing::XDrawPagesSupplier> xDPS(xDoc, uno::UNO_QUERY_THROW);
     uno::Reference<drawing::XDrawPages> xDP(xDPS->getDrawPages(), uno::UNO_SET_THROW);
@@ -90,15 +86,9 @@ uno::Reference<uno::XInterface> ScDrawPagesObj::init()
 
 void ScDrawPagesObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScDrawPagesObj::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScDrawPagesObj);

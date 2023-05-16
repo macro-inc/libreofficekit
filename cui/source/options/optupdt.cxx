@@ -25,7 +25,7 @@
 #include <comphelper/processfactory.hxx>
 #include <com/sun/star/configuration/theDefaultProvider.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
-#include <com/sun/star/ui/dialogs/FolderPicker.hpp>
+#include <com/sun/star/ui/dialogs/XFolderPicker2.hpp>
 #include <com/sun/star/ui/dialogs/ExecutableDialogResults.hpp>
 #include <com/sun/star/deployment/UpdateInformationProvider.hpp>
 #include <com/sun/star/ucb/XWebDAVCommandEnvironment.hpp>
@@ -42,7 +42,7 @@
 #include <officecfg/Office/Common.hxx>
 #include <osl/file.hxx>
 #include <osl/security.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/configmgr.hxx>
 
 using namespace ::css;

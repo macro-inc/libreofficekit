@@ -17,8 +17,9 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/debug.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <comphelper/propertyvalue.hxx>
@@ -66,7 +67,6 @@
 #include "polypolyaction.hxx"
 #include "textaction.hxx"
 #include "transparencygroupaction.hxx"
-#include <utility>
 #include <vector>
 #include <algorithm>
 #include <memory>
@@ -549,7 +549,7 @@ namespace cppcanvas::internal
                     uno::Sequence< uno::Sequence < double > > aColors;
                     uno::Sequence< double > aStops;
 
-                    if( rGradient.GetStyle() == GradientStyle::Axial )
+                    if( rGradient.GetStyle() == css::awt::GradientStyle_AXIAL )
                     {
                         aStops = { 0.0, 0.5, 1.0 };
                         aColors = { aEndColor, aStartColor, aEndColor };
@@ -575,7 +575,7 @@ namespace cppcanvas::internal
                     OUString aGradientService;
                     switch( rGradient.GetStyle() )
                     {
-                        case GradientStyle::Linear:
+                        case css::awt::GradientStyle_LINEAR:
                             aGradInfo = basegfx::utils::createLinearODFGradientInfo(
                                                                         aBounds,
                                                                         nSteps,
@@ -587,7 +587,7 @@ namespace cppcanvas::internal
                             aGradientService = "LinearGradient";
                             break;
 
-                        case GradientStyle::Axial:
+                        case css::awt::GradientStyle_AXIAL:
                         {
                             // Adapt the border so that it is suitable
                             // for the axial gradient.  An axial
@@ -621,7 +621,7 @@ namespace cppcanvas::internal
                             break;
                         }
 
-                        case GradientStyle::Radial:
+                        case css::awt::GradientStyle_RADIAL:
                             aGradInfo = basegfx::utils::createRadialODFGradientInfo(
                                                                         aBounds,
                                                                         aOffset,
@@ -630,7 +630,7 @@ namespace cppcanvas::internal
                             aGradientService = "EllipticalGradient";
                             break;
 
-                        case GradientStyle::Elliptical:
+                        case css::awt::GradientStyle_ELLIPTICAL:
                             aGradInfo = basegfx::utils::createEllipticalODFGradientInfo(
                                                                             aBounds,
                                                                             aOffset,
@@ -640,7 +640,7 @@ namespace cppcanvas::internal
                             aGradientService = "EllipticalGradient";
                             break;
 
-                        case GradientStyle::Square:
+                        case css::awt::GradientStyle_SQUARE:
                             aGradInfo = basegfx::utils::createSquareODFGradientInfo(
                                                                         aBounds,
                                                                         aOffset,
@@ -650,7 +650,7 @@ namespace cppcanvas::internal
                             aGradientService = "RectangularGradient";
                             break;
 
-                        case GradientStyle::Rect:
+                        case css::awt::GradientStyle_RECT:
                             aGradInfo = basegfx::utils::createRectangularODFGradientInfo(
                                                                              aBounds,
                                                                              aOffset,
@@ -720,9 +720,8 @@ namespace cppcanvas::internal
             }
 
             GDIMetaFile aTmpMtf;
-            rParms.mrVDev.AddGradientActions( rPoly.GetBoundRect(),
-                                              rGradient,
-                                               aTmpMtf );
+            Gradient aGradient(rGradient);
+            aGradient.AddGradientActions( rPoly.GetBoundRect(), aTmpMtf );
 
             createActions( aTmpMtf, rParms, bSubsettableActions );
 
@@ -826,7 +825,7 @@ namespace cppcanvas::internal
                 else
                     aFontMatrix.m11 *= nScaleY / nScaleX;
             }
-            aFontRequest.CellSize = (rState.mapModeTransform * vcl::unotools::b2DSizeFromSize(rFontSizeLog)).getY();
+            aFontRequest.CellSize = (rState.mapModeTransform * vcl::unotools::b2DSizeFromSize(rFontSizeLog)).getHeight();
 
             if (rFont.GetEmphasisMark() != FontEmphasisMark::NONE)
             {
@@ -847,7 +846,7 @@ namespace cppcanvas::internal
                                              const OUString&                rString,
                                              int                            nIndex,
                                              int                            nLength,
-                                             o3tl::span<const sal_Int32>    pCharWidths,
+                                             KernArraySpan                pCharWidths,
                                              const ActionFactoryParameters& rParms,
                                              bool                           bSubsettableActions )
         {
@@ -964,7 +963,7 @@ namespace cppcanvas::internal
                 pChars[3]=pChars[2]=pChars[1]=pChars[0];
 
                 ::tools::Long nStrikeoutWidth = (rParms.mrVDev.GetTextWidth(
-                    OUString(pChars, SAL_N_ELEMENTS(pChars))) + 2) / 4;
+                    OUString(pChars, std::size(pChars))) + 2) / 4;
 
                 if( nStrikeoutWidth <= 0 )
                     nStrikeoutWidth = 1;
@@ -985,16 +984,16 @@ namespace cppcanvas::internal
                 {
                     ::tools::Long nInterval = ( nWidth - nStrikeoutWidth * nLen ) / nLen;
                     nStrikeoutWidth += nInterval;
-                    std::vector<sal_Int32> aStrikeoutCharWidths(nLen);
+                    KernArray aStrikeoutCharWidths;
 
                     for ( int i = 0;i<nLen; i++)
                     {
-                        aStrikeoutCharWidths[i] = nStrikeoutWidth;
+                        aStrikeoutCharWidths.push_back(nStrikeoutWidth);
                     }
 
                     for ( int i = 1;i< nLen; i++ )
                     {
-                        aStrikeoutCharWidths[ i ] += aStrikeoutCharWidths[ i-1 ];
+                        aStrikeoutCharWidths.adjust(i, aStrikeoutCharWidths[i - 1]);
                     }
 
                     pStrikeoutTextAction =
@@ -2138,10 +2137,8 @@ namespace cppcanvas::internal
                         std::shared_ptr<Action> pBmpAction(
                                 internal::BitmapActionFactory::createBitmapAction(
                                     BitmapEx(pAct->GetBitmap()),
-                                    rStates.getState().mapModeTransform *
-                                    vcl::unotools::b2DPointFromPoint( pAct->GetPoint() ),
-                                    rStates.getState().mapModeTransform *
-                                    vcl::unotools::b2DSizeFromSize( pAct->GetSize() ),
+                                    rStates.getState().mapModeTransform * vcl::unotools::b2DPointFromPoint( pAct->GetPoint() ),
+                                    rStates.getState().mapModeTransform * vcl::unotools::b2DVectorFromSize( pAct->GetSize() ),
                                     rCanvas,
                                     rStates.getState() ) );
 
@@ -2173,7 +2170,7 @@ namespace cppcanvas::internal
                                     rStates.getState().mapModeTransform *
                                     vcl::unotools::b2DPointFromPoint( pAct->GetDestPoint() ),
                                     rStates.getState().mapModeTransform *
-                                    vcl::unotools::b2DSizeFromSize( pAct->GetDestSize() ),
+                                    vcl::unotools::b2DVectorFromSize( pAct->GetDestSize() ),
                                     rCanvas,
                                     rStates.getState() ) );
 
@@ -2221,7 +2218,7 @@ namespace cppcanvas::internal
                                     rStates.getState().mapModeTransform *
                                     vcl::unotools::b2DPointFromPoint( pAct->GetPoint() ),
                                     rStates.getState().mapModeTransform *
-                                    vcl::unotools::b2DSizeFromSize( pAct->GetSize() ),
+                                    vcl::unotools::b2DVectorFromSize( pAct->GetSize() ),
                                     rCanvas,
                                     rStates.getState() ) );
 
@@ -2253,7 +2250,7 @@ namespace cppcanvas::internal
                                 rStates.getState().mapModeTransform *
                                 vcl::unotools::b2DPointFromPoint( pAct->GetDestPoint() ),
                                 rStates.getState().mapModeTransform *
-                                vcl::unotools::b2DSizeFromSize( pAct->GetDestSize() ),
+                                vcl::unotools::b2DVectorFromSize( pAct->GetDestSize() ),
                                 rCanvas,
                                 rStates.getState() ) );
 
@@ -2313,7 +2310,7 @@ namespace cppcanvas::internal
                                 rStates.getState().mapModeTransform *
                                 vcl::unotools::b2DPointFromPoint( pAct->GetPoint() ),
                                 rStates.getState().mapModeTransform *
-                                vcl::unotools::b2DSizeFromSize( pAct->GetSize() ),
+                                vcl::unotools::b2DVectorFromSize( pAct->GetSize() ),
                                 rCanvas,
                                 rStates.getState() ) );
 
@@ -2350,7 +2347,7 @@ namespace cppcanvas::internal
                                 rStates.getState().mapModeTransform *
                                 vcl::unotools::b2DPointFromPoint( pAct->GetDestPoint() ),
                                 rStates.getState().mapModeTransform *
-                                vcl::unotools::b2DSizeFromSize( pAct->GetDestSize() ),
+                                vcl::unotools::b2DVectorFromSize( pAct->GetDestSize() ),
                                 rCanvas,
                                 rStates.getState() ) );
 
@@ -2423,7 +2420,7 @@ namespace cppcanvas::internal
                                 rStates.getState().mapModeTransform *
                                 vcl::unotools::b2DPointFromPoint( pAct->GetPoint() ),
                                 rStates.getState().mapModeTransform *
-                                vcl::unotools::b2DSizeFromSize( pAct->GetSize() ),
+                                vcl::unotools::b2DVectorFromSize( pAct->GetSize() ),
                                 rCanvas,
                                 rStates.getState() ) );
 
@@ -2497,8 +2494,8 @@ namespace cppcanvas::internal
                                     rState.mapModeTransform *
                                     ::basegfx::B2DPoint(
                                         vcl::unotools::b2DPointFromPoint(pAct->GetStartPoint()) +
-                                        vcl::unotools::b2DSizeFromSize(aBaselineOffset)),
-                                    aSize.getX(),
+                                        vcl::unotools::b2DVectorFromSize(aBaselineOffset)),
+                                    aSize.getWidth(),
                                     tools::createTextLineInfo( rVDev,
                                                                rState )),
                                 rCanvas,
@@ -2557,7 +2554,7 @@ namespace cppcanvas::internal
                         // generating a DX array, and uniformly
                         // distributing the excess/insufficient width
                         // to every logical character.
-                        std::vector<sal_Int32> aDXArray;
+                        KernArray aDXArray;
 
                         rVDev.GetTextArray( pAct->GetText(), &aDXArray,
                                             pAct->GetIndex(), pAct->GetLen() );
@@ -2565,7 +2562,6 @@ namespace cppcanvas::internal
                         const sal_Int32 nWidthDifference( pAct->GetWidth() - aDXArray[ nLen-1 ] );
 
                         // Last entry of pDXArray contains total width of the text
-                        sal_Int32* p = aDXArray.data();
                         for (sal_Int32 i = 1; i <= nLen; ++i)
                         {
                             // calc ratio for every array entry, to
@@ -2574,7 +2570,7 @@ namespace cppcanvas::internal
                             // entry represents the 'end' position of
                             // the corresponding character, thus, we
                             // let i run from 1 to nLen.
-                            *p++ += i * nWidthDifference / nLen;
+                            aDXArray.adjust(i - 1, i * nWidthDifference / nLen);
                         }
 
                         createTextAction(
@@ -2608,8 +2604,8 @@ namespace cppcanvas::internal
             class ActionRenderer
             {
             public:
-                explicit ActionRenderer( const ::basegfx::B2DHomMatrix& rTransformation ) :
-                    maTransformation( rTransformation ),
+                explicit ActionRenderer( ::basegfx::B2DHomMatrix aTransformation ) :
+                    maTransformation(std::move( aTransformation )),
                     mbRet( true )
                 {
                 }
@@ -2643,8 +2639,8 @@ namespace cppcanvas::internal
             class AreaQuery
             {
             public:
-                explicit AreaQuery( const ::basegfx::B2DHomMatrix& rTransformation ) :
-                    maTransformation( rTransformation )
+                explicit AreaQuery( ::basegfx::B2DHomMatrix aTransformation ) :
+                    maTransformation(std::move( aTransformation ))
                 {
                 }
 

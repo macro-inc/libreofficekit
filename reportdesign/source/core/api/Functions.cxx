@@ -22,16 +22,18 @@
 #include <strings.hrc>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <com/sun/star/lang/NoSupportException.hpp>
+#include <o3tl/safeint.hxx>
+#include <utility>
 
 namespace reportdesign
 {
 
     using namespace com::sun::star;
 
-OFunctions::OFunctions(const uno::Reference< report::XFunctionsSupplier >& _xParent,const uno::Reference< uno::XComponentContext >& context)
+OFunctions::OFunctions(const uno::Reference< report::XFunctionsSupplier >& _xParent,uno::Reference< uno::XComponentContext > context)
 :FunctionsBase(m_aMutex)
 ,m_aContainerListeners(m_aMutex)
-,m_xContext(context)
+,m_xContext(std::move(context))
 ,m_xParent(_xParent)
 {
 }
@@ -89,7 +91,7 @@ void SAL_CALL OFunctions::insertByIndex( ::sal_Int32 Index, const uno::Any& aEle
         xFunction->setParent(*this);
     }
     // notify our container listeners
-    container::ContainerEvent aEvent(static_cast<container::XContainer*>(this), uno::makeAny(Index), aElement, uno::Any());
+    container::ContainerEvent aEvent(static_cast<container::XContainer*>(this), uno::Any(Index), aElement, uno::Any());
     m_aContainerListeners.notifyEach(&container::XContainerListener::elementInserted,aEvent);
 }
 
@@ -106,7 +108,7 @@ void SAL_CALL OFunctions::removeByIndex( ::sal_Int32 Index )
         m_aFunctions.erase(aPos);
         xFunction->setParent(nullptr);
     }
-    container::ContainerEvent aEvent(static_cast<container::XContainer*>(this), uno::makeAny(Index), uno::makeAny(xFunction), uno::Any());
+    container::ContainerEvent aEvent(static_cast<container::XContainer*>(this), uno::Any(Index), uno::Any(xFunction), uno::Any());
     m_aContainerListeners.notifyEach(&container::XContainerListener::elementRemoved,aEvent);
 }
 
@@ -126,7 +128,7 @@ void SAL_CALL OFunctions::replaceByIndex( ::sal_Int32 Index, const uno::Any& Ele
         *aPos = xFunction;
     }
 
-    container::ContainerEvent aEvent(static_cast<container::XContainer*>(this), uno::makeAny(Index), Element, aOldElement);
+    container::ContainerEvent aEvent(static_cast<container::XContainer*>(this), uno::Any(Index), Element, aOldElement);
     m_aContainerListeners.notifyEach(&container::XContainerListener::elementReplaced,aEvent);
 }
 
@@ -143,7 +145,7 @@ uno::Any SAL_CALL OFunctions::getByIndex( ::sal_Int32 Index )
     checkIndex(Index);
     TFunctions::const_iterator aPos = m_aFunctions.begin();
     ::std::advance(aPos,Index);
-    return uno::makeAny(*aPos);
+    return uno::Any(*aPos);
 }
 
 // XElementAccess
@@ -182,7 +184,7 @@ void SAL_CALL OFunctions::removeContainerListener( const uno::Reference< contain
 
 void OFunctions::checkIndex(sal_Int32 _nIndex)
 {
-    if ( _nIndex < 0 || static_cast<sal_Int32>(m_aFunctions.size()) <= _nIndex )
+    if ( _nIndex < 0 || m_aFunctions.size() <= o3tl::make_unsigned(_nIndex) )
         throw lang::IndexOutOfBoundsException();
 }
 

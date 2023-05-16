@@ -30,6 +30,8 @@
 #include <svx/svdouno.hxx>
 #include <editeng/lrspitem.hxx>
 #include <editeng/fhgtitem.hxx>
+#include <rtl/character.hxx>
+
 #include <doc.hxx>
 #include "wrtww8.hxx"
 #include <docary.hxx>
@@ -104,20 +106,61 @@ struct WW8_SED
 class WW8_WrPlc0
 {
 private:
-    std::vector<sal_uLong> aPos;      // PTRARR of CPs / FCs
-    sal_uLong nOfs;
+    std::vector<sal_uLong> m_aPos;      // PTRARR of CPs / FCs
+    sal_uLong m_nOfs;
 
     WW8_WrPlc0(WW8_WrPlc0 const&) = delete;
     WW8_WrPlc0& operator=(WW8_WrPlc0 const&) = delete;
 
 public:
     explicit WW8_WrPlc0( sal_uLong nOffset );
-    sal_uInt16 Count() const                { return aPos.size(); }
+    sal_uInt16 Count() const                { return m_aPos.size(); }
     void Append( sal_uLong nStartCpOrFc );
     void Write( SvStream& rStrm );
 };
 
 //  Styles
+
+// According to [MS-DOC] v20221115 2.9.271 STSH,
+// "The beginning of the rglpstd array is reserved for specific "fixed-index" application-defined
+//  styles. A particular fixed-index, application-defined style has the same istd value in every
+//  stylesheet. The rglpstd MUST contain an LPStd for each of these fixed-index styles and the order
+//  MUST match the order in the following table.
+//
+//  istd   sti of application-defined style (see sti in StdfBase)
+//  0      0
+//  1      1
+//  2      2
+//  3      3
+//  4      4
+//  5      5
+//  6      6
+//  7      7
+//  8      8
+//  9      9
+//  10     65
+//  11     105
+//  12     107
+//  13     Reserved for future use
+//  14     Reserved for future use"
+//
+// And [MS-OE376] v20220816 2.1.236 Part 4 Section 2.7.3.9, name (Primary Style Name)
+// specifies the following mapping:
+//
+//  sti    Style name                Style type
+//  0      Normal                    paragraph
+//  1      heading 1                 paragraph
+//  2      heading 2                 paragraph
+//  3      heading 3                 paragraph
+//  4      heading 4                 paragraph
+//  5      heading 5                 paragraph
+//  6      heading 6                 paragraph
+//  7      heading 7                 paragraph
+//  8      heading 8                 paragraph
+//  9      heading 9                 paragraph
+//  65     Default Paragraph Font    character
+//  105    Normal Table              table
+//  107    No List                   numbering
 
 #define WW8_RESERVED_SLOTS 15
 
@@ -151,16 +194,11 @@ MSWordStyles::MSWordStyles( MSWordExportBase& rExport, bool bListStyles )
         m_rExport.m_rDoc.GetFootnoteInfo().GetAnchorCharFormat( m_rExport.m_rDoc );
         m_rExport.m_rDoc.GetFootnoteInfo().GetCharFormat( m_rExport.m_rDoc );
     }
-    sal_uInt32 nAlloc = WW8_RESERVED_SLOTS + m_rExport.m_rDoc.GetCharFormats()->size() - 1 +
-                                         m_rExport.m_rDoc.GetTextFormatColls()->size() - 1 +
-                                         (bListStyles ? m_rExport.m_rDoc.GetNumRuleTable().size() - 1 : 0);
-    nAlloc = std::min<sal_uInt32>(nAlloc, MSWORD_MAX_STYLES_LIMIT);
 
-    // somewhat generous ( free for up to 15 )
-    m_aFormatA.resize(nAlloc, nullptr);
     memset( m_aHeadingParagraphStyles, -1 , MAXLEVEL * sizeof( sal_uInt16));
 
     BuildStylesTable();
+    BuildWwNames();
     BuildStyleIds();
 }
 
@@ -171,21 +209,19 @@ MSWordStyles::~MSWordStyles()
 // Sty_SetWWSlot() dependencies for the styles -> zero is allowed
 sal_uInt16 MSWordStyles::GetSlot( const SwFormat* pFormat ) const
 {
-    sal_uInt16 n;
-    for ( n = 0; n < m_nUsedSlots; n++ )
-        if ( m_aFormatA[n] == pFormat )
-            return n;
+    for (size_t slot = 0; slot < m_aStyles.size(); ++slot)
+        if (m_aStyles[slot].format == pFormat)
+            return slot;
     return 0xfff;                   // 0xfff: WW: zero
 }
 
-sal_uInt16 MSWordStyles::BuildGetSlot( const SwFormat& rFormat )
+/// Get reserved slot number during building the style table.
+static sal_uInt16 BuildGetSlot(const SwFormat& rFormat)
 {
-    sal_uInt16 nRet = rFormat.GetPoolFormatId();
-    switch ( nRet )
+    switch (sal_uInt16 nRet = rFormat.GetPoolFormatId())
     {
         case RES_POOLCOLL_STANDARD:
-            nRet = 0;
-            break;
+            return 0;
 
         case RES_POOLCOLL_HEADLINE1:
         case RES_POOLCOLL_HEADLINE2:
@@ -197,16 +233,14 @@ sal_uInt16 MSWordStyles::BuildGetSlot( const SwFormat& rFormat )
         case RES_POOLCOLL_HEADLINE8:
         case RES_POOLCOLL_HEADLINE9:
             nRet -= RES_POOLCOLL_HEADLINE1-1;
-            break;
-
-        default:
-            nRet = m_nUsedSlots++;
-            break;
+            assert(nRet < WW8_RESERVED_SLOTS);
+            return nRet;
     }
-    return nRet;
+    return 0xfff;
 }
 
 
+// Keep in sync with StyleSheetTable::ConvertStyleName
 sal_uInt16 MSWordStyles::GetWWId( const SwFormat& rFormat )
 {
     sal_uInt16 nRet = ww::stiUser;    // user style as default
@@ -278,28 +312,38 @@ sal_uInt16 MSWordStyles::GetWWId( const SwFormat& rFormat )
 
 void MSWordStyles::BuildStylesTable()
 {
-    m_nUsedSlots = WW8_RESERVED_SLOTS;  // reserved slots for standard, headingX, and others
+    assert(m_aStyles.empty());
+    // Put reserved slots first, then character styles, then paragraph styles
+    m_aStyles.resize(WW8_RESERVED_SLOTS);
 
     const SwCharFormats& rArr = *m_rExport.m_rDoc.GetCharFormats();       // first CharFormat
     // the default character style ( 0 ) will not be outputted !
-    for( size_t n = 1; n < rArr.size() && m_nUsedSlots < MSWORD_MAX_STYLES_LIMIT; n++ )
-    {
-        SwCharFormat* pFormat = rArr[n];
-        m_aFormatA[ BuildGetSlot( *pFormat ) ] = pFormat;
-    }
+    for (size_t n = 1; n < rArr.size() && m_aStyles.size() < MSWORD_MAX_STYLES_LIMIT; ++n)
+        m_aStyles.emplace_back(rArr[n]);
 
     const SwTextFormatColls& rArr2 = *m_rExport.m_rDoc.GetTextFormatColls();   // then TextFormatColls
-    // the default character style ( 0 ) will not be outputted !
-    for( size_t n = 1; n < rArr2.size() && m_nUsedSlots < MSWORD_MAX_STYLES_LIMIT; n++ )
+    // the default paragraph style ( 0 ) will not be outputted !
+    for (size_t n = 1; n < rArr2.size(); ++n)
     {
         SwTextFormatColl* pFormat = rArr2[n];
-        sal_uInt16 nId = BuildGetSlot( *pFormat ) ;
-        m_aFormatA[ nId ] = pFormat;
+
+        sal_uInt16 nSlot = BuildGetSlot(*pFormat);
+        if (nSlot != 0xfff)
+        {
+            m_aStyles[nSlot] = { pFormat };
+        }
+        else
+        {
+            if (m_aStyles.size() >= MSWORD_MAX_STYLES_LIMIT)
+                continue;
+            m_aStyles.emplace_back(pFormat);
+            nSlot = m_aStyles.size() - 1;
+        }
         if ( pFormat->IsAssignedToListLevelOfOutlineStyle() )
         {
             int nLvl = pFormat->GetAssignedOutlineStyleLevel() ;
             if (nLvl >= 0 && nLvl < MAXLEVEL)
-                m_aHeadingParagraphStyles[nLvl] = nId ;
+                m_aHeadingParagraphStyles[nLvl] = nSlot;
         }
     }
 
@@ -307,29 +351,87 @@ void MSWordStyles::BuildStylesTable()
         return;
 
     const SwNumRuleTable& rNumRuleTable = m_rExport.m_rDoc.GetNumRuleTable();
-    for (size_t i = 0; i < rNumRuleTable.size() && m_nUsedSlots < MSWORD_MAX_STYLES_LIMIT; ++i)
+    for (size_t i = 0; i < rNumRuleTable.size() && m_aStyles.size() < MSWORD_MAX_STYLES_LIMIT; ++i)
     {
         const SwNumRule* pNumRule = rNumRuleTable[i];
         if (pNumRule->IsAutoRule() || pNumRule->GetName().startsWith("WWNum"))
             continue;
-        sal_uInt16 nSlot = BuildGetSlot(*pNumRule);
-        m_aNumRules[nSlot] = pNumRule;
+        m_aStyles.emplace_back(pNumRule);
     }
 }
 
-OString MSWordStyles::CreateStyleId(const OUString &rName)
+// StyleSheetTable::ConvertStyleName appends the suffix do disambiguate conflicting style names
+static OUString StripWWSuffix(const OUString& s)
 {
-    OStringBuffer aStyleIdBuf(rName.getLength());
-    for (int i = 0; i < rName.getLength(); ++i)
+    OUString ret = s;
+    ret.endsWith(" (WW)", &ret);
+    return ret;
+}
+
+void MSWordStyles::BuildWwNames()
+{
+    std::unordered_set<OUString> aUsed;
+
+    auto makeUniqueName = [&aUsed](OUString& name) {
+        // toAsciiLowerCase rules out e.g. user's "normal"; no problem if there are non-ASCII chars
+        OUString lower(name.toAsciiLowerCase());
+        if (!aUsed.insert(lower).second)
+        {
+            int nFree = 1;
+            while (!aUsed.insert(lower + OUString::number(nFree)).second)
+                ++nFree;
+
+            name += OUString::number(nFree);
+        }
+    };
+
+    // We want to map LO's default style to Word's "Normal" style.
+    // Word looks for this specific style name when reading docx files.
+    // (It must be the English word regardless of language settings)
+    assert(!m_aStyles.empty());
+    assert(!m_aStyles[0].format || m_aStyles[0].ww_id == ww::stiNormal);
+    m_aStyles[0].ww_name = "Normal";
+    aUsed.insert("normal");
+
+    // 1. Handle styles having special wwIds, and thus pre-defined names
+    for (auto& entry : m_aStyles)
     {
-        sal_Unicode nChar = rName[i];
-        if (('0' <= nChar && nChar <= '9') ||
-            ('a' <= nChar && nChar <= 'z') ||
-            ('A' <= nChar && nChar <= 'Z'))
+        if (!entry.ww_name.isEmpty())
+            continue; // "Normal" is already added
+        if (entry.ww_id >= ww::stiMax)
+            continue; // Not a format with special name
+        assert(entry.format);
+
+        entry.ww_name = OUString::createFromAscii(ww::GetEnglishNameFromSti(static_cast<ww::sti>(entry.ww_id)));
+        makeUniqueName(entry.ww_name);
+    }
+
+    // 2. Now handle other styles
+    for (auto& entry : m_aStyles)
+    {
+        if (!entry.ww_name.isEmpty())
+            continue;
+        if (entry.format)
+            entry.ww_name = StripWWSuffix(entry.format->GetName());
+        else if (entry.num_rule)
+            entry.ww_name = StripWWSuffix(entry.num_rule->GetName());
+        else
+            continue;
+        makeUniqueName(entry.ww_name);
+    }
+}
+
+OString MSWordStyles::CreateStyleId(std::u16string_view aName)
+{
+    OStringBuffer aStyleIdBuf(aName.size());
+    for (size_t i = 0; i < aName.size(); ++i)
+    {
+        sal_Unicode nChar = aName[i];
+        if (rtl::isAsciiAlphanumeric(nChar) || nChar == '-')
         {
             // first letter should be uppercase
-            if (aStyleIdBuf.isEmpty() && 'a' <= nChar && nChar <= 'z')
-                aStyleIdBuf.append(char(nChar - ('a' - 'A')));
+            if (aStyleIdBuf.isEmpty())
+                aStyleIdBuf.append(char(rtl::toAsciiUpperCase(nChar)));
             else
                 aStyleIdBuf.append(char(nChar));
         }
@@ -341,18 +443,9 @@ void MSWordStyles::BuildStyleIds()
 {
     std::unordered_set<OString> aUsed;
 
-    m_aStyleIds.emplace_back("Normal");
-    aUsed.insert("normal");
-
-    for (sal_uInt16 n = 1; n < m_nUsedSlots; ++n)
+    for (auto& entry : m_aStyles)
     {
-        OUString aName;
-        if (m_aFormatA[n])
-            aName = m_aFormatA[n]->GetName();
-        else if (m_aNumRules.find(n) != m_aNumRules.end())
-            aName = m_aNumRules[n]->GetName();
-
-        OString aStyleId = CreateStyleId(aName);
+        OString aStyleId = CreateStyleId(entry.ww_name);
 
         if (aStyleId.isEmpty())
             aStyleId = "Style";
@@ -360,24 +453,22 @@ void MSWordStyles::BuildStyleIds()
         OString aLower(aStyleId.toAsciiLowerCase());
 
         // check for uniqueness & construct something unique if we have to
-        if (aUsed.insert(aLower).second)
-        {
-            m_aStyleIds.push_back(aStyleId);
-        }
-        else
+        if (!aUsed.insert(aLower).second)
         {
             int nFree = 1;
             while (!aUsed.insert(aLower + OString::number(nFree)).second)
                 ++nFree;
 
-            m_aStyleIds.emplace_back(aStyleId + OString::number(nFree));
+            aStyleId += OString::number(nFree);
         }
+        entry.style_id = aStyleId;
     }
 }
 
-OString const & MSWordStyles::GetStyleId(sal_uInt16 nId) const
+OString const & MSWordStyles::GetStyleId(sal_uInt16 nSlot) const
 {
-    return m_aStyleIds[nId];
+    assert(!m_aStyles[nSlot].style_id.isEmpty());
+    return m_aStyles[nSlot].style_id;
 }
 
 /// For WW8 only - extend pO so that the size of pTableStrm is even.
@@ -389,20 +480,20 @@ static void impl_SkipOdd(std::unique_ptr<ww::bytes> const& pO, std::size_t nTabl
 
 void WW8AttributeOutput::EndStyle()
 {
-    impl_SkipOdd( m_rWW8Export.pO, m_rWW8Export.pTableStrm->Tell() );
+    impl_SkipOdd( m_rWW8Export.m_pO, m_rWW8Export.m_pTableStrm->Tell() );
 
-    short nLen = m_rWW8Export.pO->size() - 2;            // length of the style
-    sal_uInt8* p = m_rWW8Export.pO->data() + nPOPosStdLen1;
+    short nLen = m_rWW8Export.m_pO->size() - 2;            // length of the style
+    sal_uInt8* p = m_rWW8Export.m_pO->data() + m_nPOPosStdLen1;
     ShortToSVBT16( nLen, p );               // add
-    p = m_rWW8Export.pO->data() + nPOPosStdLen2;
+    p = m_rWW8Export.m_pO->data() + m_nPOPosStdLen2;
     ShortToSVBT16( nLen, p );               // also
 
-    m_rWW8Export.pTableStrm->WriteBytes(m_rWW8Export.pO->data(), m_rWW8Export.pO->size());
-    m_rWW8Export.pO->clear();
+    m_rWW8Export.m_pTableStrm->WriteBytes(m_rWW8Export.m_pO->data(), m_rWW8Export.m_pO->size());
+    m_rWW8Export.m_pO->clear();
 }
 
 void WW8AttributeOutput::StartStyle( const OUString& rName, StyleType eType, sal_uInt16 nWwBase,
-    sal_uInt16 nWwNext, sal_uInt16 /*nWwLink*/, sal_uInt16 nWwId, sal_uInt16 /*nId*/, bool bAutoUpdate )
+    sal_uInt16 nWwNext, sal_uInt16 /*nWwLink*/, sal_uInt16 nWwId, sal_uInt16 /*nSlot*/, bool bAutoUpdate )
 {
     sal_uInt8 aWW8_STD[ sizeof( WW8_STD ) ] = {};
     sal_uInt8* pData = aWW8_STD;
@@ -431,17 +522,17 @@ void WW8AttributeOutput::StartStyle( const OUString& rName, StyleType eType, sal
     sal_uInt16 nLen = static_cast< sal_uInt16 >( ( pData - aWW8_STD ) + 1 +
                 (2 * (rName.getLength() + 1)) );  // temporary
 
-    nPOPosStdLen1 = m_rWW8Export.pO->size();        // Adr1 for adding the length
+    m_nPOPosStdLen1 = m_rWW8Export.m_pO->size();        // Adr1 for adding the length
 
-    SwWW8Writer::InsUInt16( *m_rWW8Export.pO, nLen );
-    m_rWW8Export.pO->insert( m_rWW8Export.pO->end(), aWW8_STD, pData );
+    SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, nLen );
+    m_rWW8Export.m_pO->insert( m_rWW8Export.m_pO->end(), aWW8_STD, pData );
 
-    nPOPosStdLen2 = nPOPosStdLen1 + 8;  // Adr2 for adding of "end of upx"
+    m_nPOPosStdLen2 = m_nPOPosStdLen1 + 8;  // Adr2 for adding of "end of upx"
 
     // write names
-    SwWW8Writer::InsUInt16( *m_rWW8Export.pO, rName.getLength() ); // length
-    SwWW8Writer::InsAsString16( *m_rWW8Export.pO, rName );
-    m_rWW8Export.pO->push_back( sal_uInt8(0) );             // Despite P-String 0 at the end!
+    SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, rName.getLength() ); // length
+    SwWW8Writer::InsAsString16( *m_rWW8Export.m_pO, rName );
+    m_rWW8Export.m_pO->push_back( sal_uInt8(0) );             // Despite P-String 0 at the end!
 }
 
 void MSWordStyles::SetStyleDefaults( const SwFormat& rFormat, bool bPap )
@@ -506,19 +597,19 @@ void MSWordStyles::SetStyleDefaults( const SwFormat& rFormat, bool bPap )
 
 void WW8AttributeOutput::StartStyleProperties( bool bParProp, sal_uInt16 nStyle )
 {
-    impl_SkipOdd( m_rWW8Export.pO, m_rWW8Export.pTableStrm->Tell() );
+    impl_SkipOdd( m_rWW8Export.m_pO, m_rWW8Export.m_pTableStrm->Tell() );
 
     sal_uInt16 nLen = bParProp ? 2 : 0;         // default length
-    m_nStyleLenPos = m_rWW8Export.pO->size();   // adding length
+    m_nStyleLenPos = m_rWW8Export.m_pO->size();   // adding length
                                                 // Don't save pointer, because it
                                                 // changes by _grow!
 
-    SwWW8Writer::InsUInt16( *m_rWW8Export.pO, nLen );        // Style-Len
+    SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, nLen );        // Style-Len
 
-    m_nStyleStartSize = m_rWW8Export.pO->size();
+    m_nStyleStartSize = m_rWW8Export.m_pO->size();
 
     if ( bParProp )
-        SwWW8Writer::InsUInt16( *m_rWW8Export.pO, nStyle );     // Style-Number
+        SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, nStyle );     // Style-Number
 }
 
 void MSWordStyles::WriteProperties( const SwFormat* pFormat, bool bParProp, sal_uInt16 nPos,
@@ -543,12 +634,12 @@ void MSWordStyles::WriteProperties( const SwFormat* pFormat, bool bParProp, sal_
 
 void WW8AttributeOutput::EndStyleProperties( bool /*bParProp*/ )
 {
-    sal_uInt16 nLen = m_rWW8Export.pO->size() - m_nStyleStartSize;
-    sal_uInt8* pUpxLen = m_rWW8Export.pO->data() + m_nStyleLenPos; // adding length
+    sal_uInt16 nLen = m_rWW8Export.m_pO->size() - m_nStyleStartSize;
+    sal_uInt8* pUpxLen = m_rWW8Export.m_pO->data() + m_nStyleLenPos; // adding length
     ShortToSVBT16( nLen, pUpxLen );                 // add default length
 }
 
-void MSWordStyles::GetStyleData( SwFormat* pFormat, bool& bFormatColl, sal_uInt16& nBase, sal_uInt16& nNext, sal_uInt16& nLink )
+void MSWordStyles::GetStyleData( const SwFormat* pFormat, bool& bFormatColl, sal_uInt16& nBase, sal_uInt16& nNext, sal_uInt16& nLink )
 {
     bFormatColl = pFormat->Which() == RES_TXTFMTCOLL || pFormat->Which() == RES_CONDTXTFMTCOLL;
 
@@ -559,18 +650,18 @@ void MSWordStyles::GetStyleData( SwFormat* pFormat, bool& bFormatColl, sal_uInt1
     if ( !pFormat->IsDefault() )
         nBase = GetSlot( pFormat->DerivedFrom() );
 
-    SwFormat* pNext;
+    const SwFormat* pNext;
     const SwFormat* pLink = nullptr;
     if ( bFormatColl )
     {
-        auto pFormatColl = static_cast<SwTextFormatColl*>(pFormat);
+        auto pFormatColl = static_cast<const SwTextFormatColl*>(pFormat);
         pNext = &pFormatColl->GetNextTextFormatColl();
         pLink = pFormatColl->GetLinkedCharFormat();
     }
     else
     {
         pNext = pFormat; // CharFormat: next CharFormat == self
-        auto pCharFormat = static_cast<SwCharFormat*>(pFormat);
+        auto pCharFormat = static_cast<const SwCharFormat*>(pFormat);
         pLink = pCharFormat->GetLinkedParaFormat();
     }
 
@@ -584,84 +675,48 @@ void MSWordStyles::GetStyleData( SwFormat* pFormat, bool& bFormatColl, sal_uInt1
 
 void WW8AttributeOutput::DefaultStyle()
 {
-    m_rWW8Export.pTableStrm->WriteUInt16(0);   // empty Style
+    m_rWW8Export.m_pTableStrm->WriteUInt16(0);   // empty Style
 }
 
-void MSWordStyles::OutputStyle(const SwNumRule* pNumRule, sal_uInt16 nPos)
+void MSWordStyles::OutputStyle(sal_uInt16 nSlot)
 {
-    m_rExport.AttrOutput().StartStyle( pNumRule->GetName(), STYLE_TYPE_LIST,
-            /*nBase =*/ 0, /*nWwNext =*/ 0, /*nWwLink =*/ 0, /*nWWId =*/ 0, nPos,
+    const auto& entry = m_aStyles[nSlot];
+
+    if (entry.num_rule)
+    {
+        m_rExport.AttrOutput().StartStyle( entry.ww_name, STYLE_TYPE_LIST,
+            /*nBase =*/ 0, /*nWwNext =*/ 0, /*nWwLink =*/ 0, /*nWWId =*/ 0, nSlot,
             /*bAutoUpdateFormat =*/ false );
 
-    m_rExport.AttrOutput().EndStyle();
-}
-
-// OutputStyle applies for TextFormatColls and CharFormats
-void MSWordStyles::OutputStyle( SwFormat* pFormat, sal_uInt16 nPos )
-{
-    if ( !pFormat )
+        m_rExport.AttrOutput().EndStyle();
+    }
+    else if (!entry.format)
+    {
         m_rExport.AttrOutput().DefaultStyle();
+    }
     else
     {
         bool bFormatColl;
         sal_uInt16 nBase, nWwNext;
         sal_uInt16 nWwLink = 0x0FFF;
 
-        GetStyleData(pFormat, bFormatColl, nBase, nWwNext, nWwLink);
+        GetStyleData(entry.format, bFormatColl, nBase, nWwNext, nWwLink);
 
-        OUString aName = pFormat->GetName();
-        // We want to map LO's default style to Word's "Normal" style.
-        // Word looks for this specific style name when reading docx files.
-        // (It must be the English word regardless of language settings)
-        if ( nPos == 0 )
-        {
-            assert( pFormat->GetPoolFormatId() == RES_POOLCOLL_STANDARD );
-            aName = "Normal";
-        }
-        else if (aName.equalsIgnoreAsciiCase("Normal"))
-        {
-            // If LO has a style named "Normal"(!) rename it to something unique
-            const OUString aBaseName = "LO-" + aName;
-            aName = aBaseName;
-            // Check if we still have a clash, in which case we add a suffix
-            for ( int nSuffix = 0; ; ++nSuffix ) {
-                bool clash=false;
-                for ( sal_uInt16 n = 1; n < m_nUsedSlots; ++n )
-                    if ( m_aFormatA[n] &&
-                         m_aFormatA[n]->GetName().equalsIgnoreAsciiCase(aName) )
-                    {
-                        clash = true;
-                        break;
-                    }
-                if (!clash)
-                    break;
-                // TODO: verify if we really need to increment nSuffix in 2 places
-                aName = aBaseName + OUString::number(++nSuffix);
-            }
-        }
-        else if (!bFormatColl && m_rExport.GetExportFormat() == MSWordExportBase::DOCX &&
-                        m_rExport.m_pStyles->GetStyleId(nPos).startsWith("ListLabel"))
+        if (!bFormatColl && m_rExport.GetExportFormat() == MSWordExportBase::DOCX &&
+                        entry.style_id.startsWith("ListLabel"))
         {
             // tdf#92335 don't export redundant DOCX import style "ListLabel"
             return;
         }
-        else if (aName.equalsIgnoreAsciiCase("Internet Link"))
-        {
-            aName = "Hyperlink";
-        }
-        else if (aName.equalsIgnoreAsciiCase("Visited Internet Link"))
-        {
-            aName = "FollowedHyperlink";
-        }
 
-        m_rExport.AttrOutput().StartStyle( aName, (bFormatColl ? STYLE_TYPE_PARA : STYLE_TYPE_CHAR),
-                nBase, nWwNext, nWwLink, GetWWId( *pFormat ), nPos,
-                pFormat->IsAutoUpdateFormat() );
+        m_rExport.AttrOutput().StartStyle(entry.ww_name, (bFormatColl ? STYLE_TYPE_PARA : STYLE_TYPE_CHAR),
+                nBase, nWwNext, nWwLink, m_aStyles[nSlot].ww_id, nSlot,
+                entry.format->IsAutoUpdateFormat() );
 
         if ( bFormatColl )
-            WriteProperties( pFormat, true, nPos, nBase==0xfff );           // UPX.papx
+            WriteProperties( entry.format, true, nSlot, nBase==0xfff );           // UPX.papx
 
-        WriteProperties( pFormat, false, nPos, bFormatColl && nBase==0xfff );  // UPX.chpx
+        WriteProperties( entry.format, false, nSlot, bFormatColl && nBase==0xfff );  // UPX.chpx
 
         m_rExport.AttrOutput().EndStyle();
     }
@@ -669,12 +724,12 @@ void MSWordStyles::OutputStyle( SwFormat* pFormat, sal_uInt16 nPos )
 
 void WW8AttributeOutput::StartStyles()
 {
-    WW8Fib& rFib = *m_rWW8Export.pFib;
+    WW8Fib& rFib = *m_rWW8Export.m_pFib;
 
-    sal_uLong nCurPos = m_rWW8Export.pTableStrm->Tell();
+    sal_uInt64 nCurPos = m_rWW8Export.m_pTableStrm->Tell();
     if ( nCurPos & 1 )                   // start on even
     {
-        m_rWW8Export.pTableStrm->WriteChar( char(0) );        // Address
+        m_rWW8Export.m_pTableStrm->WriteChar( char(0) );        // Address
         ++nCurPos;
     }
     rFib.m_fcStshfOrig = rFib.m_fcStshf = nCurPos;
@@ -686,15 +741,15 @@ void WW8AttributeOutput::StartStyles()
         0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00 };
 
-    m_rWW8Export.pTableStrm->WriteBytes(&aStShi, sizeof(aStShi));
+    m_rWW8Export.m_pTableStrm->WriteBytes(&aStShi, sizeof(aStShi));
 }
 
 void WW8AttributeOutput::EndStyles( sal_uInt16 nNumberOfStyles )
 {
-    WW8Fib& rFib = *m_rWW8Export.pFib;
+    WW8Fib& rFib = *m_rWW8Export.m_pFib;
 
-    rFib.m_lcbStshfOrig = rFib.m_lcbStshf = m_rWW8Export.pTableStrm->Tell() - rFib.m_fcStshf;
-    SwWW8Writer::WriteShort( *m_rWW8Export.pTableStrm, m_nStyleCountPos, nNumberOfStyles );
+    rFib.m_lcbStshfOrig = rFib.m_lcbStshf = m_rWW8Export.m_pTableStrm->Tell() - rFib.m_fcStshf;
+    SwWW8Writer::WriteShort( *m_rWW8Export.m_pTableStrm, m_nStyleCountPos, nNumberOfStyles );
 }
 
 void MSWordStyles::OutputStylesTable()
@@ -703,38 +758,23 @@ void MSWordStyles::OutputStylesTable()
 
     m_rExport.AttrOutput().StartStyles();
 
-    sal_uInt16 n;
     // HACK
     // Ms Office seems to have an internal limitation of 4091 styles
     // and refuses to load .docx with more, even though the spec seems to allow that;
     // so simply if there are more styles, don't export those
     // Implementing check for all exports DOCX, DOC, RTF
-    sal_uInt16 const nLimit = MSWORD_MAX_STYLES_LIMIT;
-    m_nUsedSlots = std::min(nLimit, m_nUsedSlots);
+    assert(m_aStyles.size() <= MSWORD_MAX_STYLES_LIMIT);
+    for (size_t slot = 0; slot < m_aStyles.size(); ++slot)
+        OutputStyle(slot);
 
-    for ( n = 0; n < m_nUsedSlots; n++ )
-    {
-        if (m_aNumRules.find(n) != m_aNumRules.end())
-            OutputStyle(m_aNumRules[n], n);
-        else
-            OutputStyle(m_aFormatA[n], n);
-    }
-
-    m_rExport.AttrOutput().EndStyles( m_nUsedSlots );
+    m_rExport.AttrOutput().EndStyles(m_aStyles.size());
 
     m_rExport.m_bStyDef = false;
 }
 
-const SwNumRule* MSWordStyles::GetSwNumRule(sal_uInt16 nId) const
-{
-    std::map<sal_uInt16, const SwNumRule*>::const_iterator it = m_aNumRules.find(nId);
-    assert(it != m_aNumRules.end());
-    return it->second;
-}
-
 //          Fonts
 
-wwFont::wwFont(const OUString &rFamilyName, FontPitch ePitch, FontFamily eFamily,
+wwFont::wwFont(std::u16string_view rFamilyName, FontPitch ePitch, FontFamily eFamily,
         rtl_TextEncoding eChrSet)
     : mbAlt(false), mePitch(ePitch), meFamily(eFamily), meChrSet(eChrSet)
 {
@@ -873,13 +913,13 @@ sal_uInt16 wwFontHelper::GetId(const wwFont &rFont)
 
 void wwFontHelper::InitFontTable(const SwDoc& rDoc)
 {
-    GetId(wwFont("Times New Roman", PITCH_VARIABLE,
+    GetId(wwFont(u"Times New Roman", PITCH_VARIABLE,
         FAMILY_ROMAN, RTL_TEXTENCODING_MS_1252));
 
-    GetId(wwFont("Symbol", PITCH_VARIABLE, FAMILY_ROMAN,
+    GetId(wwFont(u"Symbol", PITCH_VARIABLE, FAMILY_ROMAN,
         RTL_TEXTENCODING_SYMBOL));
 
-    GetId(wwFont("Arial", PITCH_VARIABLE, FAMILY_SWISS,
+    GetId(wwFont(u"Arial", PITCH_VARIABLE, FAMILY_SWISS,
         RTL_TEXTENCODING_MS_1252));
 
     const SvxFontItem* pFont = GetDfltAttr(RES_CHRATR_FONT);
@@ -895,7 +935,7 @@ void wwFontHelper::InitFontTable(const SwDoc& rDoc)
             pFont->GetFamily(), pFont->GetCharSet()));
     }
 
-    if (!bLoadAllFonts)
+    if (!m_bLoadAllFonts)
         return;
 
     const sal_uInt16 aTypes[] = { RES_CHRATR_FONT, RES_CHRATR_CJK_FONT, RES_CHRATR_CTL_FONT, 0 };
@@ -971,18 +1011,18 @@ void wwFontHelper::WriteFontTable( const RtfAttributeOutput& rAttrOutput )
 }
 
 WW8_WrPlc0::WW8_WrPlc0( sal_uLong nOffset )
-    : nOfs( nOffset )
+    : m_nOfs( nOffset )
 {
 }
 
 void WW8_WrPlc0::Append( sal_uLong nStartCpOrFc )
 {
-    aPos.push_back( nStartCpOrFc - nOfs );
+    m_aPos.push_back( nStartCpOrFc - m_nOfs );
 }
 
 void WW8_WrPlc0::Write( SvStream& rStrm )
 {
-    for( const auto& rPos : aPos )
+    for( const auto& rPos : m_aPos )
     {
         rStrm.WriteUInt32(rPos);
     }
@@ -997,13 +1037,12 @@ MSWordSections::MSWordSections( MSWordExportBase& rExport )
     const SwSectionFormat *pFormat = nullptr;
     rExport.m_pCurrentPageDesc = &rExport.m_rDoc.GetPageDesc( 0 );
 
-    const SfxPoolItem* pI;
-    const SwNode* pNd = rExport.m_pCurPam->GetContentNode();
+    const SwNode* pNd = rExport.m_pCurPam->GetPointContentNode();
     const SfxItemSet* pSet = pNd ? &static_cast<const SwContentNode*>(pNd)->GetSwAttrSet() : nullptr;
 
     sal_uLong nRstLnNum =  pSet ? pSet->Get( RES_LINENUMBER ).GetStartValue() : 0;
 
-    const SwTableNode* pTableNd = rExport.m_pCurPam->GetNode().FindTableNode();
+    const SwTableNode* pTableNd = rExport.m_pCurPam->GetPointNode().FindTableNode();
     const SwSectionNode* pSectNd = nullptr;
     if ( pTableNd )
     {
@@ -1021,7 +1060,7 @@ MSWordSections::MSWordSections( MSWordExportBase& rExport )
         if ( SectionType::ToxContent == pSectNd->GetSection().GetType() )
         {
             pNd = pSectNd;
-            rExport.m_pCurPam->GetPoint()->nNode = *pNd;
+            rExport.m_pCurPam->GetPoint()->Assign(*pNd);
         }
 
         if ( SectionType::Content == pSectNd->GetSection().GetType() )
@@ -1034,11 +1073,12 @@ MSWordSections::MSWordSections( MSWordExportBase& rExport )
             SectionType::ToxContent == pSectNd->GetSection().GetType()  );
 
     // Try to get page descriptor of the first node
+    const SwFormatPageDesc* pDescItem;
     if ( pSet &&
-         SfxItemState::SET == pSet->GetItemState( RES_PAGEDESC, true, &pI ) &&
-         static_cast<const SwFormatPageDesc*>(pI)->GetPageDesc() )
+         (pDescItem = pSet->GetItemIfSet( RES_PAGEDESC )) &&
+         pDescItem->GetPageDesc() )
     {
-        AppendSection( *static_cast<const SwFormatPageDesc*>(pI), *pNd, pFormat, nRstLnNum );
+        AppendSection( *pDescItem, *pNd, pFormat, nRstLnNum );
     }
     else
         AppendSection( rExport.m_pCurrentPageDesc, pFormat, nRstLnNum, /*bIsFirstParagraph=*/true );
@@ -1050,7 +1090,7 @@ WW8_WrPlcSepx::WW8_WrPlcSepx( MSWordExportBase& rExport )
 {
     // to be in sync with the AppendSection() call in the MSWordSections
     // constructor
-    aCps.push_back( 0 );
+    m_aCps.push_back( 0 );
 }
 
 MSWordSections::~MSWordSections()
@@ -1073,11 +1113,11 @@ bool WW8_WrPlcSepx::HeaderFooterWritten()
 
 sal_uInt16 MSWordSections::CurrentNumberOfColumns( const SwDoc &rDoc ) const
 {
-    OSL_ENSURE( !aSects.empty(), "no segment inserted yet" );
-    if ( aSects.empty() )
+    OSL_ENSURE( !m_aSects.empty(), "no segment inserted yet" );
+    if ( m_aSects.empty() )
         return 1;
 
-    return NumberOfColumns( rDoc, aSects.back() );
+    return NumberOfColumns( rDoc, m_aSects.back() );
 }
 
 sal_uInt16 MSWordSections::NumberOfColumns( const SwDoc &rDoc, const WW8_SepInfo& rInfo )
@@ -1101,8 +1141,8 @@ sal_uInt16 MSWordSections::NumberOfColumns( const SwDoc &rDoc, const WW8_SepInfo
 
 const WW8_SepInfo* MSWordSections::CurrentSectionInfo()
 {
-    if ( !aSects.empty() )
-        return &aSects.back();
+    if ( !m_aSects.empty() )
+        return &m_aSects.back();
 
     return nullptr;
 }
@@ -1113,8 +1153,8 @@ void MSWordSections::AppendSection( const SwPageDesc* pPd,
     if (HeaderFooterWritten()) {
         return; // #i117955# prevent new sections in endnotes
     }
-    aSects.emplace_back( pPd, pSectionFormat, nLnNumRestartNo, std::nullopt, nullptr, bIsFirstParagraph );
-    NeedsDocumentProtected( aSects.back() );
+    m_aSects.emplace_back( pPd, pSectionFormat, nLnNumRestartNo, std::nullopt, nullptr, bIsFirstParagraph );
+    NeedsDocumentProtected( m_aSects.back() );
 }
 
 void WW8_WrPlcSepx::AppendSep( WW8_CP nStartCp, const SwPageDesc* pPd,
@@ -1123,7 +1163,7 @@ void WW8_WrPlcSepx::AppendSep( WW8_CP nStartCp, const SwPageDesc* pPd,
     if (HeaderFooterWritten()) {
         return; // #i117955# prevent new sections in endnotes
     }
-    aCps.push_back( nStartCp );
+    m_aCps.push_back( nStartCp );
     AppendSection( pPd, pSectionFormat, nLnNumRestartNo );
 }
 
@@ -1136,7 +1176,7 @@ void MSWordSections::AppendSection( const SwFormatPageDesc& rPD,
 
     WW8_SepInfo aI( rPD.GetPageDesc(), pSectionFormat, nLnNumRestartNo, rPD.GetNumOffset(), &rNd );
 
-    aSects.push_back( aI );
+    m_aSects.push_back( aI );
     NeedsDocumentProtected( aI );
 }
 
@@ -1146,7 +1186,7 @@ void WW8_WrPlcSepx::AppendSep( WW8_CP nStartCp, const SwFormatPageDesc& rPD,
     if (HeaderFooterWritten()) {
         return; // #i117955# prevent new sections in endnotes
     }
-    aCps.push_back( nStartCp );
+    m_aCps.push_back( nStartCp );
     AppendSection( rPD, rNd, pSectionFormat, nLnNumRestartNo );
 }
 
@@ -1160,36 +1200,36 @@ void WW8_WrPlcSepx::WriteFootnoteEndText( WW8Export& rWrt, sal_uLong nCpStt )
     sal_uInt8 nEmptyStt = 0;
     if( nInfoFlags )
     {
-        pTextPos->Append( nCpStt );  // empty footnote separator
+        m_pTextPos->Append( nCpStt );  // empty footnote separator
 
         if( 0x02 & nInfoFlags )         // Footnote continuation separator
         {
-            pTextPos->Append( nCpStt );
+            m_pTextPos->Append( nCpStt );
             rWrt.WriteStringAsPara( rInfo.m_aErgoSum );
             rWrt.WriteStringAsPara( OUString() );
             nCpStt = rWrt.Fc2Cp( rWrt.Strm().Tell() );
         }
         else
-            pTextPos->Append( nCpStt );
+            m_pTextPos->Append( nCpStt );
 
         if( 0x04 & nInfoFlags )         // Footnote continuation notice
         {
-            pTextPos->Append( nCpStt );
+            m_pTextPos->Append( nCpStt );
             rWrt.WriteStringAsPara( rInfo.m_aQuoVadis );
             rWrt.WriteStringAsPara( OUString() );
             nCpStt = rWrt.Fc2Cp( rWrt.Strm().Tell() );
         }
         else
-            pTextPos->Append( nCpStt );
+            m_pTextPos->Append( nCpStt );
 
         nEmptyStt = 3;
     }
 
     while( 6 > nEmptyStt++ )
-        pTextPos->Append( nCpStt );
+        m_pTextPos->Append( nCpStt );
 
     // set the flags at the Dop right away
-    WW8Dop& rDop = *rWrt.pDop;
+    WW8Dop& rDop = *rWrt.m_pDop;
     // Footnote Info
     switch( rInfo.m_eNum )
     {
@@ -1212,20 +1252,16 @@ void WW8_WrPlcSepx::WriteFootnoteEndText( WW8Export& rWrt, sal_uLong nCpStt )
 void MSWordSections::SetHeaderFlag( sal_uInt8& rHeadFootFlags, const SwFormat& rFormat,
     sal_uInt8 nFlag )
 {
-    const SfxPoolItem* pItem;
-    if( SfxItemState::SET == rFormat.GetItemState(RES_HEADER, true, &pItem)
-        && static_cast<const SwFormatHeader*>(pItem)->IsActive() &&
-        static_cast<const SwFormatHeader*>(pItem)->GetHeaderFormat() )
+    const SwFormatHeader* pItem = rFormat.GetItemIfSet(RES_HEADER);
+    if( pItem && pItem->IsActive() && pItem->GetHeaderFormat() )
         rHeadFootFlags |= nFlag;
 }
 
 void MSWordSections::SetFooterFlag( sal_uInt8& rHeadFootFlags, const SwFormat& rFormat,
     sal_uInt8 nFlag )
 {
-    const SfxPoolItem* pItem;
-    if( SfxItemState::SET == rFormat.GetItemState(RES_FOOTER, true, &pItem)
-        && static_cast<const SwFormatFooter*>(pItem)->IsActive() &&
-        static_cast<const SwFormatFooter*>(pItem)->GetFooterFormat() )
+    const SwFormatFooter* pItem = rFormat.GetItemIfSet(RES_FOOTER);
+    if( pItem && pItem->IsActive() && pItem->GetFooterFormat() )
         rHeadFootFlags |= nFlag;
 }
 
@@ -1235,14 +1271,14 @@ void WW8_WrPlcSepx::OutHeaderFooter( WW8Export& rWrt, bool bHeader,
 {
     if ( nFlag & nHFFlags )
     {
-        pTextPos->Append( rCpPos );
+        m_pTextPos->Append( rCpPos );
         rWrt.WriteHeaderFooterText( rFormat, bHeader);
         rWrt.WriteStringAsPara( OUString() ); // CR to the end ( otherwise WW complains )
         rCpPos = rWrt.Fc2Cp( rWrt.Strm().Tell() );
     }
     else
     {
-        pTextPos->Append( rCpPos );
+        m_pTextPos->Append( rCpPos );
         if ((bHeader? rWrt.m_bHasHdr : rWrt.m_bHasFtr) && nBreakCode!=0)
         {
             rWrt.WriteStringAsPara( OUString() ); // Empty paragraph for empty header/footer
@@ -1281,7 +1317,7 @@ void MSWordSections::CheckForFacinPg( const WW8Export& rWrt ) const
     //      Dop.fFacingPages            == Header and Footer different
     //      Dop.fSwapBordersFacingPgs   == mirrored borders
     sal_uInt16 nEnd = 0;
-    for( const WW8_SepInfo& rSepInfo : aSects )
+    for( const WW8_SepInfo& rSepInfo : m_aSects )
     {
         if( !rSepInfo.pSectionFormat )
         {
@@ -1302,21 +1338,21 @@ void MSWordSections::CheckForFacinPg( const WW8Export& rWrt ) const
                  ( UseOnPage::Right == ( UseOnPage::All & pPd->ReadUseOn() ) &&
                    UseOnPage::Left == ( UseOnPage::All & pPd->GetFollow()->ReadUseOn() )) ))
             {
-                rWrt.pDop->fFacingPages = rWrt.pDop->fMirrorMargins = true;
+                rWrt.m_pDop->fFacingPages = rWrt.m_pDop->fMirrorMargins = true;
                 nEnd |= 1;
             }
 
             if( !( 1 & nEnd ) &&
                 ( !pPd->IsHeaderShared() || !pPd->IsFooterShared() ))
             {
-                rWrt.pDop->fFacingPages = true;
+                rWrt.m_pDop->fFacingPages = true;
                 nEnd |= 1;
             }
             if( !( 2 & nEnd ) &&
                 UseOnPage::Mirror == ( UseOnPage::Mirror & pPd->ReadUseOn() ))
             {
-                rWrt.pDop->fSwapBordersFacingPgs =
-                    rWrt.pDop->fMirrorMargins = true;
+                rWrt.m_pDop->fSwapBordersFacingPgs =
+                    rWrt.m_pDop->fMirrorMargins = true;
                 nEnd |= 2;
             }
 
@@ -1328,17 +1364,17 @@ void MSWordSections::CheckForFacinPg( const WW8Export& rWrt ) const
 
 bool MSWordSections::HasBorderItem( const SwFormat& rFormat )
 {
-    const SfxPoolItem* pItem;
-    return SfxItemState::SET == rFormat.GetItemState(RES_BOX, true, &pItem) &&
-            (   static_cast<const SvxBoxItem*>(pItem)->GetTop() ||
-                static_cast<const SvxBoxItem*>(pItem)->GetBottom()  ||
-                static_cast<const SvxBoxItem*>(pItem)->GetLeft()  ||
-                static_cast<const SvxBoxItem*>(pItem)->GetRight() );
+    const SvxBoxItem* pItem = rFormat.GetItemIfSet(RES_BOX);
+    return pItem &&
+            (   pItem->GetTop() ||
+                pItem->GetBottom()  ||
+                pItem->GetLeft()  ||
+                pItem->GetRight() );
 }
 
 void WW8AttributeOutput::StartSection()
 {
-    m_rWW8Export.pO->clear();
+    m_rWW8Export.m_pO->clear();
 }
 
 void WW8AttributeOutput::SectFootnoteEndnotePr()
@@ -1348,60 +1384,60 @@ void WW8AttributeOutput::SectFootnoteEndnotePr()
     m_rWW8Export.InsUInt16( NS_sprm::SRncFtn::val );
     switch( rInfo.m_eNum )
     {
-    case FTNNUM_PAGE:     m_rWW8Export.pO->push_back( sal_uInt8/*rncRstPage*/ (2) ); break;
-    case FTNNUM_CHAPTER:  m_rWW8Export.pO->push_back( sal_uInt8/*rncRstSect*/ (1) ); break;
-    default:              m_rWW8Export.pO->push_back( sal_uInt8/*rncCont*/ (0) ); break;
+    case FTNNUM_PAGE:     m_rWW8Export.m_pO->push_back( sal_uInt8/*rncRstPage*/ (2) ); break;
+    case FTNNUM_CHAPTER:  m_rWW8Export.m_pO->push_back( sal_uInt8/*rncRstSect*/ (1) ); break;
+    default:              m_rWW8Export.m_pO->push_back( sal_uInt8/*rncCont*/ (0) ); break;
     }
 
     m_rWW8Export.InsUInt16(NS_sprm::SNfcFtnRef::val);
     sal_uInt8 nId = WW8Export::GetNumId(rInfo.m_aFormat.GetNumberingType());
-    SwWW8Writer::InsUInt16(*m_rWW8Export.pO, nId);
+    SwWW8Writer::InsUInt16(*m_rWW8Export.m_pO, nId);
     m_rWW8Export.InsUInt16(NS_sprm::SNfcEdnRef::val);
     nId = WW8Export::GetNumId(rEndNoteInfo.m_aFormat.GetNumberingType());
-    SwWW8Writer::InsUInt16(*m_rWW8Export.pO, nId);
+    SwWW8Writer::InsUInt16(*m_rWW8Export.m_pO, nId);
 }
 
 void WW8AttributeOutput::SectionFormProtection( bool bProtected )
 {
     //If the document is to be exported as protected, then if a segment
     //is not protected, set the unlocked flag
-    if ( m_rWW8Export.pSepx->DocumentIsProtected() && !bProtected )
+    if ( m_rWW8Export.m_pSepx->DocumentIsProtected() && !bProtected )
     {
-        SwWW8Writer::InsUInt16( *m_rWW8Export.pO, NS_sprm::SFProtected::val );
-        m_rWW8Export.pO->push_back( 1 );
+        SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, NS_sprm::SFProtected::val );
+        m_rWW8Export.m_pO->push_back( 1 );
     }
 }
 
 void WW8AttributeOutput::SectionLineNumbering( sal_uLong nRestartNo, const SwLineNumberInfo& rLnNumInfo )
 {
     // sprmSNLnnMod - activate Line Numbering and define Modulo
-    SwWW8Writer::InsUInt16( *m_rWW8Export.pO, NS_sprm::SNLnnMod::val );
-    SwWW8Writer::InsUInt16( *m_rWW8Export.pO, rLnNumInfo.GetCountBy() );
+    SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, NS_sprm::SNLnnMod::val );
+    SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, rLnNumInfo.GetCountBy() );
 
     // sprmSDxaLnn - xPosition of Line Number
-    SwWW8Writer::InsUInt16( *m_rWW8Export.pO, NS_sprm::SDxaLnn::val );
-    SwWW8Writer::InsUInt16( *m_rWW8Export.pO, rLnNumInfo.GetPosFromLeft() );
+    SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, NS_sprm::SDxaLnn::val );
+    SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, rLnNumInfo.GetPosFromLeft() );
 
     // sprmSLnc - restart number: 0 per page, 1 per section, 2 never restart
     if ( nRestartNo || !rLnNumInfo.IsRestartEachPage() )
     {
-        SwWW8Writer::InsUInt16( *m_rWW8Export.pO, NS_sprm::SLnc::val );
-        m_rWW8Export.pO->push_back( nRestartNo ? 1 : 2 );
+        SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, NS_sprm::SLnc::val );
+        m_rWW8Export.m_pO->push_back( nRestartNo ? 1 : 2 );
     }
 
     // sprmSLnnMin - Restart the Line Number with given value
     if ( nRestartNo )
     {
-        SwWW8Writer::InsUInt16( *m_rWW8Export.pO, NS_sprm::SLnnMin::val );
-        SwWW8Writer::InsUInt16( *m_rWW8Export.pO, o3tl::narrowing<sal_uInt16>(nRestartNo) - 1 );
+        SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, NS_sprm::SLnnMin::val );
+        SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, o3tl::narrowing<sal_uInt16>(nRestartNo) - 1 );
     }
 }
 
 void WW8AttributeOutput::SectionTitlePage()
 {
     // sprmSFTitlePage
-    SwWW8Writer::InsUInt16( *m_rWW8Export.pO, NS_sprm::SFTitlePage::val );
-    m_rWW8Export.pO->push_back( 1 );
+    SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, NS_sprm::SFTitlePage::val );
+    m_rWW8Export.m_pO->push_back( 1 );
 }
 
 void WW8AttributeOutput::SectionPageBorders( const SwFrameFormat* pPdFormat, const SwFrameFormat* pPdFirstPgFormat )
@@ -1431,33 +1467,33 @@ void WW8AttributeOutput::SectionPageBorders( const SwFrameFormat* pPdFormat, con
     if ( USHRT_MAX != nPgBorder )
     {
         // write the Flag and Border Attribute
-        SwWW8Writer::InsUInt16( *m_rWW8Export.pO, NS_sprm::SPgbProp::val );
-        SwWW8Writer::InsUInt16( *m_rWW8Export.pO, nPgBorder );
+        SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, NS_sprm::SPgbProp::val );
+        SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, nPgBorder );
     }
 }
 
 void WW8AttributeOutput::SectionBiDi( bool bBiDi )
 {
-    SwWW8Writer::InsUInt16( *m_rWW8Export.pO, NS_sprm::SFBiDi::val );
-    m_rWW8Export.pO->push_back( bBiDi? 1: 0 );
+    SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, NS_sprm::SFBiDi::val );
+    m_rWW8Export.m_pO->push_back( bBiDi? 1: 0 );
 }
 
 void WW8AttributeOutput::SectionPageNumbering( sal_uInt16 nNumType, const ::std::optional<sal_uInt16>& oPageRestartNumber )
 {
     // sprmSNfcPgn
     sal_uInt8 nb = WW8Export::GetNumId( nNumType );
-    SwWW8Writer::InsUInt16( *m_rWW8Export.pO, NS_sprm::SNfcPgn::val );
-    m_rWW8Export.pO->push_back( nb );
+    SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, NS_sprm::SNfcPgn::val );
+    m_rWW8Export.m_pO->push_back( nb );
 
     if ( oPageRestartNumber )
     {
         // sprmSFPgnRestart
-        SwWW8Writer::InsUInt16( *m_rWW8Export.pO, NS_sprm::SFPgnRestart::val );
-        m_rWW8Export.pO->push_back( 1 );
+        SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, NS_sprm::SFPgnRestart::val );
+        m_rWW8Export.m_pO->push_back( 1 );
 
         // sprmSPgnStart
-        SwWW8Writer::InsUInt16( *m_rWW8Export.pO, NS_sprm::SPgnStart97::val );
-        SwWW8Writer::InsUInt16( *m_rWW8Export.pO, *oPageRestartNumber );
+        SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, NS_sprm::SPgnStart97::val );
+        SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, *oPageRestartNumber );
     }
 }
 
@@ -1465,8 +1501,8 @@ void WW8AttributeOutput::SectionType( sal_uInt8 nBreakCode )
 {
     if ( 2 != nBreakCode ) // new page is the default
     {
-        SwWW8Writer::InsUInt16( *m_rWW8Export.pO, NS_sprm::SBkc::val );
-        m_rWW8Export.pO->push_back( nBreakCode );
+        SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, NS_sprm::SBkc::val );
+        m_rWW8Export.m_pO->push_back( nBreakCode );
     }
 }
 
@@ -1475,13 +1511,13 @@ void WW8Export::SetupSectionPositions( WW8_PdAttrDesc* pA )
     if ( !pA )
         return;
 
-    if ( !pO->empty() ) // are there attributes ?
+    if ( !m_pO->empty() ) // are there attributes ?
     {
-        pA->m_nLen = pO->size();
-        pA->m_pData.reset(new sal_uInt8 [pO->size()]);
+        pA->m_nLen = m_pO->size();
+        pA->m_pData.reset(new sal_uInt8 [m_pO->size()]);
         // store for later
-        memcpy( pA->m_pData.get(), pO->data(), pO->size() );
-        pO->clear(); // clear HdFt-Text
+        memcpy( pA->m_pData.get(), m_pO->data(), m_pO->size() );
+        m_pO->clear(); // clear HdFt-Text
     }
     else // no attributes there
     {
@@ -1510,8 +1546,8 @@ void WW8AttributeOutput::TextVerticalAdjustment( const drawing::TextVerticalAdju
         default:
             break;
     }
-    SwWW8Writer::InsUInt16( *m_rWW8Export.pO, NS_sprm::SVjc::val );
-    m_rWW8Export.pO->push_back( nMSVA );
+    SwWW8Writer::InsUInt16( *m_rWW8Export.m_pO, NS_sprm::SVjc::val );
+    m_rWW8Export.m_pO->push_back( nMSVA );
 }
 
 void WW8Export::WriteHeadersFooters( sal_uInt8 nHeadFootFlags,
@@ -1520,26 +1556,26 @@ void WW8Export::WriteHeadersFooters( sal_uInt8 nHeadFootFlags,
     sal_uLong nCpPos = Fc2Cp( Strm().Tell() );
 
     IncrementHdFtIndex();
-    if ( !(nHeadFootFlags & WW8_HEADER_EVEN) && pDop->fFacingPages )
-        pSepx->OutHeaderFooter( *this, true, rFormat, nCpPos, nHeadFootFlags, WW8_HEADER_ODD, nBreakCode );
+    if ( !(nHeadFootFlags & WW8_HEADER_EVEN) && m_pDop->fFacingPages )
+        m_pSepx->OutHeaderFooter( *this, true, rFormat, nCpPos, nHeadFootFlags, WW8_HEADER_ODD, nBreakCode );
     else
-        pSepx->OutHeaderFooter( *this, true, rLeftHeaderFormat, nCpPos, nHeadFootFlags, WW8_HEADER_EVEN, nBreakCode );
+        m_pSepx->OutHeaderFooter( *this, true, rLeftHeaderFormat, nCpPos, nHeadFootFlags, WW8_HEADER_EVEN, nBreakCode );
     IncrementHdFtIndex();
-    pSepx->OutHeaderFooter( *this, true, rFormat, nCpPos, nHeadFootFlags, WW8_HEADER_ODD, nBreakCode );
+    m_pSepx->OutHeaderFooter( *this, true, rFormat, nCpPos, nHeadFootFlags, WW8_HEADER_ODD, nBreakCode );
 
     IncrementHdFtIndex();
-    if ( !(nHeadFootFlags & WW8_FOOTER_EVEN) && pDop->fFacingPages )
-        pSepx->OutHeaderFooter( *this, false, rFormat, nCpPos, nHeadFootFlags, WW8_FOOTER_ODD, nBreakCode );
+    if ( !(nHeadFootFlags & WW8_FOOTER_EVEN) && m_pDop->fFacingPages )
+        m_pSepx->OutHeaderFooter( *this, false, rFormat, nCpPos, nHeadFootFlags, WW8_FOOTER_ODD, nBreakCode );
     else
-        pSepx->OutHeaderFooter( *this, false, rLeftFooterFormat, nCpPos, nHeadFootFlags, WW8_FOOTER_EVEN, nBreakCode );
+        m_pSepx->OutHeaderFooter( *this, false, rLeftFooterFormat, nCpPos, nHeadFootFlags, WW8_FOOTER_EVEN, nBreakCode );
     IncrementHdFtIndex();
-    pSepx->OutHeaderFooter( *this, false, rFormat, nCpPos, nHeadFootFlags, WW8_FOOTER_ODD, nBreakCode );
+    m_pSepx->OutHeaderFooter( *this, false, rFormat, nCpPos, nHeadFootFlags, WW8_FOOTER_ODD, nBreakCode );
 
     //#i24344# Drawing objects cannot be directly shared between main hd/ft
     //and title hd/ft so we need to differentiate them
     IncrementHdFtIndex();
-    pSepx->OutHeaderFooter( *this, true, rFirstPageFormat, nCpPos, nHeadFootFlags, WW8_HEADER_FIRST, nBreakCode );
-    pSepx->OutHeaderFooter( *this, false, rFirstPageFormat, nCpPos, nHeadFootFlags, WW8_FOOTER_FIRST, nBreakCode );
+    m_pSepx->OutHeaderFooter( *this, true, rFirstPageFormat, nCpPos, nHeadFootFlags, WW8_HEADER_FIRST, nBreakCode );
+    m_pSepx->OutHeaderFooter( *this, false, rFirstPageFormat, nCpPos, nHeadFootFlags, WW8_FOOTER_FIRST, nBreakCode );
 }
 
 namespace
@@ -1581,12 +1617,12 @@ bool UsePrevSectionNextStyle(sal_uInt8 nBreakCode, const SwPageDesc* pPd,
 
     SwPaM aPaM(*pSectionStart);
     aPaM.Move(fnMoveBackward);
-    if (!aPaM.GetNode().IsTextNode())
+    if (!aPaM.GetPointNode().IsTextNode())
     {
         return false;
     }
 
-    SwTextNode* pTextNode = aPaM.GetNode().GetTextNode();
+    SwTextNode* pTextNode = aPaM.GetPointNode().GetTextNode();
     const SwAttrSet* pParaProps = &pTextNode->GetSwAttrSet();
     sal_uInt32 nCharHeight = pParaProps->GetSize().GetHeight();
     if (nCharHeight > 20)
@@ -1595,12 +1631,12 @@ bool UsePrevSectionNextStyle(sal_uInt8 nBreakCode, const SwPageDesc* pPd,
     }
 
     aPaM.Move(fnMoveBackward);
-    if (!aPaM.GetNode().IsTextNode())
+    if (!aPaM.GetPointNode().IsTextNode())
     {
         return false;
     }
 
-    pTextNode = aPaM.GetNode().GetTextNode();
+    pTextNode = aPaM.GetPointNode().GetTextNode();
     pParaProps = &pTextNode->GetSwAttrSet();
     return pParaProps->HasItem(RES_PAGEDESC);
 }
@@ -1620,6 +1656,7 @@ void MSWordExportBase::SectionProperties( const WW8_SepInfo& rSepInfo, WW8_PdAtt
 
     bool bOldPg = m_bOutPageDescs;
     m_bOutPageDescs = true;
+    const SwPageDesc* pSavedPageDesc = pPd;
 
     AttrOutput().StartSection();
 
@@ -1638,7 +1675,6 @@ void MSWordExportBase::SectionProperties( const WW8_SepInfo& rSepInfo, WW8_PdAtt
         */
     sal_uInt8 nBreakCode = 2;            // default start new page
     bool bOutPgDscSet = true, bLeftRightPgChain = false, bOutputStyleItemSet = false;
-    bool bEnsureHeaderFooterWritten = rSepInfo.pSectionFormat && rSepInfo.bIsFirstParagraph;
     const SwFrameFormat* pPdFormat = &pPd->GetMaster();
     bool bUsePrevSectionNextStyle = false;
     if ( rSepInfo.pSectionFormat )
@@ -1648,17 +1684,18 @@ void MSWordExportBase::SectionProperties( const WW8_SepInfo& rSepInfo, WW8_PdAtt
         //  0xfff -> Section terminated
         nBreakCode = 0;         // consecutive section
 
-        if ( rSepInfo.pPDNd && rSepInfo.pPDNd->IsContentNode() )
+        if (rSepInfo.pPDNd && (rSepInfo.pPDNd->IsContentNode() || rSepInfo.pPDNd->IsTableNode()))
         {
-            if ( !NoPageBreakSection( &rSepInfo.pPDNd->GetContentNode()->GetSwAttrSet() ) )
-            {
+            const SfxItemSet* pSet
+                = rSepInfo.pPDNd->IsContentNode()
+                      ? &rSepInfo.pPDNd->GetContentNode()->GetSwAttrSet()
+                      : &rSepInfo.pPDNd->GetTableNode()->GetTable().GetFrameFormat()->GetAttrSet();
+
+            if (!NoPageBreakSection(pSet))
                 nBreakCode = 2;
-            }
         }
 
-        if ( reinterpret_cast<SwSectionFormat*>(sal_IntPtr(-1)) == rSepInfo.pSectionFormat )
-            bEnsureHeaderFooterWritten |= !rSepInfo.pPDNd && GetExportFormat() != ExportFormat::RTF;
-        else
+        if (reinterpret_cast<SwSectionFormat*>(sal_IntPtr(-1)) != rSepInfo.pSectionFormat)
         {
             if ( nBreakCode == 0 )
                 bOutPgDscSet = false;
@@ -1681,9 +1718,9 @@ void MSWordExportBase::SectionProperties( const WW8_SepInfo& rSepInfo, WW8_PdAtt
             // at the child ONLY change column structure according to Sect-Attr.
 
             const SvxLRSpaceItem &rSectionLR =
-                ItemGet<SvxLRSpaceItem>( *(rSepInfo.pSectionFormat), RES_LR_SPACE );
+                rSepInfo.pSectionFormat->GetFormatAttr( RES_LR_SPACE );
             const SvxLRSpaceItem &rPageLR =
-                ItemGet<SvxLRSpaceItem>( *pPdFormat, RES_LR_SPACE );
+                pPdFormat->GetFormatAttr( RES_LR_SPACE );
 
             SvxLRSpaceItem aResultLR( rPageLR.GetLeft() +
                     rSectionLR.GetLeft(), rPageLR.GetRight() +
@@ -1691,7 +1728,7 @@ void MSWordExportBase::SectionProperties( const WW8_SepInfo& rSepInfo, WW8_PdAtt
             //i120133: The Section width should consider section indent value.
             if (rSectionLR.GetLeft()+rSectionLR.GetRight()!=0)
             {
-                const SwFormatCol& rCol = dynamic_cast<const SwFormatCol&>(rSepInfo.pSectionFormat->GetFormatAttr(RES_COL));
+                const SwFormatCol& rCol = rSepInfo.pSectionFormat->GetFormatAttr(RES_COL);
                 SwFormatCol aCol(rCol);
                 aCol.SetAdjustValue(rSectionLR.GetLeft()+rSectionLR.GetRight());
                 aSet.Put(aCol);
@@ -1759,6 +1796,11 @@ void MSWordExportBase::SectionProperties( const WW8_SepInfo& rSepInfo, WW8_PdAtt
                 // has different headers/footers for the title page
                 titlePage = true;
             }
+        }
+        else if (nBreakCode == 2 && pPd == m_pPreviousSectionPageDesc && pPd->GetFollow() == pPd)
+        {
+            // The first title page has already been displayed in the previous section. Drop it.
+            titlePage = false;
         }
 
         const SfxItemSet* pOldI = m_pISet;
@@ -1892,7 +1934,7 @@ void MSWordExportBase::SectionProperties( const WW8_SepInfo& rSepInfo, WW8_PdAtt
     }
 
     // Ensure that headers are written if section is first paragraph
-    if ( nBreakCode != 0 || bEnsureHeaderFooterWritten )
+    if (nBreakCode != 0 || (rSepInfo.pSectionFormat && rSepInfo.bIsFirstParagraph))
     {
         if ( titlePage )
         {
@@ -1972,14 +2014,15 @@ void MSWordExportBase::SectionProperties( const WW8_SepInfo& rSepInfo, WW8_PdAtt
 
     // outside of the section properties again
     m_bOutPageDescs = bOldPg;
+    m_pPreviousSectionPageDesc = pSavedPageDesc;
 }
 
 bool WW8_WrPlcSepx::WriteKFText( WW8Export& rWrt )
 {
     sal_uLong nCpStart = rWrt.Fc2Cp( rWrt.Strm().Tell() );
 
-    OSL_ENSURE( !pTextPos, "who set the pointer?" );
-    pTextPos.reset( new WW8_WrPlc0( nCpStart ) );
+    OSL_ENSURE( !m_pTextPos, "who set the pointer?" );
+    m_pTextPos.reset( new WW8_WrPlc0( nCpStart ) );
 
     WriteFootnoteEndText( rWrt, nCpStart );
     CheckForFacinPg( rWrt );
@@ -1987,7 +2030,7 @@ bool WW8_WrPlcSepx::WriteKFText( WW8Export& rWrt )
     unsigned int nOldIndex = rWrt.GetHdFtIndex();
     rWrt.SetHdFtIndex( 0 );
 
-    for (const WW8_SepInfo & rSepInfo : aSects)
+    for (const WW8_SepInfo & rSepInfo : m_aSects)
     {
         auto pAttrDesc = std::make_shared<WW8_PdAttrDesc>();
         m_SectionAttributes.push_back(pAttrDesc);
@@ -2001,33 +2044,33 @@ bool WW8_WrPlcSepx::WriteKFText( WW8Export& rWrt )
     }
     rWrt.SetHdFtIndex( nOldIndex ); //0
 
-    if ( pTextPos->Count() )
+    if ( m_pTextPos->Count() )
     {
         // HdFt available?
         sal_uLong nCpEnd = rWrt.Fc2Cp( rWrt.Strm().Tell() );
-        pTextPos->Append( nCpEnd );  // End of last Header/Footer for PlcfHdd
+        m_pTextPos->Append( nCpEnd );  // End of last Header/Footer for PlcfHdd
 
         if ( nCpEnd > nCpStart )
         {
             ++nCpEnd;
-            pTextPos->Append( nCpEnd + 1 );  // End of last Header/Footer for PlcfHdd
+            m_pTextPos->Append( nCpEnd + 1 );  // End of last Header/Footer for PlcfHdd
 
             rWrt.WriteStringAsPara( OUString() ); // CR to the end ( otherwise WW complains )
         }
-        rWrt.m_pFieldHdFt->Finish( nCpEnd, rWrt.pFib->m_ccpText + rWrt.pFib->m_ccpFootnote );
-        rWrt.pFib->m_ccpHdr = nCpEnd - nCpStart;
+        rWrt.m_pFieldHdFt->Finish( nCpEnd, rWrt.m_pFib->m_ccpText + rWrt.m_pFib->m_ccpFootnote );
+        rWrt.m_pFib->m_ccpHdr = nCpEnd - nCpStart;
     }
     else
     {
-        pTextPos.reset();
+        m_pTextPos.reset();
     }
 
-    return rWrt.pFib->m_ccpHdr != 0;
+    return rWrt.m_pFib->m_ccpHdr != 0;
 }
 
 void WW8_WrPlcSepx::WriteSepx( SvStream& rStrm ) const
 {
-    OSL_ENSURE(m_SectionAttributes.size() == static_cast<size_t>(aSects.size())
+    OSL_ENSURE(m_SectionAttributes.size() == static_cast<size_t>(m_aSects.size())
         , "WriteSepx(): arrays out of sync!");
     for (const auto & rSectionAttribute : m_SectionAttributes) // all sections
     {
@@ -2043,15 +2086,15 @@ void WW8_WrPlcSepx::WriteSepx( SvStream& rStrm ) const
 
 void WW8_WrPlcSepx::WritePlcSed( WW8Export& rWrt ) const
 {
-    OSL_ENSURE(m_SectionAttributes.size() == static_cast<size_t>(aSects.size())
+    OSL_ENSURE(m_SectionAttributes.size() == static_cast<size_t>(m_aSects.size())
         , "WritePlcSed(): arrays out of sync!");
-    OSL_ENSURE( aCps.size() == aSects.size() + 1, "WrPlcSepx: DeSync" );
-    sal_uLong nFcStart = rWrt.pTableStrm->Tell();
+    OSL_ENSURE( m_aCps.size() == m_aSects.size() + 1, "WrPlcSepx: DeSync" );
+    sal_uInt64 nFcStart = rWrt.m_pTableStrm->Tell();
 
-    for( decltype(aSects)::size_type i = 0; i <= aSects.size(); i++ )
+    for( decltype(m_aSects)::size_type i = 0; i <= m_aSects.size(); i++ )
     {
-        sal_uInt32 nP = aCps[i];
-        rWrt.pTableStrm->WriteUInt32(nP);
+        sal_uInt32 nP = m_aCps[i];
+        rWrt.m_pTableStrm->WriteUInt32(nP);
     }
 
     static WW8_SED aSed = {{4, 0},{0, 0, 0, 0},{0, 0},{0xff, 0xff, 0xff, 0xff}};
@@ -2060,21 +2103,21 @@ void WW8_WrPlcSepx::WritePlcSed( WW8Export& rWrt ) const
     {
         // Sepx-Pos
         UInt32ToSVBT32( rSectionAttribute->m_nSepxFcPos, aSed.fcSepx );
-        rWrt.pTableStrm->WriteBytes(&aSed, sizeof(aSed));
+        rWrt.m_pTableStrm->WriteBytes(&aSed, sizeof(aSed));
     }
-    rWrt.pFib->m_fcPlcfsed = nFcStart;
-    rWrt.pFib->m_lcbPlcfsed = rWrt.pTableStrm->Tell() - nFcStart;
+    rWrt.m_pFib->m_fcPlcfsed = nFcStart;
+    rWrt.m_pFib->m_lcbPlcfsed = rWrt.m_pTableStrm->Tell() - nFcStart;
 }
 
 void WW8_WrPlcSepx::WritePlcHdd( WW8Export& rWrt ) const
 {
     // Don't write out the PlcfHdd if ccpHdd is 0: it's a validation failure case.
-    if( rWrt.pFib->m_ccpHdr != 0 && pTextPos && pTextPos->Count() )
+    if( rWrt.m_pFib->m_ccpHdr != 0 && m_pTextPos && m_pTextPos->Count() )
     {
-        rWrt.pFib->m_fcPlcfhdd = rWrt.pTableStrm->Tell();
-        pTextPos->Write( *rWrt.pTableStrm );             // Plc0
-        rWrt.pFib->m_lcbPlcfhdd = rWrt.pTableStrm->Tell() -
-                                rWrt.pFib->m_fcPlcfhdd;
+        rWrt.m_pFib->m_fcPlcfhdd = rWrt.m_pTableStrm->Tell();
+        m_pTextPos->Write( *rWrt.m_pTableStrm );             // Plc0
+        rWrt.m_pFib->m_lcbPlcfhdd = rWrt.m_pTableStrm->Tell() -
+                                rWrt.m_pFib->m_fcPlcfhdd;
     }
 }
 
@@ -2147,8 +2190,8 @@ WW8_WrPlcSubDoc::~WW8_WrPlcSubDoc()
 
 void WW8_WrPlcFootnoteEdn::Append( WW8_CP nCp, const SwFormatFootnote& rFootnote )
 {
-    aCps.push_back( nCp );
-    aContent.push_back( &rFootnote );
+    m_aCps.push_back( nCp );
+    m_aContent.push_back( &rFootnote );
 }
 
 WW8_Annotation::WW8_Annotation(const SwPostItField* pPostIt, WW8_CP nRangeStart, WW8_CP nRangeEnd)
@@ -2194,7 +2237,7 @@ void WW8_WrPlcAnnotations::AddRangeStartPosition(const OUString& rName, WW8_CP n
 
 void WW8_WrPlcAnnotations::Append( WW8_CP nCp, const SwPostItField *pPostIt )
 {
-    aCps.push_back( nCp );
+    m_aCps.push_back( nCp );
     WW8_Annotation* p;
     if( m_aRangeStartPositions.find(pPostIt->GetName()) != m_aRangeStartPositions.end() )
     {
@@ -2207,15 +2250,15 @@ void WW8_WrPlcAnnotations::Append( WW8_CP nCp, const SwPostItField *pPostIt )
     {
         p = new WW8_Annotation(pPostIt, nCp, nCp);
     }
-    aContent.push_back( p );
+    m_aContent.push_back( p );
 }
 
 void WW8_WrPlcAnnotations::Append( WW8_CP nCp, const SwRedlineData *pRedline )
 {
     maProcessedRedlines.insert(pRedline);
-    aCps.push_back( nCp );
+    m_aCps.push_back( nCp );
     WW8_Annotation* p = new WW8_Annotation(pRedline);
-    aContent.push_back( p );
+    m_aContent.push_back( p );
 }
 
 bool WW8_WrPlcAnnotations::IsNewRedlineComment( const SwRedlineData *pRedline )
@@ -2225,19 +2268,19 @@ bool WW8_WrPlcAnnotations::IsNewRedlineComment( const SwRedlineData *pRedline )
 
 WW8_WrPlcAnnotations::~WW8_WrPlcAnnotations()
 {
-    for(const void * p : aContent)
+    for(const void * p : m_aContent)
         delete static_cast<WW8_Annotation const *>(p);
 }
 
 bool WW8_WrPlcSubDoc::WriteGenericText( WW8Export& rWrt, sal_uInt8 nTTyp,
     WW8_CP& rCount )
 {
-    sal_uInt16 nLen = aContent.size();
+    sal_uInt16 nLen = m_aContent.size();
     if ( !nLen )
         return false;
 
     sal_uLong nCpStart = rWrt.Fc2Cp( rWrt.Strm().Tell() );
-    pTextPos.reset( new WW8_WrPlc0( nCpStart ) );
+    m_pTextPos.reset( new WW8_WrPlc0( nCpStart ) );
     sal_uInt16 i;
 
     switch ( nTTyp )
@@ -2246,10 +2289,10 @@ bool WW8_WrPlcSubDoc::WriteGenericText( WW8Export& rWrt, sal_uInt8 nTTyp,
             for ( i = 0; i < nLen; i++ )
             {
                 // beginning for PlcfAtnText
-                pTextPos->Append( rWrt.Fc2Cp( rWrt.Strm().Tell() ));
+                m_pTextPos->Append( rWrt.Fc2Cp( rWrt.Strm().Tell() ));
 
                 rWrt.WritePostItBegin();
-                const WW8_Annotation& rAtn = *static_cast<const WW8_Annotation*>(aContent[i]);
+                const WW8_Annotation& rAtn = *static_cast<const WW8_Annotation*>(m_aContent[i]);
                 if (rAtn.mpRichText)
                     rWrt.WriteOutliner(*rAtn.mpRichText, nTTyp);
                 else
@@ -2266,13 +2309,13 @@ bool WW8_WrPlcSubDoc::WriteGenericText( WW8Export& rWrt, sal_uInt8 nTTyp,
             {
                 // textbox content
                 WW8_CP nCP = rWrt.Fc2Cp( rWrt.Strm().Tell() );
-                aCps.insert( aCps.begin()+i, nCP );
-                pTextPos->Append( nCP );
+                m_aCps.insert( m_aCps.begin()+i, nCP );
+                m_pTextPos->Append( nCP );
 
-                if( aContent[ i ] != nullptr )
+                if( m_aContent[ i ] != nullptr )
                 {
                     // is it a writer or sdr - textbox?
-                    const SdrObject& rObj = *static_cast<SdrObject const *>(aContent[ i ]);
+                    const SdrObject& rObj = *static_cast<SdrObject const *>(m_aContent[ i ]);
                     if (rObj.GetObjInventor() == SdrInventor::FmForm)
                     {
                         sal_uInt8 nOldTyp = rWrt.m_nTextTyp;
@@ -2280,8 +2323,8 @@ bool WW8_WrPlcSubDoc::WriteGenericText( WW8Export& rWrt, sal_uInt8 nTTyp,
                         rWrt.GetOCXExp().ExportControl(rWrt, dynamic_cast<const SdrUnoObj&>(rObj));
                         rWrt.m_nTextTyp = nOldTyp;
                     }
-                    else if( dynamic_cast<const SdrTextObj*>( &rObj) !=  nullptr )
-                        rWrt.WriteSdrTextObj(dynamic_cast<const SdrTextObj&>(rObj), nTTyp);
+                    else if( auto pText = DynCastSdrTextObj(&rObj) )
+                        rWrt.WriteSdrTextObj(*pText, nTTyp);
                     else
                     {
                         const SwFrameFormat* pFormat = ::FindFrameFormat( &rObj );
@@ -2318,9 +2361,9 @@ bool WW8_WrPlcSubDoc::WriteGenericText( WW8Export& rWrt, sal_uInt8 nTTyp,
                         }
                     }
                 }
-                else if (i < aSpareFormats.size() && aSpareFormats[i])
+                else if (i < m_aSpareFormats.size() && m_aSpareFormats[i])
                 {
-                    const SwFrameFormat& rFormat = *aSpareFormats[i];
+                    const SwFrameFormat& rFormat = *m_aSpareFormats[i];
                     const SwNodeIndex* pNdIdx = rFormat.GetContent().GetContentIdx();
                     rWrt.WriteSpecialText( pNdIdx->GetIndex() + 1,
                                pNdIdx->GetNode().EndOfSectionIndex(), nTTyp );
@@ -2336,10 +2379,10 @@ bool WW8_WrPlcSubDoc::WriteGenericText( WW8Export& rWrt, sal_uInt8 nTTyp,
             for ( i = 0; i < nLen; i++ )
             {
                 // beginning for PlcfFootnoteText/PlcfEdnText
-                pTextPos->Append( rWrt.Fc2Cp( rWrt.Strm().Tell() ));
+                m_pTextPos->Append( rWrt.Fc2Cp( rWrt.Strm().Tell() ));
 
                 // Note content
-                const SwFormatFootnote* pFootnote = static_cast<SwFormatFootnote const *>(aContent[ i ]);
+                const SwFormatFootnote* pFootnote = static_cast<SwFormatFootnote const *>(m_aContent[ i ]);
                 rWrt.WriteFootnoteBegin( *pFootnote );
                 const SwNodeIndex* pIdx = pFootnote->GetTextFootnote()->GetStartNode();
                 OSL_ENSURE( pIdx, "Where is the start node of Foot-/Endnote?" );
@@ -2353,12 +2396,12 @@ bool WW8_WrPlcSubDoc::WriteGenericText( WW8Export& rWrt, sal_uInt8 nTTyp,
             OSL_ENSURE( false, "What kind of SubDocType is that?" );
     }
 
-    pTextPos->Append( rWrt.Fc2Cp( rWrt.Strm().Tell() ));
+    m_pTextPos->Append( rWrt.Fc2Cp( rWrt.Strm().Tell() ));
     // CR to the end ( otherwise WW complains )
     rWrt.WriteStringAsPara( OUString() );
 
     WW8_CP nCpEnd = rWrt.Fc2Cp( rWrt.Strm().Tell() );
-    pTextPos->Append( nCpEnd );
+    m_pTextPos->Append( nCpEnd );
     rCount = nCpEnd - nCpStart;
 
     return ( rCount != 0 );
@@ -2378,15 +2421,15 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
     WW8_FC& rTextStart, sal_Int32& rTextCount, WW8_FC& rRefStart, sal_Int32& rRefCount ) const
 {
 
-    sal_uLong nFcStart = rWrt.pTableStrm->Tell();
-    sal_uInt16 nLen = aCps.size();
+    sal_uInt64 nFcStart = rWrt.m_pTableStrm->Tell();
+    sal_uInt16 nLen = m_aCps.size();
     if ( !nLen )
         return;
 
-    OSL_ENSURE( aCps.size() + 2 == pTextPos->Count(), "WritePlc: DeSync" );
+    OSL_ENSURE( m_aCps.size() + 2 == m_pTextPos->Count(), "WritePlc: DeSync" );
 
     std::vector<std::pair<OUString,OUString> > aStrArr;
-    WW8Fib& rFib = *rWrt.pFib;              // n+1-th CP-Pos according to the manual
+    WW8Fib& rFib = *rWrt.m_pFib;              // n+1-th CP-Pos according to the manual
     bool bWriteCP = true;
 
     switch ( nTTyp )
@@ -2402,7 +2445,7 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
                 int nIdx = 0;
                 for ( sal_uInt16 i = 0; i < nLen; ++i )
                 {
-                    const WW8_Annotation& rAtn = *static_cast<const WW8_Annotation*>(aContent[i]);
+                    const WW8_Annotation& rAtn = *static_cast<const WW8_Annotation*>(m_aContent[i]);
                     aStrArr.emplace_back(rAtn.msOwner,rAtn.m_sInitials);
                     // record start and end positions for ranges
                     if (rAtn.HasRange())
@@ -2435,13 +2478,13 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
                 for ( decltype(aStrArr)::size_type i = 0; i < aStrArr.size(); ++i )
                 {
                     const OUString& sAuthor = aStrArr[i].first;
-                    SwWW8Writer::WriteShort(*rWrt.pTableStrm, sAuthor.getLength());
-                    SwWW8Writer::WriteString16(*rWrt.pTableStrm, sAuthor,
+                    SwWW8Writer::WriteShort(*rWrt.m_pTableStrm, sAuthor.getLength());
+                    SwWW8Writer::WriteString16(*rWrt.m_pTableStrm, sAuthor,
                             false);
                 }
 
                 rFib.m_fcGrpStAtnOwners = nFcStart;
-                nFcStart = rWrt.pTableStrm->Tell();
+                nFcStart = rWrt.m_pTableStrm->Tell();
                 rFib.m_lcbGrpStAtnOwners = nFcStart - rFib.m_fcGrpStAtnOwners;
 
                 // Commented text ranges
@@ -2451,66 +2494,66 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
                     rFib.m_fcPlcfAtnbkf = nFcStart;
                     for ( decltype(aRangeStartPos)::size_type i = 0; i < aRangeStartPos.size(); ++i )
                     {
-                        SwWW8Writer::WriteLong( *rWrt.pTableStrm, aRangeStartPos[i].first );
+                        SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, aRangeStartPos[i].first );
                     }
-                    SwWW8Writer::WriteLong( *rWrt.pTableStrm, rFib.m_ccpText + 1);
+                    SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, rFib.m_ccpText + 1);
 
                     // Commented text ranges additional information (Plcfbkf.aFBKF)
                     for ( decltype(aRangeStartPos)::size_type i = 0; i < aRangeStartPos.size(); ++i )
                     {
-                        SwWW8Writer::WriteShort( *rWrt.pTableStrm, aStartEndMap[i] ); // FBKF.ibkl
-                        SwWW8Writer::WriteShort( *rWrt.pTableStrm, 0 ); // FBKF.bkc
+                        SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, aStartEndMap[i] ); // FBKF.ibkl
+                        SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, 0 ); // FBKF.bkc
                     }
 
-                    nFcStart = rWrt.pTableStrm->Tell();
+                    nFcStart = rWrt.m_pTableStrm->Tell();
                     rFib.m_lcbPlcfAtnbkf = nFcStart - rFib.m_fcPlcfAtnbkf;
 
                     // Commented text ranges ending positions (PlcfBkl.aCP)
                     rFib.m_fcPlcfAtnbkl = nFcStart;
                     for ( decltype(aRangeEndPos)::size_type i = 0; i < aRangeEndPos.size(); ++i )
                     {
-                        SwWW8Writer::WriteLong( *rWrt.pTableStrm, aRangeEndPos[i].first );
+                        SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, aRangeEndPos[i].first );
                     }
-                    SwWW8Writer::WriteLong( *rWrt.pTableStrm, rFib.m_ccpText + 1);
+                    SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, rFib.m_ccpText + 1);
 
-                    nFcStart = rWrt.pTableStrm->Tell();
+                    nFcStart = rWrt.m_pTableStrm->Tell();
                     rFib.m_lcbPlcfAtnbkl = nFcStart - rFib.m_fcPlcfAtnbkl;
 
                     // Commented text ranges as bookmarks (SttbfAtnBkmk)
                     rFib.m_fcSttbfAtnbkmk = nFcStart;
-                    SwWW8Writer::WriteShort( *rWrt.pTableStrm, sal_Int16(sal_uInt16(0xFFFF)) ); // SttbfAtnBkmk.fExtend
-                    SwWW8Writer::WriteShort( *rWrt.pTableStrm, aRangeStartPos.size() ); // SttbfAtnBkmk.cData
-                    SwWW8Writer::WriteShort( *rWrt.pTableStrm, 0xA );                   // SttbfAtnBkmk.cbExtra
+                    SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, sal_Int16(sal_uInt16(0xFFFF)) ); // SttbfAtnBkmk.fExtend
+                    SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, aRangeStartPos.size() ); // SttbfAtnBkmk.cData
+                    SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, 0xA );                   // SttbfAtnBkmk.cbExtra
 
                     for ( decltype(aRangeStartPos)::size_type i = 0; i < aRangeStartPos.size(); ++i )
                     {
-                        SwWW8Writer::WriteShort( *rWrt.pTableStrm, 0 );         // SttbfAtnBkmk.cchData
+                        SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, 0 );         // SttbfAtnBkmk.cchData
                         // One ATNBE structure for all text ranges
-                        SwWW8Writer::WriteShort( *rWrt.pTableStrm, 0x0100 );    // ATNBE.bmc
-                        SwWW8Writer::WriteLong( *rWrt.pTableStrm, aStartAtnMap[i] );          // ATNBE.lTag
-                        SwWW8Writer::WriteLong( *rWrt.pTableStrm, -1 );         // ATNBE.lTagOld
+                        SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, 0x0100 );    // ATNBE.bmc
+                        SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, aStartAtnMap[i] );          // ATNBE.lTag
+                        SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, -1 );         // ATNBE.lTagOld
                     }
 
-                    nFcStart = rWrt.pTableStrm->Tell();
+                    nFcStart = rWrt.m_pTableStrm->Tell();
                     rFib.m_lcbSttbfAtnbkmk = nFcStart - rFib.m_fcSttbfAtnbkmk;
                 }
 
                 // Write the extended >= Word XP ATRD records
                 for( sal_uInt16 i = 0; i < nLen; ++i )
                 {
-                    const WW8_Annotation& rAtn = *static_cast<const WW8_Annotation*>(aContent[i]);
+                    const WW8_Annotation& rAtn = *static_cast<const WW8_Annotation*>(m_aContent[i]);
 
                     sal_uInt32 nDTTM = sw::ms::DateTime2DTTM(rAtn.maDateTime);
 
-                    SwWW8Writer::WriteLong( *rWrt.pTableStrm, nDTTM );
-                    SwWW8Writer::WriteShort( *rWrt.pTableStrm, 0 );
-                    SwWW8Writer::WriteLong( *rWrt.pTableStrm, 0 );
-                    SwWW8Writer::WriteLong( *rWrt.pTableStrm, 0 );
-                    SwWW8Writer::WriteLong( *rWrt.pTableStrm, 0 );
+                    SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, nDTTM );
+                    SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, 0 );
+                    SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, 0 );
+                    SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, 0 );
+                    SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, 0 );
                 }
 
                 rFib.m_fcAtrdExtra = nFcStart;
-                nFcStart = rWrt.pTableStrm->Tell();
+                nFcStart = rWrt.m_pTableStrm->Tell();
                 rFib.m_lcbAtrdExtra = nFcStart - rFib.m_fcAtrdExtra;
                 rFib.m_fcHplxsdr = 0x01010002;  //WTF, but apparently necessary
                 rFib.m_lcbHplxsdr = 0;
@@ -2519,7 +2562,7 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
         case TXT_TXTBOX:
         case TXT_HFTXTBOX:
             {
-                pTextPos->Write( *rWrt.pTableStrm );
+                m_pTextPos->Write( *rWrt.m_pTableStrm );
                 const std::vector<sal_uInt32>* pShapeIds = GetShapeIdArr();
                 OSL_ENSURE( pShapeIds, "Where are the ShapeIds?" );
 
@@ -2527,9 +2570,9 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
                 {
                     // write textbox story - FTXBXS
                     // is it a writer or sdr - textbox?
-                    const SdrObject* pObj = static_cast<SdrObject const *>(aContent[ i ]);
+                    const SdrObject* pObj = static_cast<SdrObject const *>(m_aContent[ i ]);
                     sal_Int32 nCnt = 1;
-                    if (dynamic_cast< const SdrTextObj *>( pObj ))
+                    if (DynCastSdrTextObj( pObj ))
                     {
                         // find the "highest" SdrObject of this
                         const SwFrameFormat& rFormat = *::FindFrameFormat( pObj );
@@ -2545,9 +2588,9 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
                     }
                     if( nullptr == pObj )
                     {
-                        if (i < aSpareFormats.size() && aSpareFormats[i])
+                        if (i < m_aSpareFormats.size() && m_aSpareFormats[i])
                         {
-                            const SwFrameFormat& rFormat = *aSpareFormats[i];
+                            const SwFrameFormat& rFormat = *m_aSpareFormats[i];
 
                             const SwFormatChain* pChn = &rFormat.GetChain();
                             while( pChn->GetNext() )
@@ -2560,20 +2603,20 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
                         }
                     }
                     // long cTxbx / iNextReuse
-                    SwWW8Writer::WriteLong( *rWrt.pTableStrm, nCnt );
+                    SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, nCnt );
                     // long cReusable
-                    SwWW8Writer::WriteLong( *rWrt.pTableStrm, 0 );
+                    SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, 0 );
                     // short fReusable
-                    SwWW8Writer::WriteShort( *rWrt.pTableStrm, 0 );
+                    SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, 0 );
                     // long reserved
-                    SwWW8Writer::WriteLong( *rWrt.pTableStrm, -1 );
+                    SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, -1 );
                     // long lid
-                    SwWW8Writer::WriteLong( *rWrt.pTableStrm,
+                    SwWW8Writer::WriteLong( *rWrt.m_pTableStrm,
                             (*pShapeIds)[i]);
                     // long txidUndo
-                    SwWW8Writer::WriteLong( *rWrt.pTableStrm, 0 );
+                    SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, 0 );
                 }
-                SwWW8Writer::FillCount( *rWrt.pTableStrm, 22 );
+                SwWW8Writer::FillCount( *rWrt.m_pTableStrm, 22 );
                 bWriteCP = false;
             }
             break;
@@ -2583,10 +2626,10 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
     {
         // write CP Positions
         for ( sal_uInt16 i = 0; i < nLen; i++ )
-            SwWW8Writer::WriteLong( *rWrt.pTableStrm, aCps[ i ] );
+            SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, m_aCps[ i ] );
 
         // n+1-th CP-Pos according to the manual
-        SwWW8Writer::WriteLong( *rWrt.pTableStrm,
+        SwWW8Writer::WriteLong( *rWrt.m_pTableStrm,
                 rFib.m_ccpText + rFib.m_ccpFootnote + rFib.m_ccpHdr + rFib.m_ccpEdn +
                 rFib.m_ccpTxbx + rFib.m_ccpHdrTxbx + 1 );
 
@@ -2595,7 +2638,7 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
             sal_uInt16 nlTag = 0;
             for ( sal_uInt16 i = 0; i < nLen; ++i )
             {
-                const WW8_Annotation& rAtn = *static_cast<const WW8_Annotation*>(aContent[i]);
+                const WW8_Annotation& rAtn = *static_cast<const WW8_Annotation*>(m_aContent[i]);
 
                 //aStrArr is sorted
                 auto aIter = std::lower_bound(aStrArr.begin(),
@@ -2614,10 +2657,10 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
 
                 // xstUsrInitl[ 10 ] pascal-style String holding initials
                 // of annotation author
-                SwWW8Writer::WriteShort(*rWrt.pTableStrm, nInitialsLen);
-                SwWW8Writer::WriteString16(*rWrt.pTableStrm, sInitials,
+                SwWW8Writer::WriteShort(*rWrt.m_pTableStrm, nInitialsLen);
+                SwWW8Writer::WriteString16(*rWrt.m_pTableStrm, sInitials,
                         false);
-                SwWW8Writer::FillCount( *rWrt.pTableStrm,
+                SwWW8Writer::FillCount( *rWrt.m_pTableStrm,
                         (9 - nInitialsLen) * 2 );
 
                 // documents layout of WriteShort's below:
@@ -2627,16 +2670,16 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
                 // SVBT16 grfbmc;    // not used
                 // SVBT32 ITagBkmk;  // when not -1, this tag identifies the ATNBE
 
-                SwWW8Writer::WriteShort( *rWrt.pTableStrm, nFndPos );
-                SwWW8Writer::WriteShort( *rWrt.pTableStrm, 0 );
-                SwWW8Writer::WriteShort( *rWrt.pTableStrm, 0 );
+                SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, nFndPos );
+                SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, 0 );
+                SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, 0 );
                 if (rAtn.HasRange())
                 {
-                    SwWW8Writer::WriteLong( *rWrt.pTableStrm, nlTag );
+                    SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, nlTag );
                     ++nlTag;
                 }
                 else
-                    SwWW8Writer::WriteLong( *rWrt.pTableStrm, -1 );
+                    SwWW8Writer::WriteLong( *rWrt.m_pTableStrm, -1 );
             }
         }
         else
@@ -2644,17 +2687,17 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
             sal_uInt16 nNo = 0;
             for ( sal_uInt16 i = 0; i < nLen; ++i )             // write Flags
             {
-                const SwFormatFootnote* pFootnote = static_cast<SwFormatFootnote const *>(aContent[ i ]);
-                SwWW8Writer::WriteShort( *rWrt.pTableStrm,
+                const SwFormatFootnote* pFootnote = static_cast<SwFormatFootnote const *>(m_aContent[ i ]);
+                SwWW8Writer::WriteShort( *rWrt.m_pTableStrm,
                         !pFootnote->GetNumStr().isEmpty() ? 0 : ++nNo );
             }
         }
     }
     rRefStart = nFcStart;
-    nFcStart = rWrt.pTableStrm->Tell();
+    nFcStart = rWrt.m_pTableStrm->Tell();
     rRefCount = nFcStart - rRefStart;
 
-    pTextPos->Write( *rWrt.pTableStrm );
+    m_pTextPos->Write( *rWrt.m_pTableStrm );
 
     switch ( nTTyp )
     {
@@ -2664,19 +2707,19 @@ void WW8_WrPlcSubDoc::WriteGenericPlc( WW8Export& rWrt, sal_uInt8 nTTyp,
             {
                 // write break descriptor (BKD)
                 // short itxbxs
-                SwWW8Writer::WriteShort( *rWrt.pTableStrm, i );
+                SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, i );
                 // short dcpDepend
-                SwWW8Writer::WriteShort( *rWrt.pTableStrm, 0 );
+                SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, 0 );
                 // short flags : icol/fTableBreak/fColumnBreak/fMarked/
                 //               fUnk/fTextOverflow
-                SwWW8Writer::WriteShort( *rWrt.pTableStrm, 0x800 );
+                SwWW8Writer::WriteShort( *rWrt.m_pTableStrm, 0x800 );
             }
-            SwWW8Writer::FillCount( *rWrt.pTableStrm, 6 );
+            SwWW8Writer::FillCount( *rWrt.m_pTableStrm, 6 );
             break;
     }
 
     rTextStart = nFcStart;
-    rTextCount = rWrt.pTableStrm->Tell() - nFcStart;
+    rTextCount = rWrt.m_pTableStrm->Tell() - nFcStart;
 }
 
 const std::vector<sal_uInt32>* WW8_WrPlcSubDoc::GetShapeIdArr() const

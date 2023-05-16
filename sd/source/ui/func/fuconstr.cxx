@@ -29,6 +29,7 @@
 #include <svx/xflclit.hxx>
 #include <svx/xlineit0.hxx>
 #include <svx/xlnclit.hxx>
+#include <docmodel/theme/Theme.hxx>
 
 #include <app.hrc>
 #include <strings.hrc>
@@ -320,7 +321,7 @@ void FuConstruct::SetStyleSheet( SfxItemSet& rAttr, SdrObject* pObj,
         * Objects was created on the slide master page
         ***********************************************/
         OUString aName( pPage->GetLayoutName() );
-        sal_Int32 n = aName.indexOf(SD_LT_SEPARATOR) + strlen(SD_LT_SEPARATOR);
+        sal_Int32 n = aName.indexOf(SD_LT_SEPARATOR) + SD_LT_SEPARATOR.getLength();
         aName = OUString::Concat(aName.subView(0, n)) + STR_LAYOUT_BACKGROUNDOBJECTS;
         SfxStyleSheet* pSheet(
             static_cast< SfxStyleSheet* >(
@@ -379,7 +380,7 @@ void FuConstruct::SetStyleSheet( SfxItemSet& rAttr, SdrObject* pObj,
                 pThemePage = &pThemePage->TRG_GetMasterPage();
             }
 
-            svx::Theme* pTheme = pThemePage->getSdrPageProperties().GetTheme();
+            auto const& pTheme = pThemePage->getSdrPageProperties().GetTheme();
             if (pTheme)
             {
                 // We construct an object on a page where the master page has a theme. Take the
@@ -389,10 +390,10 @@ void FuConstruct::SetStyleSheet( SfxItemSet& rAttr, SdrObject* pObj,
 
                 aAttr.Put(XFillStyleItem(css::drawing::FillStyle_SOLID));
 
-                svx::ThemeColorType eColorType = svx::ThemeColorType::ACCENT1;
+                model::ThemeColorType eColorType = model::ThemeColorType::Accent1;
                 Color aColor = pTheme->GetColor(eColorType);
                 XFillColorItem aFillColorItem("", aColor);
-                aFillColorItem.GetThemeColor().SetThemeIndex(static_cast<sal_Int16>(eColorType));
+                aFillColorItem.GetThemeColor().setType(eColorType);
                 aAttr.Put(aFillColorItem);
 
                 aAttr.Put(XLineStyleItem(css::drawing::LineStyle_SOLID));

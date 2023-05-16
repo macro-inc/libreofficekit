@@ -19,11 +19,7 @@
 
 
 #include <rtl/uri.hxx>
-#include <osl/mutex.hxx>
-#include <cppuhelper/compbase.hxx>
-#include <cppuhelper/factory.hxx>
-#include <cppuhelper/basemutex.hxx>
-#include <cppuhelper/implementationentry.hxx>
+#include <comphelper/compbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <ucbhelper/content.hxx>
 #include <com/sun/star/uno/XComponentContext.hpp>
@@ -32,7 +28,7 @@
 #include <com/sun/star/util/theMacroExpander.hpp>
 #include <com/sun/star/ucb/IllegalIdentifierException.hpp>
 #include <com/sun/star/ucb/XContentProvider.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #define EXPAND_PROTOCOL "vnd.sun.star.expand"
 
@@ -42,11 +38,11 @@ using namespace ::com::sun::star;
 namespace
 {
 
-typedef ::cppu::WeakComponentImplHelper<
+typedef comphelper::WeakComponentImplHelper<
     lang::XServiceInfo, ucb::XContentProvider > t_impl_helper;
 
 
-class ExpandContentProviderImpl : protected cppu::BaseMutex, public t_impl_helper
+class ExpandContentProviderImpl : public t_impl_helper
 {
     uno::Reference< uno::XComponentContext > m_xComponentContext;
     uno::Reference< util::XMacroExpander >   m_xMacroExpander;
@@ -55,13 +51,11 @@ class ExpandContentProviderImpl : protected cppu::BaseMutex, public t_impl_helpe
 
 protected:
     void check() const;
-    virtual void SAL_CALL disposing() override;
 
 public:
     explicit ExpandContentProviderImpl(
         uno::Reference< uno::XComponentContext > const & xComponentContext )
-        : t_impl_helper( m_aMutex ),
-          m_xComponentContext( xComponentContext ),
+        : m_xComponentContext( xComponentContext ),
           m_xMacroExpander( util::theMacroExpander::get(xComponentContext) )
         {}
 
@@ -83,7 +77,7 @@ void ExpandContentProviderImpl::check() const
 {
     // xxx todo guard?
 //     MutexGuard guard( m_mutex );
-    if (rBHelper.bInDispose || rBHelper.bDisposed)
+    if (m_bDisposed)
     {
         throw lang::DisposedException(
             "expand content provider instance has "
@@ -92,11 +86,6 @@ void ExpandContentProviderImpl::check() const
                 const_cast< ExpandContentProviderImpl * >(this) ) );
     }
 }
-
-void ExpandContentProviderImpl::disposing()
-{
-}
-
 
 // XServiceInfo
 

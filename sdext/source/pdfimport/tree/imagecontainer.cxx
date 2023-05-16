@@ -24,6 +24,7 @@
 
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 
 #include <com/sun/star/beans/PropertyValue.hpp>
@@ -43,7 +44,7 @@ const char aBase64EncodeTable[] =
       'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/' };
 
-OUString encodeBase64( const sal_Int8* i_pBuffer, const sal_uInt32 i_nBufferLength )
+OUString encodeBase64( const sal_Int8* i_pBuffer, const sal_Int32 i_nBufferLength )
 {
     OUStringBuffer aBuf( (i_nBufferLength+1) * 4 / 3 );
     const sal_Int32 nRemain(i_nBufferLength%3);
@@ -111,7 +112,7 @@ ImageId ImageContainer::addImage( const uno::Sequence<beans::PropertyValue>& xBi
 
 void ImageContainer::writeBase64EncodedStream( ImageId nId, EmitContext& rContext )
 {
-    OSL_ASSERT( nId >= 0 && nId < ImageId( m_aImages.size()) );
+    OSL_ASSERT( nId >= 0 && o3tl::make_unsigned(nId) < m_aImages.size() );
 
     const uno::Sequence<beans::PropertyValue>& rEntry( m_aImages[nId] );
 

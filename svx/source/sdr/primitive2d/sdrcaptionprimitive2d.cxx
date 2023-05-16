@@ -23,6 +23,7 @@
 #include <sdr/primitive2d/sdrdecompositiontools.hxx>
 #include <svx/sdr/primitive2d/svx_primitivetypes2d.hxx>
 #include <drawinglayer/primitive2d/sdrdecompositiontools2d.hxx>
+#include <utility>
 
 
 using namespace com::sun::star;
@@ -76,7 +77,7 @@ namespace drawinglayer::primitive2d
                     createHiddenGeometryPrimitives2D(
                         false,
                         basegfx::B2DPolyPolygon(getTail()),
-                        getTransform()));
+                        {}));
             }
             else
             {
@@ -89,11 +90,9 @@ namespace drawinglayer::primitive2d
                         getSdrLFSTAttribute().getLine(),
                         attribute::SdrLineStartEndAttribute()));
 
-                aTransformed = getTail();
-                aTransformed.transform(getTransform());
                 aRetval.push_back(
                     createPolygonLinePrimitive(
-                        aTransformed,
+                        getTail(),
                         getSdrLFSTAttribute().getLine(),
                         getSdrLFSTAttribute().getLineStartEnd()));
             }
@@ -117,28 +116,21 @@ namespace drawinglayer::primitive2d
                 aRetval = createEmbeddedShadowPrimitive(std::move(aRetval), getSdrLFSTAttribute().getShadow());
             }
 
-            rContainer.insert(rContainer.end(), aRetval.begin(), aRetval.end());
+            rContainer.append(std::move(aRetval));
         }
 
         SdrCaptionPrimitive2D::SdrCaptionPrimitive2D(
-            const basegfx::B2DHomMatrix& rTransform,
+            basegfx::B2DHomMatrix aTransform,
             const attribute::SdrLineFillEffectsTextAttribute& rSdrLFSTAttribute,
-            const basegfx::B2DPolygon& rTail,
+            basegfx::B2DPolygon aTail,
             double fCornerRadiusX,
             double fCornerRadiusY)
-        :   maTransform(rTransform),
+        :   maTransform(std::move(aTransform)),
             maSdrLFSTAttribute(rSdrLFSTAttribute),
-            maTail(rTail),
+            maTail(std::move(aTail)),
             mfCornerRadiusX(fCornerRadiusX),
             mfCornerRadiusY(fCornerRadiusY)
         {
-            // transform maTail to unit polygon
-            if(getTail().count())
-            {
-                basegfx::B2DHomMatrix aInverse(getTransform());
-                aInverse.invert();
-                maTail.transform(aInverse);
-            }
         }
 
         bool SdrCaptionPrimitive2D::operator==(const BasePrimitive2D& rPrimitive) const

@@ -21,9 +21,9 @@
 #define INCLUDED_SVX_SHAPEPROPERTYNOTIFIER_HXX
 
 #include <svx/svxdllapi.h>
-#include <svx/shapeproperty.hxx>
-#include <comphelper/multiinterfacecontainer2.hxx>
+#include <comphelper/multiinterfacecontainer3.hxx>
 #include <rtl/ustring.hxx>
+#include <o3tl/enumarray.hxx>
 
 #include <memory>
 #include <unordered_map>
@@ -42,43 +42,41 @@ namespace cppu
 namespace svx
 {
 
+    //= ShapeProperty
 
-    //= IPropertyValueProvider
-
-    /** a provider for a property value
-    */
-    class SVXCORE_DLLPUBLIC IPropertyValueProvider
+    enum class ShapePropertyProviderId
     {
-    public:
-        /** returns the name of the property which this provider is responsible for
-        */
-        virtual OUString getPropertyName() const = 0;
-
-        /** returns the current value of the property which the provider is responsible for
-        */
-        virtual void getCurrentValue( css::uno::Any& _out_rValue ) const = 0;
-
-        virtual ~IPropertyValueProvider();
+        // generic (UNO) shape properties
+        Position,
+        Size,
+        // text doc shape properties
+        TextDocAnchor,
+        LAST = TextDocAnchor
     };
 
     //= PropertyValueProvider
 
-    /** default implementation of an IPropertyValueProvider
+    /** Default provider for a property value
 
         This default implementation queries the object which it is constructed with for the XPropertySet interface,
         and calls the getPropertyValue method.
     */
-    class SVXCORE_DLLPUBLIC PropertyValueProvider   :public IPropertyValueProvider
+    class SVXCORE_DLLPUBLIC PropertyValueProvider
     {
     public:
-        PropertyValueProvider( ::cppu::OWeakObject& _rContext, const char* _pAsciiPropertyName )
+        PropertyValueProvider( ::cppu::OWeakObject& _rContext, OUString _aPropertyName )
             :m_rContext( _rContext )
-            ,m_sPropertyName( OUString::createFromAscii( _pAsciiPropertyName ) )
+            ,m_sPropertyName( std::move( _aPropertyName ) )
         {
         }
+        virtual ~PropertyValueProvider();
 
-        virtual OUString getPropertyName() const override;
-        virtual void getCurrentValue( css::uno::Any& _out_rValue ) const override;
+        /** returns the name of the property which this provider is responsible for
+        */
+        const OUString & getPropertyName() const;
+        /** returns the current value of the property which the provider is responsible for
+        */
+        virtual void getCurrentValue( css::uno::Any& _out_rValue ) const;
 
     protected:
         ::cppu::OWeakObject&    getContext() const { return m_rContext; }
@@ -111,16 +109,16 @@ namespace svx
         void addPropertyChangeListener( const OUString& _rPropertyName, const css::uno::Reference< css::beans::XPropertyChangeListener >& _rxListener );
         void removePropertyChangeListener( const OUString& _rPropertyName, const css::uno::Reference< css::beans::XPropertyChangeListener >& _rxListener );
 
-        /** registers an IPropertyValueProvider
+        /** registers an PropertyValueProvider
         */
-        void    registerProvider( const ShapeProperty _eProperty, const std::shared_ptr<IPropertyValueProvider>& _rProvider );
+        void    registerProvider( const ShapePropertyProviderId _eProperty, std::unique_ptr<PropertyValueProvider> _rProvider );
 
         /** notifies changes in the given property to all registered listeners
 
             If no property value provider for the given property ID is registered, this is worth an assertion in a
             non-product build, and otherwise ignored.
         */
-        void    notifyPropertyChange( const ShapeProperty _eProperty ) const;
+        void    notifyPropertyChange( const ShapePropertyProviderId _eProperty ) const;
 
         /** is called to dispose the instance
         */
@@ -130,18 +128,9 @@ namespace svx
         PropertyChangeNotifier(const PropertyChangeNotifier&) = delete;
         PropertyChangeNotifier& operator=(const PropertyChangeNotifier&) = delete;
 
-        struct ShapePropertyHash
-        {
-            size_t operator()( svx::ShapeProperty x ) const
-            {
-                return size_t( x );
-            }
-        };
-        typedef std::unordered_map< ShapeProperty, std::shared_ptr<IPropertyValueProvider>, ShapePropertyHash  >
-            PropertyProviders;
         ::cppu::OWeakObject&            m_rContext;
-        PropertyProviders               m_aProviders;
-        comphelper::OMultiTypeInterfaceContainerHelperVar2<OUString> m_aPropertyChangeListeners;
+        o3tl::enumarray<ShapePropertyProviderId, std::unique_ptr<PropertyValueProvider>>  m_aProviders;
+        comphelper::OMultiTypeInterfaceContainerHelperVar3<css::beans::XPropertyChangeListener, OUString> m_aPropertyChangeListeners;
     };
 
 

@@ -26,6 +26,7 @@
 #include <dsitems.hxx>
 #include <sfx2/filedlghelper.hxx>
 #include <sfx2/docfilt.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <svl/stritem.hxx>
@@ -77,7 +78,7 @@ namespace dbaui
             OUString eType;
             OUString sDisplayName;
 
-            DisplayedType( const OUString& _eType, const OUString& _rDisplayName ) : eType( _eType ), sDisplayName( _rDisplayName ) { }
+            DisplayedType( OUString _eType, OUString _sDisplayName ) : eType(std::move( _eType )), sDisplayName(std::move( _sDisplayName )) { }
         };
         typedef std::vector< DisplayedType > DisplayedTypes;
 
@@ -453,7 +454,6 @@ namespace dbaui
         , m_xFT_EmbeddedDBLabel(m_xBuilder->weld_label("embeddeddbLabel"))
         , m_xEmbeddedDBType(m_xBuilder->weld_combo_box("embeddeddbList"))
         , m_xFT_DocListLabel(m_xBuilder->weld_label("docListLabel"))
-        , m_xFT_HelpText(m_xBuilder->weld_label("helpText"))
         , m_xLB_DocumentList(new OpenDocumentListBox(m_xBuilder->weld_combo_box("documentList"), "com.sun.star.sdb.OfficeDatabaseDocument"))
         , m_xPB_OpenDatabase(new OpenDocumentButton(m_xBuilder->weld_button("openDatabase"), "com.sun.star.sdb.OfficeDatabaseDocument"))
         , m_xFT_NoEmbeddedDBLabel(m_xBuilder->weld_label("noembeddeddbLabel"))
@@ -567,7 +567,7 @@ namespace dbaui
         case ::dbaccess::DST_MYSQL_JDBC:
         case ::dbaccess::DST_MYSQL_ODBC:
         case ::dbaccess::DST_MYSQL_NATIVE:
-            _inout_rDisplayName = "MySQL";
+            _inout_rDisplayName = "MySQL/MariaDB";
             break;
         default:
             break;
@@ -680,7 +680,7 @@ namespace dbaui
         // check for aFileDlg.GetCurrentFilter used to be here but current fpicker filter
         // can be set to anything, see tdf#125267 how this breaks if other value
         // than 'ODF Database' is selected. Let's therefore check only if wildcard matches
-        if ( !pFilter->GetWildcard().Matches(sPath) )
+        if (pFilter && !pFilter->GetWildcard().Matches(sPath))
         {
             OUString sMessage(DBA_RES(STR_ERR_USE_CONNECT_TO));
             std::unique_ptr<weld::MessageDialog> xInfoBox(Application::CreateMessageDialog(GetFrameWeld(),

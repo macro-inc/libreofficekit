@@ -18,9 +18,9 @@
  */
 #pragma once
 
-#include <MutexContainer.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <com/sun/star/beans/XMultiPropertySet.hpp>
 #include <com/sun/star/beans/XMultiPropertyStates.hpp>
@@ -36,7 +36,7 @@ namespace chart::wrapper
 
 class Chart2ModelContact;
 
-class UpDownBarWrapper : public MutexContainer
+class UpDownBarWrapper : public cppu::BaseMutex
                        , public ::cppu::WeakImplHelper
                         < css::lang::XComponent
                         , css::lang::XServiceInfo
@@ -47,7 +47,7 @@ class UpDownBarWrapper : public MutexContainer
                         >
 {
 public:
-    UpDownBarWrapper(bool bUp, const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact);
+    UpDownBarWrapper(bool bUp, std::shared_ptr<Chart2ModelContact> spChart2ModelContact);
     virtual ~UpDownBarWrapper() override;
 
     /// XServiceInfo declarations
@@ -95,7 +95,7 @@ public:
 
 private: //member
     std::shared_ptr< Chart2ModelContact >   m_spChart2ModelContact;
-    ::comphelper::OInterfaceContainerHelper2      m_aEventListenerContainer;
+    ::comphelper::OInterfaceContainerHelper3<css::lang::XEventListener> m_aEventListenerContainer;
 
     OUString       m_aPropertySetName;
 };

@@ -21,13 +21,14 @@
 #include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/container/XIndexAccess.hpp>
 #include <com/sun/star/container/XNameAccess.hpp>
+#include <utility>
 
 namespace comphelper
 {
 
-OEnumerationByName::OEnumerationByName(const css::uno::Reference<css::container::XNameAccess>& _rxAccess)
-    :m_aNames(_rxAccess->getElementNames())
-    ,m_xAccess(_rxAccess)
+OEnumerationByName::OEnumerationByName(css::uno::Reference<css::container::XNameAccess> _xAccess)
+    :m_aNames(_xAccess->getElementNames())
+    ,m_xAccess(_xAccess)
     ,m_nPos(0)
     ,m_bListening(false)
 {
@@ -35,16 +36,15 @@ OEnumerationByName::OEnumerationByName(const css::uno::Reference<css::container:
 }
 
 
-OEnumerationByName::OEnumerationByName(const css::uno::Reference<css::container::XNameAccess>& _rxAccess,
-                                       const css::uno::Sequence< OUString >&           _aNames  )
-    :m_aNames(_aNames)
-    ,m_xAccess(_rxAccess)
+OEnumerationByName::OEnumerationByName(css::uno::Reference<css::container::XNameAccess> _xAccess,
+                                       std::vector<OUString> _aNames  )
+    :m_aNames(std::move(_aNames))
+    ,m_xAccess(std::move(_xAccess))
     ,m_nPos(0)
     ,m_bListening(false)
 {
     impl_startDisposeListening();
 }
-
 
 OEnumerationByName::~OEnumerationByName()
 {
@@ -58,7 +58,7 @@ sal_Bool SAL_CALL OEnumerationByName::hasMoreElements(  )
 {
     std::lock_guard aLock(m_aLock);
 
-    if (m_xAccess.is() && m_aNames.getLength() > m_nPos)
+    if (m_xAccess.is() && getLength() > m_nPos)
         return true;
 
     if (m_xAccess.is())
@@ -76,10 +76,10 @@ css::uno::Any SAL_CALL OEnumerationByName::nextElement(  )
     std::lock_guard aLock(m_aLock);
 
     css::uno::Any aRes;
-    if (m_xAccess.is() && m_nPos < m_aNames.getLength())
-        aRes = m_xAccess->getByName(m_aNames.getConstArray()[m_nPos++]);
+    if (m_xAccess.is() && m_nPos < getLength())
+        aRes = m_xAccess->getByName(getElement(m_nPos++));
 
-    if (m_xAccess.is() && m_nPos >= m_aNames.getLength())
+    if (m_xAccess.is() && m_nPos >= getLength())
     {
         impl_stopDisposeListening();
         m_xAccess.clear();
@@ -90,7 +90,6 @@ css::uno::Any SAL_CALL OEnumerationByName::nextElement(  )
 
     return aRes;
 }
-
 
 void SAL_CALL OEnumerationByName::disposing(const css::lang::EventObject& aEvent)
 {
@@ -132,8 +131,25 @@ void OEnumerationByName::impl_stopDisposeListening()
     osl_atomic_decrement(&m_refCount);
 }
 
-OEnumerationByIndex::OEnumerationByIndex(const css::uno::Reference< css::container::XIndexAccess >& _rxAccess)
-    :m_xAccess(_rxAccess)
+sal_Int32 OEnumerationByName::getLength() const
+{
+    if (m_aNames.index() == 0)
+        return std::get<css::uno::Sequence<OUString>>(m_aNames).getLength();
+    else
+        return std::get<std::vector<OUString>>(m_aNames).size();
+}
+
+const OUString& OEnumerationByName::getElement(sal_Int32 nIndex) const
+{
+    if (m_aNames.index() == 0)
+        return std::get<css::uno::Sequence<OUString>>(m_aNames).getConstArray()[nIndex];
+    else
+        return std::get<std::vector<OUString>>(m_aNames)[nIndex];
+}
+
+
+OEnumerationByIndex::OEnumerationByIndex(css::uno::Reference< css::container::XIndexAccess > _xAccess)
+    :m_xAccess(std::move(_xAccess))
     ,m_nPos(0)
     ,m_bListening(false)
 {

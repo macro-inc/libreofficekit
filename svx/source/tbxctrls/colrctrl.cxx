@@ -79,7 +79,7 @@ bool SvxColorValueSetData::GetData( const css::datatransfer::DataFlavor& rFlavor
 
     if( SotExchange::GetFormat( rFlavor ) == SotClipboardFormatId::XFA )
     {
-        SetAny(uno::makeAny(m_Data));
+        SetAny(uno::Any(m_Data));
         bRet = true;
     }
 
@@ -94,7 +94,7 @@ void SvxColorValueSet_docking::SetDrawingArea(weld::DrawingArea* pDrawingArea)
 
     m_xHelper.set(new SvxColorValueSetData);
     rtl::Reference<TransferDataContainer> xHelper(m_xHelper);
-    SetDragDataTransferrable(xHelper, DND_ACTION_COPY);
+    SetDragDataTransferable(xHelper, DND_ACTION_COPY);
 }
 
 SvxColorValueSet_docking::SvxColorValueSet_docking(std::unique_ptr<weld::ScrolledWindow> xWindow)
@@ -404,7 +404,7 @@ void SvxColorDockingWindow::GetFocus()
 bool SvxColorDockingWindow::EventNotify( NotifyEvent& rNEvt )
 {
     bool bRet = false;
-    if( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT )
+    if( rNEvt.GetType() == NotifyEventType::KEYINPUT )
     {
         KeyEvent aKeyEvt = *rNEvt.GetKeyEvent();
         sal_uInt16   nKeyCode = aKeyEvt.GetKeyCode().GetCode();

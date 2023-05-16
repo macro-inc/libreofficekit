@@ -34,6 +34,7 @@
 #include <defnamesbuffer.hxx>
 #include <externallinkbuffer.hxx>
 #include <tablebuffer.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace oox::xls {
 
@@ -1145,7 +1146,7 @@ const FunctionInfo* FormulaParserImpl::resolveBadFuncName( const OUString& rToke
     sal_Int32 nExclamation = rTokenData.indexOf( '!' );
     if( (0 == nBracketOpen) && (nBracketOpen + 1 < nBracketClose) && (nBracketClose + 1 == nExclamation) && (nExclamation + 1 < rTokenData.getLength()) )
     {
-        sal_Int32 nRefId = rTokenData.copy( nBracketOpen + 1, nBracketClose - nBracketOpen - 1 ).toInt32();
+        sal_Int32 nRefId = o3tl::toInt32(rTokenData.subView( nBracketOpen + 1, nBracketClose - nBracketOpen - 1 ));
         const ExternalLink* pExtLink = getExternalLinks().getExternalLink( nRefId ).get();
         if( pExtLink && (pExtLink->getLinkType() == ExternalLinkType::Library) )
         {
@@ -1732,15 +1733,15 @@ namespace {
 
 /** Extracts the reference identifier and the remaining data from a formula in
     the format '[RefID]Remaining'. */
-bool lclExtractRefId( sal_Int32& rnRefId, OUString& rRemainder, const OUString& rFormulaString )
+bool lclExtractRefId( sal_Int32& rnRefId, OUString& rRemainder, std::u16string_view aFormulaString )
 {
-    if( (rFormulaString.getLength() >= 4) && (rFormulaString[ 0 ] == '[') )
+    if( (aFormulaString.size() >= 4) && (aFormulaString[ 0 ] == '[') )
     {
-        sal_Int32 nBracketClose = rFormulaString.indexOf( ']', 1 );
-        if( nBracketClose >= 2 )
+        size_t nBracketClose = aFormulaString.find( ']', 1 );
+        if( nBracketClose != std::u16string_view::npos && nBracketClose >= 2 )
         {
-            rnRefId = rFormulaString.copy( 1, nBracketClose - 1 ).toInt32();
-            rRemainder = rFormulaString.copy( nBracketClose + 1 );
+            rnRefId = o3tl::toInt32(aFormulaString.substr( 1, nBracketClose - 1 ));
+            rRemainder = aFormulaString.substr( nBracketClose + 1 );
             return !rRemainder.isEmpty();
         }
     }
@@ -1769,11 +1770,11 @@ ApiTokenSequence FormulaParser::importFormula( const ScAddress& rBaseAddress, Fo
     return mxImpl->importBiff12Formula( rBaseAddress, eType, rStrm );
 }
 
-OUString FormulaParser::importOleTargetLink( const OUString& rFormulaString )
+OUString FormulaParser::importOleTargetLink( std::u16string_view aFormulaString )
 {
     sal_Int32 nRefId = -1;
     OUString aRemainder;
-    if( lclExtractRefId( nRefId, aRemainder, rFormulaString ) && (aRemainder.getLength() >= 3) &&
+    if( lclExtractRefId( nRefId, aRemainder, aFormulaString ) && (aRemainder.getLength() >= 3) &&
             (aRemainder[ 0 ] == '!') && (aRemainder[ 1 ] == '\'') && (aRemainder[ aRemainder.getLength() - 1 ] == '\'') )
         return mxImpl->resolveOleTarget( nRefId, false );
     return OUString();
@@ -1796,7 +1797,7 @@ OUString FormulaParser::importOleTargetLink( SequenceInputStream& rStrm )
     return aTargetLink;
 }
 
-OUString FormulaParser::importMacroName( const OUString& rFormulaString )
+OUString FormulaParser::importMacroName( std::u16string_view aFormulaString )
 {
     /*  Valid macros are either sheet macros or VBA macros. OOXML and all BIFF
         documents store defined names for sheet macros, but OOXML documents do
@@ -1822,7 +1823,7 @@ OUString FormulaParser::importMacroName( const OUString& rFormulaString )
      */
     sal_Int32 nRefId = -1;
     OUString aRemainder;
-    if( lclExtractRefId( nRefId, aRemainder, rFormulaString ) && (aRemainder.getLength() > 1) && (aRemainder[ 0 ] == '!') )
+    if( lclExtractRefId( nRefId, aRemainder, aFormulaString ) && (aRemainder.getLength() > 1) && (aRemainder[ 0 ] == '!') )
     {
         /*  In BIFF12 documents, the reference identifier is always the
             one-based index of the external link as it is in OOXML documents

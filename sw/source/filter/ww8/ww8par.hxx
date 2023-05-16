@@ -24,17 +24,19 @@
 #include <filter/msfilter/msdffimp.hxx>
 #include <filter/msfilter/util.hxx>
 #include <editeng/frmdir.hxx>
+#include <svl/zforlist.hxx>
 #include <fltshell.hxx>
 
 #include <svx/svdobj.hxx>
 
+#include <utility>
 #include <vector>
 #include <stack>
 #include <string_view>
 #include <deque>
 #include <map>
-#include <utility>
 #include <memory>
+#include <optional>
 
 #include "ww8struc.hxx"
 #include "ww8scan.hxx"
@@ -165,13 +167,13 @@ public:
 
 private:
     wwSprmParser maSprmParser;
-    SwWW8ImplReader& rReader;
-    SwDoc&           rDoc;
-    const WW8Fib&    rFib;
-    SvStream&        rSt;
+    SwWW8ImplReader& m_rReader;
+    SwDoc&           m_rDoc;
+    const WW8Fib&    m_rFib;
+    SvStream&        m_rSt;
     std::vector<std::unique_ptr<WW8LSTInfo>> maLSTInfos;
     std::vector<std::unique_ptr<WW8LFOInfo>> m_LFOInfos;// D. from PLF LFO, sorted exactly like in the WW8 Stream
-    sal_uInt16       nUniqueList; // current number for creating unique list names
+    sal_uInt16       m_nUniqueList; // current number for creating unique list names
     SprmResult GrpprlHasSprm(sal_uInt16 nId, sal_uInt8& rSprms, sal_uInt8 nLen);
     WW8LSTInfo* GetLSTByListId(    sal_uInt32  nIdLst     ) const;
     //the rParaSprms returns back the original word paragraph indent
@@ -192,7 +194,7 @@ private:
 
     WW8ListManager(const WW8ListManager&) = delete;
     WW8ListManager& operator=(const WW8ListManager&) = delete;
-    sal_uInt16 nLastLFOPosition;
+    sal_uInt16 m_nLastLFOPosition;
 };
 
 struct WW8FlyPara
@@ -200,11 +202,11 @@ struct WW8FlyPara
                         // Attention: *DO NOT* reorder, since parts will be
                         // compared using memcmp
     bool bVer67;
-    sal_Int16 nSp26, nSp27;         // raw position
+    sal_Int16 nTDxaAbs, nTDyaAbs;         // raw position
     sal_Int16 nSp45, nSp28;         // width / height
-    sal_Int16 nLeMgn, nRiMgn, nUpMgn, nLoMgn;           // borders
-    sal_uInt8 nSp29;                 // raw binding + alignment
-    sal_uInt8 nSp37;                 // Wrap-Mode ( 1 / 2; 0 = no Apo ? )
+    sal_Int16 nLeftMargin, nRightMargin, nUpperMargin, nLowerMargin;           // borders
+    sal_uInt8 nTPc;                 // raw binding + alignment
+    sal_uInt8 nPWr;                 // Wrap-Mode ( 1 / 2; 0 = no Apo ? )
     WW8_BRCVer9_5 brc;          // borders Top, Left, Bottom, Right, Between
     bool bBorderLines;          // border lines
     bool bGrafApo;              // true: this frame is only used to position
@@ -213,9 +215,9 @@ struct WW8FlyPara
 
     WW8FlyPara(bool bIsVer67, const WW8FlyPara* pSrc = nullptr);
     bool operator==(const WW8FlyPara& rSrc) const;
-    void Read(sal_uInt8 nSprm29, WW8PLCFx_Cp_FKP* pPap);
+    void Read(sal_uInt8 nSprmTPc, WW8PLCFx_Cp_FKP* pPap);
     void ReadFull(sal_uInt8 nSprm29, SwWW8ImplReader* pIo);
-    void Read(sal_uInt8 nSprm29, WW8RStyle const * pStyle);
+    void Read(sal_uInt8 nSprmTPc, WW8RStyle const * pStyle);
     void ApplyTabPos(const WW8_TablePos *pTabPos);
     bool IsEmpty() const;
 };
@@ -366,10 +368,10 @@ public:
 class SwWW8FltControlStack : public SwFltControlStack
 {
 private:
-    SwWW8ImplReader& rReader;
+    SwWW8ImplReader& m_rReader;
     std::unique_ptr<SfxItemSet> m_xScratchSet;
-    sal_uInt16 nToggleAttrFlags;
-    sal_uInt16 nToggleBiDiAttrFlags;
+    sal_uInt16 m_nToggleAttrFlags;
+    sal_uInt16 m_nToggleBiDiAttrFlags;
     SwWW8FltControlStack(const SwWW8FltControlStack&) = delete;
     SwWW8FltControlStack& operator=(const SwWW8FltControlStack&) = delete;
     const SwNumFormat* GetNumFormatFromStack(const SwPosition &rPos,
@@ -380,8 +382,8 @@ protected:
 
 public:
     SwWW8FltControlStack(SwDoc& rDo, sal_uLong nFieldFl, SwWW8ImplReader& rReader_ )
-        : SwFltControlStack( rDo, nFieldFl ), rReader( rReader_ ),
-        nToggleAttrFlags(0), nToggleBiDiAttrFlags(0)
+        : SwFltControlStack( rDo, nFieldFl ), m_rReader( rReader_ ),
+        m_nToggleAttrFlags(0), m_nToggleBiDiAttrFlags(0)
     {}
 
     void NewAttr(const SwPosition& rPos, const SfxPoolItem& rAttr);
@@ -391,24 +393,24 @@ public:
     void SetToggleAttr(sal_uInt8 nId, bool bOn)
     {
         if( bOn )
-            nToggleAttrFlags |= (1 << nId);
+            m_nToggleAttrFlags |= (1 << nId);
         else
-            nToggleAttrFlags &= ~(1 << nId);
+            m_nToggleAttrFlags &= ~(1 << nId);
     }
 
-    sal_uInt16 GetToggleAttrFlags() const { return nToggleAttrFlags; }
+    sal_uInt16 GetToggleAttrFlags() const { return m_nToggleAttrFlags; }
 
     void SetToggleBiDiAttr(sal_uInt8 nId, bool bOn)
     {
         if( bOn )
-            nToggleBiDiAttrFlags |= (1 << nId);
+            m_nToggleBiDiAttrFlags |= (1 << nId);
         else
-            nToggleBiDiAttrFlags &= ~(1 << nId);
+            m_nToggleBiDiAttrFlags &= ~(1 << nId);
     }
 
-    sal_uInt16 GetToggleBiDiAttrFlags() const { return nToggleBiDiAttrFlags; }
-    void SetToggleAttrFlags(sal_uInt16 nFlags) { nToggleAttrFlags = nFlags; }
-    void SetToggleBiDiAttrFlags(sal_uInt16 nFlags) {nToggleBiDiAttrFlags = nFlags;}
+    sal_uInt16 GetToggleBiDiAttrFlags() const { return m_nToggleBiDiAttrFlags; }
+    void SetToggleAttrFlags(sal_uInt16 nFlags) { m_nToggleAttrFlags = nFlags; }
+    void SetToggleBiDiAttrFlags(sal_uInt16 nFlags) {m_nToggleBiDiAttrFlags = nFlags;}
 
     const SfxPoolItem* GetFormatAttr(const SwPosition& rPos, sal_uInt16 nWhich);
     template<class T> const T* GetFormatAttr( const SwPosition& rPos, TypedWhichId<T> nWhich )
@@ -438,17 +440,9 @@ namespace SwWW8
 {
     struct ltstr
     {
-        bool operator()(const OUString &r1, std::u16string_view r2) const
+        bool operator()(std::u16string_view r1, std::u16string_view r2) const
         {
-            return r1.compareToIgnoreAsciiCase(r2)<0;
-        }
-    };
-
-    struct ltnode
-    {
-        bool operator()(const SwTextNode *r1, const SwTextNode *r2) const
-        {
-            return r1->GetIndex() < r2->GetIndex();
+            return o3tl::compareToIgnoreAsciiCase(r1, r2)<0;
         }
     };
 };
@@ -458,12 +452,12 @@ class SwWW8ReferencedFltEndStack : public SwFltEndStack
 public:
     SwWW8ReferencedFltEndStack( SwDoc& rDo, sal_uLong nFieldFl )
         : SwFltEndStack( rDo, nFieldFl )
-        , aReferencedTOCBookmarks()
+        , m_aReferencedTOCBookmarks()
     {}
 
     // Keep track of referenced TOC bookmarks in order to suppress the import
     // of unreferenced ones.
-    std::set<OUString, SwWW8::ltstr> aReferencedTOCBookmarks;
+    std::set<OUString, SwWW8::ltstr> m_aReferencedTOCBookmarks;
 protected:
     virtual void SetAttrInDoc( const SwPosition& rTmpPos,
                                SwFltStackEntry& rEntry ) override;
@@ -474,14 +468,14 @@ class SwWW8FltRefStack final : public SwFltEndStack
 public:
     SwWW8FltRefStack(SwDoc& rDo, sal_uLong nFieldFl)
         : SwFltEndStack( rDo, nFieldFl )
-        , aFieldVarNames()
+        , m_aFieldVarNames()
     {}
     bool IsFootnoteEdnBkmField(const SwFormatField& rFormatField, sal_uInt16& rBkmNo);
 
     //Keep track of variable names created with fields, and the bookmark
     //mapped to their position, hopefully the same, but very possibly
     //an additional pseudo bookmark
-    std::map<OUString, OUString, SwWW8::ltstr> aFieldVarNames;
+    std::map<OUString, OUString, SwWW8::ltstr> m_aFieldVarNames;
 private:
     SwFltStackEntry *RefToVar(const SwField* pField,SwFltStackEntry& rEntry);
     virtual void SetAttrInDoc(const SwPosition& rTmpPos,
@@ -554,7 +548,7 @@ namespace sw
         };
     }
 
-    auto FilterControlChars(OUString const& rString) -> OUString;
+    auto FilterControlChars(std::u16string_view aString) -> OUString;
 }
 
 class WW8FieldEntry
@@ -574,7 +568,7 @@ class WW8FieldEntry
         WW8FieldEntry &operator=(const WW8FieldEntry &rOther) noexcept;
         void Swap(WW8FieldEntry &rOther) noexcept;
 
-        SwNodeIndex GetPtNode() const { return maStartPos.GetPtNode(); };
+        const SwNodeIndex& GetPtNode() const { return maStartPos.GetPtNode(); };
         sal_Int32 GetPtContent() const { return maStartPos.GetPtContent(); };
 
         const OUString& GetBookmarkName() const { return msBookmarkName;}
@@ -627,7 +621,7 @@ enum class eF_ResT { OK, TEXT, TAGIGN, READ_FSPA };
 class SwWW8Shade
 {
 public:
-    Color aColor;
+    Color m_aColor;
     SwWW8Shade(bool bVer67, const WW8_SHD& rSHD);
     SwWW8Shade(Color nFore, Color nBack, sal_uInt16 nIndex)
     {
@@ -655,11 +649,11 @@ protected:
     WW8FormulaControl& operator=(WW8FormulaControl const&) = delete;
 
 public:
-    WW8FormulaControl(const OUString& rN, SwWW8ImplReader &rRdr)
+    WW8FormulaControl(OUString aN, SwWW8ImplReader &rRdr)
         : mrRdr(rRdr), mfUnknown(0), mfDropdownIndex(0),
         mfToolTip(0), mfNoMark(0), mfType(0),
         mfUnused(0), mhpsCheckBox(20), mnChecked(0), mnMaxLen(0),
-        mbHelp(false), msName( rN )
+        mbHelp(false), msName(std::move( aN ))
     {
     }
     sal_uInt8 mfUnknown:2;
@@ -745,23 +739,23 @@ public:
         css::uno::Reference< css::drawing::XShape > *pShapeRef,
         bool bFloatingCtrl=false );
 private:
-    SwPaM *pPaM;
+    SwPaM *m_pPaM;
     sal_uInt32 mnObjectId;
 };
 
 class SwMSDffManager : public SvxMSDffManager
 {
 private:
-    SwWW8ImplReader& rReader;
-    SvStream *pFallbackStream;
-    std::unordered_map<sal_uInt32, Graphic> aOldEscherBlipCache;
+    SwWW8ImplReader& m_rReader;
+    SvStream *m_pFallbackStream;
+    std::unordered_map<sal_uInt32, Graphic> m_aOldEscherBlipCache;
 
     virtual bool GetOLEStorageName( sal_uInt32 nOLEId, OUString& rStorageName,
         tools::SvRef<SotStorage>& rSrcStorage, css::uno::Reference < css::embed::XStorage >& rDestStorage ) const override;
     virtual bool ShapeHasText( sal_uLong nShapeId, sal_uLong nFilePos ) const override;
     // #i32596# - new parameter <_nCalledByGroup>, which
     // indicates, if the OLE object is imported inside a group object
-    virtual SdrObject* ImportOLE( sal_uInt32 nOLEId,
+    virtual rtl::Reference<SdrObject> ImportOLE( sal_uInt32 nOLEId,
                                   const Graphic& rGrf,
                                   const tools::Rectangle& rBoundRect,
                                   const tools::Rectangle& rVisArea,
@@ -777,7 +771,7 @@ public:
     void DisableFallbackStream();
     void EnableFallbackStream();
 protected:
-    virtual SdrObject* ProcessObj( SvStream& rSt, DffObjData& rObjData, SvxMSDffClientData& rData, tools::Rectangle& rTextRect, SdrObject* pObj ) override;
+    virtual rtl::Reference<SdrObject> ProcessObj( SvStream& rSt, DffObjData& rObjData, SvxMSDffClientData& rData, tools::Rectangle& rTextRect, SdrObject* pObj ) override;
 };
 
 class wwSection
@@ -785,16 +779,16 @@ class wwSection
 public:
     explicit wwSection(const SwPosition &rPos);
     SEPr maSep;
-    WW8_BRCVer9 brc[4];
+    WW8_BRCVer9 m_brc[4];
     SwNodeIndex maStart;
     SwSection *mpSection;
     SwPageDesc *mpPage;
     SvxFrameDirection meDir;
 
-    sal_uInt32 nPgWidth;
-    sal_uInt32 nPgLeft;
-    sal_uInt32 nPgRight;
-    sal_uInt32 nPgGutter;
+    sal_uInt32 m_nPgWidth;
+    sal_uInt32 m_nPgLeft;
+    sal_uInt32 m_nPgRight;
+    sal_uInt32 m_nPgGutter;
     bool m_bRtlGutter = false;
 
     css::drawing::TextVerticalAdjust mnVerticalAdjustment;
@@ -810,12 +804,12 @@ public:
     sal_uInt16 PageStartAt() const { return maSep.pgnStart; }
     bool PageRestartNo() const { return maSep.fPgnRestart != 0; }
     bool IsBiDi() const { return maSep.fBiDi != 0; }
-    sal_uInt32 GetPageWidth() const { return nPgWidth; }
+    sal_uInt32 GetPageWidth() const { return m_nPgWidth; }
     sal_uInt32 GetTextAreaWidth() const
-        { return GetPageWidth() - GetPageLeft() - nPgGutter - GetPageRight(); }
+        { return GetPageWidth() - GetPageLeft() - m_nPgGutter - GetPageRight(); }
     sal_uInt32 GetPageHeight() const { return maSep.yaPage; }
-    sal_uInt32 GetPageLeft() const { return nPgLeft; }
-    sal_uInt32 GetPageRight() const { return nPgRight; }
+    sal_uInt32 GetPageLeft() const { return m_nPgLeft; }
+    sal_uInt32 GetPageRight() const { return m_nPgRight; }
     bool IsLandScape() const { return maSep.dmOrientPage != 0; }
     bool IsFixedHeightHeader() const { return maSep.dyaTop < 0; }
     bool IsFixedHeightFooter() const { return maSep.dyaBottom < 0; }
@@ -887,7 +881,7 @@ public:
     bool CurrentSectionIsProtected() const;
     void PrependedInlineNode(const SwPosition &rPos, const SwNode &rNode);
     sal_uInt16 CurrentSectionColCount() const;
-    bool WillHavePageDescHere(const SwNodeIndex& rIdx) const;
+    bool WillHavePageDescHere(const SwNode&) const;
     void CreateSep(const tools::Long nTextPos);
     void InsertSegments();
     void JoinNode(const SwPosition &rPos, const SwNode &rNode);
@@ -896,6 +890,25 @@ public:
     sal_uInt32 GetPageWidth() const;
     sal_uInt32 GetWWPageTopMargin() const;
     sal_uInt32 GetTextAreaWidth() const;
+};
+
+class TextNodeListener : public SwClient
+{
+    SwTextNode *m_pTextNode;
+
+protected:
+    virtual void SwClientNotify(const SwModify&, const SfxHint&) override;
+
+public:
+    TextNodeListener(SwTextNode* pTextNode);
+    bool operator<(const TextNodeListener& rOther) const
+    {
+        return m_pTextNode->GetIndex() < rOther.m_pTextNode->GetIndex();
+    }
+    void StopListening(SwModify* pTextNode);
+    SwTextNode* GetTextNode() const { return m_pTextNode; }
+    virtual void removed(SwModify* pTextNode);
+    virtual ~TextNodeListener() override;
 };
 
 //Various writer elements like frames start off containing a blank paragraph,
@@ -913,26 +926,36 @@ public:
 class wwExtraneousParas
 {
 private:
+    class ExtraTextNodeListener : public TextNodeListener
+    {
+    private:
+        wwExtraneousParas* m_pOwner;
+    public:
+        ExtraTextNodeListener(SwTextNode* pTextNode, wwExtraneousParas* pOwner)
+            : TextNodeListener(pTextNode)
+            , m_pOwner(pOwner)
+        {
+        }
+        virtual void removed(SwModify* pTextNode) override;
+    };
+
     /*
     A vector of SwTextNodes to erase from a document after import is complete
     */
-    std::set<SwTextNode*, SwWW8::ltnode> m_aTextNodes;
+    std::set<ExtraTextNodeListener> m_aTextNodes;
     SwDoc& m_rDoc;
+
+    void remove_if_present(SwModify* pModify);
 
     wwExtraneousParas(wwExtraneousParas const&) = delete;
     wwExtraneousParas& operator=(wwExtraneousParas const&) = delete;
-
 public:
     explicit wwExtraneousParas(SwDoc &rDoc) : m_rDoc(rDoc) {}
     ~wwExtraneousParas() { delete_all_from_doc(); }
-    void insert(SwTextNode *pTextNode) { m_aTextNodes.insert(pTextNode); }
-    void check_anchor_destination(SwTextNode *pTextNode)
+    void insert(SwTextNode *pTextNode);
+    void remove_if_present(SwTextNode *pTextNode)
     {
-        auto it = m_aTextNodes.find(pTextNode);
-        if (it == m_aTextNodes.end())
-            return;
-        SAL_WARN("sw.ww8", "It is unexpected to anchor something in a para scheduled for removal");
-        m_aTextNodes.erase(it);
+        remove_if_present(static_cast<SwModify*>(pTextNode));
     }
     void delete_all_from_doc();
 };
@@ -949,8 +972,8 @@ private:
 
 public:
     void SetUniqueGraphName(SwFrameFormat *pFrameFormat, std::u16string_view rFixedPart);
-    wwFrameNamer(bool bIsDisabled, const OUString &rSeed)
-        : msSeed(rSeed), mnImportedGraphicsCount(0), mbIsDisabled(bIsDisabled)
+    wwFrameNamer(bool bIsDisabled, OUString aSeed)
+        : msSeed(std::move(aSeed)), mnImportedGraphicsCount(0), mbIsDisabled(bIsDisabled)
     {
     }
 };
@@ -965,8 +988,8 @@ private:
     wwSectionNamer& operator=(const wwSectionNamer&) = delete;
 public:
     OUString UniqueName();
-    wwSectionNamer(const SwDoc &rDoc, const OUString &rSeed)
-        : mrDoc(rDoc), msFileLinkSeed(rSeed), mnFileSectionNo(0)
+    wwSectionNamer(const SwDoc &rDoc, OUString aSeed)
+        : mrDoc(rDoc), msFileLinkSeed(std::move(aSeed)), mnFileSectionNo(0)
         { }
 };
 
@@ -1377,11 +1400,11 @@ private:
     // Indicate that current on loading a hyperlink, which is inside a TOC; Managed by Read_F_Hyperlink() and End_Field()
     bool m_bLoadingTOXHyperlink;
     // a document position recorded the after-position of TOC section, managed by Read_F_TOX() and End_Field()
-    std::unique_ptr<SwPaM> m_pPosAfterTOC;
+    std::optional<SwPaM> m_oPosAfterTOC;
     // used for some dropcap tweaking
-    SwTextNode* m_pPreviousNode;
+    std::unique_ptr<TextNodeListener> m_xPreviousNode;
 
-    std::unique_ptr< SwPosition > m_pLastAnchorPos;
+    std::optional< SwPosition > m_oLastAnchorPos;
 
     bool m_bCareFirstParaEndInToc;
     bool m_bCareLastParaEndInToc;
@@ -1426,7 +1449,7 @@ private:
         DeleteStack(std::move(m_xAnchorStck));
     }
     void emulateMSWordAddTextToParagraph(const OUString& rAddString);
-    void simpleAddTextToParagraph(const OUString& rAddString);
+    void simpleAddTextToParagraph(std::u16string_view aAddString);
     bool HandlePageBreakChar();
     bool ReadChar(tools::Long nPosCp, tools::Long nCpOfs);
     bool ReadPlainChars(WW8_CP& rPos, sal_Int32 nEnd, sal_Int32 nCpOfs);
@@ -1519,7 +1542,7 @@ private:
     bool ProcessSpecial(bool &rbReSync, WW8_CP nStartCp);
     sal_uInt16 TabRowSprm(int nLevel) const;
 
-    bool ReadGrafFile(OUString& rFileName, std::unique_ptr<Graphic>& rpGraphic,
+    bool ReadGrafFile(OUString& rFileName, std::optional<Graphic>& rpGraphic,
        const WW8_PIC& rPic, SvStream* pSt, sal_uLong nFilePos, bool* pDelIt);
 
     static void ReplaceObj(const SdrObject &rReplaceTextObj,
@@ -1537,7 +1560,7 @@ private:
     SwFrameFormat* ImportGraf1(WW8_PIC const & rPic, SvStream* pSt, sal_uLong nFilePos);
     SwFrameFormat* ImportGraf(SdrTextObj const * pTextObj = nullptr, SwFrameFormat const * pFlyFormat = nullptr);
 
-    SdrObject* ImportOleBase( Graphic& rGraph, const Graphic* pGrf=nullptr,
+    rtl::Reference<SdrObject> ImportOleBase( Graphic& rGraph, const Graphic* pGrf=nullptr,
         const SfxItemSet* pFlySet=nullptr, const tools::Rectangle& aVisArea = tools::Rectangle() );
 
     SwFrameFormat* ImportOle( const Graphic* = nullptr, const SfxItemSet* pFlySet = nullptr,
@@ -1591,11 +1614,11 @@ private:
 
     bool ReadGrafStart(void* pData, short nDataSiz, WW8_DPHEAD const * pHd,
         SfxAllItemSet &rSet);
-    SdrObject *ReadLine(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
-    SdrObject *ReadRect(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
-    SdrObject *ReadEllipse(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
-    SdrObject *ReadArc(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
-    SdrObject *ReadPolyLine(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
+    rtl::Reference<SdrObject> ReadLine(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
+    rtl::Reference<SdrObject> ReadRect(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
+    rtl::Reference<SdrObject> ReadEllipse(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
+    rtl::Reference<SdrObject> ReadArc(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
+    rtl::Reference<SdrObject> ReadPolyLine(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
     void InsertTxbxStyAttrs( SfxItemSet& rS, sal_uInt16 nColl );
     void InsertAttrsAsDrawingAttrs(WW8_CP nStartCp, WW8_CP nEndCp, ManTypes eType, bool bONLYnPicLocFc=false);
 
@@ -1612,20 +1635,20 @@ private:
     bool TxbxChainContainsRealText( sal_uInt16 nTxBxS,
                                     tools::Long&  rStartCp,
                                     tools::Long&  rEndCp );
-    SdrObject *ReadTextBox(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
-    SdrObject *ReadCaptionBox(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
-    SdrObject *ReadGroup(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
-    SdrObject *ReadGrafPrimitive(short& rLeft, SfxAllItemSet &rSet);
+    rtl::Reference<SdrObject> ReadTextBox(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
+    rtl::Reference<SdrObject> ReadCaptionBox(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
+    rtl::Reference<SdrObject> ReadGroup(WW8_DPHEAD const * pHd, SfxAllItemSet &rSet);
+    rtl::Reference<SdrObject> ReadGrafPrimitive(short& rLeft, SfxAllItemSet &rSet);
     void ReadGrafLayer1(WW8PLCFspecial& rPF, tools::Long nGrafAnchorCp);
     SdrObject* CreateContactObject(SwFrameFormat* pFlyFormat);
     RndStdIds ProcessEscherAlign(SvxMSDffImportRec& rRecord, WW8_FSPA& rFSPA, SfxItemSet& rFlySet);
     bool MiserableRTLGraphicsHack(SwTwips &rLeft, SwTwips nWidth,
         sal_Int16 eHoriOri, sal_Int16 eHoriRel);
     SwFrameFormat* Read_GrafLayer( tools::Long nGrafAnchorCp );
-    SwFlyFrameFormat* ImportReplaceableDrawables(SdrObject*& rpObject, SdrObject*& rpOurNewObject,
+    SwFlyFrameFormat* ImportReplaceableDrawables(rtl::Reference<SdrObject>& rpObject, rtl::Reference<SdrObject>& rpOurNewObject,
                                                  SvxMSDffImportRec& rRecord, WW8_FSPA& rF,
                                                  SfxItemSet& rFlySet);
-    SwFlyFrameFormat* ConvertDrawTextToFly(SdrObject*& rpObject, SdrObject*& rpOurNewObject,
+    SwFlyFrameFormat* ConvertDrawTextToFly(rtl::Reference<SdrObject>& rpObject, rtl::Reference<SdrObject>& rpOurNewObject,
                                            const SvxMSDffImportRec& rRecord, RndStdIds eAnchor,
                                            const WW8_FSPA& rF, SfxItemSet& rFlySet);
     SwFrameFormat* MungeTextIntoDrawBox(SvxMSDffImportRec& rRecord, tools::Long nGrafAnchorCp,
@@ -1700,7 +1723,7 @@ private:
 
     // #i84783#
     // determine object attribute "Layout in Table Cell"
-    bool IsObjectLayoutInTableCell( const sal_uInt32 nLayoutInTableCell ) const;
+    bool IsObjectLayoutInTableCell(const sal_uInt32 nGroupShapeBooleanProperties) const;
     void ReadGlobalTemplateSettings( std::u16string_view sCreatedFrom, const css::uno::Reference< css::container::XNameContainer >& xPrjNameMap );
     SwWW8ImplReader(const SwWW8ImplReader &) = delete;
     SwWW8ImplReader& operator=(const SwWW8ImplReader&) = delete;
@@ -1797,7 +1820,7 @@ public:     // really private, but can only be done public
 
     void Read_TabRowEnd(        sal_uInt16, const sal_uInt8* pData, short nLen );
     void Read_TabCellEnd(        sal_uInt16, const sal_uInt8* pData, short nLen );
-    bool ParseTabPos(WW8_TablePos *aTabPos, WW8PLCFx_Cp_FKP* pPap);
+    static bool ParseTabPos(WW8_TablePos *aTabPos, WW8PLCFx_Cp_FKP* pPap);
     void Read_Shade(            sal_uInt16, const sal_uInt8* pData, short nLen );
     void Read_ANLevelNo(        sal_uInt16, const sal_uInt8* pData, short nLen );
     void Read_ANLevelDesc(      sal_uInt16, const sal_uInt8* pData, short nLen );
@@ -1847,7 +1870,7 @@ public:     // really private, but can only be done public
     eF_ResT Read_F_DocInfo( WW8FieldDesc* pF, OUString& rStr );
     eF_ResT Read_F_Author( WW8FieldDesc*, OUString& );
     eF_ResT Read_F_TemplName( WW8FieldDesc*, OUString& );
-    SvNumFormatType GetTimeDatePara(OUString const & rStr, sal_uInt32& rFormat, LanguageType &rLang,
+    SvNumFormatType GetTimeDatePara(std::u16string_view aStr, sal_uInt32& rFormat, LanguageType &rLang,
         int nWhichDefault, bool bHijri = false);
     bool ForceFieldLanguage(SwField &rField, LanguageType nLang);
     eF_ResT Read_F_DateTime( WW8FieldDesc*, OUString& rStr );
@@ -1891,7 +1914,6 @@ public:     // really private, but can only be done public
     bool SearchRowEnd(WW8PLCFx_Cp_FKP* pPap,WW8_CP &rStartCp, int nLevel) const;
     /// Seek to the end of the table with pPap, returns true on success.
     bool SearchTableEnd(WW8PLCFx_Cp_FKP* pPap) const;
-    bool FloatingTableConversion(WW8PLCFx_Cp_FKP* pPap);
 
     const WW8Fib& GetFib() const    { return *m_xWwFib; }
     SwDoc& GetDoc() const           { return m_rDoc; }
@@ -1908,7 +1930,7 @@ public:     // really private, but can only be done public
     static Color GetCol(sal_uInt8 nIco);
 
     SwWW8ImplReader( sal_uInt8 nVersionPara, SotStorage* pStorage, SvStream* pSt,
-        SwDoc& rD, const OUString& rBaseURL, bool bNewDoc, bool bSkipImages, SwPosition const &rPos );
+        SwDoc& rD, OUString aBaseURL, bool bNewDoc, bool bSkipImages, SwPosition const &rPos );
 
     const OUString& GetBaseURL() const { return m_sBaseURL; }
     // load a complete doc file

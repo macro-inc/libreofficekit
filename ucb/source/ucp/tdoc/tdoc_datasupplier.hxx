@@ -22,7 +22,7 @@
 #include <rtl/ref.hxx>
 #include <ucbhelper/resultset.hxx>
 #include <optional>
-#include <memory>
+#include <utility>
 #include <vector>
 #include <string_view>
 
@@ -40,7 +40,7 @@ class ResultSetDataSupplier : public ::ucbhelper::ResultSetDataSupplier
         css::uno::Reference< css::ucb::XContent >           xContent;
         css::uno::Reference< css::sdbc::XRow >              xRow;
 
-        explicit ResultListEntry( const OUString& rURL ) : aURL( rURL ) {}
+        explicit ResultListEntry( OUString _aURL ) : aURL(std::move( _aURL )) {}
     };
 
     osl::Mutex                                   m_aMutex;
@@ -57,8 +57,8 @@ private:
 
 public:
     ResultSetDataSupplier(
-        const css::uno::Reference< css::uno::XComponentContext >& rxContext,
-        const rtl::Reference< Content >& rContent );
+        css::uno::Reference< css::uno::XComponentContext > xContext,
+        rtl::Reference< Content > xContent );
     virtual ~ResultSetDataSupplier() override;
 
     virtual OUString queryContentIdentifierString( sal_uInt32 nIndex ) override;

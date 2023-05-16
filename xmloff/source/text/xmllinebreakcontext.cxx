@@ -38,7 +38,8 @@ SvXMLLineBreakContext::SvXMLLineBreakContext(SvXMLImport& rImport, XMLTextImport
 void SvXMLLineBreakContext::startFastElement(
     sal_Int32 /*nElement*/, const uno::Reference<xml::sax::XFastAttributeList>& xAttrList)
 {
-    uno::Reference<lang::XMultiServiceFactory> xFactory(GetImport().GetModel(), uno::UNO_QUERY);
+    const uno::Reference<frame::XModel>& xModel = GetImport().GetModel();
+    uno::Reference<lang::XMultiServiceFactory> xFactory(xModel, uno::UNO_QUERY);
     if (!xFactory.is())
         return;
 
@@ -50,7 +51,7 @@ void SvXMLLineBreakContext::startFastElement(
     if (SvXMLUnitConverter::convertEnum(eClear, aClear, pXML_LineBreakClear_Enum))
     {
         uno::Reference<beans::XPropertySet> xLineBreakProps(xLineBreak, uno::UNO_QUERY);
-        xLineBreakProps->setPropertyValue("Clear", uno::makeAny(eClear));
+        xLineBreakProps->setPropertyValue("Clear", uno::Any(eClear));
     }
 
     m_rHelper.InsertTextContent(xLineBreak);

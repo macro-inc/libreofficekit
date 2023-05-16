@@ -26,7 +26,7 @@
 #include <com/sun/star/sdbcx/XTablesSupplier.hpp>
 
 #include <connectivity/dbtools.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace sdbtools
 {
@@ -190,19 +190,16 @@ namespace sdbtools
                 { CompositionType::Complete,                 EComposeRule::Complete }
             };
 
-            bool found = false;
-            size_t i = 0;
-            for ( ; i < SAL_N_ELEMENTS( TypeTable ) && !found; ++i )
-                if ( TypeTable[i].nCompositionType == _nType )
-                    found = true;
-            if ( !found )
+            auto const found = std::find_if(std::begin(TypeTable), std::end(TypeTable)
+                                            , [_nType](auto const & type){ return type.nCompositionType == _nType; });
+            if (found == std::end(TypeTable))
                 throw IllegalArgumentException(
                     DBA_RES( STR_INVALID_COMPOSITION_TYPE ),
                     nullptr,
                     0
                 );
 
-            return TypeTable[i].eComposeRule;
+            return found->eComposeRule;
         }
     }
 

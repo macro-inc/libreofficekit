@@ -11,7 +11,6 @@
 
 #include <com/sun/star/drawing/GraphicExportFilter.hpp>
 #include <com/sun/star/drawing/XDrawPageSupplier.hpp>
-#include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/drawing/XDrawPagesSupplier.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/awt/XControlModel.hpp>
@@ -19,11 +18,11 @@
 #include <com/sun/star/table/XCellRange.hpp>
 #include <com/sun/star/text/XTextRange.hpp>
 #include <com/sun/star/text/ControlCharacter.hpp>
+#include <com/sun/star/frame/XStorable.hpp>
 
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertysequence.hxx>
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
+#include <test/unoapixml_test.hxx>
 #include <unotools/tempfile.hxx>
 #include <svx/unopage.hxx>
 #include <vcl/virdev.hxx>
@@ -31,7 +30,9 @@
 #include <drawinglayer/tools/primitive2dxmldump.hxx>
 #include <svx/sdr/contact/viewcontact.hxx>
 #include <svx/sdr/contact/viewobjectcontact.hxx>
-#include <test/xmltesttools.hxx>
+#include <unotools/streamwrap.hxx>
+#include <unotools/mediadescriptor.hxx>
+#include <vcl/filter/PngImageReader.hxx>
 
 #include <sdr/contact/objectcontactofobjlistpainter.hxx>
 
@@ -39,39 +40,20 @@ using namespace ::com::sun::star;
 
 namespace
 {
-constexpr OUStringLiteral DATA_DIRECTORY = u"/svx/qa/unit/data/";
-
 /// Tests for svx/source/unodraw/ code.
-class UnodrawTest : public test::BootstrapFixture, public unotest::MacrosTest, public XmlTestTools
+class UnodrawTest : public UnoApiXmlTest
 {
-protected:
-    uno::Reference<lang::XComponent> mxComponent;
-
 public:
-    void setUp() override;
-    void tearDown() override;
+    UnodrawTest()
+        : UnoApiXmlTest("svx/qa/unit/data/")
+    {
+    }
 };
-
-void UnodrawTest::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set(frame::Desktop::create(mxComponentContext));
-}
-
-void UnodrawTest::tearDown()
-{
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
-}
 
 CPPUNIT_TEST_FIXTURE(UnodrawTest, testWriterGraphicExport)
 {
     // Load a document with a Writer picture in it.
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "unodraw-writer-image.odt";
-    mxComponent = loadFromDesktop(aURL);
+    loadFromURL(u"unodraw-writer-image.odt");
     uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
     uno::Reference<lang::XComponent> xShape(xDrawPage->getByIndex(0), uno::UNO_QUERY);
@@ -83,17 +65,15 @@ CPPUNIT_TEST_FIXTURE(UnodrawTest, testWriterGraphicExport)
     // picture.
     xExportFilter->setSourceDocument(xShape);
 
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
     uno::Sequence<beans::PropertyValue> aProperties(
-        comphelper::InitPropertySequence({ { "URL", uno::Any(aTempFile.GetURL()) },
+        comphelper::InitPropertySequence({ { "URL", uno::Any(maTempFile.GetURL()) },
                                            { "MediaType", uno::Any(OUString("image/jpeg")) } }));
     CPPUNIT_ASSERT(xExportFilter->filter(aProperties));
 }
 
 CPPUNIT_TEST_FIXTURE(UnodrawTest, testTdf93998)
 {
-    mxComponent = loadFromDesktop(m_directories.getURLFromSrc(DATA_DIRECTORY) + "tdf93998.odp");
+    loadFromURL(u"tdf93998.odp");
     uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     CPPUNIT_ASSERT(xDrawPagesSupplier.is());
 
@@ -139,9 +119,9 @@ CPPUNIT_TEST_FIXTURE(UnodrawTest, testTableShadowDirect)
     uno::Reference<beans::XPropertySet> xShapeProps(xShape, uno::UNO_QUERY);
     // Without the accompanying fix in place, this test would have failed with throwing a
     // beans.UnknownPropertyException, as shadow-as-direct-formatting on tables were not possible.
-    xShapeProps->setPropertyValue("Shadow", uno::makeAny(true));
+    xShapeProps->setPropertyValue("Shadow", uno::Any(true));
     sal_Int32 nRed = 0xff0000;
-    xShapeProps->setPropertyValue("ShadowColor", uno::makeAny(nRed));
+    xShapeProps->setPropertyValue("ShadowColor", uno::Any(nRed));
     CPPUNIT_ASSERT(xShapeProps->getPropertyValue("ShadowColor") >>= nRed);
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0xff0000), nRed);
 
@@ -207,6 +187,38 @@ CPPUNIT_TEST_FIXTURE(UnodrawTest, testTitleShapeBullets)
     // Without the accompanying fix in place, this test would have failed, because the 2 paragraphs
     // were merged together (e.g. 1 bullet instead of 2 bullets for bulleted paragraphs).
     CPPUNIT_ASSERT(xTextE->hasMoreElements());
+}
+
+CPPUNIT_TEST_FIXTURE(UnodrawTest, testPngExport)
+{
+    // Given an empty Impress document:
+    mxComponent = loadFromDesktop("private:factory/simpress",
+                                  "com.sun.star.presentation.PresentationDocument");
+
+    // When exporting that document to PNG with a JSON size:
+    uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY_THROW);
+    SvMemoryStream aStream;
+    uno::Reference<io::XOutputStream> xOut = new utl::OOutputStreamWrapper(aStream);
+    utl::MediaDescriptor aMediaDescriptor;
+    aMediaDescriptor["FilterName"] <<= OUString("impress_png_Export");
+    aMediaDescriptor["FilterOptions"]
+        <<= OUString("{\"PixelHeight\":{\"type\":\"long\",\"value\":\"192\"},"
+                     "\"PixelWidth\":{\"type\":\"long\",\"value\":\"192\"}}");
+    aMediaDescriptor["OutputStream"] <<= xOut;
+    xStorable->storeToURL("private:stream", aMediaDescriptor.getAsConstPropertyValueList());
+
+    // Then make sure that the size request is handled:
+    aStream.Seek(STREAM_SEEK_TO_BEGIN);
+    vcl::PngImageReader aPngReader(aStream);
+    BitmapEx aBitmapEx;
+    aPngReader.read(aBitmapEx);
+    Size aSize = aBitmapEx.GetSizePixel();
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 192
+    // - Actual  : 595
+    // i.e. it was not possible to influence the size from the cmdline.
+    CPPUNIT_ASSERT_EQUAL(static_cast<tools::Long>(192), aSize.getHeight());
+    CPPUNIT_ASSERT_EQUAL(static_cast<tools::Long>(192), aSize.getWidth());
 }
 }
 

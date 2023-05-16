@@ -10,18 +10,15 @@
 #include <sal/config.h>
 #include <sal/types.h>
 
-#include <unotest/filters-test.hxx>
-#include "helper/qahelper.hxx"
+#include "helper/scfiltertestbase.hxx"
 
 #include <com/sun/star/uno/Reference.hxx>
 
-class SCQAHELPER_DLLPUBLIC FunctionsTest : public ScBootstrapFixture, public test::FiltersTest
+class SCQAHELPER_DLLPUBLIC FunctionsTest : public ScFilterTestBase
 {
 public:
 
-    FunctionsTest(const OUString& rPath);
-
-    virtual void setUp() override;
+    FunctionsTest();
 
     virtual bool load(
         const OUString &rFilter,
@@ -30,9 +27,6 @@ public:
         SfxFilterFlags nFilterFlags,
         SotClipboardFormatId nClipboardID,
         unsigned int nFilterVersion) override;
-
-private:
-    css::uno::Reference<css::uno::XInterface> m_xCalcComponent;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

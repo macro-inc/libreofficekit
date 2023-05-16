@@ -9,7 +9,11 @@
 
 $(eval $(call gb_Library_Library,i18npool))
 
-$(eval $(call gb_Library_set_componentfile,i18npool,i18npool/util/i18npool))
+ifeq ($(WITH_LOCALES),en)
+$(eval $(call gb_Library_set_componentfile,i18npool,i18npool/util/i18npool.en,services))
+else
+$(eval $(call gb_Library_set_componentfile,i18npool,i18npool/util/i18npool,services))
+endif
 
 $(eval $(call gb_Library_set_include,i18npool,\
 	$$(INCLUDE) \
@@ -130,7 +134,7 @@ $(call gb_CustomTarget_get_workdir,i18npool/localedata)/localedata_static.hxx : 
 $(call gb_CxxObject_get_target,i18npool/source/localedata/localedata) : \
 	INCLUDE += -I$(call gb_CustomTarget_get_workdir,i18npool/localedata)
 
-endif
+endif # DISABLE_DYNLOADING
 
 # collator_unicode.cxx includes generated lrl_include.hxx
 $(call gb_CxxObject_get_target,i18npool/source/collator/collator_unicode) : \

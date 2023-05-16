@@ -29,7 +29,8 @@ class VCL_DLLPUBLIC IconThemeInfo
 {
 public:
     /** The name of the icon theme to use for high contrast mode */
-    static constexpr OUStringLiteral HIGH_CONTRAST_ID = u"sifr";
+    static constexpr OUStringLiteral HIGH_CONTRAST_ID_BRIGHT = u"sifr";
+    static constexpr OUStringLiteral HIGH_CONTRAST_ID_DARK = u"sifr_dark";
 
     /** Construct an IconThemeInfo from the URL to a file.
      * This method will throw a std::runtime_error if the URL cannot be properly parsed.
@@ -51,7 +52,7 @@ public:
     static Size SizeByThemeName(std::u16string_view);
 
     /** Check whether an IconThemeInfo can be constructed from a URL */
-    static bool UrlCanBeParsed(const OUString& url);
+    static bool UrlCanBeParsed(std::u16string_view url);
 
     /** Find an icon theme by its id in a vector.
      * Throws a runtime_error if the theme is not contained in the vector
@@ -73,7 +74,7 @@ private:
      * If the name does not have an underscore in it, the whole name until the last dot is returned,
      * e.g. default.zip becomes default
      */
-    static OUString FileNameToThemeId(const OUString&);
+    static OUString FileNameToThemeId(std::u16string_view);
 
     /** Creates the display name for the given id of a file.
      * Currently, we only uppercase the id.

@@ -90,7 +90,7 @@ void FuConstructArc::DoExecute( SfxRequest& rReq )
                                pCenterY->GetValue () + pAxisY->GetValue () / 2);
 
     Activate();  // sets aObjKind
-    SdrCircObj* pNewCircle =
+    rtl::Reference<SdrCircObj> pNewCircle =
         new SdrCircObj(
             mpView->getSdrModelFromSdrView(),
             ToSdrCircKind(mpView->GetCurrentObjIdentifier()),
@@ -99,7 +99,7 @@ void FuConstructArc::DoExecute( SfxRequest& rReq )
             Degree100(pPhiEnd->GetValue() * 10));
     SdrPageView *pPV = mpView->GetSdrPageView();
 
-    mpView->InsertObjectAtView(pNewCircle, *pPV, SdrInsertFlags::SETDEFLAYER);
+    mpView->InsertObjectAtView(pNewCircle.get(), *pPV, SdrInsertFlags::SETDEFLAYER);
 }
 
 bool FuConstructArc::MouseButtonDown( const MouseEvent& rMEvt )
@@ -165,7 +165,7 @@ void FuConstructArc::Activate()
         case SID_DRAW_ARC      :
         case SID_DRAW_CIRCLEARC:
         {
-            aObjKind = OBJ_CARC;
+            aObjKind = SdrObjKind::CircleArc;
         }
         break;
 
@@ -174,7 +174,7 @@ void FuConstructArc::Activate()
         case SID_DRAW_CIRCLEPIE       :
         case SID_DRAW_CIRCLEPIE_NOFILL:
         {
-            aObjKind = OBJ_SECT;
+            aObjKind = SdrObjKind::CircleSection;
         }
         break;
 
@@ -183,13 +183,13 @@ void FuConstructArc::Activate()
         case SID_DRAW_CIRCLECUT        :
         case SID_DRAW_CIRCLECUT_NOFILL :
         {
-            aObjKind = OBJ_CCUT;
+            aObjKind = SdrObjKind::CircleCut;
         }
         break;
 
         default:
         {
-            aObjKind = OBJ_CARC;
+            aObjKind = SdrObjKind::CircleArc;
         }
         break;
     }
@@ -199,10 +199,10 @@ void FuConstructArc::Activate()
     FuConstruct::Activate();
 }
 
-SdrObjectUniquePtr FuConstructArc::CreateDefaultObject(const sal_uInt16 nID, const ::tools::Rectangle& rRectangle)
+rtl::Reference<SdrObject> FuConstructArc::CreateDefaultObject(const sal_uInt16 nID, const ::tools::Rectangle& rRectangle)
 {
 
-    SdrObjectUniquePtr pObj(SdrObjFactory::MakeNewObject(
+    rtl::Reference<SdrObject> pObj(SdrObjFactory::MakeNewObject(
         mpView->getSdrModelFromSdrView(),
         mpView->GetCurrentObjInventor(),
         mpView->GetCurrentObjIdentifier()));

@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/sheet/documentsettings.hxx>
 
 #include <com/sun/star/lang/XComponent.hpp>
@@ -23,7 +23,7 @@ using namespace com::sun::star;
 
 namespace sc_apitest
 {
-class ScDocumentConfigurationObj : public CalcUnoApiTest, public apitest::DocumentSettings
+class ScDocumentConfigurationObj : public UnoApiTest, public apitest::DocumentSettings
 {
 public:
     ScDocumentConfigurationObj();
@@ -31,7 +31,6 @@ public:
     virtual uno::Reference<uno::XInterface> init() override;
 
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScDocumentConfigurationObj);
 
@@ -39,13 +38,10 @@ public:
     CPPUNIT_TEST(testDocumentSettingsProperties);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScDocumentConfigurationObj::ScDocumentConfigurationObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
 {
 }
 
@@ -58,15 +54,9 @@ uno::Reference<uno::XInterface> ScDocumentConfigurationObj::init()
 
 void ScDocumentConfigurationObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
     mxComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScDocumentConfigurationObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScDocumentConfigurationObj);

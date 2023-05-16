@@ -531,7 +531,7 @@ bool DockingWindow::EventNotify( NotifyEvent& rNEvt )
     {
         const bool bDockingSupportCrippled = !StyleSettings::GetDockingFloatsSupported();
 
-        if ( rNEvt.GetType() == MouseNotifyEvent::MOUSEBUTTONDOWN )
+        if ( rNEvt.GetType() == NotifyEventType::MOUSEBUTTONDOWN )
         {
             const MouseEvent* pMEvt = rNEvt.GetMouseEvent();
             if ( pMEvt->IsLeft() )
@@ -563,7 +563,7 @@ bool DockingWindow::EventNotify( NotifyEvent& rNEvt )
                 }
             }
         }
-        else if( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT )
+        else if( rNEvt.GetType() == NotifyEventType::KEYINPUT )
         {
             const vcl::KeyCode& rKey = rNEvt.GetKeyEvent()->GetKeyCode();
             if( rKey.GetCode() == KEY_F10 && rKey.GetModifier() &&
@@ -833,10 +833,12 @@ void DockingWindow::setPosSizePixel( tools::Long nX, tools::Long nY,
     {
         if (!mpFloatWin)
             Window::setPosSizePixel( nX, nY, nWidth, nHeight, nFlags );
-        else
+        else if (comphelper::LibreOfficeKit::isActive())
         {
-            mpFloatWin->SetOutputSizePixel(Size(nWidth, nHeight));
-            mpFloatWin->SetPosPixel(Point(nX, nY));
+            if ((nFlags & PosSizeFlags::Size) == PosSizeFlags::Size)
+                mpFloatWin->SetOutputSizePixel({ nWidth, nHeight });
+            if ((nFlags & PosSizeFlags::Pos) == PosSizeFlags::Pos)
+                mpFloatWin->SetPosPixel({ nX, nY });
         }
     }
 
@@ -920,10 +922,10 @@ Point DockingWindow::GetFloatingPos() const
     {
         if ( pWrapper->mpFloatWin )
         {
-            WindowStateData aData;
-            aData.SetMask( WindowStateMask::Pos );
-            pWrapper->mpFloatWin->GetWindowStateData( aData );
-            Point aPos( aData.GetX(), aData.GetY() );
+            vcl::WindowData aData;
+            aData.setMask(vcl::WindowDataMask::Pos);
+            pWrapper->mpFloatWin->GetWindowState( aData );
+            Point aPos(aData.x(), aData.y());
             // LOK needs logic coordinates not absolute screen position for autofilter menu
             if (!comphelper::LibreOfficeKit::isActive() || get_id() != "check_list_menu")
                 aPos = pWrapper->mpFloatWin->GetParent()->ImplGetFrameWindow()->AbsoluteScreenToOutputPixel( aPos );
@@ -935,10 +937,10 @@ Point DockingWindow::GetFloatingPos() const
 
     if ( mpFloatWin )
     {
-        WindowStateData aData;
-        aData.SetMask( WindowStateMask::Pos );
-        mpFloatWin->GetWindowStateData( aData );
-        Point aPos( aData.GetX(), aData.GetY() );
+        vcl::WindowData aData;
+        aData.setMask(vcl::WindowDataMask::Pos);
+        mpFloatWin->GetWindowState( aData );
+        Point aPos(aData.x(), aData.y());
         aPos = mpFloatWin->GetParent()->ImplGetFrameWindow()->AbsoluteScreenToOutputPixel( aPos );
         return aPos;
     }

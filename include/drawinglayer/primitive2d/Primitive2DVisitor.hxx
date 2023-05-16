@@ -27,12 +27,12 @@ namespace drawinglayer::primitive2d
 class Primitive2DContainer;
 
 // Visitor class for walking a tree of Primitive2DReference
-class DRAWINGLAYER_DLLPUBLIC Primitive2DDecompositionVisitor
+class DRAWINGLAYERCORE_DLLPUBLIC Primitive2DDecompositionVisitor
 {
 public:
-    virtual void append(const Primitive2DReference&) = 0;
-    virtual void append(const Primitive2DContainer&) = 0;
-    virtual void append(Primitive2DContainer&&) = 0;
+    virtual void visit(const Primitive2DReference&) = 0;
+    virtual void visit(const Primitive2DContainer&) = 0;
+    virtual void visit(Primitive2DContainer&&) = 0;
     virtual ~Primitive2DDecompositionVisitor() {}
 };
 

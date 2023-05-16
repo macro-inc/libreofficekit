@@ -42,7 +42,8 @@ enum class ContentTypeId
     DRAWOBJECT     = 11,
     TEXTFIELD      = 12,
     FOOTNOTE       = 13,
-    LAST           = FOOTNOTE,
+    ENDNOTE        = 14,
+    LAST           = ENDNOTE,
     UNKNOWN        = -1
 };
 
@@ -74,13 +75,13 @@ class SwContent : public SwTypeNumber
 {
     const SwContentType*    m_pParent;
     OUString                m_sContentName;
-    tools::Long                    m_nYPosition;
+    double m_nYPosition;
         // some subclasses appear to use this for a tools/gen.hxx-style
         // geometric Y position, while e.g. SwOutlineContent wants to store
         // the index in its subtree
     bool                    m_bInvisible;
 public:
-        SwContent(const SwContentType* pCnt, const OUString& rName, tools::Long nYPos );
+        SwContent(const SwContentType* pCnt, OUString aName, double nYPos);
 
     virtual bool            IsProtect() const;
     const SwContentType*    GetParent() const {return m_pParent;}

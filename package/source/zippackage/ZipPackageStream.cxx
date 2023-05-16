@@ -20,10 +20,14 @@
 #include <ZipPackageStream.hxx>
 
 #include <com/sun/star/beans/PropertyValue.hpp>
+#include <com/sun/star/container/XNameContainer.hpp>
 #include <com/sun/star/packages/NoRawFormatException.hpp>
 #include <com/sun/star/packages/zip/ZipConstants.hpp>
 #include <com/sun/star/embed/StorageFormats.hpp>
 #include <com/sun/star/packages/zip/ZipIOException.hpp>
+#include <com/sun/star/packages/NoEncryptionException.hpp>
+#include <com/sun/star/packages/zip/ZipException.hpp>
+#include <com/sun/star/packages/WrongPasswordException.hpp>
 #include <com/sun/star/io/TempFile.hpp>
 #include <com/sun/star/io/XInputStream.hpp>
 #include <com/sun/star/io/XOutputStream.hpp>
@@ -32,14 +36,10 @@
 #include <com/sun/star/xml/crypto/DigestID.hpp>
 #include <com/sun/star/xml/crypto/CipherID.hpp>
 
-#include <string.h>
-
 #include <CRC32.hxx>
-#include <ThreadedDeflater.hxx>
 #include <ZipOutputEntry.hxx>
 #include <ZipOutputStream.hxx>
 #include <ZipPackage.hxx>
-#include <ZipPackageFolder.hxx>
 #include <ZipFile.hxx>
 #include <EncryptedDataHeader.hxx>
 #include <osl/diagnose.h>
@@ -48,17 +48,17 @@
 #include <comphelper/seekableinput.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <comphelper/storagehelper.hxx>
-#include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <unotools/tempfile.hxx>
 
 #include <rtl/random.h>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <PackageConstants.hxx>
 
 #include <algorithm>
-#include <thread>
+#include <cstddef>
 
 using namespace com::sun::star::packages::zip::ZipConstants;
 using namespace com::sun::star::packages::zip;
@@ -73,7 +73,7 @@ using namespace cppu;
 #define THROW_WHERE ""
 #endif
 
-css::uno::Sequence < sal_Int8 > ZipPackageStream::getUnoTunnelId()
+const css::uno::Sequence < sal_Int8 > & ZipPackageStream::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit lcl_CachedImplId;
     return lcl_CachedImplId.getSeq();
@@ -174,15 +174,13 @@ uno::Reference< io::XInputStream > ZipPackageStream::GetRawEncrStreamNoHeaderCop
                     m_xBaseEncryptionData->m_aSalt.getLength() + m_xBaseEncryptionData->m_aDigest.getLength() );
 
     // create temporary stream
-    uno::Reference < io::XTempFile > xTempFile = io::TempFile::create(m_xContext);
-    uno::Reference < io::XOutputStream > xTempOut = xTempFile->getOutputStream();
+    rtl::Reference < utl::TempFileFastService > xTempFile = new utl::TempFileFastService;
     uno::Reference < io::XInputStream > xTempIn = xTempFile->getInputStream();
-    uno::Reference < io::XSeekable > xTempSeek( xTempOut, UNO_QUERY_THROW );
 
     // copy the raw stream to the temporary file starting from the current position
-    ::comphelper::OStorageHelper::CopyInputToOutput( GetOwnSeekStream(), xTempOut );
-    xTempOut->closeOutput();
-    xTempSeek->seek( 0 );
+    ::comphelper::OStorageHelper::CopyInputToOutput( GetOwnSeekStream(), xTempFile );
+    xTempFile->closeOutput();
+    xTempFile->seek( 0 );
 
     return xTempIn;
 }
@@ -277,9 +275,7 @@ uno::Reference< io::XInputStream > ZipPackageStream::TryToGetRawFromDataStream( 
     try
     {
         // create temporary file
-        uno::Reference < io::XStream > xTempStream(
-                            io::TempFile::create(m_xContext),
-                            uno::UNO_QUERY_THROW );
+        uno::Reference < io::XStream > xTempStream(new utl::TempFileFastService);
 
         // create a package based on it
         rtl::Reference<ZipPackage> pPackage = new ZipPackage( m_xContext );
@@ -295,12 +291,12 @@ uno::Reference< io::XInputStream > ZipPackageStream::TryToGetRawFromDataStream( 
         uno::Reference< XPropertySet > xNewPSProps( xNewPackStream, UNO_QUERY_THROW );
 
         // copy all the properties of this stream to the new stream
-        xNewPSProps->setPropertyValue("MediaType", makeAny( msMediaType ) );
-        xNewPSProps->setPropertyValue("Compressed", makeAny( m_bToBeCompressed ) );
+        xNewPSProps->setPropertyValue("MediaType", Any( msMediaType ) );
+        xNewPSProps->setPropertyValue("Compressed", Any( m_bToBeCompressed ) );
         if ( m_bToBeEncrypted )
         {
-            xNewPSProps->setPropertyValue(ENCRYPTION_KEY_PROPERTY, makeAny( aKey ) );
-            xNewPSProps->setPropertyValue("Encrypted", makeAny( true ) );
+            xNewPSProps->setPropertyValue(ENCRYPTION_KEY_PROPERTY, Any( aKey ) );
+            xNewPSProps->setPropertyValue("Encrypted", Any( true ) );
         }
 
         // insert a new stream in the package
@@ -310,7 +306,7 @@ uno::Reference< io::XInputStream > ZipPackageStream::TryToGetRawFromDataStream( 
         uno::Reference< container::XNameContainer > xRootNameContainer( xTunnel, UNO_QUERY_THROW );
 
         uno::Reference< XUnoTunnel > xNPSTunnel( xNewPackStream, UNO_QUERY );
-        xRootNameContainer->insertByName("dummy", makeAny( xNPSTunnel ) );
+        xRootNameContainer->insertByName("dummy", Any( xNPSTunnel ) );
 
         // commit the temporary package
         pPackage->commitChanges();
@@ -323,16 +319,13 @@ uno::Reference< io::XInputStream > ZipPackageStream::TryToGetRawFromDataStream( 
             xInRaw = xNewPackStream->getPlainRawStream();
 
         // create another temporary file
-        uno::Reference < io::XOutputStream > xTempOut(
-                            io::TempFile::create(m_xContext),
-                            uno::UNO_QUERY_THROW );
-        uno::Reference < io::XInputStream > xTempIn( xTempOut, UNO_QUERY_THROW );
-        uno::Reference < io::XSeekable > xTempSeek( xTempOut, UNO_QUERY_THROW );
+        rtl::Reference < utl::TempFileFastService > xTempOut = new utl::TempFileFastService;
+        uno::Reference < io::XInputStream > xTempIn( xTempOut );
 
         // copy the raw stream to the temporary file
         ::comphelper::OStorageHelper::CopyInputToOutput( xInRaw, xTempOut );
         xTempOut->closeOutput();
-        xTempSeek->seek( 0 );
+        xTempOut->seek( 0 );
 
         // close raw stream, package stream and folder
         xInRaw.clear();
@@ -658,7 +651,7 @@ bool ZipPackageStream::saveChild(
 
             ZipOutputStream::setEntry(pTempEntry);
             rZipOut.writeLOC(pTempEntry);
-            // the entry is provided to the ZipOutputStream that will delete it
+            // coverity[leaked_storage] - the entry is provided to the ZipOutputStream that will delete it
             pAutoTempEntry.release();
 
             uno::Sequence < sal_Int8 > aSeq ( n_ConstBufferSize );
@@ -773,7 +766,7 @@ bool ZipPackageStream::saveChild(
                     // cores and allow 4-times the amount for having the queue well filled. The
                     // 2nd parameter is the time to wait between cleanups in 10th of a second.
                     // Both values may be added to the configuration settings if needed.
-                    static sal_Int32 nAllowedTasks(comphelper::ThreadPool::getPreferredConcurrency() * 4);
+                    static std::size_t nAllowedTasks(comphelper::ThreadPool::getPreferredConcurrency() * 4); //TODO: overflow
                     rZipOut.reduceScheduledThreadTasksToGivenNumberOrLess(nAllowedTasks);
 
                     // Start a new thread task deflating this zip entry

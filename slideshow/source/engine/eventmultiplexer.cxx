@@ -18,7 +18,7 @@
  */
 
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <rtl/ref.hxx>
 #include <cppuhelper/compbase.hxx>
@@ -135,9 +135,9 @@ class PrioritizedHandlerEntry
     double            mnPrio;
 
 public:
-    PrioritizedHandlerEntry( HandlerSharedPtrT const& pHandler,
+    PrioritizedHandlerEntry( HandlerSharedPtrT pHandler,
                              double                   nPrio ) :
-        mpHandler(pHandler),
+        mpHandler(std::move(pHandler)),
         mnPrio(nPrio)
     {}
 

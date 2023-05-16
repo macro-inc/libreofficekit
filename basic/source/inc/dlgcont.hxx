@@ -60,10 +60,10 @@ class SfxDialogLibraryContainer final : public SfxLibraryContainer
 
     virtual void onNewRootStorage() override;
 
-    virtual const char*    getInfoFileName() const override;
-    virtual const char*    getOldInfoFileName() const override;
-    virtual const char*    getLibElementFileExtension() const override;
-    virtual const char*    getLibrariesDir() const override;
+    virtual OUString getInfoFileName() const override;
+    virtual OUString getOldInfoFileName() const override;
+    virtual OUString getLibElementFileExtension() const override;
+    virtual OUString getLibrariesDir() const override;
 
 public:
     SfxDialogLibraryContainer();
@@ -108,7 +108,7 @@ public:
     SfxDialogLibrary
     (
         ModifiableHelper& _rModifiable,
-        const OUString& aName,
+        OUString aName,
         const css::uno::Reference< css::ucb::XSimpleFileAccess3 >& xSFI,
         SfxDialogLibraryContainer* pParent
     );
@@ -116,7 +116,7 @@ public:
     SfxDialogLibrary
     (
         ModifiableHelper& _rModifiable,
-        const OUString& aName,
+        OUString aName,
         const css::uno::Reference< css::ucb::XSimpleFileAccess3 >& xSFI,
         const OUString& aLibInfoFileURL, const OUString& aStorageURL, bool ReadOnly,
         SfxDialogLibraryContainer* pParent

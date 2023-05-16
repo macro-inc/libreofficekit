@@ -79,7 +79,7 @@ SalLayoutGlyphs* lcl_GetRulerTextGlyphs(const vcl::RenderContext& rRenderContext
     // Calculate glyph items.
 
     std::unique_ptr<SalLayout> pLayout = rRenderContext.ImplLayout(
-        rText, 0, rText.getLength(), Point(0, 0), 0, {}, SalLayoutFlags::GlyphItemsOnly);
+        rText, 0, rText.getLength(), Point(0, 0), 0, {}, {}, SalLayoutFlags::GlyphItemsOnly);
     if (!pLayout)
         return nullptr;
 
@@ -339,7 +339,7 @@ void Ruler::ImplVDrawText(vcl::RenderContext& rRenderContext, tools::Long nX, to
     tools::Rectangle aRect;
     SalLayoutGlyphs* pTextLayout
         = lcl_GetRulerTextGlyphs(rRenderContext, rText, maTextGlyphs[rText]);
-    rRenderContext.GetTextBoundRect(aRect, rText, 0, 0, -1, 0, {}, pTextLayout);
+    rRenderContext.GetTextBoundRect(aRect, rText, 0, 0, -1, 0, {}, {}, pTextLayout);
 
     tools::Long nShiftX = ( aRect.GetWidth() / 2 ) + aRect.Left();
     tools::Long nShiftY = ( aRect.GetHeight() / 2 ) + aRect.Top();
@@ -417,6 +417,7 @@ void Ruler::ImplInvertLines(vcl::RenderContext& rRenderContext)
 
 void Ruler::ImplDrawTicks(vcl::RenderContext& rRenderContext, tools::Long nMin, tools::Long nMax, tools::Long nStart, tools::Long nTop, tools::Long nBottom)
 {
+    const StyleSettings& rStyleSettings = rRenderContext.GetSettings().GetStyleSettings();
     double nCenter = nTop + ((nBottom - nTop) / 2);
 
     tools::Long nTickLength3 = (nBottom - nTop) * 0.5;
@@ -523,7 +524,7 @@ void Ruler::ImplDrawTicks(vcl::RenderContext& rRenderContext, tools::Long nMin, 
     }
     else
     {
-        rRenderContext.SetLineColor(rRenderContext.GetSettings().GetStyleSettings().GetShadowColor());
+        rRenderContext.SetLineColor(rStyleSettings.GetShadowColor());
     }
 
     if (bNoTicks)
@@ -576,6 +577,7 @@ void Ruler::ImplDrawTicks(vcl::RenderContext& rRenderContext, tools::Long nMin, 
             double aStep = nTick / nTick4;
             double aRest = std::abs(aStep - std::floor(aStep));
             double nAcceptanceDelta = 0.0001;
+            rRenderContext.SetFillColor(rStyleSettings.GetShadowColor());
 
             if (aRest < nAcceptanceDelta)
             {
@@ -994,6 +996,12 @@ void Ruler::ApplySettings(vcl::RenderContext& rRenderContext)
     svtools::ColorConfig aColorConfig;
     aColor = aColorConfig.GetColorValue(svtools::APPBACKGROUND).nColor;
     ApplyControlBackground(rRenderContext, aColor);
+    // A hack to get it to change the non-ruler application background to change immediately
+    if (aColor != maVirDev->GetBackground().GetColor())
+    {
+        maVirDev->SetBackground(aColor);
+        Resize();
+    }
 }
 
 void Ruler::ImplInitSettings(bool bFont, bool bForeground, bool bBackground)

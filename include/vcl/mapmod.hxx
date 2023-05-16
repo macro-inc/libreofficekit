@@ -64,6 +64,9 @@ public:
     }
     bool            IsDefault() const;
 
+    // Compute value usable as hash.
+    size_t          GetHashValue() const;
+
     // tdf#117984 needs to be thread-safe due to being used e.g. in Bitmaps
     // vcl::ScopedBitmapAccess in parallelized 3D renderer
     typedef o3tl::cow_wrapper< ImplMapMode, o3tl::ThreadSafeRefCountingPolicy > ImplType;
@@ -82,6 +85,8 @@ inline std::basic_ostream<charT, traits> & operator <<(
     rStream << "MapMode(" << static_cast<unsigned>(rMode.GetMapUnit()) << ",(" << rMode.GetScaleX() << "," << rMode.GetScaleY() << ")@(" << rMode.GetOrigin() << "))";
     return rStream;
 }
+
+bool TooLargeScaleForMapMode(const Fraction& rScale, int nDPI);
 
 #endif // INCLUDED_VCL_MAPMOD_HXX
 

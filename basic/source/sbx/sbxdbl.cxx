@@ -19,8 +19,7 @@
 
 #include <config_features.h>
 
-#include <o3tl/float_int_conversion.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include "sbxconv.hxx"
 #include <rtlproto.hxx>
 #include <runtime.hxx>
@@ -62,9 +61,7 @@ double ImpGetDouble( const SbxValues* p )
             nRes = ImpSalUInt64ToDouble( p->uInt64 ); break;
         case SbxDECIMAL:
         case SbxBYREF | SbxDECIMAL:
-            if( p->pDecimal )
-                p->pDecimal->getDouble( nRes );
-            else
+            if (!p->pDecimal || !p->pDecimal->getDouble(nRes))
                 nRes = 0.0;
             break;
         case SbxBYREF | SbxSTRING:
@@ -212,67 +209,19 @@ start:
             break;
         }
         case SbxBYREF | SbxCHAR:
-            if( !o3tl::convertsToAtMost(o3tl::roundAway(n), SbxMAXCHAR) )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); n = SbxMAXCHAR;
-            }
-            else if( !o3tl::convertsToAtLeast(o3tl::roundAway(n), SbxMINCHAR) )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); n = SbxMINCHAR;
-            }
-            *p->pChar = static_cast<sal_Unicode>(n); break;
+            *p->pChar = ImpDoubleToChar(n); break;
         case SbxBYREF | SbxBYTE:
-            if( !o3tl::convertsToAtMost(o3tl::roundAway(n), SbxMAXBYTE) )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); n = SbxMAXBYTE;
-            }
-            else if( n < 0 )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); n = 0;
-            }
-            *p->pByte = static_cast<sal_uInt8>(n); break;
+            *p->pByte = ImpDoubleToByte(n); break;
         case SbxBYREF | SbxINTEGER:
         case SbxBYREF | SbxBOOL:
-            if( !o3tl::convertsToAtMost(o3tl::roundAway(n), SbxMAXINT) )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); n = SbxMAXINT;
-            }
-            else if( !o3tl::convertsToAtLeast(o3tl::roundAway(n), SbxMININT) )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); n = SbxMININT;
-            }
-            *p->pInteger = static_cast<sal_Int16>(n); break;
+            *p->pInteger = ImpDoubleToInteger(n); break;
         case SbxBYREF | SbxERROR:
         case SbxBYREF | SbxUSHORT:
-            if( !o3tl::convertsToAtMost(o3tl::roundAway(n), SbxMAXUINT) )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); n = SbxMAXUINT;
-            }
-            else if( n < 0 )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); n = 0;
-            }
-            *p->pUShort = static_cast<sal_uInt16>(n); break;
+            *p->pUShort = ImpDoubleToUShort(n); break;
         case SbxBYREF | SbxLONG:
-            if( !o3tl::convertsToAtMost(o3tl::roundAway(n), SbxMAXLNG) )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); n = SbxMAXLNG;
-            }
-            else if( !o3tl::convertsToAtLeast(o3tl::roundAway(n), SbxMINLNG) )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); n = SbxMINLNG;
-            }
-            *p->pLong = static_cast<sal_Int32>(n); break;
+            *p->pLong = ImpDoubleToLong(n); break;
         case SbxBYREF | SbxULONG:
-            if( !o3tl::convertsToAtMost(o3tl::roundAway(n), SbxMAXULNG) )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); n = SbxMAXULNG;
-            }
-            else if( n < 0 )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); n = 0;
-            }
-            *p->pULong = static_cast<sal_uInt32>(n); break;
+            *p->pULong = ImpDoubleToULong(n); break;
         case SbxBYREF | SbxSINGLE:
             if( n > SbxMAXSNG )
             {

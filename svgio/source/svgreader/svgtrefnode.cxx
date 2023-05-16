@@ -45,7 +45,7 @@ namespace svgio::svgreader
             SvgNode::parseAttribute(rTokenName, aSVGToken, aContent);
 
             // read style attributes
-            maSvgStyleAttributes.parseStyleAttribute(aSVGToken, aContent, false);
+            maSvgStyleAttributes.parseStyleAttribute(aSVGToken, aContent);
 
             // parse own
             switch(aSVGToken)
@@ -58,12 +58,7 @@ namespace svgio::svgreader
                 case SVGToken::Href:
                 case SVGToken::XlinkHref:
                 {
-                    const sal_Int32 nLen(aContent.getLength());
-
-                    if(nLen && '#' == aContent[0])
-                    {
-                        maXLink = aContent.copy(1);
-                    }
+                    readLocalLink(aContent, maXLink);
                     break;
                 }
                 default:

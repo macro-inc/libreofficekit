@@ -134,6 +134,13 @@ inline Sequence< E > & Sequence< E >::operator = ( const Sequence & rSeq )
     return *this;
 }
 
+#if defined LIBO_INTERNAL_ONLY
+template<typename E> Sequence<E> & Sequence<E>::operator =(Sequence && other) {
+    std::swap(_pSequence, other._pSequence);
+    return *this;
+}
+#endif
+
 template< class E >
 inline bool Sequence< E >::operator == ( const Sequence & rSeq ) const
 {
@@ -319,13 +326,13 @@ template< typename T > inline ::com::sun::star::uno::Type const &
 getTypeFavourUnsigned(
     SAL_UNUSED_PARAMETER ::com::sun::star::uno::Sequence< T > const *)
 {
-    if (::com::sun::star::uno::Sequence< T >::s_pType == 0) {
+    if (::com::sun::star::uno::Sequence< T >::s_pType == NULL) {
         ::typelib_static_sequence_type_init(
             &::com::sun::star::uno::Sequence< T >::s_pType,
             (::cppu::getTypeFavourUnsigned(
                 static_cast<
                 typename ::com::sun::star::uno::Sequence< T >::ElementType * >(
-                    0)).
+                    NULL)).
              getTypeLibType()));
     }
     return detail::getTypeFromTypeDescriptionReference(
@@ -345,7 +352,7 @@ getTypeFavourChar(
             (::cppu::getTypeFavourChar(
                 static_cast<
                 typename ::com::sun::star::uno::Sequence< T >::ElementType * >(
-                    0)).
+                    NULL)).
              getTypeLibType()));
     }
     return detail::getTypeFromTypeDescriptionReference(&td);

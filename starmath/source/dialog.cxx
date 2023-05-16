@@ -61,8 +61,8 @@ void lclGetSettingColors(Color& rBackgroundColor, Color& rTextColor)
     }
     else
     {
-        rBackgroundColor = COL_WHITE;
-        rTextColor = COL_BLACK;
+        rBackgroundColor = rStyleSettings.GetFaceColor();
+        rTextColor = rStyleSettings.GetLabelTextColor();
     }
 }
 
@@ -181,7 +181,8 @@ SmPrintOptionsTabPage::SmPrintOptionsTabPage(weld::Container* pPage, weld::Dialo
 
 SmPrintOptionsTabPage::~SmPrintOptionsTabPage()
 {
-    SmGetActiveView()->GetEditWindow()->UpdateStatus(false);
+    if (SmViewShell *pViewSh = SmGetActiveView())
+        pViewSh->GetEditWindow()->UpdateStatus();
 }
 
 bool SmPrintOptionsTabPage::FillItemSet(SfxItemSet* rSet)
@@ -194,23 +195,25 @@ bool SmPrintOptionsTabPage::FillItemSet(SfxItemSet* rSet)
     else
         nPrintSize = PRINT_SIZE_ZOOMED;
 
-    rSet->Put(SfxUInt16Item(GetWhich(SID_PRINTSIZE), nPrintSize));
-    rSet->Put(SfxUInt16Item(GetWhich(SID_PRINTZOOM), sal::static_int_cast<sal_uInt16>(m_xZoom->get_value(FieldUnit::PERCENT))));
-    rSet->Put(SfxBoolItem(GetWhich(SID_PRINTTITLE), m_xTitle->get_active()));
-    rSet->Put(SfxBoolItem(GetWhich(SID_PRINTTEXT), m_xText->get_active()));
-    rSet->Put(SfxBoolItem(GetWhich(SID_PRINTFRAME), m_xFrame->get_active()));
-    rSet->Put(SfxBoolItem(GetWhich(SID_NO_RIGHT_SPACES), m_xNoRightSpaces->get_active()));
-    rSet->Put(SfxBoolItem(GetWhich(SID_SAVE_ONLY_USED_SYMBOLS), m_xSaveOnlyUsedSymbols->get_active()));
-    rSet->Put(SfxBoolItem(GetWhich(SID_AUTO_CLOSE_BRACKETS), m_xAutoCloseBrackets->get_active()));
-    rSet->Put(SfxUInt16Item(GetWhich(SID_SMEDITWINDOWZOOM), sal::static_int_cast<sal_uInt16>(m_xSmZoom->get_value(FieldUnit::PERCENT))));
+    rSet->Put(SfxUInt16Item(SID_PRINTSIZE, nPrintSize));
+    rSet->Put(SfxUInt16Item(SID_PRINTZOOM, sal::static_int_cast<sal_uInt16>(m_xZoom->get_value(FieldUnit::PERCENT))));
+    rSet->Put(SfxBoolItem(SID_PRINTTITLE, m_xTitle->get_active()));
+    rSet->Put(SfxBoolItem(SID_PRINTTEXT, m_xText->get_active()));
+    rSet->Put(SfxBoolItem(SID_PRINTFRAME, m_xFrame->get_active()));
+    rSet->Put(SfxBoolItem(SID_NO_RIGHT_SPACES, m_xNoRightSpaces->get_active()));
+    rSet->Put(SfxBoolItem(SID_SAVE_ONLY_USED_SYMBOLS, m_xSaveOnlyUsedSymbols->get_active()));
+    rSet->Put(SfxBoolItem(SID_AUTO_CLOSE_BRACKETS, m_xAutoCloseBrackets->get_active()));
+    rSet->Put(SfxUInt16Item(SID_SMEDITWINDOWZOOM, sal::static_int_cast<sal_uInt16>(m_xSmZoom->get_value(FieldUnit::PERCENT))));
 
-    SmGetActiveView()->GetEditWindow()->UpdateStatus(false);
+    if (SmViewShell *pViewSh = SmGetActiveView())
+        pViewSh->GetEditWindow()->UpdateStatus();
+
     return true;
 }
 
 void SmPrintOptionsTabPage::Reset(const SfxItemSet* rSet)
 {
-    SmPrintSize ePrintSize = static_cast<SmPrintSize>(static_cast<const SfxUInt16Item &>(rSet->Get(GetWhich(SID_PRINTSIZE))).GetValue());
+    SmPrintSize ePrintSize = static_cast<SmPrintSize>(rSet->Get(SID_PRINTSIZE).GetValue());
 
     m_xSizeNormal->set_active(ePrintSize == PRINT_SIZE_NORMAL);
     m_xSizeScaled->set_active(ePrintSize == PRINT_SIZE_SCALED);
@@ -218,15 +221,15 @@ void SmPrintOptionsTabPage::Reset(const SfxItemSet* rSet)
 
     m_xZoom->set_sensitive(m_xSizeZoomed->get_active());
 
-    m_xZoom->set_value(static_cast<const SfxUInt16Item &>(rSet->Get(GetWhich(SID_PRINTZOOM))).GetValue(), FieldUnit::PERCENT);
+    m_xZoom->set_value(rSet->Get(SID_PRINTZOOM).GetValue(), FieldUnit::PERCENT);
 
     m_xSmZoom->set_sensitive(true);
-    m_xSmZoom->set_value(static_cast<const SfxUInt16Item &>(rSet->Get(GetWhich(SID_SMEDITWINDOWZOOM))).GetValue(), FieldUnit::PERCENT);
+    m_xSmZoom->set_value(rSet->Get(SID_SMEDITWINDOWZOOM).GetValue(), FieldUnit::PERCENT);
 
-    m_xTitle->set_active(static_cast<const SfxBoolItem &>(rSet->Get(GetWhich(SID_PRINTTITLE))).GetValue());
-    m_xNoRightSpaces->set_active(static_cast<const SfxBoolItem &>(rSet->Get(GetWhich(SID_NO_RIGHT_SPACES))).GetValue());
-    m_xSaveOnlyUsedSymbols->set_active(static_cast<const SfxBoolItem &>(rSet->Get(GetWhich(SID_SAVE_ONLY_USED_SYMBOLS))).GetValue());
-    m_xAutoCloseBrackets->set_active(static_cast<const SfxBoolItem &>(rSet->Get(GetWhich(SID_AUTO_CLOSE_BRACKETS))).GetValue());
+    m_xTitle->set_active(rSet->Get(SID_PRINTTITLE).GetValue());
+    m_xNoRightSpaces->set_active(rSet->Get(SID_NO_RIGHT_SPACES).GetValue());
+    m_xSaveOnlyUsedSymbols->set_active(rSet->Get(SID_SAVE_ONLY_USED_SYMBOLS).GetValue());
+    m_xAutoCloseBrackets->set_active(rSet->Get(SID_AUTO_CLOSE_BRACKETS).GetValue());
 }
 
 std::unique_ptr<SfxTabPage> SmPrintOptionsTabPage::Create(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rSet)
@@ -1563,7 +1566,7 @@ IMPL_LINK_NOARG(SmSymDefineDialog, SubsetChangeHdl, weld::ComboBox&, void)
     int nPos = m_xFontsSubsetLB->get_active();
     if (nPos != -1)
     {
-        const Subset* pSubset = reinterpret_cast<const Subset*>(m_xFontsSubsetLB->get_active_id().toUInt64());
+        const Subset* pSubset = weld::fromId<const Subset*>(m_xFontsSubsetLB->get_active_id());
         if (pSubset)
         {
             m_xCharsetDisplay->SelectCharacter( pSubset->GetRangeMin() );
@@ -1822,7 +1825,7 @@ bool SmSymDefineDialog::SelectSymbolSet(weld::ComboBox& rComboBox,
     assert((&rComboBox == m_xOldSymbolSets.get() || &rComboBox == m_xSymbolSets.get()) && "Sm : wrong ComboBox");
 
     // trim SymbolName (no leading and trailing blanks)
-    OUString aNormName = comphelper::string::strip(rSymbolSetName, ' ');
+    OUString aNormName( comphelper::string::strip(rSymbolSetName, ' ') );
     // and remove possible deviations within the input
     rComboBox.set_entry_text(aNormName);
 
@@ -1977,7 +1980,7 @@ void SmSymDefineDialog::SetFont(const OUString &rFontName, std::u16string_view r
     bool bFirst = true;
     for (auto & subset : m_xSubsetMap->GetSubsetMap())
     {
-        m_xFontsSubsetLB->append(OUString::number(reinterpret_cast<sal_uInt64>(&subset)), subset.GetName());
+        m_xFontsSubsetLB->append(weld::toId(&subset), subset.GetName());
         // subset must live at least as long as the selected font !!!
         if (bFirst)
             m_xFontsSubsetLB->set_active(0);

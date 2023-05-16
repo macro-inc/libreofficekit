@@ -30,12 +30,19 @@ namespace drawinglayer::primitive2d
             const vcl::PDFWriter::StructElement& rStructureElement,
             bool bBackground,
             bool bIsImage,
-            Primitive2DContainer&& aChildren)
+            Primitive2DContainer&& aChildren,
+            sal_Int32 const nAnchorStructureElementId,
+            ::std::vector<sal_Int32> const*const pAnnotIds)
         :   GroupPrimitive2D(std::move(aChildren)),
             maStructureElement(rStructureElement),
             mbBackground(bBackground),
             mbIsImage(bIsImage)
+        ,   m_nAnchorStructureElementId(nAnchorStructureElementId)
         {
+            if (pAnnotIds)
+            {
+                m_AnnotIds = *pAnnotIds;
+            }
         }
 
         bool StructureTagPrimitive2D::operator==(const BasePrimitive2D& rPrimitive) const
@@ -55,6 +62,13 @@ namespace drawinglayer::primitive2d
         sal_uInt32 StructureTagPrimitive2D::getPrimitive2DID() const
         {
             return PRIMITIVE2D_ID_STRUCTURETAGPRIMITIVE2D;
+        }
+
+        bool StructureTagPrimitive2D::isTaggedSdrObject() const
+        {
+            // note at the moment *all* StructureTagPrimitive2D are created for
+            // SdrObjects - if that ever changes, need another condition here
+            return !isBackground() || isImage();
         }
 
 } // end of namespace

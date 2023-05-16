@@ -18,11 +18,14 @@
  */
 #pragma once
 
-#include <cppuhelper/weakref.hxx>
 #include <com/sun/star/awt/Size.hpp>
 #include <com/sun/star/awt/Point.hpp>
 #include <com/sun/star/awt/Rectangle.hpp>
-
+#include <rtl/ref.hxx>
+#include <svx/unopage.hxx>
+#include <unotools/weakref.hxx>
+#include <ChartModel.hxx>
+#include <Diagram.hxx>
 #include <map>
 
 namespace chart { struct ExplicitIncrementData; }
@@ -54,17 +57,14 @@ public:
     ~Chart2ModelContact();
 
 public:
-    void setModel( const css::uno::Reference< css::frame::XModel >& xChartModel );
+    void setDocumentModel( ChartModel* pChartModel );
     void clear();
 
-    css::uno::Reference< css::frame::XModel > getChartModel() const;
+    rtl::Reference<ChartModel> getDocumentModel() const;
 
-    ChartModel* getModel() const { return mpModel;}
+    rtl::Reference< ::chart::Diagram > getDiagram() const;
 
-    css::uno::Reference< css::chart2::XChartDocument > getChart2Document() const;
-    css::uno::Reference< css::chart2::XDiagram > getChart2Diagram() const;
-
-    css::uno::Reference< css::drawing::XDrawPage > getDrawPage() const;
+    rtl::Reference<SvxDrawPage> getDrawPage() const;
 
     /** get the current values calculated for an axis in the current view in
         case properties are 'auto'.
@@ -130,17 +130,15 @@ public:
 
 private: //methods
     ExplicitValueProvider* getExplicitValueProvider() const;
-    css::uno::Reference< css::lang::XUnoTunnel > const & getChartView() const;
+    rtl::Reference< ChartView > const & getChartView() const;
 
 public: //member
     css::uno::Reference< css::uno::XComponentContext >  m_xContext;
 
 private: //member
-    css::uno::WeakReference< css::frame::XModel >   m_xChartModel;
+    unotools::WeakReference< ChartModel >   m_xChartModel;
 
-    ChartModel* mpModel;
-
-    mutable css::uno::Reference< css::lang::XUnoTunnel > m_xChartView;
+    mutable rtl::Reference< ChartView > m_xChartView;
 
     std::map< OUString, css::uno::Reference< css::container::XNameContainer > > m_aTableMap;
 };

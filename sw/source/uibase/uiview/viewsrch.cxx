@@ -251,7 +251,7 @@ void SwView::ExecSearch(SfxRequest& rReq)
             {
                 // Disable LOK selection notifications during search.
                 m_pWrtShell->GetSfxViewShell()->setTiledSearching(true);
-                bool bRet = SearchAll();
+                const auto nFound = SearchAll();
                 m_pWrtShell->GetSfxViewShell()->setTiledSearching(false);
 
                 GetDocShell()->Broadcast(
@@ -259,7 +259,7 @@ void SwView::ExecSearch(SfxRequest& rReq)
                 GetDocShell()->Broadcast(
                             SfxHint(SfxHintId::SwNavigatorSelectOutlinesWithSelections));
 
-                if( !bRet )
+                if (nFound == 0)
                 {
 #if HAVE_FEATURE_DESKTOP
                     if( !bQuiet )
@@ -270,9 +270,18 @@ void SwView::ExecSearch(SfxRequest& rReq)
 #endif
                     s_bFound = false;
                 }
-                else if (comphelper::LibreOfficeKit::isActive())
-                    lcl_emitSearchResultCallbacks(s_pSrchItem, m_pWrtShell.get(), /* bHighlightAll = */ true);
-                rReq.SetReturnValue(SfxBoolItem(nSlot, bRet));
+                else
+                {
+                    if (comphelper::LibreOfficeKit::isActive())
+                        lcl_emitSearchResultCallbacks(s_pSrchItem, m_pWrtShell.get(), /* bHighlightAll = */ true);
+                    if (!bQuiet)
+                    {
+                        OUString sText(SwResId(STR_SEARCH_KEY_FOUND_TIMES));
+                        sText = sText.replaceFirst("%1", OUString::number(nFound));
+                        SvxSearchDialogWrapper::SetSearchLabel(sText);
+                    }
+                }
+                rReq.SetReturnValue(SfxBoolItem(nSlot, nFound != 0));
             }
             break;
             case SvxSearchCmd::REPLACE:
@@ -426,7 +435,7 @@ void SwView::ExecSearch(SfxRequest& rReq)
                 aSet.MergeRange(RES_PARATR_SCRIPTSPACE, RES_PARATR_FORBIDDEN_RULES);
             }
 
-            sal_uInt16 nWhich = SID_SEARCH_SEARCHSET;
+            TypedWhichId<SvxSetItem> nWhich = SID_SEARCH_SEARCHSET;
 
             if ( FID_SEARCH_REPLACESET == nSlot )
             {
@@ -492,7 +501,7 @@ bool SwView::SearchAndWrap(bool bApi)
     if (!s_pSrchItem->GetSelection())
         m_pWrtShell->KillSelection(nullptr, false);
 
-    std::unique_ptr<SwWait> pWait(new SwWait( *GetDocShell(), true ));
+    std::optional<SwWait> oWait( std::in_place, *GetDocShell(), true );
     if( FUNC_Search( aOpts ) )
     {
         s_bFound = true;
@@ -505,7 +514,7 @@ bool SwView::SearchAndWrap(bool bApi)
         m_pWrtShell->EndAllAction();
         return true;
     }
-    pWait.reset();
+    oWait.reset();
 
         // Search in the specialized areas when no search is present in selections.
         // When searching selections will already searched in these special areas.
@@ -545,7 +554,7 @@ bool SwView::SearchAndWrap(bool bApi)
 
     m_pWrtShell->StartAllAction();
     m_pWrtShell->Pop(SwCursorShell::PopMode::DeleteCurrent);
-    pWait.reset(new SwWait( *GetDocShell(), true ));
+    oWait.emplace( *GetDocShell(), true );
 
     bool bSrchBkwrd = SwDocPositions::Start == aOpts.eEnd;
 
@@ -576,7 +585,7 @@ bool SwView::SearchAndWrap(bool bApi)
     }
 
     m_pWrtShell->EndAllAction();
-    pWait.reset();
+    oWait.reset();
 #if HAVE_FEATURE_DESKTOP
     if (s_bFound)
     {
@@ -594,7 +603,7 @@ bool SwView::SearchAndWrap(bool bApi)
     return s_bFound;
 }
 
-bool SwView::SearchAll()
+sal_uInt16 SwView::SearchAll()
 {
     SwWait aWait( *GetDocShell(), true );
     m_pWrtShell->StartAllAction();
@@ -616,7 +625,7 @@ bool SwView::SearchAll()
     s_bFound = 0 != nFound;
 
     m_pWrtShell->EndAllAction();
-    return s_bFound;
+    return nFound;
 }
 
 void SwView::Replace()
@@ -782,7 +791,7 @@ sal_uLong SwView::FUNC_Search( const SwSearchOptions& rOptions )
     if( !bDoReplace )
         aSearchOpt.replaceString.clear();
 
-    sal_uLong nFound;
+    sal_Int32 nFound;
     if( aSrchSet.Count() || ( xReplSet && xReplSet->Count() ))
     {
         nFound = m_pWrtShell->SearchAttr(
@@ -821,9 +830,13 @@ SvxSearchDialog* SwView::GetSearchDialog()
 {
 #if HAVE_FEATURE_DESKTOP
     const sal_uInt16 nId = SvxSearchDialogWrapper::GetChildWindowId();
-    SvxSearchDialogWrapper *pWrp = static_cast<SvxSearchDialogWrapper*>( SfxViewFrame::Current()->GetChildWindow(nId) );
-    auto pSrchDlg = pWrp ? pWrp->getDialog() : nullptr;
-    return pSrchDlg;
+    SfxViewFrame* pFrame = SfxViewFrame::Current();
+    if (!pFrame)
+        return nullptr;
+    SvxSearchDialogWrapper *pWrp = static_cast<SvxSearchDialogWrapper*>(pFrame->GetChildWindow(nId));
+    if (!pWrp)
+        return nullptr;
+    return pWrp->getDialog();
 #else
     return nullptr;
 #endif

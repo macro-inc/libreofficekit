@@ -72,6 +72,9 @@ namespace drawinglayer::primitive2d
     point in FontCoordinateSystem X-Direction (given by maTextTransform) to the start
     point of the second character
 
+    @param rKashidaArray
+    The Kashida insertion positions.
+
     @param rFontAttribute
     The font definition
 
@@ -107,6 +110,9 @@ private:
     /// The DX array in logic units
     std::vector<double> maDXArray;
 
+    /// The Kashida array
+    std::vector<sal_Bool> maKashidaArray;
+
     /// The font definition
     attribute::FontAttribute maFontAttribute;
 
@@ -136,11 +142,11 @@ protected:
 
 public:
     /// constructor
-    TextSimplePortionPrimitive2D(const basegfx::B2DHomMatrix& rNewTransform, const OUString& rText,
+    TextSimplePortionPrimitive2D(basegfx::B2DHomMatrix aNewTransform, OUString aText,
                                  sal_Int32 nTextPosition, sal_Int32 nTextLength,
                                  std::vector<double>&& rDXArray,
-                                 const attribute::FontAttribute& rFontAttribute,
-                                 const css::lang::Locale& rLocale,
+                                 std::vector<sal_Bool>&& rKashidaArray,
+                                 attribute::FontAttribute aFontAttribute, css::lang::Locale aLocale,
                                  const basegfx::BColor& rFontColor, bool bFilled = false,
                                  tools::Long nWidthToFill = 0,
                                  const Color& rTextFillColor = COL_TRANSPARENT);
@@ -157,6 +163,7 @@ public:
     sal_Int32 getTextPosition() const { return mnTextPosition; }
     sal_Int32 getTextLength() const { return mnTextLength; }
     const ::std::vector<double>& getDXArray() const { return maDXArray; }
+    const ::std::vector<sal_Bool>& getKashidaArray() const { return maKashidaArray; }
     const attribute::FontAttribute& getFontAttribute() const { return maFontAttribute; }
     const css::lang::Locale& getLocale() const { return maLocale; }
     const basegfx::BColor& getFontColor() const { return maFontColor; }

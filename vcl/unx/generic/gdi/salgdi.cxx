@@ -17,6 +17,13 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_features.h>
+#include <vcl/skia/SkiaHelper.hxx>
+#if HAVE_FEATURE_SKIA
+#include <skia/x11/gdiimpl.hxx>
+#include <skia/x11/textrender.hxx>
+#endif
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/Xrender.h>
@@ -50,34 +57,62 @@
 #include "cairo_xlib_cairo.hxx"
 #include <cairo-xlib.h>
 
-#include <config_features.h>
-#include <vcl/skia/SkiaHelper.hxx>
-#if HAVE_FEATURE_SKIA
-#include <skia/x11/gdiimpl.hxx>
-#include <skia/x11/textrender.hxx>
+#if ENABLE_CAIRO_CANVAS
+#include "X11CairoSalGraphicsImpl.hxx"
 #endif
+
+
+// X11Common
+
+X11Common::X11Common()
+    : m_hDrawable(None)
+    , m_pColormap(nullptr)
+    , m_pExternalSurface(nullptr)
+{}
+
+cairo_t* X11Common::getCairoContext()
+{
+    if (m_pExternalSurface)
+        return cairo_create(m_pExternalSurface);
+
+    cairo_surface_t* surface = cairo_xlib_surface_create(GetXDisplay(), m_hDrawable, GetVisual().visual, SAL_MAX_INT16, SAL_MAX_INT16);
+
+    cairo_t *cr = cairo_create(surface);
+    cairo_surface_destroy(surface);
+
+    return cr;
+}
+
+void X11Common::releaseCairoContext(cairo_t* cr)
+{
+   cairo_destroy(cr);
+}
+
+bool X11Common::SupportsCairo() const
+{
+    static bool bSupportsCairo = [this] {
+        Display *pDisplay = GetXDisplay();
+        int nDummy;
+        return XQueryExtension(pDisplay, "RENDER", &nDummy, &nDummy, &nDummy);
+    }();
+    return bSupportsCairo;
+}
+
+// X11SalGraphics
 
 X11SalGraphics::X11SalGraphics():
     m_pFrame(nullptr),
     m_pVDev(nullptr),
-    m_pColormap(nullptr),
-    hDrawable_(None),
-    m_pExternalSurface(nullptr),
     m_nXScreen( 0 ),
     m_pXRenderFormat(nullptr),
     m_aXRenderPicture(0),
     mpClipRegion(nullptr),
-#if ENABLE_CAIRO_CANVAS
-    mnPenColor(SALCOLOR_NONE),
-    mnFillColor(SALCOLOR_NONE),
-#endif // ENABLE_CAIRO_CANVAS
     hBrush_(None),
     bWindow_(false),
-    bVirDev_(false),
-    m_bSkia(SkiaHelper::isVCLSkiaEnabled())
+    bVirDev_(false)
 {
 #if HAVE_FEATURE_SKIA
-    if (m_bSkia)
+    if (SkiaHelper::isVCLSkiaEnabled())
     {
         mxImpl.reset(new X11SkiaSalGraphicsImpl(*this));
         mxTextRenderImpl.reset(new SkiaTextRender);
@@ -86,9 +121,12 @@ X11SalGraphics::X11SalGraphics():
 #endif
     {
         mxTextRenderImpl.reset(new X11CairoTextRender(*this));
+#if ENABLE_CAIRO_CANVAS
+        mxImpl.reset(new X11CairoSalGraphicsImpl(*this, maX11Common));
+#else
         mxImpl.reset(new X11SalGraphicsImpl(*this));
+#endif
     }
-
 }
 
 X11SalGraphics::~X11SalGraphics() COVERITY_NOEXCEPT_FALSE
@@ -105,7 +143,7 @@ void X11SalGraphics::freeResources()
     if( mpClipRegion )
     {
         XDestroyRegion( mpClipRegion );
-        mpClipRegion = None;
+        mpClipRegion = nullptr;
     }
 
     mxImpl->freeResources();
@@ -118,7 +156,7 @@ void X11SalGraphics::freeResources()
     if( m_pDeleteColormap )
     {
         m_pDeleteColormap.reset();
-        m_pColormap = nullptr;
+        maX11Common.m_pColormap = nullptr;
     }
     if( m_aXRenderPicture )
     {
@@ -134,21 +172,21 @@ SalGraphicsImpl* X11SalGraphics::GetImpl() const
 
 void X11SalGraphics::SetDrawable(Drawable aDrawable, cairo_surface_t* pExternalSurface, SalX11Screen nXScreen)
 {
-    m_pExternalSurface = pExternalSurface;
+    maX11Common.m_pExternalSurface = pExternalSurface;
 
     // shortcut if nothing changed
-    if( hDrawable_ == aDrawable )
+    if( maX11Common.m_hDrawable == aDrawable )
         return;
 
     // free screen specific resources if needed
     if( nXScreen != m_nXScreen )
     {
         freeResources();
-        m_pColormap = &vcl_sal::getSalDisplay(GetGenericUnixSalData())->GetColormap( nXScreen );
+        maX11Common.m_pColormap = &vcl_sal::getSalDisplay(GetGenericUnixSalData())->GetColormap( nXScreen );
         m_nXScreen = nXScreen;
     }
 
-    hDrawable_ = aDrawable;
+    maX11Common.m_hDrawable = aDrawable;
     SetXRenderFormat( nullptr );
     if( m_aXRenderPicture )
     {
@@ -160,7 +198,7 @@ void X11SalGraphics::SetDrawable(Drawable aDrawable, cairo_surface_t* pExternalS
 void X11SalGraphics::Init( SalFrame *pFrame, Drawable aTarget,
                            SalX11Screen nXScreen )
 {
-    m_pColormap = &vcl_sal::getSalDisplay(GetGenericUnixSalData())->GetColormap(nXScreen);
+    maX11Common.m_pColormap = &vcl_sal::getSalDisplay(GetGenericUnixSalData())->GetColormap(nXScreen);
     m_nXScreen  = nXScreen;
 
     m_pFrame    = pFrame;
@@ -324,149 +362,6 @@ void X11SalGraphics::GetResolution( sal_Int32 &rDPIX, sal_Int32 &rDPIY ) // cons
     rDPIX = rDPIY; // y-resolution is more trustworthy
 }
 
-sal_uInt16 X11SalGraphics::GetBitCount() const
-{
-    return mxImpl->GetBitCount();
-}
-
-tools::Long X11SalGraphics::GetGraphicsWidth() const
-{
-    return mxImpl->GetGraphicsWidth();
-}
-
-void X11SalGraphics::ResetClipRegion()
-{
-#if ENABLE_CAIRO_CANVAS
-    maClipRegion.SetNull();
-#endif
-    mxImpl->ResetClipRegion();
-}
-
-bool X11SalGraphics::setClipRegion( const vcl::Region& i_rClip )
-{
-#if ENABLE_CAIRO_CANVAS
-    maClipRegion = i_rClip;
-#endif
-    return mxImpl->setClipRegion( i_rClip );
-}
-
-void X11SalGraphics::SetLineColor()
-{
-#if ENABLE_CAIRO_CANVAS
-    mnPenColor = SALCOLOR_NONE;
-#endif // ENABLE_CAIRO_CANVAS
-
-    mxImpl->SetLineColor();
-}
-
-void X11SalGraphics::SetLineColor( Color nColor )
-{
-#if ENABLE_CAIRO_CANVAS
-    mnPenColor = nColor;
-#endif // ENABLE_CAIRO_CANVAS
-
-    mxImpl->SetLineColor( nColor );
-}
-
-void X11SalGraphics::SetFillColor()
-{
-#if ENABLE_CAIRO_CANVAS
-    mnFillColor = SALCOLOR_NONE;
-#endif // ENABLE_CAIRO_CANVAS
-
-    mxImpl->SetFillColor();
-}
-
-void X11SalGraphics::SetFillColor( Color nColor )
-{
-#if ENABLE_CAIRO_CANVAS
-    mnFillColor = nColor;
-#endif // ENABLE_CAIRO_CANVAS
-
-    mxImpl->SetFillColor( nColor );
-}
-
-void X11SalGraphics::SetROPLineColor( SalROPColor nROPColor )
-{
-    mxImpl->SetROPLineColor( nROPColor );
-}
-
-void X11SalGraphics::SetROPFillColor( SalROPColor nROPColor )
-{
-    mxImpl->SetROPFillColor( nROPColor );
-}
-
-void X11SalGraphics::SetXORMode( bool bSet, bool bInvertOnly )
-{
-    mxImpl->SetXORMode( bSet, bInvertOnly );
-}
-
-void X11SalGraphics::drawPixel( tools::Long nX, tools::Long nY )
-{
-    mxImpl->drawPixel( nX, nY );
-}
-
-void X11SalGraphics::drawPixel( tools::Long nX, tools::Long nY, Color nColor )
-{
-    mxImpl->drawPixel( nX, nY, nColor );
-}
-
-void X11SalGraphics::drawLine( tools::Long nX1, tools::Long nY1, tools::Long nX2, tools::Long nY2 )
-{
-    mxImpl->drawLine( nX1, nY1, nX2, nY2 );
-}
-
-void X11SalGraphics::drawRect( tools::Long nX, tools::Long nY, tools::Long nDX, tools::Long nDY )
-{
-    mxImpl->drawRect( nX, nY, nDX, nDY );
-}
-
-void X11SalGraphics::drawPolyLine( sal_uInt32 nPoints, const Point *pPtAry )
-{
-    mxImpl->drawPolyLine( nPoints, pPtAry );
-}
-
-void X11SalGraphics::drawPolygon( sal_uInt32 nPoints, const Point* pPtAry )
-{
-    mxImpl->drawPolygon( nPoints, pPtAry );
-}
-
-void X11SalGraphics::drawPolyPolygon( sal_uInt32 nPoly,
-                                   const sal_uInt32    *pPoints,
-                                   const Point*  *pPtAry )
-{
-    mxImpl->drawPolyPolygon( nPoly, pPoints, pPtAry );
-}
-
-bool X11SalGraphics::drawPolyLineBezier( sal_uInt32 nPoints, const Point* pPtAry, const PolyFlags* pFlgAry )
-{
-    return mxImpl->drawPolyLineBezier( nPoints, pPtAry, pFlgAry );
-}
-
-bool X11SalGraphics::drawPolygonBezier( sal_uInt32 nPoints, const Point* pPtAry, const PolyFlags* pFlgAry )
-{
-    return mxImpl->drawPolygonBezier( nPoints, pPtAry, pFlgAry );
-}
-
-bool X11SalGraphics::drawPolyPolygonBezier( sal_uInt32 nPoints, const sal_uInt32* pPoints,
-                                                const Point* const* pPtAry, const PolyFlags* const* pFlgAry)
-{
-    return mxImpl->drawPolyPolygonBezier( nPoints, pPoints, pPtAry, pFlgAry );
-}
-
-void X11SalGraphics::invert( sal_uInt32 nPoints,
-                             const Point* pPtAry,
-                             SalInvert nFlags )
-{
-    mxImpl->invert( nPoints, pPtAry, nFlags );
-}
-
-bool X11SalGraphics::drawEPS( tools::Long nX, tools::Long nY, tools::Long nWidth,
-        tools::Long nHeight, void* pPtr, sal_uInt32 nSize )
-{
-    return mxImpl->drawEPS( nX, nY, nWidth, nHeight, pPtr, nSize );
-}
-
 XRenderPictFormat* X11SalGraphics::GetXRenderFormat() const
 {
     if( m_pXRenderFormat == nullptr )
@@ -480,7 +375,7 @@ SystemGraphicsData X11SalGraphics::GetGraphicsData() const
 
     aRes.nSize = sizeof(aRes);
     aRes.pDisplay  = GetXDisplay();
-    aRes.hDrawable = hDrawable_;
+    aRes.hDrawable = maX11Common.m_hDrawable;
     aRes.pVisual   = GetVisual().visual;
     aRes.nScreen   = m_nXScreen.getXScreen();
     aRes.pXRenderFormat = m_pXRenderFormat;
@@ -497,12 +392,7 @@ void X11SalGraphics::Flush()
 
 bool X11SalGraphics::SupportsCairo() const
 {
-    static bool bSupportsCairo = [this] {
-        Display *pDisplay = GetXDisplay();
-        int nDummy;
-        return XQueryExtension(pDisplay, "RENDER", &nDummy, &nDummy, &nDummy);
-    }();
-    return bSupportsCairo;
+    return maX11Common.SupportsCairo();
 }
 
 cairo::SurfaceSharedPtr X11SalGraphics::CreateSurface(const cairo::CairoSurfaceSharedPtr& rSurface) const
@@ -571,210 +461,6 @@ css::uno::Any X11SalGraphics::GetNativeSurfaceHandle(cairo::SurfaceSharedPtr& rS
 
 #endif // ENABLE_CAIRO_CANVAS
 
-// draw a poly-polygon
-bool X11SalGraphics::drawPolyPolygon(
-    const basegfx::B2DHomMatrix& rObjectToDevice,
-    const basegfx::B2DPolyPolygon& rPolyPolygon,
-    double fTransparency)
-{
-    if(fTransparency >= 1.0)
-    {
-        return true;
-    }
-
-    if(rPolyPolygon.count() == 0)
-    {
-        return true;
-    }
-
-#if ENABLE_CAIRO_CANVAS
-    // Fallback: Transform to DeviceCoordinates
-    basegfx::B2DPolyPolygon aPolyPolygon(rPolyPolygon);
-    aPolyPolygon.transform(rObjectToDevice);
-
-    if(SALCOLOR_NONE == mnFillColor && SALCOLOR_NONE == mnPenColor)
-    {
-        return true;
-    }
-
-    // enable by setting to something
-    static const char* pUseCairoForPolygons(getenv("SAL_ENABLE_USE_CAIRO_FOR_POLYGONS"));
-
-    if (!m_bSkia && nullptr != pUseCairoForPolygons && SupportsCairo())
-    {
-        // snap to raster if requested
-        const bool bSnapPoints(!getAntiAlias());
-
-        if(bSnapPoints)
-        {
-            aPolyPolygon = basegfx::utils::snapPointsOfHorizontalOrVerticalEdges(aPolyPolygon);
-        }
-
-        cairo_t* cr = getCairoContext();
-        clipRegion(cr);
-
-        for(auto const& rPolygon : std::as_const(aPolyPolygon))
-        {
-            const sal_uInt32 nPointCount(rPolygon.count());
-
-            if(nPointCount)
-            {
-                const sal_uInt32 nEdgeCount(rPolygon.isClosed() ? nPointCount : nPointCount - 1);
-
-                if(nEdgeCount)
-                {
-                    basegfx::B2DCubicBezier aEdge;
-
-                    for(sal_uInt32 b = 0; b < nEdgeCount; ++b)
-                    {
-                        rPolygon.getBezierSegment(b, aEdge);
-
-                        if(!b)
-                        {
-                            const basegfx::B2DPoint aStart(aEdge.getStartPoint());
-                            cairo_move_to(cr, aStart.getX(), aStart.getY());
-                        }
-
-                        const basegfx::B2DPoint aEnd(aEdge.getEndPoint());
-
-                        if(aEdge.isBezier())
-                        {
-                            const basegfx::B2DPoint aCP1(aEdge.getControlPointA());
-                            const basegfx::B2DPoint aCP2(aEdge.getControlPointB());
-                            cairo_curve_to(cr,
-                                aCP1.getX(), aCP1.getY(),
-                                aCP2.getX(), aCP2.getY(),
-                                aEnd.getX(), aEnd.getY());
-                        }
-                        else
-                        {
-                            cairo_line_to(cr, aEnd.getX(), aEnd.getY());
-                        }
-                    }
-
-                    cairo_close_path(cr);
-                }
-            }
-        }
-
-        if(SALCOLOR_NONE != mnFillColor)
-        {
-            cairo_set_source_rgba(cr,
-                mnFillColor.GetRed()/255.0,
-                mnFillColor.GetGreen()/255.0,
-                mnFillColor.GetBlue()/255.0,
-                1.0 - fTransparency);
-            cairo_set_fill_rule(cr, CAIRO_FILL_RULE_EVEN_ODD);
-            cairo_fill_preserve(cr);
-        }
-
-        if(SALCOLOR_NONE != mnPenColor)
-        {
-            cairo_set_source_rgba(cr,
-                    mnPenColor.GetRed()/255.0,
-                    mnPenColor.GetGreen()/255.0,
-                    mnPenColor.GetBlue()/255.0,
-                    1.0 - fTransparency);
-            cairo_stroke_preserve(cr);
-        }
-
-        releaseCairoContext(cr);
-        return true;
-    }
-#endif // ENABLE_CAIRO_CANVAS
-
-    return mxImpl->drawPolyPolygon(
-        rObjectToDevice,
-        rPolyPolygon,
-        fTransparency);
-}
-
-#if ENABLE_CAIRO_CANVAS
-void X11SalGraphics::clipRegion(cairo_t* cr)
-{
-    SvpSalGraphics::clipRegion(cr, maClipRegion);
-}
-#endif // ENABLE_CAIRO_CANVAS
-
-bool X11SalGraphics::drawPolyLine(
-    const basegfx::B2DHomMatrix& rObjectToDevice,
-    const basegfx::B2DPolygon& rPolygon,
-    double fTransparency,
-    double fLineWidth,
-    const std::vector< double >* pStroke, // MM01
-    basegfx::B2DLineJoin eLineJoin,
-    css::drawing::LineCap eLineCap,
-    double fMiterMinimumAngle,
-    bool bPixelSnapHairline)
-{
-    if(0 == rPolygon.count())
-    {
-        return true;
-    }
-
-    if(fTransparency >= 1.0)
-    {
-        return true;
-    }
-
-#if ENABLE_CAIRO_CANVAS
-    // disable by setting to something
-    static const char* pUseCairoForFatLines(getenv("SAL_DISABLE_USE_CAIRO_FOR_FATLINES"));
-
-    if (!m_bSkia && nullptr == pUseCairoForFatLines && SupportsCairo())
-    {
-        cairo_t* cr = getCairoContext();
-        clipRegion(cr);
-
-        // Use the now available static drawPolyLine from the Cairo-Headless-Fallback
-        // that will take care of all needed stuff
-        const bool bRetval(
-            SvpSalGraphics::drawPolyLine(
-                cr,
-                nullptr,
-                mnPenColor,
-                getAntiAlias(),
-                rObjectToDevice,
-                rPolygon,
-                fTransparency,
-                fLineWidth,
-                pStroke, // MM01
-                eLineJoin,
-                eLineCap,
-                fMiterMinimumAngle,
-                bPixelSnapHairline));
-
-        releaseCairoContext(cr);
-
-        if(bRetval)
-        {
-            return true;
-        }
-    }
-#endif // ENABLE_CAIRO_CANVAS
-
-    return mxImpl->drawPolyLine(
-        rObjectToDevice,
-        rPolygon,
-        fTransparency,
-        fLineWidth,
-        pStroke, // MM01
-        eLineJoin,
-        eLineCap,
-        fMiterMinimumAngle,
-        bPixelSnapHairline);
-}
-
-bool X11SalGraphics::drawGradient(const tools::PolyPolygon& rPoly, const Gradient& rGradient)
-{
-    return mxImpl->drawGradient(rPoly, rGradient);
-}
-
-bool X11SalGraphics::implDrawGradient(basegfx::B2DPolyPolygon const & rPolyPolygon, SalGradient const & rGradient)
-{
-    return mxImpl->implDrawGradient(rPolyPolygon, rGradient);
-}
-
 SalGeometryProvider *X11SalGraphics::GetGeometryProvider() const
 {
     if (m_pFrame)
@@ -785,21 +471,12 @@ SalGeometryProvider *X11SalGraphics::GetGeometryProvider() const
 
 cairo_t* X11SalGraphics::getCairoContext()
 {
-    if (m_pExternalSurface)
-        return cairo_create(m_pExternalSurface);
-
-    cairo_surface_t* surface = cairo_xlib_surface_create(GetXDisplay(), hDrawable_,
-            GetVisual().visual, SAL_MAX_INT16, SAL_MAX_INT16);
-
-    cairo_t *cr = cairo_create(surface);
-    cairo_surface_destroy(surface);
-
-    return cr;
+    return maX11Common.getCairoContext();
 }
 
 void X11SalGraphics::releaseCairoContext(cairo_t* cr)
 {
-   cairo_destroy(cr);
+   X11Common::releaseCairoContext(cr);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

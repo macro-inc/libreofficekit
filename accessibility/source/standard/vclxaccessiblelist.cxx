@@ -22,7 +22,6 @@
 #include <helper/listboxhelper.hxx>
 
 #include <unotools/accessiblerelationsethelper.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/accessibility/AccessibleEventId.hpp>
 #include <com/sun/star/accessibility/AccessibleRelationType.hpp>
@@ -44,7 +43,7 @@ using namespace ::accessibility;
 namespace
 {
     /// @throws css::lang::IndexOutOfBoundsException
-    void checkSelection_Impl( sal_Int32 _nIndex, const IComboListBoxHelper& _rListBox, bool bSelected )
+    void checkSelection_Impl( sal_Int64 _nIndex, const IComboListBoxHelper& _rListBox, bool bSelected )
     {
         sal_Int32 nCount = bSelected ? _rListBox.GetSelectedEntryCount()
                                      : _rListBox.GetEntryCount();
@@ -114,7 +113,7 @@ void SAL_CALL VCLXAccessibleList::disposing()
 }
 
 
-void VCLXAccessibleList::FillAccessibleStateSet (utl::AccessibleStateSetHelper& rStateSet)
+void VCLXAccessibleList::FillAccessibleStateSet (sal_Int64& rStateSet)
 {
     SolarMutexGuard aSolarGuard;
 
@@ -124,8 +123,8 @@ void VCLXAccessibleList::FillAccessibleStateSet (utl::AccessibleStateSetHelper& 
         && (m_pListBoxHelper->GetStyle() & WB_DROPDOWN ) == WB_DROPDOWN
         && !m_pListBoxHelper->IsInDropDown() )
     {
-        rStateSet.RemoveState (AccessibleStateType::VISIBLE);
-        rStateSet.RemoveState (AccessibleStateType::SHOWING);
+        rStateSet &= ~AccessibleStateType::VISIBLE;
+        rStateSet &= ~AccessibleStateType::SHOWING;
         m_bVisible = false;
     }
 
@@ -135,10 +134,10 @@ void VCLXAccessibleList::FillAccessibleStateSet (utl::AccessibleStateSetHelper& 
     if ( m_pListBoxHelper )
     {
         if ( m_pListBoxHelper->IsMultiSelectionEnabled() )
-            rStateSet.AddState( AccessibleStateType::MULTI_SELECTABLE);
-        rStateSet.AddState (AccessibleStateType::FOCUSABLE);
+            rStateSet |= AccessibleStateType::MULTI_SELECTABLE;
+        rStateSet |= AccessibleStateType::FOCUSABLE;
         // All children are transient.
-        rStateSet.AddState (AccessibleStateType::MANAGES_DESCENDANTS);
+        rStateSet |= AccessibleStateType::MANAGES_DESCENDANTS;
     }
 }
 
@@ -521,14 +520,14 @@ Reference<XAccessibleContext> SAL_CALL
 
 // XAccessibleContext
 
-sal_Int32 SAL_CALL VCLXAccessibleList::getAccessibleChildCount()
+sal_Int64 SAL_CALL VCLXAccessibleList::getAccessibleChildCount()
 {
     SolarMutexGuard aSolarGuard;
     ::osl::Guard< ::osl::Mutex > aGuard( GetMutex() );
     return implGetAccessibleChildCount();
 }
 
-sal_Int32 VCLXAccessibleList::implGetAccessibleChildCount()
+sal_Int64 VCLXAccessibleList::implGetAccessibleChildCount()
 {
     sal_Int32 nCount = 0;
     if ( m_pListBoxHelper )
@@ -537,7 +536,7 @@ sal_Int32 VCLXAccessibleList::implGetAccessibleChildCount()
     return nCount;
 }
 
-Reference<XAccessible> SAL_CALL VCLXAccessibleList::getAccessibleChild (sal_Int32 i)
+Reference<XAccessible> SAL_CALL VCLXAccessibleList::getAccessibleChild (sal_Int64 i)
 {
     SolarMutexGuard aSolarGuard;
     ::osl::Guard< ::osl::Mutex > aGuard( GetMutex() );
@@ -547,7 +546,7 @@ Reference<XAccessible> SAL_CALL VCLXAccessibleList::getAccessibleChild (sal_Int3
 
     Reference< XAccessible > xChild;
     // search for the child
-    if ( i >= static_cast<sal_Int32>(m_aAccessibleChildren.size()) )
+    if ( o3tl::make_unsigned(i) >= m_aAccessibleChildren.size() )
         xChild = CreateChild (i);
     else
     {
@@ -566,7 +565,7 @@ Reference< XAccessible > SAL_CALL VCLXAccessibleList::getAccessibleParent(  )
     return m_xParent;
 }
 
-sal_Int32 SAL_CALL VCLXAccessibleList::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL VCLXAccessibleList::getAccessibleIndexInParent()
 {
     if (m_nIndexInParent != DEFAULT_INDEX_IN_PARENT)
         return m_nIndexInParent;
@@ -724,7 +723,7 @@ void VCLXAccessibleList::UpdateSelection_Impl(sal_Int32)
 
 // XAccessibleSelection
 
-void SAL_CALL VCLXAccessibleList::selectAccessibleChild( sal_Int32 nChildIndex )
+void SAL_CALL VCLXAccessibleList::selectAccessibleChild( sal_Int64 nChildIndex )
 {
     bool bNotify = false;
 
@@ -749,7 +748,7 @@ void SAL_CALL VCLXAccessibleList::selectAccessibleChild( sal_Int32 nChildIndex )
         UpdateSelection_Impl();
 }
 
-sal_Bool SAL_CALL VCLXAccessibleList::isAccessibleChildSelected( sal_Int32 nChildIndex )
+sal_Bool SAL_CALL VCLXAccessibleList::isAccessibleChildSelected( sal_Int64 nChildIndex )
 {
     SolarMutexGuard aSolarGuard;
     ::osl::Guard< ::osl::Mutex > aGuard( GetMutex() );
@@ -808,18 +807,18 @@ void SAL_CALL VCLXAccessibleList::selectAllAccessibleChildren(  )
         UpdateSelection_Impl();
 }
 
-sal_Int32 SAL_CALL VCLXAccessibleList::getSelectedAccessibleChildCount(  )
+sal_Int64 SAL_CALL VCLXAccessibleList::getSelectedAccessibleChildCount(  )
 {
     SolarMutexGuard aSolarGuard;
     ::osl::Guard< ::osl::Mutex > aGuard( GetMutex() );
 
-    sal_Int32 nCount = 0;
+    sal_Int64 nCount = 0;
     if ( m_pListBoxHelper )
            nCount = m_pListBoxHelper->GetSelectedEntryCount();
     return nCount;
 }
 
-Reference< XAccessible > SAL_CALL VCLXAccessibleList::getSelectedAccessibleChild( sal_Int32 nSelectedChildIndex )
+Reference< XAccessible > SAL_CALL VCLXAccessibleList::getSelectedAccessibleChild( sal_Int64 nSelectedChildIndex )
 {
     SolarMutexGuard aSolarGuard;
     ::osl::Guard< ::osl::Mutex > aGuard( GetMutex() );
@@ -833,7 +832,7 @@ Reference< XAccessible > SAL_CALL VCLXAccessibleList::getSelectedAccessibleChild
     return nullptr;
 }
 
-void SAL_CALL VCLXAccessibleList::deselectAccessibleChild( sal_Int32 nSelectedChildIndex )
+void SAL_CALL VCLXAccessibleList::deselectAccessibleChild( sal_Int64 nSelectedChildIndex )
 {
     bool bNotify = false;
 

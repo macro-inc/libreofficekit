@@ -39,7 +39,7 @@
 #include <comphelper/graphicmimetype.hxx>
 #include <comphelper/processfactory.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/datetime.hxx>
 #include <unotools/datetime.hxx>
 #include <unotools/ucbstreamhelper.hxx>
@@ -554,7 +554,7 @@ SgaObjectSvDraw GalleryBinaryEngine::updateSvDrawObject(const GalleryObject* pEn
 
 void GalleryBinaryEngine::updateTheme()
 {
-    ::utl::TempFile aTmp;
+    ::utl::TempFileNamed aTmp;
     INetURLObject aInURL(GetSdgURL());
     INetURLObject aTmpURL(aTmp.GetURL());
 
@@ -772,7 +772,7 @@ SvStream& GalleryBinaryEngine::writeGalleryTheme(SvStream& rOStm, const GalleryT
     rOStm.WriteUInt32(COMPAT_FORMAT('G', 'A', 'L', 'R'))
         .WriteUInt32(COMPAT_FORMAT('E', 'S', 'R', 'V'));
 
-    const tools::Long nReservePos = rOStm.Tell();
+    const sal_uInt64 nReservePos = rOStm.Tell();
     std::unique_ptr<VersionCompatWrite> pCompat(new VersionCompatWrite(rOStm, 2));
 
     rOStm.WriteUInt32(rId).WriteBool(pThm->IsNameFromResource()); // From version 2 and up

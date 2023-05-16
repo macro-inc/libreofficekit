@@ -17,13 +17,16 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <memory>
 #include <optional>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 #include <com/sun/star/beans/XPropertySetInfo.hpp>
 #include <tools/urlobj.hxx>
+#include <utility>
 #include <vcl/embeddedfontshelper.hxx>
 #include <vcl/graph.hxx>
 #include <xmloff/unointerfacetouniqueidentifiermapper.hxx>
@@ -60,6 +63,7 @@
 #include <comphelper/fileformat.h>
 #include <comphelper/namecontainer.hxx>
 #include <comphelper/servicehelper.hxx>
+#include <comphelper/string.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <comphelper/extract.hxx>
@@ -70,6 +74,7 @@
 #include <unotools/fontcvt.hxx>
 #include <fasttokenhandler.hxx>
 #include <vcl/GraphicExternalLink.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <com/sun/star/rdf/XMetadatable.hpp>
 #include <com/sun/star/rdf/XRepositorySupplier.hpp>
@@ -308,8 +313,8 @@ public:
 
     std::unique_ptr< DocumentInfo > mpDocumentInfo;
 
-    SvXMLImport_Impl( const uno::Reference< uno::XComponentContext >& rxContext,
-                      OUString const & theImplementationName,
+    SvXMLImport_Impl( uno::Reference< uno::XComponentContext > xContext,
+                      OUString theImplementationName,
                       const css::uno::Sequence< OUString > & sSupportedServiceNames = {})
         : hBatsFontConv( nullptr )
         , hMathFontConv( nullptr )
@@ -319,8 +324,8 @@ public:
         // Convert drawing object positions from OOo file format to OASIS (#i28749#)
         , mbShapePositionInHoriL2R( false )
         , mbTextDocInOOoFileFormat( false )
-        , mxComponentContext( rxContext )
-        , implementationName(theImplementationName)
+        , mxComponentContext(std::move( xContext ))
+        , implementationName(std::move(theImplementationName))
         , maSupportedServiceNames(sSupportedServiceNames)
     {
         SAL_WARN_IF(!mxComponentContext.is(), "xmloff.core", "SvXMLImport: no ComponentContext");
@@ -487,9 +492,9 @@ namespace
     private:
         css::uno::Reference<css::xml::sax::XFastParser> mxParser;
     public:
-        setFastDocumentHandlerGuard(const css::uno::Reference<css::xml::sax::XFastParser>& Parser,
+        setFastDocumentHandlerGuard(css::uno::Reference<css::xml::sax::XFastParser> Parser,
                                     const css::uno::Reference<css::xml::sax::XFastDocumentHandler>& Handler)
-            : mxParser(Parser)
+            : mxParser(std::move(Parser))
         {
             mxParser->setFastDocumentHandler(Handler);
         }
@@ -594,7 +599,8 @@ void SAL_CALL SvXMLImport::endDocument()
     //  #i9518# All the stuff that accesses the document has to be done here, not in the dtor,
     //  because the SvXMLImport dtor might not be called until after the document has been closed.
 
-    GetTextImport()->MapCrossRefHeadingFieldsHorribly();
+    if (mxTextImport)
+        mxTextImport->MapCrossRefHeadingFieldsHorribly();
 
     if (mpImpl->mpRDFaHelper)
     {
@@ -626,7 +632,7 @@ void SAL_CALL SvXMLImport::endDocument()
                     mxImportInfo->setPropertyValue(sProgressCurrent, uno::Any(nProgressCurrent));
                 }
                 if (xPropertySetInfo->hasPropertyByName(sRepeat))
-                    mxImportInfo->setPropertyValue(sRepeat, css::uno::makeAny(mpProgressBarHelper->GetRepeat()));
+                    mxImportInfo->setPropertyValue(sRepeat, css::uno::Any(mpProgressBarHelper->GetRepeat()));
                 // pProgressBarHelper is deleted in dtor
             }
             OUString sNumberStyles(XML_NUMBERSTYLES);
@@ -694,7 +700,7 @@ std::optional<SvXMLNamespaceMap> SvXMLImport::processNSAttributes(
             {
                 throw xml::sax::SAXException("Inconsistent ODF versions in content.xml and manifest.xml!",
                         uno::Reference< uno::XInterface >(),
-                        uno::makeAny(
+                        uno::Any(
                             packages::zip::ZipIOException("Inconsistent ODF versions in content.xml and manifest.xml!" ) ) );
             }
         }
@@ -766,7 +772,7 @@ void SAL_CALL SvXMLImport::startFastElement (sal_Int32 Element,
             {
                 throw xml::sax::SAXException("Inconsistent ODF versions in content.xml and manifest.xml!",
                         uno::Reference< uno::XInterface >(),
-                        uno::makeAny(
+                        uno::Any(
                             packages::zip::ZipIOException("Inconsistent ODF versions in content.xml and manifest.xml!" ) ) );
             }
         }
@@ -1045,7 +1051,7 @@ void SAL_CALL SvXMLImport::initialize( const uno::Sequence< uno::Any >& aArgumen
     }
 
     uno::Reference<lang::XInitialization> const xInit(mxParser, uno::UNO_QUERY_THROW);
-    xInit->initialize( { makeAny(OUString("IgnoreMissingNSDecl")) });
+    xInit->initialize( { Any(OUString("IgnoreMissingNSDecl")) });
 }
 
 // XServiceInfo
@@ -1076,7 +1082,16 @@ XMLShapeImportHelper* SvXMLImport::CreateShapeImport()
 
 SchXMLImportHelper* SvXMLImport::CreateChartImport()
 {
+// WASM_CHART change
+// TODO: Instead of importing the ChartModel an alternative may be
+// added to convert not to Chart/OLE SdrObejct, but to GraphicObject
+// with the Chart visualization. There should be a preview available
+// in the imported chart data
+#if !ENABLE_WASM_STRIP_CHART
     return new SchXMLImportHelper();
+#else
+    return nullptr;
+#endif
 }
 
 ::xmloff::OFormLayerXMLImport* SvXMLImport::CreateFormImport()
@@ -1221,7 +1236,7 @@ const Reference< container::XNameContainer > & SvXMLImport::GetDashHelper()
     return mxDashHelper;
 }
 
-bool SvXMLImport::IsPackageURL( const OUString& rURL ) const
+bool SvXMLImport::IsPackageURL( std::u16string_view rURL ) const
 {
 
     // if, and only if, only parts are imported, then we're in a package
@@ -1232,7 +1247,7 @@ bool SvXMLImport::IsPackageURL( const OUString& rURL ) const
     // TODO: from this point extract to own static function
 
     // Some quick tests: Some may rely on the package structure!
-    sal_Int32 nLen = rURL.getLength();
+    size_t nLen = rURL.size();
     if( nLen > 0 && '/' == rURL[0] )
         // RFC2396 net_path or abs_path
         return false;
@@ -1248,7 +1263,7 @@ bool SvXMLImport::IsPackageURL( const OUString& rURL ) const
     }
 
     // Now check for a RFC2396 schema
-    sal_Int32 nPos = 1;
+    size_t nPos = 1;
     while( nPos < nLen )
     {
         switch( rURL[nPos] )
@@ -1559,7 +1574,9 @@ void SvXMLImport::SetAutoStyles( SvXMLStylesContext *pAutoStyles )
     mxAutoStyles = pAutoStyles;
     GetTextImport()->SetAutoStyles( pAutoStyles );
     GetShapeImport()->SetAutoStylesContext( pAutoStyles );
+#if !ENABLE_WASM_STRIP_CHART
     GetChartImport()->SetAutoStylesContext( pAutoStyles );
+#endif
     GetFormImport()->setAutoStyleContext( pAutoStyles );
 }
 
@@ -1614,7 +1631,7 @@ OUString SvXMLImport::GetAbsoluteReference(const OUString& rValue) const
 
 bool SvXMLImport::IsODFVersionConsistent( const OUString& aODFVersion )
 {
-    // the check returns sal_False only if the storage version could be retrieved
+    // the check returns false only if the storage version could be retrieved
     bool bResult = true;
 
     if ( !aODFVersion.isEmpty() && aODFVersion.compareTo( ODFVER_012_TEXT ) >= 0 )
@@ -1624,6 +1641,8 @@ bool SvXMLImport::IsODFVersionConsistent( const OUString& aODFVersion )
         try
         {   // don't use getDocumentStorage(), it's temporary and latest version
             uno::Reference<embed::XStorage> const xStor(GetSourceStorage());
+            if (!xStor.is())
+                return bResult;
             uno::Reference< beans::XPropertySet > xStorProps( xStor, uno::UNO_QUERY_THROW );
 
             // the check should be done only for OASIS format
@@ -1652,7 +1671,7 @@ bool SvXMLImport::IsODFVersionConsistent( const OUString& aODFVersion )
                         bResult = aODFVersion == aStorVersion;
                     else
                         xStorProps->setPropertyValue( "Version",
-                                                      uno::makeAny( aODFVersion ) );
+                                                      uno::Any( aODFVersion ) );
 
                     if ( bResult )
                     {
@@ -1814,11 +1833,11 @@ bool SvXMLImport::getBuildIds( sal_Int32& rUPD, sal_Int32& rBuild ) const
         sal_Int32 nIndex = aBuildId.indexOf('$');
         if (nIndex != -1)
         {
-            rUPD = aBuildId.copy( 0, nIndex ).toInt32();
+            rUPD = o3tl::toInt32(aBuildId.subView( 0, nIndex ));
             sal_Int32 nIndexEnd = aBuildId.indexOf(';', nIndex);
             rBuild = (nIndexEnd == -1)
-                ? aBuildId.copy(nIndex + 1).toInt32()
-                : aBuildId.copy(nIndex + 1, nIndexEnd - nIndex - 1).toInt32();
+                ? o3tl::toInt32(aBuildId.subView(nIndex + 1))
+                : o3tl::toInt32(aBuildId.subView(nIndex + 1, nIndexEnd - nIndex - 1));
             bRet = true;
         }
     }
@@ -1982,10 +2001,10 @@ OUString SvXMLImport::getNamespacePrefixFromURI( const OUString& rURI )
         return OUString();
 }
 
-sal_Int32 SvXMLImport::getTokenFromName( const OUString& rName )
+sal_Int32 SvXMLImport::getTokenFromName( std::u16string_view rName )
 {
     Sequence< sal_Int8 > aLocalNameSeq( reinterpret_cast<sal_Int8 const *>(
-        OUStringToOString( rName, RTL_TEXTENCODING_UTF8 ).getStr()), rName.getLength() );
+        OUStringToOString( rName, RTL_TEXTENCODING_UTF8 ).getStr()), rName.size() );
     return xTokenHandler->getTokenFromUTF8( aLocalNameSeq );
 }
 
@@ -2138,8 +2157,8 @@ OUString SvXMLImportFastNamespaceHandler::getNamespaceURI( const OUString&/* rNa
     return OUString();
 }
 
-SvXMLLegacyToFastDocHandler::SvXMLLegacyToFastDocHandler( const rtl::Reference< SvXMLImport > & rImport )
-:   mrImport( rImport ),
+SvXMLLegacyToFastDocHandler::SvXMLLegacyToFastDocHandler( rtl::Reference< SvXMLImport > xImport )
+:   mrImport(std::move( xImport )),
     mxFastAttributes( new sax_fastparser::FastAttributeList( SvXMLImport::xTokenHandler.get() ) )
 {
 }

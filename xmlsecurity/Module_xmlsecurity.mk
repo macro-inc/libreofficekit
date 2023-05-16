@@ -21,6 +21,7 @@ $(eval $(call gb_Module_add_slowcheck_targets,xmlsecurity,\
 
 $(eval $(call gb_Module_add_subsequentcheck_targets,xmlsecurity,\
     CppunitTest_xmlsecurity_signing \
+    CppunitTest_xmlsecurity_signing2 \
 ))
 
 $(eval $(call gb_Module_add_l10n_targets,xmlsecurity,\
@@ -40,7 +41,7 @@ $(eval $(call gb_Module_add_screenshot_targets,xmlsecurity,\
 ifneq (,$(filter DESKTOP,$(BUILD_TYPE)))
 ifneq (,$(or $(ENABLE_NSS),$(filter WNT,$(OS))))
 $(eval $(call gb_Module_add_targets,xmlsecurity,\
-    Executable_pdfverify \
+    $(if $(DISABLE_DYNLOADING),,Executable_pdfverify) \
 ))
 endif
 endif

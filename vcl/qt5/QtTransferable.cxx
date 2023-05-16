@@ -12,6 +12,7 @@
 
 #include <comphelper/sequence.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <QtWidgets/QApplication>
 
@@ -20,18 +21,18 @@
 
 #include <cassert>
 
-static bool lcl_textMimeInfo(const OUString& rMimeString, bool& bHaveNoCharset, bool& bHaveUTF16,
-                             bool& bHaveUTF8)
+static bool lcl_textMimeInfo(std::u16string_view rMimeString, bool& bHaveNoCharset,
+                             bool& bHaveUTF16, bool& bHaveUTF8)
 {
     sal_Int32 nIndex = 0;
-    if (rMimeString.getToken(0, ';', nIndex) == "text/plain")
+    if (o3tl::getToken(rMimeString, 0, ';', nIndex) == u"text/plain")
     {
-        OUString aToken(rMimeString.getToken(0, ';', nIndex));
-        if (aToken == "charset=utf-16")
+        std::u16string_view aToken(o3tl::getToken(rMimeString, 0, ';', nIndex));
+        if (aToken == u"charset=utf-16")
             bHaveUTF16 = true;
-        else if (aToken == "charset=utf-8")
+        else if (aToken == u"charset=utf-8")
             bHaveUTF8 = true;
-        else if (aToken.isEmpty())
+        else if (aToken.empty())
             bHaveNoCharset = true;
         else // we just handle UTF-16 and UTF-8, everything else is "bytes"
             return false;
@@ -185,7 +186,7 @@ css::uno::Any SAL_CALL
 QtClipboardTransferable::getTransferData(const css::datatransfer::DataFlavor& rFlavor)
 {
     css::uno::Any aAny;
-    auto* pSalInst(static_cast<QtInstance*>(GetSalData()->m_pInstance));
+    auto* pSalInst(GetQtInstance());
     SolarMutexGuard g;
     pSalInst->RunInMainThread([&, this]() {
         if (!hasInFlightChanged())
@@ -198,7 +199,7 @@ css::uno::Sequence<css::datatransfer::DataFlavor>
     SAL_CALL QtClipboardTransferable::getTransferDataFlavors()
 {
     css::uno::Sequence<css::datatransfer::DataFlavor> aSeq;
-    auto* pSalInst(static_cast<QtInstance*>(GetSalData()->m_pInstance));
+    auto* pSalInst(GetQtInstance());
     SolarMutexGuard g;
     pSalInst->RunInMainThread([&, this]() {
         if (!hasInFlightChanged())
@@ -211,7 +212,7 @@ sal_Bool SAL_CALL
 QtClipboardTransferable::isDataFlavorSupported(const css::datatransfer::DataFlavor& rFlavor)
 {
     bool bIsSupported = false;
-    auto* pSalInst(static_cast<QtInstance*>(GetSalData()->m_pInstance));
+    auto* pSalInst(GetQtInstance());
     SolarMutexGuard g;
     pSalInst->RunInMainThread([&, this]() {
         if (!hasInFlightChanged())
@@ -330,14 +331,12 @@ QVariant QtMimeData::retrieveData(const QString& mimeType, QMetaType) const
         if (bWantUTF8)
         {
             OString aUTF8String(OUStringToOString(aString, RTL_TEXTENCODING_UTF8));
-            aByteArray = QByteArray(reinterpret_cast<const char*>(aUTF8String.getStr()),
-                                    aUTF8String.getLength());
+            aByteArray = QByteArray(aUTF8String.getStr(), aUTF8String.getLength());
         }
         else if (bWantNoCharset)
         {
             OString aLocaleString(OUStringToOString(aString, osl_getThreadTextEncoding()));
-            aByteArray = QByteArray(reinterpret_cast<const char*>(aLocaleString.getStr()),
-                                    aLocaleString.getLength());
+            aByteArray = QByteArray(aLocaleString.getStr(), aLocaleString.getLength());
         }
         else if (bWantUTF16)
         {

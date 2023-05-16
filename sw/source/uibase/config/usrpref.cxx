@@ -270,7 +270,7 @@ Sequence<OUString> SwLayoutViewConfig::GetPropertyNames() const
         "ViewLayout/BookMode",                  //16
         "Other/IsSquaredPageMode",              //17
         "Other/ApplyCharUnit",                  //18
-        "Window/ShowScrollBarTips"              //19
+        "Window/ShowScrollBarTips",             //19
     };
     const int nCount = m_bWeb ? 13 : 20;
     Sequence<OUString> aNames(nCount);

@@ -51,12 +51,10 @@
 #include <guisaveas.hxx>
 
 #include <sal/log.hxx>
-#include <unotools/pathoptions.hxx>
 #include <svl/itemset.hxx>
 #include <svl/eitem.hxx>
-#include <unotools/saveopt.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <tools/json_writer.hxx>
 #include <tools/urlobj.hxx>
@@ -67,6 +65,7 @@
 #include <comphelper/mimeconfighelper.hxx>
 #include <comphelper/lok.hxx>
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <o3tl/char16_t2wchar_t.hxx>
@@ -225,7 +224,7 @@ public:
             {
                 OUString aLoadReadonlyString( "LoadReadonly" );
                 m_xDocumentSettings->getPropertyValue( aLoadReadonlyString ) >>= m_bPreserveReadOnly;
-                m_xDocumentSettings->setPropertyValue( aLoadReadonlyString, uno::makeAny( bReadOnly ) );
+                m_xDocumentSettings->setPropertyValue( aLoadReadonlyString, uno::Any( bReadOnly ) );
                 m_bReadOnlySupported = true;
             }
             catch( const uno::Exception& )
@@ -245,7 +244,7 @@ public:
             try
             {
                 if ( m_bReadOnlySupported )
-                    m_xDocumentSettings->setPropertyValue( "LoadReadonly", uno::makeAny( m_bPreserveReadOnly ) );
+                    m_xDocumentSettings->setPropertyValue( "LoadReadonly", uno::Any( m_bPreserveReadOnly ) );
             }
             catch( const uno::Exception& )
             {
@@ -280,7 +279,7 @@ class ModelData_Impl
 
 public:
     ModelData_Impl( SfxStoringHelper& aOwner,
-                    const uno::Reference< frame::XModel >& xModel,
+                    uno::Reference< frame::XModel > xModel,
                     const uno::Sequence< beans::PropertyValue >& aMediaDescr );
 
     ~ModelData_Impl();
@@ -339,10 +338,10 @@ public:
 
 
 ModelData_Impl::ModelData_Impl( SfxStoringHelper& aOwner,
-                                const uno::Reference< frame::XModel >& xModel,
+                                uno::Reference< frame::XModel > xModel,
                                 const uno::Sequence< beans::PropertyValue >& aMediaDescr )
 : m_pOwner( &aOwner )
-, m_xModel( xModel )
+, m_xModel(std::move( xModel ))
 , m_aMediaDescrHM( aMediaDescr )
 , m_bRecommendReadOnly( false )
 {
@@ -496,7 +495,7 @@ uno::Sequence< beans::PropertyValue > ModelData_Impl::GetDocServiceDefaultFilter
 
 uno::Sequence< beans::PropertyValue > ModelData_Impl::GetDocServiceAnyFilter( SfxFilterFlags nMust, SfxFilterFlags nDont )
 {
-    uno::Sequence< beans::NamedValue > aSearchRequest { { "DocumentService", css::uno::makeAny(GetDocServiceName()) } };
+    uno::Sequence< beans::NamedValue > aSearchRequest { { "DocumentService", css::uno::Any(GetDocServiceName()) } };
 
     return ::comphelper::MimeConfigurationHelper::SearchForFilter( m_pOwner->GetFilterQuery(), aSearchRequest, nMust, nDont );
 }
@@ -517,8 +516,8 @@ uno::Sequence< beans::PropertyValue > ModelData_Impl::GetPreselectedFilter_Impl(
         // Preselect PDF-Filter for EXPORT
         uno::Sequence< beans::NamedValue > aSearchRequest
         {
-            { "Type", css::uno::makeAny(OUString("pdf_Portable_Document_Format")) },
-            { "DocumentService", css::uno::makeAny(GetDocServiceName()) }
+            { "Type", css::uno::Any(OUString("pdf_Portable_Document_Format")) },
+            { "DocumentService", css::uno::Any(GetDocServiceName()) }
         };
 
         aFilterProps = ::comphelper::MimeConfigurationHelper::SearchForFilter( m_pOwner->GetFilterQuery(), aSearchRequest, nMust, nDont );
@@ -528,8 +527,8 @@ uno::Sequence< beans::PropertyValue > ModelData_Impl::GetPreselectedFilter_Impl(
         // Preselect EPUB filter for export.
         uno::Sequence<beans::NamedValue> aSearchRequest
         {
-            { "Type", css::uno::makeAny(OUString("writer_EPUB_Document")) },
-            { "DocumentService", css::uno::makeAny(GetDocServiceName()) }
+            { "Type", css::uno::Any(OUString("writer_EPUB_Document")) },
+            { "DocumentService", css::uno::Any(GetDocServiceName()) }
         };
 
         aFilterProps = ::comphelper::MimeConfigurationHelper::SearchForFilter( m_pOwner->GetFilterQuery(), aSearchRequest, nMust, nDont );
@@ -675,11 +674,18 @@ IMPL_LINK( ModelData_Impl, OptionsDialogClosedHdl, css::ui::dialogs::DialogClose
 {
     if (pEvt->DialogResult == RET_OK && m_xFilterProperties)
     {
+        if ( comphelper::LibreOfficeKit::isActive() && SfxViewShell::Current() )
+            SfxViewShell::Current()->libreOfficeKitViewCallback( LOK_CALLBACK_EXPORT_FILE, "PENDING" );
+
         const uno::Sequence< beans::PropertyValue > aPropsFromDialog = m_xFilterProperties->getPropertyValues();
         for ( const auto& rProp : aPropsFromDialog )
             GetMediaDescr()[rProp.Name] = rProp.Value;
 
         m_pOwner->CallFinishGUIStoreModel();
+    }
+    else if ( comphelper::LibreOfficeKit::isActive() && SfxViewShell::Current() )
+    {
+        SfxViewShell::Current()->libreOfficeKitViewCallback( LOK_CALLBACK_EXPORT_FILE, "ABORT" );
     }
 }
 
@@ -842,7 +848,7 @@ sal_Int8 ModelData_Impl::CheckFilter( const OUString& aFilterName )
 
 bool ModelData_Impl::CheckFilterOptionsDialogExistence()
 {
-    uno::Sequence< beans::NamedValue > aSearchRequest { { "DocumentService", css::uno::makeAny(GetDocServiceName()) } };
+    uno::Sequence< beans::NamedValue > aSearchRequest { { "DocumentService", css::uno::Any(GetDocServiceName()) } };
 
     uno::Reference< container::XEnumeration > xFilterEnum =
                                     m_pOwner->GetFilterQuery()->createSubSetEnumerationByProperties( aSearchRequest );
@@ -935,14 +941,14 @@ bool ModelData_Impl::OutputFileDialog( sal_Int16 nStoreMode,
             // this is a PDF export
             // the filter options has been shown already
             const OUString aFilterUIName = aPreselectedFilterPropsHM.getUnpackedValueOrDefault( "UIName", OUString() );
-            pFileDlg.reset(new sfx2::FileDialogHelper( aDialogMode, aDialogFlags, aFilterUIName, "pdf", rStandardDir, rDenyList, pFrameWin ));
+            pFileDlg.reset(new sfx2::FileDialogHelper( aDialogMode, aDialogFlags, aFilterUIName, u"pdf", rStandardDir, rDenyList, pFrameWin ));
             pFileDlg->SetCurrentFilter( aFilterUIName );
         }
         else if ((nStoreMode & EPUBEXPORT_REQUESTED) && !aPreselectedFilterPropsHM.empty())
         {
             // This is an EPUB export, the filter options has been shown already.
             const OUString aFilterUIName = aPreselectedFilterPropsHM.getUnpackedValueOrDefault( "UIName", OUString() );
-            pFileDlg.reset(new sfx2::FileDialogHelper(aDialogMode, aDialogFlags, aFilterUIName, "epub", rStandardDir, rDenyList, pFrameWin));
+            pFileDlg.reset(new sfx2::FileDialogHelper(aDialogMode, aDialogFlags, aFilterUIName, u"epub", rStandardDir, rDenyList, pFrameWin));
             pFileDlg->SetCurrentFilter(aFilterUIName);
         }
         else
@@ -1056,8 +1062,7 @@ bool ModelData_Impl::OutputFileDialog( sal_Int16 nStoreMode,
                          GetMediaDescr().getAsConstPropertyValueList(),
                          *pDialogParams );
 
-    const SfxPoolItem* pItem = nullptr;
-    if ( bPreselectPassword && pDialogParams->GetItemState( SID_ENCRYPTIONDATA, true, &pItem ) != SfxItemState::SET )
+    if ( bPreselectPassword && !pDialogParams->HasItem( SID_ENCRYPTIONDATA ) )
     {
         // the file dialog preselects the password checkbox if the provided mediadescriptor has encryption data entry
         // after dialog execution the password interaction flag will be either removed or not
@@ -1337,7 +1342,7 @@ OUString ModelData_Impl::GetRecommendedName( const OUString& aSuggestedName, con
             uno::UNO_QUERY );
         if ( xTypeDetection.is() )
         {
-            INetURLObject aObj( "c:/" + aRecommendedName, INetProtocol::File,
+            INetURLObject aObj( rtl::Concat2View("c:/" + aRecommendedName), INetProtocol::File,
                     INetURLObject::EncodeMechanism::All, RTL_TEXTENCODING_UTF8, FSysStyle::Dos );
 
             const OUString aExtension = GetRecommendedExtension( aTypeName );

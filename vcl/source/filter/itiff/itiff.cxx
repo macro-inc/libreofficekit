@@ -38,12 +38,14 @@ namespace
     struct Context
     {
         SvStream& rStream;
+        tsize_t nStart;
         tsize_t nSize;
-        int nShortReads;
-        Context(SvStream& rInStream, tsize_t nInSize)
+        bool bAllowOneShortRead;
+        Context(SvStream& rInStream)
             : rStream(rInStream)
-            , nSize(nInSize)
-            , nShortReads(0)
+            , nStart(rInStream.Tell())
+            , nSize(rInStream.remainingSize())
+            , bAllowOneShortRead(false)
         {
         }
     };
@@ -55,10 +57,10 @@ static tsize_t tiff_read(thandle_t handle, tdata_t buf, tsize_t size)
     tsize_t nRead = pContext->rStream.ReadBytes(buf, size);
     // tdf#149417 allow one short read, which is similar to what
     // we do for jpeg since tdf#138950
-    if (nRead < size && !pContext->nShortReads)
+    if (nRead < size && pContext->bAllowOneShortRead)
     {
         memset(static_cast<char*>(buf) + nRead, 0, size - nRead);
-        ++pContext->nShortReads;
+        pContext->bAllowOneShortRead = false;
         return size;
     }
     return nRead;
@@ -76,21 +78,22 @@ static toff_t tiff_seek(thandle_t handle, toff_t offset, int whence)
     switch (whence)
     {
         case SEEK_SET:
-            pContext->rStream.Seek(offset);
+            offset = pContext->nStart + offset;
             break;
         case SEEK_CUR:
-            pContext->rStream.SeekRel(offset);
+            offset = pContext->rStream.Tell() + offset;
             break;
         case SEEK_END:
-            pContext->rStream.Seek(STREAM_SEEK_TO_END);
-            pContext->rStream.SeekRel(offset);
+            offset = pContext->rStream.TellEnd() + offset;
             break;
         default:
             assert(false && "unknown seek type");
             break;
     }
 
-    return pContext->rStream.Tell();
+    pContext->rStream.Seek(offset);
+
+    return offset - pContext->nStart;
 }
 
 static int tiff_close(thandle_t)
@@ -113,7 +116,7 @@ bool ImportTiffGraphicImport(SvStream& rTIFF, Graphic& rGraphic)
         TIFFSetWarningHandler(origWarningHandler);
     });
 
-    Context aContext(rTIFF, rTIFF.remainingSize());
+    Context aContext(rTIFF);
     TIFF* tif = TIFFClientOpen("libtiff-svstream", "r", &aContext,
                                tiff_read, tiff_write,
                                tiff_seek, tiff_close,
@@ -125,6 +128,8 @@ bool ImportTiffGraphicImport(SvStream& rTIFF, Graphic& rGraphic)
     const auto nOrigPos = rTIFF.Tell();
 
     Animation aAnimation;
+
+    const bool bFuzzing = utl::ConfigManager::IsFuzzing();
 
     do
     {
@@ -148,27 +153,64 @@ bool ImportTiffGraphicImport(SvStream& rTIFF, Graphic& rGraphic)
             break;
         }
 
-        if (utl::ConfigManager::IsFuzzing())
+        uint32_t nPixelsRequired;
+        // use the same max size that libtiff defaults to for its own utilities
+        constexpr size_t nMaxPixelsAllowed = (256 * 1024 * 1024) / 4;
+        // two buffers currently required, so limit further
+        bool bOk = !o3tl::checked_multiply(w, h, nPixelsRequired) && nPixelsRequired <= nMaxPixelsAllowed / 2;
+        SAL_WARN_IF(!bOk, "filter.tiff", "skipping oversized tiff image " << w << " x " << h);
+
+        if (bOk && bFuzzing)
         {
-            const uint64_t MAX_SIZE = 500000000;
-            if (TIFFTileSize64(tif) > MAX_SIZE)
+            const uint64_t MAX_PIXEL_SIZE = 150000000;
+            const uint64_t MAX_TILE_SIZE = 100000000;
+            if (TIFFTileSize64(tif) > MAX_TILE_SIZE || nPixelsRequired > MAX_PIXEL_SIZE)
             {
                 SAL_WARN("filter.tiff", "skipping large tiffs");
                 break;
             }
+
+            if (TIFFIsTiled(tif))
+            {
+                uint32_t tw, th;
+                TIFFGetField(tif, TIFFTAG_TILEWIDTH, &tw);
+                TIFFGetField(tif, TIFFTAG_TILELENGTH, &th);
+
+                if (tw > w || th > h)
+                {
+                    bOk = th < 1000 * tw && tw < 1000 * th;
+                    SAL_WARN_IF(!bOk, "filter.tiff", "skipping slow bizarre ratio tile of " << tw << " x " << th << " for image of " << w << " x " << h);
+                }
+
+                uint16_t PhotometricInterpretation;
+                if (TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &PhotometricInterpretation) == 1)
+                {
+                    if (PhotometricInterpretation == PHOTOMETRIC_LOGL)
+                    {
+                        uint32_t nLogLBufferRequired;
+                        bOk &= !o3tl::checked_multiply(tw, th, nLogLBufferRequired) && nLogLBufferRequired < MAX_PIXEL_SIZE;
+                        SAL_WARN_IF(!bOk, "filter.tiff", "skipping oversized tiff tile " << tw << " x " << th);
+                    }
+                }
+
+                uint16_t Compression;
+                if (TIFFGetField(tif, TIFFTAG_COMPRESSION, &Compression) == 1)
+                {
+                    if (Compression == COMPRESSION_CCITTFAX4)
+                    {
+                        uint32_t DspRuns;
+                        bOk &= !o3tl::checked_multiply(tw, static_cast<uint32_t>(4), DspRuns) && DspRuns < MAX_PIXEL_SIZE;
+                        SAL_WARN_IF(!bOk, "filter.tiff", "skipping oversized tiff tile width: " << tw);
+                    }
+                }
+            }
         }
 
-        uint32_t nPixelsRequired;
-        constexpr size_t nMaxPixelsAllowed = SAL_MAX_INT32/4;
-        // two buffers currently required, so limit further
-        bool bOk = !o3tl::checked_multiply(w, h, nPixelsRequired) && nPixelsRequired <= nMaxPixelsAllowed / 2;
         if (!bOk)
-        {
-            SAL_WARN("filter.tiff", "skipping oversized tiff image " << w << " x " << h);
             break;
-        }
 
         std::vector<uint32_t> raster(nPixelsRequired);
+        aContext.bAllowOneShortRead = true;
         if (TIFFReadRGBAImageOriented(tif, w, h, raster.data(), ORIENTATION_TOPLEFT, 1))
         {
             Bitmap bitmap(Size(w, h), vcl::PixelFormat::N24_BPP);
@@ -235,13 +277,16 @@ bool ImportTiffGraphicImport(SvStream& rTIFF, Graphic& rGraphic)
 
             BitmapEx aBitmapEx(bitmap, bitmapAlpha);
 
-            switch (nOrientation)
+            if (!bFuzzing)
             {
-                case ORIENTATION_LEFTBOT:
-                    aBitmapEx.Rotate(2700_deg10, COL_BLACK);
-                    break;
-                default:
-                    break;
+                switch (nOrientation)
+                {
+                    case ORIENTATION_LEFTBOT:
+                        aBitmapEx.Rotate(2700_deg10, COL_BLACK);
+                        break;
+                    default:
+                        break;
+                }
             }
 
             MapMode aMapMode;
@@ -263,10 +308,12 @@ bool ImportTiffGraphicImport(SvStream& rTIFF, Graphic& rGraphic)
             aBitmapEx.SetPrefMapMode(aMapMode);
             aBitmapEx.SetPrefSize(Size(w, h));
 
-            AnimationBitmap aAnimationBitmap(aBitmapEx, Point(0, 0), aBitmapEx.GetSizePixel(),
+            AnimationFrame aAnimationFrame(aBitmapEx, Point(0, 0), aBitmapEx.GetSizePixel(),
                                              ANIMATION_TIMEOUT_ON_CLICK, Disposal::Back);
-            aAnimation.Insert(aAnimationBitmap);
+            aAnimation.Insert(aAnimationFrame);
         }
+        else
+            break;
     } while (TIFFReadDirectory(tif));
 
     TIFFClose(tif);

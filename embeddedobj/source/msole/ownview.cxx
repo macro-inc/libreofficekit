@@ -29,7 +29,6 @@
 #include <com/sun/star/task/XInteractionHandler.hpp>
 #include <com/sun/star/ucb/SimpleFileAccess.hpp>
 #include <com/sun/star/util/XCloseable.hpp>
-#include <com/sun/star/beans/XPropertySet.hpp>
 
 #include <com/sun/star/document/XEventBroadcaster.hpp>
 #include <com/sun/star/document/XEventListener.hpp>
@@ -39,7 +38,7 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/storagehelper.hxx>
 #include <comphelper/mimeconfighelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include "olepersist.hxx"
 #include "ownview.hxx"
@@ -243,19 +242,17 @@ bool OwnView_Impl::ReadContentsAndGenerateTempFile( const uno::Reference< io::XI
 
     // create m_aNativeTempURL
     OUString aNativeTempURL;
-    uno::Reference < beans::XPropertySet > xNativeTempFile(
+    uno::Reference < io::XTempFile > xNativeTempFile(
             io::TempFile::create(m_xContext),
-            uno::UNO_QUERY_THROW );
-    uno::Reference < io::XStream > xNativeTempStream( xNativeTempFile, uno::UNO_QUERY_THROW );
-    uno::Reference < io::XOutputStream > xNativeOutTemp = xNativeTempStream->getOutputStream();
-    uno::Reference < io::XInputStream > xNativeInTemp = xNativeTempStream->getInputStream();
+            uno::UNO_SET_THROW );
+    uno::Reference < io::XOutputStream > xNativeOutTemp = xNativeTempFile->getOutputStream();
+    uno::Reference < io::XInputStream > xNativeInTemp = xNativeTempFile->getInputStream();
     if ( !xNativeOutTemp.is() || !xNativeInTemp.is() )
         throw uno::RuntimeException();
 
     try {
-        xNativeTempFile->setPropertyValue("RemoveFile", uno::makeAny( false ) );
-        uno::Any aUrl = xNativeTempFile->getPropertyValue("Uri");
-        aUrl >>= aNativeTempURL;
+        xNativeTempFile->setRemoveFile( false );
+        aNativeTempURL = xNativeTempFile->getUri();
     }
     catch ( uno::Exception& )
     {

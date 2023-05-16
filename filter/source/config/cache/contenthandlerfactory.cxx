@@ -29,8 +29,7 @@ namespace filter::config{
 ContentHandlerFactory::ContentHandlerFactory(const css::uno::Reference< css::uno::XComponentContext >& rxContext)
  : m_xContext(rxContext)
 {
-    BaseContainer::init(rxContext                                             ,
-                        "com.sun.star.comp.filter.config.ContentHandlerFactory"   ,
+    BaseContainer::init("com.sun.star.comp.filter.config.ContentHandlerFactory"   ,
                         { "com.sun.star.frame.ContentHandlerFactory" },
                         FilterCache::E_CONTENTHANDLER                         );
 }
@@ -75,7 +74,7 @@ css::uno::Reference< css::uno::XInterface > SAL_CALL ContentHandlerFactory::crea
         aHandler >> lConfig;
 
         ::std::vector< css::uno::Any > stlArguments(comphelper::sequenceToContainer< ::std::vector< css::uno::Any > >(lArguments));
-        stlArguments.insert(stlArguments.begin(), css::uno::makeAny(lConfig));
+        stlArguments.insert(stlArguments.begin(), css::uno::Any(lConfig));
 
         xInit->initialize(comphelper::containerToSequence(stlArguments));
     }

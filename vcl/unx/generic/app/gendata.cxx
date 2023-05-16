@@ -17,27 +17,53 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#ifdef IOS
+#include <ios/iosinst.hxx>
+#endif
+
 #include <unx/gendata.hxx>
 
 #include <unx/fontmanager.hxx>
-#include <unx/glyphcache.hxx>
 
-GenericUnixSalData::GenericUnixSalData(SalInstance* const pInstance)
+#ifndef IOS
+
+#include <unx/glyphcache.hxx>
+#include <printerinfomanager.hxx>
+
+SalData::SalData() { SetSalData(this); }
+
+SalData::~SalData() {}
+
+#endif
+
+GenericUnixSalData::GenericUnixSalData()
     : m_pDisplay(nullptr)
 {
-    m_pInstance = pInstance;
-    SetSalData(this);
 }
 
-GenericUnixSalData::~GenericUnixSalData() {}
+GenericUnixSalData::~GenericUnixSalData()
+{
+#ifndef IOS
+    // at least for InitPrintFontManager the sequence is important
+    m_pPrintFontManager.reset();
+    m_pFreetypeManager.reset();
+    m_pPrinterInfoManager.reset();
+#endif
+}
 
+void GenericUnixSalData::Dispose() {}
+
+#ifndef IOS
 void GenericUnixSalData::InitFreetypeManager() { m_pFreetypeManager.reset(new FreetypeManager); }
+#endif
 
 void GenericUnixSalData::InitPrintFontManager()
 {
+#ifndef IOS
     GetFreetypeManager();
     m_pPrintFontManager.reset(new psp::PrintFontManager);
     m_pPrintFontManager->initialize();
+#endif
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

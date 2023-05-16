@@ -346,7 +346,7 @@ void TextConvWrapper::ReplaceUnit(
     //EditSelection aOldEditSel = pEditView->GetImpEditView()->GetEditSelection();
 
 #ifdef DBG_UTIL
-    LanguageType nOldLang   = pImpEditEng->GetLanguage( pImpEditEng->CreateSel( aOldSel ).Min() );
+    LanguageType nOldLang   = pImpEditEng->GetLanguage( pImpEditEng->CreateSel( aOldSel ).Min() ).nLang;
 #endif
 
     pImpEditEng->UndoActionStart( EDITUNDO_INSERT );
@@ -401,7 +401,7 @@ void TextConvWrapper::ReplaceUnit(
 
 
 void TextConvWrapper::ChangeText( const OUString &rNewText,
-        const OUString& rOrigText,
+        std::u16string_view rOrigText,
         const uno::Sequence< sal_Int32 > *pOffsets,
         ESelection *pESelection )
 {
@@ -443,7 +443,7 @@ void TextConvWrapper::ChangeText( const OUString &rNewText,
             else
             {
                 nPos   = nConvTextLen;
-                nIndex = rOrigText.getLength();
+                nIndex = rOrigText.size();
             }
 
             // end of string also terminates non-matching char sequence

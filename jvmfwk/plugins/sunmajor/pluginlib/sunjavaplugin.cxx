@@ -19,7 +19,6 @@
 
 
 #ifdef _WIN32
-# include <stdio.h>
 # include <sys/stat.h>
 # if !defined WIN32_LEAN_AND_MEAN
 #  define WIN32_LEAN_AND_MEAN
@@ -33,6 +32,7 @@
 
 #include <string.h>
 
+#include <cstddef>
 #include <cassert>
 #include <memory>
 #include <string_view>
@@ -72,7 +72,7 @@
 #include "sunversion.hxx"
 #include "diagnostics.h"
 
-#ifdef MACOSX
+#if defined MACOSX && defined __x86_64__
 #include "util_cocoa.hxx"
 #endif
 
@@ -199,7 +199,7 @@ extern "C" void JNICALL abort_handler()
     // If we are within JNI_CreateJavaVM then we jump back into getJavaVM
     if( g_bInGetJavaVM != 0 )
     {
-        fprintf(stderr, "JavaVM: JNI_CreateJavaVM called os::abort(), caught by abort_handler in javavm.cxx\n");
+        SAL_WARN("jfw", "JavaVM: JNI_CreateJavaVM called os::abort(), caught by abort_handler");
         longjmp( jmp_jvm_abort, 0);
     }
 }
@@ -465,34 +465,34 @@ javaPluginError jfw_plugin_getJavaInfosFromPath(
 // think it should be, do nothing, and just let the implicit loading
 // that happens when loading the JVM take care of it.
 
-static void load_msvcr(OUString const & jvm_dll, std::u16string_view msvcr)
+static void load_msvcr(std::u16string_view jvm_dll, std::u16string_view msvcr)
 {
     // First check if msvcr71.dll is in the same folder as jvm.dll. It
     // normally isn't, at least up to 1.6.0_22, but who knows if it
     // might be in the future.
-    sal_Int32 slash = jvm_dll.lastIndexOf('\\');
+    std::size_t slash = jvm_dll.rfind('\\');
 
-    if (slash == -1)
+    if (slash == std::u16string_view::npos)
     {
         // Huh, weird path to jvm.dll. Oh well.
-        SAL_WARN("jfw", "JVM pathname <" + jvm_dll + "> w/o backslash");
+        SAL_WARN("jfw", "JVM pathname <" << OUString(jvm_dll) << "> w/o backslash");
         return;
     }
 
     if (LoadLibraryW(
-            o3tl::toW(OUString(OUString::Concat(jvm_dll.subView(0, slash+1)) + msvcr).getStr())))
+            o3tl::toW(OUString(OUString::Concat(jvm_dll.substr(0, slash+1)) + msvcr).getStr())))
         return;
 
     // Then check if msvcr71.dll is in the parent folder of where
     // jvm.dll is. That is currently (1.6.0_22) as far as I know the
     // normal case.
-    slash = jvm_dll.lastIndexOf('\\', slash);
+    slash = jvm_dll.substr(0, slash).rfind('\\');
 
-    if (slash == -1)
+    if (slash == std::u16string_view::npos)
         return;
 
     (void)LoadLibraryW(
-        o3tl::toW(OUString(OUString::Concat(jvm_dll.subView(0, slash+1)) + msvcr).getStr()));
+        o3tl::toW(OUString(OUString::Concat(jvm_dll.substr(0, slash+1)) + msvcr).getStr()));
 }
 
 // Check if the jvm DLL imports msvcr71.dll, and in that case try
@@ -625,7 +625,7 @@ javaPluginError jfw_plugin_startJavaVirtualMachine(
         return javaPluginError::VmCreationFailed;
 #endif
     OUString sRuntimeLib = getRuntimeLib(pInfo->arVendorData);
-#ifdef MACOSX
+#if defined MACOSX && defined __x86_64__
     if ( !JvmfwkUtil_isLoadableJVM( sRuntimeLib ) )
         return javaPluginError::VmCreationFailed;
 #endif
@@ -681,9 +681,7 @@ javaPluginError jfw_plugin_startJavaVirtualMachine(
             sRuntimeLib, osl_getThreadTextEncoding());
         OString sSymbol = OUStringToOString(
             sSymbolCreateJava, osl_getThreadTextEncoding());
-        fprintf(stderr,"[Java framework]sunjavaplugin" SAL_DLLEXTENSION
-                ": Java runtime library: %s does not export symbol %s !\n",
-                sLib.getStr(), sSymbol.getStr());
+        SAL_WARN("jfw", "Java runtime library: " << sLib << " does not export symbol " << sSymbol);
         return javaPluginError::VmCreationFailed;
     }
     moduleRt.release();
@@ -697,8 +695,8 @@ javaPluginError jfw_plugin_startJavaVirtualMachine(
     JavaVMInitArgs vm_args;
 
     struct Option {
-        Option(OString const & theOptionString, void * theExtraInfo):
-            optionString(theOptionString), extraInfo(theExtraInfo)
+        Option(OString theOptionString, void * theExtraInfo):
+            optionString(std::move(theOptionString)), extraInfo(theExtraInfo)
         {}
 
         OString optionString;
@@ -805,14 +803,12 @@ javaPluginError jfw_plugin_startJavaVirtualMachine(
     {
         if( err < 0)
         {
-            fprintf(stderr,"[Java framework] sunjavaplugin" SAL_DLLEXTENSION
-                    ": Can not create Java Virtual Machine, %" SAL_PRIdINT32 "\n", sal_Int32(err));
+            SAL_WARN("jfw", "Can not create Java Virtual Machine, " << err);
             errorcode = javaPluginError::VmCreationFailed;
         }
         else if( err > 0)
         {
-            fprintf(stderr,"[Java framework] sunjavaplugin" SAL_DLLEXTENSION
-                    ": Can not create JavaVirtualMachine, abort handler was called.\n");
+            SAL_WARN("jfw", "Can not create JavaVirtualMachine, abort handler was called");
             errorcode = javaPluginError::VmCreationFailed;
         }
     }
@@ -828,7 +824,6 @@ javaPluginError jfw_plugin_startJavaVirtualMachine(
     // On Android we always have a Java VM as we only expect this code
     // to be run in an Android app anyway.
     *ppVm = lo_get_javavm();
-    fprintf(stderr, "lo_get_javavm returns %p", *ppVm);
 #endif
 
     return errorcode;

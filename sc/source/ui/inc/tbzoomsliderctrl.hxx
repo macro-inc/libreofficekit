@@ -19,6 +19,7 @@
 #pragma once
 
 #include <vcl/customweld.hxx>
+#include <vcl/image.hxx>
 #include <vcl/window.hxx>
 #include <svl/poolitem.hxx>
 #include <vcl/InterimItemWindow.hxx>
@@ -58,7 +59,7 @@ private:
 
     void DoPaint(vcl::RenderContext& rRenderContext);
 public:
-    ScZoomSlider(const css::uno::Reference<css::frame::XDispatchProvider>& rDispatchProvider,
+    ScZoomSlider(css::uno::Reference<css::frame::XDispatchProvider> xDispatchProvider,
                  sal_uInt16 nCurrentZoom);
 
     void UpdateFromItem(const SvxZoomSliderItem* pZoomSliderItem);

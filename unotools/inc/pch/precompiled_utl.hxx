@@ -66,7 +66,7 @@
 #include <sal/saldllapi.h>
 #include <sal/types.h>
 #include <sal/typesizes.h>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #endif // PCH_LEVEL >= 2
 #if PCH_LEVEL >= 3
 #include <com/sun/star/beans/NamedValue.hpp>
@@ -116,7 +116,7 @@
 #include <salhelper/condition.hxx>
 #include <tools/date.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/lineend.hxx>
 #include <tools/long.hxx>
 #include <tools/ref.hxx>

@@ -24,13 +24,17 @@
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
 #include <drawinglayer/attribute/fillgraphicattribute.hxx>
+#include <drawinglayer/attribute/fontattribute.hxx>
+#include <drawinglayer/attribute/lineattribute.hxx>
 #include <drawinglayer/primitive2d/fillgraphicprimitive2d.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonSelectionPrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/textlayoutdevice.hxx>
 #include <drawinglayer/primitive2d/textprimitive2d.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
 #include <vcl/graph.hxx>
+#include <vcl/mnemonic.hxx>
 #include <vcl/outdev.hxx>
 #include <vcl/texteng.hxx>
 
@@ -209,13 +213,13 @@ void ThumbnailViewItem::addTextPrimitives (const OUString& rText, const Thumbnai
     aPos.setY(aPos.getY() + aTextDev.getTextHeight());
 
     sal_Int32 nMnemonicPos = -1;
-    OUString aOrigText(mrParent.isDrawMnemonic() ? OutputDevice::GetNonMnemonicString(rText, nMnemonicPos) : rText);
+    OUString aOrigText(mrParent.isDrawMnemonic() ? removeMnemonicFromString(rText, nMnemonicPos) : rText);
 
     TextEngine aTextEngine;
     aTextEngine.SetFont(getVclFontFromFontAttribute(pAttrs->aFontAttr,
                               pAttrs->aFontSize.getX(), pAttrs->aFontSize.getY(), 0,
                               css::lang::Locale()));
-    aTextEngine.SetMaxTextWidth(maDrawArea.getWidth());
+    aTextEngine.SetMaxTextWidth(maDrawArea.getOpenWidth());
     aTextEngine.SetText(aOrigText);
 
     sal_Int32 nPrimitives = rSeq.size();
@@ -237,7 +241,7 @@ void ThumbnailViewItem::addTextPrimitives (const OUString& rText, const Thumbnai
             double nDotsWidth = aTextDev.getTextWidth("...",0,3);
 
             sal_Int32 nLength = nLineLength - 1;
-            while ( nDotsWidth + aTextDev.getTextWidth(aText, nLineStart, nLength) > maDrawArea.getWidth() && nLength > 0)
+            while ( nDotsWidth + aTextDev.getTextWidth(aText, nLineStart, nLength) > maDrawArea.getOpenWidth() && nLength > 0)
             {
                 --nLength;
             }
@@ -246,7 +250,7 @@ void ThumbnailViewItem::addTextPrimitives (const OUString& rText, const Thumbnai
             nLineLength = nLength + 3;
         }
 
-        double nLineX = maDrawArea.Left() + (maDrawArea.getWidth() - nLineWidth) / 2.0;
+        double nLineX = maDrawArea.Left() + (maDrawArea.getOpenWidth() - nLineWidth) / 2.0;
 
         basegfx::B2DHomMatrix aTextMatrix( createScaleTranslateB2DHomMatrix(
                     pAttrs->aFontSize.getX(), pAttrs->aFontSize.getY(),
@@ -266,6 +270,7 @@ void ThumbnailViewItem::addTextPrimitives (const OUString& rText, const Thumbnai
                     new TextSimplePortionPrimitive2D(aTextMatrix,
                                                      aText, nLineStart, nLineLength,
                                                      std::vector<double>(),
+                                                     {},
                                                      pAttrs->aFontAttr,
                                                      css::lang::Locale(),
                                                      aTextColor));
@@ -291,7 +296,7 @@ void ThumbnailViewItem::addTextPrimitives (const OUString& rText, const Thumbnai
             drawinglayer::attribute::LineAttribute aLineAttribute(Color(aTextColor).getBColor(), fMnemonicHeight);
 
             rSeq[nPrimitives++] = drawinglayer::primitive2d::Primitive2DReference(
-                        new PolygonStrokePrimitive2D(aLine, aLineAttribute));
+                        new PolygonStrokePrimitive2D(std::move(aLine), aLineAttribute));
         }
 
         nLineStart += nLineLength;

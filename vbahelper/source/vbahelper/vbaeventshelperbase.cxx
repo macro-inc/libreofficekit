@@ -22,6 +22,7 @@
 #include <com/sun/star/document/XEventBroadcaster.hpp>
 #include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/script/ModuleType.hpp>
+#include <com/sun/star/script/vba/VBAEventId.hpp>
 #include <com/sun/star/script/vba/XVBAModuleInfo.hpp>
 #include <com/sun/star/script/XLibraryContainer.hpp>
 #include <com/sun/star/util/VetoException.hpp>
@@ -320,6 +321,23 @@ void VbaEventsHelperBase::ensureVBALibrary()
     }
 }
 
+bool VbaEventsHelperBase::hasModule(const OUString& rModuleName)
+{
+    if (rModuleName.isEmpty())
+        return false;
+
+    bool bRet = false;
+    try
+    {
+        ensureVBALibrary();
+        bRet = mxModuleInfos->hasModuleInfo(rModuleName);
+    }
+    catch (uno::Exception&)
+    {}
+
+    return bRet;
+}
+
 sal_Int32 VbaEventsHelperBase::getModuleType( const OUString& rModuleName )
 {
     // make sure the VBA library exists
@@ -346,11 +364,72 @@ VbaEventsHelperBase::ModulePathMap& VbaEventsHelperBase::updateModulePathMap( co
     sal_Int32 nModuleType = getModuleType( rModuleName );
     // search for all event handlers
     ModulePathMap& rPathMap = maEventPaths[ rModuleName ];
+
+    // Use WORKBOOK_OPEN as a way to get the codename for ThisWorkbook
+    OUString sThisWorkbook;
+    if (getImplementationName() == "ScVbaEventsHelper")
+    {
+        EventHandlerInfo& rThisWorksheetInfo
+            = maEventInfos[css::script::vba::VBAEventId::WORKBOOK_OPEN];
+        css::uno::Sequence<css::uno::Any> aNoArgs;
+        sThisWorkbook = implGetDocumentModuleName(rThisWorksheetInfo, aNoArgs);
+    }
+
+    // Use DOCUMENT_OPEN as a way to get the codename for ThisDocument
+    OUString sThisDocument;
+    if (getImplementationName() == "SwVbaEventsHelper")
+    {
+        EventHandlerInfo& rThisDocumentInfo
+            = maEventInfos[css::script::vba::VBAEventId::DOCUMENT_OPEN];
+        css::uno::Sequence<css::uno::Any> aNoArgs;
+        sThisDocument = implGetDocumentModuleName(rThisDocumentInfo, aNoArgs);
+    }
+
     for( const auto& rEventInfo : maEventInfos )
     {
         const EventHandlerInfo& rInfo = rEventInfo.second;
         if( rInfo.mnModuleType == nModuleType )
-            rPathMap[ rInfo.mnEventId ] = resolveVBAMacro( mpShell, maLibraryName, rModuleName, rInfo.maMacroName );
+        {
+            OUString sName;
+            bool bOnlyPublic = false;
+            OUString sSkipModule;
+            if (rInfo.mnEventId == css::script::vba::VBAEventId::AUTO_NEW
+                || rInfo.mnEventId == css::script::vba::VBAEventId::AUTO_OPEN
+                || rInfo.mnEventId == css::script::vba::VBAEventId::AUTO_CLOSE)
+            {
+                if (getImplementationName() == "ScVbaEventsHelper")
+                {
+                    // Only in Calc, ignore Auto_* in ThisWorkbook
+                    sSkipModule = sThisWorkbook;
+                }
+                else if (getImplementationName() == "SwVbaEventsHelper")
+                {
+                    // Only in Word, Auto* only runs if defined as Public, not Private.
+                    bOnlyPublic = true;
+                    // Only in Word, auto* subroutines in ThisDocument have highest priority
+                    sName = resolveVBAMacro(mpShell, maLibraryName, sThisDocument,
+                                            rInfo.maMacroName, bOnlyPublic, sSkipModule);
+                }
+            }
+
+            if (sName.isEmpty())
+                sName = resolveVBAMacro(mpShell, maLibraryName, rModuleName,
+                                        rInfo.maMacroName, bOnlyPublic, sSkipModule);
+
+            // Only in Word (with lowest priority), an Auto* module can execute a "Public Sub Main"
+            if (sName.isEmpty() && rModuleName.isEmpty()
+                && getImplementationName() == "SwVbaEventsHelper")
+            {
+                if (rInfo.mnEventId == css::script::vba::VBAEventId::AUTO_NEW
+                    || rInfo.mnEventId == css::script::vba::VBAEventId::AUTO_OPEN
+                    || rInfo.mnEventId == css::script::vba::VBAEventId::AUTO_CLOSE)
+                {
+                    sName = resolveVBAMacro(mpShell, maLibraryName, rInfo.maMacroName, "Main",
+                                            bOnlyPublic, sSkipModule);
+                }
+            }
+            rPathMap[rInfo.mnEventId] = sName;
+        }
     }
     return rPathMap;
 }

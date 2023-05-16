@@ -19,7 +19,8 @@ namespace oox::shape
 class WpgContext final : public oox::core::FragmentHandler2
 {
 public:
-    explicit WpgContext(oox::core::FragmentHandler2 const& rParent);
+    explicit WpgContext(oox::core::FragmentHandler2 const& rParent,
+                        const oox::drawingml::ShapePtr& pMaster);
     ~WpgContext() override;
 
     oox::core::ContextHandlerRef onCreateContext(sal_Int32 nElementToken,
@@ -27,8 +28,13 @@ public:
 
     const oox::drawingml::ShapePtr& getShape() const { return mpShape; }
 
+    const bool& isFullWPGSupport() const { return m_bFullWPGSupport; };
+    void setFullWPGSupport(bool bUse) { m_bFullWPGSupport = bUse; };
+
 private:
     oox::drawingml::ShapePtr mpShape;
+
+    bool m_bFullWPGSupport;
 };
 }
 

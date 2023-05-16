@@ -17,11 +17,14 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <sal/config.h>
+#include <config_wasm_strip.h>
 
+#include <sal/config.h>
 #include <sal/log.hxx>
+
 #include <filter/msfilter/util.hxx>
 #include <o3tl/string_view.hxx>
+#include <o3tl/any.hxx>
 #include <oox/core/xmlfilterbase.hxx>
 #include <oox/export/shapes.hxx>
 #include <oox/export/utils.hxx>
@@ -44,6 +47,7 @@
 #include <com/sun/star/drawing/ConnectorType.hpp>
 #include <com/sun/star/drawing/EnhancedCustomShapeParameterPair.hpp>
 #include <com/sun/star/drawing/EnhancedCustomShapeParameterType.hpp>
+#include <com/sun/star/embed/Aspects.hpp>
 #include <com/sun/star/embed/EmbedStates.hpp>
 #include <com/sun/star/embed/XEmbeddedObject.hpp>
 #include <com/sun/star/embed/XEmbedPersist.hpp>
@@ -60,8 +64,10 @@
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/drawing/XDrawPages.hpp>
 #include <com/sun/star/drawing/XDrawPagesSupplier.hpp>
-#include <com/sun/star/document/XEventsSupplier.hpp>
 #include <com/sun/star/presentation/ClickAction.hpp>
+#include <com/sun/star/drawing/XGluePointsSupplier.hpp>
+#include <com/sun/star/container/XIdentifierAccess.hpp>
+#include <com/sun/star/table/BorderLineStyle.hpp>
 #include <tools/globname.hxx>
 #include <comphelper/classids.hxx>
 #include <comphelper/propertysequence.hxx>
@@ -73,8 +79,7 @@
 #include <filter/msfilter/escherex.hxx>
 #include <svx/svdoashp.hxx>
 #include <svx/svdoole2.hxx>
-#include <tools/diagnose_ex.h>
-#include <svx/unoapi.hxx>
+#include <comphelper/diagnose_ex.hxx>
 #include <oox/export/chartexport.hxx>
 #include <oox/mathml/export.hxx>
 #include <basegfx/numeric/ftools.hxx>
@@ -315,16 +320,6 @@ uno::Reference<io::XInputStream> GetOLEObjectStream(
 } // namespace oox
 
 namespace oox::drawingml {
-
-#define GETA(propName) \
-    GetProperty( rXPropSet, #propName)
-
-#define GETAD(propName) \
-    ( GetPropertyAndState( rXPropSet, rXPropState, #propName, eState ) && eState == beans::PropertyState_DIRECT_VALUE )
-
-#define GET(variable, propName) \
-    if ( GETA(propName) ) \
-        mAny >>= variable;
 
 ShapeExport::ShapeExport( sal_Int32 nXmlNamespace, FSHelperPtr pFS, ShapeHashMap* pShapeMap, XmlFilterBase* pFB, DocumentType eDocumentType, DMLTextExport* pTextExport, bool bUserShapes )
     : DrawingML( std::move(pFS), pFB, eDocumentType, pTextExport )
@@ -611,7 +606,7 @@ static bool lcl_IsOnAllowlist(OUString const & rShapeType)
     return std::find(vAllowlist.begin(), vAllowlist.end(), rShapeType) != vAllowlist.end();
 }
 
-static bool lcl_GetHandlePosition( sal_Int32 &nValue, const EnhancedCustomShapeParameter &rParam, Sequence< EnhancedCustomShapeAdjustmentValue > &rSeq)
+static bool lcl_GetHandlePosition( sal_Int32 &nValue, const EnhancedCustomShapeParameter &rParam, const Sequence< EnhancedCustomShapeAdjustmentValue > &rSeq)
 {
     bool bAdj = false;
     if ( rParam.Value.getValueTypeClass() == TypeClass_DOUBLE )
@@ -647,7 +642,7 @@ static bool lcl_GetHandlePosition( sal_Int32 &nValue, const EnhancedCustomShapeP
 
 static void lcl_AnalyzeHandles( const uno::Sequence<beans::PropertyValues> & rHandles,
         std::vector< std::pair< sal_Int32, sal_Int32> > &rHandlePositionList,
-        Sequence< EnhancedCustomShapeAdjustmentValue > &rSeq)
+        const Sequence< EnhancedCustomShapeAdjustmentValue > &rSeq)
 {
     for ( const Sequence< PropertyValue >& rPropSeq : rHandles )
     {
@@ -741,7 +736,7 @@ ShapeExport& ShapeExport::WriteCustomShape( const Reference< XShape >& xShape )
     bool bHasGeometrySeq(false);
     Sequence< PropertyValue > aGeometrySeq;
     OUString sShapeType("non-primitive"); // default in ODF
-    if (GETA(CustomShapeGeometry))
+    if (GetProperty(rXPropSet, "CustomShapeGeometry"))
     {
         SAL_INFO("oox.shape", "got custom shape geometry");
         if (mAny >>= aGeometrySeq)
@@ -768,7 +763,7 @@ ShapeExport& ShapeExport::WriteCustomShape( const Reference< XShape >& xShape )
         EscherPropertyContainer::IsDefaultObject(
             rSdrObjCustomShape,
             eShapeType));
-    const char* sPresetShape = msfilter::util::GetOOXMLPresetGeometry(sShapeType.toUtf8().getStr());
+    OString sPresetShape = msfilter::util::GetOOXMLPresetGeometry(sShapeType);
     SAL_INFO("oox.shape", "custom shape type: " << sShapeType << " ==> " << sPresetShape);
 
     sal_Int32 nAdjustmentValuesIndex = -1;
@@ -807,23 +802,29 @@ ShapeExport& ShapeExport::WriteCustomShape( const Reference< XShape >& xShape )
     }
 
     FSHelperPtr pFS = GetFS();
-    pFS->startElementNS(mnXmlNamespace, (GetDocumentType() != DOCUMENT_DOCX || mbUserShapes ? XML_sp : XML_wsp));
-
     // non visual shape properties
     if (GetDocumentType() != DOCUMENT_DOCX || mbUserShapes)
     {
+        bool bUseBackground = false;
+        if (GetProperty(rXPropSet, "FillUseSlideBackground"))
+            mAny >>= bUseBackground;
+        if (bUseBackground)
+            mpFS->startElementNS(mnXmlNamespace, XML_sp, XML_useBgFill, "1");
+        else
+            mpFS->startElementNS(mnXmlNamespace, XML_sp);
+
         bool isVisible = true ;
-        if( GETA (Visible))
+        if( GetProperty(rXPropSet, "Visible"))
         {
             mAny >>= isVisible;
         }
         pFS->startElementNS( mnXmlNamespace, XML_nvSpPr );
-        pFS->startElementNS( mnXmlNamespace, XML_cNvPr,
-                XML_id, OString::number(GetNewShapeID(xShape)),
-                XML_name, GetShapeName(xShape),
-                XML_hidden, sax_fastparser::UseIf("1", !isVisible));
+        pFS->startElementNS(
+            mnXmlNamespace, XML_cNvPr, XML_id,
+            OString::number(GetShapeID(xShape) == -1 ? GetNewShapeID(xShape) : GetShapeID(xShape)),
+            XML_name, GetShapeName(xShape), XML_hidden, sax_fastparser::UseIf("1", !isVisible));
 
-        if( GETA( URL ) )
+        if( GetProperty(rXPropSet, "URL") )
         {
             OUString sURL;
             mAny >>= sURL;
@@ -839,10 +840,10 @@ ShapeExport& ShapeExport::WriteCustomShape( const Reference< XShape >& xShape )
         }
 
         OUString sBookmark;
-        if (GETA(Bookmark))
+        if (GetProperty(rXPropSet, "Bookmark"))
             mAny >>= sBookmark;
 
-        if (GETA(OnClick))
+        if (GetProperty(rXPropSet, "OnClick"))
         {
             OUString sPPAction;
             presentation::ClickAction eClickAction = presentation::ClickAction_NONE;
@@ -899,7 +900,33 @@ ShapeExport& ShapeExport::WriteCustomShape( const Reference< XShape >& xShape )
         pFS->endElementNS( mnXmlNamespace, XML_nvSpPr );
     }
     else
+    {
+        pFS->startElementNS(mnXmlNamespace, XML_wsp);
+        if (m_xParent.is())
+        {
+            pFS->startElementNS(mnXmlNamespace, XML_cNvPr, XML_id,
+                                OString::number(GetShapeID(xShape) == -1 ? GetNewShapeID(xShape)
+                                                                         : GetShapeID(xShape)),
+                                XML_name, GetShapeName(xShape));
+
+            if (GetProperty(rXPropSet, "Hyperlink"))
+            {
+                OUString sURL;
+                mAny >>= sURL;
+                if (!sURL.isEmpty())
+                {
+                    OUString sRelId = mpFB->addRelation(
+                        mpFS->getOutputStream(), oox::getRelationship(Relationship::HYPERLINK),
+                        mpURLTransformer->getTransformedString(sURL),
+                        mpURLTransformer->isExternalURL(sURL));
+
+                    mpFS->singleElementNS(XML_a, XML_hlinkClick, FSNS(XML_r, XML_id), sRelId);
+                }
+            }
+            pFS->endElementNS(mnXmlNamespace, XML_cNvPr);
+        }
         pFS->singleElementNS(mnXmlNamespace, XML_cNvSpPr);
+    }
 
     // visual shape properties
     pFS->startElementNS(mnXmlNamespace, XML_spPr);
@@ -926,8 +953,7 @@ ShapeExport& ShapeExport::WriteCustomShape( const Reference< XShape >& xShape )
     bool bPresetWriteSuccessful = false;
     // Let the custom shapes what has name and preset information in OOXML, to be written
     // as preset ones with parameters. Try that with this converter class.
-    if (!sShapeType.startsWith("ooxml") && sShapeType != "non-primitive"
-        && GetDocumentType() == DOCUMENT_DOCX && !mbUserShapes
+    if (!sShapeType.startsWith("ooxml") && sShapeType != "non-primitive" && !mbUserShapes
         && xShape->getShapeType() == "com.sun.star.drawing.CustomShape"
         && !lcl_IsOnAllowlist(sShapeType))
     {
@@ -1062,7 +1088,7 @@ ShapeExport& ShapeExport::WriteCustomShape( const Reference< XShape >& xShape )
             // case mso_sptBorderCallout3:
             default:
             {
-                if (!strcmp( sPresetShape, "frame" ))
+                if ( sPresetShape == "frame" )
                 {
                     sal_Int32 adj1 =  double( nYPosition )/aViewBox.Height *100000 ;
                     lcl_AppendAdjustmentValue( aAvList, 1, adj1 );
@@ -1411,49 +1437,328 @@ void ShapeExport::WriteGraphicObjectShapePart( const Reference< XShape >& xShape
     pFS->endElementNS( mnXmlNamespace, XML_pic );
 }
 
+static void lcl_Rotate(sal_Int32 nAngle, Point center, awt::Point& pt)
+{
+    sal_Int16 nCos, nSin;
+    switch (nAngle)
+    {
+        case 90:
+            nCos = 0;
+            nSin = 1;
+            break;
+        case 180:
+            nCos = -1;
+            nSin = 0;
+            break;
+        case 270:
+            nCos = 0;
+            nSin = -1;
+            break;
+        default:
+            return;
+    }
+    sal_Int32 x = pt.X - center.X();
+    sal_Int32 y = pt.Y - center.Y();
+    pt.X = center.X() + x * nCos - y * nSin;
+    pt.Y = center.Y() + y * nCos + x * nSin;
+}
+
+static void lcl_FlipHFlipV(tools::Polygon aPoly, sal_Int32 nAngle, bool& rFlipH, bool& rFlipV)
+{
+    Point aStart = aPoly[0];
+    Point aEnd = aPoly[aPoly.GetSize() - 1];
+
+    if (aStart.X() > aEnd.X() && aStart.Y() > aEnd.Y())
+    {
+        if (nAngle)
+        {
+            if (nAngle == 90)
+                rFlipH = true;
+            if (nAngle == 270)
+                rFlipV = true;
+        }
+        else // 0°
+        {
+            rFlipH = true;
+            rFlipV = true;
+        }
+    }
+
+    if (aStart.X() < aEnd.X() && aStart.Y() < aEnd.Y())
+    {
+        if (nAngle)
+        {
+            if (nAngle != 270)
+            {
+                rFlipH = true;
+                rFlipV = true;
+            }
+            else
+                rFlipH = true;
+        }
+    }
+
+    if (aStart.Y() < aEnd.Y() && aStart.X() > aEnd.X())
+    {
+        if (nAngle)
+        {
+            if (nAngle == 180)
+                rFlipV = true;
+            if (nAngle == 270)
+            {
+                rFlipV = true;
+                rFlipH = true;
+            }
+        }
+        else // 0°
+        {
+            rFlipH = true;
+        }
+    }
+
+    if (aStart.Y() > aEnd.Y() && aStart.X() < aEnd.X())
+    {
+        if (nAngle)
+        {
+            if (nAngle == 90)
+            {
+                rFlipH = true;
+                rFlipV = true;
+            }
+            if (nAngle == 180)
+                rFlipH = true;
+        }
+        else // 0°
+            rFlipV = true;
+    }
+}
+
+static sal_Int32 lcl_GetAngle(tools::Polygon aPoly)
+{
+    sal_Int32 nAngle;
+    Point aStartPoint = aPoly[0];
+    Point aEndPoint = aPoly[aPoly.GetSize() - 1];
+    if (aStartPoint.X() == aPoly[1].X())
+    {
+        if ((aStartPoint.X() < aEndPoint.X() && aStartPoint.Y() > aEndPoint.Y())
+            || (aStartPoint.X() > aEndPoint.X() && aStartPoint.Y() < aEndPoint.Y()))
+        {
+            nAngle = 90;
+        }
+        else
+            nAngle = 270;
+    }
+    else
+    {
+        if (aStartPoint.X() > aPoly[1].X())
+            nAngle = 180;
+        else
+            nAngle = 0;
+    }
+
+    return nAngle;
+}
+
+// Adjust value decide the position, where the connector should turn.
+static void lcl_GetConnectorAdjustValue(const Reference<XShape>& xShape, tools::Polygon aPoly,
+                                        ConnectorType eConnectorType,
+                                        std::vector<std::pair<sal_Int32, sal_Int32>>& rAvList)
+{
+    sal_Int32 nAdjCount = 0;
+    if (eConnectorType == ConnectorType_CURVE)
+    {
+        if (aPoly.GetSize() == 4)
+        {
+            if ((aPoly[0].X() == aPoly[1].X() && aPoly[2].X() == aPoly[3].X())
+                || (aPoly[0].Y() == aPoly[1].Y() && aPoly[2].Y() == aPoly[3].Y()))
+            {
+                nAdjCount = 1; // curvedConnector3
+            }
+            else
+                nAdjCount = 0; // curvedConnector2
+        }
+        else if (aPoly.GetSize() > 4)
+        {
+            if ((aPoly[2].X() == aPoly[3].X() && aPoly[3].X() == aPoly[4].X())
+                || (aPoly[2].Y() == aPoly[3].Y() && aPoly[3].Y() == aPoly[4].Y()))
+            {
+                nAdjCount = 3; // curvedConnector5
+            }
+            else
+                nAdjCount = 2; // curvedConnector4
+        }
+    }
+    else
+    {
+        switch (aPoly.GetSize())
+        {
+            case 3:
+                nAdjCount = 0; // bentConnector2
+                break;
+            case 4:
+                nAdjCount = 1; // bentConnector3
+                break;
+            case 5:
+                nAdjCount = 2; // bentConnector4
+                break;
+            case 6:
+                nAdjCount = 3; // bentConnector5
+                break;
+        }
+    }
+
+    if (nAdjCount)
+    {
+        sal_Int32 nAdjustValue;
+        Point aStart = aPoly[0];
+        Point aEnd = aPoly[aPoly.GetSize() - 1];
+
+        for (sal_Int32 i = 1; i <= nAdjCount; ++i)
+        {
+            Point aPt = aPoly[i];
+
+            if (aEnd.Y() == aStart.Y())
+                aEnd.setY(aStart.Y() + 1);
+            if (aEnd.X() == aStart.X())
+                aEnd.setX(aStart.X() + 1);
+
+            bool bVertical = aPoly[1].X() - aStart.X() != 0 ? true : false;
+            // vertical and horizon alternate
+            if (i % 2 == 1)
+                bVertical = !bVertical;
+
+            if (eConnectorType == ConnectorType_CURVE)
+            {
+                awt::Size aSize = xShape->getSize();
+                awt::Point aShapePosition = xShape->getPosition();
+                tools::Rectangle aBoundRect = aPoly.GetBoundRect();
+
+                if (bVertical)
+                {
+                    if ((aBoundRect.GetSize().Height() - aSize.Height) == 1)
+                        aPt.setY(aPoly[i + 1].Y());
+                    else if (aStart.Y() > aPt.Y())
+                        aPt.setY(aShapePosition.Y);
+                    else
+                        aPt.setY(aShapePosition.Y + aSize.Height);
+                }
+                else
+                {
+                    if ((aBoundRect.GetSize().Width() - aSize.Width) == 1)
+                        aPt.setX(aPoly[i + 1].X());
+                    else if (aStart.X() > aPt.X())
+                        aPt.setX(aShapePosition.X);
+                    else
+                        aPt.setX(aShapePosition.X + aSize.Width);
+                }
+            }
+
+            if (bVertical)
+                nAdjustValue = ((aPt.Y() - aStart.Y()) * 100000) / (aEnd.Y() - aStart.Y());
+            else
+                nAdjustValue = ((aPt.X() - aStart.X()) * 100000) / (aEnd.X() - aStart.X());
+
+            rAvList.emplace_back(i, nAdjustValue);
+        }
+    }
+}
+
+static sal_Int32 lcl_GetGluePointId(const Reference<XShape>& xShape, sal_Int32 nGluePointId)
+{
+    if (nGluePointId > 3)
+        return nGluePointId - 4;
+    else
+    {
+        bool bFlipH = false;
+        bool bFlipV = false;
+        Reference<XPropertySet> xShapeProps(xShape, UNO_QUERY);
+        if (xShapeProps->getPropertySetInfo()->hasPropertyByName("CustomShapeGeometry"))
+        {
+            Sequence<PropertyValue> aGeometrySeq;
+            xShapeProps->getPropertyValue("CustomShapeGeometry") >>= aGeometrySeq;
+            for (int i = 0; i < aGeometrySeq.getLength(); i++)
+            {
+                const PropertyValue& rProp = aGeometrySeq[i];
+                if (rProp.Name == "MirroredX")
+                    rProp.Value >>= bFlipH;
+
+                if (rProp.Name == "MirroredY")
+                    rProp.Value >>= bFlipV;
+            }
+        }
+
+        if ((!bFlipH && !bFlipV) || (bFlipH && bFlipV))
+        {
+            // change id of the bounding box (1 <-> 3)
+            if (nGluePointId == 1)
+                nGluePointId = 3; // Right
+            else if (nGluePointId == 3)
+                nGluePointId = 1; // Left
+        }
+    }
+
+    return nGluePointId;
+}
+
 ShapeExport& ShapeExport::WriteConnectorShape( const Reference< XShape >& xShape )
 {
     bool bFlipH = false;
     bool bFlipV = false;
+    sal_Int32 nAngle = 0;
+    sal_Int32 nStartGlueId = 0;
+    sal_Int32 nEndGlueId = 0;
 
     SAL_INFO("oox.shape", "write connector shape");
 
     FSHelperPtr pFS = GetFS();
 
-    const char* sGeometry = "line";
+    OUString sGeometry;
+    std::vector<std::pair<sal_Int32, sal_Int32>> aAdjustValueList;
     Reference< XPropertySet > rXPropSet( xShape, UNO_QUERY );
     Reference< XPropertyState > rXPropState( xShape, UNO_QUERY );
     awt::Point aStartPoint, aEndPoint;
     Reference< XShape > rXShapeA;
     Reference< XShape > rXShapeB;
     PropertyState eState;
-    ConnectorType eConnectorType;
-    if( GETAD( EdgeKind ) ) {
+    ConnectorType eConnectorType = ConnectorType_STANDARD;
+    if (GetProperty(rXPropSet, "EdgeKind"))
         mAny >>= eConnectorType;
 
-        switch( eConnectorType ) {
-            case ConnectorType_CURVE:
-                sGeometry = "curvedConnector3";
-                break;
-            case ConnectorType_STANDARD:
-                sGeometry = "bentConnector3";
-                break;
-            default:
-            case ConnectorType_LINE:
-            case ConnectorType_LINES:
-                sGeometry = "straightConnector1";
-                break;
-        }
-
-        if( GETAD( EdgeStartPoint ) ) {
-            mAny >>= aStartPoint;
-            if( GETAD( EdgeEndPoint ) ) {
-                mAny >>= aEndPoint;
-            }
-        }
-        GET( rXShapeA, EdgeStartConnection );
-        GET( rXShapeB, EdgeEndConnection );
+    switch( eConnectorType ) {
+        case ConnectorType_CURVE:
+            sGeometry = "curvedConnector";
+            break;
+        case ConnectorType_LINES:
+        case ConnectorType_STANDARD:
+            sGeometry = "bentConnector";
+            break;
+        default:
+        case ConnectorType_LINE:
+            sGeometry = "straightConnector1";
+            break;
     }
+
+    if (GetPropertyAndState( rXPropSet, rXPropState, "EdgeStartPoint", eState ) && eState == beans::PropertyState_DIRECT_VALUE )
+    {
+        mAny >>= aStartPoint;
+        if (GetPropertyAndState( rXPropSet, rXPropState, "EdgeEndPoint", eState ) && eState == beans::PropertyState_DIRECT_VALUE )
+            mAny >>= aEndPoint;
+    }
+    if (GetProperty(rXPropSet, "EdgeStartConnection"))
+        mAny >>= rXShapeA;
+    if (GetProperty(rXPropSet, "EdgeEndConnection"))
+        mAny >>= rXShapeB;
+
+    if (GetProperty(rXPropSet, "StartGluePointIndex"))
+        mAny >>= nStartGlueId;
+    if (nStartGlueId != -1)
+        nStartGlueId = lcl_GetGluePointId(rXShapeA, nStartGlueId);
+
+    if (GetProperty(rXPropSet, "EndGluePointIndex"))
+        mAny >>= nEndGlueId;
+    if (nEndGlueId != -1)
+        nEndGlueId = lcl_GetGluePointId(rXShapeB, nEndGlueId);
+
     // Position is relative to group in Word, but relative to anchor of group in API.
     if (GetDocumentType() == DOCUMENT_DOCX && !mbUserShapes && m_xParent.is())
     {
@@ -1464,17 +1769,40 @@ ShapeExport& ShapeExport::WriteConnectorShape( const Reference< XShape >& xShape
         aEndPoint.Y -= aParentPos.Y;
     }
     EscherConnectorListEntry aConnectorEntry( xShape, aStartPoint, rXShapeA, aEndPoint, rXShapeB );
-    tools::Rectangle aRect( Point( aStartPoint.X, aStartPoint.Y ), Point( aEndPoint.X, aEndPoint.Y ) );
-    if( aRect.getWidth() < 0 ) {
-        bFlipH = true;
-        aRect.SetLeft(aEndPoint.X);
-        aRect.setWidth( aStartPoint.X - aEndPoint.X );
+
+    if (eConnectorType != ConnectorType_LINE)
+    {
+        tools::PolyPolygon aPolyPolygon = EscherPropertyContainer::GetPolyPolygon(xShape);
+        if (aPolyPolygon.Count() > 0)
+        {
+            tools::Polygon aPoly = aPolyPolygon.GetObject(0);
+            lcl_GetConnectorAdjustValue(xShape, aPoly, eConnectorType, aAdjustValueList);
+            nAngle = lcl_GetAngle(aPoly);
+            lcl_FlipHFlipV(aPoly, nAngle, bFlipH, bFlipV);
+            if (nAngle)
+            {
+                Point center((aEndPoint.X + aStartPoint.X) / 2, (aEndPoint.Y + aStartPoint.Y) / 2);
+                lcl_Rotate(nAngle, center, aStartPoint);
+                lcl_Rotate(nAngle, center, aEndPoint);
+                nAngle *= 60000;
+            }
+            sGeometry = sGeometry + OUString::number(aAdjustValueList.size() + 2);
+        }
     }
 
-    if( aRect.getHeight() < 0 ) {
-        bFlipV = true;
+    tools::Rectangle aRect( Point( aStartPoint.X, aStartPoint.Y ), Point( aEndPoint.X, aEndPoint.Y ) );
+    if( aRect.getOpenWidth() < 0 ) {
+        aRect.SetLeft(aEndPoint.X);
+        aRect.setWidth( aStartPoint.X - aEndPoint.X );
+        if (eConnectorType == ConnectorType_LINE)
+            bFlipH = true;
+    }
+
+    if( aRect.getOpenHeight() < 0 ) {
         aRect.SetTop(aEndPoint.Y);
         aRect.setHeight( aStartPoint.Y - aEndPoint.Y );
+        if (eConnectorType == ConnectorType_LINE)
+            bFlipV = true;
     }
 
     // tdf#99810 connector shape (cxnSp) is not valid with namespace 'wps'
@@ -1495,17 +1823,23 @@ ShapeExport& ShapeExport::WriteConnectorShape( const Reference< XShape >& xShape
             XML_name, GetShapeName(xShape));
         // non visual connector shape drawing properties
         pFS->startElementNS(mnXmlNamespace, XML_cNvCxnSpPr);
-        WriteConnectorConnections(aConnectorEntry, GetShapeID(rXShapeA), GetShapeID(rXShapeB));
+
+        if (GetShapeID(rXShapeA) == -1)
+            GetNewShapeID(rXShapeA);
+        if (GetShapeID(rXShapeB) == -1)
+            GetNewShapeID(rXShapeB);
+        WriteConnectorConnections(nStartGlueId, nEndGlueId, GetShapeID(rXShapeA), GetShapeID(rXShapeB));
         pFS->endElementNS(mnXmlNamespace, XML_cNvCxnSpPr);
-        pFS->singleElementNS(mnXmlNamespace, XML_nvPr);
+        if (GetDocumentType() == DOCUMENT_PPTX)
+            pFS->singleElementNS(mnXmlNamespace, XML_nvPr);
         pFS->endElementNS(mnXmlNamespace, XML_nvCxnSpPr);
     }
 
     // visual shape properties
     pFS->startElementNS(mnXmlNamespace, XML_spPr);
-    WriteTransformation( xShape, aRect, XML_a, bFlipH, bFlipV );
+    WriteTransformation( xShape, aRect, XML_a, bFlipH, bFlipV, nAngle );
     // TODO: write adjustments (ppt export doesn't work well there either)
-    WritePresetShape( sGeometry );
+    WritePresetShape( sGeometry.toUtf8(), aAdjustValueList);
     Reference< XPropertySet > xShapeProps( xShape, UNO_QUERY );
     if( xShapeProps.is() )
         WriteOutline( xShapeProps );
@@ -1656,6 +1990,11 @@ static const NameToConvertMapType& lcl_GetConverters()
 {
     static NameToConvertMapType const shape_converters
     {
+        // tdf#98736 export CaptionShape as TextShape, because it is non-ooxml shape and
+        //           we can't export this shape as CustomShape
+        // TODO: WriteCaptionShape
+        { "com.sun.star.drawing.CaptionShape"              , &ShapeExport::WriteTextShape },
+
         { "com.sun.star.drawing.ClosedBezierShape"         , &ShapeExport::WriteClosedPolyPolygonShape },
         { "com.sun.star.drawing.ConnectorShape"            , &ShapeExport::WriteConnectorShape },
         { "com.sun.star.drawing.CustomShape"               , &ShapeExport::WriteCustomShape },
@@ -1692,6 +2031,9 @@ static const NameToConvertMapType& lcl_GetConverters()
 
 ShapeExport& ShapeExport::WriteShape( const Reference< XShape >& xShape )
 {
+    if (!xShape)
+        throw lang::IllegalArgumentException();
+
     OUString sShapeType = xShape->getShapeType();
     SAL_INFO("oox.shape", "write shape: " << sShapeType);
     NameToConvertMapType::const_iterator aConverter
@@ -1701,9 +2043,33 @@ ShapeExport& ShapeExport::WriteShape( const Reference< XShape >& xShape )
         SAL_INFO("oox.shape", "unknown shape");
         return WriteUnknownShape( xShape );
     }
+
+    if (GetDocumentType() == DOCUMENT_PPTX)
+    {
+        Reference< XPropertySet > xShapeProperties(xShape, UNO_QUERY);
+        if (xShapeProperties && xShapeProperties->getPropertySetInfo()
+            && xShapeProperties->getPropertySetInfo()->hasPropertyByName("IsPresentationObject")
+            && xShapeProperties->getPropertyValue("IsPresentationObject").hasValue())
+            mbPlaceholder = xShapeProperties->getPropertyValue("IsPresentationObject").get<bool>();
+    }
+
     (this->*(aConverter->second))( xShape );
 
     return *this;
+}
+
+static bool lcl_isTextBox(const Reference<XInterface>& xIface)
+{
+    uno::Reference<beans::XPropertySet> xPropertySet(xIface, uno::UNO_QUERY);
+    if (!xPropertySet.is())
+        return false;
+    uno::Reference<beans::XPropertySetInfo> xPropertySetInfo = xPropertySet->getPropertySetInfo();
+    if (!xPropertySetInfo->hasPropertyByName("TextBox"))
+       return false;
+    css::uno::Any aTextBox(xPropertySet->getPropertyValue("TextBox"));
+    if (!aTextBox.hasValue())
+       return false;
+    return aTextBox.get<bool>();
 }
 
 ShapeExport& ShapeExport::WriteTextBox( const Reference< XInterface >& xIface, sal_Int32 nXmlNamespace, bool bWritePropertiesAsLstStyles )
@@ -1711,16 +2077,11 @@ ShapeExport& ShapeExport::WriteTextBox( const Reference< XInterface >& xIface, s
     // In case this shape has an associated textbox, then export that, and we're done.
     if (GetDocumentType() == DOCUMENT_DOCX && !mbUserShapes && GetTextExport())
     {
-        uno::Reference<beans::XPropertySet> xPropertySet(xIface, uno::UNO_QUERY);
-        if (xPropertySet.is())
+        if (lcl_isTextBox(xIface))
         {
-            uno::Reference<beans::XPropertySetInfo> xPropertySetInfo = xPropertySet->getPropertySetInfo();
-            if (xPropertySetInfo->hasPropertyByName("TextBox") && xPropertySet->getPropertyValue("TextBox").get<bool>())
-            {
-                GetTextExport()->WriteTextBox(uno::Reference<drawing::XShape>(xIface, uno::UNO_QUERY_THROW));
-                WriteText( xIface, /*bBodyPr=*/true, /*bText=*/false, /*nXmlNamespace=*/nXmlNamespace );
-                return *this;
-            }
+            GetTextExport()->WriteTextBox(uno::Reference<drawing::XShape>(xIface, uno::UNO_QUERY_THROW));
+            WriteText( xIface, /*bBodyPr=*/true, /*bText=*/false, /*nXmlNamespace=*/nXmlNamespace );
+            return *this;
         }
     }
 
@@ -1951,7 +2312,27 @@ void ShapeExport::WriteTableCellProperties(const Reference< XPropertySet>& xCell
     aVerticalAlignment >>= eVerticalAlignment;
     sVerticalAlignment = GetTextVerticalAdjust(eVerticalAlignment);
 
+    sal_Int32 nRotateAngle = 0;
+    Any aRotateAngle = xCellPropSet->getPropertyValue("RotateAngle");
+    aRotateAngle >>= nRotateAngle;
+    std::optional<OString> aTextVerticalValue = GetTextVerticalType(nRotateAngle);
+
+    Sequence<PropertyValue> aGrabBag;
+    if( !aTextVerticalValue &&
+        (xCellPropSet->getPropertyValue("CellInteropGrabBag") >>= aGrabBag) )
+    {
+        for (auto const& rIt : std::as_const(aGrabBag))
+        {
+            if (rIt.Name == "mso-tcPr-vert-value")
+            {
+                aTextVerticalValue = rIt.Value.get<OUString>().toUtf8();
+                break;
+            }
+        }
+    }
+
     mpFS->startElementNS(XML_a, XML_tcPr, XML_anchor, sVerticalAlignment,
+    XML_vert, aTextVerticalValue,
     XML_marL, sax_fastparser::UseIf(OString::number(oox::drawingml::convertHmmToEmu(nLeftMargin)), nLeftMargin > 0),
     XML_marR, sax_fastparser::UseIf(OString::number(oox::drawingml::convertHmmToEmu(nRightMargin)), nRightMargin > 0));
 
@@ -1978,7 +2359,30 @@ void ShapeExport::WriteBorderLine(const sal_Int32 XML_line, const BorderLine2& r
             mpFS->singleElementNS(XML_a, XML_noFill);
         else
             DrawingML::WriteSolidFill( ::Color(ColorTransparency, rBorderLine.Color) );
-        mpFS->endElementNS( XML_a, XML_line );
+
+        OUString sBorderStyle;
+        sal_Int16 nStyle = rBorderLine.LineStyle;
+        mAny.setValue(&nStyle, cppu::UnoType<sal_Int16>::get());
+        switch (*o3tl::doAccess<sal_Int16>(mAny))
+        {
+            case ::table::BorderLineStyle::SOLID:
+                sBorderStyle = "solid";
+                break;
+            case ::table::BorderLineStyle::DOTTED:
+                sBorderStyle = "dot";
+                break;
+            case ::table::BorderLineStyle::DASHED:
+                sBorderStyle = "dash";
+                break;
+            case ::table::BorderLineStyle::DASH_DOT:
+                sBorderStyle = "dashDot";
+                break;
+            case ::table::BorderLineStyle::DASH_DOT_DOT:
+                sBorderStyle = "sysDashDotDot";
+                break;
+        }
+        mpFS->singleElementNS(XML_a, XML_prstDash, XML_val, sBorderStyle);
+        mpFS->endElementNS(XML_a, XML_line);
     }
     else if( nBorderWidth == 0)
     {
@@ -2167,9 +2571,14 @@ ShapeExport& ShapeExport::WriteOLE2Shape( const Reference< XShape >& xShape )
         xPropSet->getPropertyValue("Model") >>= xChartDoc;
         assert(xChartDoc.is());
         //export the chart
+#if !ENABLE_WASM_STRIP_CHART
+        // WASM_CHART change
+        // TODO: With Chart extracted this cannot really happen since
+        // no Chart could've been added at all
         ChartExport aChartExport( mnXmlNamespace, GetFS(), xChartDoc, GetFB(), GetDocumentType() );
         static sal_Int32 nChartCount = 0;
         aChartExport.WriteChartObj( xShape, GetNewShapeID( xShape ), ++nChartCount );
+#endif
         return *this;
     }
 
@@ -2185,6 +2594,16 @@ ShapeExport& ShapeExport::WriteOLE2Shape( const Reference< XShape >& xShape )
     if (!xObj.is())
     {
         SAL_WARN("oox.shape", "ShapeExport::WriteOLE2Shape: no object");
+
+        // tdf#152436 Export the preview graphic of the object if the object is missing.
+        SdrObject* pSdrOLE2(SdrObject::getSdrObjectFromXShape(xShape));
+        if (auto pOle2Obj = dynamic_cast<SdrOle2Obj*>(pSdrOLE2))
+        {
+            const Graphic* pGraphic = pOle2Obj->GetGraphic();
+            if (pGraphic)
+                WriteGraphicObjectShapePart(xShape, pGraphic);
+        }
+
         return *this;
     }
 
@@ -2239,44 +2658,59 @@ ShapeExport& ShapeExport::WriteOLE2Shape( const Reference< XShape >& xShape )
     OUString sRelationType;
     OUString sSuffix;
     const char * pProgID(nullptr);
+    OString anotherProgID;
 
     uno::Reference<io::XInputStream> const xInStream =
         oox::GetOLEObjectStream(
             mpFB->getComponentContext(), xObj, progID,
             sMediaType, sRelationType, sSuffix, pProgID);
 
+    OUString sURL;
+    OUString sRelId;
     if (!xInStream.is())
     {
-        return *this;
-    }
+        xPropSet->getPropertyValue("LinkURL") >>= sURL;
+        if (sURL.isEmpty())
+            return *this;
 
-    OString anotherProgID;
-    if (!pProgID && !progID.isEmpty())
+        sRelId = mpFB->addRelation(mpFS->getOutputStream(),
+                                   oox::getRelationship(Relationship::OLEOBJECT), sURL, true);
+    }
+    else
     {
-        anotherProgID = OUStringToOString(progID, RTL_TEXTENCODING_UTF8);
-        pProgID = anotherProgID.getStr();
+        if (!pProgID && !progID.isEmpty())
+        {
+            anotherProgID = OUStringToOString(progID, RTL_TEXTENCODING_UTF8);
+            pProgID = anotherProgID.getStr();
+        }
+
+        assert(!sMediaType.isEmpty());
+        assert(!sRelationType.isEmpty());
+        assert(!sSuffix.isEmpty());
+
+        OUString sFileName
+            = "embeddings/oleObject" + OUString::number(++m_nEmbeddedObjects) + "." + sSuffix;
+        uno::Reference<io::XOutputStream> const xOutStream(mpFB->openFragmentStream(
+            OUString::createFromAscii(GetComponentDir()) + "/" + sFileName, sMediaType));
+        assert(xOutStream.is()); // no reason why that could fail
+
+        try
+        {
+            ::comphelper::OStorageHelper::CopyInputToOutput(xInStream, xOutStream);
+        }
+        catch (uno::Exception const&)
+        {
+            TOOLS_WARN_EXCEPTION("oox.shape", "ShapeExport::WriteOLEObject");
+        }
+
+        sRelId = mpFB->addRelation(
+            mpFS->getOutputStream(), sRelationType,
+            Concat2View(OUString::createFromAscii(GetRelationCompPrefix()) + sFileName));
     }
 
-    assert(!sMediaType.isEmpty());
-    assert(!sRelationType.isEmpty());
-    assert(!sSuffix.isEmpty());
-
-    OUString sFileName = "embeddings/oleObject" + OUString::number(++m_nEmbeddedObjects) + "." + sSuffix;
-    uno::Reference<io::XOutputStream> const xOutStream(
-        mpFB->openFragmentStream(
-            OUString::createFromAscii(GetComponentDir()) + "/" + sFileName,
-            sMediaType));
-    assert(xOutStream.is()); // no reason why that could fail
-
-    try {
-        ::comphelper::OStorageHelper::CopyInputToOutput(xInStream, xOutStream);
-    } catch (uno::Exception const&) {
-        TOOLS_WARN_EXCEPTION("oox.shape", "ShapeExport::WriteOLEObject");
-    }
-
-    OUString const sRelId = mpFB->addRelation(
-        mpFS->getOutputStream(), sRelationType,
-        OUStringConcatenation(OUString::createFromAscii(GetRelationCompPrefix()) + sFileName));
+    sal_Int64 nAspect;
+    bool bShowAsIcon = (xPropSet->getPropertyValue("Aspect") >>= nAspect)
+                       && nAspect == embed::Aspects::MSOLE_ICON;
 
     mpFS->startElementNS(mnXmlNamespace, XML_graphicFrame);
 
@@ -2300,6 +2734,7 @@ ShapeExport& ShapeExport::WriteOLE2Shape( const Reference< XShape >& xShape )
     if (pProgID)
     {
         mpFS->startElementNS( mnXmlNamespace, XML_oleObj,
+                          XML_showAsIcon, sax_fastparser::UseIf("1", bShowAsIcon),
                           XML_progId, pProgID,
                           FSNS(XML_r, XML_id), sRelId,
                           XML_spid, "" );
@@ -2308,12 +2743,16 @@ ShapeExport& ShapeExport::WriteOLE2Shape( const Reference< XShape >& xShape )
     {
         mpFS->startElementNS( mnXmlNamespace, XML_oleObj,
 //?                                              XML_name, "Document",
+                          XML_showAsIcon, sax_fastparser::UseIf("1", bShowAsIcon),
                           FSNS(XML_r, XML_id), sRelId,
                           // The spec says that this is a required attribute, but PowerPoint can only handle an empty value.
                           XML_spid, "" );
     }
 
-    mpFS->singleElementNS( mnXmlNamespace, XML_embed );
+    if (sURL.isEmpty())
+        mpFS->singleElementNS(mnXmlNamespace, XML_embed);
+    else
+        mpFS->singleElementNS(mnXmlNamespace, XML_link, XML_updateAutomatic, "1");
 
     // pic element
     SdrObject* pSdrOLE2(SdrObject::getSdrObjectFromXShape(xShape));

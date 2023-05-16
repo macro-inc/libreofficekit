@@ -68,7 +68,7 @@ class SW_DLLPUBLIC SwFormat : public sw::BorderCacheOwner, public sw::Broadcasti
 protected:
     SwFormat( SwAttrPool& rPool, const char* pFormatNm,
             const WhichRangesContainer& pWhichRanges, SwFormat *pDrvdFrame, sal_uInt16 nFormatWhich );
-    SwFormat( SwAttrPool& rPool, const OUString &rFormatNm, const WhichRangesContainer& pWhichRanges,
+    SwFormat( SwAttrPool& rPool, OUString aFormatNm, const WhichRangesContainer& pWhichRanges,
             SwFormat *pDrvdFrame, sal_uInt16 nFormatWhich );
     SwFormat( const SwFormat& rFormat );
     virtual void SwClientNotify(const SwModify&, const SfxHint&) override;
@@ -98,8 +98,24 @@ public:
     {
         return static_cast<const T&>(GetFormatAttr(sal_uInt16(nWhich), bInParents));
     }
+
     SfxItemState GetItemState( sal_uInt16 nWhich, bool bSrchInParent = true,
                                     const SfxPoolItem **ppItem = nullptr ) const;
+    template<class T>
+    SfxItemState GetItemState( TypedWhichId<T> nWhich, bool bSrchInParent = true,
+                                    const T **ppItem = nullptr ) const
+    { return GetItemState(sal_uInt16(nWhich), bSrchInParent, reinterpret_cast<const SfxPoolItem **>(ppItem)); }
+
+    /// Templatized version of GetItemState() to directly return the correct type.
+    template<class T>
+    const T *                   GetItemIfSet(   TypedWhichId<T> nWhich,
+                                                bool bSrchInParent = true ) const
+    {
+        const SfxPoolItem * pItem = nullptr;
+        if( SfxItemState::SET == GetItemState(sal_uInt16(nWhich), bSrchInParent, &pItem) )
+            return static_cast<const T*>(pItem);
+        return nullptr;
+    }
     SfxItemState GetBackgroundState(std::unique_ptr<SvxBrushItem>& rItem) const;
     virtual bool SetFormatAttr( const SfxPoolItem& rAttr );
     virtual bool SetFormatAttr( const SfxItemSet& rSet );
@@ -114,7 +130,7 @@ public:
 
     const OUString& GetName() const                  { return m_aFormatName; }
     bool HasName(std::u16string_view rName) const { return m_aFormatName == rName; }
-    virtual void SetName( const OUString& rNewName, bool bBroadcast=false );
+    virtual void SetFormatName( const OUString& rNewName, bool bBroadcast=false );
 
     /// For querying the attribute array.
     const SwAttrSet& GetAttrSet() const { return m_aSet; }
@@ -217,6 +233,7 @@ public:
     inline const SwFormatEditInReadonly  &GetEditInReadonly( bool = true ) const;
     inline const SwFormatLayoutSplit     &GetLayoutSplit( bool = true ) const;
     inline const SwFormatRowSplit          &GetRowSplit( bool = true ) const;
+    inline const SwFormatFlySplit          &GetFlySplit( bool = true ) const;
     inline const SwFormatChain               &GetChain( bool = true ) const;
     inline const SwFormatFootnoteAtTextEnd     &GetFootnoteAtTextEnd( bool = true ) const;
     inline const SwFormatEndAtTextEnd     &GetEndAtTextEnd( bool = true ) const;

@@ -69,8 +69,8 @@ class SFX2_DLLPUBLIC SfxFrame final : public SvCompatWeakBase<SfxFrame>
     friend class SfxFrameWindow_Impl;
 
 private:
-    std::unique_ptr< SfxFrame_Impl >     pImpl;
-    VclPtr<vcl::Window> pWindow;
+    std::unique_ptr< SfxFrame_Impl >     m_pImpl;
+    VclPtr<vcl::Window> m_pWindow;
 
     virtual             ~SfxFrame();
 
@@ -82,7 +82,7 @@ public:
                         CreateBlankFrame();
     static SfxFrame*    CreateHidden( SfxObjectShell const & rDoc, vcl::Window& rWindow, SfxInterfaceId nViewId );
 
-    vcl::Window&        GetWindow() const { return *pWindow;}
+    vcl::Window&        GetWindow() const { return *m_pWindow;}
     void                CancelTransfers();
     bool                DoClose();
 
@@ -116,7 +116,7 @@ public:
     SAL_DLLPRIVATE bool PrepareClose_Impl( bool bUI );
     SAL_DLLPRIVATE bool DocIsModified_Impl();
     SAL_DLLPRIVATE void SetCurrentViewFrame_Impl( SfxViewFrame* );
-    SAL_DLLPRIVATE bool IsClosing_Impl() const;
+    bool IsClosing_Impl() const;
     SAL_DLLPRIVATE void SetIsClosing_Impl();
 
     // Methods for accessing the current set
@@ -188,7 +188,7 @@ class SFX2_DLLPUBLIC SfxUnoFrameItem final : public SfxPoolItem
 public:
                                 static SfxPoolItem* CreateDefault();
                                 SfxUnoFrameItem();
-                                SfxUnoFrameItem( sal_uInt16 nWhich, const css::uno::Reference< css::frame::XFrame >& i_rFrame );
+                                SfxUnoFrameItem( sal_uInt16 nWhich, css::uno::Reference< css::frame::XFrame > i_xFrame );
     const css::uno::Reference< css::frame::XFrame >&
                                 GetFrame() const
                                 { return m_xFrame; }

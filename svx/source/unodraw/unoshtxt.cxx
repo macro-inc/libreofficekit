@@ -110,7 +110,7 @@ private:
                                     {
                                         if (!mbShapeIsEditMode)
                                             return false;
-                                        SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>( mpObject  );
+                                        SdrTextObj* pTextObj = DynCastSdrTextObj( mpObject  );
                                         return pTextObj && pTextObj->IsTextEditActive();
                                     }
 
@@ -170,7 +170,7 @@ SvxTextEditSourceImpl::SvxTextEditSourceImpl( SdrObject* pObject, SdrText* pText
 
     if( !mpText )
     {
-        SdrTextObj* pTextObj = dynamic_cast< SdrTextObj* >( mpObject );
+        SdrTextObj* pTextObj = DynCastSdrTextObj( mpObject );
         if( pTextObj )
             mpText = pTextObj->getText( 0 );
     }
@@ -201,7 +201,7 @@ SvxTextEditSourceImpl::SvxTextEditSourceImpl( SdrObject& rObject, SdrText* pText
 {
     if( !mpText )
     {
-        SdrTextObj* pTextObj = dynamic_cast< SdrTextObj* >( mpObject );
+        SdrTextObj* pTextObj = DynCastSdrTextObj( mpObject );
         if( pTextObj )
             mpText = pTextObj->getText( 0 );
     }
@@ -373,8 +373,9 @@ void SvxTextEditSourceImpl::Notify(SfxBroadcaster& rBC, const SfxHint& rHint)
                 break;
         }
     }
-    else if (const SvxViewChangedHint* pViewHint = dynamic_cast<const SvxViewChangedHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SvxViewChanged)
     {
+        const SvxViewChangedHint* pViewHint = static_cast<const SvxViewChangedHint*>(&rHint);
         Broadcast( *pViewHint );
     }
 }
@@ -440,7 +441,7 @@ void SvxTextEditSourceImpl::SetupOutliner()
     if( !(mpObject && mpOutliner) )
         return;
 
-    SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>( mpObject  );
+    SdrTextObj* pTextObj = DynCastSdrTextObj( mpObject  );
     if( pTextObj )
     {
         tools::Rectangle aPaintRect;
@@ -461,7 +462,7 @@ void SvxTextEditSourceImpl::UpdateOutliner()
     if( !(mpObject && mpOutliner) )
         return;
 
-    SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>( mpObject  );
+    SdrTextObj* pTextObj = DynCastSdrTextObj( mpObject  );
     if( pTextObj )
     {
         tools::Rectangle aPaintRect;
@@ -485,9 +486,9 @@ SvxTextForwarder* SvxTextEditSourceImpl::GetBackgroundTextForwarder()
     {
         if( mpOutliner == nullptr )
         {
-            SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>( mpObject  );
+            SdrTextObj* pTextObj = DynCastSdrTextObj( mpObject  );
             OutlinerMode nOutlMode = OutlinerMode::TextObject;
-            if( pTextObj && pTextObj->IsTextFrame() && pTextObj->GetTextKind() == OBJ_OUTLINETEXT )
+            if( pTextObj && pTextObj->IsTextFrame() && pTextObj->GetTextKind() == SdrObjKind::OutlineText )
                 nOutlMode = OutlinerMode::OutlineObject;
 
             mpOutliner = mpModel->createOutliner( nOutlMode );
@@ -522,7 +523,7 @@ SvxTextForwarder* SvxTextEditSourceImpl::GetBackgroundTextForwarder()
         }
 
 
-        mpTextForwarder.reset(new SvxOutlinerForwarder( *mpOutliner, (mpObject->GetObjInventor() == SdrInventor::Default) && (mpObject->GetObjIdentifier() == OBJ_OUTLINETEXT) ));
+        mpTextForwarder.reset(new SvxOutlinerForwarder( *mpOutliner, (mpObject->GetObjInventor() == SdrInventor::Default) && (mpObject->GetObjIdentifier() == SdrObjKind::OutlineText) ));
         // delay listener subscription and UAA initialization until Outliner is fully setup
         bCreated = true;
 
@@ -535,7 +536,7 @@ SvxTextForwarder* SvxTextEditSourceImpl::GetBackgroundTextForwarder()
         mpTextForwarder->flushCache();
 
         std::optional<OutlinerParaObject> pOutlinerParaObject;
-        SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>( mpObject  );
+        SdrTextObj* pTextObj = DynCastSdrTextObj( mpObject  );
         if( pTextObj && pTextObj->getActiveText() == mpText )
             pOutlinerParaObject = pTextObj->CreateEditOutlinerParaObject(); // Get the OutlinerParaObject if text edit is active
         bool bOwnParaObj(false);
@@ -550,7 +551,7 @@ SvxTextForwarder* SvxTextEditSourceImpl::GetBackgroundTextForwarder()
             mpOutliner->SetText( *pOutlinerParaObject );
 
             // put text to object and set EmptyPresObj to FALSE
-            if( mpText && bOwnParaObj && mpObject->IsEmptyPresObj() && pTextObj->IsReallyEdited() )
+            if (mpText && bOwnParaObj && mpObject->IsEmptyPresObj() && pTextObj && pTextObj->IsReallyEdited())
             {
                 mpObject->SetEmptyPresObj( false );
                 static_cast< SdrTextObj* >( mpObject)->NbcSetOutlinerParaObjectForText( pOutlinerParaObject, mpText );
@@ -591,7 +592,10 @@ SvxTextForwarder* SvxTextEditSourceImpl::GetBackgroundTextForwarder()
                 // its empty, so we have to force the outliner to initialise itself
                 mpOutliner->SetText( "", mpOutliner->GetParagraph( 0 ) );
 
-                if(mpObject->GetStyleSheet())
+                auto pCell = dynamic_cast<sdr::table::Cell*>(mpText);
+                if (pCell && pCell->GetStyleSheet())
+                    mpOutliner->SetStyleSheet( 0, pCell->GetStyleSheet());
+                else if (mpObject->GetStyleSheet())
                     mpOutliner->SetStyleSheet( 0, mpObject->GetStyleSheet());
             }
         }
@@ -621,7 +625,7 @@ SvxTextForwarder* SvxTextEditSourceImpl::GetEditModeTextForwarder()
 
         if( pEditOutliner )
         {
-            mpTextForwarder.reset(new SvxOutlinerForwarder( *pEditOutliner, (mpObject->GetObjInventor() == SdrInventor::Default) && (mpObject->GetObjIdentifier() == OBJ_OUTLINETEXT) ));
+            mpTextForwarder.reset(new SvxOutlinerForwarder( *pEditOutliner, (mpObject->GetObjInventor() == SdrInventor::Default) && (mpObject->GetObjIdentifier() == SdrObjKind::OutlineText) ));
             mbForwarderIsEditMode = true;
         }
     }
@@ -664,7 +668,7 @@ SvxTextForwarder* SvxTextEditSourceImpl::GetTextForwarder()
         {
             assert(!mbForwarderIsEditMode); // because without a view there is no other option except !mbForwarderIsEditMode
             bool bTextEditActive = false;
-            SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>(mpObject);
+            SdrTextObj* pTextObj = DynCastSdrTextObj(mpObject);
             // similar to the GetBackgroundTextForwarder check, see if the text edit is active
             if (pTextObj && pTextObj->getActiveText() == mpText && pTextObj->CanCreateEditOutlinerParaObject())
                 bTextEditActive = true; // text edit active
@@ -684,7 +688,7 @@ std::unique_ptr<SvxDrawOutlinerViewForwarder> SvxTextEditSourceImpl::CreateViewF
         mpView->GetTextEditOutliner()->SetNotifyHdl( LINK(this, SvxTextEditSourceImpl, NotifyHdl) );
         mbNotifyEditOutlinerSet = true;
 
-        SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>( mpObject  );
+        SdrTextObj* pTextObj = DynCastSdrTextObj( mpObject  );
         if( pTextObj )
         {
             tools::Rectangle aBoundRect( pTextObj->GetCurrentBoundRect() );
@@ -735,7 +739,7 @@ SvxEditViewForwarder* SvxTextEditSourceImpl::GetEditViewForwarder( bool bCreate 
 
             if(mpView->SdrBeginTextEdit(mpObject))
             {
-                SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>( mpObject  );
+                SdrTextObj* pTextObj = DynCastSdrTextObj( mpObject  );
                 if (pTextObj && pTextObj->IsTextEditActive())
                 {
                     // create new view forwarder
@@ -772,17 +776,18 @@ void SvxTextEditSourceImpl::UpdateData()
     {
         if( mpOutliner && mpObject && mpText )
         {
-            SdrTextObj* pTextObj = dynamic_cast< SdrTextObj* >( mpObject );
+            SdrTextObj* pTextObj = DynCastSdrTextObj( mpObject );
             if( pTextObj )
             {
-                if( (mpOutliner->GetParagraphCount() != 1 && mpOutliner->GetParagraphCount() != 2)
-                    || mpOutliner->GetEditEngine().GetTextLen( 0 ) )
+                if( (mpOutliner->GetParagraphCount() == 1 && mpOutliner->GetEditEngine().GetTextLen( 0 ) == 0 )
+                        || (mpOutliner->GetParagraphCount() == 2 && mpOutliner->GetEditEngine().GetTextLen( 0 ) == 0
+                            && mpOutliner->GetEditEngine().GetTextLen( 1 ) == 0) )
                 {
-                    pTextObj->NbcSetOutlinerParaObjectForText( mpOutliner->CreateParaObject(), mpText );
+                    pTextObj->NbcSetOutlinerParaObjectForText( std::nullopt, mpText );
                 }
                 else
                 {
-                    pTextObj->NbcSetOutlinerParaObjectForText( std::nullopt, mpText );
+                    pTextObj->NbcSetOutlinerParaObjectForText( mpOutliner->CreateParaObject(), mpText );
                 }
             }
 

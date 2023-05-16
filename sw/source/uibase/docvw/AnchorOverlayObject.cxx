@@ -21,6 +21,7 @@
 #include <SidebarWindowsConsts.hxx>
 
 #include <swrect.hxx>
+#include <utility>
 #include <view.hxx>
 #include <svx/sdrpaintwindow.hxx>
 #include <svx/svdview.hxx>
@@ -28,9 +29,11 @@
 #include <tools/long.hxx>
 
 #include <sw_primitivetypes2d.hxx>
+#include <drawinglayer/attribute/lineattribute.hxx>
+#include <drawinglayer/attribute/strokeattribute.hxx>
 #include <drawinglayer/primitive2d/primitivetools2d.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokePrimitive2D.hxx>
 
 namespace sw::sidebarwindows {
 
@@ -57,16 +60,16 @@ protected:
         const drawinglayer::geometry::ViewInformation2D& rViewInformation) const override;
 
 public:
-    AnchorPrimitive( const basegfx::B2DPolygon& rTriangle,
-                     const basegfx::B2DPolygon& rLine,
-                     const basegfx::B2DPolygon& rLineTop,
+    AnchorPrimitive( basegfx::B2DPolygon aTriangle,
+                     basegfx::B2DPolygon aLine,
+                     basegfx::B2DPolygon aLineTop,
                      AnchorState aAnchorState,
                      const basegfx::BColor& rColor,
                      double fDiscreteLineWidth,
                      bool bLineSolid )
-    :   maTriangle(rTriangle),
-        maLine(rLine),
-        maLineTop(rLineTop),
+    :   maTriangle(std::move(aTriangle)),
+        maLine(std::move(aLine)),
+        maLineTop(std::move(aLineTop)),
         maAnchorState(aAnchorState),
         maColor(rColor),
         mfDiscreteLineWidth(fDiscreteLineWidth),
@@ -127,7 +130,7 @@ void AnchorPrimitive::create2DDecomposition(
             aDotDashArray.push_back(fDashLen);
             aDotDashArray.push_back(fDistance);
 
-            const drawinglayer::attribute::StrokeAttribute aStrokeAttribute(
+            drawinglayer::attribute::StrokeAttribute aStrokeAttribute(
                 std::move(aDotDashArray),
                 fDistance + fDashLen);
 
@@ -135,7 +138,7 @@ void AnchorPrimitive::create2DDecomposition(
                 new drawinglayer::primitive2d::PolygonStrokePrimitive2D(
                     getLine(),
                     aLineAttribute,
-                    aStrokeAttribute));
+                    std::move(aStrokeAttribute)));
 
             rContainer.push_back(aStrokedLine);
         }

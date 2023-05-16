@@ -29,7 +29,6 @@
 #include <sfx2/docfile.hxx>
 #include <sfx2/docfilt.hxx>
 #include <sfx2/fcontnr.hxx>
-#include <tools/solar.h>
 
 using namespace ::com::sun::star;
 using utl::MediaDescriptor;
@@ -209,7 +208,7 @@ static bool lcl_MayBeDBase( SvStream& rStream )
     // Empty dbf is >= 32*2+1 bytes in size.
     const size_t nEmptyDbf = nHeaderBlockSize * 2 + 1;
 
-    sal_uLong nSize = rStream.TellEnd();
+    sal_uInt64 nSize = rStream.TellEnd();
     if ( nSize < nEmptyDbf )
         return false;
 

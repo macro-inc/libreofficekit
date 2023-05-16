@@ -31,6 +31,7 @@
 #include <com/sun/star/io/XInputStream.hpp>
 #include <com/sun/star/packages/zip/ZipIOException.hpp>
 #include <com/sun/star/task/XInteractionHandler.hpp>
+#include <utility>
 
 #include <comphelper/lok.hxx>
 
@@ -77,8 +78,8 @@ OUString getInternalFromMediaType(std::u16string_view aMediaType)
 
 }
 
-StorageFilterDetect::StorageFilterDetect(const uno::Reference<uno::XComponentContext>& xCxt) :
-    mxCxt(xCxt) {}
+StorageFilterDetect::StorageFilterDetect(uno::Reference<uno::XComponentContext> xCxt) :
+    mxCxt(std::move(xCxt)) {}
 
 StorageFilterDetect::~StorageFilterDetect() {}
 

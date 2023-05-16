@@ -24,6 +24,7 @@
 #include <svx/svdhdl.hxx>
 #include <svx/svdpagv.hxx>
 #include <svx/svdmrkv.hxx>
+#include <utility>
 #include <vcl/settings.hxx>
 #include <vcl/virdev.hxx>
 #include <vcl/ptrstyle.hxx>
@@ -55,13 +56,14 @@
 #include <vcl/BitmapTools.hxx>
 #include <svx/sdr/contact/objectcontact.hxx>
 #include <svx/sdr/contact/viewcontact.hxx>
+#include <osl/diagnose.h>
 
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <svx/sdr/overlay/overlayprimitive2dsequenceobject.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/graphicprimitive2d.hxx>
 #include <drawinglayer/primitive2d/maskprimitive2d.hxx>
 #include <drawinglayer/primitive2d/unifiedtransparenceprimitive2d.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <svtools/optionsdrawinglayer.hxx>
 #include <memory>
 #include <bitmaps.hlst>
@@ -2462,15 +2464,15 @@ void SdrCropHdl::CreateB2dIAObject()
 // accordingly
 
 SdrCropViewHdl::SdrCropViewHdl(
-    const basegfx::B2DHomMatrix& rObjectTransform,
-    const Graphic& rGraphic,
+    basegfx::B2DHomMatrix aObjectTransform,
+    Graphic aGraphic,
     double fCropLeft,
     double fCropTop,
     double fCropRight,
     double fCropBottom)
 :   SdrHdl(Point(), SdrHdlKind::User),
-    maObjectTransform(rObjectTransform),
-    maGraphic(rGraphic),
+    maObjectTransform(std::move(aObjectTransform)),
+    maGraphic(std::move(aGraphic)),
     mfCropLeft(fCropLeft),
     mfCropTop(fCropTop),
     mfCropRight(fCropRight),
@@ -2624,7 +2626,7 @@ void SdrCropViewHdl::CreateB2dIAObject()
     const basegfx::BColor aHilightColor(SvtOptionsDrawinglayer::getHilightColor().getBColor());
     const drawinglayer::primitive2d::Primitive2DReference aGraphicOutline(
         new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(
-        aGraphicOutlinePolygon,
+        std::move(aGraphicOutlinePolygon),
         aHilightColor));
 
     // combine these
@@ -2635,7 +2637,7 @@ void SdrCropViewHdl::CreateB2dIAObject()
     // embed to MaskPrimitive2D
     const drawinglayer::primitive2d::Primitive2DReference aMaskedGraphic(
         new drawinglayer::primitive2d::MaskPrimitive2D(
-            aCropPolyPolygon,
+            std::move(aCropPolyPolygon),
             std::move(aCombination)));
 
     // embed to UnifiedTransparencePrimitive2D

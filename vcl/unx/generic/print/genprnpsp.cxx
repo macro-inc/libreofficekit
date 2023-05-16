@@ -44,6 +44,7 @@
 #include <rtl/ustring.hxx>
 #include <sal/log.hxx>
 
+#include <utility>
 #include <vcl/gdimtf.hxx>
 #include <vcl/idle.hxx>
 #include <vcl/printer/Options.hxx>
@@ -55,7 +56,6 @@
 #include <vcl/settings.hxx>
 #include <vcl/weld.hxx>
 #include <strings.hrc>
-#include <saldatabasic.hxx>
 #include <unx/genprn.h>
 #include <unx/geninst.h>
 #include <unx/genpspgraphics.h>
@@ -569,6 +569,10 @@ bool PspSalInfoPrinter::SetData(
         const PPDKey* pKey;
         const PPDValue* pValue;
 
+        // merge orientation if necessary
+        if( nSetDataFlags & JobSetFlags::ORIENTATION )
+            aData.m_eOrientation = pJobSetup->GetOrientation() == Orientation::Landscape ? orientation::Landscape : orientation::Portrait;
+
         // merge papersize if necessary
         if( nSetDataFlags & JobSetFlags::PAPERSIZE )
         {
@@ -577,7 +581,8 @@ bool PspSalInfoPrinter::SetData(
             if( pJobSetup->GetPaperFormat() == PAPER_USER )
                 aPaper = aData.m_pParser->matchPaper(
                     TenMuToPt( pJobSetup->GetPaperWidth() ),
-                    TenMuToPt( pJobSetup->GetPaperHeight() ) );
+                    TenMuToPt( pJobSetup->GetPaperHeight() ),
+                    &aData.m_eOrientation );
             else
                 aPaper = OStringToOUString(PaperInfo::toPSName(pJobSetup->GetPaperFormat()), RTL_TEXTENCODING_ISO_8859_1);
 
@@ -591,7 +596,8 @@ bool PspSalInfoPrinter::SetData(
                 PaperInfo aInfo( pJobSetup->GetPaperFormat() );
                 aPaper = aData.m_pParser->matchPaper(
                     TenMuToPt( aInfo.getWidth() ),
-                    TenMuToPt( aInfo.getHeight() ) );
+                    TenMuToPt( aInfo.getHeight() ),
+                    &aData.m_eOrientation );
                 pValue = pKey->getValueCaseInsensitive( aPaper );
             }
 
@@ -618,10 +624,6 @@ bool PspSalInfoPrinter::SetData(
             // if printer has no InputSlot key simply ignore this setting
             // (e.g. SGENPRT has no InputSlot)
         }
-
-        // merge orientation if necessary
-        if( nSetDataFlags & JobSetFlags::ORIENTATION )
-            aData.m_eOrientation = pJobSetup->GetOrientation() == Orientation::Landscape ? orientation::Landscape : orientation::Portrait;
 
         // merge duplex if necessary
         if( nSetDataFlags & JobSetFlags::DUPLEXMODE )
@@ -830,7 +832,7 @@ bool PspSalPrinter::StartJob(
     ImplJobSetup* pJobSetup )
 {
     SAL_INFO( "vcl.unx.print", "PspSalPrinter::StartJob");
-    GetSalData()->m_pInstance->jobStartedPrinterUpdate();
+    GetSalInstance()->jobStartedPrinterUpdate();
     m_bPdf      = false;
     if (pFileName)
         m_aFileName = *pFileName;
@@ -883,7 +885,7 @@ bool PspSalPrinter::EndJob()
             bSuccess = createPdf( m_aFileName, m_aTmpFile, rInfo.m_aCommand );
         }
     }
-    GetSalData()->m_pInstance->jobEndedPrinterUpdate();
+    GetSalInstance()->jobEndedPrinterUpdate();
     return bSuccess;
 }
 
@@ -949,8 +951,8 @@ struct PDFPrintFile
     OUString       maTmpURL;
     PDFNewJobParameters maParameters;
 
-    PDFPrintFile( const OUString& i_rURL, const PDFNewJobParameters& i_rNewParameters )
-    : maTmpURL( i_rURL )
+    PDFPrintFile( OUString i_URL, const PDFNewJobParameters& i_rNewParameters )
+    : maTmpURL(std::move( i_URL ))
     , maParameters( i_rNewParameters ) {}
 };
 
@@ -1226,7 +1228,7 @@ int PrinterUpdate::nActiveJobs = 0;
 void PrinterUpdate::doUpdate()
 {
     ::psp::PrinterInfoManager& rManager( ::psp::PrinterInfoManager::get() );
-    SalGenericInstance *pInst = static_cast<SalGenericInstance *>( GetSalData()->m_pInstance );
+    SalGenericInstance *pInst = GetGenericInstance();
     if( pInst && rManager.checkPrintersChanged( false ) )
         pInst->PostPrintersChanged();
 }

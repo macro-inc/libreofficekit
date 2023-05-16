@@ -21,9 +21,10 @@
 #include <com/sun/star/sdb/CommandType.hpp>
 #include <com/sun/star/sdb/XDocumentDataSource.hpp>
 
+#include <utility>
 #include <vcl/svapp.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <connectivity/dbtools.hxx>
 #include <core_resource.hxx>
@@ -59,14 +60,13 @@ IMPL_LINK(OAddFieldWindow, DragBeginHdl, bool&, rUnsetDragIcon, bool)
     return false;
 }
 
-OAddFieldWindow::OAddFieldWindow(weld::Window* pParent, const uno::Reference< beans::XPropertySet >& xRowSet)
+OAddFieldWindow::OAddFieldWindow(weld::Window* pParent, uno::Reference< beans::XPropertySet > xRowSet)
     : GenericDialogController(pParent, "modules/dbreport/ui/floatingfield.ui", "FloatingField")
     , ::comphelper::OPropertyChangeListener(m_aMutex)
     , ::comphelper::OContainerListener(m_aMutex)
-    , m_xRowSet(xRowSet)
+    , m_xRowSet(std::move(xRowSet))
     , m_xActions(m_xBuilder->weld_toolbar("toolbox"))
     , m_xListBox(m_xBuilder->weld_tree_view("treeview"))
-    , m_xHelpText(m_xBuilder->weld_label("helptext"))
     , m_nCommandType(0)
     , m_bEscapeProcessing(false)
 {
@@ -151,7 +151,7 @@ void OAddFieldWindow::addToList(const uno::Sequence< OUString >& rEntries)
     for (const OUString& rEntry : rEntries)
     {
         m_aListBoxData.emplace_back(new ColumnInfo(rEntry));
-        OUString sId(OUString::number(reinterpret_cast<sal_Int64>(m_aListBoxData.back().get())));
+        OUString sId(weld::toId(m_aListBoxData.back().get()));
         m_xListBox->append(sId, rEntry);
     }
 }
@@ -166,7 +166,7 @@ void OAddFieldWindow::addToList(const uno::Reference< container::XNameAccess>& i
         if ( xColumn->getPropertySetInfo()->hasPropertyByName(PROPERTY_LABEL) )
             xColumn->getPropertyValue(PROPERTY_LABEL) >>= sLabel;
         m_aListBoxData.emplace_back(new ColumnInfo(rEntry, sLabel));
-        OUString sId(OUString::number(reinterpret_cast<sal_Int64>(m_aListBoxData.back().get())));
+        OUString sId(weld::toId(m_aListBoxData.back().get()));
         if ( !sLabel.isEmpty() )
             m_xListBox->append(sId, sLabel);
         else
@@ -189,7 +189,7 @@ void OAddFieldWindow::Update()
         m_xListBox->clear();
         m_aListBoxData.clear();
         const OString aIds[] = { "up", "down" };
-        for (size_t j = 0; j< SAL_N_ELEMENTS(aIds); ++j)
+        for (size_t j = 0; j< std::size(aIds); ++j)
             m_xActions->set_item_sensitive(aIds[j], false);
 
         OUString aTitle(RptResId(RID_STR_FIELDSELECTION));
@@ -233,7 +233,7 @@ void OAddFieldWindow::Update()
             m_xDialog->set_title(aTitle);
             if ( !m_aCommandName.isEmpty() )
             {
-                for (size_t i = 0; i < SAL_N_ELEMENTS(aIds); ++i)
+                for (size_t i = 0; i < std::size(aIds); ++i)
                     m_xActions->set_item_sensitive(aIds[i], true);
             }
             OnSelectHdl(*m_xListBox);
@@ -272,7 +272,7 @@ void OAddFieldWindow::fillDescriptor(const weld::TreeIter& rSelected, svx::OData
     rDescriptor[ svx::DataAccessDescriptorProperty::EscapeProcessing ]   <<= m_bEscapeProcessing;
     rDescriptor[ svx::DataAccessDescriptorProperty::Connection ]         <<= getConnection();
 
-    ColumnInfo* pInfo = reinterpret_cast<ColumnInfo*>(m_xListBox->get_id(rSelected).toInt64());
+    ColumnInfo* pInfo = weld::fromId<ColumnInfo*>(m_xListBox->get_id(rSelected));
     rDescriptor[ svx::DataAccessDescriptorProperty::ColumnName ]         <<= pInfo->sColumnName;
     if ( m_xColumns->hasByName( pInfo->sColumnName ) )
         rDescriptor[ svx::DataAccessDescriptorProperty::ColumnObject ] = m_xColumns->getByName(pInfo->sColumnName);
@@ -289,7 +289,7 @@ void OAddFieldWindow::_elementInserted( const container::ContainerEvent& _rEvent
     if ( xColumn->getPropertySetInfo()->hasPropertyByName(PROPERTY_LABEL) )
         xColumn->getPropertyValue(PROPERTY_LABEL) >>= sLabel;
     m_aListBoxData.emplace_back(new ColumnInfo(sName, sLabel));
-    OUString sId(OUString::number(reinterpret_cast<sal_Int64>(m_aListBoxData.back().get())));
+    OUString sId(weld::toId(m_aListBoxData.back().get()));
     if (!sLabel.isEmpty())
         m_xListBox->append(sId, sLabel);
     else
@@ -331,7 +331,7 @@ IMPL_LINK(OAddFieldWindow, OnSortAction, const OString&, rCurItem, void)
 
     if (rCurItem == "delete")
     {
-        for (size_t j = 0; j< SAL_N_ELEMENTS(aIds); ++j)
+        for (size_t j = 0; j< std::size(aIds); ++j)
             m_xActions->set_item_active(aIds[j], false);
 
         m_xListBox->make_unsorted();
@@ -339,7 +339,7 @@ IMPL_LINK(OAddFieldWindow, OnSortAction, const OString&, rCurItem, void)
         return;
     }
 
-    for (size_t j = 0; j< SAL_N_ELEMENTS(aIds); ++j)
+    for (size_t j = 0; j< std::size(aIds); ++j)
         m_xActions->set_item_active(aIds[j], rCurItem == aIds[j]);
 
     m_xListBox->make_sorted();

@@ -27,6 +27,7 @@ $(eval $(call gb_Library_use_libraries,subsequenttest,\
 	cppuhelper \
 	i18nlangtag \
 	sal \
+	sfx \
 	test \
 	tl \
 	utl \
@@ -37,11 +38,15 @@ $(eval $(call gb_Library_use_libraries,subsequenttest,\
 $(eval $(call gb_Library_use_externals,subsequenttest,\
 	boost_headers \
 	cppunit \
+	libxml2 \
 ))
 
 $(eval $(call gb_Library_add_exception_objects,subsequenttest,\
 	test/source/unoapi_test \
-	test/source/calc_unoapi_test \
+	test/source/unoapixml_test \
+	test/source/a11y/AccessibilityTools \
+	test/source/a11y/accessibletestbase \
+	test/source/a11y/swaccessibletestbase \
 	test/source/beans/xpropertyset \
 	test/source/chart/xchartdata \
 	test/source/container/xchild \

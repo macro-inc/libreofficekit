@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <sal/config.h>
 
 #include <o3tl/safeint.hxx>
@@ -28,7 +30,6 @@
 
 #include <algorithm>
 #include <math.h>
-#include <string_view>
 
 #include <frmselimpl.hxx>
 #include <AccessibleFrameSelector.hxx>
@@ -235,8 +236,10 @@ FrameSelectorImpl::FrameSelectorImpl( FrameSelector& rFrameSel ) :
     mbBLTR( false ),
     mbFullRepaint( true ),
     mbAutoSelect( true ),
-    mbHCMode( false ),
-    maChildVec( 8 )
+    mbHCMode( false )
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
+    ,maChildVec( 8 )
+#endif
 {
     maAllBorders.resize( FRAMEBORDERTYPE_COUNT, nullptr );
     maAllBorders[ GetIndexFromFrameBorderType( FrameBorderType::Left   ) ] = &maLeft;
@@ -268,11 +271,12 @@ FrameSelectorImpl::FrameSelectorImpl( FrameSelector& rFrameSel ) :
 }
 
 FrameSelectorImpl::~FrameSelectorImpl()
-
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     for( auto& rpChild : maChildVec )
         if( rpChild.is() )
             rpChild->Invalidate();
+#endif
 }
 
 // initialization
@@ -306,24 +310,24 @@ void FrameSelectorImpl::InitColors()
     maHCLineCol = COL_BLACK;
 }
 
-const std::u16string_view aImageIds[] =
+constexpr rtl::OUStringConstExpr aImageIds[] =
 {
-    u"" RID_SVXBMP_FRMSEL_ARROW1,
-    u"" RID_SVXBMP_FRMSEL_ARROW2,
-    u"" RID_SVXBMP_FRMSEL_ARROW3,
-    u"" RID_SVXBMP_FRMSEL_ARROW4,
-    u"" RID_SVXBMP_FRMSEL_ARROW5,
-    u"" RID_SVXBMP_FRMSEL_ARROW6,
-    u"" RID_SVXBMP_FRMSEL_ARROW7,
-    u"" RID_SVXBMP_FRMSEL_ARROW8,
-    u"" RID_SVXBMP_FRMSEL_ARROW9,
-    u"" RID_SVXBMP_FRMSEL_ARROW10,
-    u"" RID_SVXBMP_FRMSEL_ARROW11,
-    u"" RID_SVXBMP_FRMSEL_ARROW12,
-    u"" RID_SVXBMP_FRMSEL_ARROW13,
-    u"" RID_SVXBMP_FRMSEL_ARROW14,
-    u"" RID_SVXBMP_FRMSEL_ARROW15,
-    u"" RID_SVXBMP_FRMSEL_ARROW16
+    RID_SVXBMP_FRMSEL_ARROW1,
+    RID_SVXBMP_FRMSEL_ARROW2,
+    RID_SVXBMP_FRMSEL_ARROW3,
+    RID_SVXBMP_FRMSEL_ARROW4,
+    RID_SVXBMP_FRMSEL_ARROW5,
+    RID_SVXBMP_FRMSEL_ARROW6,
+    RID_SVXBMP_FRMSEL_ARROW7,
+    RID_SVXBMP_FRMSEL_ARROW8,
+    RID_SVXBMP_FRMSEL_ARROW9,
+    RID_SVXBMP_FRMSEL_ARROW10,
+    RID_SVXBMP_FRMSEL_ARROW11,
+    RID_SVXBMP_FRMSEL_ARROW12,
+    RID_SVXBMP_FRMSEL_ARROW13,
+    RID_SVXBMP_FRMSEL_ARROW14,
+    RID_SVXBMP_FRMSEL_ARROW15,
+    RID_SVXBMP_FRMSEL_ARROW16
 };
 
 void FrameSelectorImpl::InitArrowImageList()
@@ -420,7 +424,7 @@ void FrameSelectorImpl::InitBorderGeometry()
     {
         for( nRow = 0, nRows = maArray.GetRowCount(); nRow < nRows; ++nRow )
         {
-            const basegfx::B2DRange aCellRange(maArray.GetCellRange( nCol, nRow, true ));
+            const basegfx::B2DRange aCellRange(maArray.GetCellRange( nCol, nRow ));
             const tools::Rectangle aRect(
                 basegfx::fround(aCellRange.getMinX()), basegfx::fround(aCellRange.getMinY()),
                 basegfx::fround(aCellRange.getMaxX()), basegfx::fround(aCellRange.getMaxY()));
@@ -480,7 +484,7 @@ void FrameSelectorImpl::InitBorderGeometry()
         for( nRow = 0, nRows = maArray.GetRowCount(); nRow < nRows; ++nRow )
         {
             // the usable area between horizontal/vertical frame borders of current quadrant
-            const basegfx::B2DRange aCellRange(maArray.GetCellRange( nCol, nRow, true ));
+            const basegfx::B2DRange aCellRange(maArray.GetCellRange( nCol, nRow ));
             const tools::Rectangle aRect(
                 basegfx::fround(aCellRange.getMinX()) + nClV + 1, basegfx::fround(aCellRange.getMinY()) + nClH + 1,
                 basegfx::fround(aCellRange.getMaxX()) - nClV + 1, basegfx::fround(aCellRange.getMaxY()) - nClH + 1);
@@ -676,8 +680,8 @@ void FrameSelectorImpl::DrawAllFrameBorders()
             rBottomStyle.Type(), rBottomStyle.PatternScale() );
     maArray.SetRowStyleBottom( mbHor ? 1 : 0, rInvertedBottom );
 
-    for( size_t nCol = 0; nCol < maArray.GetColCount(); ++nCol )
-        for( size_t nRow = 0; nRow < maArray.GetRowCount(); ++nRow )
+    for( sal_Int32 nCol = 0; nCol < maArray.GetColCount(); ++nCol )
+        for( sal_Int32 nRow = 0; nRow < maArray.GetRowCount(); ++nRow )
             maArray.SetCellStyleDiag( nCol, nRow, maTLBR.GetUIStyle(), maBLTR.GetUIStyle() );
 
     // This is used in the dialog/control for 'Border' attributes. When using
@@ -753,17 +757,24 @@ void FrameSelectorImpl::SetBorderState( FrameBorder& rBorder, FrameBorderState e
     Any aNew;
     Any& rMod = eState == FrameBorderState::Show ? aNew : aOld;
     rMod <<= AccessibleStateType::CHECKED;
+
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     rtl::Reference< a11y::AccFrameSelectorChild > xRet;
     size_t nVecIdx = static_cast< size_t >( rBorder.GetType() );
     if( GetBorder(rBorder.GetType()).IsEnabled() && (1 <= nVecIdx) && (nVecIdx <= maChildVec.size()) )
         xRet = maChildVec[ --nVecIdx ].get();
+#endif
 
     if( eState == FrameBorderState::Show )
         SetBorderCoreStyle( rBorder, &maCurrStyle );
     else
         rBorder.SetState( eState );
+
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if (xRet.is())
         xRet->NotifyAccessibleEvent( AccessibleEventId::STATE_CHANGED, aOld, aNew );
+#endif
+
     DoInvalidate( true );
 }
 
@@ -837,8 +848,10 @@ void FrameSelector::SetDrawingArea(weld::DrawingArea* pDrawingArea)
 
 FrameSelector::~FrameSelector()
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if( mxAccess.is() )
         mxAccess->Invalidate();
+#endif
 }
 
 void FrameSelector::Initialize( FrameSelFlags nFlags )
@@ -971,6 +984,7 @@ bool FrameSelector::IsBorderSelected( FrameBorderType eBorder ) const
 void FrameSelector::SelectBorder( FrameBorderType eBorder )
 {
     mxImpl->SelectBorder( mxImpl->GetBorderAccess( eBorder ), true/*bSelect*/ );
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     // MT: bFireFox as API parameter is ugly...
     // if (bFocus)
     {
@@ -982,6 +996,7 @@ void FrameSelector::SelectBorder( FrameBorderType eBorder )
             xRet->NotifyAccessibleEvent( AccessibleEventId::STATE_CHANGED, aOldValue, aNewValue );
         }
     }
+#endif
 }
 
 bool FrameSelector::IsAnyBorderSelected() const
@@ -1025,8 +1040,10 @@ SvxBorderLineStyle FrameSelector::getCurrentStyleLineStyle() const
 // accessibility
 Reference< XAccessible > FrameSelector::CreateAccessible()
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if( !mxAccess.is() )
         mxAccess = new a11y::AccFrameSelector(*this);
+#endif
     return mxAccess;
 }
 

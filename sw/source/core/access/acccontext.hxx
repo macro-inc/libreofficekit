@@ -35,9 +35,6 @@ namespace vcl { class Window; }
 class SwCursorShell;
 class SdrObject;
 class SwPaM;
-namespace utl {
-    class AccessibleStateSetHelper;
-}
 namespace accessibility {
     class AccessibleShape;
 }
@@ -176,12 +173,12 @@ protected:
     void FireVisibleDataEvent();
 
     // broadcast state change event
-    void FireStateChangedEvent( sal_Int16 nState, bool bNewState );
+    void FireStateChangedEvent( sal_Int64 nState, bool bNewState );
 
     // Set states for getAccessibleStateSet.
     // This base class sets DEFUNC(0/1), EDITABLE(0/1), ENABLED(1),
     // SHOWING(0/1), OPAQUE(0/1) and VISIBLE(1).
-    virtual void GetStates( ::utl::AccessibleStateSetHelper& rStateSet );
+    virtual void GetStates( sal_Int64& rStateSet );
 
      bool IsEditableState();
 
@@ -217,11 +214,11 @@ public:
     // XAccessibleContext
 
     // Return the number of currently visible children.
-    virtual sal_Int32 SAL_CALL getAccessibleChildCount() override;
+    virtual sal_Int64 SAL_CALL getAccessibleChildCount() override;
 
     // Return the specified child or NULL if index is invalid.
     virtual css::uno::Reference< css::accessibility::XAccessible> SAL_CALL
-        getAccessibleChild (sal_Int32 nIndex) override;
+        getAccessibleChild (sal_Int64 nIndex) override;
 
     virtual css::uno::Sequence<css::uno::Reference< css::accessibility::XAccessible>> SAL_CALL
         getAccessibleChildren() override;
@@ -231,7 +228,7 @@ public:
         getAccessibleParent() override;
 
     // Return this objects index among the parents children.
-    virtual sal_Int32 SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getAccessibleIndexInParent() override;
 
     // Return this object's role.
@@ -250,9 +247,7 @@ public:
         getAccessibleRelationSet() override;
 
     // Return the set of current states.
-    virtual css::uno::Reference<
-            css::accessibility::XAccessibleStateSet> SAL_CALL
-        getAccessibleStateSet() override;
+    virtual sal_Int64 SAL_CALL getAccessibleStateSet() override;
 
     /** Return the parents locale or throw exception if this object has no
         parent yet/anymore. */
@@ -351,8 +346,10 @@ public:
     }
 
     //This method is used to update the selected state and fire the selected state changed event.
-    virtual bool SetSelectedState(bool bSeleted);
-    bool  IsSeletedInDoc() const { return m_isSelectedInDoc; }
+    virtual bool SetSelectedState(bool bSelected);
+    bool  IsSelectedInDoc() const { return m_isSelectedInDoc; }
+
+    bool IsDisposed() const;
 
     static OUString GetResource(TranslateId pResId,
                                 const OUString *pArg1 = nullptr,

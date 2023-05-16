@@ -21,19 +21,15 @@
 #define INCLUDED_PACKAGE_INC_ZIPFILEACCESS_HXX
 
 #include <com/sun/star/packages/zip/XZipFileAccess2.hpp>
-#include <com/sun/star/packages/zip/ZipException.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <com/sun/star/lang/XComponent.hpp>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
-#include <com/sun/star/container/XNameAccess.hpp>
 
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <comphelper/refcountedmutex.hxx>
 #include <cppuhelper/implbase.hxx>
 
 #include "ZipFile.hxx"
-#include "HashMaps.hxx"
 
 #include <memory>
 #include <optional>
@@ -48,7 +44,7 @@ class OZipFileAccess final : public ::cppu::WeakImplHelper<
     css::uno::Reference< css::uno::XComponentContext > m_xContext;
     css::uno::Reference< css::io::XInputStream > m_xContentStream;
     std::optional<ZipFile> m_pZipFile;
-    std::unique_ptr<::comphelper::OInterfaceContainerHelper2> m_pListenersContainer;
+    std::unique_ptr<::comphelper::OInterfaceContainerHelper3<css::lang::XEventListener>> m_pListenersContainer;
     bool m_bDisposed;
     bool m_bOwnContent;
 
@@ -59,7 +55,7 @@ public:
 
     static css::uno::Sequence< OUString > GetPatternsFromString_Impl( const OUString& aString );
 
-    static bool StringGoodForPattern_Impl( const OUString& aString,
+    static bool StringGoodForPattern_Impl( std::u16string_view,
                                         const css::uno::Sequence< OUString >& aPattern );
 
     // XInitialization

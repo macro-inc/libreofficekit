@@ -414,7 +414,7 @@ DECL_ABSTDLG_CLASS(AbstractSignSignatureLineDialog,SignSignatureLineDialog)
 };
 
 // AbstractAdditionsDialog_Impl
-DECL_ABSTDLG_CLASS(AbstractAdditionsDialog,AdditionsDialog)
+DECL_ABSTDLG_CLASS(AbstractAdditionsDialog,weld::GenericDialogController)
 };
 
 // AbstractDiagramDialog_Impl
@@ -547,7 +547,8 @@ public:
     virtual VclPtr<AbstractSvxAreaTabDialog>       CreateSvxAreaTabDialog(weld::Window* pParent,
                                                                           const SfxItemSet* pAttr,
                                                                           SdrModel* pModel,
-                                                                          bool bShadow) override;
+                                                                          bool bShadow,
+                                                                          bool bSlideBackground) override;
     virtual VclPtr<SfxAbstractTabDialog>           CreateSvxLineTabDialog(weld::Window* pParent, const SfxItemSet* pAttr,
                                                                  SdrModel* pModel,
                                                                  const SdrObject* pObj,
@@ -576,7 +577,7 @@ public:
                 const sal_uInt16 _nInitiallySelectedEvent
             ) override;
 
-    virtual VclPtr<SfxAbstractTabDialog> CreateSvxFormatCellsDialog(weld::Window* pParent, const SfxItemSet* pAttr, const SdrModel& rModel) override;
+    virtual VclPtr<SfxAbstractTabDialog> CreateSvxFormatCellsDialog(weld::Window* pParent, const SfxItemSet* pAttr, const SdrModel& rModel, bool bStyle) override;
 
     virtual VclPtr<SvxAbstractSplitTableDialog> CreateSvxSplitTableDialog(weld::Window* pParent, bool bIsTableVertical, tools::Long nMaxVertical) override;
 
@@ -616,7 +617,7 @@ public:
 
     virtual VclPtr<AbstractDiagramDialog> CreateDiagramDialog(
         weld::Window* pParent,
-        std::shared_ptr<DiagramDataInterface> pDiagramData) override;
+        SdrObjGroup& rDiagram) override;
 
 #ifdef _WIN32
     virtual VclPtr<VclAbstractDialog> CreateFileExtCheckDialog(weld::Window* pParent,

@@ -12,7 +12,6 @@
 #include "ItemConverter.hxx"
 #include <rtl/ref.hxx>
 #include <vector>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 
 namespace com::sun::star::awt
 {
@@ -31,13 +30,13 @@ class SdrModel;
 
 namespace chart::wrapper
 {
+/** Convert data table properties to and from ItemSet and UNO PropertySet */
 class DataTableItemConverter final : public ItemConverter
 {
 public:
-    DataTableItemConverter(
-        const css::uno::Reference<css::beans::XPropertySet>& rPropertySet, SfxItemPool& rItemPool,
-        SdrModel& rDrawModel,
-        css::uno::Reference<css::lang::XMultiServiceFactory> const& xNamedPropertyContainerFactory);
+    DataTableItemConverter(const css::uno::Reference<css::beans::XPropertySet>& rPropertySet,
+                           SfxItemPool& rItemPool, SdrModel& rDrawModel,
+                           const rtl::Reference<::chart::ChartModel>& xChartDoc);
 
     virtual ~DataTableItemConverter() override;
 

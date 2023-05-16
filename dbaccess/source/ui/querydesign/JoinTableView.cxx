@@ -46,7 +46,7 @@
 #include <com/sun/star/accessibility/AccessibleEventId.hpp>
 #include <cppuhelper/exc_hlp.hxx>
 #include <connectivity/dbtools.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <algorithm>
 #include <functional>
 
@@ -66,14 +66,14 @@ using namespace ::com::sun::star::lang;
 #define TABWIN_HEIGHT_STD   120
 
 OScrollWindowHelper::OScrollWindowHelper( vcl::Window* pParent) : Window( pParent)
-    ,m_aHScrollBar( VclPtr<ScrollBar>::Create(this, WB_HSCROLL|WB_REPEAT|WB_DRAG) )
-    ,m_aVScrollBar( VclPtr<ScrollBar>::Create(this, WB_VSCROLL|WB_REPEAT|WB_DRAG) )
-    ,m_pCornerWindow(VclPtr<ScrollBarBox>::Create(this, WB_3DLOOK))
+    ,m_aHScrollBar( VclPtr<ScrollAdaptor>::Create(this, true) )
+    ,m_aVScrollBar( VclPtr<ScrollAdaptor>::Create(this, false) )
     ,m_pTableView(nullptr)
 {
+    StyleSettings aSystemStyle = Application::GetSettings().GetStyleSettings();
+    SetBackground(aSystemStyle.GetFaceColor());
 
     // ScrollBars
-
     GetHScrollBar().SetRange( Range(0, 1000) );
     GetVScrollBar().SetRange( Range(0, 1000) );
 
@@ -82,7 +82,6 @@ OScrollWindowHelper::OScrollWindowHelper( vcl::Window* pParent) : Window( pParen
 
     GetHScrollBar().Show();
     GetVScrollBar().Show();
-    m_pCornerWindow->Show();
 
     // normally we should be SCROLL_PANE
     SetAccessibleRole(AccessibleRole::SCROLL_PANE);
@@ -97,7 +96,6 @@ void OScrollWindowHelper::dispose()
 {
     m_aHScrollBar.disposeAndClear();
     m_aVScrollBar.disposeAndClear();
-    m_pCornerWindow.disposeAndClear();
     m_pTableView.clear();
     vcl::Window::dispose();
 }
@@ -106,8 +104,8 @@ void OScrollWindowHelper::setTableView(OJoinTableView* _pTableView)
 {
     m_pTableView = _pTableView;
     // ScrollBars
-    GetHScrollBar().SetScrollHdl( LINK(m_pTableView, OJoinTableView, ScrollHdl) );
-    GetVScrollBar().SetScrollHdl( LINK(m_pTableView, OJoinTableView, ScrollHdl) );
+    GetHScrollBar().SetScrollHdl( LINK(m_pTableView, OJoinTableView, HorzScrollHdl) );
+    GetVScrollBar().SetScrollHdl( LINK(m_pTableView, OJoinTableView, VertScrollHdl) );
 }
 
 void OScrollWindowHelper::resetRange(const Point& _aSize)
@@ -133,11 +131,6 @@ void OScrollWindowHelper::Resize()
     GetVScrollBar().SetPosSizePixel(
         Point( aTotalOutputSize.Width()-nVScrollWidth, 0 ),
         Size( nVScrollWidth, aTotalOutputSize.Height()-nHScrollHeight )
-        );
-
-    m_pCornerWindow->SetPosSizePixel(
-        Point( aTotalOutputSize.Width() - nVScrollWidth, aTotalOutputSize.Height() - nHScrollHeight),
-        Size( nVScrollWidth, nHScrollHeight )
         );
 
     GetHScrollBar().SetPageSize( aTotalOutputSize.Width() );
@@ -201,10 +194,16 @@ void OJoinTableView::dispose()
     vcl::Window::dispose();
 }
 
-IMPL_LINK( OJoinTableView, ScrollHdl, ScrollBar*, pScrollBar, void )
+IMPL_LINK(OJoinTableView, HorzScrollHdl, weld::Scrollbar&, rScrollbar, void)
 {
     // move all windows
-    ScrollPane( pScrollBar->GetDelta(), (pScrollBar == &GetHScrollBar()), false );
+    ScrollPane(rScrollbar.adjustment_get_value() - m_aScrollOffset.X(), true, false);
+}
+
+IMPL_LINK(OJoinTableView, VertScrollHdl, weld::Scrollbar&, rScrollbar, void)
+{
+    // move all windows
+    ScrollPane(rScrollbar.adjustment_get_value() - m_aScrollOffset.Y(), false, false);
 }
 
 void OJoinTableView::Resize()
@@ -237,7 +236,7 @@ void OJoinTableView::Resize()
     }
 }
 
-sal_uLong OJoinTableView::GetTabWinCount() const
+sal_Int64 OJoinTableView::GetTabWinCount() const
 {
     return m_aTableMap.size();
 }
@@ -258,7 +257,7 @@ bool OJoinTableView::RemoveConnection(VclPtr<OTableConnection>& rConn, bool _bDe
     modified();
     if ( m_pAccessible )
         m_pAccessible->notifyAccessibleEvent(   AccessibleEventId::CHILD,
-                                                makeAny(xConn->GetAccessible()),
+                                                Any(xConn->GetAccessible()),
                                                 Any());
     if (_bDelete)
         xConn->disposeOnce();
@@ -338,7 +337,7 @@ void OJoinTableView::AddTabWin(const OUString& _rComposedName, const OUString& r
         if ( m_pAccessible )
             m_pAccessible->notifyAccessibleEvent(   AccessibleEventId::CHILD,
                                                     Any(),
-                                                    makeAny(pNewTabWin->GetAccessible()));
+                                                    Any(pNewTabWin->GetAccessible()));
     }
     else
     {
@@ -374,7 +373,7 @@ void OJoinTableView::RemoveTabWin( OTableWindow* pTabWin )
     {
         if ( m_pAccessible )
             m_pAccessible->notifyAccessibleEvent(   AccessibleEventId::CHILD,
-                                                    makeAny(pTabWin->GetAccessible()),Any()
+                                                    Any(pTabWin->GetAccessible()),Any()
                                                     );
 
         pTabWin->Hide();
@@ -405,7 +404,7 @@ namespace
     bool isScrollAllowed( OJoinTableView* _pView,tools::Long nDelta, bool bHoriz)
     {
         // adjust ScrollBar-Positions
-        ScrollBar& rBar = bHoriz ? _pView->GetHScrollBar() : _pView->GetVScrollBar() ;
+        ScrollAdaptor& rBar = bHoriz ? _pView->GetHScrollBar() : _pView->GetVScrollBar();
 
         tools::Long nOldThumbPos = rBar.GetThumbPos();
         tools::Long nNewThumbPos = nOldThumbPos + nDelta;
@@ -1219,7 +1218,7 @@ bool OJoinTableView::PreNotify(NotifyEvent& rNEvt)
     bool bHandled = false;
     switch (rNEvt.GetType())
     {
-        case MouseNotifyEvent::COMMAND:
+        case NotifyEventType::COMMAND:
         {
             const CommandEvent* pCommand = rNEvt.GetCommandEvent();
             if (pCommand->GetCommand() == CommandEventId::Wheel)
@@ -1236,7 +1235,7 @@ bool OJoinTableView::PreNotify(NotifyEvent& rNEvt)
             }
         }
         break;
-        case MouseNotifyEvent::KEYINPUT:
+        case NotifyEventType::KEYINPUT:
         {
             if (m_aTableMap.empty())
                 // no tab wins -> no conns -> no traveling
@@ -1364,7 +1363,7 @@ bool OJoinTableView::PreNotify(NotifyEvent& rNEvt)
             }
         }
         break;
-        case MouseNotifyEvent::GETFOCUS:
+        case NotifyEventType::GETFOCUS:
         {
             if (m_aTableMap.empty())
                 // no tab wins -> no conns -> no focus change
@@ -1546,7 +1545,7 @@ void OJoinTableView::addConnection(OTableConnection* _pConnection,bool _bAddData
     if ( m_pAccessible )
         m_pAccessible->notifyAccessibleEvent(   AccessibleEventId::CHILD,
                                                 Any(),
-                                                makeAny(_pConnection->GetAccessible()));
+                                                Any(_pConnection->GetAccessible()));
 }
 
 bool OJoinTableView::allowQueries() const

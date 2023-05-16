@@ -22,7 +22,7 @@
 
 #include <framework/desktop.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/beans/NamedValue.hpp>
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/frame/theAutoRecovery.hpp>
@@ -42,6 +42,7 @@
 
 #include <com/sun/star/uno/Any.hxx>
 #include <com/sun/star/uno/Sequence.hxx>
+#include <utility>
 
 using namespace css;
 using namespace com::sun::star::uno;
@@ -101,7 +102,7 @@ private:
     void QuitSessionQuietly();
 
 public:
-    explicit SessionListener(const css::uno::Reference< css::uno::XComponentContext >& xContext);
+    explicit SessionListener(css::uno::Reference< css::uno::XComponentContext >  xContext);
 
     virtual ~SessionListener() override;
 
@@ -138,8 +139,8 @@ public:
     virtual void SAL_CALL statusChanged(const css::frame::FeatureStateEvent& event) override;
 };
 
-SessionListener::SessionListener(const css::uno::Reference< css::uno::XComponentContext >& rxContext )
-        : m_xContext( rxContext )
+SessionListener::SessionListener(css::uno::Reference< css::uno::XComponentContext >  rxContext )
+        : m_xContext(std::move( rxContext ))
         , m_bRestored( false )
         , m_bSessionStoreRequested( false )
         , m_bAllowUserInteractionOnQuit( false )
@@ -179,7 +180,7 @@ void SessionListener::StoreSession( bool bAsync )
         if ( bAsync )
             xDispatch->addStatusListener(this, aURL);
 
-        Sequence< PropertyValue > args{ PropertyValue("DispatchAsynchron",-1,makeAny(bAsync),
+        Sequence< PropertyValue > args{ PropertyValue("DispatchAsynchron",-1,Any(bAsync),
                                                       PropertyState_DIRECT_VALUE) };
         xDispatch->dispatch(aURL, args);
     } catch (const css::uno::Exception&) {
@@ -207,7 +208,7 @@ void SessionListener::QuitSessionQuietly()
         aURL.Complete = "vnd.sun.star.autorecovery:/doSessionQuietQuit";
         xURLTransformer->parseStrict(aURL);
 
-        Sequence< PropertyValue > args{ PropertyValue("DispatchAsynchron",-1,makeAny(false),
+        Sequence< PropertyValue > args{ PropertyValue("DispatchAsynchron",-1,Any(false),
                                                       PropertyState_DIRECT_VALUE) };
         xDispatch->dispatch(aURL, args);
     } catch (const css::uno::Exception&) {

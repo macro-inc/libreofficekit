@@ -25,6 +25,7 @@
 #include <JoinTableView.hxx>
 #include <JoinDesignView.hxx>
 #include <osl/diagnose.h>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/commandevent.hxx>
@@ -32,7 +33,7 @@
 #include <vcl/ptrstyle.hxx>
 #include <vcl/wall.hxx>
 #include <vcl/weldutils.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/container/XContainer.hpp>
 #include <com/sun/star/container/XNameAccess.hpp>
@@ -86,11 +87,11 @@ void Draw3DBorder(vcl::RenderContext& rRenderContext, const tools::Rectangle& rR
 
 }
 
-OTableWindow::OTableWindow( vcl::Window* pParent, const TTableWindowData::value_type& pTabWinData )
+OTableWindow::OTableWindow( vcl::Window* pParent, TTableWindowData::value_type pTabWinData )
     : ::comphelper::OContainerListener(m_aMutex)
     , Window( pParent, WB_3DLOOK|WB_MOVEABLE )
     , m_xTitle( VclPtr<OTableWindowTitle>::Create(this) )
-    , m_pData( pTabWinData )
+    , m_pData(std::move( pTabWinData ))
     , m_nMoveCount(0)
     , m_nMoveIncrement(1)
     , m_nSizingFlags( SizingFlags::NONE )
@@ -192,7 +193,7 @@ void OTableWindow::FillListBox()
 
     if (GetData()->IsShowAll())
     {
-        rTreeView.append(OUString::number(reinterpret_cast<sal_uInt64>(createUserData(nullptr,false))), OUString("*"));
+        rTreeView.append(weld::toId(createUserData(nullptr,false)), OUString("*"));
     }
 
     Reference<XNameAccess> xPKeyColumns;
@@ -220,7 +221,7 @@ void OTableWindow::FillListBox()
                 OUString sId;
                 Reference<XPropertySet> xColumn(xColumns->getByName(*pIter),UNO_QUERY);
                 if (xColumn.is())
-                    sId = OUString::number(reinterpret_cast<sal_uInt64>(createUserData(xColumn, bPrimaryKeyColumn)));
+                    sId = weld::toId(createUserData(xColumn, bPrimaryKeyColumn));
 
                 rTreeView.append(sId, *pIter);
 
@@ -255,7 +256,7 @@ void OTableWindow::clearListBox()
 
     weld::TreeView& rTreeView = m_xListBox->get_widget();
     rTreeView.all_foreach([this, &rTreeView](weld::TreeIter& rEntry){
-        void* pUserData = reinterpret_cast<void*>(rTreeView.get_id(rEntry).toUInt64());
+        void* pUserData = weld::fromId<void*>(rTreeView.get_id(rEntry));
         deleteUserData(pUserData);
         return false;
     });
@@ -563,7 +564,7 @@ bool OTableWindow::PreNotify(NotifyEvent& rNEvt)
     bool bHandled = false;
     switch (rNEvt.GetType())
     {
-        case MouseNotifyEvent::KEYINPUT:
+        case NotifyEventType::KEYINPUT:
         {
             if ( getDesignView()->getController().isReadOnly() )
                 break;
@@ -673,7 +674,7 @@ bool OTableWindow::PreNotify(NotifyEvent& rNEvt)
             }
             break;
         }
-        case MouseNotifyEvent::KEYUP:
+        case NotifyEventType::KEYUP:
         {
             const KeyEvent* pKeyEvent = rNEvt.GetKeyEvent();
             const vcl::KeyCode& rCode = pKeyEvent->GetKeyCode();

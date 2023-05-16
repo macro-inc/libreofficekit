@@ -58,6 +58,7 @@ public:
     css::uno::Any SAL_CALL ContentControls(const css::uno::Any& index) override;
     css::uno::Any SAL_CALL SelectContentControlsByTag(const css::uno::Any& index) override;
     css::uno::Any SAL_CALL SelectContentControlsByTitle(const css::uno::Any& index) override;
+    css::uno::Reference<ov::word::XWindow> SAL_CALL getActiveWindow() override;
     virtual css::uno::Any SAL_CALL Variables( const css::uno::Any& rIndex ) override;
     virtual css::uno::Any SAL_CALL getAttachedTemplate() override;
     virtual void SAL_CALL setAttachedTemplate( const css::uno::Any& _attachedtemplate ) override;
@@ -66,6 +67,7 @@ public:
     virtual css::uno::Any SAL_CALL Tables( const css::uno::Any& aIndex ) override;
     virtual css::uno::Any SAL_CALL Fields( const css::uno::Any& aIndex ) override;
     virtual css::uno::Any SAL_CALL Shapes( const css::uno::Any& aIndex ) override;
+    virtual void SAL_CALL Select() override;
     virtual css::uno::Any SAL_CALL Sections( const css::uno::Any& aIndex ) override;
     virtual void SAL_CALL Activate() override;
     virtual css::uno::Any SAL_CALL PageSetup() override;

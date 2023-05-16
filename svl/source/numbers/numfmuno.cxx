@@ -21,6 +21,7 @@
 #include <o3tl/any.hxx>
 #include <osl/mutex.hxx>
 #include <osl/diagnose.h>
+#include <rtl/character.hxx>
 #include <rtl/ustring.hxx>
 
 #include <com/sun/star/util/Date.hpp>
@@ -36,6 +37,7 @@
 #include <svl/zforlist.hxx>
 #include <svl/zformat.hxx>
 #include <svl/itemprop.hxx>
+#include <utility>
 
 using namespace com::sun::star;
 
@@ -60,7 +62,7 @@ constexpr OUStringLiteral PROPERTYNAME_TWODIGIT = u"TwoDigitDateStart";
 
 // All without a Which-ID, Map only for PropertySetInfo
 
-static const SfxItemPropertyMapEntry* lcl_GetNumberFormatPropertyMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetNumberFormatPropertyMap()
 {
     static const SfxItemPropertyMapEntry aNumberFormatPropertyMap_Impl[] =
     {
@@ -77,12 +79,11 @@ static const SfxItemPropertyMapEntry* lcl_GetNumberFormatPropertyMap()
         {PROPERTYNAME_THOUS,    0, cppu::UnoType<bool>::get(),         beans::PropertyAttribute::BOUND | beans::PropertyAttribute::READONLY, 0},
         {PROPERTYNAME_USERDEF,  0, cppu::UnoType<bool>::get(),         beans::PropertyAttribute::BOUND | beans::PropertyAttribute::READONLY, 0},
         {PROPERTYNAME_CURRABB,  0, cppu::UnoType<OUString>::get(),    beans::PropertyAttribute::BOUND | beans::PropertyAttribute::READONLY, 0},
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
     return aNumberFormatPropertyMap_Impl;
 }
 
-static const SfxItemPropertyMapEntry* lcl_GetNumberSettingsPropertyMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetNumberSettingsPropertyMap()
 {
     static const SfxItemPropertyMapEntry aNumberSettingsPropertyMap_Impl[] =
     {
@@ -90,14 +91,13 @@ static const SfxItemPropertyMapEntry* lcl_GetNumberSettingsPropertyMap()
         {PROPERTYNAME_NULLDATE, 0, cppu::UnoType<util::Date>::get(),  beans::PropertyAttribute::BOUND, 0},
         {PROPERTYNAME_STDDEC,   0, cppu::UnoType<sal_Int16>::get(),   beans::PropertyAttribute::BOUND, 0},
         {PROPERTYNAME_TWODIGIT, 0, cppu::UnoType<sal_Int16>::get(),   beans::PropertyAttribute::BOUND, 0},
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
     return aNumberSettingsPropertyMap_Impl;
 }
 
 static LanguageType lcl_GetLanguage( const lang::Locale& rLocale )
 {
-    LanguageType eRet = LanguageTag::convertToLanguageTypeWithFallback( rLocale, false);
+    LanguageType eRet = LanguageTag::convertToLanguageTypeWithFallback( rLocale );
     if ( eRet == LANGUAGE_NONE )
         eRet = LANGUAGE_SYSTEM; //! or throw an exception?
 
@@ -344,9 +344,9 @@ uno::Sequence<OUString> SAL_CALL SvNumberFormatterServiceObj::getSupportedServic
     return { "com.sun.star.util.NumberFormatter" };
 }
 
-SvNumberFormatsObj::SvNumberFormatsObj( SvNumberFormatsSupplierObj& _rParent, ::comphelper::SharedMutex const & _rMutex )
+SvNumberFormatsObj::SvNumberFormatsObj( SvNumberFormatsSupplierObj& _rParent, ::comphelper::SharedMutex  _aMutex )
     :m_xSupplier( &_rParent )
-    ,m_aMutex( _rMutex )
+    ,m_aMutex(std::move( _aMutex ))
 {
 }
 
@@ -410,8 +410,55 @@ sal_Int32 SAL_CALL SvNumberFormatsObj::queryKey( const OUString& aFormat,
     {
         //! FIXME: Something still needs to happen here ...
     }
-    sal_Int32 nRet = pFormatter->GetEntryKey( aFormat, eLang );
-    return nRet;
+    sal_uInt32 nRet = pFormatter->GetEntryKey( aFormat, eLang );
+    if (nRet == NUMBERFORMAT_ENTRY_NOT_FOUND)
+    {
+        // This seems to be a workaround for what maybe the bScan option was
+        // intended for? Tokenize the format code?
+
+        // The format string based search is vague and fuzzy, as it is case
+        // sensitive, but the format string is only half way cased, the
+        // keywords (except the "General" keyword) are uppercased and literals
+        // of course are not. Clients using this queryKey() and if not
+        // successful addNew() may still fail if the result of PutEntry() is
+        // false because the format actually existed, just with a different
+        // casing. The only clean way is to just use PutEntry() and ignore the
+        // duplicate case, which clients can't because the API doesn't provide
+        // the information.
+        // Try just another possibilty here, without any guarantee.
+
+        // Use only ASCII upper, because keywords are only those.
+        // Do not transliterate any quoted literals.
+        const sal_Int32 nLen = aFormat.getLength();
+        OUStringBuffer aBuf(0);
+        sal_Unicode* p = aBuf.appendUninitialized( nLen + 1);
+        memcpy( p, aFormat.getStr(), (nLen + 1) * sizeof(sal_Unicode));   // including 0-char
+        aBuf.setLength( nLen);
+        assert(p == aBuf.getStr());
+        sal_Unicode const * const pStop = p + aBuf.getLength();
+        bool bQuoted = false;
+        for ( ; p < pStop; ++p)
+        {
+            if (bQuoted)
+            {
+                // Format codes don't have embedded doubled quotes, i.e. "a""b"
+                // is two literals displayed as `ab`.
+                if (*p == '"')
+                    bQuoted = false;
+            }
+            else if (*p == '"')
+                bQuoted = true;
+            else if (rtl::isAsciiLowerCase(*p))
+                *p = rtl::toAsciiUpperCase(*p);
+            else if (*p == '\\')
+                ++p;            // skip escaped next char
+                // Theoretically that should cater for UTF-32 with
+                // iterateCodePoints(), but such character would not match any
+                // of [a-z\"] in its UTF-16 units.
+        }
+        nRet = pFormatter->GetEntryKey( aBuf, eLang );
+    }
+    return static_cast<sal_Int32>(nRet);
 }
 
 sal_Int32 SAL_CALL SvNumberFormatsObj::addNew( const OUString& aFormat,
@@ -435,6 +482,14 @@ sal_Int32 SAL_CALL SvNumberFormatsObj::addNew( const OUString& aFormat,
     else if (nCheckPos)
     {
         throw util::MalformedNumberFormatException(); // Invalid Format
+    }
+    else if (aFormStr != aFormat)
+    {
+        // The format exists but with a different format code string, and if it
+        // was only uppercase vs lowercase keywords; but also syntax extensions
+        // are possible like resulting embedded LCIDs and what not the client
+        // doesn't know about. Silently accept instead of throwing an error.
+        nRet = nKey;
     }
     else
         throw uno::RuntimeException(); // Other error (e.g. already added)
@@ -584,10 +639,10 @@ uno::Sequence<OUString> SAL_CALL SvNumberFormatsObj::getSupportedServiceNames()
     return { "com.sun.star.util.NumberFormats" };
 }
 
-SvNumberFormatObj::SvNumberFormatObj( SvNumberFormatsSupplierObj& rParent, sal_uLong nK, const ::comphelper::SharedMutex& _rMutex )
+SvNumberFormatObj::SvNumberFormatObj( SvNumberFormatsSupplierObj& rParent, sal_uLong nK, ::comphelper::SharedMutex _aMutex )
     :m_xSupplier( &rParent )
     ,nKey( nK )
-    ,m_aMutex( _rMutex )
+    ,m_aMutex(std::move( _aMutex ))
 {
 }
 
@@ -794,9 +849,9 @@ uno::Sequence<OUString> SAL_CALL SvNumberFormatObj::getSupportedServiceNames()
     return { "com.sun.star.util.NumberFormatProperties" };
 }
 
-SvNumberFormatSettingsObj::SvNumberFormatSettingsObj( SvNumberFormatsSupplierObj& rParent, const ::comphelper::SharedMutex& _rMutex )
+SvNumberFormatSettingsObj::SvNumberFormatSettingsObj( SvNumberFormatsSupplierObj& rParent, ::comphelper::SharedMutex _aMutex )
     :m_xSupplier( &rParent )
-    ,m_aMutex( _rMutex )
+    ,m_aMutex(std::move( _aMutex ))
 {
 }
 

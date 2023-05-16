@@ -65,6 +65,7 @@
 #include <ucbhelper/propertyvalueset.hxx>
 #include <ucbhelper/cancelcommandexecution.hxx>
 #include <ucbhelper/macros.hxx>
+#include <utility>
 #include "hierarchycontent.hxx"
 #include "hierarchyprovider.hxx"
 #include "dynamicresultset.hxx"
@@ -90,7 +91,7 @@ rtl::Reference<HierarchyContent> HierarchyContent::create(
     if ( !loadData( rxContext, pProvider, Identifier, aProps ) )
         return nullptr;
 
-    return new HierarchyContent( rxContext, pProvider, Identifier, aProps );
+    return new HierarchyContent( rxContext, pProvider, Identifier, std::move(aProps) );
 }
 
 
@@ -115,9 +116,9 @@ HierarchyContent::HierarchyContent(
             const uno::Reference< uno::XComponentContext >& rxContext,
             HierarchyContentProvider* pProvider,
             const uno::Reference< ucb::XContentIdentifier >& Identifier,
-            const HierarchyContentProperties& rProps )
+            HierarchyContentProperties aProps )
 : ContentImplHelper( rxContext, pProvider, Identifier ),
-  m_aProps( rProps ),
+  m_aProps(std::move( aProps )),
   m_eState( PERSISTENT ),
   m_pProvider( pProvider ),
   m_bCheckedReadOnly( false ),
@@ -309,7 +310,7 @@ uno::Any SAL_CALL HierarchyContent::execute(
         if ( !( aCommand.Argument >>= Properties ) )
         {
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "Wrong argument type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -329,7 +330,7 @@ uno::Any SAL_CALL HierarchyContent::execute(
         if ( !( aCommand.Argument >>= aProperties ) )
         {
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "Wrong argument type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -340,7 +341,7 @@ uno::Any SAL_CALL HierarchyContent::execute(
         if ( !aProperties.hasElements() )
         {
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "No properties!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -376,7 +377,7 @@ uno::Any SAL_CALL HierarchyContent::execute(
         if ( !( aCommand.Argument >>= aOpenCommand ) )
         {
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "Wrong argument type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -399,7 +400,7 @@ uno::Any SAL_CALL HierarchyContent::execute(
         if ( !( aCommand.Argument >>= aArg ) )
         {
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "Wrong argument type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -454,7 +455,7 @@ uno::Any SAL_CALL HierarchyContent::execute(
         {
             OSL_FAIL( "Wrong argument type!" );
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "Wrong argument type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -476,7 +477,7 @@ uno::Any SAL_CALL HierarchyContent::execute(
         {
             OSL_FAIL( "Wrong argument type!" );
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "Wrong argument type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -493,7 +494,7 @@ uno::Any SAL_CALL HierarchyContent::execute(
 
 
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( ucb::UnsupportedCommandException(
+            uno::Any( ucb::UnsupportedCommandException(
                                 OUString(),
                                 static_cast< cppu::OWeakObject * >( this ) ) ),
             Environment );
@@ -867,7 +868,7 @@ uno::Reference< sdbc::XRow > HierarchyContent::getPropertyValues(
             else if ( rProp.Name == "CreatableContentsInfo" )
             {
                 xRow->appendObject(
-                    rProp, uno::makeAny( rData.getCreatableContentsInfo() ) );
+                    rProp, uno::Any( rData.getCreatableContentsInfo() ) );
             }
             else if ( rProp.Name == "TargetURL" )
             {
@@ -955,7 +956,7 @@ uno::Reference< sdbc::XRow > HierarchyContent::getPropertyValues(
                 cppu::UnoType<uno::Sequence< ucb::ContentInfo >>::get(),
                 beans::PropertyAttribute::BOUND
                 | beans::PropertyAttribute::READONLY ),
-            uno::makeAny( rData.getCreatableContentsInfo() ) );
+            uno::Any( rData.getCreatableContentsInfo() ) );
 
         // Append all Additional Core Properties.
 
@@ -1290,7 +1291,7 @@ void HierarchyContent::insert( sal_Int32 nNameClashResolve,
     if ( m_eKind == ROOT )
     {
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( ucb::UnsupportedCommandException(
+            uno::Any( ucb::UnsupportedCommandException(
                                 "Not supported by root folder!",
                                 static_cast< cppu::OWeakObject * >( this ) ) ),
             xEnv );
@@ -1302,7 +1303,7 @@ void HierarchyContent::insert( sal_Int32 nNameClashResolve,
     {
         uno::Sequence<OUString> aProps { "Title" };
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( ucb::MissingPropertiesException(
+            uno::Any( ucb::MissingPropertiesException(
                                 OUString(),
                                 static_cast< cppu::OWeakObject * >( this ),
                                 aProps ) ),
@@ -1324,7 +1325,7 @@ void HierarchyContent::insert( sal_Int32 nNameClashResolve,
             if ( hasData( xId ) )
             {
                 ucbhelper::cancelCommandExecution(
-                    uno::makeAny(
+                    uno::Any(
                         ucb::NameClashException(
                             OUString(),
                             static_cast< cppu::OWeakObject * >( this ),
@@ -1356,7 +1357,7 @@ void HierarchyContent::insert( sal_Int32 nNameClashResolve,
                 if ( nTry == 1000 )
                 {
                     ucbhelper::cancelCommandExecution(
-                        uno::makeAny(
+                        uno::Any(
                             ucb::UnsupportedNameClashException(
                                 "Unable to resolve name clash!",
                                 static_cast< cppu::OWeakObject * >( this ),
@@ -1378,7 +1379,7 @@ void HierarchyContent::insert( sal_Int32 nNameClashResolve,
             if ( hasData( xId ) )
             {
                 ucbhelper::cancelCommandExecution(
-                    uno::makeAny(
+                    uno::Any(
                         ucb::UnsupportedNameClashException(
                                 OUString(),
                                 static_cast< cppu::OWeakObject * >( this ),
@@ -1433,7 +1434,7 @@ void HierarchyContent::destroy( bool bDeletePhysical,
     if ( m_eState != PERSISTENT )
     {
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( ucb::UnsupportedCommandException(
+            uno::Any( ucb::UnsupportedCommandException(
                                 "Not persistent!",
                                 static_cast< cppu::OWeakObject * >( this ) ) ),
             xEnv );
@@ -1444,7 +1445,7 @@ void HierarchyContent::destroy( bool bDeletePhysical,
     if ( m_eKind == ROOT )
     {
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( ucb::UnsupportedCommandException(
+            uno::Any( ucb::UnsupportedCommandException(
                                 "Not supported by root folder!",
                                 static_cast< cppu::OWeakObject * >( this ) ) ),
             xEnv );
@@ -1481,7 +1482,7 @@ void HierarchyContent::transfer(
     if ( m_eState != PERSISTENT )
     {
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( ucb::UnsupportedCommandException(
+            uno::Any( ucb::UnsupportedCommandException(
                                 "Not persistent!",
                                 static_cast< cppu::OWeakObject * >( this ) ) ),
             xEnv );
@@ -1492,7 +1493,7 @@ void HierarchyContent::transfer(
     if ( !rInfo.SourceURL.startsWith( HIERARCHY_URL_SCHEME ":/" ) )
     {
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( ucb::InteractiveBadTransferURLException(
+            uno::Any( ucb::InteractiveBadTransferURLException(
                             OUString(),
                             static_cast< cppu::OWeakObject * >( this ) ) ),
             xEnv );

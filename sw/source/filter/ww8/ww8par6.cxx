@@ -68,6 +68,7 @@
 #include <i18nlangtag/mslangid.hxx>
 #include <svx/xfillit0.hxx>
 #include <svx/xflclit.hxx>
+#include <officecfg/Office/Writer.hxx>
 #include "sortedarray.hxx"
 #include "sprmids.hxx"
 #include <node.hxx>
@@ -99,7 +100,7 @@
 #include "ww8graf.hxx"
 
 #include <fmtwrapinfluenceonobjpos.hxx>
-#include <textlinebreak.hxx>
+#include <formatflysplit.hxx>
 
 using namespace sw::util;
 using namespace sw::types;
@@ -220,12 +221,12 @@ void SwWW8ImplReader::SetDocumentGrid(SwFrameFormat &rFormat, const wwSection &r
     rFormat.SetFormatAttr(SvxFrameDirectionItem(rSection.meDir, RES_FRAMEDIR));
 
     SwTwips nTextareaHeight = rFormat.GetFrameSize().GetHeight();
-    const SvxULSpaceItem &rUL = ItemGet<SvxULSpaceItem>(rFormat, RES_UL_SPACE);
+    const SvxULSpaceItem &rUL = rFormat.GetFormatAttr(RES_UL_SPACE);
     nTextareaHeight -= rUL.GetUpper();
     nTextareaHeight -= rUL.GetLower();
 
     SwTwips nTextareaWidth = rFormat.GetFrameSize().GetWidth();
-    const SvxLRSpaceItem &rLR = ItemGet<SvxLRSpaceItem>(rFormat, RES_LR_SPACE);
+    const SvxLRSpaceItem &rLR = rFormat.GetFormatAttr(RES_LR_SPACE);
     nTextareaWidth -= rLR.GetLeft();
     nTextareaWidth -= rLR.GetRight();
 
@@ -277,8 +278,9 @@ void SwWW8ImplReader::SetDocumentGrid(SwFrameFormat &rFormat, const wwSection &r
         if (m_vColl[nI].m_bValid && m_vColl[nI].m_pFormat &&
             m_vColl[nI].IsWW8BuiltInDefaultStyle())
         {
-            nCharWidth = ItemGet<SvxFontHeightItem>(*(m_vColl[nI].m_pFormat),
-                RES_CHRATR_CJK_FONTSIZE).GetHeight();
+            const SvxFontHeightItem& rFontHeightItem =
+                m_vColl[nI].m_pFormat->GetFormatAttr(RES_CHRATR_CJK_FONTSIZE);
+            nCharWidth = rFontHeightItem.GetHeight();
             break;
         }
     }
@@ -491,7 +493,7 @@ void wwSectionManager::SetLeftRight(wwSection &rSection)
     }
 
     // Left / Right
-    if ((rSection.nPgWidth - nWWLe - nWWRi) < MINLAY)
+    if ((rSection.m_nPgWidth - nWWLe - nWWRi) < MINLAY)
     {
         /*
         There are some label templates which are "broken", they specify
@@ -506,12 +508,12 @@ void wwSectionManager::SetLeftRight(wwSection &rSection)
         it will add up the values to give a wider page than is actually being
         used.
         */
-        nWWRi = rSection.nPgWidth - nWWLe - MINLAY;
+        nWWRi = rSection.m_nPgWidth - nWWLe - MINLAY;
     }
 
-    rSection.nPgLeft = nWWLe;
-    rSection.nPgRight = nWWRi;
-    rSection.nPgGutter = nWWGu;
+    rSection.m_nPgLeft = nWWLe;
+    rSection.m_nPgRight = nWWRi;
+    rSection.m_nPgGutter = nWWGu;
 }
 
 void wwSectionManager::SetPage(SwPageDesc &rInPageDesc, SwFrameFormat &rFormat,
@@ -527,7 +529,7 @@ void wwSectionManager::SetPage(SwPageDesc &rInPageDesc, SwFrameFormat &rFormat,
     rFormat.SetFormatAttr(aSz);
 
     SvxLRSpaceItem aLR(rSection.GetPageLeft(), rSection.GetPageRight(), 0, 0, RES_LR_SPACE);
-    aLR.SetGutterMargin(rSection.nPgGutter);
+    aLR.SetGutterMargin(rSection.m_nPgGutter);
     rFormat.SetFormatAttr(aLR);
 
     SfxBoolItem aRtlGutter(RES_RTL_GUTTER, rSection.m_bRtlGutter);
@@ -557,15 +559,15 @@ tools::Long SetBorderDistance(bool bFromEdge, SvxBoxItem& aBox, SvxBoxItemLine e
 
 void SwWW8ImplReader::SetPageBorder(SwFrameFormat &rFormat, const wwSection &rSection)
 {
-    if (!IsBorder(rSection.brc))
+    if (!IsBorder(rSection.m_brc))
         return;
 
     SfxItemSet aSet(rFormat.GetAttrSet());
     short aSizeArray[5]={0};
-    SetFlyBordersShadow(aSet, rSection.brc, &aSizeArray[0]);
-    SvxLRSpaceItem aLR(ItemGet<SvxLRSpaceItem>(aSet, RES_LR_SPACE));
-    SvxULSpaceItem aUL(ItemGet<SvxULSpaceItem>(aSet, RES_UL_SPACE));
-    SvxBoxItem aBox(ItemGet<SvxBoxItem>(aSet, RES_BOX));
+    SetFlyBordersShadow(aSet, rSection.m_brc, &aSizeArray[0]);
+    SvxLRSpaceItem aLR(aSet.Get(RES_LR_SPACE));
+    SvxULSpaceItem aUL(aSet.Get(RES_UL_SPACE));
+    SvxBoxItem aBox(aSet.Get(RES_BOX));
     bool bFromEdge = rSection.maSep.pgbOffsetFrom == 1;
 
     aLR.SetLeft(SetBorderDistance(bFromEdge, aBox, SvxBoxItemLine::LEFT, aLR.GetLeft()));
@@ -821,14 +823,14 @@ void SwWW8ImplReader::HandleLineNumbering(const wwSection &rSection)
     }
 }
 
-wwSection::wwSection(const SwPosition &rPos) : maStart(rPos.nNode)
+wwSection::wwSection(const SwPosition &rPos) : maStart(rPos.GetNode())
     , mpSection(nullptr)
     , mpPage(nullptr)
     , meDir(SvxFrameDirection::Horizontal_LR_TB)
-    , nPgWidth(SvxPaperInfo::GetPaperSize(PAPER_A4).Width())
-    , nPgLeft(MM_250)
-    , nPgRight(MM_250)
-    , nPgGutter(0)
+    , m_nPgWidth(SvxPaperInfo::GetPaperSize(PAPER_A4).Width())
+    , m_nPgLeft(MM_250)
+    , m_nPgRight(MM_250)
+    , m_nPgGutter(0)
     , mnVerticalAdjustment(drawing::TextVerticalAdjust_TOP)
     , mnBorders(0)
     , mbHasFootnote(false)
@@ -870,12 +872,12 @@ void wwSectionManager::CreateSep(const tools::Long nTextPos)
     if (!pSep)
         return;
 
-    if (!maSegments.empty() && mrReader.m_pLastAnchorPos && *mrReader.m_pLastAnchorPos == *mrReader.m_pPaM->GetPoint())
+    if (!maSegments.empty() && mrReader.m_oLastAnchorPos && *mrReader.m_oLastAnchorPos == *mrReader.m_pPaM->GetPoint())
     {
         bool insert = true;
-        SwPaM pam( *mrReader.m_pLastAnchorPos );
+        SwPaM pam( *mrReader.m_oLastAnchorPos );
         if( pam.Move(fnMoveBackward, GoInNode))
-            if( SwTextNode* txtNode = pam.GetPoint()->nNode.GetNode().GetTextNode())
+            if( SwTextNode* txtNode = pam.GetPoint()->GetNode().GetTextNode())
                 if( txtNode->Len() == 0 )
                     insert = false;
         if( insert )
@@ -1080,7 +1082,7 @@ void wwSectionManager::CreateSep(const tools::Long nTextPos)
 
     // 2. paper size
     aNewSection.maSep.xaPage = ReadUSprm(pSep, pIds[1], lLetterWidth);
-    aNewSection.nPgWidth = SvxPaperInfo::GetSloppyPaperDimension(aNewSection.maSep.xaPage);
+    aNewSection.m_nPgWidth = SvxPaperInfo::GetSloppyPaperDimension(aNewSection.maSep.xaPage);
 
     aNewSection.maSep.yaPage = ReadUSprm(pSep, pIds[2], lLetterHeight);
 
@@ -1198,7 +1200,7 @@ void wwSectionManager::CreateSep(const tools::Long nTextPos)
         aNewSection.maSep.pgbPageDepth = (pgbProp & 0x0018) >> 3;
         aNewSection.maSep.pgbOffsetFrom = (pgbProp & 0x00E0) >> 5;
 
-        aNewSection.mnBorders = ::lcl_ReadBorders(false, aNewSection.brc, nullptr, nullptr, pSep);
+        aNewSection.mnBorders = ::lcl_ReadBorders(false, aNewSection.m_brc, nullptr, nullptr, pSep);
     }
 
     // check if Line Numbering must be activated or reset
@@ -1638,14 +1640,14 @@ void WW8FlyPara::ApplyTabPos(const WW8_TablePos *pTabPos)
 {
     if (pTabPos)
     {
-        nSp26 = pTabPos->nSp26;
-        nSp27 = pTabPos->nSp27;
-        nSp29 = pTabPos->nSp29;
-        nLeMgn = pTabPos->nLeMgn;
-        nRiMgn = pTabPos->nRiMgn;
-        nUpMgn = pTabPos->nUpMgn;
-        nLoMgn = pTabPos->nLoMgn;
-        nSp37 = pTabPos->nSp37;
+        nTDxaAbs = pTabPos->nTDxaAbs;
+        nTDyaAbs = pTabPos->nTDyaAbs;
+        nTPc = pTabPos->nTPc;
+        nLeftMargin = pTabPos->nLeftMargin;
+        nRightMargin = pTabPos->nRightMargin;
+        nUpperMargin = pTabPos->nUpperMargin;
+        nLowerMargin = pTabPos->nLowerMargin;
+        nPWr = pTabPos->nPWr;
     }
 }
 
@@ -1655,16 +1657,16 @@ WW8FlyPara::WW8FlyPara(bool bIsVer67, const WW8FlyPara* pSrc /* = 0 */)
         memcpy( this, pSrc, sizeof( WW8FlyPara ) ); // Copy-Ctor
     else
     {
-        nSp26 = 0;
-        nSp27 = 0;
+        nTDxaAbs = 0;
+        nTDyaAbs = 0;
         nSp45 = 0;
         nSp28 = 0;
-        nLeMgn = 0;
-        nRiMgn = 0;
-        nUpMgn = 0;
-        nLoMgn = 0;
-        nSp29 = 0;
-        nSp37 = 2;                                  // Default: wrapping
+        nLeftMargin = 0;
+        nRightMargin = 0;
+        nUpperMargin = 0;
+        nLowerMargin = 0;
+        nTPc = 0;
+        nPWr = 2;                                  // Default: wrapping
         bBorderLines = false;
         bGrafApo = false;
         mbVertSet = false;
@@ -1681,53 +1683,53 @@ bool WW8FlyPara::operator==(const WW8FlyPara& rSrc) const
     */
     return
        (
-         (nSp26 == rSrc.nSp26) &&
-         (nSp27 == rSrc.nSp27) &&
+         (nTDxaAbs == rSrc.nTDxaAbs) &&
+         (nTDyaAbs == rSrc.nTDyaAbs) &&
          ((nSp45 & 0x7fff) == (rSrc.nSp45 & 0x7fff)) &&
          (nSp28 == rSrc.nSp28) &&
-         (nLeMgn == rSrc.nLeMgn) &&
-         (nRiMgn == rSrc.nRiMgn) &&
-         (nUpMgn == rSrc.nUpMgn) &&
-         (nLoMgn == rSrc.nLoMgn) &&
-         (nSp29 == rSrc.nSp29) &&
-         (nSp37 == rSrc.nSp37)
+         (nLeftMargin == rSrc.nLeftMargin) &&
+         (nRightMargin == rSrc.nRightMargin) &&
+         (nUpperMargin == rSrc.nUpperMargin) &&
+         (nLowerMargin == rSrc.nLowerMargin) &&
+         (nTPc == rSrc.nTPc) &&
+         (nPWr == rSrc.nPWr)
        );
 }
 
 // Read for normal text
-void WW8FlyPara::Read(sal_uInt8 nOrigSp29, WW8PLCFx_Cp_FKP* pPap)
+void WW8FlyPara::Read(sal_uInt8 nOrigSprmTPc, WW8PLCFx_Cp_FKP* pPap)
 {
     if( bVer67 )
     {
-        SetValSprm( &nSp26, pPap, 26 ); // X-position   //sprmPDxaAbs
+        SetValSprm( &nTDxaAbs, pPap, 26 ); // X-position   //sprmPDxaAbs
         //set in me or in parent style
-        mbVertSet |= SetValSprm( &nSp27, pPap, 27 );    // Y-position   //sprmPDyaAbs
+        mbVertSet |= SetValSprm( &nTDyaAbs, pPap, 27 );    // Y-position   //sprmPDyaAbs
         SetValSprm( &nSp45, pPap, 45 ); // height       //sprmPWHeightAbs
         SetValSprm( &nSp28, pPap, 28 ); // width        //sprmPDxaWidth
-        SetValSprm( &nLeMgn, pPap, 49 ); // L-border    //sprmPDxaFromText
-        SetValSprm( &nRiMgn, pPap, 49 ); // R-border    //sprmPDxaFromText
-        SetValSprm( &nUpMgn, pPap, 48 ); // U-border    //sprmPDyaFromText
-        SetValSprm( &nLoMgn, pPap, 48 ); // D-border    //sprmPDyaFromText
+        SetValSprm( &nLeftMargin, pPap, 49 ); // L-border    //sprmPDxaFromText
+        SetValSprm( &nRightMargin, pPap, 49 ); // R-border    //sprmPDxaFromText
+        SetValSprm( &nUpperMargin, pPap, 48 ); // U-border    //sprmPDyaFromText
+        SetValSprm( &nLowerMargin, pPap, 48 ); // D-border    //sprmPDyaFromText
 
         SprmResult aS = pPap->HasSprm(NS_sprm::v6::sprmPWr);
         if (aS.pSprm && aS.nRemainingData >= 1)
-            nSp37 = *aS.pSprm;
+            nPWr = *aS.pSprm;
     }
     else
     {
-        SetValSprm( &nSp26, pPap, NS_sprm::PDxaAbs::val ); // X-position
+        SetValSprm( &nTDxaAbs, pPap, NS_sprm::PDxaAbs::val ); // X-position
         //set in me or in parent style
-        mbVertSet |= SetValSprm( &nSp27, pPap, NS_sprm::PDyaAbs::val );    // Y-position
+        mbVertSet |= SetValSprm( &nTDyaAbs, pPap, NS_sprm::PDyaAbs::val );    // Y-position
         SetValSprm( &nSp45, pPap, NS_sprm::PWHeightAbs::val ); // height
         SetValSprm( &nSp28, pPap, NS_sprm::PDxaWidth::val ); // width
-        SetValSprm( &nLeMgn, pPap, NS_sprm::PDxaFromText::val );    // L-border
-        SetValSprm( &nRiMgn, pPap, NS_sprm::PDxaFromText::val );    // R-border
-        SetValSprm( &nUpMgn, pPap, NS_sprm::PDyaFromText::val );    // U-border
-        SetValSprm( &nLoMgn, pPap, NS_sprm::PDyaFromText::val );    // D-border
+        SetValSprm( &nLeftMargin, pPap, NS_sprm::PDxaFromText::val );    // L-border
+        SetValSprm( &nRightMargin, pPap, NS_sprm::PDxaFromText::val );    // R-border
+        SetValSprm( &nUpperMargin, pPap, NS_sprm::PDyaFromText::val );    // U-border
+        SetValSprm( &nLowerMargin, pPap, NS_sprm::PDyaFromText::val );    // D-border
 
         SprmResult aS = pPap->HasSprm(NS_sprm::PWr::val);                               // wrapping
         if (aS.pSprm && aS.nRemainingData >= 1)
-            nSp37 = *aS.pSprm;
+            nPWr = *aS.pSprm;
     }
 
     if( ::lcl_ReadBorders( bVer67, brc, pPap ))     // borders
@@ -1741,17 +1743,17 @@ void WW8FlyPara::Read(sal_uInt8 nOrigSp29, WW8PLCFx_Cp_FKP* pPap)
      anchoring
     */
     if (!mbVertSet)
-        nSp29 = (nOrigSp29 & 0xCF) | 0x20;
+        nTPc = (nOrigSprmTPc & 0xCF) | 0x20;
     else
-        nSp29 = nOrigSp29;
+        nTPc = nOrigSprmTPc;
 }
 
-void WW8FlyPara::ReadFull(sal_uInt8 nOrigSp29, SwWW8ImplReader* pIo)
+void WW8FlyPara::ReadFull(sal_uInt8 nOrigSprmTPc, SwWW8ImplReader* pIo)
 {
     std::shared_ptr<WW8PLCFMan> xPlcxMan = pIo->m_xPlcxMan;
     WW8PLCFx_Cp_FKP* pPap = xPlcxMan->GetPapPLCF();
 
-    Read(nOrigSp29, pPap);    // read Apo parameter
+    Read(nOrigSprmTPc, pPap);    // read Apo parameter
 
     do{             // block for quick exit
         if( nSp45 != 0 /* || nSp28 != 0 */ )
@@ -1823,39 +1825,39 @@ void WW8FlyPara::ReadFull(sal_uInt8 nOrigSp29, SwWW8ImplReader* pIo)
 }
 
 // read for Apo definitions in Styledefs
-void WW8FlyPara::Read(sal_uInt8 nOrigSp29, WW8RStyle const * pStyle)
+void WW8FlyPara::Read(sal_uInt8 nOrigSprmTPc, WW8RStyle const * pStyle)
 {
     if (bVer67)
     {
-        SetValSprm( &nSp26, pStyle, NS_sprm::v6::sprmPDxaAbs );            // X-position
+        SetValSprm( &nTDxaAbs, pStyle, NS_sprm::v6::sprmPDxaAbs );            // X-position
         //set in me or in parent style
-        mbVertSet |= SetValSprm(&nSp27, pStyle, NS_sprm::v6::sprmPDyaAbs); // Y-position
+        mbVertSet |= SetValSprm(&nTDyaAbs, pStyle, NS_sprm::v6::sprmPDyaAbs); // Y-position
         SetValSprm( &nSp45, pStyle, NS_sprm::v6::sprmPWHeightAbs );        // height
         SetValSprm( &nSp28, pStyle, NS_sprm::v6::sprmPDxaWidth );          // width
-        SetValSprm( &nLeMgn, pStyle, NS_sprm::v6::sprmPDxaFromText );      // L-border
-        SetValSprm( &nRiMgn, pStyle, NS_sprm::v6::sprmPDxaFromText );      // R-border
-        SetValSprm( &nUpMgn, pStyle, NS_sprm::v6::sprmPDyaFromText );      // U-border
-        SetValSprm( &nLoMgn, pStyle, NS_sprm::v6::sprmPDyaFromText );      // D-border
+        SetValSprm( &nLeftMargin, pStyle, NS_sprm::v6::sprmPDxaFromText );      // L-border
+        SetValSprm( &nRightMargin, pStyle, NS_sprm::v6::sprmPDxaFromText );      // R-border
+        SetValSprm( &nUpperMargin, pStyle, NS_sprm::v6::sprmPDyaFromText );      // U-border
+        SetValSprm( &nLowerMargin, pStyle, NS_sprm::v6::sprmPDyaFromText );      // D-border
 
         SprmResult aS = pStyle->HasParaSprm( NS_sprm::v6::sprmPWr );       // wrapping
         if (aS.pSprm && aS.nRemainingData >= 1)
-            nSp37 = *aS.pSprm;
+            nPWr = *aS.pSprm;
     }
     else
     {
-        SetValSprm( &nSp26, pStyle, NS_sprm::PDxaAbs::val );            // X-position
+        SetValSprm( &nTDxaAbs, pStyle, NS_sprm::PDxaAbs::val );            // X-position
         //set in me or in parent style
-        mbVertSet |= SetValSprm(&nSp27, pStyle, NS_sprm::PDyaAbs::val); // Y-position
+        mbVertSet |= SetValSprm(&nTDyaAbs, pStyle, NS_sprm::PDyaAbs::val); // Y-position
         SetValSprm( &nSp45, pStyle, NS_sprm::PWHeightAbs::val );        // height
         SetValSprm( &nSp28, pStyle, NS_sprm::PDxaWidth::val );          // width
-        SetValSprm( &nLeMgn, pStyle, NS_sprm::PDxaFromText::val );      // L-border
-        SetValSprm( &nRiMgn, pStyle, NS_sprm::PDxaFromText::val );      // R-border
-        SetValSprm( &nUpMgn, pStyle, NS_sprm::PDyaFromText::val );      // U-border
-        SetValSprm( &nLoMgn, pStyle, NS_sprm::PDyaFromText::val );      // D-border
+        SetValSprm( &nLeftMargin, pStyle, NS_sprm::PDxaFromText::val );      // L-border
+        SetValSprm( &nRightMargin, pStyle, NS_sprm::PDxaFromText::val );      // R-border
+        SetValSprm( &nUpperMargin, pStyle, NS_sprm::PDyaFromText::val );      // U-border
+        SetValSprm( &nLowerMargin, pStyle, NS_sprm::PDyaFromText::val );      // D-border
 
         SprmResult aS = pStyle->HasParaSprm( NS_sprm::PWr::val );       // wrapping
         if (aS.pSprm && aS.nRemainingData >= 1)
-            nSp37 = *aS.pSprm;
+            nPWr = *aS.pSprm;
     }
 
     if (::lcl_ReadBorders(bVer67, brc, nullptr, pStyle))      // border
@@ -1869,9 +1871,9 @@ void WW8FlyPara::Read(sal_uInt8 nOrigSp29, WW8RStyle const * pStyle)
      anchoring
     */
     if (!mbVertSet)
-        nSp29 = (nOrigSp29 & 0xCF) | 0x20;
+        nTPc = (nOrigSprmTPc & 0xCF) | 0x20;
     else
-        nSp29 = nOrigSp29;
+        nTPc = nOrigSprmTPc;
 }
 
 bool WW8FlyPara::IsEmpty() const
@@ -1882,9 +1884,9 @@ bool WW8FlyPara::IsEmpty() const
      #107103# if wrong, so given that the empty is 2, if we are 0 then set
      empty to 0 to make 0 equiv to 2 for empty checking
     */
-    OSL_ENSURE(aEmpty.nSp37 == 2, "this is not what we expect for nSp37");
-    if (this->nSp37 == 0)
-        aEmpty.nSp37 = 0;
+    OSL_ENSURE(aEmpty.nPWr == 2, "this is not what we expect for nPWr");
+    if (this->nPWr == 0)
+        aEmpty.nPWr = 0;
     return aEmpty == *this;
 }
 
@@ -1898,10 +1900,10 @@ WW8SwFlyPara::WW8SwFlyPara( SwPaM& rPaM,
                             const sal_Int32 nIniFlyDy ):
 nXPos(0),
 nYPos(0),
-nLeMgn(rWW.nLeMgn),
-nRiMgn(rWW.nRiMgn),
-nUpMgn(rWW.nUpMgn),
-nLoMgn(rWW.nLoMgn),
+nLeftMargin(rWW.nLeftMargin),
+nRightMargin(rWW.nRightMargin),
+nUpperMargin(rWW.nUpperMargin),
+nLowerMargin(rWW.nLowerMargin),
 nWidth(rWW.nSp28),
 nHeight(rWW.nSp45),
 nNetWidth(rWW.nSp28),
@@ -1910,9 +1912,9 @@ eHRel(text::RelOrientation::PAGE_FRAME),
 eVRel(text::RelOrientation::FRAME),
 eVAlign(text::VertOrientation::NONE),
 eHAlign(text::HoriOrientation::NONE),
-eSurround(( rWW.nSp37 > 1 ) ? css::text::WrapTextMode_DYNAMIC : css::text::WrapTextMode_NONE),
-nXBind(( rWW.nSp29 & 0xc0 ) >> 6),
-nYBind(( rWW.nSp29 & 0x30 ) >> 4),
+eSurround(( rWW.nPWr > 1 ) ? css::text::WrapTextMode_DYNAMIC : css::text::WrapTextMode_NONE),
+nXBind(( rWW.nTPc & 0xc0 ) >> 6),
+nYBind(( rWW.nTPc & 0x30 ) >> 4),
 nNewNetWidth(MINFLY),
 nLineSpace(0),
 bAutoWidth(false),
@@ -1920,7 +1922,7 @@ bTogglePos(false)
 {
     //#i119466 mapping "Around" wrap setting to "Parallel" for table
     const bool bIsTable = rIo.m_xPlcxMan->HasParaSprm(NS_sprm::PFInTable::val).pSprm;
-    if (bIsTable && rWW.nSp37 == 2)
+    if (bIsTable && rWW.nPWr == 2)
         eSurround = css::text::WrapTextMode_PARALLEL;
 
     /*
@@ -1962,7 +1964,7 @@ bTogglePos(false)
 
     //#i53725# - absolute positioned objects have to be
     // anchored at-paragraph to assure its correct anchor position.
-    rIo.m_pLastAnchorPos.reset( new SwPosition(*rPaM.GetPoint()));
+    rIo.m_oLastAnchorPos.emplace(*rPaM.GetPoint());
 
     switch (nYBind)
     {
@@ -1978,12 +1980,12 @@ bTogglePos(false)
     }
 
 // #i18732#
-    switch( rWW.nSp27 )             // particular Y-positions ?
+    switch( rWW.nTDyaAbs )             // particular Y-positions ?
     {
         case -4:
             eVAlign = text::VertOrientation::TOP;
             if (nYBind < 2)
-                nUpMgn = 0;
+                nUpperMargin = 0;
             break;  // up
         case -8:
             eVAlign = text::VertOrientation::CENTER;
@@ -1991,25 +1993,25 @@ bTogglePos(false)
         case -12:
             eVAlign = text::VertOrientation::BOTTOM;
             if (nYBind < 2)
-                nLoMgn = 0;
+                nLowerMargin = 0;
             break;  // down
         default:
-            nYPos = rWW.nSp27 + static_cast<short>(nIniFlyDy);
+            nYPos = rWW.nTDyaAbs + static_cast<short>(nIniFlyDy);
             break;  // corrections from ini file
     }
 
-    switch( rWW.nSp26 )                 // particular X-positions ?
+    switch( rWW.nTDxaAbs )                 // particular X-positions ?
     {
         case 0:
             eHAlign = text::HoriOrientation::LEFT;
-            nLeMgn = 0;
+            nLeftMargin = 0;
             break;  // left
         case -4:
             eHAlign = text::HoriOrientation::CENTER;
             break;  // centered
         case -8:
             eHAlign = text::HoriOrientation::RIGHT;
-            nRiMgn = 0;
+            nRightMargin = 0;
             break;  // right
         case -12:
             eHAlign = text::HoriOrientation::LEFT;
@@ -2020,7 +2022,7 @@ bTogglePos(false)
             bTogglePos = true;
             break;  // outside
         default:
-            nXPos = rWW.nSp26 + static_cast<short>(nIniFlyDx);
+            nXPos = rWW.nTDxaAbs + static_cast<short>(nIniFlyDx);
             break;  // corrections from ini file
     }
 
@@ -2069,9 +2071,9 @@ bTogglePos(false)
         // to page text area'
         eHAlign = text::HoriOrientation::NONE;
         eHRel = text::RelOrientation::PAGE_PRINT_AREA;
-        nXPos = -nWidth - (2*nLeBorderMgn) - rWW.nRiMgn;
+        nXPos = -nWidth - (2*nLeBorderMgn) - rWW.nRightMargin;
         // re-set left wrap distance
-        nLeMgn = rWW.nLeMgn;
+        nLeftMargin = rWW.nLeftMargin;
     }
     else if ( !bAutoWidth && eHAlign == text::HoriOrientation::RIGHT && eHRel == text::RelOrientation::PAGE_FRAME )
     {
@@ -2080,9 +2082,9 @@ bTogglePos(false)
         // to right page border'
         eHAlign = text::HoriOrientation::NONE;
         eHRel = text::RelOrientation::PAGE_RIGHT;
-        nXPos = ( nRiBorderMgn - nLeBorderMgn ) + rWW.nLeMgn;
+        nXPos = ( nRiBorderMgn - nLeBorderMgn ) + rWW.nLeftMargin;
         // re-set right wrap distance
-        nRiMgn = rWW.nRiMgn;
+        nRightMargin = rWW.nRightMargin;
     }
     else if ( !bAutoWidth && eHAlign == text::HoriOrientation::LEFT && eHRel == text::RelOrientation::PAGE_PRINT_AREA )
     {
@@ -2092,7 +2094,7 @@ bTogglePos(false)
         eHRel = text::RelOrientation::PAGE_PRINT_AREA;
         nXPos = -nLeBorderMgn;
         // re-set left wrap distance
-        nLeMgn = rWW.nLeMgn;
+        nLeftMargin = rWW.nLeftMargin;
     }
     else if ( !bAutoWidth && eHAlign == text::HoriOrientation::RIGHT && eHRel == text::RelOrientation::PAGE_PRINT_AREA )
     {
@@ -2102,7 +2104,7 @@ bTogglePos(false)
         eHRel = text::RelOrientation::PAGE_RIGHT;
         nXPos = -nWidth - nLeBorderMgn;
         // re-set right wrap distance
-        nRiMgn = rWW.nRiMgn;
+        nRightMargin = rWW.nRightMargin;
     }
     else if (rWW.bBorderLines)
     {
@@ -2182,11 +2184,11 @@ WW8FlySet::WW8FlySet(SwWW8ImplReader& rReader, const WW8FlyPara* pFW,
     Put( SwFormatHoriOrient(nXPos, pFS->eHAlign, pFS->eHRel, pFS->bTogglePos ));
     Put( SwFormatVertOrient( pFS->nYPos, pFS->eVAlign, pFS->eVRel ) );
 
-    if (pFS->nLeMgn || pFS->nRiMgn)     // set borders
-        Put(SvxLRSpaceItem(pFS->nLeMgn, pFS->nRiMgn, 0, 0, RES_LR_SPACE));
+    if (pFS->nLeftMargin || pFS->nRightMargin)     // set borders
+        Put(SvxLRSpaceItem(pFS->nLeftMargin, pFS->nRightMargin, 0, 0, RES_LR_SPACE));
 
-    if (pFS->nUpMgn || pFS->nLoMgn)
-        Put(SvxULSpaceItem(pFS->nUpMgn, pFS->nLoMgn, RES_UL_SPACE));
+    if (pFS->nUpperMargin || pFS->nLowerMargin)
+        Put(SvxULSpaceItem(pFS->nUpperMargin, pFS->nLowerMargin, RES_UL_SPACE));
 
     //we no longer need to hack around the header/footer problems
     SwFormatSurround aSurround(pFS->eSurround);
@@ -2274,26 +2276,26 @@ void WW8FlySet::Init(const SwWW8ImplReader& rReader, const SwPaM* pPaM)
 }
 
 WW8DupProperties::WW8DupProperties(SwDoc &rDoc, SwWW8FltControlStack *pStack)
-    : pCtrlStck(pStack),
-    aChrSet(rDoc.GetAttrPool()),
-    aParSet(rDoc.GetAttrPool())
+    : m_pCtrlStck(pStack),
+    m_aChrSet(rDoc.GetAttrPool()),
+    m_aParSet(rDoc.GetAttrPool())
 {
     //Close any open character properties and duplicate them inside the
     //first table cell
-    size_t nCnt = pCtrlStck->size();
+    size_t nCnt = m_pCtrlStck->size();
     for (size_t i=0; i < nCnt; ++i)
     {
-        const SwFltStackEntry& rEntry = (*pCtrlStck)[ i ];
+        const SwFltStackEntry& rEntry = (*m_pCtrlStck)[ i ];
         if (rEntry.m_bOpen)
         {
             if (isCHRATR(rEntry.m_pAttr->Which()))
             {
-                aChrSet.Put( *rEntry.m_pAttr );
+                m_aChrSet.Put( *rEntry.m_pAttr );
 
             }
             else if (isPARATR(rEntry.m_pAttr->Which()))
             {
-                aParSet.Put( *rEntry.m_pAttr );
+                m_aParSet.Put( *rEntry.m_pAttr );
             }
         }
     }
@@ -2301,7 +2303,7 @@ WW8DupProperties::WW8DupProperties(SwDoc &rDoc, SwWW8FltControlStack *pStack)
 
 void WW8DupProperties::Insert(const SwPosition &rPos)
 {
-    for (const SfxItemSet* pSet : {&aChrSet, &aParSet})
+    for (const SfxItemSet* pSet : {&m_aChrSet, &m_aParSet})
     {
         if( pSet->Count() )
         {
@@ -2309,7 +2311,7 @@ void WW8DupProperties::Insert(const SwPosition &rPos)
             const SfxPoolItem* pItem = aIter.GetCurItem();
             do
             {
-                pCtrlStck->NewAttr(rPos, *pItem);
+                m_pCtrlStck->NewAttr(rPos, *pItem);
             } while ((pItem = aIter.NextItem()));
         }
     }
@@ -2324,8 +2326,7 @@ void SwWW8ImplReader::MoveInsideFly(const SwFrameFormat *pFlyFormat)
     // set Pam in FlyFrame
     const SwFormatContent& rContent = pFlyFormat->GetContent();
     OSL_ENSURE( rContent.GetContentIdx(), "No content prepared." );
-    m_pPaM->GetPoint()->nNode = rContent.GetContentIdx()->GetIndex() + 1;
-    m_pPaM->GetPoint()->nContent.Assign( m_pPaM->GetContentNode(), 0 );
+    m_pPaM->GetPoint()->Assign( rContent.GetContentIdx()->GetIndex() + 1 );
 
     aDup.Insert(*m_pPaM->GetPoint());
 }
@@ -2490,20 +2491,20 @@ bool SwWW8ImplReader::StartApo(const ApoTestResults &rApo, const WW8_TablePos *p
 
         WW8FlySet aFlySet(*this, m_xWFlyPara.get(), m_xSFlyPara.get(), false);
 
-        if (pTabPos && pTabPos->bNoFly)
+        // ofz#34749 we shouldn't anchor anything into an 'extra' paragraph scheduled for
+        // removal at end of import, but check if that scenario is happening
+        m_aExtraneousParas.remove_if_present(m_pPaM->GetPointNode().GetTextNode());
+
+        if (pTabPos)
         {
-            m_xSFlyPara->SetFlyFormat(nullptr);
+            // Map a positioned table to a split fly.
+            aFlySet.Put(SwFormatFlySplit(true));
         }
-        else
-        {
-            // ofz#34749 we shouldn't anchor anything into an 'extra' paragraph scheduled for
-            // removal at end of import, but check if that scenario is happening
-            m_aExtraneousParas.check_anchor_destination(m_pPaM->GetNode().GetTextNode());
-            m_xSFlyPara->SetFlyFormat(m_rDoc.MakeFlySection(WW8SwFlyPara::eAnchor,
-                                                            m_pPaM->GetPoint(), &aFlySet));
-            OSL_ENSURE(m_xSFlyPara->GetFlyFormat()->GetAnchor().GetAnchorId() ==
-                    WW8SwFlyPara::eAnchor, "Not the anchor type requested!");
-        }
+
+        m_xSFlyPara->SetFlyFormat(m_rDoc.MakeFlySection(WW8SwFlyPara::eAnchor,
+                    m_pPaM->GetPoint(), &aFlySet));
+        OSL_ENSURE(m_xSFlyPara->GetFlyFormat()->GetAnchor().GetAnchorId() ==
+                WW8SwFlyPara::eAnchor, "Not the anchor type requested!");
 
         if (SwFlyFrameFormat* pFlyFormat = m_xSFlyPara->GetFlyFormat())
         {
@@ -2544,30 +2545,29 @@ bool SwWW8ImplReader::StartApo(const ApoTestResults &rApo, const WW8_TablePos *p
 
 void wwSectionManager::JoinNode(const SwPosition &rPos, const SwNode &rNode)
 {
-    if ((!maSegments.empty()) && (maSegments.back().maStart == rPos.nNode))
+    if ((!maSegments.empty()) && (maSegments.back().maStart == rPos.GetNode()))
         maSegments.back().maStart.Assign(rNode);
 }
 
 bool SwWW8ImplReader::JoinNode(SwPaM &rPam, bool bStealAttr)
 {
     bool bRet = false;
-    rPam.GetPoint()->nContent = 0; // go to start of paragraph
+    rPam.GetPoint()->SetContent(0); // go to start of paragraph
 
-    SwNodeIndex aPref(rPam.GetPoint()->nNode, -1);
+    SwNodeIndex aPref(rPam.GetPoint()->GetNode(), -1);
 
     if (SwTextNode* pNode = aPref.GetNode().GetTextNode())
     {
         m_aSectionManager.JoinNode(*rPam.GetPoint(), aPref.GetNode());
-        rPam.GetPoint()->nNode = aPref;
-        rPam.GetPoint()->nContent.Assign(pNode, pNode->GetText().getLength());
+        rPam.GetPoint()->Assign(*pNode, pNode->GetText().getLength());
         if (bStealAttr)
-            m_xCtrlStck->StealAttr(rPam.GetPoint()->nNode);
+            m_xCtrlStck->StealAttr(rPam.GetPoint()->GetNode());
 
-        if (m_pLastAnchorPos || m_pPreviousNode || (m_xSFlyPara && m_xSFlyPara->xMainTextPos))
+        if (m_oLastAnchorPos || m_xPreviousNode || (m_xSFlyPara && m_xSFlyPara->xMainTextPos))
         {
             SwNodeIndex aToBeJoined(aPref, 1);
 
-            if (m_pLastAnchorPos)
+            if (m_oLastAnchorPos)
             {
                 //If the last anchor pos is here, then clear the anchor pos.
                 //This "last anchor pos" is only used for fixing up the
@@ -2575,25 +2575,25 @@ bool SwWW8ImplReader::JoinNode(SwPaM &rPam, bool bStealAttr)
                 //we are removing the last paragraph of a frame, so there
                 //cannot be a page break at this point so we can
                 //safely reset m_pLastAnchorPos to avoid any dangling
-                //SwIndex's pointing into the deleted paragraph
-                SwNodeIndex aLastAnchorPos(m_pLastAnchorPos->nNode);
+                //SwContentIndex's pointing into the deleted paragraph
+                SwNodeIndex aLastAnchorPos(m_oLastAnchorPos->GetNode());
                 if (aLastAnchorPos == aToBeJoined)
-                    m_pLastAnchorPos.reset();
+                    m_oLastAnchorPos.reset();
             }
 
-            if (m_pPreviousNode)
+            if (m_xPreviousNode)
             {
                 //If the drop character start pos is here, then clear it.
-                SwNodeIndex aDropCharPos(*m_pPreviousNode);
+                SwNodeIndex aDropCharPos(*m_xPreviousNode->GetTextNode());
                 if (aDropCharPos == aToBeJoined)
-                    m_pPreviousNode = nullptr;
+                    m_xPreviousNode.reset();
             }
 
             if (m_xSFlyPara && m_xSFlyPara->xMainTextPos)
             {
                 // If an open apo pos is here, then clear it before
                 // JoinNext destroys it
-                SwNodeIndex aOpenApoPos(m_xSFlyPara->xMainTextPos->GetPoint()->nNode);
+                SwNodeIndex aOpenApoPos(m_xSFlyPara->xMainTextPos->GetPoint()->GetNode());
                 if (aOpenApoPos == aToBeJoined)
                     m_xSFlyPara->xMainTextPos.reset();
             }
@@ -2620,7 +2620,7 @@ void SwWW8ImplReader::StripNegativeAfterIndent(SwFrameFormat const *pFlyFormat)
         SwTextNode *pNd = aIdx.GetNode().GetTextNode();
         if (pNd)
         {
-            const SvxLRSpaceItem& rLR = ItemGet<SvxLRSpaceItem>(*pNd, RES_LR_SPACE);
+            const SvxLRSpaceItem& rLR = pNd->GetAttr(RES_LR_SPACE);
             if (rLR.GetRight() < 0)
             {
                 SvxLRSpaceItem aLR(rLR);
@@ -2665,7 +2665,7 @@ void SwWW8ImplReader::StopApo()
         that comes with the frame by default so that as normal we don't end up
         with one more paragraph than we wanted.
         */
-        SwNodeIndex aPref(m_pPaM->GetPoint()->nNode, -1);
+        SwNodeIndex aPref(m_pPaM->GetPoint()->GetNode(), -1);
 
         SwTwips nNewWidth =
             MoveOutsideFly(m_xSFlyPara->GetFlyFormat(), *m_xSFlyPara->xMainTextPos->GetPoint());
@@ -2689,7 +2689,7 @@ void SwWW8ImplReader::StopApo()
             if (rBrush.GetColor() != COL_AUTO)
                 aBg = rBrush.GetColor();
 
-            if (m_pLastAnchorPos)
+            if (m_oLastAnchorPos)
             {
                 //If the last anchor pos is here, then clear the anchor pos.
                 //This "last anchor pos" is only used for fixing up the
@@ -2697,11 +2697,11 @@ void SwWW8ImplReader::StopApo()
                 //we are removing the last paragraph of a frame, so there
                 //cannot be a page break at this point so we can
                 //safely reset m_pLastAnchorPos to avoid any dangling
-                //SwIndex's pointing into the deleted paragraph
-                SwNodeIndex aLastAnchorPos(m_pLastAnchorPos->nNode);
+                //SwContentIndex's pointing into the deleted paragraph
+                SwNodeIndex aLastAnchorPos(m_oLastAnchorPos->GetNode());
                 SwNodeIndex aToBeJoined(aPref, 1);
                 if (aLastAnchorPos == aToBeJoined)
-                    m_pLastAnchorPos.reset();
+                    m_oLastAnchorPos.reset();
             }
 
             //Get rid of extra empty paragraph
@@ -2741,17 +2741,17 @@ void SwWW8ImplReader::StopApo()
             using namespace sw::util;
             SfxItemSet aFlySet( m_xSFlyPara->GetFlyFormat()->GetAttrSet() );
 
-            SwFormatFrameSize aSize(ItemGet<SwFormatFrameSize>(aFlySet, RES_FRM_SIZE));
+            SwFormatFrameSize aSize(aFlySet.Get(RES_FRM_SIZE));
 
             aFlySet.ClearItem(RES_FRM_SIZE);
 
             if (!m_bFuzzing)
             {
-                CalculateFlySize(aFlySet, m_xSFlyPara->xMainTextPos->GetPoint()->nNode,
+                CalculateFlySize(aFlySet, m_xSFlyPara->xMainTextPos->GetPoint()->GetNode(),
                     m_xSFlyPara->nWidth);
             }
 
-            nNewWidth = ItemGet<SwFormatFrameSize>(aFlySet, RES_FRM_SIZE).GetWidth();
+            nNewWidth = aFlySet.Get(RES_FRM_SIZE).GetWidth();
 
             aSize.SetWidth(nNewWidth);
             aSize.SetWidthSizeType(SwFrameSize::Variable);
@@ -2824,13 +2824,13 @@ void SwWW8ImplReader::NewAttr( const SfxPoolItem& rAttr,
         // #i103711#
         if ( bFirstLineOfStSet )
         {
-            const SwNode* pNd = &(m_pPaM->GetPoint()->nNode.GetNode());
+            const SwNode* pNd = &(m_pPaM->GetPoint()->GetNode());
             m_aTextNodesHavingFirstLineOfstSet.insert( pNd );
         }
         // #i105414#
         if ( bLeftIndentSet )
         {
-            const SwNode* pNd = &(m_pPaM->GetPoint()->nNode.GetNode());
+            const SwNode* pNd = &(m_pPaM->GetPoint()->GetNode());
             m_aTextNodesHavingLeftIndentSet.insert( pNd );
         }
     }
@@ -3433,10 +3433,10 @@ SwFrameFormat *SwWW8ImplReader::ContainsSingleInlineGraphic(const SwPaM &rRegion
     RndStdIds::FLY_AS_CHAR and then we can change its anchoring to centered in the line.
     */
     SwFrameFormat *pRet=nullptr;
-    SwNodeIndex aBegin(rRegion.Start()->nNode);
-    const sal_Int32 nBegin(rRegion.Start()->nContent.GetIndex());
-    SwNodeIndex aEnd(rRegion.End()->nNode);
-    const sal_Int32 nEnd(rRegion.End()->nContent.GetIndex());
+    SwNodeIndex aBegin(rRegion.Start()->GetNode());
+    const sal_Int32 nBegin(rRegion.Start()->GetContentIndex());
+    SwNodeIndex aEnd(rRegion.End()->GetNode());
+    const sal_Int32 nEnd(rRegion.End()->GetContentIndex());
     const SwTextNode* pTNd;
     const SwTextAttr* pTFlyAttr;
     if (
@@ -4125,12 +4125,12 @@ void SwWW8ImplReader::Read_CharShadow(  sal_uInt16, const sal_uInt8* pData, shor
         aSHD.SetWWValue( *reinterpret_cast<SVBT16 const *>(pData) );
         SwWW8Shade aSh( m_bVer67, aSHD );
 
-        NewAttr( SvxBrushItem( aSh.aColor, RES_CHRATR_BACKGROUND ));
+        NewAttr( SvxBrushItem( aSh.m_aColor, RES_CHRATR_BACKGROUND ));
 
         // Add a marker to the grabbag indicating that character background was imported from MSO shading
         SfxGrabBagItem aGrabBag = *static_cast<const SfxGrabBagItem*>(GetFormatAttr(RES_CHRATR_GRABBAG));
         std::map<OUString, css::uno::Any>& rMap = aGrabBag.GetGrabBag();
-        rMap.insert(std::pair<OUString, css::uno::Any>("CharShadingMarker",uno::makeAny(true)));
+        rMap.insert(std::pair<OUString, css::uno::Any>("CharShadingMarker",uno::Any(true)));
         NewAttr(aGrabBag);
     }
 }
@@ -4152,7 +4152,7 @@ void SwWW8ImplReader::Read_TextBackColor(sal_uInt16, const sal_uInt8* pData, sho
         // Add a marker to the grabbag indicating that character background was imported from MSO shading
         SfxGrabBagItem aGrabBag = *static_cast<const SfxGrabBagItem*>(GetFormatAttr(RES_CHRATR_GRABBAG));
         std::map<OUString, css::uno::Any>& rMap = aGrabBag.GetGrabBag();
-        rMap.insert(std::pair<OUString, css::uno::Any>("CharShadingMarker",uno::makeAny(true)));
+        rMap.insert(std::pair<OUString, css::uno::Any>("CharShadingMarker",uno::Any(true)));
         NewAttr(aGrabBag);
     }
 }
@@ -4231,7 +4231,7 @@ void SwWW8ImplReader::Read_LR( sal_uInt16 nId, const sal_uInt8* pData, short nLe
     // for list levels of mode LABEL_ALIGNMENT.(see ww8par3.cxx
     // W8ImplReader::RegisterNumFormatOnTextNode).
     // Need to apply the list format to the paragraph here.
-    SwTextNode* pTextNode = m_pPaM->GetNode().GetTextNode();
+    SwTextNode* pTextNode = m_pPaM->GetPointNode().GetTextNode();
     if( pTextNode && pTextNode->AreListLevelIndentsApplicable() )
     {
         SwNumRule * pNumRule = pTextNode->GetNumRule();
@@ -4312,8 +4312,7 @@ void SwWW8ImplReader::Read_LR( sal_uInt16 nId, const sal_uInt8* pData, short nLe
                 if (aIsZeroed.pSprm && aIsZeroed.nRemainingData >= 1 && *aIsZeroed.pSprm == 0)
                 {
                     const SvxLRSpaceItem &rLR =
-                        ItemGet<SvxLRSpaceItem>(*(m_vColl[m_nCurrentColl].m_pFormat),
-                        RES_LR_SPACE);
+                        m_vColl[m_nCurrentColl].m_pFormat->GetFormatAttr(RES_LR_SPACE);
                     nPara = nPara - rLR.GetTextFirstLineOffset();
                 }
             }
@@ -4322,7 +4321,7 @@ void SwWW8ImplReader::Read_LR( sal_uInt16 nId, const sal_uInt8* pData, short nLe
 
             if (!m_pCurrentColl)
             {
-                if (const SwTextNode* pNode = m_pPaM->GetNode().GetTextNode())
+                if (const SwTextNode* pNode = m_pPaM->GetPointNode().GetTextNode())
                 {
                     if ( const SwNumFormat *pNumFormat = GetNumFormatFromTextNode(*pNode) )
                     {
@@ -4546,8 +4545,8 @@ void SwWW8ImplReader::Read_LineBreakClear(sal_uInt16 /*nId*/, const sal_uInt8* p
 {
     if (nLen == -1 && m_oLineBreakClear.has_value())
     {
-        SwTextNode* pText = m_pPaM->GetNode().GetTextNode();
-        sal_Int32 nPos = m_pPaM->GetPoint()->nContent.GetIndex();
+        SwTextNode* pText = m_pPaM->GetPointNode().GetTextNode();
+        sal_Int32 nPos = m_pPaM->GetPoint()->GetContentIndex();
         if (!pText || !nPos)
         {
             // There should have been a linebreak char.
@@ -4557,7 +4556,7 @@ void SwWW8ImplReader::Read_LineBreakClear(sal_uInt16 /*nId*/, const sal_uInt8* p
         // Replace the linebreak char with a clearing break.
         --nPos;
         m_pPaM->SetMark();
-        --m_pPaM->GetMark()->nContent;
+        m_pPaM->GetMark()->AdjustContent(-1);
         m_rDoc.getIDocumentContentOperations().DeleteRange(*m_pPaM);
         m_pPaM->DeleteMark();
         SwFormatLineBreak aLineBreak(*m_oLineBreakClear);
@@ -4959,7 +4958,7 @@ void SwWW8Shade::SetShade(Color nFore, Color nBack, sal_uInt16 nIndex)
     switch (nWW8BrushStyle)
     {
         case 0: // Null-Brush
-            aColor = nBack;
+            m_aColor = nBack;
             break;
         default:
             {
@@ -4973,7 +4972,7 @@ void SwWW8Shade::SetShade(Color nFore, Color nBack, sal_uInt16 nIndex)
                 nGreen += aBackColor.GetGreen()* (1000 - nWW8BrushStyle);
                 nBlue += aBackColor.GetBlue() * (1000 - nWW8BrushStyle);
 
-                aColor = Color( nRed/1000, nGreen/1000, nBlue/1000 );
+                m_aColor = Color( nRed/1000, nGreen/1000, nBlue/1000 );
             }
             break;
     }
@@ -4997,7 +4996,7 @@ void SwWW8ImplReader::Read_Shade( sal_uInt16, const sal_uInt8* pData, short nLen
         SwWW8Shade aSh( m_bVer67, aSHD );
 
         NewAttr( XFillStyleItem(drawing::FillStyle_SOLID) );
-        NewAttr( XFillColorItem(OUString(), aSh.aColor) );
+        NewAttr( XFillColorItem(OUString(), aSh.m_aColor) );
     }
 }
 
@@ -5040,7 +5039,7 @@ Color SwWW8ImplReader::ExtractColour(const sal_uInt8* &rpData, bool bVer67)
     OSL_ENSURE(nBack == COL_AUTO || !nBack.IsTransparent(),
         "ww8: don't know what to do with such a transparent bg colour, report");
     SwWW8Shade aShade(nFore, nBack, nIndex);
-    return aShade.aColor;
+    return aShade.m_aColor;
 }
 
 void SwWW8ImplReader::Read_TextVerticalAdjustment( sal_uInt16, const sal_uInt8* pData, short nLen )
@@ -5318,27 +5317,26 @@ bool SwWW8ImplReader::ParseTabPos(WW8_TablePos *pTabPos, WW8PLCFx_Cp_FKP* pPap)
     SprmResult aRes = pPap->HasSprm(NS_sprm::TPc::val);
     if (aRes.pSprm && aRes.nRemainingData >= 1)
     {
-        pTabPos->nSp29 = *aRes.pSprm;
-        pTabPos->nSp37 = 2;     //Possible fail area, always parallel wrap
+        pTabPos->nTPc = *aRes.pSprm;
+        pTabPos->nPWr = 2;     //Possible fail area, always parallel wrap
         aRes = pPap->HasSprm(NS_sprm::TDxaAbs::val);
         if (aRes.pSprm && aRes.nRemainingData >= 2)
-            pTabPos->nSp26 = SVBT16ToUInt16(aRes.pSprm);
+            pTabPos->nTDxaAbs = SVBT16ToUInt16(aRes.pSprm);
         aRes = pPap->HasSprm(NS_sprm::TDyaAbs::val);
         if (aRes.pSprm && aRes.nRemainingData >= 2)
-            pTabPos->nSp27 = SVBT16ToUInt16(aRes.pSprm);
+            pTabPos->nTDyaAbs = SVBT16ToUInt16(aRes.pSprm);
         aRes = pPap->HasSprm(NS_sprm::TDxaFromText::val);
         if (aRes.pSprm && aRes.nRemainingData >= 2)
-            pTabPos->nLeMgn = SVBT16ToUInt16(aRes.pSprm);
+            pTabPos->nLeftMargin = SVBT16ToUInt16(aRes.pSprm);
         aRes = pPap->HasSprm(NS_sprm::TDxaFromTextRight::val);
         if (aRes.pSprm && aRes.nRemainingData >= 2)
-            pTabPos->nRiMgn = SVBT16ToUInt16(aRes.pSprm);
+            pTabPos->nRightMargin = SVBT16ToUInt16(aRes.pSprm);
         aRes = pPap->HasSprm(NS_sprm::TDyaFromText::val);
         if (aRes.pSprm && aRes.nRemainingData >= 2)
-            pTabPos->nUpMgn = SVBT16ToUInt16(aRes.pSprm);
+            pTabPos->nUpperMargin = SVBT16ToUInt16(aRes.pSprm);
         aRes = pPap->HasSprm(NS_sprm::TDyaFromTextBottom::val);
         if (aRes.pSprm && aRes.nRemainingData >= 2)
-            pTabPos->nLoMgn = SVBT16ToUInt16(aRes.pSprm);
-        pTabPos->bNoFly = !FloatingTableConversion(pPap);
+            pTabPos->nLowerMargin = SVBT16ToUInt16(aRes.pSprm);
         bRet = true;
     }
     return bRet;

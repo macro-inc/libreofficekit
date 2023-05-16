@@ -30,33 +30,17 @@
 
 namespace sdr::properties
     {
-        class EmptyProperties : public BaseProperties
+        class EmptyProperties final : public BaseProperties
         {
-        protected:
-            // the to be used ItemSet
-            mutable std::optional<SfxItemSet> mxEmptyItemSet;
-
-            // create a new itemset
-            virtual SfxItemSet CreateObjectSpecificItemSet(SfxItemPool& rPool) override;
-
-            // test changeability for a single item
-            virtual bool AllowItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr) const override;
-
-            // Do the ItemChange, may do special handling
-            virtual void ItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr) override;
-
-            // Called after ItemChange() is done for all items.
-            virtual void PostItemChange(const sal_uInt16 nWhich) override;
-
-            // react on ItemSet changes
-            virtual void ItemSetChanged(const SfxItemSet*) override;
-
         public:
             // basic constructor
             explicit EmptyProperties(SdrObject& rObj);
 
             // Clone() operator, normally just calls the local copy constructor
             virtual std::unique_ptr<BaseProperties> Clone(SdrObject& rObj) const override;
+
+            // create a new object specific itemset with object specific ranges.
+            virtual SfxItemSet CreateObjectSpecificItemSet(SfxItemPool& pPool) override;
 
             // get itemset
             virtual const SfxItemSet& GetObjectItemSet() const override;
@@ -78,7 +62,8 @@ namespace sdr::properties
             virtual void SetObjectItemSet(const SfxItemSet& rSet) override;
 
             // set a new StyleSheet and broadcast
-            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr) override;
+            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast) override;
 
             // get the installed StyleSheet
             virtual SfxStyleSheet* GetStyleSheet() const override;

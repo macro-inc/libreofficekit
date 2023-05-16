@@ -16,8 +16,7 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef INCLUDED_COMPHELPER_INTERFACECONTAINER3_H
-#define INCLUDED_COMPHELPER_INTERFACECONTAINER3_H
+#pragma once
 
 #include <sal/config.h>
 
@@ -35,7 +34,6 @@ namespace osl
 class Mutex;
 }
 
-/** */ //for docpp
 namespace comphelper
 {
 template <class ListenerT> class OInterfaceContainerHelper3;
@@ -128,10 +126,8 @@ public:
        The lifetime must be longer than the lifetime
        of this object.
      */
-    OInterfaceContainerHelper3(::osl::Mutex& rMutex_)
-        : rMutex(rMutex_)
-    {
-    }
+    inline OInterfaceContainerHelper3(::osl::Mutex& rMutex_);
+
     /**
       Return the number of Elements in the container. Only useful if you have acquired
       the mutex.
@@ -168,6 +164,9 @@ public:
                 the new count of elements in the container
     */
     sal_Int32 removeInterface(const css::uno::Reference<ListenerT>& rxIFace);
+    /** Return an interface by index
+    */
+    const css::uno::Reference<ListenerT>& getInterface(sal_Int32 nIndex) const;
     /**
       Call disposing on all object in the container that
       support XEventListener. Then clear the container.
@@ -219,9 +218,19 @@ private:
     o3tl::cow_wrapper<std::vector<css::uno::Reference<ListenerT>>,
                       o3tl::ThreadSafeRefCountingPolicy>
         maData;
-    ::osl::Mutex& rMutex;
+    ::osl::Mutex& mrMutex;
     OInterfaceContainerHelper3(const OInterfaceContainerHelper3&) = delete;
     OInterfaceContainerHelper3& operator=(const OInterfaceContainerHelper3&) = delete;
+
+    static o3tl::cow_wrapper<std::vector<css::uno::Reference<ListenerT>>,
+                             o3tl::ThreadSafeRefCountingPolicy>&
+    DEFAULT()
+    {
+        static o3tl::cow_wrapper<std::vector<css::uno::Reference<ListenerT>>,
+                                 o3tl::ThreadSafeRefCountingPolicy>
+            SINGLETON;
+        return SINGLETON;
+    }
 
 private:
     template <typename EventT> class NotifySingleListener
@@ -244,6 +253,13 @@ private:
         }
     };
 };
+
+template <class T>
+inline OInterfaceContainerHelper3<T>::OInterfaceContainerHelper3(::osl::Mutex& rMutex_)
+    : maData(OInterfaceContainerHelper3<T>::DEFAULT())
+    , mrMutex(rMutex_)
+{
+}
 
 template <class T>
 template <typename FuncT>
@@ -275,7 +291,7 @@ inline void OInterfaceContainerHelper3<ListenerT>::notifyEach(
 
 template <class ListenerT> sal_Int32 OInterfaceContainerHelper3<ListenerT>::getLength() const
 {
-    osl::MutexGuard aGuard(rMutex);
+    osl::MutexGuard aGuard(mrMutex);
     return maData->size();
 }
 
@@ -284,7 +300,7 @@ std::vector<css::uno::Reference<ListenerT>>
 OInterfaceContainerHelper3<ListenerT>::getElements() const
 {
     std::vector<css::uno::Reference<ListenerT>> rVec;
-    osl::MutexGuard aGuard(rMutex);
+    osl::MutexGuard aGuard(mrMutex);
     rVec = *maData;
     return rVec;
 }
@@ -294,7 +310,7 @@ sal_Int32
 OInterfaceContainerHelper3<ListenerT>::addInterface(const css::uno::Reference<ListenerT>& rListener)
 {
     assert(rListener.is());
-    osl::MutexGuard aGuard(rMutex);
+    osl::MutexGuard aGuard(mrMutex);
 
     maData->push_back(rListener);
     return maData->size();
@@ -305,7 +321,7 @@ sal_Int32 OInterfaceContainerHelper3<ListenerT>::removeInterface(
     const css::uno::Reference<ListenerT>& rListener)
 {
     assert(rListener.is());
-    osl::MutexGuard aGuard(rMutex);
+    osl::MutexGuard aGuard(mrMutex);
 
     // It is not valid to compare the pointer directly, but it's faster.
     auto it = std::find_if(maData->begin(), maData->end(),
@@ -324,9 +340,18 @@ sal_Int32 OInterfaceContainerHelper3<ListenerT>::removeInterface(
 }
 
 template <class ListenerT>
+const css::uno::Reference<ListenerT>&
+OInterfaceContainerHelper3<ListenerT>::getInterface(sal_Int32 nIndex) const
+{
+    osl::MutexGuard aGuard(mrMutex);
+
+    return (*maData)[nIndex];
+}
+
+template <class ListenerT>
 void OInterfaceContainerHelper3<ListenerT>::disposeAndClear(const css::lang::EventObject& rEvt)
 {
-    osl::ClearableMutexGuard aGuard(rMutex);
+    osl::ClearableMutexGuard aGuard(mrMutex);
     OInterfaceIteratorHelper3<ListenerT> aIt(*this);
     maData->clear();
     aGuard.clear();
@@ -346,10 +371,9 @@ void OInterfaceContainerHelper3<ListenerT>::disposeAndClear(const css::lang::Eve
 
 template <class ListenerT> void OInterfaceContainerHelper3<ListenerT>::clear()
 {
-    osl::MutexGuard aGuard(rMutex);
+    osl::MutexGuard aGuard(mrMutex);
     maData->clear();
 }
 }
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

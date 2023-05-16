@@ -60,10 +60,14 @@ namespace sw::mark {
 
             virtual void repositionMark(::sw::mark::IMark* io_pMark, const SwPaM& rPaM) override;
             virtual bool renameMark(::sw::mark::IMark* io_pMark, const OUString& rNewName) override;
-            virtual void correctMarksAbsolute(const SwNodeIndex& rOldNode, const SwPosition& rNewPos, const sal_Int32 nOffset) override;
-            virtual void correctMarksRelative(const SwNodeIndex& rOldNode, const SwPosition& rNewPos, const sal_Int32 nOffset) override;
+            virtual void correctMarksAbsolute(const SwNode& rOldNode, const SwPosition& rNewPos, const sal_Int32 nOffset) override;
+            virtual void correctMarksRelative(const SwNode& rOldNode, const SwPosition& rNewPos, const sal_Int32 nOffset) override;
 
-            virtual void deleteMarks(const SwNodeIndex& rStt, const SwNodeIndex& rEnd, std::vector< ::sw::mark::SaveBookmark>* pSaveBkmk, const SwIndex* pSttIdx, const SwIndex* pEndIdx) override;
+            virtual void deleteMarks(const SwNode& rStt,
+                                    const SwNode& rEnd,
+                                    std::vector< ::sw::mark::SaveBookmark>* pSaveBkmk,
+                                    std::optional<sal_Int32> oStartContentIdx,
+                                    std::optional<sal_Int32> oEndContentIdx) override;
 
             // deleters
             virtual std::unique_ptr<ILazyDeleter>
@@ -78,20 +82,22 @@ namespace sw::mark {
             virtual const_iterator_t findMark(const OUString& rName) const override;
 
             // bookmarks
-            virtual bool isBookmarkDeleted(SwPaM const& rPaM) const override;
+            virtual bool isBookmarkDeleted(SwPaM const& rPaM, bool isReplace) const override;
             virtual const_iterator_t getBookmarksBegin() const override;
             virtual const_iterator_t getBookmarksEnd() const override;
             virtual sal_Int32 getBookmarksCount() const override;
             virtual const_iterator_t findBookmark(const OUString& rName) const override;
             virtual const_iterator_t findFirstBookmarkStartsAfter(const SwPosition& rPos) const override;
+            virtual ::sw::mark::IMark* getBookmarkFor(const SwPosition& rPos) const override;
 
             // Fieldmarks
             virtual const_iterator_t getFieldmarksBegin() const override;
             virtual const_iterator_t getFieldmarksEnd() const override;
+            virtual sal_Int32 getFieldmarksCount() const override;
             virtual ::sw::mark::IFieldmark* getFieldmarkAt(const SwPosition& rPos) const override;
             virtual ::sw::mark::IFieldmark* getFieldmarkFor(const SwPosition& rPos) const override;
-            virtual ::sw::mark::IFieldmark* getFieldmarkBefore(const SwPosition& rPos) const override;
-            virtual ::sw::mark::IFieldmark* getFieldmarkAfter(const SwPosition& rPos) const override;
+            virtual sw::mark::IFieldmark* getFieldmarkBefore(const SwPosition& rPos, bool bLoop) const override;
+            virtual sw::mark::IFieldmark* getFieldmarkAfter(const SwPosition& rPos, bool bLoop) const override;
 
             virtual ::sw::mark::IFieldmark* getDropDownFor(const SwPosition &rPos) const override;
             virtual std::vector<::sw::mark::IFieldmark*> getNoTextFieldmarksIn(const SwPaM &rPaM) const override;

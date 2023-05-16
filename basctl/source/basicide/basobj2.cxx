@@ -34,7 +34,7 @@
 #include <comphelper/sequence.hxx>
 #include <framework/documentundoguard.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/moduleoptions.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
@@ -62,24 +62,25 @@ extern "C" {
 
         return pScriptURL;
     }
-    SAL_DLLPUBLIC_EXPORT void basicide_macro_organizer(void *pParent, sal_Int16 nTabId)
+    SAL_DLLPUBLIC_EXPORT void basicide_macro_organizer(void *pParent, void* pDocFrame_AsXFrame, sal_Int16 nTabId)
     {
         SAL_INFO("basctl.basicide","in basicide_macro_organizer");
-        basctl::Organize(static_cast<weld::Window*>(pParent), nTabId);
+        Reference< frame::XFrame > aDocFrame( static_cast< frame::XFrame* >( pDocFrame_AsXFrame ) );
+        basctl::Organize(static_cast<weld::Window*>(pParent), aDocFrame, nTabId);
     }
 }
 
-void Organize(weld::Window* pParent, sal_Int16 tabId)
+void Organize(weld::Window* pParent, const css::uno::Reference<css::frame::XFrame>& xDocFrame, sal_Int16 tabId)
 {
     EnsureIde();
 
-    auto xDlg(std::make_shared<OrganizeDialog>(pParent, tabId));
+    auto xDlg(std::make_shared<OrganizeDialog>(pParent, xDocFrame, tabId));
     weld::DialogController::runAsync(xDlg, [](int) {});
 }
 
-bool IsValidSbxName( const OUString& rName )
+bool IsValidSbxName( std::u16string_view rName )
 {
-    for ( sal_Int32 nChar = 0; nChar < rName.getLength(); nChar++ )
+    for ( size_t nChar = 0; nChar < rName.size(); nChar++ )
     {
         sal_Unicode c = rName[nChar];
         bool bValid = (
@@ -160,27 +161,28 @@ bool RenameModule (
     if ( !rDocument.renameModule( rLibName, rOldName, rNewName ) )
         return false;
 
-    if (Shell* pShell = GetShell())
+    Shell* pShell = GetShell();
+    if (!pShell)
+        return true;
+    VclPtr<ModulWindow> pWin = pShell->FindBasWin(rDocument, rLibName, rNewName, false, true);
+    if (!pWin)
+        return true;
+
+    // set new name in window
+    pWin->SetName( rNewName );
+
+    // set new module in module window
+    pWin->SetSbModule( pWin->GetBasic()->FindModule( rNewName ) );
+
+    // update tabwriter
+    sal_uInt16 nId = pShell->GetWindowId( pWin );
+    SAL_WARN_IF( nId == 0 , "basctl.basicide", "No entry in Tabbar!");
+    if ( nId )
     {
-        if (VclPtr<ModulWindow> pWin = pShell->FindBasWin(rDocument, rLibName, rNewName, false, true))
-        {
-            // set new name in window
-            pWin->SetName( rNewName );
-
-            // set new module in module window
-            pWin->SetSbModule( pWin->GetBasic()->FindModule( rNewName ) );
-
-            // update tabwriter
-            sal_uInt16 nId = pShell->GetWindowId( pWin );
-            SAL_WARN_IF( nId == 0 , "basctl.basicide", "No entry in Tabbar!");
-            if ( nId )
-            {
-                TabBar& rTabBar = pShell->GetTabBar();
-                rTabBar.SetPageText(nId, rNewName);
-                rTabBar.Sort();
-                rTabBar.MakeVisible(rTabBar.GetCurPageId());
-            }
-        }
+        TabBar& rTabBar = pShell->GetTabBar();
+        rTabBar.SetPageText(nId, rNewName);
+        rTabBar.Sort();
+        rTabBar.MakeVisible(rTabBar.GetCurPageId());
     }
     return true;
 }
@@ -215,9 +217,9 @@ namespace
 
         // in case this is a document-local macro, try to protect the document's Undo Manager from
         // flawed scripts
-        std::unique_ptr< ::framework::DocumentUndoGuard > pUndoGuard;
+        std::optional< ::framework::DocumentUndoGuard > pUndoGuard;
         if ( pData->aDocument.isDocument() )
-            pUndoGuard.reset( new ::framework::DocumentUndoGuard( pData->aDocument.getDocument() ) );
+            pUndoGuard.emplace( pData->aDocument.getDocument() );
 
         RunMethod( pData->xMethod.get() );
     }

@@ -40,9 +40,6 @@ void SkiaTextRender::DrawTextLayout(const GenericSalLayout& rLayout, const SalGr
     if (nWidth == 0 || nHeight == 0)
         return;
 
-    if (FreetypeFont::AlmostHorizontalDrainsRenderingPool(nWidth * 10 / nHeight, rFSD))
-        return;
-
     if (!fontManager)
     {
         // Get the global FcConfig that our VCL fontconfig code uses, and refcount it.
@@ -53,16 +50,18 @@ void SkiaTextRender::DrawTextLayout(const GenericSalLayout& rLayout, const SalGr
     SkFont font(typeface);
     font.setSize(nHeight);
     font.setScaleX(1.0 * nWidth / nHeight);
-    if (rFont.NeedsArtificialItalic())
-        font.setSkewX(1.0 * -0x4000L / 0x10000L);
-    if (rFont.NeedsArtificialBold())
+    if (rInstance.NeedsArtificialItalic())
+        font.setSkewX(-1.0 * ARTIFICIAL_ITALIC_SKEW);
+    if (rInstance.NeedsArtificialBold())
         font.setEmbolden(true);
 
-    bool bSubpixelPositioning = rGraphics.getTextRenderModeForResolutionIndependentLayoutEnabled();
+    bool bSubpixelPositioning = rLayout.GetTextRenderModeForResolutionIndependentLayout();
     SkFont::Edging ePreferredAliasing
         = bSubpixelPositioning ? SkFont::Edging::kSubpixelAntiAlias : SkFont::Edging::kAntiAlias;
     if (bSubpixelPositioning)
     {
+        // note that SkFont defaults to a BaselineSnap of true, so I think really only
+        // subpixel in text direction
         font.setSubpixel(true);
 
         SkFontHinting eHinting = font.getHinting();

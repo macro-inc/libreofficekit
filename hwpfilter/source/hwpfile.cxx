@@ -139,6 +139,16 @@ bool HWPFile::Read2b(unsigned short &out)
     return hiodev && hiodev->read2b(out);
 }
 
+bool HWPFile::Read2b(char16_t &out)
+{
+    unsigned short n;
+    auto const ok = Read2b(n);
+    if (ok) {
+        out = n;
+    }
+    return ok;
+}
+
 bool HWPFile::Read4b(unsigned int &out)
 {
     return hiodev && hiodev->read4b(out);
@@ -457,11 +467,6 @@ EmPicture *HWPFile::GetEmPictureByName(char * name)
     return nullptr;
 }
 
-void HWPFile::AddBox(FBox * box)
-{
-    blist.push_back(box);
-}
-
 ParaShape *HWPFile::getParaShape(int index)
 {
     if (index < 0 || o3tl::make_unsigned(index) >= pslist.size())
@@ -603,23 +608,20 @@ void HWPFile::AddFBoxStyle(FBoxStyle * fbstyle)
 int HWPFile::compareCharShape(CharShape const *shape)
 {
     int count = cslist.size();
-    if( count > 0 )
+    for(int i = 0; i< count; i++)
     {
-        for(int i = 0; i< count; i++)
-        {
-            CharShape *cshape = getCharShape(i);
+        CharShape *cshape = getCharShape(i);
 
-            if( shape->size == cshape->size &&
-                shape->font[0] == cshape->font[0] &&
-                shape->ratio[0] == cshape->ratio[0] &&
-                shape->space[0] == cshape->space[0] &&
-                shape->color[1] == cshape->color[1] &&
-                shape->color[0] == cshape->color[0] &&
-                shape->shade == cshape->shade &&
-                shape->attr == cshape->attr )
-            {
-                return cshape->index;
-            }
+        if( shape->size == cshape->size &&
+            shape->font == cshape->font &&
+            shape->ratio == cshape->ratio &&
+            shape->space == cshape->space &&
+            shape->color[1] == cshape->color[1] &&
+            shape->color[0] == cshape->color[0] &&
+            shape->shade == cshape->shade &&
+            shape->attr == cshape->attr )
+        {
+            return cshape->index;
         }
     }
     return 0;
@@ -647,9 +649,9 @@ int HWPFile::compareParaShape(const ParaShape* shape)
             shape->pagebreak == pshape->pagebreak)
         {
             if (shape->cshape->size == pshape->cshape->size &&
-                shape->cshape->font[0] == pshape->cshape->font[0] &&
-                shape->cshape->ratio[0] == pshape->cshape->ratio[0] &&
-                shape->cshape->space[0] == pshape->cshape->space[0] &&
+                shape->cshape->font == pshape->cshape->font &&
+                shape->cshape->ratio == pshape->cshape->ratio &&
+                shape->cshape->space == pshape->cshape->space &&
                 shape->cshape->color[1] == pshape->cshape->color[1] &&
                 shape->cshape->color[0] == pshape->cshape->color[0] &&
                 shape->cshape->shade == pshape->cshape->shade &&

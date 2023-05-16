@@ -19,7 +19,7 @@
 
 
 // must be first
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 
 #include "viewbackgroundshape.hxx"
@@ -36,6 +36,7 @@
 #include <cppcanvas/basegfxfactory.hxx>
 #include <cppcanvas/renderer.hxx>
 #include <cppcanvas/bitmap.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -122,9 +123,9 @@ namespace slideshow::internal
             return mxBitmap.is();
         }
 
-        ViewBackgroundShape::ViewBackgroundShape( const ViewLayerSharedPtr&         rViewLayer,
+        ViewBackgroundShape::ViewBackgroundShape( ViewLayerSharedPtr                xViewLayer,
                                                   const ::basegfx::B2DRectangle&    rShapeBounds ) :
-            mpViewLayer( rViewLayer ),
+            mpViewLayer(std::move( xViewLayer )),
             mxBitmap(),
             mpLastMtf(),
             maLastTransformation(),

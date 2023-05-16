@@ -28,13 +28,15 @@ namespace com::sun::star::beans { class XPropertySet; }
 class SwFieldDokInfPage : public SwFieldPage
 {
     std::unique_ptr<weld::TreeIter> m_xSelEntry;
-    css::uno::Reference < css::beans::XPropertySet > xCustomPropertySet;
+    css::uno::Reference < css::beans::XPropertySet > m_xCustomPropertySet;
 
-    sal_Int32               nOldSel;
-    sal_uLong               nOldFormat;
+    sal_Int32               m_nOldSel;
+    sal_uLong               m_nOldFormat;
     OUString                m_sOldCustomFieldName;
 
-    std::unique_ptr<weld::TreeView> m_xTypeTLB;
+    std::unique_ptr<weld::TreeView> m_xTypeList;
+    std::unique_ptr<weld::TreeView> m_xTypeTree;
+    weld::TreeView* m_pTypeView;
     std::unique_ptr<weld::Widget> m_xSelection;
     std::unique_ptr<weld::TreeView> m_xSelectionLB;
     std::unique_ptr<weld::Widget> m_xFormat;

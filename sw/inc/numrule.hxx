@@ -32,6 +32,7 @@
 #include <memory>
 #include <vector>
 #include "charfmt.hxx"
+#include "fmtornt.hxx"
 
 class SwTextFormatColl;
 class IDocumentListsAccess;
@@ -40,7 +41,6 @@ namespace vcl { class Font; }
 class SvxBrushItem;
 class SfxGrabBagItem;
 class SwDoc;
-class SwFormatVertOrient;
 class SwTextNode;
 class Size;
 class SwWrtShell;
@@ -49,7 +49,7 @@ const sal_Unicode cBulletChar = 0x2022; ///< Character for lists.
 
 class SW_DLLPUBLIC SwNumFormat final : public SvxNumberFormat, public SwClient
 {
-    std::unique_ptr<SwFormatVertOrient> m_pVertOrient;
+    SwFormatVertOrient m_aVertOrient;
     //For i120928,record the cp info of graphic within bullet
     sal_Unicode     m_cGrfBulletCP;
     SAL_DLLPRIVATE void UpdateNumNodes(SwDoc& rDoc);
@@ -142,7 +142,7 @@ private:
 
 public:
     /// add parameter <eDefaultNumberFormatPositionAndSpaceMode>
-    SwNumRule( const OUString& rNm,
+    SwNumRule( OUString aNm,
                const SvxNumberFormat::SvxNumPositionAndSpaceMode eDefaultNumberFormatPositionAndSpaceMode,
                SwNumRuleType = NUM_RULE );
 
@@ -168,7 +168,6 @@ public:
          restrict returned string to this level. */
     OUString MakeNumString( const SwNumberTree::tNumberVector & rNumVector,
                           const bool bInclStrings = true,
-                          const bool bOnlyArabic = false,
                           const unsigned int _nRestrictToThisLevel = MAXLEVEL,
                           Extremities* pExtremities = nullptr,
                           LanguageType nLang = LANGUAGE_SYSTEM) const;
@@ -273,6 +272,9 @@ public:
     void dumpAsXml(xmlTextWriterPtr w) const;
     void GetGrabBagItem(css::uno::Any& rVal) const;
     void SetGrabBagItem(const css::uno::Any& rVal);
+
+    /// Is it possible that this numbering has multiple lists?
+    bool HasContinueList() const;
 };
 
 /// namespace for static functions and methods for numbering and bullets

@@ -28,11 +28,7 @@
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/uno/Reference.h>
 #include <cppuhelper/implbase.hxx>
-#include <svl/SfxBroadcaster.hxx>
 
-#include <editeng/editeng.hxx>
-#include <editeng/unoedsrc.hxx>
-#include <edit.hxx>
 #include <view.hxx>
 
 class SmDocShell;
@@ -94,15 +90,15 @@ public:
     virtual sal_Int32 SAL_CALL getBackground(  ) override;
 
     // XAccessibleContext
-    virtual sal_Int32 SAL_CALL getAccessibleChildCount(  ) override;
-    virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int32 i ) override;
+    virtual sal_Int64 SAL_CALL getAccessibleChildCount(  ) override;
+    virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int64 i ) override;
     virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleParent(  ) override;
-    virtual sal_Int32 SAL_CALL getAccessibleIndexInParent(  ) override;
+    virtual sal_Int64 SAL_CALL getAccessibleIndexInParent(  ) override;
     virtual sal_Int16 SAL_CALL getAccessibleRole(  ) override;
     virtual OUString SAL_CALL getAccessibleDescription(  ) override;
     virtual OUString SAL_CALL getAccessibleName(  ) override;
     virtual css::uno::Reference< css::accessibility::XAccessibleRelationSet > SAL_CALL getAccessibleRelationSet(  ) override;
-    virtual css::uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL getAccessibleStateSet(  ) override;
+    virtual sal_Int64 SAL_CALL getAccessibleStateSet(  ) override;
     virtual css::lang::Locale SAL_CALL getLocale(  ) override;
 
     // XAccessibleEventBroadcaster

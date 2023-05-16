@@ -22,6 +22,7 @@
 #include "charttoolsdllapi.hxx"
 #include <com/sun/star/uno/Reference.h>
 #include <rtl/ustring.hxx>
+#include <rtl/ref.hxx>
 
 #include <vector>
 
@@ -35,6 +36,12 @@ namespace com::sun::star::chart2::data { class XDataSource; }
 namespace com::sun::star::chart2::data { class XLabeledDataSequence; }
 namespace com::sun::star::uno { class Any; }
 namespace com::sun::star::uno { template <class E> class Sequence; }
+namespace chart { class BaseCoordinateSystem; }
+namespace chart { class ChartType; }
+namespace chart { class DataSource; }
+namespace chart { class Diagram; }
+namespace chart { class DataSeries; }
+namespace chart { class LabeledDataSequence; }
 
 namespace chart::DataSeriesHelper
 {
@@ -70,18 +77,26 @@ OOO_DLLPUBLIC_CHARTTOOLS std::vector<
   css::uno::Reference< css::chart2::data::XLabeledDataSequence > >
     getAllDataSequencesByRole( const css::uno::Sequence< css::uno::Reference< css::chart2::data::XLabeledDataSequence > > & aDataSequences,
                                const OUString& aRole );
+OOO_DLLPUBLIC_CHARTTOOLS std::vector<
+  css::uno::Reference< css::chart2::data::XLabeledDataSequence > >
+    getAllDataSequencesByRole( const std::vector< css::uno::Reference< css::chart2::data::XLabeledDataSequence > > & aDataSequences,
+                               const OUString& aRole );
 
 OOO_DLLPUBLIC_CHARTTOOLS
-std::vector<css::uno::Reference<css::chart2::data::XLabeledDataSequence> >
+std::vector< css::uno::Reference< css::chart2::data::XLabeledDataSequence > >
 getAllDataSequences(
     const css::uno::Sequence<css::uno::Reference<css::chart2::XDataSeries> >& aSeries );
+OOO_DLLPUBLIC_CHARTTOOLS
+std::vector< css::uno::Reference< css::chart2::data::XLabeledDataSequence > >
+getAllDataSequences(
+    const std::vector<rtl::Reference<::chart::DataSeries> >& aSeries );
 
 /** Retrieves all data sequences found in the given data series and puts them
     into a data source.  The order of sequences will match the order of the data
     series.
  */
-OOO_DLLPUBLIC_CHARTTOOLS css::uno::Reference< css::chart2::data::XDataSource >
-    getDataSource( const css::uno::Sequence< css::uno::Reference< css::chart2::XDataSeries > > & aSeries );
+OOO_DLLPUBLIC_CHARTTOOLS rtl::Reference< ::chart::DataSource >
+    getDataSource( const std::vector< rtl::Reference< ::chart::DataSeries > > & aSeries );
 
 /** Get the label of a series (e.g. for the legend)
 
@@ -90,7 +105,7 @@ OOO_DLLPUBLIC_CHARTTOOLS css::uno::Reference< css::chart2::data::XDataSource >
         to take its label.
  */
 OOO_DLLPUBLIC_CHARTTOOLS OUString getDataSeriesLabel(
-    const css::uno::Reference< css::chart2::XDataSeries > & xSeries,
+    const rtl::Reference< ::chart::DataSeries > & xSeries,
     const OUString & rLabelSequenceRole );
 
 /** Get the label of a labeled sequence including necessary automatic generation
@@ -99,8 +114,8 @@ OOO_DLLPUBLIC_CHARTTOOLS OUString getLabelForLabeledDataSequence(
     const css::uno::Reference< css::chart2::data::XLabeledDataSequence > & xLabeledSeq );
 
 OOO_DLLPUBLIC_CHARTTOOLS void setStackModeAtSeries(
-    const css::uno::Sequence< css::uno::Reference< css::chart2::XDataSeries > > & aSeries,
-    const css::uno::Reference< css::chart2::XCoordinateSystem > & xCorrespondingCoordinateSystem,
+    const std::vector< rtl::Reference< ::chart::DataSeries > > & aSeries,
+    const rtl::Reference< ::chart::BaseCoordinateSystem > & xCorrespondingCoordinateSystem,
     StackMode eStackMode );
 
 OOO_DLLPUBLIC_CHARTTOOLS sal_Int32 getAttachedAxisIndex(
@@ -109,25 +124,25 @@ OOO_DLLPUBLIC_CHARTTOOLS sal_Int32 getAttachedAxisIndex(
 /// @param nAxisIndex, if -1 it is determined by the given data series via getAttachedAxisIndex
 OOO_DLLPUBLIC_CHARTTOOLS sal_Int32 getNumberFormatKeyFromAxis(
     const css::uno::Reference< css::chart2::XDataSeries > & xSeries,
-    const css::uno::Reference< css::chart2::XCoordinateSystem > & xCorrespondingCoordinateSystem,
+    const rtl::Reference< ::chart::BaseCoordinateSystem > & xCorrespondingCoordinateSystem,
     sal_Int32 nDimensionIndex,
     sal_Int32 nAxisIndex = -1 );
 
 OOO_DLLPUBLIC_CHARTTOOLS
-css::uno::Reference< css::chart2::XCoordinateSystem >
+rtl::Reference< ::chart::BaseCoordinateSystem >
     getCoordinateSystemOfSeries(
         const css::uno::Reference< css::chart2::XDataSeries > & xSeries,
-        const css::uno::Reference< css::chart2::XDiagram > & xDiagram );
+        const rtl::Reference< ::chart::Diagram > & xDiagram );
 
 OOO_DLLPUBLIC_CHARTTOOLS
-css::uno::Reference< css::chart2::XChartType >
+rtl::Reference< ::chart::ChartType >
     getChartTypeOfSeries(
         const css::uno::Reference< css::chart2::XDataSeries > & xSeries,
-        const css::uno::Reference< css::chart2::XDiagram > & xDiagram );
+        const rtl::Reference< ::chart::Diagram > & xDiagram );
 
 OOO_DLLPUBLIC_CHARTTOOLS void deleteSeries(
     const css::uno::Reference< css::chart2::XDataSeries > & xSeries,
-    const css::uno::Reference< css::chart2::XChartType > & xChartType );
+    const rtl::Reference< ::chart::ChartType > & xChartType );
 
 OOO_DLLPUBLIC_CHARTTOOLS void switchSymbolsOnOrOff(
     const css::uno::Reference< css::beans::XPropertySet > & xSeriesProperties,
@@ -144,6 +159,11 @@ OOO_DLLPUBLIC_CHARTTOOLS void setPropertyAlsoToAllAttributedDataPoints(
         const css::uno::Reference< css::chart2::XDataSeries >& xSeries,
         const OUString& rPropertyName,
         const css::uno::Any& rPropertyValue );
+OOO_DLLPUBLIC_CHARTTOOLS void setPropertyAlsoToAllAttributedDataPoints(
+        const rtl::Reference< ::chart::DataSeries >& xSeries,
+        const OUString& rPropertyName,
+        const css::uno::Any& rPropertyValue );
+
 
 OOO_DLLPUBLIC_CHARTTOOLS bool hasAttributedDataPointDifferentValue(
     const css::uno::Reference< css::chart2::XDataSeries >& xSeries,

@@ -23,10 +23,13 @@
 #include <editeng/tstpitem.hxx>
 #include <editeng/lrspitem.hxx>
 #include <svtools/unitconv.hxx>
+#include <svx/drawitem.hxx>
 #include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 
 #include <cmdid.h>
+#include <IDocumentDrawModelAccess.hxx>
+#include <drawdoc.hxx>
 #include <wrtsh.hxx>
 #include <view.hxx>
 #include "envfmt.hxx"
@@ -150,7 +153,7 @@ IMPL_LINK( SwEnvFormatPage, ModifyHdl, weld::MetricSpinButton&, rEdit, void )
     }
     else
     {
-        FillItem(GetParentSwEnvDlg()->aEnvItem);
+        FillItem(GetParentSwEnvDlg()->m_aEnvItem);
         SetMinMax();
         m_xPreview->queue_draw();
     }
@@ -168,7 +171,7 @@ IMPL_LINK(SwEnvFormatPage, SendEditHdl, const OString&, rIdent, void)
 
 void SwEnvFormatPage::Edit(std::string_view rIdent, bool bSender)
 {
-    SwWrtShell* pSh = GetParentSwEnvDlg()->pSh;
+    SwWrtShell* pSh = GetParentSwEnvDlg()->m_pSh;
     OSL_ENSURE(pSh, "Shell missing");
 
     SwTextFormatColl* pColl = pSh->GetTextCollFromPool( static_cast< sal_uInt16 >(
@@ -221,19 +224,25 @@ void SwEnvFormatPage::Edit(std::string_view rIdent, bool bSender)
         // set BoxInfo
         ::PrepareBoxInfo( aTmpSet, *pSh );
 
+        SwDrawModel* pDrawModel = pSh->GetView().GetDocShell()->GetDoc()->getIDocumentDrawModelAccess().GetDrawModel();
+        aTmpSet.Put(SvxColorListItem(pDrawModel->GetColorList(), SID_COLOR_TABLE));
+        aTmpSet.Put(SvxGradientListItem(pDrawModel->GetGradientList(), SID_GRADIENT_LIST));
+        aTmpSet.Put(SvxHatchListItem(pDrawModel->GetHatchList(), SID_HATCH_LIST));
+        aTmpSet.Put(SvxBitmapListItem(pDrawModel->GetBitmapList(), SID_BITMAP_LIST));
+        aTmpSet.Put(SvxPatternListItem(pDrawModel->GetPatternList(), SID_PATTERN_LIST));
+
         const OUString sFormatStr = pColl->GetName();
         SwParaDlg aDlg(GetFrameWeld(), pSh->GetView(), aTmpSet, DLG_ENVELOP, &sFormatStr);
 
         if (aDlg.run() == RET_OK)
         {
             // maybe relocate defaults
-            const SfxPoolItem* pItem = nullptr;
+            const SfxUInt16Item* pDefaultsItem = nullptr;
             SfxItemSet* pOutputSet = const_cast<SfxItemSet*>(aDlg.GetOutputItemSet());
             sal_uInt16 nNewDist;
 
-            if( SfxItemState::SET == pOutputSet->GetItemState( SID_ATTR_TABSTOP_DEFAULTS,
-                false, &pItem ) &&
-                nDefDist != (nNewDist = static_cast<const SfxUInt16Item*>(pItem)->GetValue()) )
+            if( (pDefaultsItem = pOutputSet->GetItemIfSet( SID_ATTR_TABSTOP_DEFAULTS, false )) &&
+                nDefDist != (nNewDist = pDefaultsItem->GetValue()) )
             {
                 SvxTabStopItem aDefTabs( 0, 0, SvxTabAdjust::Default, RES_PARATR_TABSTOP );
                 MakeDefTabs( nNewDist, aDefTabs );
@@ -251,7 +260,7 @@ void SwEnvFormatPage::Edit(std::string_view rIdent, bool bSender)
 // A temporary Itemset that gets discarded at abort
 SfxItemSet *SwEnvFormatPage::GetCollItemSet(SwTextFormatColl const * pColl, bool bSender)
 {
-    std::unique_ptr<SfxItemSet>& pAddrSet = bSender ? GetParentSwEnvDlg()->pSenderSet : GetParentSwEnvDlg()->pAddresseeSet;
+    std::unique_ptr<SfxItemSet>& pAddrSet = bSender ? GetParentSwEnvDlg()->m_pSenderSet : GetParentSwEnvDlg()->m_pAddresseeSet;
     if (!pAddrSet)
     {
         // determine range (merge both Itemsets' ranges)
@@ -268,7 +277,7 @@ SfxItemSet *SwEnvFormatPage::GetCollItemSet(SwTextFormatColl const * pColl, bool
             SID_ATTR_BORDER_INNER, SID_ATTR_BORDER_INNER
         >);
 
-        pAddrSet.reset(new SfxItemSet(GetParentSwEnvDlg()->pSh->GetView().GetCurShell()->GetPool(),
+        pAddrSet.reset(new SfxItemSet(GetParentSwEnvDlg()->m_pSh->GetView().GetCurShell()->GetPool(),
                                   pRanges));
         for (const auto& rPair : aRanges)
             pAddrSet->MergeRange(rPair.first, rPair.second);
@@ -315,7 +324,7 @@ IMPL_LINK_NOARG(SwEnvFormatPage, FormatHdl, weld::ComboBox&, void)
 
     SetMinMax();
 
-    FillItem(GetParentSwEnvDlg()->aEnvItem);
+    FillItem(GetParentSwEnvDlg()->m_aEnvItem);
     m_xPreview->queue_draw();
 }
 
@@ -346,7 +355,7 @@ std::unique_ptr<SfxTabPage> SwEnvFormatPage::Create(weld::Container* pPage, weld
 void SwEnvFormatPage::ActivatePage(const SfxItemSet& rSet)
 {
     SfxItemSet aSet(rSet);
-    aSet.Put(GetParentSwEnvDlg()->aEnvItem);
+    aSet.Put(GetParentSwEnvDlg()->m_aEnvItem);
     Reset(&aSet);
 }
 
@@ -383,8 +392,8 @@ void SwEnvFormatPage::FillItem(SwEnvItem& rItem)
 
 bool SwEnvFormatPage::FillItemSet(SfxItemSet* rSet)
 {
-    FillItem(GetParentSwEnvDlg()->aEnvItem);
-    rSet->Put(GetParentSwEnvDlg()->aEnvItem);
+    FillItem(GetParentSwEnvDlg()->m_aEnvItem);
+    rSet->Put(GetParentSwEnvDlg()->m_aEnvItem);
     return true;
 }
 
@@ -408,8 +417,8 @@ void SwEnvFormatPage::Reset(const SfxItemSet* rSet)
     setfieldval(*m_xSizeHeightField , std::min(rItem.m_nWidth, rItem.m_nHeight));
     SetMinMax();
 
-    GetParentSwEnvDlg()->pSenderSet.reset();
-    GetParentSwEnvDlg()->pAddresseeSet.reset();
+    GetParentSwEnvDlg()->m_pSenderSet.reset();
+    GetParentSwEnvDlg()->m_pAddresseeSet.reset();
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

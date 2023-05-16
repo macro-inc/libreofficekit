@@ -49,6 +49,10 @@ class SdrLayerAdmin;
 class SdrObjGeoData;
 class OutlinerParaObject;
 
+namespace svx { namespace diagram {
+    class DiagramDataState;
+}}
+
 /**
  * Abstract base class (ABC) for all UndoActions of DrawingEngine
  */
@@ -123,10 +127,11 @@ public:
 class SVXCORE_DLLPUBLIC SdrUndoObj : public SdrUndoAction
 {
 protected:
-    SdrObject* pObj;
+    rtl::Reference<SdrObject> mxObj;
 
 protected:
     SdrUndoObj(SdrObject& rNewObj);
+    virtual ~SdrUndoObj() override;
 
     OUString ImpGetDescriptionStr(TranslateId pStrCacheID, bool bRepeat = false) const;
 
@@ -144,7 +149,6 @@ protected:
 
 class SVXCORE_DLLPUBLIC SdrUndoAttrObj : public SdrUndoObj
 {
-protected:
     std::optional<SfxItemSet> moUndoSet;
     std::optional<SfxItemSet> moRedoSet;
 
@@ -163,6 +167,7 @@ protected:
     // If we have a group object:
     std::unique_ptr<SdrUndoGroup> pUndoGroup;
 
+protected:
     // Helper to ensure StyleSheet is in pool (provided by SdrModel from SdrObject)
     static void ensureStyleSheetInStyleSheetPool(SfxStyleSheetBasePool& rStyleSheetPool, SfxStyleSheet& rSheet);
 
@@ -224,6 +229,24 @@ public:
     void SetSkipChangeLayout(bool bOn) { mbSkipChangeLayout=bOn; }
 };
 
+// Diagram ModelData changes
+class SVXCORE_DLLPUBLIC SdrUndoDiagramModelData : public SdrUndoObj
+{
+    std::shared_ptr< svx::diagram::DiagramDataState > m_aStartState;
+    std::shared_ptr< svx::diagram::DiagramDataState > m_aEndState;
+
+    void implUndoRedo(bool bUndo);
+
+public:
+    SdrUndoDiagramModelData(SdrObject& rNewObj, std::shared_ptr< svx::diagram::DiagramDataState >& rStartState);
+    virtual ~SdrUndoDiagramModelData() override;
+
+    virtual void Undo() override;
+    virtual void Redo() override;
+
+    virtual OUString GetComment() const override;
+};
+
 /**
  * Manipulation of an ObjList: New Object, DeleteObj, SetObjZLevel, Grouping, ...
  * Abstract base class.
@@ -233,9 +256,6 @@ class SVXCORE_DLLPUBLIC SdrUndoObjList : public SdrUndoObj {
     class ObjListListener;
     friend class ObjListListener;
 
-private:
-    bool bOwner;
-
 protected:
     SdrObjList* pObjList;
     sal_uInt32 nOrdNum;
@@ -243,9 +263,6 @@ protected:
 protected:
     SdrUndoObjList(SdrObject& rNewObj, bool bOrdNumDirect);
     virtual ~SdrUndoObjList() override;
-
-    bool IsOwner() const { return bOwner; }
-    void SetOwner(bool bNew);
 };
 
 /**
@@ -329,11 +346,8 @@ public:
 
 class SVXCORE_DLLPUBLIC SdrUndoReplaceObj : public SdrUndoObj
 {
-    bool bOldOwner;
-    bool bNewOwner;
-
     SdrObjList* pObjList;
-    SdrObject* pNewObj;
+    rtl::Reference<SdrObject> mxNewObj;
 
 public:
     SdrUndoReplaceObj(SdrObject& rOldObj1, SdrObject& rNewObj1);
@@ -341,12 +355,6 @@ public:
 
     virtual void Undo() override;
     virtual void Redo() override;
-
-    bool IsNewOwner() const { return bNewOwner; }
-    void SetNewOwner(bool bNew);
-
-    bool IsOldOwner() const { return bOldOwner; }
-    void SetOldOwner(bool bNew);
 };
 
 /**
@@ -387,7 +395,7 @@ private:
     void Do(::std::vector<sal_Int32> & rSortOrder);
 
 public:
-    SdrUndoSort(SdrPage & rPage,
+    SdrUndoSort(const SdrPage & rPage,
         ::std::vector<sal_Int32> const& rSortOrder);
 
     virtual void Undo() override;
@@ -412,7 +420,6 @@ public:
 
 class SVXCORE_DLLPUBLIC SdrUndoObjSetText : public SdrUndoObj
 {
-protected:
     std::optional<OutlinerParaObject>
                                 pOldText;
     std::optional<OutlinerParaObject>
@@ -454,8 +461,8 @@ public:
 
     SdrUndoObjStrAttr( SdrObject& rNewObj,
                        const ObjStrAttrType eObjStrAttr,
-                       const OUString& sOldStr,
-                       const OUString& sNewStr);
+                       OUString sOldStr,
+                       OUString sNewStr);
 
     virtual void Undo() override;
     virtual void Redo() override;
@@ -741,6 +748,9 @@ public:
                                                     const OUString& sOldStr,
                                                     const OUString& sNewStr );
 
+    // Diagram ModelData changes
+    virtual std::unique_ptr<SdrUndoAction> CreateUndoDiagramModelData( SdrObject& rObject, std::shared_ptr< svx::diagram::DiagramDataState >& rStartState );
+
     // Layer
     virtual std::unique_ptr<SdrUndoAction> CreateUndoNewLayer(sal_uInt16 nLayerNum, SdrLayerAdmin& rNewLayerAdmin, SdrModel& rNewModel);
     virtual std::unique_ptr<SdrUndoAction> CreateUndoDeleteLayer(sal_uInt16 nLayerNum, SdrLayerAdmin& rNewLayerAdmin, SdrModel& rNewModel);
@@ -750,7 +760,7 @@ public:
     virtual std::unique_ptr<SdrUndoAction> CreateUndoNewPage(SdrPage& rPage);
     virtual std::unique_ptr<SdrUndoAction> CreateUndoCopyPage(SdrPage& rPage);
     virtual std::unique_ptr<SdrUndoAction> CreateUndoSetPageNum(SdrPage& rNewPg, sal_uInt16 nOldPageNum1, sal_uInt16 nNewPageNum1);
-    virtual std::unique_ptr<SdrUndoAction> CreateUndoSort(SdrPage& rPage, ::std::vector<sal_Int32> const& rSortOrder);
+    static std::unique_ptr<SdrUndoAction> CreateUndoSort(SdrPage& rPage, ::std::vector<sal_Int32> const& rSortOrder);
 
     // Master page
     virtual std::unique_ptr<SdrUndoAction> CreateUndoPageRemoveMasterPage(SdrPage& rChangedPage);

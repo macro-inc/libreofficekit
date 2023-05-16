@@ -21,6 +21,7 @@
 #define INCLUDED_OOX_SOURCE_DRAWINGML_DIAGRAM_LAYOUTATOMVISITORS_HXX
 
 #include <oox/drawingml/drawingmltypes.hxx>
+#include <utility>
 #include "diagram.hxx"
 #include "diagramlayoutatoms.hxx"
 #include "layoutatomvisitorbase.hxx"
@@ -31,10 +32,10 @@ class ShapeCreationVisitor : public LayoutAtomVisitorBase
 {
 public:
     ShapeCreationVisitor(const Diagram& rDgm,
-                         const dgm::Point* pRootPoint,
-                         const ShapePtr& rParentShape) :
+                         const svx::diagram::Point* pRootPoint,
+                         ShapePtr xParentShape) :
         LayoutAtomVisitorBase(rDgm, pRootPoint),
-        mpParentShape(rParentShape)
+        mpParentShape(std::move(xParentShape))
     {}
 
     using LayoutAtomVisitorBase::visit;
@@ -51,7 +52,7 @@ private:
 class ShapeTemplateVisitor : public LayoutAtomVisitorBase
 {
 public:
-    ShapeTemplateVisitor(const Diagram& rDgm, const dgm::Point* pRootPoint)
+    ShapeTemplateVisitor(const Diagram& rDgm, const svx::diagram::Point* pRootPoint)
         : LayoutAtomVisitorBase(rDgm, pRootPoint)
     {}
 
@@ -73,7 +74,7 @@ private:
 class ShapeLayoutingVisitor : public LayoutAtomVisitorBase
 {
 public:
-    ShapeLayoutingVisitor(const Diagram& rDgm, const dgm::Point* pRootPoint) :
+    ShapeLayoutingVisitor(const Diagram& rDgm, const svx::diagram::Point* pRootPoint) :
         LayoutAtomVisitorBase(rDgm, pRootPoint)
     {}
 

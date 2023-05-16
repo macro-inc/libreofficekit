@@ -37,6 +37,7 @@ namespace com::sun::star::embed {
 }
 
 class OutputDevice;
+typedef struct _xmlTextWriter* xmlTextWriterPtr;
 
 namespace svt {
 
@@ -48,6 +49,7 @@ class SVT_DLLPUBLIC EmbeddedObjectRef
 
     SVT_DLLPRIVATE std::unique_ptr<SvStream> GetGraphicStream( bool bUpdate ) const;
     SVT_DLLPRIVATE void GetReplacement( bool bUpdate );
+    SVT_DLLPRIVATE void UpdateOleObject( bool bUpdateOle);
 
     EmbeddedObjectRef& operator = ( const EmbeddedObjectRef& ) = delete;
 
@@ -100,7 +102,9 @@ public:
                         const css::uno::Reference< css::io::XInputStream >& xInGrStream,
                         const OUString& rMediaType );
 
-    void            UpdateReplacement();
+                    // bUpdateOle = false update the Link-Objects
+                    //            = true  update the OLE-Objects
+    void            UpdateReplacement( bool bUpdateOle = false );
     void            UpdateReplacementOnDemand();
     void Lock( bool bLock = true );
     void            Clear();
@@ -109,7 +113,7 @@ public:
     bool IsLocked() const;
 
     void SetIsProtectedHdl(const Link<LinkParamNone*, bool>& rProtectedHdl);
-    Link<LinkParamNone*, bool> GetIsProtectedHdl() const;
+    const Link<LinkParamNone*, bool> & GetIsProtectedHdl() const;
 
     bool IsChart() const;
 
@@ -122,6 +126,8 @@ public:
     // fetching the Graphic what would be too expensive e.g. for charts
     sal_uInt32 getGraphicVersion() const;
     void            SetDefaultSizeForChart( const Size& rSizeIn_100TH_MM );//#i103460# charts do not necessarily have an own size within ODF files, in this case they need to use the size settings from the surrounding frame, which is made available with this method
+
+    void dumpAsXml(xmlTextWriterPtr pWriter) const;
 };
 
 }

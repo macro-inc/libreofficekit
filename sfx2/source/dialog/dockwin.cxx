@@ -26,6 +26,7 @@
 #include <vcl/timer.hxx>
 #include <vcl/idle.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <tools/debug.hxx>
@@ -320,10 +321,10 @@ static SfxWorkWindow* lcl_getWorkWindowFromXFrame( const uno::Reference< frame::
     The string rDockingWindowName MUST BE a valid ID! The ID is pre-defined by a certain slot range located
     in sfxsids.hrc (currently SID_DOCKWIN_START = 9800).
 */
-void SfxDockingWindowFactory( const uno::Reference< frame::XFrame >& rFrame, const OUString& rDockingWindowName )
+void SfxDockingWindowFactory( const uno::Reference< frame::XFrame >& rFrame, std::u16string_view rDockingWindowName )
 {
     SolarMutexGuard aGuard;
-    sal_uInt16 nID = sal_uInt16(rDockingWindowName.toInt32());
+    sal_uInt16 nID = sal_uInt16(o3tl::toInt32(rDockingWindowName));
 
     // Check the range of the provided ID otherwise nothing will happen
     if ( !lcl_checkDockingWindowID( nID ))
@@ -345,11 +346,11 @@ void SfxDockingWindowFactory( const uno::Reference< frame::XFrame >& rFrame, con
     a special name. The string rDockingWindowName MUST BE a valid ID! The ID is pre-defined by a certain slot
     range located in sfxsids.hrc (currently SID_DOCKWIN_START = 9800).
 */
-bool IsDockingWindowVisible( const uno::Reference< frame::XFrame >& rFrame, const OUString& rDockingWindowName )
+bool IsDockingWindowVisible( const uno::Reference< frame::XFrame >& rFrame, std::u16string_view rDockingWindowName )
 {
     SolarMutexGuard aGuard;
 
-    sal_uInt16 nID = sal_uInt16(rDockingWindowName.toInt32());
+    sal_uInt16 nID = sal_uInt16(o3tl::toInt32(rDockingWindowName));
 
     // Check the range of the provided ID otherwise nothing will happen
     if ( lcl_checkDockingWindowID( nID ))
@@ -1441,7 +1442,7 @@ bool SfxDockingWindow::EventNotify( NotifyEvent& rEvt )
     if ( !pImpl )
         return ResizableDockingWindow::EventNotify( rEvt );
 
-    if ( rEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if ( rEvt.GetType() == NotifyEventType::GETFOCUS )
     {
         if (pMgr != nullptr)
             pBindings->SetActiveFrame( pMgr->GetFrame() );
@@ -1455,9 +1456,12 @@ bool SfxDockingWindow::EventNotify( NotifyEvent& rEvt )
         // base class, otherwise the parent learns nothing
         // if ( rEvt.GetWindow() == this )  PB: #i74693# not necessary any longer
         ResizableDockingWindow::EventNotify( rEvt );
+        // tdf#151112 move focus into container widget hierarchy if not already there
+        if (m_xContainer && !m_xContainer->has_child_focus())
+            m_xContainer->child_grab_focus();
         return true;
     }
-    else if( rEvt.GetType() == MouseNotifyEvent::KEYINPUT )
+    else if( rEvt.GetType() == NotifyEventType::KEYINPUT )
     {
         // First, allow KeyInput for Dialog functions
         if (!DockingWindow::EventNotify(rEvt) && SfxViewShell::Current())
@@ -1467,7 +1471,7 @@ bool SfxDockingWindow::EventNotify( NotifyEvent& rEvt )
         }
         return true;
     }
-    else if ( rEvt.GetType() == MouseNotifyEvent::LOSEFOCUS && !HasChildPathFocus() )
+    else if ( rEvt.GetType() == NotifyEventType::LOSEFOCUS && !HasChildPathFocus() )
     {
         pBindings->SetActiveFrame( nullptr );
     }

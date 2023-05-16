@@ -26,7 +26,7 @@
 
 #include <comphelper/propertyvalue.hxx>
 #include <svl/documentlockfile.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/table/XCell2.hpp>
 #include <com/sun/star/sheet/XCalculatable.hpp>
@@ -198,7 +198,7 @@ void Desktop::CheckOpenCLCompute(const Reference< XDesktop2 > &xDesktop)
     OUString aDevice = officecfg::Office::Calc::Formula::Calculation::OpenCLDevice::get();
     OUString aSelectedCLDeviceVersionID;
     if (!openclwrapper::switchOpenCLDevice(
-            &aDevice,
+            aDevice,
             officecfg::Office::Calc::Formula::Calculation::OpenCLAutoSelect::get(),
             false /* bForceEvaluation */,
             aSelectedCLDeviceVersionID))

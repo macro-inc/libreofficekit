@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/sheet/xrecentfunctions.hxx>
 
 #include <com/sun/star/lang/XComponent.hpp>
@@ -23,14 +23,13 @@ using namespace com::sun::star;
 
 namespace sc_apitest
 {
-class ScRecentFunctionsObj : public CalcUnoApiTest, public apitest::XRecentFunctions
+class ScRecentFunctionsObj : public UnoApiTest, public apitest::XRecentFunctions
 {
 public:
     ScRecentFunctionsObj();
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScRecentFunctionsObj);
 
@@ -40,13 +39,10 @@ public:
     CPPUNIT_TEST(testGetMaxRecentFunctions);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScRecentFunctionsObj::ScRecentFunctionsObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
 {
 }
 
@@ -59,15 +55,9 @@ uno::Reference<uno::XInterface> ScRecentFunctionsObj::init()
 
 void ScRecentFunctionsObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
     mxComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScRecentFunctionsObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScRecentFunctionsObj);

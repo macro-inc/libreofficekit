@@ -19,10 +19,11 @@ $(call gb_ExternalProject_get_state_target,libexttextcat,build):
 		$(gb_RUN_CONFIGURE) ./configure --disable-shared --with-pic \
 			$(if $(verbose),--disable-silent-rules,--enable-silent-rules) \
 			$(if $(ENABLE_WERROR),--enable-werror,--disable-werror) \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
-		CFLAGS="$(CFLAGS) $(gb_VISIBILITY_FLAGS) $(gb_DEBUGINFO_FLAGS) $(if $(ENABLE_OPTIMIZED),$(gb_COMPILEROPTFLAGS),$(gb_COMPILERNOOPTFLAGS)) \
+			$(gb_CONFIGURE_PLATFORMS) \
+		CFLAGS="$(CFLAGS) $(gb_VISIBILITY_FLAGS) $(gb_DEBUGINFO_FLAGS) $(call gb_ExternalProject_get_build_flags,libexttextcat) \
 			$(if $(COM_IS_CLANG),-Qunused-arguments) \
 			$(if $(filter AIX,$(OS)),-D_LINUX_SOURCE_COMPAT)" \
+		LDFLAGS="$(call gb_ExternalProject_get_link_flags,libexttextcat)" \
 		&& $(MAKE) \
 	)
 	$(call gb_Trace_EndRange,libexttextcat,EXTERNAL)

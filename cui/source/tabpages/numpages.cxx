@@ -17,7 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <com/sun/star/text/HoriOrientation.hpp>
 #include <com/sun/star/text/VertOrientation.hpp>
 
 #include <numpages.hxx>
@@ -44,6 +43,7 @@
 #include <unotools/pathoptions.hxx>
 #include <svtools/ctrltool.hxx>
 #include <svtools/unitconv.hxx>
+#include <svtools/colorcfg.hxx>
 #include <com/sun/star/style/NumberingType.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/container/XIndexAccess.hpp>
@@ -53,6 +53,7 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <svx/svxids.hrc>
+#include <o3tl/string_view.hxx>
 
 #include <algorithm>
 #include <memory>
@@ -228,20 +229,19 @@ bool  SvxSingleNumPickTabPage::FillItemSet( SfxItemSet* rSet )
 
 void  SvxSingleNumPickTabPage::ActivatePage(const SfxItemSet& rSet)
 {
-    const SfxPoolItem* pItem;
     bPreset = false;
     bool bIsPreset = false;
     const SfxItemSet* pExampleSet = GetDialogExampleSet();
     if(pExampleSet)
     {
-        if(SfxItemState::SET == pExampleSet->GetItemState(SID_PARAM_NUM_PRESET, false, &pItem))
-            bIsPreset = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-        if(SfxItemState::SET == pExampleSet->GetItemState(SID_PARAM_CUR_NUM_LEVEL, false, &pItem))
-            nActNumLvl = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        if(const SfxBoolItem* pPresetItem = pExampleSet->GetItemIfSet(SID_PARAM_NUM_PRESET, false))
+            bIsPreset = pPresetItem->GetValue();
+        if(const SfxUInt16Item* pLevelItem = pExampleSet->GetItemIfSet(SID_PARAM_CUR_NUM_LEVEL, false))
+            nActNumLvl = pLevelItem->GetValue();
     }
-    if(SfxItemState::SET == rSet.GetItemState(nNumItemId, false, &pItem))
+    if(const SvxNumBulletItem* pNumItem = rSet.GetItemIfSet(nNumItemId, false))
     {
-        pSaveNum.reset( new SvxNumRule(static_cast<const SvxNumBulletItem*>(pItem)->GetNumRule()) );
+        pSaveNum.reset( new SvxNumRule(pNumItem->GetNumRule()) );
     }
     if(pActNum && *pSaveNum != *pActNum)
     {
@@ -280,7 +280,7 @@ void  SvxSingleNumPickTabPage::Reset( const SfxItemSet* rSet )
 
         if( eState != SfxItemState::SET )
         {
-            pItem = &static_cast< const SvxNumBulletItem& >( rSet->Get( nNumItemId ) );
+            pItem = & rSet->Get( nNumItemId );
             eState = SfxItemState::SET;
         }
     }
@@ -373,20 +373,19 @@ bool  SvxBulletPickTabPage::FillItemSet( SfxItemSet* rSet )
 
 void  SvxBulletPickTabPage::ActivatePage(const SfxItemSet& rSet)
 {
-    const SfxPoolItem* pItem;
     bPreset = false;
     bool bIsPreset = false;
     const SfxItemSet* pExampleSet = GetDialogExampleSet();
     if(pExampleSet)
     {
-        if(SfxItemState::SET == pExampleSet->GetItemState(SID_PARAM_NUM_PRESET, false, &pItem))
-            bIsPreset = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-        if(SfxItemState::SET == pExampleSet->GetItemState(SID_PARAM_CUR_NUM_LEVEL, false, &pItem))
-            nActNumLvl = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        if(const SfxBoolItem* pPresetItem = pExampleSet->GetItemIfSet(SID_PARAM_NUM_PRESET, false))
+            bIsPreset = pPresetItem->GetValue();
+        if(const SfxUInt16Item* pLevelItem = pExampleSet->GetItemIfSet(SID_PARAM_CUR_NUM_LEVEL, false))
+            nActNumLvl = pLevelItem->GetValue();
     }
-    if(SfxItemState::SET == rSet.GetItemState(nNumItemId, false, &pItem))
+    if(const SvxNumBulletItem* pBulletItem = rSet.GetItemIfSet(nNumItemId, false))
     {
-        pSaveNum.reset( new SvxNumRule(static_cast<const SvxNumBulletItem*>(pItem)->GetNumRule()) );
+        pSaveNum.reset( new SvxNumRule(pBulletItem->GetNumRule()) );
     }
     if(pActNum && *pSaveNum != *pActNum)
     {
@@ -413,23 +412,20 @@ DeactivateRC SvxBulletPickTabPage::DeactivatePage(SfxItemSet *_pSet)
 
 void  SvxBulletPickTabPage::Reset( const SfxItemSet* rSet )
 {
-    const SfxPoolItem* pItem;
     // in Draw the item exists as WhichId, in Writer only as SlotId
-    SfxItemState eState = rSet->GetItemState(SID_ATTR_NUMBERING_RULE, false, &pItem);
-    if(eState != SfxItemState::SET)
+    const SvxNumBulletItem* pItem = rSet->GetItemIfSet(SID_ATTR_NUMBERING_RULE, false);
+    if(!pItem)
     {
         nNumItemId = rSet->GetPool()->GetWhich(SID_ATTR_NUMBERING_RULE);
-        eState = rSet->GetItemState(nNumItemId, false, &pItem);
+        pItem = rSet->GetItemIfSet(nNumItemId, false);
 
-        if( eState != SfxItemState::SET )
+        if( !pItem )
         {
-            pItem = &static_cast< const SvxNumBulletItem& >( rSet->Get( nNumItemId ) );
-            eState = SfxItemState::SET;
+            pItem = & rSet->Get( nNumItemId );
         }
 
     }
-    DBG_ASSERT(eState == SfxItemState::SET, "no item found!");
-    pSaveNum.reset( new SvxNumRule(static_cast<const SvxNumBulletItem*>(pItem)->GetNumRule()) );
+    pSaveNum.reset( new SvxNumRule(pItem->GetNumRule()) );
 
     if(!pActNum)
         pActNum.reset( new SvxNumRule(*pSaveNum) );
@@ -513,11 +509,14 @@ SvxNumPickTabPage::SvxNumPickTabPage(weld::Container* pPage, weld::DialogControl
             SvxNumSettingsArr_Impl& rItemArr = aNumSettingsArrays[ nItem ];
 
             Reference<XIndexAccess> xLevel = aOutlineAccess.getConstArray()[nItem];
-            for(sal_Int32 nLevel = 0; nLevel < xLevel->getCount() && nLevel < 5; nLevel++)
+            for(sal_Int32 nLevel = 0; nLevel < SVX_MAX_NUM; nLevel++)
             {
-                Any aValueAny = xLevel->getByIndex(nLevel);
+                // use the last locale-defined level for all remaining levels.
+                sal_Int32 nLocaleLevel = std::min(nLevel, xLevel->getCount() - 1);
                 Sequence<PropertyValue> aLevelProps;
-                aValueAny >>= aLevelProps;
+                if (nLocaleLevel >= 0)
+                    xLevel->getByIndex(nLocaleLevel) >>= aLevelProps;
+
                 SvxNumSettings_Impl* pNew = lcl_CreateNumSettingsPtr(aLevelProps);
                 rItemArr.push_back( std::unique_ptr<SvxNumSettings_Impl>(pNew) );
             }
@@ -555,20 +554,19 @@ bool  SvxNumPickTabPage::FillItemSet( SfxItemSet* rSet )
 
 void  SvxNumPickTabPage::ActivatePage(const SfxItemSet& rSet)
 {
-    const SfxPoolItem* pItem;
     bPreset = false;
     bool bIsPreset = false;
     const SfxItemSet* pExampleSet = GetDialogExampleSet();
     if(pExampleSet)
     {
-        if(SfxItemState::SET == pExampleSet->GetItemState(SID_PARAM_NUM_PRESET, false, &pItem))
-            bIsPreset = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-        if(SfxItemState::SET == pExampleSet->GetItemState(SID_PARAM_CUR_NUM_LEVEL, false, &pItem))
-            nActNumLvl = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        if(const SfxBoolItem* pPresetItem = pExampleSet->GetItemIfSet(SID_PARAM_NUM_PRESET, false))
+            bIsPreset = pPresetItem->GetValue();
+        if(const SfxUInt16Item* pLevelItem = pExampleSet->GetItemIfSet(SID_PARAM_CUR_NUM_LEVEL, false))
+            nActNumLvl = pLevelItem->GetValue();
     }
-    if(SfxItemState::SET == rSet.GetItemState(nNumItemId, false, &pItem))
+    if(const SvxNumBulletItem* pBulletItem = rSet.GetItemIfSet(nNumItemId, false))
     {
-        pSaveNum.reset( new SvxNumRule(static_cast<const SvxNumBulletItem*>(pItem)->GetNumRule()) );
+        pSaveNum.reset( new SvxNumRule(pBulletItem->GetNumRule()) );
     }
     if(pActNum && *pSaveNum != *pActNum)
     {
@@ -595,23 +593,19 @@ DeactivateRC SvxNumPickTabPage::DeactivatePage(SfxItemSet *_pSet)
 
 void  SvxNumPickTabPage::Reset( const SfxItemSet* rSet )
 {
-    const SfxPoolItem* pItem;
     // in Draw the item exists as WhichId, in Writer only as SlotId
-    SfxItemState eState = rSet->GetItemState(SID_ATTR_NUMBERING_RULE, false, &pItem);
-    if(eState != SfxItemState::SET)
+    const SvxNumBulletItem* pItem = rSet->GetItemIfSet(SID_ATTR_NUMBERING_RULE, false);
+    if(!pItem)
     {
         nNumItemId = rSet->GetPool()->GetWhich(SID_ATTR_NUMBERING_RULE);
-        eState = rSet->GetItemState(nNumItemId, false, &pItem);
+        pItem = rSet->GetItemIfSet(nNumItemId, false);
 
-        if( eState != SfxItemState::SET )
+        if( !pItem )
         {
-            pItem = &static_cast< const SvxNumBulletItem& >( rSet->Get( nNumItemId ) );
-            eState = SfxItemState::SET;
+            pItem = & rSet->Get( nNumItemId );
         }
-
     }
-    DBG_ASSERT(eState == SfxItemState::SET, "no item found!");
-    pSaveNum.reset( new SvxNumRule(static_cast<const SvxNumBulletItem*>(pItem)->GetNumRule()) );
+    pSaveNum.reset( new SvxNumRule(pItem->GetNumRule()) );
 
     if(!pActNum)
         pActNum.reset( new SvxNumRule(*pSaveNum) );
@@ -654,11 +648,13 @@ IMPL_LINK_NOARG(SvxNumPickTabPage, NumSelectHdl_Impl, ValueSet*, void)
                 //search for the font
                 if(!pList)
                 {
-                    SfxObjectShell* pCurDocShell = SfxObjectShell::Current();
-                    const SvxFontListItem* pFontListItem =
-                            static_cast<const SvxFontListItem*>( pCurDocShell
-                                                ->GetItem( SID_ATTR_CHAR_FONTLIST ));
-                    pList = pFontListItem ? pFontListItem->GetFontList() : nullptr;
+                    if (SfxObjectShell* pCurDocShell = SfxObjectShell::Current())
+                    {
+                        const SvxFontListItem* pFontListItem =
+                                static_cast<const SvxFontListItem*>( pCurDocShell
+                                                    ->GetItem( SID_ATTR_CHAR_FONTLIST ));
+                        pList = pFontListItem ? pFontListItem->GetFontList() : nullptr;
+                    }
                 }
                 if(pList && pList->IsAvailable( pLevelSettings->sBulletFont ) )
                 {
@@ -695,6 +691,11 @@ IMPL_LINK_NOARG(SvxNumPickTabPage, NumSelectHdl_Impl, ValueSet*, void)
             aFmt.SetIncludeUpperLevels(sal::static_int_cast< sal_uInt8 >(0 != nUpperLevelOrChar ? pActNum->GetLevelCount() : 1));
             aFmt.SetCharFormatName(sNumCharFmtName);
             aFmt.SetBulletRelSize(100);
+
+            // Completely ignore the Left/Right value provided by the locale outline definition,
+            // because this function doesn't actually modify the indents at all,
+            // and right-adjusted numbering definitely needs a different FirstLineIndent.
+
             // #i93908#
             aFmt.SetListFormat(pLevelSettings->sPrefix, pLevelSettings->sSuffix, i);
         }
@@ -785,20 +786,19 @@ std::unique_ptr<SfxTabPage> SvxBitmapPickTabPage::Create(weld::Container* pPage,
 
 void  SvxBitmapPickTabPage::ActivatePage(const SfxItemSet& rSet)
 {
-    const SfxPoolItem* pItem;
     bPreset = false;
     bool bIsPreset = false;
     const SfxItemSet* pExampleSet = GetDialogExampleSet();
     if(pExampleSet)
     {
-        if(SfxItemState::SET == pExampleSet->GetItemState(SID_PARAM_NUM_PRESET, false, &pItem))
-            bIsPreset = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-        if(SfxItemState::SET == pExampleSet->GetItemState(SID_PARAM_CUR_NUM_LEVEL, false, &pItem))
-            nActNumLvl = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        if(const SfxBoolItem* pPresetItem = pExampleSet->GetItemIfSet(SID_PARAM_NUM_PRESET, false))
+            bIsPreset = pPresetItem->GetValue();
+        if(const SfxUInt16Item* pLevelItem = pExampleSet->GetItemIfSet(SID_PARAM_CUR_NUM_LEVEL, false))
+            nActNumLvl = pLevelItem->GetValue();
     }
-    if(SfxItemState::SET == rSet.GetItemState(nNumItemId, false, &pItem))
+    if(const SvxNumBulletItem* pBulletItem = rSet.GetItemIfSet(nNumItemId, false))
     {
-        pSaveNum.reset( new SvxNumRule(static_cast<const SvxNumBulletItem*>(pItem)->GetNumRule()) );
+        pSaveNum.reset( new SvxNumRule(pBulletItem->GetNumRule()) );
     }
     if(pActNum && *pSaveNum != *pActNum)
     {
@@ -842,23 +842,21 @@ bool  SvxBitmapPickTabPage::FillItemSet( SfxItemSet* rSet )
 
 void  SvxBitmapPickTabPage::Reset( const SfxItemSet* rSet )
 {
-    const SfxPoolItem* pItem;
     // in Draw the item exists as WhichId, in Writer only as SlotId
-    SfxItemState eState = rSet->GetItemState(SID_ATTR_NUMBERING_RULE, false, &pItem);
-    if(eState != SfxItemState::SET)
+    const SvxNumBulletItem* pItem = rSet->GetItemIfSet(SID_ATTR_NUMBERING_RULE, false);
+    if(!pItem)
     {
         nNumItemId = rSet->GetPool()->GetWhich(SID_ATTR_NUMBERING_RULE);
-        eState = rSet->GetItemState(nNumItemId, false, &pItem);
+        pItem = rSet->GetItemIfSet(nNumItemId, false);
 
-        if( eState != SfxItemState::SET )
+        if( !pItem )
         {
-            pItem = &static_cast< const SvxNumBulletItem& >( rSet->Get( nNumItemId ) );
-            eState = SfxItemState::SET;
+            pItem = & rSet->Get( nNumItemId );
         }
 
     }
-    DBG_ASSERT(eState == SfxItemState::SET, "no item found!");
-    pSaveNum.reset( new SvxNumRule(static_cast<const SvxNumBulletItem*>(pItem)->GetNumRule()) );
+    DBG_ASSERT(pItem, "no item found!");
+    pSaveNum.reset( new SvxNumRule(pItem->GetNumRule()) );
 
     if(!pActNum)
         pActNum.reset( new SvxNumRule(*pSaveNum) );
@@ -913,12 +911,12 @@ IMPL_LINK_NOARG(SvxBitmapPickTabPage, ClickAddBrowseHdl_Impl, weld::Button&, voi
 {
     sfx2::FileDialogHelper aFileDialog(0, FileDialogFlags::NONE, GetFrameWeld());
     aFileDialog.SetContext(sfx2::FileDialogHelper::BulletsAddImage);
-    aFileDialog.SetTitle(CuiResId(RID_SVXSTR_ADD_IMAGE));
+    aFileDialog.SetTitle(CuiResId(RID_CUISTR_ADD_IMAGE));
     if ( aFileDialog.Execute() != ERRCODE_NONE )
         return;
 
     OUString aPath = SvtPathOptions().GetGalleryPath();
-    OUString aPathToken = aPath.getToken( 1 , SEARCHPATH_DELIMITER );
+    std::u16string_view aPathToken = o3tl::getToken(aPath, 1 , SEARCHPATH_DELIMITER );
 
     OUString aUserImageURL = aFileDialog.GetPath();
 
@@ -929,7 +927,7 @@ IMPL_LINK_NOARG(SvxBitmapPickTabPage, ClickAddBrowseHdl_Impl, weld::Button&, voi
     else if (nPos<aUserImageURL.getLength())
         aFileName = aUserImageURL.copy(nPos);
 
-    OUString aUserGalleryURL = aPathToken + "/" + aFileName;
+    OUString aUserGalleryURL = OUString::Concat(aPathToken) + "/" + aFileName;
     INetURLObject aURL( aUserImageURL );
     DBG_ASSERT( aURL.GetProtocol() != INetProtocol::NotValid, "invalid URL" );
 
@@ -1137,19 +1135,18 @@ std::unique_ptr<SfxTabPage> SvxNumOptionsTabPage::Create(weld::Container* pPage,
 
 void    SvxNumOptionsTabPage::ActivatePage(const SfxItemSet& rSet)
 {
-    const SfxPoolItem* pItem;
     const SfxItemSet* pExampleSet = GetDialogExampleSet();
     sal_uInt16 nTmpNumLvl = 1;
     if(pExampleSet)
     {
-        if(SfxItemState::SET == pExampleSet->GetItemState(SID_PARAM_NUM_PRESET, false, &pItem))
-            bPreset = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-        if(SfxItemState::SET == pExampleSet->GetItemState(SID_PARAM_CUR_NUM_LEVEL, false, &pItem))
-            nTmpNumLvl = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        if(const SfxBoolItem* pPresetItem = pExampleSet->GetItemIfSet(SID_PARAM_NUM_PRESET, false))
+            bPreset = pPresetItem->GetValue();
+        if(const SfxUInt16Item* pLevelItem = pExampleSet->GetItemIfSet(SID_PARAM_CUR_NUM_LEVEL, false))
+            nTmpNumLvl = pLevelItem->GetValue();
     }
-    if(SfxItemState::SET == rSet.GetItemState(nNumItemId, false, &pItem))
+    if(const SvxNumBulletItem* pBulletItem = rSet.GetItemIfSet(nNumItemId, false))
     {
-        pSaveNum.reset( new SvxNumRule(static_cast<const SvxNumBulletItem*>(pItem)->GetNumRule()) );
+        pSaveNum.reset( new SvxNumRule(pBulletItem->GetNumRule()) );
     }
 
     bModified = (!pActNum->Get( 0 ) || bPreset);
@@ -1196,23 +1193,21 @@ bool    SvxNumOptionsTabPage::FillItemSet( SfxItemSet* rSet )
 
 void    SvxNumOptionsTabPage::Reset( const SfxItemSet* rSet )
 {
-    const SfxPoolItem* pItem;
     // in Draw the item exists as WhichId, in Writer only as SlotId
-    SfxItemState eState = rSet->GetItemState(SID_ATTR_NUMBERING_RULE, false, &pItem);
-    if(eState != SfxItemState::SET)
+    const SvxNumBulletItem* pBulletItem =
+        rSet->GetItemIfSet(SID_ATTR_NUMBERING_RULE, false);
+    if(!pBulletItem)
     {
         nNumItemId = rSet->GetPool()->GetWhich(SID_ATTR_NUMBERING_RULE);
-        eState = rSet->GetItemState(nNumItemId, false, &pItem);
+        pBulletItem = rSet->GetItemIfSet(nNumItemId, false);
 
-        if( eState != SfxItemState::SET )
+        if( !pBulletItem )
         {
-            pItem = &static_cast< const SvxNumBulletItem& >( rSet->Get( nNumItemId ) );
-            eState = SfxItemState::SET;
+            pBulletItem = & rSet->Get( nNumItemId );
         }
-
     }
-    DBG_ASSERT(eState == SfxItemState::SET, "no item found!");
-    pSaveNum.reset( new SvxNumRule(static_cast<const SvxNumBulletItem*>(pItem)->GetNumRule()) );
+    DBG_ASSERT(pBulletItem, "no item found!");
+    pSaveNum.reset( new SvxNumRule(pBulletItem->GetNumRule()) );
 
     // insert levels
     if (!m_xLevelLB->n_children())
@@ -1254,12 +1249,16 @@ void    SvxNumOptionsTabPage::Reset( const SfxItemSet* rSet )
     m_aPreviewWIN.SetNumRule(pActNum.get());
     m_xSameLevelCB->set_active(pActNum->IsContinuousNumbering());
 
-    SfxObjectShell* pShell;
-    if ( SfxItemState::SET == rSet->GetItemState( SID_HTML_MODE, false, &pItem )
-         || ( nullptr != ( pShell = SfxObjectShell::Current()) &&
-              nullptr != ( pItem = pShell->GetItem( SID_HTML_MODE ) ) ) )
+    const SfxUInt16Item* pHtmlModeItem =
+        rSet->GetItemIfSet( SID_HTML_MODE, false );
+    if (!pHtmlModeItem)
     {
-        sal_uInt16 nHtmlMode = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        if (SfxObjectShell* pShell = SfxObjectShell::Current())
+            pHtmlModeItem = pShell->GetItem( SID_HTML_MODE );
+    }
+    if ( pHtmlModeItem )
+    {
+        sal_uInt16 nHtmlMode = pHtmlModeItem->GetValue();
         bHTMLMode = 0 != (nHtmlMode&HTMLMODE_ON);
     }
 
@@ -1618,7 +1617,7 @@ IMPL_LINK(SvxNumOptionsTabPage, AllLevelHdl_Impl, weld::SpinButton&, rBox, void)
         if(nActNumLvl & nMask)
         {
             SvxNumberFormat aNumFmt(pActNum->GetLevel(e));
-            aNumFmt.SetIncludeUpperLevels(static_cast<sal_uInt8>(std::min(rBox.get_value(), int(e + 1))) );
+            aNumFmt.SetIncludeUpperLevels(static_cast<sal_uInt8>(std::min(rBox.get_value(), sal_Int64(e + 1))) );
             // Set the same prefix/suffix to generate list format with changed IncludedUpperLevels
             aNumFmt.SetListFormat(aNumFmt.GetPrefix(), aNumFmt.GetSuffix(), e);
             pActNum->SetLevel(e, aNumFmt);
@@ -1802,7 +1801,7 @@ IMPL_LINK(SvxNumOptionsTabPage, GraphicHdl_Impl, const OString&, rIdent, void)
     OUString                aGrfName;
     Size                    aSize;
     bool                bSucc(false);
-    SvxOpenGraphicDialog aGrfDlg(CuiResId(RID_SVXSTR_EDIT_GRAPHIC), GetFrameWeld());
+    SvxOpenGraphicDialog aGrfDlg(CuiResId(RID_CUISTR_EDIT_GRAPHIC), GetFrameWeld());
 
     OString sNumber;
     if (rIdent.startsWith("gallery", &sNumber))
@@ -2163,10 +2162,10 @@ static tools::Long lcl_DrawBullet(VirtualDevice* pVDev,
     aFont.SetFontSize(aTmpSize);
     aFont.SetTransparent(true);
     Color aBulletColor = rFmt.GetBulletColor();
-    if(aBulletColor == COL_AUTO)
-        aBulletColor = pVDev->GetFillColor().IsDark() ? COL_WHITE : COL_BLACK;
-    else if(aBulletColor == pVDev->GetFillColor())
-        aBulletColor.Invert();
+    if (aBulletColor == COL_AUTO)
+        aBulletColor = pVDev->GetBackgroundColor().IsDark() ? COL_WHITE : COL_BLACK;
+    else if (pVDev->GetBackgroundColor().IsDark() == aBulletColor.IsDark())
+        aBulletColor = pVDev->GetBackgroundColor().IsDark() ? COL_WHITE : COL_BLACK;
     aFont.SetColor(aBulletColor);
     pVDev->SetFont( aFont );
     sal_UCS4 cChar = rFmt.GetBulletChar();
@@ -2192,9 +2191,9 @@ void SvxNumberingPreview::Paint(vcl::RenderContext& rRenderContext, const ::tool
 {
     Size aSize(rRenderContext.PixelToLogic(GetOutputSizePixel()));
 
-    const StyleSettings& rStyleSettings = rRenderContext.GetSettings().GetStyleSettings();
-    const Color aBackColor = rStyleSettings.GetFieldColor();
-    const Color aTextColor = rStyleSettings.GetFieldTextColor();
+    // Use default document and font colors to create preview
+    const Color aBackColor = svtools::ColorConfig().GetColorValue(svtools::DOCCOLOR).nColor;
+    const Color aTextColor = svtools::ColorConfig().GetColorValue(svtools::FONTCOLOR).nColor;
 
     ScopedVclPtrInstance<VirtualDevice> pVDev(rRenderContext);
     pVDev->EnableRTL(rRenderContext.IsRTLEnabled());
@@ -2206,6 +2205,8 @@ void SvxNumberingPreview::Paint(vcl::RenderContext& rRenderContext, const ::tool
         aLineColor.Invert();
     pVDev->SetLineColor(aLineColor);
     pVDev->SetFillColor(aBackColor);
+    pVDev->SetBackground(Wallpaper(aBackColor));
+    pVDev->DrawWallpaper(pVDev->GetOutputRectPixel(), pVDev->GetBackground());
 
     if (pActNum)
     {
@@ -2233,6 +2234,9 @@ void SvxNumberingPreview::Paint(vcl::RenderContext& rRenderContext, const ::tool
 
         if (bPosition)
         {
+            // When bPosition == true, draw the preview used in the Writer's "Position" tab
+            // This is not used in Impress/Draw
+
             tools::Long nLineHeight = nFontHeight * 8 / 7;
             sal_uInt8 nStart = 0;
             while (!(nActLevel & (1<<nStart)))
@@ -2299,9 +2303,9 @@ void SvxNumberingPreview::Paint(vcl::RenderContext& rRenderContext, const ::tool
                     vcl::Font aColorFont(aSaveFont);
                     Color aTmpBulletColor = rFmt.GetBulletColor();
                     if (aTmpBulletColor == COL_AUTO)
-                        aTmpBulletColor = aBackColor.IsDark() ? COL_WHITE : COL_BLACK;
-                    else if (aTmpBulletColor == aBackColor)
-                        aTmpBulletColor.Invert();
+                        aTmpBulletColor = pVDev->GetBackgroundColor().IsDark() ? COL_WHITE : COL_BLACK;
+                    else if (pVDev->GetBackgroundColor().IsDark() == aTmpBulletColor.IsDark())
+                        aTmpBulletColor = pVDev->GetBackgroundColor().IsDark() ? COL_WHITE : COL_BLACK;
                     aColorFont.SetColor(aTmpBulletColor);
                     pVDev->SetFont(aColorFont);
                     pVDev->DrawText(Point(nNumberXPos, nYStart), aText);
@@ -2363,14 +2367,15 @@ void SvxNumberingPreview::Paint(vcl::RenderContext& rRenderContext, const ::tool
         }
         else
         {
+            // When bPosition == false, draw the preview used in Writer's "Customize" tab
+            // and in Impress' "Bullets and Numbering" dialog
+
             //#i5153# painting gray or black rectangles as 'normal' numbering text
             tools::Long nWidth = pVDev->GetTextWidth("Preview");
             tools::Long nTextHeight = pVDev->GetTextHeight();
             tools::Long nRectHeight = nTextHeight * 2 / 3;
             tools::Long nTopOffset = nTextHeight - nRectHeight;
-            Color aBlackColor(COL_BLACK);
-            if (aBlackColor == aBackColor)
-                aBlackColor.Invert();
+            Color aSelRectColor = pVDev->GetBackgroundColor().IsDark() ? COL_WHITE : COL_BLACK;
 
             for (sal_uInt16 nLevel = 0; nLevel < pActNum->GetLevelCount(); ++nLevel, nYStart = nYStart + nYStep)
             {
@@ -2431,9 +2436,9 @@ void SvxNumberingPreview::Paint(vcl::RenderContext& rRenderContext, const ::tool
                     aFont.SetFontSize(aTmpSize);
                     Color aTmpBulletColor = rFmt.GetBulletColor();
                     if (aTmpBulletColor == COL_AUTO)
-                        aTmpBulletColor = aBackColor.IsDark() ? COL_WHITE : COL_BLACK;
-                    else if (aTmpBulletColor == aBackColor)
-                        aTmpBulletColor.Invert();
+                        aTmpBulletColor = pVDev->GetBackgroundColor().IsDark() ? COL_WHITE : COL_BLACK;
+                    else if (pVDev->GetBackgroundColor().IsDark() == aTmpBulletColor.IsDark())
+                        aTmpBulletColor = pVDev->GetBackgroundColor().IsDark() ? COL_WHITE : COL_BLACK;
                     aFont.SetColor(aTmpBulletColor);
                     pVDev->SetFont(aFont);
                     aNum.SetLevel( nLevel );
@@ -2451,8 +2456,8 @@ void SvxNumberingPreview::Paint(vcl::RenderContext& rRenderContext, const ::tool
                 //#i5153# the selected rectangle(s) should be black
                 if (0 != (nActLevel & (1<<nLevel)))
                 {
-                    pVDev->SetFillColor( aBlackColor );
-                    pVDev->SetLineColor( aBlackColor );
+                    pVDev->SetFillColor( aSelRectColor );
+                    pVDev->SetLineColor( aSelRectColor );
                 }
                 else
                 {
@@ -2755,19 +2760,18 @@ void SvxNumPositionTabPage::InitControls()
 
 void SvxNumPositionTabPage::ActivatePage(const SfxItemSet& rSet)
 {
-    const SfxPoolItem* pItem;
     sal_uInt16 nTmpNumLvl = 1;
     const SfxItemSet* pExampleSet = GetDialogExampleSet();
     if(pExampleSet)
     {
-        if(SfxItemState::SET == pExampleSet->GetItemState(SID_PARAM_NUM_PRESET, false, &pItem))
-            bPreset = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-        if(SfxItemState::SET == pExampleSet->GetItemState(SID_PARAM_CUR_NUM_LEVEL, false, &pItem))
-            nTmpNumLvl = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        if(const SfxBoolItem* pPresetItem = pExampleSet->GetItemIfSet(SID_PARAM_NUM_PRESET, false))
+            bPreset = pPresetItem->GetValue();
+        if(const SfxUInt16Item* pLevelItem = pExampleSet->GetItemIfSet(SID_PARAM_CUR_NUM_LEVEL, false))
+            nTmpNumLvl = pLevelItem->GetValue();
     }
-    if(SfxItemState::SET == rSet.GetItemState(nNumItemId, false, &pItem))
+    if(const SvxNumBulletItem* pBulletItem = rSet.GetItemIfSet(nNumItemId, false))
     {
-        pSaveNum.reset( new SvxNumRule(static_cast<const SvxNumBulletItem*>(pItem)->GetNumRule()) );
+        pSaveNum.reset( new SvxNumRule(pBulletItem->GetNumRule()) );
     }
     bModified = (!pActNum->Get( 0 ) || bPreset);
     if(*pSaveNum != *pActNum ||
@@ -2824,23 +2828,21 @@ bool SvxNumPositionTabPage::FillItemSet( SfxItemSet* rSet )
 
 void SvxNumPositionTabPage::Reset( const SfxItemSet* rSet )
 {
-    const SfxPoolItem* pItem;
     // in Draw the item exists as WhichId, in Writer only as SlotId
-    SfxItemState eState = rSet->GetItemState(SID_ATTR_NUMBERING_RULE, false, &pItem);
-    if(eState != SfxItemState::SET)
+    const SvxNumBulletItem* pItem =
+        rSet->GetItemIfSet(SID_ATTR_NUMBERING_RULE, false);
+    if(!pItem)
     {
         nNumItemId = rSet->GetPool()->GetWhich(SID_ATTR_NUMBERING_RULE);
-        eState = rSet->GetItemState(nNumItemId, false, &pItem);
+        pItem = rSet->GetItemIfSet(nNumItemId, false);
 
-        if( eState != SfxItemState::SET )
+        if( !pItem )
         {
-            pItem = &static_cast< const SvxNumBulletItem& >( rSet->Get( nNumItemId ) );
-            eState = SfxItemState::SET;
+            pItem = & rSet->Get( nNumItemId );
         }
-
     }
-    DBG_ASSERT(eState == SfxItemState::SET, "no item found!");
-    pSaveNum.reset( new SvxNumRule(static_cast<const SvxNumBulletItem*>(pItem)->GetNumRule()) );
+    DBG_ASSERT(pItem, "no item found!");
+    pSaveNum.reset( new SvxNumRule(pItem->GetNumRule()) );
 
     // insert levels
     if (!m_xLevelLB->count_selected_rows())

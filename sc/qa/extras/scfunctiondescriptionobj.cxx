@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/sheet/functiondescription.hxx>
 
 #include <com/sun/star/beans/PropertyValue.hpp>
@@ -26,7 +26,7 @@ using namespace com::sun::star;
 
 namespace sc_apitest
 {
-class ScFunctionDescriptionObj : public CalcUnoApiTest, public apitest::FunctionDescription
+class ScFunctionDescriptionObj : public UnoApiTest, public apitest::FunctionDescription
 {
 public:
     ScFunctionDescriptionObj();
@@ -34,7 +34,6 @@ public:
     virtual uno::Sequence<beans::PropertyValue> init() override;
 
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScFunctionDescriptionObj);
 
@@ -42,13 +41,10 @@ public:
     CPPUNIT_TEST(testFunctionDescriptionProperties);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScFunctionDescriptionObj::ScFunctionDescriptionObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
 {
 }
 
@@ -70,15 +66,9 @@ uno::Sequence<beans::PropertyValue> ScFunctionDescriptionObj::init()
 
 void ScFunctionDescriptionObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
     mxComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScFunctionDescriptionObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScFunctionDescriptionObj);

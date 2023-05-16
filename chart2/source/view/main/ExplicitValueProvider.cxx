@@ -28,7 +28,7 @@
 #include <ObjectIdentifier.hxx>
 
 #include <comphelper/servicehelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace chart
 {
@@ -42,27 +42,24 @@ namespace
 {
 constexpr sal_Int32 constDiagramTitleSpace = 200; //=0,2 cm spacing
 
-bool lcl_getPropertySwapXAndYAxis(const uno::Reference<XDiagram>& xDiagram)
+bool lcl_getPropertySwapXAndYAxis(const rtl::Reference<Diagram>& xDiagram)
 {
     bool bSwapXAndY = false;
 
-    uno::Reference<XCoordinateSystemContainer> xCooSysContainer(xDiagram, uno::UNO_QUERY);
-    if (xCooSysContainer.is())
+    if (xDiagram.is())
     {
-        uno::Sequence<uno::Reference<XCoordinateSystem>> aCooSysList(
-            xCooSysContainer->getCoordinateSystems());
-        if (aCooSysList.hasElements())
+        const std::vector<rtl::Reference<BaseCoordinateSystem>>& aCooSysList(
+            xDiagram->getBaseCoordinateSystems());
+        if (!aCooSysList.empty())
         {
-            uno::Reference<beans::XPropertySet> xProp(aCooSysList[0], uno::UNO_QUERY);
-            if (xProp.is())
-                try
-                {
-                    xProp->getPropertyValue("SwapXAndYAxis") >>= bSwapXAndY;
-                }
-                catch (const uno::Exception&)
-                {
-                    TOOLS_WARN_EXCEPTION("chart2", "");
-                }
+            try
+            {
+                aCooSysList[0]->getPropertyValue("SwapXAndYAxis") >>= bSwapXAndY;
+            }
+            catch (const uno::Exception&)
+            {
+                TOOLS_WARN_EXCEPTION("chart2", "");
+            }
         }
     }
     return bSwapXAndY;
@@ -72,8 +69,8 @@ bool lcl_getPropertySwapXAndYAxis(const uno::Reference<XDiagram>& xDiagram)
 
 sal_Int32 ExplicitValueProvider::getExplicitNumberFormatKeyForAxis(
     const Reference<chart2::XAxis>& xAxis,
-    const Reference<chart2::XCoordinateSystem>& xCorrespondingCoordinateSystem,
-    const Reference<chart2::XChartDocument>& xChartDoc)
+    const rtl::Reference<::chart::BaseCoordinateSystem>& xCorrespondingCoordinateSystem,
+    const rtl::Reference<::chart::ChartModel>& xChartDoc)
 {
     return AxisHelper::getExplicitNumberFormatKeyForAxis(
         xAxis, xCorrespondingCoordinateSystem, xChartDoc,
@@ -123,8 +120,8 @@ sal_Int32 ExplicitValueProvider::getExplicitPercentageNumberFormatKeyForDataLabe
 }
 
 awt::Rectangle ExplicitValueProvider::AddSubtractAxisTitleSizes(
-    ChartModel& rModel, const Reference<uno::XInterface>& xChartView,
-    const awt::Rectangle& rPositionAndSize, bool bSubtract)
+    ChartModel& rModel, ExplicitValueProvider* pChartView, const awt::Rectangle& rPositionAndSize,
+    bool bSubtract)
 {
     awt::Rectangle aRet(rPositionAndSize);
 
@@ -140,12 +137,11 @@ awt::Rectangle ExplicitValueProvider::AddSubtractAxisTitleSizes(
     if (xTitle_Height.is() || xTitle_Width.is() || xSecondTitle_Height.is()
         || xSecondTitle_Width.is())
     {
-        ExplicitValueProvider* pExplicitValueProvider
-            = comphelper::getFromUnoTunnel<ExplicitValueProvider>(xChartView);
+        ExplicitValueProvider* pExplicitValueProvider = pChartView;
         if (pExplicitValueProvider)
         {
             //detect whether x axis points into x direction or not
-            if (lcl_getPropertySwapXAndYAxis(rModel.getFirstDiagram()))
+            if (lcl_getPropertySwapXAndYAxis(rModel.getFirstChartDiagram()))
             {
                 std::swap(xTitle_Height, xTitle_Width);
                 std::swap(xSecondTitle_Height, xSecondTitle_Width);
@@ -159,7 +155,7 @@ awt::Rectangle ExplicitValueProvider::AddSubtractAxisTitleSizes(
             if (xTitle_Height.is())
             {
                 OUString aCID_X(
-                    ObjectIdentifier::createClassifiedIdentifierForObject(xTitle_Height, rModel));
+                    ObjectIdentifier::createClassifiedIdentifierForObject(xTitle_Height, &rModel));
                 nTitleSpaceHeight
                     = pExplicitValueProvider->getRectangleOfObject(aCID_X, true).Height;
                 if (nTitleSpaceHeight)
@@ -168,7 +164,7 @@ awt::Rectangle ExplicitValueProvider::AddSubtractAxisTitleSizes(
             if (xTitle_Width.is())
             {
                 OUString aCID_Y(
-                    ObjectIdentifier::createClassifiedIdentifierForObject(xTitle_Width, rModel));
+                    ObjectIdentifier::createClassifiedIdentifierForObject(xTitle_Width, &rModel));
                 nTitleSpaceWidth = pExplicitValueProvider->getRectangleOfObject(aCID_Y, true).Width;
                 if (nTitleSpaceWidth)
                     nTitleSpaceWidth += constDiagramTitleSpace;
@@ -176,7 +172,7 @@ awt::Rectangle ExplicitValueProvider::AddSubtractAxisTitleSizes(
             if (xSecondTitle_Height.is())
             {
                 OUString aCID_X(ObjectIdentifier::createClassifiedIdentifierForObject(
-                    xSecondTitle_Height, rModel));
+                    xSecondTitle_Height, &rModel));
                 nSecondTitleSpaceHeight
                     = pExplicitValueProvider->getRectangleOfObject(aCID_X, true).Height;
                 if (nSecondTitleSpaceHeight)
@@ -185,7 +181,7 @@ awt::Rectangle ExplicitValueProvider::AddSubtractAxisTitleSizes(
             if (xSecondTitle_Width.is())
             {
                 OUString aCID_Y(ObjectIdentifier::createClassifiedIdentifierForObject(
-                    xSecondTitle_Width, rModel));
+                    xSecondTitle_Width, &rModel));
                 nSecondTitleSpaceWidth
                     += pExplicitValueProvider->getRectangleOfObject(aCID_Y, true).Width;
                 if (nSecondTitleSpaceWidth)

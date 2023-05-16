@@ -63,21 +63,22 @@ namespace sdr::properties
             return std::unique_ptr<BaseProperties>(new ConnectorProperties(*this, rObj));
         }
 
-        void ConnectorProperties::ItemSetChanged(const SfxItemSet* pSet)
+        void ConnectorProperties::ItemSetChanged(o3tl::span< const SfxPoolItem* const > aChangedItems, sal_uInt16 nDeletedWhich)
         {
             SdrEdgeObj& rObj = static_cast<SdrEdgeObj&>(GetSdrObject());
 
             // call parent
-            TextProperties::ItemSetChanged(pSet);
+            TextProperties::ItemSetChanged(aChangedItems, nDeletedWhich);
 
             // local changes
             rObj.ImpSetAttrToEdgeInfo();
         }
 
-        void ConnectorProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr)
+        void ConnectorProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast)
         {
             // call parent (always first thing to do, may create the SfxItemSet)
-            TextProperties::SetStyleSheet(pNewStyleSheet, bDontRemoveHardAttr);
+            TextProperties::SetStyleSheet(pNewStyleSheet, bDontRemoveHardAttr, bBroadcast);
 
             // local changes
             SdrEdgeObj& rObj = static_cast<SdrEdgeObj&>(GetSdrObject());

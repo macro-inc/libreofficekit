@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/beans/xpropertyset.hxx>
 #include <test/container/xelementaccess.hxx>
 #include <test/container/xenumerationaccess.hxx>
@@ -30,7 +30,7 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScAutoFormatObj : public CalcUnoApiTest,
+class ScAutoFormatObj : public UnoApiTest,
                         public apitest::TableAutoFormat,
                         public apitest::XElementAccess,
                         public apitest::XEnumerationAccess,
@@ -44,7 +44,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScAutoFormatObj);
 
@@ -79,13 +78,10 @@ public:
     CPPUNIT_TEST(testSupportsService);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScAutoFormatObj::ScAutoFormatObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XElementAccess(cppu::UnoType<beans::XPropertySet>::get())
     , XIndexAccess(16)
     , XNamed("Default")
@@ -108,14 +104,8 @@ uno::Reference<uno::XInterface> ScAutoFormatObj::init()
 
 void ScAutoFormatObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     mxComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScAutoFormatObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScAutoFormatObj);

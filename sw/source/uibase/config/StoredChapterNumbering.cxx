@@ -31,7 +31,7 @@
 #include <xmloff/xmlnumi.hxx>
 
 #include <vcl/svapp.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <unosett.hxx>
 
@@ -129,7 +129,7 @@ public:
         uno::Sequence<beans::PropertyValue> const ret(
             SwXNumberingRules::GetPropertiesForNumFormat(
                 *pNumFormat, *pCharStyleName, &dummy, ""));
-        return uno::makeAny(ret);
+        return uno::Any(ret);
     }
 
     // XIndexReplace

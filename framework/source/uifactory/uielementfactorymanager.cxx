@@ -42,9 +42,9 @@
 #include <sal/log.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <comphelper/propertyvalue.hxx>
-#include <cppuhelper/basemutex.hxx>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <utility>
 
 using namespace com::sun::star::uno;
 using namespace com::sun::star::lang;
@@ -64,12 +64,12 @@ static OUString getHashKeyFromStrings( std::u16string_view aType, std::u16string
     return OUString::Concat(aType) + "^" + aName + "^" + aModuleName;
 }
 
-ConfigurationAccess_FactoryManager::ConfigurationAccess_FactoryManager( const Reference< XComponentContext >& rxContext, const OUString& _sRoot ) :
+ConfigurationAccess_FactoryManager::ConfigurationAccess_FactoryManager( const Reference< XComponentContext >& rxContext, OUString  _sRoot ) :
     m_aPropType( "Type" ),
     m_aPropName( "Name" ),
     m_aPropModule( "Module" ),
     m_aPropFactory( "FactoryImplementation" ),
-    m_sRoot(_sRoot),
+    m_sRoot(std::move(_sRoot)),
     m_bConfigAccessInitialized( false )
 {
     m_xConfigProvider = theDefaultProvider::get( rxContext );
@@ -85,7 +85,7 @@ ConfigurationAccess_FactoryManager::~ConfigurationAccess_FactoryManager()
         xContainer->removeContainerListener(m_xConfigListener);
 }
 
-OUString ConfigurationAccess_FactoryManager::getFactorySpecifierFromTypeNameModule( std::u16string_view rType, const OUString& rName, std::u16string_view rModule ) const
+OUString ConfigurationAccess_FactoryManager::getFactorySpecifierFromTypeNameModule( std::u16string_view rType, std::u16string_view rName, std::u16string_view rModule ) const
 {
     // SAFE
     std::unique_lock g(m_aMutex);
@@ -103,10 +103,10 @@ OUString ConfigurationAccess_FactoryManager::getFactorySpecifierFromTypeNameModu
         else
         {
             // Support factories which uses a defined prefix before the ui name.
-            sal_Int32 nIndex = rName.indexOf( '_' );
-            if ( nIndex > 0 )
+            size_t nIndex = rName.find( '_' );
+            if ( nIndex > 0 && nIndex != std::u16string_view::npos)
             {
-                OUString aName = rName.copy( 0, nIndex+1 );
+                std::u16string_view aName = rName.substr( 0, nIndex+1 );
                 pIter = m_aFactoryManagerMap.find( getHashKeyFromStrings( rType, aName, std::u16string_view() ));
                 if ( pIter != m_aFactoryManagerMap.end() )
                     return pIter->second;
@@ -315,23 +315,23 @@ bool ConfigurationAccess_FactoryManager::impl_getElementProps( const Any& aEleme
     Reference< XPropertySet > xPropertySet;
     aElement >>= xPropertySet;
 
-    if ( xPropertySet.is() )
+    if ( !xPropertySet.is() )
+        return true;
+
+    try
     {
-        try
-        {
-            xPropertySet->getPropertyValue( m_aPropType ) >>= rType;
-            xPropertySet->getPropertyValue( m_aPropName ) >>= rName;
-            xPropertySet->getPropertyValue( m_aPropModule ) >>= rModule;
-            xPropertySet->getPropertyValue( m_aPropFactory ) >>= rServiceSpecifier;
-        }
-        catch ( const css::beans::UnknownPropertyException& )
-        {
-            return false;
-        }
-        catch ( const css::lang::WrappedTargetException& )
-        {
-            return false;
-        }
+        xPropertySet->getPropertyValue( m_aPropType ) >>= rType;
+        xPropertySet->getPropertyValue( m_aPropName ) >>= rName;
+        xPropertySet->getPropertyValue( m_aPropModule ) >>= rModule;
+        xPropertySet->getPropertyValue( m_aPropFactory ) >>= rServiceSpecifier;
+    }
+    catch ( const css::beans::UnknownPropertyException& )
+    {
+        return false;
+    }
+    catch ( const css::lang::WrappedTargetException& )
+    {
+        return false;
     }
 
     return true;
@@ -341,14 +341,13 @@ bool ConfigurationAccess_FactoryManager::impl_getElementProps( const Any& aEleme
 
 namespace {
 
-typedef ::cppu::WeakComponentImplHelper<
+typedef comphelper::WeakComponentImplHelper<
     css::lang::XServiceInfo,
     css::ui::XUIElementFactoryManager> UIElementFactoryManager_BASE;
 
-class UIElementFactoryManager : private cppu::BaseMutex,
-                                public UIElementFactoryManager_BASE
+class UIElementFactoryManager : public UIElementFactoryManager_BASE
 {
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 public:
     explicit UIElementFactoryManager( const css::uno::Reference< css::uno::XComponentContext >& rxContext );
 
@@ -383,7 +382,6 @@ private:
 };
 
 UIElementFactoryManager::UIElementFactoryManager( const Reference< XComponentContext >& rxContext ) :
-    UIElementFactoryManager_BASE(m_aMutex),
     m_bConfigRead( false ),
     m_xContext(rxContext),
     m_pConfigAccess(
@@ -392,7 +390,7 @@ UIElementFactoryManager::UIElementFactoryManager( const Reference< XComponentCon
             "/org.openoffice.Office.UI.Factories/Registered/UIElementFactories"))
 {}
 
-void SAL_CALL UIElementFactoryManager::disposing()
+void UIElementFactoryManager::disposing(std::unique_lock<std::mutex>&)
 {
     m_pConfigAccess.clear();
 }
@@ -405,28 +403,28 @@ Reference< XUIElement > SAL_CALL UIElementFactoryManager::createUIElement(
     Reference< XFrame > xFrame;
     OUString aModuleId;
     { // SAFE
-    osl::MutexGuard g(rBHelper.rMutex);
-    if (rBHelper.bDisposed) {
-        throw css::lang::DisposedException(
-            "disposed", static_cast<OWeakObject *>(this));
-    }
+        std::unique_lock g(m_aMutex);
+        if (m_bDisposed) {
+            throw css::lang::DisposedException(
+                "disposed", static_cast<OWeakObject *>(this));
+        }
 
-    if ( !m_bConfigRead )
-    {
-        m_bConfigRead = true;
-        m_pConfigAccess->readConfigurationData();
-    }
+        if ( !m_bConfigRead )
+        {
+            m_bConfigRead = true;
+            m_pConfigAccess->readConfigurationData();
+        }
 
-    // Retrieve the frame instance from the arguments to determine the module identifier. This must be provided
-    // to the search function. An empty module identifier is provided if the frame is missing or the module id cannot
-    // retrieve from it.
-    for ( auto const & arg : Args )
-    {
-        if ( arg.Name == "Frame")
-            arg.Value >>= xFrame;
-        if (arg.Name == "Module")
-            arg.Value >>= aModuleId;
-    }
+        // Retrieve the frame instance from the arguments to determine the module identifier. This must be provided
+        // to the search function. An empty module identifier is provided if the frame is missing or the module id cannot
+        // retrieve from it.
+        for ( auto const & arg : Args )
+        {
+            if ( arg.Name == "Frame")
+                arg.Value >>= xFrame;
+            if (arg.Name == "Module")
+                arg.Value >>= aModuleId;
+        }
     } // SAFE
 
     Reference< XModuleManager2 > xManager = ModuleManager::create( m_xContext );
@@ -452,8 +450,8 @@ Reference< XUIElement > SAL_CALL UIElementFactoryManager::createUIElement(
 Sequence< Sequence< PropertyValue > > SAL_CALL UIElementFactoryManager::getRegisteredFactories()
 {
     // SAFE
-    osl::MutexGuard g(rBHelper.rMutex);
-    if (rBHelper.bDisposed) {
+    std::unique_lock g(m_aMutex);
+    if (m_bDisposed) {
         throw css::lang::DisposedException(
             "disposed", static_cast<OWeakObject *>(this));
     }
@@ -471,24 +469,22 @@ Reference< XUIElementFactory > SAL_CALL UIElementFactoryManager::getFactory( con
 {
     OUString aServiceSpecifier;
     { // SAFE
-    osl::MutexGuard g(rBHelper.rMutex);
-    if (rBHelper.bDisposed) {
-        throw css::lang::DisposedException(
-            "disposed", static_cast<OWeakObject *>(this));
-    }
+        std::unique_lock g(m_aMutex);
+        if (m_bDisposed) {
+            throw css::lang::DisposedException(
+                "disposed", static_cast<OWeakObject *>(this));
+        }
 
-    if ( !m_bConfigRead )
-    {
-        m_bConfigRead = true;
-        m_pConfigAccess->readConfigurationData();
-    }
+        if ( !m_bConfigRead )
+        {
+            m_bConfigRead = true;
+            m_pConfigAccess->readConfigurationData();
+        }
 
-    OUString aType;
-    OUString aName;
-
-    RetrieveTypeNameFromResourceURL( aResourceURL, aType, aName );
-
-    aServiceSpecifier = m_pConfigAccess->getFactorySpecifierFromTypeNameModule( aType, aName, aModuleId );
+        OUString aType;
+        OUString aName;
+        RetrieveTypeNameFromResourceURL( aResourceURL, aType, aName );
+        aServiceSpecifier = m_pConfigAccess->getFactorySpecifierFromTypeNameModule( aType, aName, aModuleId );
     } // SAFE
 
     if ( !aServiceSpecifier.isEmpty() ) try
@@ -509,8 +505,8 @@ Reference< XUIElementFactory > SAL_CALL UIElementFactoryManager::getFactory( con
 void SAL_CALL UIElementFactoryManager::registerFactory( const OUString& aType, const OUString& aName, const OUString& aModuleId, const OUString& aFactoryImplementationName )
 {
     // SAFE
-    osl::MutexGuard g(rBHelper.rMutex);
-    if (rBHelper.bDisposed) {
+    std::unique_lock g(m_aMutex);
+    if (m_bDisposed) {
         throw css::lang::DisposedException(
             "disposed", static_cast<OWeakObject *>(this));
     }
@@ -528,8 +524,8 @@ void SAL_CALL UIElementFactoryManager::registerFactory( const OUString& aType, c
 void SAL_CALL UIElementFactoryManager::deregisterFactory( const OUString& aType, const OUString& aName, const OUString& aModuleId )
 {
     // SAFE
-    osl::MutexGuard g(rBHelper.rMutex);
-    if (rBHelper.bDisposed) {
+    std::unique_lock g(m_aMutex);
+    if (m_bDisposed) {
         throw css::lang::DisposedException(
             "disposed", static_cast<OWeakObject *>(this));
     }

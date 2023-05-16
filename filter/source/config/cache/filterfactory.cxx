@@ -55,9 +55,9 @@ FilterCache& GetTheFilterCache()
 FilterFactory::FilterFactory(const css::uno::Reference< css::uno::XComponentContext >& rxContext)
     : m_xContext(rxContext)
 {
-    BaseContainer::init(rxContext                                         ,
-                        "com.sun.star.comp.filter.config.FilterFactory"   ,
-                         { "com.sun.star.document.FilterFactory" },
+    static const css::uno::Sequence<OUString> sServiceNames { "com.sun.star.document.FilterFactory" };
+    BaseContainer::init("com.sun.star.comp.filter.config.FilterFactory"   ,
+                         sServiceNames,
                         FilterCache::E_FILTER                         );
 }
 
@@ -103,7 +103,7 @@ css::uno::Reference< css::uno::XInterface > SAL_CALL FilterFactory::createInstan
         aFilter >> lConfig;
 
         ::std::vector< css::uno::Any > stlArguments(comphelper::sequenceToContainer< ::std::vector< css::uno::Any > >(lArguments));
-        stlArguments.insert(stlArguments.begin(), css::uno::makeAny(lConfig));
+        stlArguments.insert(stlArguments.begin(), css::uno::Any(lConfig));
 
         xInit->initialize(comphelper::containerToSequence(stlArguments));
     }
@@ -121,14 +121,13 @@ css::uno::Sequence< OUString > SAL_CALL FilterFactory::getAvailableServiceNames(
                   Of course we can't check for corrupted service names here. We can check
                   for empty strings only...
     */
-    CacheItem lIProps;
-    CacheItem lEProps;
-    lEProps[PROPNAME_FILTERSERVICE] <<= OUString();
+    css::beans::NamedValue lEProps[] {
+        { PROPNAME_FILTERSERVICE, css::uno::Any(OUString()) } };
 
     std::vector<OUString> lUNOFilters;
     try
     {
-        lUNOFilters = GetTheFilterCache().getMatchingItemsByProps(FilterCache::E_FILTER, lIProps, lEProps);
+        lUNOFilters = GetTheFilterCache().getMatchingItemsByProps(FilterCache::E_FILTER, {}, lEProps);
     }
     catch(const css::uno::RuntimeException&)
         { throw; }
@@ -187,8 +186,7 @@ css::uno::Reference< css::container::XEnumeration > SAL_CALL FilterFactory::crea
     // pack list of item names as an enum list
     // Attention: Do not return empty reference for empty list!
     // The outside check "hasMoreElements()" should be enough, to detect this state :-)
-    css::uno::Sequence< OUString > lSet = comphelper::containerToSequence(lEnumSet);
-    return new ::comphelper::OEnumerationByName(this, lSet);
+    return new ::comphelper::OEnumerationByName(this, std::move(lEnumSet));
 }
 
 
@@ -391,7 +389,7 @@ std::vector<OUString> FilterFactory::impl_getSortedFilterList(const QueryTokeniz
     {
         // more complex search for all filters
         // We check first, which office modules are installed...
-        std::vector<OUString> lModules = impl_getListOfInstalledModules();
+        const css::uno::Sequence<OUString> lModules = impl_getListOfInstalledModules();
         for (auto const& module : lModules)
         {
             std::vector<OUString> lFilters4Module = impl_getSortedFilterListForModule(module, nIFlags, nEFlags);
@@ -406,17 +404,10 @@ std::vector<OUString> FilterFactory::impl_getSortedFilterList(const QueryTokeniz
 }
 
 
-std::vector<OUString> FilterFactory::impl_getListOfInstalledModules() const
+css::uno::Sequence<OUString> FilterFactory::impl_getListOfInstalledModules()
 {
-    // SAFE -> ----------------------
-    osl::ClearableMutexGuard aLock(m_aMutex);
-    css::uno::Reference< css::uno::XComponentContext > xContext = m_xContext;
-    aLock.clear();
-    // <- SAFE ----------------------
-
-    css::uno::Reference< css::container::XNameAccess > xModuleConfig = officecfg::Setup::Office::Factories::get(xContext);
-    std::vector<OUString> lModules(comphelper::sequenceToContainer< std::vector<OUString> >(xModuleConfig->getElementNames()));
-    return lModules;
+    css::uno::Reference< css::container::XNameAccess > xModuleConfig = officecfg::Setup::Office::Factories::get();
+    return xModuleConfig->getElementNames();
 }
 
 
@@ -427,8 +418,7 @@ std::vector<OUString> FilterFactory::impl_getSortedFilterListForModule(const OUS
     std::vector<OUString> lSortedFilters = impl_readSortedFilterListFromConfig(sModule);
 
     // get all filters for the requested module
-    CacheItem lIProps;
-    lIProps[PROPNAME_DOCUMENTSERVICE] <<= sModule;
+    css::beans::NamedValue lIProps[] { { PROPNAME_DOCUMENTSERVICE, css::uno::Any(sModule) } };
 
     // SAFE -> ----------------------
     osl::ClearableMutexGuard aLock(m_aMutex);
@@ -469,17 +459,11 @@ std::vector<OUString> FilterFactory::impl_getSortedFilterListForModule(const OUS
 }
 
 
-std::vector<OUString> FilterFactory::impl_readSortedFilterListFromConfig(const OUString& sModule) const
+std::vector<OUString> FilterFactory::impl_readSortedFilterListFromConfig(const OUString& sModule)
 {
-    // SAFE -> ----------------------
-    osl::ClearableMutexGuard aLock(m_aMutex);
-    css::uno::Reference< css::uno::XComponentContext > xContext = m_xContext;
-    aLock.clear();
-    // <- SAFE ----------------------
-
     try
     {
-        css::uno::Reference< css::container::XNameAccess > xUISortConfig = officecfg::TypeDetection::UISort::ModuleDependendFilterOrder::get(xContext);
+        css::uno::Reference< css::container::XNameAccess > xUISortConfig = officecfg::TypeDetection::UISort::ModuleDependendFilterOrder::get();
         // don't check the module name here. If it does not exists, an exception is thrown and caught below.
         // We return an empty list as result then.
         css::uno::Reference< css::container::XNameAccess > xModule;

@@ -24,7 +24,7 @@
 #include <tools/stream.hxx>
 #include <map>
 
-#include <osl/mutex.hxx>
+#include <mutex>
 #include <osl/thread.h>
 #include <sal/log.hxx>
 
@@ -37,9 +37,9 @@ using namespace osl;
 
 namespace {
 
-osl::Mutex& LockMutex()
+std::mutex& LockMutex()
 {
-    static osl::Mutex SINGLETON;
+    static std::mutex SINGLETON;
     return SINGLETON;
 }
 
@@ -63,7 +63,7 @@ bool lockFile( const SvFileStream* pStream )
     if( aStatus.getFileType() == osl::FileStatus::Directory )
         return true;
 
-    osl::MutexGuard aGuard( LockMutex() );
+    std::unique_lock aGuard( LockMutex() );
     for( const auto& [rLockStream, rLockItem] : gLocks )
     {
         if( aItem.isIdenticalTo( rLockItem ) )
@@ -86,7 +86,7 @@ bool lockFile( const SvFileStream* pStream )
 
 void unlockFile( SvFileStream const * pStream )
 {
-    osl::MutexGuard aGuard( LockMutex() );
+    std::unique_lock aGuard( LockMutex() );
     gLocks.erase(pStream);
 }
 
@@ -198,7 +198,6 @@ SvFileStream::SvFileStream( const OUString& rFileName, StreamMode nOpenMode )
 {
     bIsOpen             = false;
     m_isWritable        = false;
-    mbDontFlushOnClose  = false;
     pInstanceData.reset(new StreamData);
 
     SetBufferSize( 1024 );
@@ -216,7 +215,6 @@ SvFileStream::SvFileStream()
 {
     bIsOpen             = false;
     m_isWritable        = false;
-    mbDontFlushOnClose  = false;
     pInstanceData.reset(new StreamData);
     SetBufferSize( 1024 );
 }
@@ -374,14 +372,20 @@ void SvFileStream::Open( const OUString& rFilename, StreamMode nOpenMode )
     // FIXME: we really need to switch to a pure URL model ...
     if ( osl::File::getFileURLFromSystemPath( aFilename, aFileURL ) != osl::FileBase::E_None )
         aFileURL = aFilename;
-    bool bStatValid = ( osl::DirectoryItem::get( aFileURL, aItem) == osl::FileBase::E_None &&
+
+    // don't both stat()ing a temporary file, unnecessary
+    bool bStatValid = true;
+    if (!(nOpenMode & StreamMode::TEMPORARY))
+    {
+        bStatValid = ( osl::DirectoryItem::get( aFileURL, aItem) == osl::FileBase::E_None &&
                         aItem.getFileStatus( aStatus ) == osl::FileBase::E_None );
 
-    // SvFileStream can't open a directory
-    if( bStatValid && aStatus.getFileType() == osl::FileStatus::Directory )
-    {
-        SetError( ::GetSvError( EISDIR ) );
-        return;
+        // SvFileStream can't open a directory
+        if( bStatValid && aStatus.getFileType() == osl::FileStatus::Directory )
+        {
+            SetError( ::GetSvError( EISDIR ) );
+            return;
+        }
     }
 
     if ( !( nOpenMode & StreamMode::WRITE ) )
@@ -460,8 +464,7 @@ void SvFileStream::Close()
     if ( IsOpen() )
     {
         SAL_INFO("tools", "Closing " << aFilename);
-        if ( !mbDontFlushOnClose )
-            Flush();
+        FlushBuffer();
         osl_closeFile( pInstanceData->rHandle );
         pInstanceData->rHandle = nullptr;
     }

@@ -38,6 +38,7 @@
 #include <com/sun/star/drawing/XShape.hpp>
 #include <com/sun/star/drawing/XShapes.hpp>
 
+#include <utility>
 #include <vbahelper/vbahelper.hxx>
 #include <vbahelper/vbashape.hxx>
 #include <vbahelper/vbashapes.hxx>
@@ -55,7 +56,7 @@ class VbShapeEnumHelper : public EnumerationHelper_BASE
         uno::Reference<container::XIndexAccess > m_xIndexAccess;
         sal_Int32 nIndex;
 public:
-    VbShapeEnumHelper( const uno::Reference< msforms::XShapes >& xParent,  const uno::Reference< container::XIndexAccess >& xIndexAccess ) : m_xParent( xParent ), m_xIndexAccess( xIndexAccess ), nIndex( 0 ) {}
+    VbShapeEnumHelper( uno::Reference< msforms::XShapes > xParent, uno::Reference< container::XIndexAccess > xIndexAccess ) : m_xParent(std::move( xParent )), m_xIndexAccess(std::move( xIndexAccess )), nIndex( 0 ) {}
         virtual sal_Bool SAL_CALL hasMoreElements(  ) override
         {
                 return ( nIndex < m_xIndexAccess->getCount() );
@@ -82,12 +83,12 @@ void ScVbaShapes::initBaseCollection()
     aShapes.reserve( nLen );
     for ( sal_Int32 index=0; index<nLen; ++index )
         aShapes.emplace_back( m_xIndexAccess->getByIndex( index ) , uno::UNO_QUERY );
-    uno::Reference< container::XIndexAccess > xShapes( new XNamedObjectCollectionHelper< drawing::XShape >( aShapes ) );
+    uno::Reference< container::XIndexAccess > xShapes( new XNamedObjectCollectionHelper< drawing::XShape >( std::move(aShapes) ) );
     m_xIndexAccess = xShapes;
     m_xNameAccess.set( xShapes, uno::UNO_QUERY );
 }
 
-ScVbaShapes::ScVbaShapes( const css::uno::Reference< ov::XHelperInterface >& xParent, const css::uno::Reference< css::uno::XComponentContext >& xContext, const css::uno::Reference< css::container::XIndexAccess >& xShapes, const uno::Reference< frame::XModel>& xModel ): ScVbaShapes_BASE( xParent, xContext, xShapes, true ), m_nNewShapeCount(0), m_xModel( xModel )
+ScVbaShapes::ScVbaShapes( const css::uno::Reference< ov::XHelperInterface >& xParent, const css::uno::Reference< css::uno::XComponentContext >& xContext, const css::uno::Reference< css::container::XIndexAccess >& xShapes, uno::Reference< frame::XModel> xModel ): ScVbaShapes_BASE( xParent, xContext, xShapes, true ), m_nNewShapeCount(0), m_xModel(std::move( xModel ))
 {
     m_xShapes.set( xShapes, uno::UNO_QUERY_THROW );
     m_xDrawPage.set( xShapes, uno::UNO_QUERY_THROW );
@@ -106,7 +107,7 @@ ScVbaShapes::createCollectionObject( const css::uno::Any& aSource )
     if( aSource.hasValue() )
     {
         uno::Reference< drawing::XShape > xShape( aSource, uno::UNO_QUERY_THROW );
-        return uno::makeAny( uno::Reference< msforms::XShape >( new ScVbaShape( getParent(), mxContext, xShape, m_xShapes, m_xModel, ScVbaShape::getType( xShape ) ) ) );
+        return uno::Any( uno::Reference< msforms::XShape >( new ScVbaShape( getParent(), mxContext, xShape, m_xShapes, m_xModel, ScVbaShape::getType( xShape ) ) ) );
     }
     return uno::Any();
 }
@@ -166,7 +167,7 @@ ScVbaShapes::getShapesByArrayIndices( const uno::Any& Index  )
         if ( xShape.is() )
             aShapes.push_back( xShape );
     }
-    uno::Reference< container::XIndexAccess > xIndexAccess( new XNamedObjectCollectionHelper< drawing::XShape >( aShapes ) );
+    uno::Reference< container::XIndexAccess > xIndexAccess( new XNamedObjectCollectionHelper< drawing::XShape >( std::move(aShapes) ) );
     return xIndexAccess;
 }
 
@@ -194,7 +195,7 @@ ScVbaShapes::SelectAll()
     uno::Reference< view::XSelectionSupplier > xSelectSupp( m_xModel->getCurrentController(), uno::UNO_QUERY_THROW );
     try
     {
-        xSelectSupp->select( uno::makeAny( m_xShapes ) );
+        xSelectSupp->select( uno::Any( m_xShapes ) );
     }
     // viewuno.cxx ScTabViewObj::select will throw IllegalArgumentException
     // if one of the shapes is no 'markable' e.g. a button
@@ -239,7 +240,7 @@ ScVbaShapes::AddRectangle(sal_Int32 startX, sal_Int32 startY, sal_Int32 nLineWid
     xShape->setSize( size );
 
     rtl::Reference<ScVbaShape> pScVbaShape = new ScVbaShape( getParent(), mxContext, xShape, m_xShapes, m_xModel, ScVbaShape::getType( xShape ) );
-    return uno::makeAny( uno::Reference< msforms::XShape > ( pScVbaShape ) );
+    return uno::Any( uno::Reference< msforms::XShape > ( pScVbaShape ) );
 }
 
 uno::Any
@@ -281,7 +282,7 @@ ScVbaShapes::AddEllipse(sal_Int32 startX, sal_Int32 startY, sal_Int32 nLineWidth
     xShape->setSize(size);
 
     rtl::Reference<ScVbaShape> pScVbaShape = new ScVbaShape( getParent(), mxContext, xShape, m_xShapes, m_xModel, ScVbaShape::getType( xShape ) );
-    return uno::makeAny( uno::Reference< msforms::XShape > ( pScVbaShape ) );
+    return uno::Any( uno::Reference< msforms::XShape > ( pScVbaShape ) );
 }
 
 //helperapi calc
@@ -316,7 +317,7 @@ ScVbaShapes::AddLine( sal_Int32 StartX, sal_Int32 StartY, sal_Int32 endX, sal_In
     xShape->setSize(size);
 
     rtl::Reference<ScVbaShape> pScVbaShape = new ScVbaShape( getParent(), mxContext, xShape, m_xShapes, m_xModel, ScVbaShape::getType( xShape ) );
-    return uno::makeAny( uno::Reference< msforms::XShape > ( pScVbaShape ) );
+    return uno::Any( uno::Reference< msforms::XShape > ( pScVbaShape ) );
 }
 
 uno::Any SAL_CALL
@@ -366,33 +367,33 @@ ScVbaShapes::AddTextboxInWriter( sal_Int32 _nLeft, sal_Int32 _nTop, sal_Int32 _n
     xShape->setSize(size);
 
     uno::Reference< beans::XPropertySet > xShapeProps( xShape, uno::UNO_QUERY_THROW );
-    xShapeProps->setPropertyValue( "AnchorType", uno::makeAny( text::TextContentAnchorType_AT_PAGE ) );
-    xShapeProps->setPropertyValue( "HoriOrientRelation", uno::makeAny( text::RelOrientation::PAGE_LEFT ) );
-    xShapeProps->setPropertyValue( "HoriOrient", uno::makeAny( text::HoriOrientation::NONE ) );
-    xShapeProps->setPropertyValue( "HoriOrientPosition", uno::makeAny( nXPos ) );
+    xShapeProps->setPropertyValue( "AnchorType", uno::Any( text::TextContentAnchorType_AT_PAGE ) );
+    xShapeProps->setPropertyValue( "HoriOrientRelation", uno::Any( text::RelOrientation::PAGE_LEFT ) );
+    xShapeProps->setPropertyValue( "HoriOrient", uno::Any( text::HoriOrientation::NONE ) );
+    xShapeProps->setPropertyValue( "HoriOrientPosition", uno::Any( nXPos ) );
 
-    xShapeProps->setPropertyValue( "VertOrientRelation", uno::makeAny( text::RelOrientation::PAGE_FRAME ) );
-    xShapeProps->setPropertyValue( "VertOrient", uno::makeAny( text::VertOrientation::NONE ) );
-    xShapeProps->setPropertyValue( "VertOrientPosition", uno::makeAny( nYPos ) );
+    xShapeProps->setPropertyValue( "VertOrientRelation", uno::Any( text::RelOrientation::PAGE_FRAME ) );
+    xShapeProps->setPropertyValue( "VertOrient", uno::Any( text::VertOrientation::NONE ) );
+    xShapeProps->setPropertyValue( "VertOrientPosition", uno::Any( nYPos ) );
 
     // set to visible
-    xShapeProps->setPropertyValue( "LineStyle", uno::makeAny( drawing::LineStyle_SOLID ) );
+    xShapeProps->setPropertyValue( "LineStyle", uno::Any( drawing::LineStyle_SOLID ) );
     // set to font
-    xShapeProps->setPropertyValue( "LayerID", uno::makeAny( sal_Int16(1) ) );
-    xShapeProps->setPropertyValue( "LayerName", uno::makeAny( OUString("Heaven") ) );
+    xShapeProps->setPropertyValue( "LayerID", uno::Any( sal_Int16(1) ) );
+    xShapeProps->setPropertyValue( "LayerName", uno::Any( OUString("Heaven") ) );
 
 
     rtl::Reference<ScVbaShape> pScVbaShape = new ScVbaShape( getParent(), mxContext, xShape, m_xShapes, m_xModel, ScVbaShape::getType( xShape ) );
-    return uno::makeAny( uno::Reference< msforms::XShape > ( pScVbaShape ) );
+    return uno::Any( uno::Reference< msforms::XShape > ( pScVbaShape ) );
 }
 
 void
 ScVbaShapes::setDefaultShapeProperties( const uno::Reference< drawing::XShape >& xShape )
 {
     uno::Reference< beans::XPropertySet > xPropertySet( xShape, uno::UNO_QUERY_THROW );
-    xPropertySet->setPropertyValue( "FillStyle", uno::makeAny( OUString("SOLID") ) );
-    xPropertySet->setPropertyValue( "FillColor", uno::makeAny( sal_Int32(0xFFFFFF) )  );
-    xPropertySet->setPropertyValue( "TextWordWrap", uno::makeAny( text::WrapTextMode_THROUGH )  );
+    xPropertySet->setPropertyValue( "FillStyle", uno::Any( OUString("SOLID") ) );
+    xPropertySet->setPropertyValue( "FillColor", uno::Any( sal_Int32(0xFFFFFF) )  );
+    xPropertySet->setPropertyValue( "TextWordWrap", uno::Any( text::WrapTextMode_THROUGH )  );
     //not find in OOo2.3
     //xPropertySet->setPropertyValue("Opaque", uno::makeAny( sal_True )  );
 }
@@ -403,7 +404,7 @@ ScVbaShapes::setShape_NameProperty( const uno::Reference< css::drawing::XShape >
     uno::Reference< beans::XPropertySet > xPropertySet( xShape, uno::UNO_QUERY_THROW );
     try
     {
-        xPropertySet->setPropertyValue( "Name", uno::makeAny( sName ) );
+        xPropertySet->setPropertyValue( "Name", uno::Any( sName ) );
     }
     catch(const script::BasicErrorException&)
     {

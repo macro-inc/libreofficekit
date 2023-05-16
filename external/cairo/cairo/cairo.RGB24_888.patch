@@ -36,13 +36,13 @@ diff -ru cairo-1.17.4.orig/src/cairo-image-source.c cairo-1.17.4/src/cairo-image
  	return pixman_image_create_solid_fill (&color);
  
 +    case CAIRO_FORMAT_RGB24_888:
-+	pixel = *(uint32_t *) (image->data + y * image->stride + 3 * x);
-+	pixel &= 0x00ffffff; /* ignore next pixel bits */
++	pixel = (uint32_t)(image->data + y * image->stride + 3 * x)[0] | ((uint32_t)(image->data + y * image->stride + 3 * x)[1] << 8) | ((uint32_t)(image->data + y * image->stride + 3 * x)[2] << 16);
 +	if (pixel == 0)
 +	    return _pixman_black_image ();
 +	if (pixel == 0x00ffffff)
 +	    return _pixman_white_image ();
 +
++	color.alpha = 0xffff;
 +	color.red = (pixel >> 16 & 0xff) | (pixel >> 8 & 0xff00);
 +	color.green = (pixel >> 8 & 0xff) | (pixel & 0xff00);
 +	color.blue = (pixel & 0xff) | (pixel << 8 & 0xff00);

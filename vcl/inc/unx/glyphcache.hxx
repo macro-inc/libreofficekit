@@ -33,7 +33,7 @@
 #include <vcl/outdev.hxx>
 
 #include <fontattributes.hxx>
-#include <fontinstance.hxx>
+#include <font/LogicalFontInstance.hxx>
 #include <impfontmetricdata.hxx>
 
 #include <unordered_map>
@@ -105,7 +105,6 @@ private:
     typedef std::unordered_map<const char*, std::unique_ptr<FreetypeFontFile>, rtl::CStringHash, rtl::CStringEqual> FontFileList;
 
     FontInfoList            m_aFontInfoList;
-    sal_IntPtr              m_nMaxFontId;
 
     FontFileList            m_aFontFileList;
 };
@@ -121,31 +120,18 @@ public:
     bool                    TestFont() const { return mbFaceOk;}
     FT_Face                 GetFtFace() const;
     const FontConfigFontOptions* GetFontOptions() const;
-    bool                    NeedsArtificialBold() const { return mbArtBold; }
-    bool                    NeedsArtificialItalic() const { return mbArtItalic; }
 
     void                    GetFontMetric(ImplFontMetricDataRef const &) const;
-    const unsigned char*    GetTable( const char* pName, sal_uLong* pLength ) const;
-    const FontCharMapRef &  GetFontCharMap() const;
-    bool                    GetFontCapabilities(vcl::FontCapabilities &) const;
 
     bool                    GetGlyphBoundRect(sal_GlyphId, tools::Rectangle&, bool) const;
     bool                    GetGlyphOutline(sal_GlyphId, basegfx::B2DPolyPolygon&, bool) const;
     bool                    GetAntialiasAdvice() const;
 
-    void                    SetFontVariationsOnHBFont(hb_font_t* pHbFace) const;
-
-    // tdf#127189 FreeType <= 2.8 will fail to render stretched horizontal brace glyphs
-    // in starmath at a fairly low stretch ratio. This appears fixed in 2.9 with
-    // https://git.savannah.gnu.org/cgit/freetype/freetype2.git/commit/?id=91015cb41d8f56777f93394f5a60914bc0c0f330
-    // "Improve complex rendering at high ppem"
-    static bool             AlmostHorizontalDrainsRenderingPool(int nRatio, const vcl::font::FontSelectPattern& rFSD);
-
 private:
     friend class FreetypeFontInstance;
     friend class FreetypeManager;
 
-    explicit FreetypeFont(FreetypeFontInstance&, const std::shared_ptr<FreetypeFontInfo>& rFontInfo);
+    explicit FreetypeFont(FreetypeFontInstance&, std::shared_ptr<FreetypeFontInfo>  rFontInfo);
 
     void                    ApplyGlyphTransform(bool bVertical, FT_Glyph) const;
 
@@ -166,8 +152,6 @@ private:
     mutable std::unique_ptr<FontConfigFontOptions> mxFontOptions;
 
     bool                    mbFaceOk;
-    bool                    mbArtItalic;
-    bool                    mbArtBold;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -117,7 +117,7 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
            Unfortunately this can increase memory consumption drastically until the non transient parent
            is destroyed and finally all the transients are released.
         */
-        if ( ! rxAccessibleContext -> getAccessibleStateSet() -> contains ( AccessibleStateType::TRANSIENT ) )
+        if ( ! ( rxAccessibleContext -> getAccessibleStateSet() & AccessibleStateType::TRANSIENT ) )
         #endif
         {
             Reference< XAccessibleEventBroadcaster > xBroadcaster(rxAccessibleContext, UNO_QUERY);
@@ -256,8 +256,9 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
 }
 
 -(id)enabledAttribute {
-    if ( [ self accessibleContext ] -> getAccessibleStateSet().is() ) {
-        return [ NSNumber numberWithBool: [ self accessibleContext ] -> getAccessibleStateSet() -> contains ( AccessibleStateType::ENABLED ) ];
+    sal_Int64 nStateSet = [ self accessibleContext ] -> getAccessibleStateSet();
+    if ( nStateSet ) {
+        return [ NSNumber numberWithBool: ( (nStateSet & AccessibleStateType::ENABLED) != 0 ) ];
     } else {
         return nil;
     }
@@ -269,13 +270,17 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
         Reference < XAccessible > rxParent = [ self accessibleContext ] -> getAccessibleParent();
         if ( rxParent.is() ) {
             Reference < XAccessibleContext > rxContext = rxParent -> getAccessibleContext();
-            if ( rxContext.is() && rxContext -> getAccessibleStateSet().is() ) {
-                isFocused = [ NSNumber numberWithBool: rxContext -> getAccessibleStateSet() -> contains ( AccessibleStateType::FOCUSED ) ];
+            if ( rxContext.is() ) {
+                sal_Int64 nStateSet = rxContext -> getAccessibleStateSet();
+                if ( nStateSet ) {
+                    isFocused = [ NSNumber numberWithBool: ( ( nStateSet & AccessibleStateType::FOCUSED ) != 0 ) ];
+                }
             }
         }
         return isFocused;
-    } else if ( [ self accessibleContext ] -> getAccessibleStateSet().is() ) {
-        return [ NSNumber numberWithBool: [ self accessibleContext ] -> getAccessibleStateSet() -> contains ( AccessibleStateType::FOCUSED ) ];
+    } else if ( [ self accessibleContext ] -> getAccessibleStateSet() ) {
+        sal_Int64 nStateSet = [ self accessibleContext ] -> getAccessibleStateSet();
+        return [ NSNumber numberWithBool: ( ( nStateSet & AccessibleStateType::FOCUSED ) != 0 ) ];
     } else {
         return nil;
     }
@@ -337,8 +342,8 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
             NSMutableArray * children = [ [ NSMutableArray alloc ] init ];
             Reference< XAccessibleContext > xContext( [ self accessibleContext ] );
 
-            sal_Int32 cnt = xContext -> getAccessibleChildCount();
-            for ( sal_Int32 i = 0; i < cnt; i++ ) {
+            sal_Int64 cnt = xContext -> getAccessibleChildCount();
+            for ( sal_Int64 i = 0; i < cnt; i++ ) {
                 Reference< XAccessible > xChild( xContext -> getAccessibleChild( i ) );
                 if( xChild.is() ) {
                     Reference< XAccessibleContext > xChildContext( xChild -> getAccessibleContext() );
@@ -547,11 +552,13 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
 }
 
 -(id)expandedAttribute {
-    return [ NSNumber numberWithBool: [ self accessibleContext ] -> getAccessibleStateSet() -> contains ( AccessibleStateType::EXPANDED ) ];
+    sal_Int64 nStateSet = [ self accessibleContext ] -> getAccessibleStateSet();
+    return [ NSNumber numberWithBool: ( ( nStateSet & AccessibleStateType::EXPANDED ) != 0 ) ];
 }
 
 -(id)selectedAttribute {
-    return [ NSNumber numberWithBool: [ self accessibleContext ] -> getAccessibleStateSet() -> contains ( AccessibleStateType::SELECTED ) ];
+    sal_Int64 nStateSet = [ self accessibleContext ] -> getAccessibleStateSet();
+    return [ NSNumber numberWithBool: ( ( nStateSet & AccessibleStateType::SELECTED ) != 0 ) ];
 }
 
 -(id)stringForRangeAttributeForParameter:(id)range {
@@ -612,10 +619,10 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
 
 -(id)orientationAttribute {
     NSString * orientation = nil;
-    Reference < XAccessibleStateSet > stateSet = [ self accessibleContext ] -> getAccessibleStateSet();
-    if ( stateSet -> contains ( AccessibleStateType::HORIZONTAL ) ) {
+    sal_Int64 stateSet = [ self accessibleContext ] -> getAccessibleStateSet();
+    if ( stateSet & AccessibleStateType::HORIZONTAL ) {
         orientation = NSAccessibilityHorizontalOrientationValue;
-    } else if ( stateSet -> contains ( AccessibleStateType::VERTICAL ) ) {
+    } else if ( stateSet & AccessibleStateType::VERTICAL ) {
         orientation = NSAccessibilityVerticalOrientationValue;
     }
     return orientation;
@@ -675,6 +682,9 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
 #pragma mark Accessibility Protocol
 
 -(id)accessibilityAttributeValue:(NSString *)attribute {
+    // Related: tdf#148453 Acquire solar mutex during native accessibility calls
+    SolarMutexGuard aGuard;
+
     SAL_INFO("vcl.a11y", "[" << self << " accessibilityAttributeValue:" << attribute << "]");
     // #i90575# guard NSAccessibility protocol against unwanted access
     if ( isPopupMenuOpen ) {
@@ -705,6 +715,9 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
 }
 
 -(BOOL)accessibilityIsIgnored {
+    // Related: tdf#148453 Acquire solar mutex during native accessibility calls
+    SolarMutexGuard aGuard;
+
     SAL_INFO("vcl.a11y", "[" << self << " accessibilityIsIgnored]");
     // #i90575# guard NSAccessibility protocol against unwanted access
     if ( isPopupMenuOpen ) {
@@ -722,13 +735,16 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
             ignored = true;
             break;
         default:
-            ignored = ! ( [ self accessibleContext ] -> getAccessibleStateSet() -> contains ( AccessibleStateType::VISIBLE ) );
+            ignored = ! ( [ self accessibleContext ] -> getAccessibleStateSet() & AccessibleStateType::VISIBLE );
             break;
     }
     return ignored; // TODO: to be completed
 }
 
 -(NSArray *)accessibilityAttributeNames {
+    // Related: tdf#148453 Acquire solar mutex during native accessibility calls
+    SolarMutexGuard aGuard;
+
     SAL_INFO("vcl.a11y", "[" << self << " accessibilityAttributeNames]");
     // #i90575# guard NSAccessibility protocol against unwanted access
     if ( isPopupMenuOpen ) {
@@ -737,7 +753,7 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
     NSString * nativeSubrole = nil;
     NSString * title = nil;
     NSMutableArray * attributeNames = nil;
-    sal_Int32 nAccessibleChildren = 0;
+    sal_Int64 nAccessibleChildren = 0;
     try {
         // Default Attributes
         attributeNames = [ NSMutableArray arrayWithObjects:
@@ -791,8 +807,13 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
         if ( [ self accessibleValue ] ) {
             [ AquaA11yValueWrapper addAttributeNamesTo: attributeNames ];
         }
-        [ nativeSubrole release ];
-        [ title release ];
+        if ( nativeSubrole ) {
+            [ nativeSubrole release ];
+        }
+        if ( title ) {
+            [ title release ];
+        }
+        // Related: tdf#153374 Don't release autoreleased attributeNames
         return attributeNames;
     } catch ( DisposedException & ) { // Object is no longer available
         if ( nativeSubrole ) {
@@ -801,15 +822,17 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
         if ( title ) {
             [ title release ];
         }
-        if ( attributeNames ) {
-            [ attributeNames release ];
-        }
+        // Related: tdf#153374 Don't release autoreleased attributeNames
+        // Also, return an autoreleased empty array instead of a retained array.
         [ AquaA11yFactory removeFromWrapperRepositoryFor: [ self accessibleContext ] ];
-        return [ [ NSArray alloc ] init ];
+        return [ NSArray array ];
     }
 }
 
 -(BOOL)accessibilityIsAttributeSettable:(NSString *)attribute {
+    // Related: tdf#148453 Acquire solar mutex during native accessibility calls
+    SolarMutexGuard aGuard;
+
     SAL_INFO("vcl.a11y", "[" << self << " accessibilityAttributeIsSettable:" << attribute << "]");
     bool isSettable = false;
     if ( [ self accessibleText ] ) {
@@ -828,6 +851,9 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
 }
 
 -(NSArray *)accessibilityParameterizedAttributeNames {
+    // Related: tdf#148453 Acquire solar mutex during native accessibility calls
+    SolarMutexGuard aGuard;
+
     SAL_INFO("vcl.a11y", "[" << self << " accessibilityParameterizedAttributeNames]");
     NSMutableArray * attributeNames = [ [ NSMutableArray alloc ] init ];
     // Special Attributes depending on interface
@@ -838,6 +864,9 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
 }
 
 -(id)accessibilityAttributeValue:(NSString *)attribute forParameter:(id)parameter {
+    // Related: tdf#148453 Acquire solar mutex during native accessibility calls
+    SolarMutexGuard aGuard;
+
     SAL_INFO("vcl.a11y", "[" << self << " accessibilityAttributeValue:" << attribute << " forParameter:" << (static_cast<NSObject*>(parameter)) << "]");
     SEL methodSelector = [ self selectorForAttribute: attribute asGetter: YES withGetterParameter: YES ];
     if ( [ self respondsToSelector: methodSelector ] ) {
@@ -853,6 +882,9 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
 }
 
 -(void)accessibilitySetValue:(id)value forAttribute:(NSString *)attribute {
+    // Related: tdf#148453 Acquire solar mutex during native accessibility calls
+    SolarMutexGuard aGuard;
+
     SAL_INFO("vcl.a11y", "[" << self << " accessibilitySetValue:" << (static_cast<NSObject*>(value)) << " forAttribute:" << attribute << "]");
     SEL methodSelector = [ self selectorForAttribute: attribute asGetter: NO withGetterParameter: NO ];
     if ( [ AquaA11yComponentWrapper respondsToSelector: methodSelector ] ) {
@@ -870,6 +902,9 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
 }
 
 -(id)accessibilityFocusedUIElement {
+    // Related: tdf#148453 Acquire solar mutex during native accessibility calls
+    SolarMutexGuard aGuard;
+
     SAL_INFO("vcl.a11y", "[" << self << " accessibilityFocusedUIElement]");
     // #i90575# guard NSAccessibility protocol against unwanted access
     if ( isPopupMenuOpen ) {
@@ -930,6 +965,9 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
 }
 
 -(void)accessibilityPerformAction:(NSString *)action {
+    // Related: tdf#148453 Acquire solar mutex during native accessibility calls
+    SolarMutexGuard aGuard;
+
     SAL_INFO("vcl.a11y", "[" << self << " accessibilityPerformAction:" << action << "]");
     AquaA11yWrapper * actionResponder = [ self actionResponder ];
     if ( actionResponder ) {
@@ -938,6 +976,9 @@ static std::ostream &operator<<(std::ostream &s, NSObject *obj) {
 }
 
 -(NSArray *)accessibilityActionNames {
+    // Related: tdf#148453 Acquire solar mutex during native accessibility calls
+    SolarMutexGuard aGuard;
+
     SAL_INFO("vcl.a11y", "[" << self << " accessibilityActionNames]");
     NSArray * actionNames = nil;
     AquaA11yWrapper * actionResponder = [ self actionResponder ];
@@ -993,19 +1034,18 @@ static Reference < XAccessibleContext > hitTestRunner ( css::awt::Point point,
         // apparently necessary as a special treatment for e.g. comboboxes
         if ( !hitChild.is() ) {
             bool bSafeToIterate = true;
-            sal_Int32 nCount = rxAccessibleContext -> getAccessibleChildCount();
+            sal_Int64 nCount = rxAccessibleContext -> getAccessibleChildCount();
 
             if (nCount < 0 || nCount > SAL_MAX_UINT16 /* slow enough for anyone */)
                 bSafeToIterate = false;
             else { // manages descendants is an horror from the a11y standards guys.
-                Reference< XAccessibleStateSet > xStateSet;
-                xStateSet = rxAccessibleContext -> getAccessibleStateSet();
-                if (xStateSet.is() && xStateSet -> contains(AccessibleStateType::MANAGES_DESCENDANTS ) )
+                sal_Int64 nStateSet = rxAccessibleContext -> getAccessibleStateSet();
+                if ( nStateSet & AccessibleStateType::MANAGES_DESCENDANTS )
                     bSafeToIterate = false;
             }
 
             if( bSafeToIterate ) {
-                for ( int i = 0; i < rxAccessibleContext -> getAccessibleChildCount(); i++ ) {
+                for ( sal_Int64 i = 0; i < rxAccessibleContext -> getAccessibleChildCount(); i++ ) {
                     Reference < XAccessible > rxAccessibleChild = rxAccessibleContext -> getAccessibleChild ( i );
                     if ( rxAccessibleChild.is() && rxAccessibleChild -> getAccessibleContext().is() && rxAccessibleChild -> getAccessibleContext() -> getAccessibleRole() != AccessibleRole::LIST ) {
                         Reference < XAccessibleContext > myHitChild = hitTestRunner ( point, rxAccessibleChild -> getAccessibleContext() );
@@ -1024,6 +1064,9 @@ static Reference < XAccessibleContext > hitTestRunner ( css::awt::Point point,
 }
 
 -(id)accessibilityHitTest:(NSPoint)point {
+    // Related: tdf#148453 Acquire solar mutex during native accessibility calls
+    SolarMutexGuard aGuard;
+
     SAL_INFO("vcl.a11y", "[" << self << " accessibilityHitTest:" << point << "]");
     static id wrapper = nil;
     if ( nil != wrapper ) {

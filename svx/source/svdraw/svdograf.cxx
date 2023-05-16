@@ -55,8 +55,6 @@
 #include <memory>
 
 using namespace ::com::sun::star;
-using namespace ::com::sun::star::uno;
-using namespace ::com::sun::star::io;
 
 class SdrGraphicLink : public sfx2::SvBaseLink
 {
@@ -68,7 +66,7 @@ public:
     virtual void        Closed() override;
 
     virtual ::sfx2::SvBaseLink::UpdateResult DataChanged(
-        const OUString& rMimeType, const css::uno::Any & rValue ) override;
+        const OUString& rMimeType, const uno::Any & rValue ) override;
 
     void                Connect() { GetRealObject(); }
 };
@@ -81,7 +79,7 @@ SdrGraphicLink::SdrGraphicLink(SdrGrafObj& rObj)
 }
 
 ::sfx2::SvBaseLink::UpdateResult SdrGraphicLink::DataChanged(
-    const OUString& rMimeType, const css::uno::Any & rValue )
+    const OUString& rMimeType, const uno::Any & rValue )
 {
     SdrModel& rModel(rGrafObj.getSdrModelFromSdrObject());
     sfx2::LinkManager* pLinkManager(rModel.GetLinkManager());
@@ -145,15 +143,15 @@ void SdrGrafObj::onGraphicChanged()
     if (rVectorGraphicDataPtr->getType() == VectorGraphicDataType::Pdf)
         return;
 
-    const drawinglayer::primitive2d::Primitive2DContainer aSequence(rVectorGraphicDataPtr->getPrimitive2DSequence());
+    const std::deque<uno::Reference<graphic::XPrimitive2D>>& rContainer(rVectorGraphicDataPtr->getPrimitive2DSequence());
 
-    if (aSequence.empty())
+    if (rContainer.empty())
         return;
 
     drawinglayer::geometry::ViewInformation2D aViewInformation2D;
     drawinglayer::processor2d::ObjectInfoPrimitiveExtractor2D aProcessor(aViewInformation2D);
 
-    aProcessor.process(aSequence);
+    aProcessor.process(rContainer);
 
     const drawinglayer::primitive2d::ObjectInfoPrimitive2D* pResult = aProcessor.getResult();
 
@@ -238,7 +236,7 @@ SdrGrafObj::SdrGrafObj(SdrModel& rSdrModel, SdrGrafObj const & rSource)
 
     if(rSource.mpBarCode)
     {
-        mpBarCode = std::make_unique<css::drawing::BarCode>(*rSource.mpBarCode);
+        mpBarCode = std::make_unique<drawing::BarCode>(*rSource.mpBarCode);
     }
     else
     {
@@ -592,7 +590,7 @@ void SdrGrafObj::TakeObjInfo(SdrObjTransformInfoRec& rInfo) const
 
 SdrObjKind SdrGrafObj::GetObjIdentifier() const
 {
-    return OBJ_GRAF;
+    return SdrObjKind::Graphic;
 }
 
 void SdrGrafObj::ImpSetLinkedGraphic( const Graphic& rGraphic )
@@ -754,10 +752,10 @@ OUString SdrGrafObj::TakeObjNamePlural() const
     return sName.makeStringAndClear();
 }
 
-SdrObjectUniquePtr SdrGrafObj::getFullDragClone() const
+rtl::Reference<SdrObject> SdrGrafObj::getFullDragClone() const
 {
     // call parent
-    SdrObjectUniquePtr pRetval = SdrRectObj::getFullDragClone();
+    rtl::Reference<SdrObject> pRetval = SdrRectObj::getFullDragClone();
 
     // #i103116# the full drag clone leads to problems
     // with linked graphics, so reset the link in this
@@ -770,7 +768,7 @@ SdrObjectUniquePtr SdrGrafObj::getFullDragClone() const
     return pRetval;
 }
 
-SdrGrafObj* SdrGrafObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> SdrGrafObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new SdrGrafObj(rTargetModel, *this);
 }
@@ -910,9 +908,9 @@ GDIMetaFile SdrGrafObj::GetMetaFile(GraphicType &rGraphicType) const
     return GDIMetaFile();
 }
 
-SdrObjectUniquePtr SdrGrafObj::DoConvertToPolyObj(bool bBezier, bool bAddText ) const
+rtl::Reference<SdrObject> SdrGrafObj::DoConvertToPolyObj(bool bBezier, bool bAddText ) const
 {
-    SdrObject* pRetval = nullptr;
+    rtl::Reference<SdrObject> pRetval;
     GraphicType aGraphicType(GetGraphicType());
     GDIMetaFile aMtf(GetMetaFile(aGraphicType));
     switch(aGraphicType)
@@ -924,7 +922,7 @@ SdrObjectUniquePtr SdrGrafObj::DoConvertToPolyObj(bool bBezier, bool bAddText ) 
                 getSdrModelFromSdrObject(),
                 GetLayer(),
                 maRect);
-            SdrObjGroup* pGrp = new SdrObjGroup(getSdrModelFromSdrObject());
+            rtl::Reference<SdrObjGroup> pGrp = new SdrObjGroup(getSdrModelFromSdrObject());
 
             if(aFilter.DoImport(aMtf, *pGrp->GetSubList(), 0))
             {
@@ -950,15 +948,13 @@ SdrObjectUniquePtr SdrGrafObj::DoConvertToPolyObj(bool bBezier, bool bAddText ) 
 
                 if(bAddText)
                 {
-                    pRetval = ImpConvertAddText(SdrObjectUniquePtr(pRetval), bBezier).release();
+                    pRetval = ImpConvertAddText(pRetval, bBezier);
                 }
 
                 // convert all children
                 if( pRetval )
                 {
-                    SdrObject* pHalfDone = pRetval;
-                    pRetval = pRetval->DoConvertToPolyObj(bBezier, bAddText).release();
-                    SdrObject::Free( pHalfDone ); // resulting object is newly created
+                    pRetval = pRetval->DoConvertToPolyObj(bBezier, bAddText);
 
                     if( pRetval )
                     {
@@ -973,33 +969,29 @@ SdrObjectUniquePtr SdrGrafObj::DoConvertToPolyObj(bool bBezier, bool bAddText ) 
                 }
             }
             else
-            {
-                // always use SdrObject::Free(...) for SdrObjects (!)
-                SdrObject* pTemp(pGrp);
-                SdrObject::Free(pTemp);
-            }
+                pGrp.clear();
 
             // #i118485# convert line and fill
-            SdrObjectUniquePtr pLineFill = SdrRectObj::DoConvertToPolyObj(bBezier, false);
+            rtl::Reference<SdrObject> pLineFill = SdrRectObj::DoConvertToPolyObj(bBezier, false);
 
             if(pLineFill)
             {
                 if(pRetval)
                 {
-                    pGrp = dynamic_cast< SdrObjGroup* >(pRetval);
+                    pGrp = dynamic_cast< SdrObjGroup* >(pRetval.get());
 
                     if(!pGrp)
                     {
                         pGrp = new SdrObjGroup(getSdrModelFromSdrObject());
                         pGrp->NbcSetLayer(GetLayer());
-                        pGrp->GetSubList()->NbcInsertObject(pRetval);
+                        pGrp->GetSubList()->NbcInsertObject(pRetval.get());
                     }
 
-                    pGrp->GetSubList()->NbcInsertObject(pLineFill.release(), 0);
+                    pGrp->GetSubList()->NbcInsertObject(pLineFill.get(), 0);
                 }
                 else
                 {
-                    pRetval = pLineFill.release();
+                    pRetval = pLineFill;
                 }
             }
 
@@ -1008,7 +1000,7 @@ SdrObjectUniquePtr SdrGrafObj::DoConvertToPolyObj(bool bBezier, bool bAddText ) 
         case GraphicType::Bitmap:
         {
             // create basic object and add fill
-            pRetval = SdrRectObj::DoConvertToPolyObj(bBezier, bAddText).release();
+            pRetval = SdrRectObj::DoConvertToPolyObj(bBezier, bAddText);
 
             // save bitmap as an attribute
             if(pRetval)
@@ -1028,12 +1020,12 @@ SdrObjectUniquePtr SdrGrafObj::DoConvertToPolyObj(bool bBezier, bool bAddText ) 
         case GraphicType::NONE:
         case GraphicType::Default:
         {
-            pRetval = SdrRectObj::DoConvertToPolyObj(bBezier, bAddText).release();
+            pRetval = SdrRectObj::DoConvertToPolyObj(bBezier, bAddText);
             break;
         }
     }
 
-    return SdrObjectUniquePtr(pRetval);
+    return pRetval;
 }
 
 void SdrGrafObj::Notify( SfxBroadcaster& rBC, const SfxHint& rHint )
@@ -1129,9 +1121,9 @@ void SdrGrafObj::SetGrafAnimationAllowed(bool bNew)
     }
 }
 
-Reference< XInputStream > SdrGrafObj::getInputStream() const
+uno::Reference<io::XInputStream> SdrGrafObj::getInputStream() const
 {
-    Reference< XInputStream > xStream;
+    uno::Reference<io::XInputStream> xStream;
 
     if (mpGraphicObject && GetGraphic().IsGfxLink())
     {

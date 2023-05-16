@@ -43,10 +43,11 @@
 
 #include <memory>
 #include <optional>
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 #include <osl/file.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/ref.hxx>
 #include <tools/debug.hxx>
 #include <unotools/streamwrap.hxx>
@@ -64,6 +65,7 @@
 #include <comphelper/classids.hxx>
 
 #include <mutex>
+#include <utility>
 #include <vector>
 
 namespace com::sun::star::ucb { class XCommandEnvironment; }
@@ -93,7 +95,7 @@ protected:
     std::unique_ptr<SvStream> m_pSvStream;
 
 public:
-    explicit FileStreamWrapper_Impl(const OUString& rName);
+    explicit FileStreamWrapper_Impl(OUString aName);
     virtual ~FileStreamWrapper_Impl() override;
 
     virtual void SAL_CALL seek( sal_Int64 _nLocation ) override;
@@ -112,8 +114,8 @@ protected:
 
 }
 
-FileStreamWrapper_Impl::FileStreamWrapper_Impl( const OUString& rName )
-    : m_aURL( rName )
+FileStreamWrapper_Impl::FileStreamWrapper_Impl( OUString aName )
+    : m_aURL(std::move( aName ))
 {
     // if no URL is provided the stream is empty
 }
@@ -156,7 +158,7 @@ sal_Int32 SAL_CALL FileStreamWrapper_Impl::readBytes(Sequence< sal_Int8 >& aData
     checkError();
 
     // if read characters < MaxLength, adjust sequence
-    if (static_cast<sal_Int32>(nRead) < aData.getLength())
+    if (nRead < o3tl::make_unsigned(aData.getLength()))
         aData.realloc( nRead );
 
     return nRead;
@@ -458,7 +460,7 @@ public:
     OUString                    m_aContentType;
     OUString                    m_aOriginalContentType;
     std::unique_ptr<::ucbhelper::Content> m_pContent;     // the content that provides the storage elements
-    std::unique_ptr<::utl::TempFile>      m_pTempFile;    // temporary file, only for storages on stream
+    std::unique_ptr<::utl::TempFileNamed> m_pTempFile;    // temporary file, only for storages on stream
     SvStream*                   m_pSource;      // original stream, only for storages on a stream
     ErrCode                     m_nError;
     StreamMode                  m_nMode;        // open mode ( read/write/trunc/nocreate/sharing )
@@ -679,7 +681,7 @@ bool UCBStorageStream_Impl::Init()
         // create one
 
         if ( m_aTempURL.isEmpty() )
-            m_aTempURL = ::utl::TempFile().GetURL();
+            m_aTempURL = ::utl::CreateTempURL();
 
         m_pStream = ::utl::UcbStreamHelper::CreateStream( m_aTempURL, StreamMode::STD_READWRITE, true /* bFileExists */ );
 #if OSL_DEBUG_LEVEL > 0
@@ -1449,7 +1451,7 @@ UCBStorage_Impl::UCBStorage_Impl( const ::ucbhelper::Content& rContent, const OU
     {
         // no name given = use temporary name!
         DBG_ASSERT( m_bIsRoot, "SubStorage must have a name!" );
-        m_pTempFile.reset(new ::utl::TempFile);
+        m_pTempFile.reset(new ::utl::TempFileNamed);
         m_pTempFile->EnableKillingFile();
         m_aName = aName = m_pTempFile->GetURL();
     }
@@ -1477,7 +1479,7 @@ UCBStorage_Impl::UCBStorage_Impl( const OUString& rName, StreamMode nMode, UCBSt
     {
         // no name given = use temporary name!
         DBG_ASSERT( m_bIsRoot, "SubStorage must have a name!" );
-        m_pTempFile.reset(new ::utl::TempFile);
+        m_pTempFile.reset(new ::utl::TempFileNamed);
         m_pTempFile->EnableKillingFile();
         m_aName = aName = m_pTempFile->GetURL();
     }
@@ -1505,7 +1507,7 @@ UCBStorage_Impl::UCBStorage_Impl( const OUString& rName, StreamMode nMode, UCBSt
 
 UCBStorage_Impl::UCBStorage_Impl( SvStream& rStream, UCBStorage* pStorage, bool bDirect )
     : m_pAntiImpl( pStorage )
-    , m_pTempFile( new ::utl::TempFile )
+    , m_pTempFile( new ::utl::TempFileNamed )
     , m_pSource( &rStream )
     , m_nError( ERRCODE_NONE )
     , m_bCommited( false )
@@ -1996,7 +1998,7 @@ sal_Int16 UCBStorage_Impl::Commit()
                         // first remove all open stream handles
                         if (pContent && (!pElement->m_xStream.is() || pElement->m_xStream->Clear()))
                         {
-                            pContent->executeCommand( "delete", makeAny( true ) );
+                            pContent->executeCommand( "delete", Any( true ) );
                             nRet = COMMIT_RESULT_SUCCESS;
                         }
                         else
@@ -2106,7 +2108,7 @@ sal_Int16 UCBStorage_Impl::Commit()
                         {
                             // create a stream to write the manifest file - use a temp file
                             OUString aURL( aNewSubFolder.getURL() );
-                            std::optional< ::utl::TempFile> pTempFile(&aURL );
+                            std::optional< ::utl::TempFileNamed > pTempFile(&aURL );
 
                             // get the stream from the temp file and create an output stream wrapper
                             SvStream* pStream = pTempFile->GetStream( StreamMode::STD_READWRITE );

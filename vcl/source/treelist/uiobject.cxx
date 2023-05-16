@@ -8,6 +8,8 @@
  */
 
 #include <memory>
+
+#include <vcl/toolkit/edit.hxx>
 #include <vcl/toolkit/svlbitm.hxx>
 #include <vcl/uitest/uiobject.hxx>
 #include <vcl/toolkit/treelistbox.hxx>
@@ -49,6 +51,10 @@ void TreeListUIObject::execute(const OUString& rAction,
     if (rAction.isEmpty())
     {
     }
+    else if (auto const pEdit = mxTreeList->GetEditWidget())
+    {
+        std::unique_ptr<UIObject>(new EditUIObject(pEdit))->execute(rAction, rParameters);
+    }
     else
         WindowUIObject::execute(rAction, rParameters);
 }
@@ -63,6 +69,13 @@ std::unique_ptr<UIObject> TreeListUIObject::get_child(const OUString& rID)
             return nullptr;
 
         return std::unique_ptr<UIObject>(new TreeListEntryUIObject(mxTreeList, pEntry));
+    }
+    else if (nID == -1) // FIXME hack?
+    {
+        if (auto const pEdit = mxTreeList->GetEditWidget())
+        {
+            return std::unique_ptr<UIObject>(new EditUIObject(pEdit));
+        }
     }
 
     return nullptr;
@@ -108,6 +121,8 @@ StringMap TreeListEntryUIObject::get_state()
     aMap["VisibleChildCount"] = OUString::number(mxTreeList->GetVisibleChildCount(mpEntry));
     aMap["IsSelected"] = OUString::boolean(mxTreeList->IsSelected(mpEntry));
 
+    aMap["IsSemiTransparent"] = OUString::boolean(bool(mpEntry->GetFlags() & SvTLEntryFlags::SEMITRANSPARENT));
+
     SvLBoxButton* pItem = static_cast<SvLBoxButton*>(mpEntry->GetFirstItem(SvLBoxItemType::Button));
     if (pItem)
         aMap["IsChecked"] = OUString::boolean(pItem->IsStateChecked());
@@ -142,7 +157,7 @@ void TreeListEntryUIObject::execute(const OUString& rAction, const StringMap& /*
     }
     else if (rAction == "DOUBLECLICK")
     {
-        mxTreeList->Select(mpEntry);
+        mxTreeList->SetCurEntry(mpEntry);
         mxTreeList->DoubleClickHdl();
     }
 }

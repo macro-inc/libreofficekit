@@ -24,6 +24,7 @@
 #include <o3tl/safeint.hxx>
 #include <svl/listener.hxx>
 #include <svx/svdobj.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <anchoredobject.hxx>
@@ -123,18 +124,16 @@ struct FrameClientSortListLess
                 continue;
             if(rFormat.GetAnchor().GetAnchorId() == nAnchorType)
             {
-                const auto nIdx =
-                    rFormat.GetAnchor().GetContentAnchor()->nContent.GetIndex();
+                const sal_Int32 nIdx = rFormat.GetAnchor().GetAnchorContentOffset();
                 const auto nOrder = rFormat.GetAnchor().GetOrder();
-                FrameClientSortListEntry entry(nIdx, nOrder, std::make_shared<sw::FrameClient>(&rFormat));
-                rFrames.push_back(entry);
+                rFrames.emplace_back(nIdx, nOrder, std::make_unique<sw::FrameClient>(&rFormat));
             }
         }
     }
 }
 
 
-void CollectFrameAtNode( const SwNodeIndex& rIdx,
+void CollectFrameAtNode( const SwNode& rNd,
                          FrameClientSortList_t& rFrames,
                          const bool bAtCharAnchoredObjs )
 {
@@ -143,13 +142,13 @@ void CollectFrameAtNode( const SwNodeIndex& rIdx,
     // <false>: at-paragraph anchored objects are collected
 
     // search all borders, images, and OLEs that are connected to the paragraph
-    SwDoc& rDoc = rIdx.GetNode().GetDoc();
+    const SwDoc& rDoc = rNd.GetDoc();
 
     const auto nChkType = bAtCharAnchoredObjs ? RndStdIds::FLY_AT_CHAR : RndStdIds::FLY_AT_PARA;
     const SwContentFrame* pCFrame;
     const SwContentNode* pCNd;
     if( rDoc.getIDocumentLayoutAccess().GetCurrentViewShell() &&
-        nullptr != (pCNd = rIdx.GetNode().GetContentNode()) &&
+        nullptr != (pCNd = rNd.GetContentNode()) &&
         nullptr != (pCFrame = pCNd->getLayoutFrame( rDoc.getIDocumentLayoutAccess().GetCurrentLayout())) )
     {
         lcl_CollectFrameAtNodeWithLayout(pCFrame, rFrames, nChkType);
@@ -162,19 +161,18 @@ void CollectFrameAtNode( const SwNodeIndex& rIdx,
         {
             const SwFrameFormat* pFormat = rFormats[ i ];
             const SwFormatAnchor& rAnchor = pFormat->GetAnchor();
-            const SwPosition* pAnchorPos;
+            const SwNode* pAnchorNode;
             if( rAnchor.GetAnchorId() == nChkType &&
-                nullptr != (pAnchorPos = rAnchor.GetContentAnchor()) &&
-                    pAnchorPos->nNode == rIdx )
+                nullptr != (pAnchorNode = rAnchor.GetAnchorNode()) &&
+                    *pAnchorNode == rNd )
             {
 
                 // OD 2004-05-07 #i28701# - determine insert position for
                 // sorted <rFrameArr>
-                const sal_Int32 nIndex = pAnchorPos->nContent.GetIndex();
+                const sal_Int32 nIndex = rAnchor.GetAnchorContentOffset();
                 sal_uInt32 nOrder = rAnchor.GetOrder();
 
-                FrameClientSortListEntry entry(nIndex, nOrder, std::make_shared<sw::FrameClient>(const_cast<SwFrameFormat*>(pFormat)));
-                rFrames.push_back(entry);
+                rFrames.emplace_back(nIndex, nOrder, std::make_unique<sw::FrameClient>(const_cast<SwFrameFormat*>(pFormat)));
             }
         }
         std::sort(rFrames.begin(), rFrames.end(), FrameClientSortListLess());
@@ -222,7 +220,7 @@ UnoActionRemoveContext::UnoActionRemoveContext(SwDoc *const pDoc)
 
 static SwDoc * lcl_IsNewStyleTable(SwUnoTableCursor const& rCursor)
 {
-    SwTableNode *const pTableNode = rCursor.GetNode().FindTableNode();
+    SwTableNode *const pTableNode = rCursor.GetPointNode().FindTableNode();
     return (pTableNode && !pTableNode->GetTable().IsNewModel())
         ? &rCursor.GetDoc()
         : nullptr;
@@ -282,7 +280,7 @@ void SwUnoCursorHelper::SetCursorAttr(SwPaM & rPam,
 
     if( rSet.GetItemState( RES_PARATR_OUTLINELEVEL, false ) >= SfxItemState::DEFAULT )
     {
-        SwTextNode * pTmpNode = rPam.GetNode().GetTextNode();
+        SwTextNode * pTmpNode = rPam.GetPointNode().GetTextNode();
         if ( pTmpNode )
         {
             rPam.GetDoc().GetNodes().UpdateOutlineNode( *pTmpNode );
@@ -303,8 +301,8 @@ void SwUnoCursorHelper::GetCursorAttr(SwPaM & rPam,
     {
         SwPosition const & rStart( *rCurrent.Start() );
         SwPosition const & rEnd( *rCurrent.End() );
-        const SwNodeOffset nSttNd = rStart.nNode.GetIndex();
-        const SwNodeOffset nEndNd = rEnd  .nNode.GetIndex();
+        const SwNodeOffset nSttNd = rStart.GetNodeIndex();
+        const SwNodeOffset nEndNd = rEnd  .GetNodeIndex();
 
         if (nEndNd - nSttNd >= SwNodeOffset(nMaxLookup))
         {
@@ -323,9 +321,9 @@ void SwUnoCursorHelper::GetCursorAttr(SwPaM & rPam,
                 case SwNodeType::Text:
                 {
                     const sal_Int32 nStart = (n == nSttNd)
-                        ? rStart.nContent.GetIndex() : 0;
+                        ? rStart.GetContentIndex() : 0;
                     const sal_Int32 nEnd   = (n == nEndNd)
-                        ? rEnd.nContent.GetIndex()
+                        ? rEnd.GetContentIndex()
                         : pNd->GetTextNode()->GetText().getLength();
                     pNd->GetTextNode()->GetParaAttr(*pSet, nStart, nEnd, bOnlyTextAttr, bGetFromChrFormat);
                 }
@@ -376,11 +374,11 @@ struct SwXParagraphEnumerationImpl final : public SwXParagraphEnumeration
     sw::UnoCursorPointer m_pCursor;
 
     SwXParagraphEnumerationImpl(
-            uno::Reference< text::XText > const& xParent,
+            uno::Reference< text::XText > xParent,
             const std::shared_ptr<SwUnoCursor>& pCursor,
             const CursorType eType,
             SwStartNode const*const pStartNode, SwTable const*const pTable)
-        : m_xParentText( xParent )
+        : m_xParentText(std::move( xParent ))
         , m_eCursorType( eType )
         // remember table and start node for later travelling
         // (used in export of tables in tables)
@@ -388,7 +386,7 @@ struct SwXParagraphEnumerationImpl final : public SwXParagraphEnumeration
         // for import of tables in tables we have to remember the actual
         // table and start node of the current position in the enumeration.
         , m_pOwnTable( pTable )
-        , m_nEndIndex( pCursor->End()->nNode.GetIndex() )
+        , m_nEndIndex( pCursor->End()->GetNodeIndex() )
         , m_nFirstParaStart( -1 )
         , m_nLastParaEnd( -1 )
         , m_bFirstParagraph( true )
@@ -404,8 +402,8 @@ struct SwXParagraphEnumerationImpl final : public SwXParagraphEnumeration
         {
             SwUnoCursor & rCursor = GetCursor();
             rCursor.Normalize();
-            m_nFirstParaStart = rCursor.GetPoint()->nContent.GetIndex();
-            m_nLastParaEnd = rCursor.GetMark()->nContent.GetIndex();
+            m_nFirstParaStart = rCursor.GetPoint()->GetContentIndex();
+            m_nLastParaEnd = rCursor.GetMark()->GetContentIndex();
             rCursor.DeleteMark();
         }
     }
@@ -466,7 +464,7 @@ rtl::Reference<SwXParagraphEnumeration> SwXParagraphEnumeration::Create(
         case CursorType::SelectionInTable:
         {
             SwTableNode const*const pTableNode(
-                pCursor->GetPoint()->nNode.GetNode().FindTableNode());
+                pCursor->GetPoint()->GetNode().FindTableNode());
             pStartNode = pTableNode;
             pTable = & pTableNode->GetTable();
             break;
@@ -512,8 +510,8 @@ lcl_CursorIsInSection(
     if (pUnoCursor && pOwnStartNode)
     {
         const SwEndNode * pOwnEndNode = pOwnStartNode->EndOfSectionNode();
-        bRes = pOwnStartNode->GetIndex() <= pUnoCursor->Start()->nNode.GetIndex() &&
-               pUnoCursor->End()->nNode.GetIndex() <= pOwnEndNode->GetIndex();
+        bRes = pOwnStartNode->GetIndex() <= pUnoCursor->Start()->GetNodeIndex() &&
+               pUnoCursor->End()->GetNodeIndex() <= pOwnEndNode->GetIndex();
     }
     return bRes;
 }
@@ -523,7 +521,7 @@ bool SwXParagraphEnumerationImpl::IgnoreLastElement(SwUnoCursor& rCursor, bool b
     // Ignore the last element of a selection enumeration if this is a stub
     // paragraph (directly after table, selection ends at paragraph start).
 
-    if (rCursor.Start()->nNode.GetIndex() != m_nEndIndex)
+    if (rCursor.Start()->GetNodeIndex() != m_nEndIndex)
         return false;
 
     if (m_eCursorType != CursorType::Selection)
@@ -555,11 +553,11 @@ SwXParagraphEnumerationImpl::NextElement_Impl()
 
         // os 2005-01-14: This part is only necessary to detect movements out
         // of a selection; if there is no selection we don't have to care
-        SwTableNode *const pTableNode = aNewCursor->GetNode().FindTableNode();
+        SwTableNode *const pTableNode = aNewCursor->GetPointNode().FindTableNode();
         bool bMovedFromTable = false;
         if (CursorType::SelectionInTable != m_eCursorType && pTableNode)
         {
-            aNewCursor->GetPoint()->nNode = pTableNode->EndOfSectionIndex();
+            aNewCursor->GetPoint()->Assign( pTableNode->EndOfSectionIndex() );
             aNewCursor->Move(fnMoveForward, GoInNode);
             bMovedFromTable = true;
         }
@@ -567,7 +565,7 @@ SwXParagraphEnumerationImpl::NextElement_Impl()
         {
             aNewCursor->MovePara(GoNextPara, fnParaStart);
         }
-        if (m_nEndIndex < aNewCursor->Start()->nNode.GetIndex())
+        if (m_nEndIndex < aNewCursor->Start()->GetNodeIndex())
         {
             return nullptr;
         }
@@ -583,12 +581,12 @@ SwXParagraphEnumerationImpl::NextElement_Impl()
     {
         rUnoCursor.SetRemainInSection( false );
         // what to do if already in a table?
-        SwTableNode * pTableNode = rUnoCursor.GetNode().FindTableNode();
+        SwTableNode * pTableNode = rUnoCursor.GetPointNode().FindTableNode();
         pTableNode = lcl_FindTopLevelTable( pTableNode, m_pOwnTable );
         if (pTableNode && (&pTableNode->GetTable() != m_pOwnTable))
         {
             // this is a foreign table: go to end
-            rUnoCursor.GetPoint()->nNode = pTableNode->EndOfSectionIndex();
+            rUnoCursor.GetPoint()->Assign( pTableNode->EndOfSectionIndex() );
             if (!rUnoCursor.Move(fnMoveForward, GoInNode))
             {
                 return nullptr;
@@ -609,7 +607,7 @@ SwXParagraphEnumerationImpl::NextElement_Impl()
         {
             // This is a selection, check if the cursor would go past the end
             // of the selection.
-            if (rUnoCursor.Start()->nNode.GetIndex() > m_nEndIndex)
+            if (rUnoCursor.Start()->GetNodeIndex() > m_nEndIndex)
                 return nullptr;
         }
 
@@ -617,10 +615,10 @@ SwXParagraphEnumerationImpl::NextElement_Impl()
         const sal_Int32 nFirstContent =
             m_bFirstParagraph ? m_nFirstParaStart : -1;
         const sal_Int32 nLastContent =
-            (m_nEndIndex == pStart->nNode.GetIndex()) ? m_nLastParaEnd : -1;
+            (m_nEndIndex == pStart->GetNodeIndex()) ? m_nLastParaEnd : -1;
 
         // position in a table, or in a simple paragraph?
-        SwTableNode * pTableNode = rUnoCursor.GetNode().FindTableNode();
+        SwTableNode * pTableNode = rUnoCursor.GetPointNode().FindTableNode();
         pTableNode = lcl_FindTopLevelTable( pTableNode, m_pOwnTable );
         if (/*CursorType::TableText != eCursorType && CursorType::SelectionInTable != eCursorType && */
             pTableNode && (&pTableNode->GetTable() != m_pOwnTable))
@@ -633,7 +631,7 @@ SwXParagraphEnumerationImpl::NextElement_Impl()
         {
             text::XText *const pText = m_xParentText.get();
             xRef = SwXParagraph::CreateXParagraph(rUnoCursor.GetDoc(),
-                pStart->nNode.GetNode().GetTextNode(),
+                pStart->GetNode().GetTextNode(),
                 static_cast<SwXText*>(pText), nFirstContent, nLastContent);
         }
     }
@@ -674,11 +672,11 @@ public:
 
     Impl(SwDoc& rDoc, const enum RangePosition eRange,
             SwFrameFormat* const pTableOrSectionFormat,
-            const uno::Reference<text::XText>& xParent = nullptr)
+            uno::Reference<text::XText> xParent = nullptr)
         : m_rPropSet(*aSwMapProvider.GetPropertySet(PROPERTY_MAP_TEXT_CURSOR))
         , m_eRangePosition(eRange)
         , m_rDoc(rDoc)
-        , m_xParentText(xParent)
+        , m_xParentText(std::move(xParent))
         , m_pTableOrSectionFormat(pTableOrSectionFormat)
         , m_pMark(nullptr)
     {
@@ -747,8 +745,7 @@ SwXTextRange::SwXTextRange(SwTableFormat& rTableFormat)
 {
     SwTable *const pTable = SwTable::FindTable( &rTableFormat );
     SwTableNode *const pTableNode = pTable->GetTableNode();
-    SwPosition aPosition( *pTableNode );
-    SwPaM aPam( aPosition );
+    SwPaM aPam( *pTableNode );
 
     SetPositions( aPam );
 }
@@ -784,7 +781,8 @@ void SwXTextRange::SetPositions(const SwPaM& rPam)
     m_pImpl->Invalidate();
     IDocumentMarkAccess* const pMA = m_pImpl->m_rDoc.getIDocumentMarkAccess();
     auto pMark = pMA->makeMark(rPam, OUString(), IDocumentMarkAccess::MarkType::UNO_BOOKMARK, sw::mark::InsertMode::New);
-    m_pImpl->SetMark(*pMark);
+    if (pMark)
+        m_pImpl->SetMark(*pMark);
 }
 
 static void DeleteTable(SwDoc & rDoc, SwTable& rTable)
@@ -800,7 +798,7 @@ static void DeleteTable(SwDoc & rDoc, SwTable& rTable)
 }
 
 void SwXTextRange::DeleteAndInsert(
-        const OUString& rText, const bool bForceExpandHints)
+        std::u16string_view aText, ::sw::DeleteAndInsertMode const eMode)
 {
     if (RANGE_IS_TABLE == m_pImpl->m_eRangePosition)
     {
@@ -870,13 +868,13 @@ void SwXTextRange::DeleteAndInsert(
             }
         }
         // now there should be a text node at the start and end of it!
-        *aCursor.GetPoint() = SwPosition(start);
+        aCursor.GetPoint()->Assign(start);
         aCursor.Move( fnMoveForward, GoInContent );
-        assert(aCursor.GetPoint()->nNode <= end);
+        assert(aCursor.GetPoint()->GetNode() <= end.GetNode());
         aCursor.SetMark();
-        *aCursor.GetPoint() = SwPosition(end);
+        aCursor.GetPoint()->Assign(end);
         aCursor.Move( fnMoveBackward, GoInContent );
-        assert(start <= aCursor.GetPoint()->nNode);
+        assert(start <= aCursor.GetPoint()->GetNode());
     }
     else
     {
@@ -887,16 +885,17 @@ void SwXTextRange::DeleteAndInsert(
 
     if (aCursor.HasMark())
     {
-        m_pImpl->m_rDoc.getIDocumentContentOperations().DeleteAndJoin(aCursor);
+        m_pImpl->m_rDoc.getIDocumentContentOperations().DeleteAndJoin(aCursor,
+            (!aText.empty() || eMode & ::sw::DeleteAndInsertMode::ForceReplace) ? SwDeleteFlags::ArtificialSelection : SwDeleteFlags::Default);
     }
 
-    if (!rText.isEmpty())
+    if (!aText.empty())
     {
         SwUnoCursorHelper::DocInsertStringSplitCR(
-                m_pImpl->m_rDoc, aCursor, rText, bForceExpandHints);
+            m_pImpl->m_rDoc, aCursor, aText, bool(eMode & ::sw::DeleteAndInsertMode::ForceExpandHints));
 
         SwUnoCursorHelper::SelectPam(aCursor, true);
-        aCursor.Left(rText.getLength());
+        aCursor.Left(aText.size());
     }
     SetPositions(aCursor);
     m_pImpl->m_rDoc.GetIDocumentUndoRedo().EndUndo(SwUndoId::INSERT, nullptr);
@@ -994,7 +993,7 @@ SwXTextRange::getStart()
         auto const pSectFormat(static_cast<SwSectionFormat const*>(m_pImpl->m_pTableOrSectionFormat));
         SwPaM aPaM(*pSectFormat->GetContent().GetContentIdx());
         aPaM.Move( fnMoveForward, GoInContent );
-        assert(aPaM.GetPoint()->nNode < *pSectFormat->GetContent().GetContentIdx()->GetNode().EndOfSectionNode());
+        assert(aPaM.GetPoint()->GetNode() < *pSectFormat->GetContent().GetContentIdx()->GetNode().EndOfSectionNode());
         xRet = new SwXTextRange(aPaM, m_pImpl->m_xParentText);
     }
     else
@@ -1031,7 +1030,7 @@ SwXTextRange::getEnd()
         auto const pSectFormat(static_cast<SwSectionFormat const*>(m_pImpl->m_pTableOrSectionFormat));
         SwPaM aPaM(*pSectFormat->GetContent().GetContentIdx()->GetNode().EndOfSectionNode());
         aPaM.Move( fnMoveBackward, GoInContent );
-        assert(*pSectFormat->GetContent().GetContentIdx() < aPaM.GetPoint()->nNode);
+        assert(*pSectFormat->GetContent().GetContentIdx() < aPaM.GetPoint()->GetNode());
         xRet = new SwXTextRange(aPaM, m_pImpl->m_xParentText);
     }
     else
@@ -1060,7 +1059,7 @@ void SAL_CALL SwXTextRange::setString(const OUString& rString)
 {
     SolarMutexGuard aGuard;
 
-    DeleteAndInsert(rString, false);
+    DeleteAndInsert(rString, ::sw::DeleteAndInsertMode::Default);
 }
 
 bool SwXTextRange::GetPositions(SwPaM& rToFill, ::sw::TextRangeMode const eMode) const
@@ -1073,14 +1072,11 @@ bool SwXTextRange::GetPositions(SwPaM& rToFill, ::sw::TextRangeMode const eMode)
             SwNodeIndex const*const pSectionNode(pSectFormat->GetContent().GetContentIdx());
             assert(pSectionNode);
             assert(pSectionNode->GetNodes().IsDocNodes());
-            rToFill.GetPoint()->nNode = *pSectionNode;
-            ++rToFill.GetPoint()->nNode;
-            rToFill.GetPoint()->nContent.Assign(rToFill.GetPoint()->nNode.GetNode().GetContentNode(), 0);
+            rToFill.GetPoint()->Assign( pSectionNode->GetNode(), SwNodeOffset(1) );
             rToFill.SetMark();
-            rToFill.GetMark()->nNode = *pSectionNode->GetNode().EndOfSectionNode();
-            --rToFill.GetMark()->nNode;
-            rToFill.GetMark()->nContent.Assign(rToFill.GetMark()->nNode.GetNode().GetContentNode(),
-                rToFill.GetMark()->nNode.GetNode().GetContentNode() ? rToFill.GetMark()->nNode.GetNode().GetContentNode()->Len() : 0);
+            rToFill.GetMark()->Assign( *pSectionNode->GetNode().EndOfSectionNode(), SwNodeOffset(-1) );
+            if (const SwContentNode* pCNd = rToFill.GetMark()->GetContentNode())
+                rToFill.GetMark()->AssignEndIndex(*pCNd);
             return true;
         }
     }
@@ -1195,6 +1191,9 @@ lcl_IsStartNodeInFormat(const bool bHeader, SwStartNode const *const pSttNode,
         if (pHeadFootFormat)
         {
             const SwFormatContent& rFlyContent = pHeadFootFormat->GetContent();
+            // tdf#146248 avoid Undo crash at shared first page
+            if ( !rFlyContent.GetContentIdx() )
+                return false;
             const SwNode& rNode = rFlyContent.GetContentIdx()->GetNode();
             SwStartNode const*const pCurSttNode = rNode.FindSttNodeByType(
                 bHeader ? SwHeaderStartNode : SwFooterStartNode);
@@ -1210,7 +1209,7 @@ lcl_IsStartNodeInFormat(const bool bHeader, SwStartNode const *const pSttNode,
 
 } // namespace sw
 
-uno::Reference< text::XTextRange >
+rtl::Reference< SwXTextRange >
 SwXTextRange::CreateXTextRange(
     SwDoc & rDoc, const SwPosition& rPos, const SwPosition *const pMark)
 {
@@ -1223,10 +1222,8 @@ SwXTextRange::CreateXTextRange(
         *pNewCursor->GetMark() = *pMark;
     }
     const bool isCell( dynamic_cast<SwXCell*>(xParentText.get()) );
-    const uno::Reference< text::XTextRange > xRet(
-        new SwXTextRange(*pNewCursor, xParentText,
-            isCell ? RANGE_IN_CELL : RANGE_IN_TEXT) );
-    return xRet;
+    return new SwXTextRange(*pNewCursor, xParentText,
+            isCell ? RANGE_IN_CELL : RANGE_IN_TEXT);
 }
 
 namespace sw {
@@ -1235,7 +1232,7 @@ uno::Reference< text::XText >
 CreateParentXText(SwDoc & rDoc, const SwPosition& rPos)
 {
     uno::Reference< text::XText > xParentText;
-    SwStartNode* pSttNode = rPos.nNode.GetNode().StartOfSectionNode();
+    SwStartNode* pSttNode = rPos.GetNode().StartOfSectionNode();
     while(pSttNode && pSttNode->IsSectionNode())
     {
         pSttNode = pSttNode->StartOfSectionNode();
@@ -1260,8 +1257,7 @@ CreateParentXText(SwDoc & rDoc, const SwPosition& rPos)
             SwFrameFormat *const pFormat = pSttNode->GetFlyFormat();
             if (nullptr != pFormat)
             {
-                xParentText.set(SwXTextFrame::CreateXTextFrame(rDoc, pFormat),
-                        uno::UNO_QUERY);
+                xParentText = SwXTextFrame::CreateXTextFrame(rDoc, pFormat);
             }
         }
         break;
@@ -1315,7 +1311,7 @@ CreateParentXText(SwDoc & rDoc, const SwPosition& rPos)
                                     FindSttNodeByType(SwFootnoteStartNode))
                 {
                     xParentText.set(SwXFootnote::CreateXFootnote(rDoc,
-                            &const_cast<SwFormatFootnote&>(rFootnote)), uno::UNO_QUERY);
+                            &const_cast<SwFormatFootnote&>(rFootnote)));
                     break;
                 }
             }
@@ -1593,7 +1589,7 @@ struct SwXTextRangesImpl final : public SwXTextRanges
     virtual SwUnoCursor* GetCursor() override
         { return &(*m_pUnoCursor); };
     void MakeRanges();
-    std::vector< uno::Reference< text::XTextRange > > m_Ranges;
+    std::vector< rtl::Reference<SwXTextRange> > m_Ranges;
     sw::UnoCursorPointer m_pUnoCursor;
 };
 
@@ -1606,7 +1602,7 @@ void SwXTextRangesImpl::MakeRanges()
 
     for(SwPaM& rTmpCursor : GetCursor()->GetRingContainer())
     {
-        const uno::Reference< text::XTextRange > xRange(
+        const rtl::Reference<SwXTextRange> xRange(
                 SwXTextRange::CreateXTextRange(
                     rTmpCursor.GetDoc(),
                     *rTmpCursor.GetPoint(), rTmpCursor.GetMark()));
@@ -1649,12 +1645,11 @@ uno::Any SAL_CALL SwXTextRangesImpl::getByIndex(sal_Int32 nIndex)
     SolarMutexGuard aGuard;
     if ((nIndex < 0) || (o3tl::make_unsigned(nIndex) >= m_Ranges.size()))
         throw lang::IndexOutOfBoundsException();
-    uno::Any ret;
-    ret <<= m_Ranges.at(nIndex);
+    uno::Any ret(uno::Reference<text::XTextRange>(m_Ranges.at(nIndex)));
     return ret;
 }
 
-void SwUnoCursorHelper::SetString(SwCursor & rCursor, const OUString& rString)
+void SwUnoCursorHelper::SetString(SwCursor & rCursor, std::u16string_view aString)
 {
     // Start/EndAction
     SwDoc& rDoc = rCursor.GetDoc();
@@ -1664,13 +1659,13 @@ void SwUnoCursorHelper::SetString(SwCursor & rCursor, const OUString& rString)
     {
         rDoc.getIDocumentContentOperations().DeleteAndJoin(rCursor);
     }
-    if (!rString.isEmpty())
+    if (!aString.empty())
     {
         const bool bSuccess( SwUnoCursorHelper::DocInsertStringSplitCR(
-                    rDoc, rCursor, rString, false ) );
+                    rDoc, rCursor, aString, false ) );
         OSL_ENSURE( bSuccess, "DocInsertStringSplitCR" );
         SwUnoCursorHelper::SelectPam(rCursor, true);
-        rCursor.Left(rString.getLength());
+        rCursor.Left(aString.size());
     }
     rDoc.GetIDocumentUndoRedo().EndUndo(SwUndoId::INSERT, nullptr);
 }
@@ -1710,14 +1705,14 @@ struct SwXParaFrameEnumerationImpl final : public SwXParaFrameEnumeration
         {
             // removing orphaned Clients
             const auto iter = std::remove_if(m_vFrames.begin(), m_vFrames.end(),
-                    [] (std::shared_ptr<sw::FrameClient>& rEntry) -> bool { return !rEntry->GetRegisteredIn(); });
+                    [] (std::unique_ptr<sw::FrameClient>& rEntry) -> bool { return !rEntry->GetRegisteredIn(); });
             m_vFrames.erase(iter, m_vFrames.end());
         }
     }
     void FillFrame();
     bool CreateNextObject();
     uno::Reference< text::XTextContent > m_xNextObject;
-    FrameClientList_t m_vFrames;
+    std::deque< std::unique_ptr<sw::FrameClient> > m_vFrames;
     ::sw::UnoCursorPointer m_pUnoCursor;
 };
 
@@ -1739,14 +1734,14 @@ SwXParaFrameEnumerationImpl::SwXParaFrameEnumerationImpl(
     if (PARAFRAME_PORTION_PARAGRAPH == eParaFrameMode)
     {
         FrameClientSortList_t vFrames;
-        ::CollectFrameAtNode(rPaM.GetPoint()->nNode, vFrames, false);
+        ::CollectFrameAtNode(rPaM.GetPoint()->GetNode(), vFrames, false);
         std::transform(vFrames.begin(), vFrames.end(),
             std::back_inserter(m_vFrames),
-            [] (const FrameClientSortListEntry& rEntry) { return rEntry.pFrameClient; });
+            [] (FrameClientSortListEntry& rEntry) { return std::move(rEntry.pFrameClient); });
     }
     else if (pFormat)
     {
-        m_vFrames.push_back(std::make_shared<sw::FrameClient>(pFormat));
+        m_vFrames.push_back(std::make_unique<sw::FrameClient>(pFormat));
     }
     else if ((PARAFRAME_PORTION_CHAR == eParaFrameMode) ||
              (PARAFRAME_PORTION_TEXTRANGE == eParaFrameMode))
@@ -1754,10 +1749,10 @@ SwXParaFrameEnumerationImpl::SwXParaFrameEnumerationImpl(
         if (PARAFRAME_PORTION_TEXTRANGE == eParaFrameMode)
         {
             //get all frames that are bound at paragraph or at character
-            for(const auto& pFlyFrame : rPaM.GetDoc().GetAllFlyFormats(&GetCursor(), false, true))
+            for(const SwPosFlyFrame& rFlyFrame : rPaM.GetDoc().GetAllFlyFormats(&GetCursor(), false, true))
             {
-                const auto pFrameFormat = const_cast<SwFrameFormat*>(&pFlyFrame->GetFormat());
-                m_vFrames.push_back(std::make_shared<sw::FrameClient>(pFrameFormat));
+                const auto pFrameFormat = const_cast<SwFrameFormat*>(&rFlyFrame.GetFormat());
+                m_vFrames.push_back(std::make_unique<sw::FrameClient>(pFrameFormat));
             }
         }
         FillFrame();
@@ -1768,16 +1763,16 @@ SwXParaFrameEnumerationImpl::SwXParaFrameEnumerationImpl(
 // into the array
 void SwXParaFrameEnumerationImpl::FillFrame()
 {
-    if(!m_pUnoCursor->GetNode().IsTextNode())
+    if(!m_pUnoCursor->GetPointNode().IsTextNode())
         return;
     // search for objects at the cursor - anchored at/as char
-    const auto pTextAttr = m_pUnoCursor->GetNode().GetTextNode()->GetTextAttrForCharAt(
-            m_pUnoCursor->GetPoint()->nContent.GetIndex(), RES_TXTATR_FLYCNT);
+    const auto pTextAttr = m_pUnoCursor->GetPointNode().GetTextNode()->GetTextAttrForCharAt(
+            m_pUnoCursor->GetPoint()->GetContentIndex(), RES_TXTATR_FLYCNT);
     if(!pTextAttr)
         return;
     const SwFormatFlyCnt& rFlyCnt = pTextAttr->GetFlyCnt();
     SwFrameFormat* const pFrameFormat = rFlyCnt.GetFrameFormat();
-    m_vFrames.push_back(std::make_shared<sw::FrameClient>(pFrameFormat));
+    m_vFrames.push_back(std::make_unique<sw::FrameClient>(pFrameFormat));
 }
 
 bool SwXParaFrameEnumerationImpl::CreateNextObject()
@@ -1807,8 +1802,8 @@ bool SwXParaFrameEnumerationImpl::CreateNextObject()
 
         if (!pNd->IsNoTextNode())
         {
-            m_xNextObject.set(SwXTextFrame::CreateXTextFrame(
-                        *pFormat->GetDoc(), pFormat));
+            m_xNextObject = static_cast<SwXFrame*>(SwXTextFrame::CreateXTextFrame(
+                        *pFormat->GetDoc(), pFormat).get());
         }
         else if (pNd->IsGrfNode())
         {

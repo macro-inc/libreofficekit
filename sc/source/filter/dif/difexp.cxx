@@ -111,7 +111,8 @@ void ScFormatFilterPluginImpl::ScExportDif( SvStream& rOut, ScDocument* pDoc,
     pDoc->GetName( nTab, aString );
     aOS.append(aString);
     aOS.append("\"\n");
-    rOut.WriteUnicodeOrByteText(aOS.makeStringAndClear());
+    rOut.WriteUnicodeOrByteText(aOS);
+    aOS.setLength(0);
 
     // VECTORS
     aOS.append(pKeyVECTORS);
@@ -119,7 +120,8 @@ void ScFormatFilterPluginImpl::ScExportDif( SvStream& rOut, ScDocument* pDoc,
     aOS.append(static_cast<sal_Int32>(nNumCols));
     aOS.append('\n');
     aOS.append(p2DoubleQuotes_LF);
-    rOut.WriteUnicodeOrByteText(aOS.makeStringAndClear());
+    rOut.WriteUnicodeOrByteText(aOS);
+    aOS.setLength(0);
 
     // TUPLES
     aOS.append(pKeyTUPLES);
@@ -127,13 +129,15 @@ void ScFormatFilterPluginImpl::ScExportDif( SvStream& rOut, ScDocument* pDoc,
     aOS.append(static_cast<sal_Int32>(nNumRows));
     aOS.append('\n');
     aOS.append(p2DoubleQuotes_LF);
-    rOut.WriteUnicodeOrByteText(aOS.makeStringAndClear());
+    rOut.WriteUnicodeOrByteText(aOS);
+    aOS.setLength(0);
 
     // DATA
     aOS.append(pKeyDATA);
     aOS.append("\n0,0\n");
     aOS.append(p2DoubleQuotes_LF);
-    rOut.WriteUnicodeOrByteText(aOS.makeStringAndClear());
+    rOut.WriteUnicodeOrByteText(aOS);
+    aOS.setLength(0);
 
     SCCOL               nColCnt;
     SCROW               nRowCnt;
@@ -144,14 +148,15 @@ void ScFormatFilterPluginImpl::ScExportDif( SvStream& rOut, ScDocument* pDoc,
         aOS.append(pSpecDataType_LF);
         aOS.append(pKeyBOT);
         aOS.append('\n');
-        rOut.WriteUnicodeOrByteText(aOS.makeStringAndClear());
+        rOut.WriteUnicodeOrByteText(aOS);
+        aOS.setLength(0);
         for( nColCnt = rRange.aStart.Col() ; nColCnt <= nEndCol ; nColCnt++ )
         {
             assert( aOS.isEmpty() && "aOS should be empty");
             bool bWriteStringData = false;
             ScRefCellValue aCell(*pDoc, ScAddress(nColCnt, nRowCnt, nTab));
 
-            switch (aCell.meType)
+            switch (aCell.getType())
             {
                 case CELLTYPE_NONE:
                     aOS.append(pEmptyData);
@@ -168,9 +173,9 @@ void ScFormatFilterPluginImpl::ScExportDif( SvStream& rOut, ScDocument* pDoc,
                     bWriteStringData = true;
                 break;
                 case CELLTYPE_FORMULA:
-                    if (aCell.mpFormula->GetErrCode() != FormulaError::NONE)
+                    if (aCell.getFormula()->GetErrCode() != FormulaError::NONE)
                         aOS.append(pNumDataERROR);
-                    else if (aCell.mpFormula->IsValue())
+                    else if (aCell.getFormula()->IsValue())
                     {
                         aOS.append(pNumData);
                         aString = pDoc->GetInputString( nColCnt, nRowCnt, nTab );
@@ -179,7 +184,7 @@ void ScFormatFilterPluginImpl::ScExportDif( SvStream& rOut, ScDocument* pDoc,
                     }
                     else
                     {
-                        aString = aCell.mpFormula->GetString().getString();
+                        aString = aCell.getFormula()->GetString().getString();
                         bWriteStringData = true;
                     }
 
@@ -188,25 +193,27 @@ void ScFormatFilterPluginImpl::ScExportDif( SvStream& rOut, ScDocument* pDoc,
             }
 
             if ( !bWriteStringData )
-                rOut.WriteUnicodeOrByteText(aOS.makeStringAndClear());
+            {
+                rOut.WriteUnicodeOrByteText(aOS);
+                aOS.setLength(0);
+            }
             else
             {
                 // for an explanation why this complicated, see
-                // sc/source/ui/docsh.cxx:ScDocShell::AsciiSave()
+                // sc/source/ui/docshell/docsh.cxx:ScDocShell::AsciiSave()
                 // In fact we should create a common method if this would be
                 // needed just one more time...
                 assert( aOS.isEmpty() && "aOS should be empty");
                 OUString aTmpStr = aString;
                 aOS.append(pStringData);
-                rOut.WriteUnicodeOrByteText(aOS.makeStringAndClear(), eCharSet);
+                rOut.WriteUnicodeOrByteText(aOS, eCharSet);
+                aOS.setLength(0);
                 if ( eCharSet == RTL_TEXTENCODING_UNICODE )
                 {
-                    sal_Int32 nPos = aTmpStr.indexOf( cStrDelim );
-                    while ( nPos != -1 )
-                    {
-                        aTmpStr = aTmpStr.replaceAt( nPos, 0, rtl::OUStringChar(cStrDelim) );
-                        nPos = aTmpStr.indexOf( cStrDelim, nPos+2 );
-                    }
+                    // the goal is to replace cStrDelim by cStrDelim+cStrDelim
+                    OUString strFrom(cStrDelim);
+                    OUString strTo = strFrom + strFrom;
+                    aTmpStr = aTmpStr.replaceAll(strFrom, strTo);
                     rOut.WriteUniOrByteChar( cStrDelim, eCharSet );
                     write_uInt16s_FromOUString(rOut, aTmpStr);
                     rOut.WriteUniOrByteChar( cStrDelim, eCharSet );
@@ -218,15 +225,8 @@ void ScFormatFilterPluginImpl::ScExportDif( SvStream& rOut, ScDocument* pDoc,
                     // back to Unicode
                     OUString aStrDec = OStringToOUString(aStrEnc, eCharSet);
                     // search on re-decoded string
-                    sal_Int32 nPos = aStrDec.indexOf(aStrDelimDecoded);
-                    while (nPos >= 0)
-                    {
-                        OUStringBuffer aBuf(aStrDec);
-                        aBuf.insert(nPos, aStrDelimDecoded);
-                        aStrDec = aBuf.makeStringAndClear();
-                        nPos = aStrDec.indexOf(
-                            aStrDelimDecoded, nPos+1+aStrDelimDecoded.getLength());
-                    }
+                    OUString aStrTo = aStrDelimDecoded + aStrDelimDecoded;
+                    aStrDec = aStrDec.replaceAll(aStrDelimDecoded, aStrTo);
                     // write byte re-encoded
                     rOut.WriteUniOrByteChar( cStrDelim, eCharSet );
                     rOut.WriteUnicodeOrByteText( aStrDec, eCharSet );
@@ -236,15 +236,8 @@ void ScFormatFilterPluginImpl::ScExportDif( SvStream& rOut, ScDocument* pDoc,
                 {
                     OString aStrEnc = OUStringToOString(aTmpStr, eCharSet);
                     // search on encoded string
-                    sal_Int32 nPos = aStrEnc.indexOf(aStrDelimEncoded);
-                    while (nPos >= 0)
-                    {
-                        OStringBuffer aBuf(aStrEnc);
-                        aBuf.insert(nPos, aStrDelimEncoded);
-                        aStrEnc = aBuf.makeStringAndClear();
-                        nPos = aStrEnc.indexOf(
-                            aStrDelimEncoded, nPos+1+aStrDelimEncoded.getLength());
-                    }
+                    OString aStrTo = aStrDelimEncoded + aStrDelimEncoded;
+                    aStrEnc = aStrEnc.replaceAll(aStrDelimEncoded, aStrTo);
                     // write byte encoded
                     rOut.WriteBytes(aStrDelimEncoded.getStr(), aStrDelimEncoded.getLength());
                     rOut.WriteBytes(aStrEnc.getStr(), aStrEnc.getLength());
@@ -260,7 +253,8 @@ void ScFormatFilterPluginImpl::ScExportDif( SvStream& rOut, ScDocument* pDoc,
     aOS.append(pSpecDataType_LF);
     aOS.append(pKeyEOD);
     aOS.append('\n');
-    rOut.WriteUnicodeOrByteText(aOS.makeStringAndClear());
+    rOut.WriteUnicodeOrByteText(aOS);
+    aOS.setLength(0);
 
     // restore original value
     rOut.SetStreamCharSet( eStreamCharSet );

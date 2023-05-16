@@ -8,6 +8,7 @@
  */
 
 #include <swmodeltestbase.hxx>
+#include <o3tl/string_view.hxx>
 
 class Test : public SwModelTestBase
 {
@@ -15,15 +16,6 @@ public:
     Test()
         : SwModelTestBase("/sw/qa/extras/fodfexport/data/", "OpenDocument Text Flat XML")
     {
-    }
-
-    /**
-     * Denylist handling
-     */
-    bool mustTestImportOf(const char* filename) const override
-    {
-        // Only test import of .fodt document
-        return OString(filename).endsWith(".odt") || OString(filename).endsWith(".fodt");
     }
 };
 
@@ -58,4 +50,5 @@ DECLARE_FODFEXPORT_TEST(testTdf113696WriterImage, "tdf113696-writerimage.odt")
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

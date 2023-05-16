@@ -28,7 +28,7 @@
 #include <com/sun/star/beans/XFastPropertySet.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <cppuhelper/implbase.hxx>
-#include <osl/mutex.hxx>
+#include <mutex>
 #include <unotools/tempfile.hxx>
 
 namespace com::sun::star::uno { class XComponentContext; }
@@ -48,14 +48,14 @@ typedef ::cppu::WeakImplHelper< css::io::XTempFile
 
 class OTempFileService : public OTempFileBase
 {
-protected:
-    std::optional<utl::TempFile> mpTempFile;
-    ::osl::Mutex maMutex;
+    std::optional<utl::TempFileNamed> mpTempFile;
+    std::mutex maMutex;
     SvStream* mpStream;
     bool mbRemoveFile;
     bool mbInClosed;
     bool mbOutClosed;
 
+protected:
     void checkError () const;
     void checkConnected ();
 

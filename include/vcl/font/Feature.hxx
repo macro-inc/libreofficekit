@@ -11,6 +11,7 @@
 #define INCLUDED_VCL_FONT_FEATURE_HXX
 
 #include <vcl/dllapi.h>
+#include <rtl/character.hxx>
 #include <rtl/ustring.hxx>
 #include <unotools/resmgr.hxx>
 #include <vector>
@@ -59,20 +60,20 @@ private:
     TranslateId m_pDescriptionID;
     OUString m_sNumericPart;
     uint32_t m_nCode;
-    uint32_t m_nDefault;
+    int32_t m_nDefault;
     FeatureParameterType m_eType;
     // the index of the parameter defines the enum value, string is the description
     std::vector<FeatureParameter> m_aEnumParameters;
 
 public:
     FeatureDefinition();
-    FeatureDefinition(uint32_t nCode, OUString const& rDescription,
+    FeatureDefinition(uint32_t nCode, OUString aDescription,
                       FeatureParameterType eType = FeatureParameterType::BOOL,
                       std::vector<FeatureParameter>&& rEnumParameters
                       = std::vector<FeatureParameter>{},
-                      uint32_t nDefault = 0);
+                      int32_t nDefault = -1);
     FeatureDefinition(uint32_t nCode, TranslateId pDescriptionID,
-                      OUString const& rNumericPart = OUString());
+                      OUString aNumericPart = OUString());
     FeatureDefinition(uint32_t nCode, TranslateId pDescriptionID,
                       std::vector<FeatureParameter> aEnumParameters);
 
@@ -80,24 +81,31 @@ public:
     uint32_t getCode() const;
     OUString getDescription() const;
     FeatureParameterType getType() const;
-    uint32_t getDefault() const;
+    int32_t getDefault() const;
 
     operator bool() const;
-};
-
-struct VCL_DLLPUBLIC FeatureID
-{
-    uint32_t m_aFeatureCode;
-    uint32_t m_aScriptCode;
-    uint32_t m_aLanguageCode;
 };
 
 struct Feature
 {
     Feature();
-    Feature(FeatureID const& rID, FeatureType eType);
+    Feature(uint32_t const nCode, FeatureType eType);
 
-    FeatureID m_aID;
+    bool isCharacterVariant() const
+    {
+        return ((m_nCode >> 24) & 0xFF) == 'c' && ((m_nCode >> 16) & 0xFF) == 'v'
+               && rtl::isAsciiDigit((m_nCode >> 8) & 0xFF)
+               && rtl::isAsciiDigit((m_nCode >> 0) & 0xFF);
+    }
+
+    bool isStylisticSet() const
+    {
+        return ((m_nCode >> 24) & 0xFF) == 's' && ((m_nCode >> 16) & 0xFF) == 's'
+               && rtl::isAsciiDigit((m_nCode >> 8) & 0xFF)
+               && rtl::isAsciiDigit((m_nCode >> 0) & 0xFF);
+    }
+
+    uint32_t m_nCode;
     FeatureType m_eType;
     FeatureDefinition m_aDefinition;
 };

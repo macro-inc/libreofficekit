@@ -23,14 +23,18 @@
 #include <string_view>
 
 #include <oox/core/relations.hxx>
+#include <utility>
 
 namespace oox::core {
 
 namespace {
 
-OUString lclRemoveFileName( const OUString& rPath )
+std::u16string_view lclRemoveFileName( std::u16string_view rPath )
 {
-    return rPath.copy( 0, ::std::max< sal_Int32 >( rPath.lastIndexOf( '/' ), 0 ) );
+    size_t idx = rPath.rfind( '/' );
+    if (idx == std::u16string_view::npos)
+        return std::u16string_view();
+    return rPath.substr( 0, idx );
 }
 
 OUString lclAppendFileName( std::u16string_view rPath, const OUString& rFileName )
@@ -52,8 +56,8 @@ OUString createOfficeDocRelationTypeStrict(std::u16string_view rType)
 
 }
 
-Relations::Relations( const OUString& rFragmentPath )
-    : maFragmentPath( rFragmentPath )
+Relations::Relations( OUString aFragmentPath )
+    : maFragmentPath(std::move( aFragmentPath ))
 {
 }
 
@@ -108,7 +112,7 @@ OUString Relations::getFragmentPathFromRelation( const Relation& rRelation ) con
         return rRelation.maTarget;
 
     // resolve relative target path according to base path
-    OUString aPath = lclRemoveFileName( maFragmentPath );
+    OUString aPath( lclRemoveFileName( maFragmentPath ) );
     sal_Int32 nStartPos = 0;
     while( nStartPos < rRelation.maTarget.getLength() )
     {

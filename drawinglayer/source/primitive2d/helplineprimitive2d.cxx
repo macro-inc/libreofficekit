@@ -19,10 +19,10 @@
 
 #include <drawinglayer/primitive2d/helplineprimitive2d.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <basegfx/polygon/b2dpolygonclipper.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
+#include <drawinglayer/primitive2d/PolygonMarkerPrimitive2D.hxx>
 
 
 using namespace com::sun::star;
@@ -52,7 +52,7 @@ namespace drawinglayer::primitive2d
                     aLineA.append(aStartA);
                     aLineA.append(aEndA);
                     aLineA.transform(rViewInformation.getInverseObjectToViewTransformation());
-                    rContainer.push_back(new PolygonMarkerPrimitive2D(aLineA, getRGBColA(), getRGBColB(), getDiscreteDashLength()));
+                    rContainer.push_back(new PolygonMarkerPrimitive2D(std::move(aLineA), getRGBColA(), getRGBColB(), getDiscreteDashLength()));
 
                     const basegfx::B2DVector aPerpendicularNormalizedDirection(basegfx::getPerpendicular(aNormalizedDirection));
                     const basegfx::B2DPoint aStartB(aViewPosition - aPerpendicularNormalizedDirection);
@@ -61,7 +61,7 @@ namespace drawinglayer::primitive2d
                     aLineB.append(aStartB);
                     aLineB.append(aEndB);
                     aLineB.transform(rViewInformation.getInverseObjectToViewTransformation());
-                    rContainer.push_back(new PolygonMarkerPrimitive2D(aLineB, getRGBColA(), getRGBColB(), getDiscreteDashLength()));
+                    rContainer.push_back(new PolygonMarkerPrimitive2D(std::move(aLineB), getRGBColA(), getRGBColB(), getDiscreteDashLength()));
 
                     break;
                 }
@@ -111,7 +111,7 @@ namespace drawinglayer::primitive2d
                         {
                             basegfx::B2DPolygon aPart(aResult.getB2DPolygon(a));
                             aPart.transform(rViewInformation.getInverseObjectToViewTransformation());
-                            rContainer.push_back(new PolygonMarkerPrimitive2D(aPart, getRGBColA(), getRGBColB(), getDiscreteDashLength()));
+                            rContainer.push_back(new PolygonMarkerPrimitive2D(std::move(aPart), getRGBColA(), getRGBColB(), getDiscreteDashLength()));
                         }
                     }
 
@@ -155,8 +155,6 @@ namespace drawinglayer::primitive2d
 
         void HelplinePrimitive2D::get2DDecomposition(Primitive2DDecompositionVisitor& rVisitor, const geometry::ViewInformation2D& rViewInformation) const
         {
-            std::unique_lock aGuard( m_aMutex );
-
             if(!getBuffered2DDecomposition().empty())
             {
                 if(maLastViewport != rViewInformation.getViewport() || maLastObjectToViewTransformation != rViewInformation.getObjectToViewTransformation())
@@ -174,7 +172,6 @@ namespace drawinglayer::primitive2d
             }
 
             // use parent implementation
-            aGuard.unlock();
             BufferedDecompositionPrimitive2D::get2DDecomposition(rVisitor, rViewInformation);
         }
 

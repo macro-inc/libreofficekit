@@ -28,8 +28,8 @@
 #include <com/sun/star/datatransfer/clipboard/XFlushableClipboard.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <cppuhelper/supportsservice.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
+#include <vcl/mnemonic.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/unohelp2.hxx>
 #include <vcl/tabctrl.hxx>
@@ -133,7 +133,7 @@ OUString VCLXAccessibleTabPage::GetPageText()
 {
     OUString sText;
     if ( m_pTabControl )
-        sText = OutputDevice::GetNonMnemonicString( m_pTabControl->GetPageText( m_nPageId ) );
+        sText = removeMnemonicFromString( m_pTabControl->GetPageText( m_nPageId ) );
 
     return sText;
 }
@@ -161,24 +161,24 @@ void VCLXAccessibleTabPage::Update( bool bNew )
 }
 
 
-void VCLXAccessibleTabPage::FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet )
+void VCLXAccessibleTabPage::FillAccessibleStateSet( sal_Int64& rStateSet )
 {
-    rStateSet.AddState( AccessibleStateType::ENABLED );
-    rStateSet.AddState( AccessibleStateType::SENSITIVE );
+    rStateSet |= AccessibleStateType::ENABLED;
+    rStateSet |= AccessibleStateType::SENSITIVE;
 
-    rStateSet.AddState( AccessibleStateType::FOCUSABLE );
+    rStateSet |= AccessibleStateType::FOCUSABLE;
 
     if ( IsFocused() )
-        rStateSet.AddState( AccessibleStateType::FOCUSED );
+        rStateSet |= AccessibleStateType::FOCUSED;
 
-    rStateSet.AddState( AccessibleStateType::VISIBLE );
+    rStateSet |= AccessibleStateType::VISIBLE;
 
-    rStateSet.AddState( AccessibleStateType::SHOWING );
+    rStateSet |= AccessibleStateType::SHOWING;
 
-    rStateSet.AddState( AccessibleStateType::SELECTABLE );
+    rStateSet |= AccessibleStateType::SELECTABLE;
 
     if ( IsSelected() )
-        rStateSet.AddState( AccessibleStateType::SELECTED );
+        rStateSet |= AccessibleStateType::SELECTED;
 }
 
 
@@ -277,15 +277,15 @@ Reference< XAccessibleContext > VCLXAccessibleTabPage::getAccessibleContext(  )
 // XAccessibleContext
 
 
-sal_Int32 VCLXAccessibleTabPage::getAccessibleChildCount()
+sal_Int64 VCLXAccessibleTabPage::getAccessibleChildCount()
 {
     OExternalLockGuard aGuard( this );
     return implGetAccessibleChildCount();
 }
 
-sal_Int32 VCLXAccessibleTabPage::implGetAccessibleChildCount()
+sal_Int64 VCLXAccessibleTabPage::implGetAccessibleChildCount()
 {
-    sal_Int32 nCount = 0;
+    sal_Int64 nCount = 0;
     if ( m_pTabControl )
     {
         TabPage* pTabPage = m_pTabControl->GetTabPage( m_nPageId );
@@ -297,7 +297,7 @@ sal_Int32 VCLXAccessibleTabPage::implGetAccessibleChildCount()
 }
 
 
-Reference< XAccessible > VCLXAccessibleTabPage::getAccessibleChild( sal_Int32 i )
+Reference< XAccessible > VCLXAccessibleTabPage::getAccessibleChild( sal_Int64 i )
 {
     OExternalLockGuard aGuard( this );
 
@@ -328,11 +328,11 @@ Reference< XAccessible > VCLXAccessibleTabPage::getAccessibleParent(  )
 }
 
 
-sal_Int32 VCLXAccessibleTabPage::getAccessibleIndexInParent(  )
+sal_Int64 VCLXAccessibleTabPage::getAccessibleIndexInParent(  )
 {
     OExternalLockGuard aGuard( this );
 
-    sal_Int32 nIndexInParent = -1;
+    sal_Int64 nIndexInParent = -1;
     if ( m_pTabControl )
         nIndexInParent = m_pTabControl->GetPagePos( m_nPageId );
 
@@ -376,22 +376,22 @@ Reference< XAccessibleRelationSet > VCLXAccessibleTabPage::getAccessibleRelation
 }
 
 
-Reference< XAccessibleStateSet > VCLXAccessibleTabPage::getAccessibleStateSet(  )
+sal_Int64 VCLXAccessibleTabPage::getAccessibleStateSet(  )
 {
     OExternalLockGuard aGuard( this );
 
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSetHelper = new utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if ( !rBHelper.bDisposed && !rBHelper.bInDispose )
     {
-        FillAccessibleStateSet( *pStateSetHelper );
+        FillAccessibleStateSet( nStateSet );
     }
     else
     {
-        pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+        nStateSet |= AccessibleStateType::DEFUNC;
     }
 
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 
@@ -411,7 +411,7 @@ Reference< XAccessible > VCLXAccessibleTabPage::getAccessibleAtPoint( const awt:
     OExternalLockGuard aGuard( this );
 
     Reference< XAccessible > xChild;
-    for ( sal_uInt32 i = 0, nCount = getAccessibleChildCount(); i < nCount; ++i )
+    for ( sal_Int64 i = 0, nCount = getAccessibleChildCount(); i < nCount; ++i )
     {
         Reference< XAccessible > xAcc = getAccessibleChild( i );
         if ( xAcc.is() )

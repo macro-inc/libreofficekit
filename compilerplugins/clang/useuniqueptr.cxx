@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <set>
+#include "config_clang.h"
 #include "plugin.hxx"
 #include "check.hxx"
 
@@ -462,9 +463,6 @@ void UseUniquePtr::CheckDeleteLocalVar(const FunctionDecl* functionDecl, const C
     // complicated
     if (fn == SRCDIR "/svx/source/sdr/contact/objectcontact.cxx")
         return;
-    // memory management in this module is a mess
-    if (fn == SRCDIR "/idlc/source/aststack.cxx")
-        return;
     // complicated
     if (fn == SRCDIR "/cui/source/customize/cfg.cxx")
         return;
@@ -589,12 +587,12 @@ void UseUniquePtr::CheckDeleteLocalVar(const FunctionDecl* functionDecl, const C
     report(
          DiagnosticsEngine::Warning,
          "call to delete on a var, should be using std::unique_ptr",
-         compat::getBeginLoc(deleteExpr))
+         deleteExpr->getBeginLoc())
          << deleteExpr->getSourceRange();
     report(
          DiagnosticsEngine::Note,
          "var is here",
-         compat::getBeginLoc(varDecl))
+         varDecl->getBeginLoc())
          << varDecl->getSourceRange();
 }
 
@@ -662,16 +660,12 @@ void UseUniquePtr::CheckLoopDelete(const FunctionDecl* functionDecl, const CXXDe
                     auto init = iterVarDecl->getInit();
                     if (init)
                     {
-                        init = compat::IgnoreImplicit(init);
-                        if (!compat::CPlusPlus17(compiler.getLangOpts()))
-                            if (auto x = dyn_cast<CXXConstructExpr>(init))
-                                if (x->isElidable())
-                                    init = compat::IgnoreImplicit(x->getArg(0));
+                        init = init->IgnoreImplicit();
                         if (auto x = dyn_cast<CXXConstructExpr>(init))
                             if (x->getNumArgs() == 1
                                 || (x->getNumArgs() >= 2 && isa<CXXDefaultArgExpr>(x->getArg(1))))
                             {
-                                init = compat::IgnoreImplicit(x->getArg(0));
+                                init = x->getArg(0)->IgnoreImplicit();
                             }
                         if (auto x = dyn_cast<CXXMemberCallExpr>(init))
                             init = x->getImplicitObjectArgument()->IgnoreParenImpCasts();
@@ -729,9 +723,6 @@ void UseUniquePtr::CheckLoopDelete(const FunctionDecl* functionDecl, const CXXDe
             return;
 
         if (loplugin::hasPathnamePrefix(fn, SRCDIR "/vcl/qa/"))
-            return;
-        // linked list
-        if (fn == SRCDIR "/registry/source/reflwrit.cxx")
             return;
         // linked list
         if (fn == SRCDIR "/tools/source/generic/config.cxx")
@@ -820,12 +811,12 @@ void UseUniquePtr::CheckLoopDelete(const FunctionDecl* functionDecl, const CXXDe
         report(
             DiagnosticsEngine::Warning,
             "loopdelete: rather manage this var with std::some_container<std::unique_ptr<T>>",
-            compat::getBeginLoc(deleteExpr))
+            deleteExpr->getBeginLoc())
             << deleteExpr->getSourceRange();
         report(
             DiagnosticsEngine::Note,
             "var is here",
-            compat::getBeginLoc(varDecl))
+            varDecl->getBeginLoc())
             << varDecl->getSourceRange();
     }
 }
@@ -851,9 +842,6 @@ void UseUniquePtr::CheckCXXForRangeStmt(const FunctionDecl* functionDecl, const 
         if (!fieldDecl)
             return;
 
-        // appears to just randomly leak stuff, and it involves some lex/yacc stuff
-        if (fn == SRCDIR "/idlc/source/aststack.cxx")
-            return;
         // complicated
         if (fn == SRCDIR "/vcl/source/gdi/print.cxx")
             return;
@@ -908,12 +896,12 @@ void UseUniquePtr::CheckCXXForRangeStmt(const FunctionDecl* functionDecl, const 
         report(
             DiagnosticsEngine::Warning,
             "rather manage this var with std::some_container<std::unique_ptr<T>>",
-            compat::getBeginLoc(deleteExpr))
+            deleteExpr->getBeginLoc())
             << deleteExpr->getSourceRange();
         report(
             DiagnosticsEngine::Note,
             "var is here",
-            compat::getBeginLoc(varDecl))
+            varDecl->getBeginLoc())
             << varDecl->getSourceRange();
     }
 }
@@ -992,12 +980,12 @@ void UseUniquePtr::CheckMemberDeleteExpr(const FunctionDecl* functionDecl, const
     report(
         DiagnosticsEngine::Warning,
         message,
-        compat::getBeginLoc(deleteExpr))
+        deleteExpr->getBeginLoc())
         << deleteExpr->getSourceRange();
     report(
         DiagnosticsEngine::Note,
         "member is here",
-        compat::getBeginLoc(fieldDecl))
+        fieldDecl->getBeginLoc())
         << fieldDecl->getSourceRange();
 }
 
@@ -1095,9 +1083,6 @@ bool UseUniquePtr::TraverseConstructorInitializer(CXXCtorInitializer * ctorInit)
         return true;
 
     StringRef fn = getFilenameOfLocation(compiler.getSourceManager().getSpellingLoc(ctorInit->getSourceLocation()));
-    // don't feel like fiddling with the yacc parser
-    if (loplugin::hasPathnamePrefix(fn, SRCDIR "/idlc/"))
-        return true;
     // cannot change URE
     if (loplugin::hasPathnamePrefix(fn, SRCDIR "/cppu/source/helper/purpenv/helper_purpenv_Environment.cxx"))
         return true;
@@ -1117,7 +1102,7 @@ bool UseUniquePtr::VisitCXXDeleteExpr(const CXXDeleteExpr* deleteExpr)
         return true;
     if (ignoreLocation(mpCurrentFunctionDecl))
         return true;
-    if (isInUnoIncludeFile(compat::getBeginLoc(mpCurrentFunctionDecl->getCanonicalDecl())))
+    if (isInUnoIncludeFile(mpCurrentFunctionDecl->getCanonicalDecl()->getBeginLoc()))
         return true;
     auto declRefExpr = dyn_cast<DeclRefExpr>(deleteExpr->getArgument()->IgnoreParenImpCasts()->IgnoreImplicit());
     if (!declRefExpr)
@@ -1298,7 +1283,7 @@ void UseUniquePtr::CheckDeleteParmVar(const CXXDeleteExpr* deleteExpr, const Par
     report(
         DiagnosticsEngine::Warning,
         "calling delete on a pointer param, should be either allowlisted or simplified",
-        compat::getBeginLoc(deleteExpr))
+        deleteExpr->getBeginLoc())
         << deleteExpr->getSourceRange();
 }
 

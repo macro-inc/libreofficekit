@@ -22,6 +22,7 @@
 #include <sal/log.hxx>
 
 #include <com/sun/star/container/XStringKeyMap.hpp>
+#include <utility>
 
 
 using namespace ::com::sun::star;
@@ -29,24 +30,24 @@ using namespace ::com::sun::star;
 
 SfxPoolItem* SvxSmartTagItem::CreateDefault() { SAL_WARN( "svx", "No SvxSmartTagItem factory available"); return nullptr; }
 
-SvxSmartTagItem::SvxSmartTagItem( const sal_uInt16 nId,
+SvxSmartTagItem::SvxSmartTagItem( const TypedWhichId<SvxSmartTagItem> nId,
                                   const css::uno::Sequence < css::uno::Sequence< css::uno::Reference< css::smarttags::XSmartTagAction > > >& rActionComponentsSequence,
                                   const css::uno::Sequence < css::uno::Sequence< sal_Int32 > >& rActionIndicesSequence,
                                   const css::uno::Sequence< css::uno::Reference< css::container::XStringKeyMap > >& rStringKeyMaps,
-                                  const css::uno::Reference<css::text::XTextRange>& rRange,
-                                  const css::uno::Reference<css::frame::XController>& rController,
-                                  const css::lang::Locale& rLocale,
-                                  const OUString& rApplicationName,
-                                  const OUString& rRangeText ) :
+                                  css::uno::Reference<css::text::XTextRange> xRange,
+                                  css::uno::Reference<css::frame::XController> xController,
+                                  css::lang::Locale aLocale,
+                                  OUString aApplicationName,
+                                  OUString aRangeText ) :
     SfxPoolItem( nId ),
     maActionComponentsSequence( rActionComponentsSequence ),
     maActionIndicesSequence( rActionIndicesSequence ),
     maStringKeyMaps( rStringKeyMaps ),
-    mxRange( rRange ),
-    mxController( rController ),
-    maLocale( rLocale ),
-    maApplicationName( rApplicationName ),
-    maRangeText( rRangeText )
+    mxRange(std::move( xRange )),
+    mxController(std::move( xController )),
+    maLocale(std::move( aLocale )),
+    maApplicationName(std::move( aApplicationName )),
+    maRangeText(std::move( aRangeText ))
 {
 }
 
@@ -54,14 +55,14 @@ SvxSmartTagItem::SvxSmartTagItem( const sal_uInt16 nId,
 bool SvxSmartTagItem::QueryValue( uno::Any& rVal, sal_uInt8 /*nMemberId*/ ) const
 {
     rVal <<= comphelper::InitPropertySequence( {
-        { "ActionComponents", css::uno::makeAny( maActionComponentsSequence ) },
-        { "ActionIndices", css::uno::makeAny( maActionIndicesSequence ) },
-        { "StringKeyMaps", css::uno::makeAny( maStringKeyMaps ) },
-        { "TextRange", css::uno::makeAny( mxRange ) },
-        { "Controller", css::uno::makeAny( mxController ) },
-        { "Locale", css::uno::makeAny( maLocale ) },
-        { "ApplicationName", css::uno::makeAny( maApplicationName ) },
-        { "RangeText", css::uno::makeAny( maRangeText ) },
+        { "ActionComponents", css::uno::Any( maActionComponentsSequence ) },
+        { "ActionIndices", css::uno::Any( maActionIndicesSequence ) },
+        { "StringKeyMaps", css::uno::Any( maStringKeyMaps ) },
+        { "TextRange", css::uno::Any( mxRange ) },
+        { "Controller", css::uno::Any( mxController ) },
+        { "Locale", css::uno::Any( maLocale ) },
+        { "ApplicationName", css::uno::Any( maApplicationName ) },
+        { "RangeText", css::uno::Any( maRangeText ) },
     } );
     return true;
 }

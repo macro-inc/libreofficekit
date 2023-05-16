@@ -1,20 +1,19 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 from uitest.framework import UITestCase
 from com.sun.star.text.TextContentAnchorType import AS_CHARACTER, AT_PARAGRAPH
-import org.libreoffice.unotest
 from uitest.uihelper.common import get_url_for_data_file
 
 class tdf141557(UITestCase):
     def test_tdf141557(self):
         # load the sample file
         with self.ui_test.load_file(get_url_for_data_file("tdf141557.docx")):
-            xWriterDoc = self.xUITest.getTopFocusWindow()
-            xWriterEdit = xWriterDoc.getChild("writer_edit")
             document = self.ui_test.get_component()
 
             self.assertEqual(AS_CHARACTER, document.DrawPage.getByIndex(0).AnchorType)

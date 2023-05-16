@@ -23,11 +23,9 @@
 #include <ObjectIdentifier.hxx>
 #include <svx/unomodel.hxx>
 #include <svl/itempool.hxx>
-#include <svl/eitem.hxx>
-#include <editeng/eeitem.hxx>
-#include <svx/svx3ditems.hxx>
 #include <svx/objfac3d.hxx>
 #include <svx/svdpage.hxx>
+#include <svx/svx3ditems.hxx>
 #include <svx/xtable.hxx>
 #include <svx/svdoutl.hxx>
 #include <editeng/unolingu.hxx>
@@ -35,8 +33,6 @@
 #include <vcl/virdev.hxx>
 #include <libxml/xmlwriter.h>
 #include <osl/diagnose.h>
-
-#include <com/sun/star/container/XChild.hpp>
 
 namespace com::sun::star::linguistic2 { class XHyphenator; }
 namespace com::sun::star::linguistic2 { class XSpellChecker1; }
@@ -48,12 +44,22 @@ namespace chart
 {
 
 DrawModelWrapper::DrawModelWrapper()
-:   SdrModel(&ChartItemPool::GetGlobalChartItemPool())
+:   SdrModel()
 {
+    m_xChartItemPool = ChartItemPool::CreateChartItemPool();
+
     SetScaleUnit(MapUnit::Map100thMM);
     SetScaleFraction(Fraction(1, 1));
     SetDefaultFontHeight(423);     // 12pt
 
+    SfxItemPool* pMasterPool = &GetItemPool();
+    pMasterPool->SetDefaultMetric(MapUnit::Map100thMM);
+    pMasterPool->SetPoolDefaultItem(SfxBoolItem(EE_PARA_HYPHENATE, true) );
+    pMasterPool->SetPoolDefaultItem(makeSvx3DPercentDiagonalItem (5));
+
+    // append chart pool to end of pool chain
+    pMasterPool->GetLastPoolInChain()->SetSecondaryPool(m_xChartItemPool.get());
+    pMasterPool->FreezeIdRanges();
     SetTextDefaults();
 
     //this factory needs to be created before first use of 3D scenes once upon an office runtime
@@ -97,6 +103,22 @@ DrawModelWrapper::DrawModelWrapper()
 
 DrawModelWrapper::~DrawModelWrapper()
 {
+    //remove m_pChartItemPool from pool chain
+    if(m_xChartItemPool)
+    {
+        SfxItemPool* pPool = &GetItemPool();
+        for (;;)
+        {
+            SfxItemPool* pSecondary = pPool->GetSecondaryPool();
+            if(pSecondary == m_xChartItemPool.get())
+            {
+                pPool->SetSecondaryPool (nullptr);
+                break;
+            }
+            pPool = pSecondary;
+        }
+        m_xChartItemPool.clear();
+    }
     m_pRefDevice.disposeAndClear();
 }
 
@@ -123,7 +145,7 @@ uno::Reference< lang::XMultiServiceFactory > DrawModelWrapper::getShapeFactory()
     return xShapeFactory;
 }
 
-uno::Reference< drawing::XDrawPage > const & DrawModelWrapper::getMainDrawPage()
+const rtl::Reference<SvxDrawPage> & DrawModelWrapper::getMainDrawPage()
 {
     if (m_xMainDrawPage.is())
         return m_xMainDrawPage;
@@ -138,12 +160,16 @@ uno::Reference< drawing::XDrawPage > const & DrawModelWrapper::getMainDrawPage()
     {
         // Take the first page in case of multiple pages.
         uno::Any aPage = xDrawPages->getByIndex(0);
-        aPage >>= m_xMainDrawPage;
+        uno::Reference<drawing::XDrawPage> xTmp;
+        aPage >>= xTmp;
+        m_xMainDrawPage = dynamic_cast<SvxDrawPage*>(xTmp.get());
+        assert(m_xMainDrawPage);
     }
 
     if (!m_xMainDrawPage.is())
     {
-        m_xMainDrawPage = xDrawPages->insertNewByIndex(0);
+        m_xMainDrawPage = dynamic_cast<SvxDrawPage*>(xDrawPages->insertNewByIndex(0).get());
+        assert(m_xMainDrawPage);
     }
 
     //ensure that additional shapes are in front of the chart objects so create the chart root before
@@ -152,7 +178,8 @@ uno::Reference< drawing::XDrawPage > const & DrawModelWrapper::getMainDrawPage()
     // ShapeFactory::getOrCreateShapeFactory(getShapeFactory())->getOrCreateChartRootShape( m_xMainDrawPage );
     return m_xMainDrawPage;
 }
-uno::Reference< drawing::XDrawPage > const & DrawModelWrapper::getHiddenDrawPage()
+
+const rtl::Reference<SvxDrawPage> & DrawModelWrapper::getHiddenDrawPage()
 {
     if( !m_xHiddenDrawPage.is() )
     {
@@ -163,14 +190,21 @@ uno::Reference< drawing::XDrawPage > const & DrawModelWrapper::getHiddenDrawPage
             if( xDrawPages->getCount()>1 )
             {
                 uno::Any aPage = xDrawPages->getByIndex( 1 ) ;
-                aPage >>= m_xHiddenDrawPage;
+                uno::Reference<drawing::XDrawPage> xTmp;
+                aPage >>= xTmp;
+                m_xHiddenDrawPage = dynamic_cast<SvxDrawPage*>(xTmp.get());
+                assert(m_xHiddenDrawPage);
             }
 
             if(!m_xHiddenDrawPage.is())
             {
                 if( xDrawPages->getCount()==0 )
-                    m_xMainDrawPage = xDrawPages->insertNewByIndex( 0 );
-                m_xHiddenDrawPage = xDrawPages->insertNewByIndex( 1 );
+                {
+                    m_xMainDrawPage = dynamic_cast<SvxDrawPage*>(xDrawPages->insertNewByIndex( 0 ).get());
+                    assert(m_xMainDrawPage);
+                }
+                m_xHiddenDrawPage = dynamic_cast<SvxDrawPage*>(xDrawPages->insertNewByIndex( 1 ).get());
+                assert(m_xHiddenDrawPage);
             }
         }
     }
@@ -179,7 +213,7 @@ uno::Reference< drawing::XDrawPage > const & DrawModelWrapper::getHiddenDrawPage
 void DrawModelWrapper::clearMainDrawPage()
 {
     //uno::Reference<drawing::XShapes> xChartRoot( m_xMainDrawPage, uno::UNO_QUERY );
-    uno::Reference<drawing::XShapes> xChartRoot( ShapeFactory::getChartRootShape( m_xMainDrawPage ) );
+    rtl::Reference<SvxShapeGroupAnyD> xChartRoot( ShapeFactory::getChartRootShape( m_xMainDrawPage ) );
     if( xChartRoot.is() )
     {
         sal_Int32 nSubCount = xChartRoot->getCount();
@@ -192,8 +226,7 @@ void DrawModelWrapper::clearMainDrawPage()
     }
 }
 
-uno::Reference< drawing::XShapes > DrawModelWrapper::getChartRootShape(
-    const uno::Reference< drawing::XDrawPage>& xDrawPage )
+rtl::Reference<SvxShapeGroupAnyD> DrawModelWrapper::getChartRootShape( const rtl::Reference<SvxDrawPage>& xDrawPage )
 {
     return ShapeFactory::getChartRootShape( xDrawPage );
 }
@@ -276,17 +309,13 @@ SdrObject* DrawModelWrapper::getNamedSdrObject( const OUString& rObjectCID, SdrO
     return nullptr;
 }
 
-bool DrawModelWrapper::removeShape( const uno::Reference< drawing::XShape >& xShape )
+bool DrawModelWrapper::removeShape( const rtl::Reference<SvxShape>& xShape )
 {
-    uno::Reference< container::XChild > xChild( xShape, uno::UNO_QUERY );
-    if( xChild.is() )
+    uno::Reference<drawing::XShapes> xShapes( xShape->getParent(), uno::UNO_QUERY );
+    if( xShapes.is() )
     {
-        uno::Reference<drawing::XShapes> xShapes( xChild->getParent(), uno::UNO_QUERY );
-        if( xShapes.is() )
-        {
-            xShapes->remove(xShape);
-            return true;
-        }
+        xShapes->remove(xShape);
+        return true;
     }
     return false;
 }

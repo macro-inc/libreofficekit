@@ -26,7 +26,8 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/sequence.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <utility>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/namespacemap.hxx>
 #include <xmloff/xmluconv.hxx>
@@ -130,7 +131,7 @@ SchXMLPlotAreaContext::SchXMLPlotAreaContext(
     bool & rRowHasLabels,
     chart::ChartDataRowSource & rDataRowSource,
     SeriesDefaultsAndStyles& rSeriesDefaultsAndStyles,
-    const OUString& aChartTypeServiceName,
+    OUString aChartTypeServiceName,
     tSchXMLLSequencesPerIndex & rLSequencesPerIndex,
     const awt::Size & rChartSize ) :
         SvXMLImportContext( rImport ),
@@ -152,7 +153,7 @@ SchXMLPlotAreaContext::SchXMLPlotAreaContext(
         mrColHasLabels( rColHasLabels ),
         mrRowHasLabels( rRowHasLabels ),
         mrDataRowSource( rDataRowSource ),
-        maChartTypeServiceName( aChartTypeServiceName ),
+        maChartTypeServiceName(std::move( aChartTypeServiceName )),
         mrLSequencesPerIndex( rLSequencesPerIndex ),
         mbGlobalChartTypeUsedBySeries( false ),
         maChartSize( rChartSize )
@@ -323,7 +324,7 @@ void SchXMLPlotAreaContext::startFastElement (sal_Int32 /*nElement*/,
                                 OUString aPropName( "StartingAngle" );
                                 uno::Any aAStartingAngle( SchXMLTools::getPropertyFromContext( aPropName, pPropStyleContext, pStylesCtxt ) );
                                 if( !aAStartingAngle.hasValue() )
-                                    xProp->setPropertyValue( aPropName, uno::makeAny(sal_Int32(0)) ) ;
+                                    xProp->setPropertyValue( aPropName, uno::Any(sal_Int32(0)) ) ;
                             }
                         }
                     }
@@ -396,7 +397,7 @@ void SchXMLPlotAreaContext::startFastElement (sal_Int32 /*nElement*/,
         // data yet.
         mxNewDoc->createInternalDataProvider( false /* bCloneExistingData */ );
         if( xProp.is() && mrDataRowSource!=chart::ChartDataRowSource_COLUMNS )
-            xProp->setPropertyValue("DataRowSource", uno::makeAny(mrDataRowSource) );
+            xProp->setPropertyValue("DataRowSource", uno::Any(mrDataRowSource) );
     }
 }
 
@@ -538,7 +539,7 @@ void SchXMLPlotAreaContext::endFastElement(sal_Int32 )
             try
             {
                 xDiaProp->setPropertyValue("NumberOfLines",
-                                            uno::makeAny( mnNumOfLinesProp ));
+                                            uno::Any( mnNumOfLinesProp ));
             }
             catch( const uno::Exception & )
             {
@@ -553,7 +554,7 @@ void SchXMLPlotAreaContext::endFastElement(sal_Int32 )
             try
             {
                 xDiaProp->setPropertyValue("Volume",
-                                            uno::makeAny( true ));
+                                            uno::Any( true ));
             }
             catch( const uno::Exception & )
             {
@@ -763,7 +764,7 @@ void SchXMLDataPointContext::startFastElement (sal_Int32 /*Element*/,
                         deletedLegendEntries.push_back(deletedLegendEntry);
                     }
                     deletedLegendEntries.push_back(mDataPoint.m_nPointIndex);
-                    xSeriesProp->setPropertyValue("DeletedLegendEntries", uno::makeAny(comphelper::containerToSequence(deletedLegendEntries)));
+                    xSeriesProp->setPropertyValue("DeletedLegendEntries", uno::Any(comphelper::containerToSequence(deletedLegendEntries)));
                 }
                 break;
             }
@@ -808,10 +809,6 @@ SchXMLPositionAttributesHelper::SchXMLPositionAttributesHelper( SvXMLImport& rIm
     , m_bHasPositionY( false )
     , m_bAutoSize( false )
     , m_bAutoPosition( false )
-{
-}
-
-SchXMLPositionAttributesHelper::~SchXMLPositionAttributesHelper()
 {
 }
 
@@ -1030,7 +1027,7 @@ static void lcl_setErrorBarSequence ( const uno::Reference< chart2::XChartDocume
 
     Reference< beans::XPropertySet > xSeqProp( xNewSequence, uno::UNO_QUERY );
 
-    xSeqProp->setPropertyValue("Role", uno::makeAny( aRole ));
+    xSeqProp->setPropertyValue("Role", uno::Any( aRole ));
 
     Reference< uno::XComponentContext > xContext = comphelper::getProcessComponentContext();
 
@@ -1053,18 +1050,18 @@ static void lcl_setErrorBarSequence ( const uno::Reference< chart2::XChartDocume
 SchXMLStatisticsObjectContext::SchXMLStatisticsObjectContext(
     SchXMLImportHelper& rImpHelper,
     SvXMLImport& rImport,
-    const OUString &rSeriesStyleName,
+    OUString sSeriesStyleName,
     ::std::vector< DataRowPointStyle >& rStyleVector,
-    const css::uno::Reference< css::chart2::XDataSeries >& xSeries,
+    css::uno::Reference< css::chart2::XDataSeries > xSeries,
     ContextType eContextType,
     tSchXMLLSequencesPerIndex & rLSequencesPerIndex) :
 
         SvXMLImportContext( rImport ),
         mrImportHelper( rImpHelper ),
         mrStyleVector( rStyleVector ),
-        m_xSeries( xSeries ),
+        m_xSeries(std::move( xSeries )),
         meContextType( eContextType ),
-        maSeriesStyleName( rSeriesStyleName),
+        maSeriesStyleName(std::move( sSeriesStyleName)),
         mrLSequencesPerIndex(rLSequencesPerIndex)
 {}
 
@@ -1215,7 +1212,7 @@ void SchXMLStatisticsObjectContext::startFastElement (sal_Int32 /*Element*/,
                 sAutoStyleName = aIter.toString();
                 break;
             case XML_ELEMENT(CHART, XML_DIMENSION):
-                bYError = aIter.toString() == "y";
+                bYError = aIter.toView() == "y";
                 break;
             case XML_ELEMENT(CHART, XML_ERROR_UPPER_RANGE):
                 aPosRange = aIter.toString();
@@ -1245,12 +1242,12 @@ void SchXMLStatisticsObjectContext::startFastElement (sal_Int32 /*Element*/,
                 uno::Reference< beans::XPropertySet > xBarProp( xFact->createInstance("com.sun.star.chart2.ErrorBar" ),
                                                                 uno::UNO_QUERY );
 
-                xBarProp->setPropertyValue("ErrorBarStyle",uno::makeAny(css::chart::ErrorBarStyle::NONE));
-                xBarProp->setPropertyValue("PositiveError",uno::makeAny(0.0));
-                xBarProp->setPropertyValue("NegativeError",uno::makeAny(0.0));
-                xBarProp->setPropertyValue("Weight",uno::makeAny(1.0));
-                xBarProp->setPropertyValue("ShowPositiveError",uno::makeAny(true));
-                xBarProp->setPropertyValue("ShowNegativeError",uno::makeAny(true));
+                xBarProp->setPropertyValue("ErrorBarStyle",uno::Any(css::chart::ErrorBarStyle::NONE));
+                xBarProp->setPropertyValue("PositiveError",uno::Any(0.0));
+                xBarProp->setPropertyValue("NegativeError",uno::Any(0.0));
+                xBarProp->setPropertyValue("Weight",uno::Any(1.0));
+                xBarProp->setPropertyValue("ShowPositiveError",uno::Any(true));
+                xBarProp->setPropertyValue("ShowNegativeError",uno::Any(true));
 
                 // first import defaults from parent style
                 SetErrorBarStyleProperties( maSeriesStyleName, xBarProp, mrImportHelper );

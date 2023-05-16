@@ -242,7 +242,7 @@ public:
     void attachRecursive(
         const css::uno::Reference< css::accessibility::XAccessible >& xAccessible,
         const css::uno::Reference< css::accessibility::XAccessibleContext >& xContext,
-        const css::uno::Reference< css::accessibility::XAccessibleStateSet >& xStateSet
+        sal_Int64 nStateSet
     );
 
     /// @throws lang::IndexOutOfBoundsException
@@ -261,7 +261,7 @@ public:
     /// @throws uno::RuntimeException
     void detachRecursive(
         const css::uno::Reference< css::accessibility::XAccessibleContext >& xContext,
-        const css::uno::Reference< css::accessibility::XAccessibleStateSet >& xStateSet
+        sal_Int64 nStateSet
     );
 
     /// @throws lang::IndexOutOfBoundsException
@@ -285,7 +285,7 @@ class GtkSalData final : public GenericUnixSalData
     rtl::Reference<DocumentFocusListener> m_xDocumentFocusListener;
 
 public:
-    GtkSalData( SalInstance *pInstance );
+    GtkSalData();
     virtual ~GtkSalData() override;
 
     DocumentFocusListener & GetDocumentFocusListener();

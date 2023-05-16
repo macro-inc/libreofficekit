@@ -21,49 +21,64 @@
 class Chart2XShapeTest : public ChartTest
 {
 public:
+    Chart2XShapeTest()
+        : ChartTest("/chart2/qa/extras/xshape/data/")
+    {
+    }
+
+    void testTdf150832();
+    void testTdf149204();
+    void testTdf151424();
     void testFdo75075();
     void testPropertyMappingBarChart();
     void testPieChartLabels1();
     void testPieChartLabels2();
     void testPieChartLabels3();
     void testPieChartLabels4();
+    void testChart();
     void testTdf76649TrendLineBug();
     void testTdf88154LabelRotatedLayout();
 
     CPPUNIT_TEST_SUITE(Chart2XShapeTest);
+    CPPUNIT_TEST(testTdf150832);
+    CPPUNIT_TEST(testTdf149204);
+    CPPUNIT_TEST(testTdf151424);
     CPPUNIT_TEST(testFdo75075);
     CPPUNIT_TEST(testPropertyMappingBarChart);
     CPPUNIT_TEST(testPieChartLabels1);
     CPPUNIT_TEST(testPieChartLabels2);
     CPPUNIT_TEST(testPieChartLabels3);
     CPPUNIT_TEST(testPieChartLabels4);
+    CPPUNIT_TEST(testChart);
     CPPUNIT_TEST(testTdf76649TrendLineBug);
     CPPUNIT_TEST(testTdf88154LabelRotatedLayout);
 
     CPPUNIT_TEST_SUITE_END();
 
 private:
-    void compareAgainstReference(std::u16string_view rReferenceFile, bool bCreateReference = false);
+    void compareAgainstReference(std::u16string_view rDump, std::u16string_view rReferenceFile);
     OUString getXShapeDumpString();
     xmlDocUniquePtr getXShapeDumpXmlDoc();
 };
 
 namespace
 {
-bool checkDumpAgainstFile(const OUString& rDump, std::u16string_view aFilePath)
+bool checkDumpAgainstFile(std::u16string_view rDump, std::u16string_view aFilePath,
+                          char const* toleranceFile)
 {
     OString aOFile = OUStringToOString(aFilePath, RTL_TEXTENCODING_UTF8);
 
-    CPPUNIT_ASSERT_MESSAGE("dump is empty", !rDump.isEmpty());
+    CPPUNIT_ASSERT_MESSAGE("dump is empty", !rDump.empty());
 
     OString aDump = OUStringToOString(rDump, RTL_TEXTENCODING_UTF8);
-    return doXMLDiff(aOFile.getStr(), aDump.getStr(), static_cast<int>(rDump.getLength()), nullptr);
+    return doXMLDiff(aOFile.getStr(), aDump.getStr(), static_cast<int>(rDump.size()),
+                     toleranceFile);
 }
 }
 
 OUString Chart2XShapeTest::getXShapeDumpString()
 {
-    uno::Reference<chart::XChartDocument> xChartDoc(getChartCompFromSheet(0, mxComponent),
+    uno::Reference<chart::XChartDocument> xChartDoc(getChartCompFromSheet(0, 0, mxComponent),
                                                     UNO_QUERY_THROW);
     uno::Reference<qa::XDumper> xDumper(xChartDoc, UNO_QUERY_THROW);
     return xDumper->dump();
@@ -76,40 +91,87 @@ xmlDocUniquePtr Chart2XShapeTest::getXShapeDumpXmlDoc()
     return xmlDocUniquePtr(xmlParseDoc(reinterpret_cast<const xmlChar*>(aXmlDump.getStr())));
 }
 
-void Chart2XShapeTest::compareAgainstReference(std::u16string_view rReferenceFile,
-                                               bool bCreateReference)
+void Chart2XShapeTest::compareAgainstReference(std::u16string_view rDump,
+                                               std::u16string_view rReferenceFile)
 {
-    OUString aDump = getXShapeDumpString();
+    checkDumpAgainstFile(
+        rDump,
+        Concat2View(m_directories.getPathFromSrc(u"/chart2/qa/extras/xshape/data/reference/")
+                    + rReferenceFile),
+        OUStringToOString(
+            m_directories.getPathFromSrc(u"/chart2/qa/extras/xshape/data/reference/tolerance.xml"),
+            RTL_TEXTENCODING_UTF8)
+            .getStr());
+}
 
-    OUString aReference = m_directories.getPathFromSrc(u"/chart2/qa/extras/xshape/data/reference/")
-                          + rReferenceFile;
-    if (bCreateReference)
-    {
-        OString aOFile = OUStringToOString(aReference, RTL_TEXTENCODING_UTF8);
-        OString aODump = OUStringToOString(aDump, RTL_TEXTENCODING_UTF8);
-        std::ofstream aReferenceFile(aOFile.getStr());
-        aReferenceFile << aODump;
-    }
-    else
-    {
-        checkDumpAgainstFile(aDump, aReference);
-    }
+void Chart2XShapeTest::testTdf150832()
+{
+    // FIXME: the DPI check should be removed when either (1) the test is fixed to work with
+    // non-default DPI; or (2) unit tests on Windows are made to use svp VCL plugin.
+    if (!IsDefaultDPI())
+        return;
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 319
+    // - Actual  : 0
+    loadFromURL(u"xls/tdf150832.xls");
+    compareAgainstReference(getXShapeDumpString(), u"tdf150832.xml");
+}
+
+void Chart2XShapeTest::testTdf149204()
+{
+    // FIXME: the DPI check should be removed when either (1) the test is fixed to work with
+    // non-default DPI; or (2) unit tests on Windows are made to use svp VCL plugin.
+    if (!IsDefaultDPI())
+        return;
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 12230
+    // - Actual  : 12940
+    // - Node: /XShapes/XShape[2]
+    // - Attr: sizeX
+    loadFromURL(u"pptx/tdf149204.pptx");
+    uno::Reference<chart::XChartDocument> xChartDoc = getChartDocFromDrawImpress(0, 0);
+    uno::Reference<qa::XDumper> xDumper(xChartDoc, UNO_QUERY_THROW);
+    compareAgainstReference(xDumper->dump(), u"tdf149204.xml");
+}
+
+void Chart2XShapeTest::testTdf151424()
+{
+    // FIXME: the DPI check should be removed when either (1) the test is fixed to work with
+    // non-default DPI; or (2) unit tests on Windows are made to use svp VCL plugin.
+    if (!IsDefaultDPI())
+        return;
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 3717
+    // - Actual  : 3530
+    // - Node: /XShapes/XShape[2]/XShapes/XShape[1]
+    // - Attr: positionX
+    loadFromURL(u"ods/tdf151424.ods");
+    compareAgainstReference(getXShapeDumpString(), u"tdf151424.xml");
 }
 
 void Chart2XShapeTest::testFdo75075()
 {
-#if 0
-    load("chart2/qa/extras/xshape/data/ods/", "fdo75075.ods");
-    compareAgainstReference("fdo75075.xml");
-#endif
+    // FIXME: the DPI check should be removed when either (1) the test is fixed to work with
+    // non-default DPI; or (2) unit tests on Windows are made to use svp VCL plugin.
+    if (!IsDefaultDPI())
+        return;
+
+    loadFromURL(u"ods/fdo75075.ods");
+    compareAgainstReference(getXShapeDumpString(), u"fdo75075.xml");
 }
 
 void Chart2XShapeTest::testPropertyMappingBarChart()
 {
-#if 0
-    load("chart2/qa/extras/xshape/data/ods/", "property-mapping-bar.ods");
-    compareAgainstReference("property-mapping-bar.xml");
-#endif
+    // FIXME: the DPI check should be removed when either (1) the test is fixed to work with
+    // non-default DPI; or (2) unit tests on Windows are made to use svp VCL plugin.
+    if (!IsDefaultDPI())
+        return;
+
+    loadFromURL(u"ods/property-mapping-bar.ods");
+    compareAgainstReference(getXShapeDumpString(), u"property-mapping-bar.xml");
 }
 
 void Chart2XShapeTest::testPieChartLabels1()
@@ -120,8 +182,8 @@ void Chart2XShapeTest::testPieChartLabels1()
         return;
 
     // inside placement for the best fit case
-    load(u"chart2/qa/extras/xshape/data/xlsx/", "tdf90839-1.xlsx");
-    compareAgainstReference(u"tdf90839-1.xml");
+    loadFromURL(u"xlsx/tdf90839-1.xlsx");
+    compareAgainstReference(getXShapeDumpString(), u"tdf90839-1.xml");
 }
 
 void Chart2XShapeTest::testPieChartLabels2()
@@ -132,8 +194,8 @@ void Chart2XShapeTest::testPieChartLabels2()
         return;
 
     // text wrap: wrap all text labels except one
-    load(u"chart2/qa/extras/xshape/data/xlsx/", "tdf90839-2.xlsx");
-    compareAgainstReference(u"tdf90839-2.xml");
+    loadFromURL(u"xlsx/tdf90839-2.xlsx");
+    compareAgainstReference(getXShapeDumpString(), u"tdf90839-2.xml");
 }
 
 void Chart2XShapeTest::testPieChartLabels3()
@@ -144,8 +206,8 @@ void Chart2XShapeTest::testPieChartLabels3()
         return;
 
     // text wrap: wrap no text label except one
-    load(u"chart2/qa/extras/xshape/data/xlsx/", "tdf90839-3.xlsx");
-    compareAgainstReference(u"tdf90839-3.xml");
+    loadFromURL(u"xlsx/tdf90839-3.xlsx");
+    compareAgainstReference(getXShapeDumpString(), u"tdf90839-3.xml");
 }
 
 void Chart2XShapeTest::testPieChartLabels4()
@@ -156,8 +218,19 @@ void Chart2XShapeTest::testPieChartLabels4()
         return;
 
     // data value and percent value are centered horizontally
-    load(u"chart2/qa/extras/xshape/data/ods/", "tdf90839-4.ods");
-    compareAgainstReference(u"tdf90839-4.xml");
+    loadFromURL(u"ods/tdf90839-4.ods");
+    compareAgainstReference(getXShapeDumpString(), u"tdf90839-4.xml");
+}
+
+void Chart2XShapeTest::testChart()
+{
+    // FIXME: the DPI check should be removed when either (1) the test is fixed to work with
+    // non-default DPI; or (2) unit tests on Windows are made to use svp VCL plugin.
+    if (!IsDefaultDPI())
+        return;
+
+    loadFromURL(u"ods/testChart.ods");
+    compareAgainstReference(getXShapeDumpString(), u"testChart.xml");
 }
 
 void Chart2XShapeTest::testTdf76649TrendLineBug()
@@ -165,7 +238,7 @@ void Chart2XShapeTest::testTdf76649TrendLineBug()
     // This bug prevents that the trendline (regression curve) is drawn
     // if the first cell is empty. See tdf#76649 for details.
 
-    load(u"chart2/qa/extras/xshape/data/ods/", "tdf76649_TrendLineBug.ods");
+    loadFromURL(u"ods/tdf76649_TrendLineBug.ods");
 
     xmlDocUniquePtr pXmlDoc = getXShapeDumpXmlDoc();
 
@@ -176,7 +249,7 @@ void Chart2XShapeTest::testTdf76649TrendLineBug()
 
 void Chart2XShapeTest::testTdf88154LabelRotatedLayout()
 {
-    load(u"chart2/qa/extras/xshape/data/pptx/", "tdf88154_LabelRotatedLayout.pptx");
+    loadFromURL(u"pptx/tdf88154_LabelRotatedLayout.pptx");
     uno::Reference<chart::XChartDocument> xChartDoc = getChartDocFromDrawImpress(0, 5);
     uno::Reference<qa::XDumper> xDumper(xChartDoc, UNO_QUERY_THROW);
     OUString rDump = xDumper->dump();

@@ -24,6 +24,7 @@
 #include <com/sun/star/animations/XAudio.hpp>
 #include <com/sun/star/drawing/XShape.hpp>
 #include <com/sun/star/util/XChangesListener.hpp>
+#include <rtl/ref.hxx>
 #include <vcl/timer.hxx>
 #include <tools/long.hxx>
 #include "sddllapi.h"
@@ -165,7 +166,7 @@ public:
     SAL_DLLPRIVATE static sal_Int32 get_node_type( const css::uno::Reference< css::animations::XAnimationNode >& xNode );
     SAL_DLLPRIVATE static sal_Int32 getNumberOfSubitems( const css::uno::Any& aTarget, sal_Int16 nIterateType );
 
-    SAL_DLLPRIVATE SdrPathObj* createSdrPathObjFromPath(SdrModel& rTargetModel);
+    SAL_DLLPRIVATE rtl::Reference<SdrPathObj> createSdrPathObjFromPath(SdrModel& rTargetModel);
     SAL_DLLPRIVATE void updateSdrPathObjFromPath( SdrPathObj& rPathObj );
     SAL_DLLPRIVATE void updatePathFromSdrPathObj( const SdrPathObj& rPathObj );
 
@@ -265,7 +266,7 @@ friend class MainSequence;
 
 public:
     SAL_DLLPRIVATE EffectSequenceHelper();
-    SAL_DLLPRIVATE EffectSequenceHelper( const css::uno::Reference< css::animations::XTimeContainer >& xSequenceRoot );
+    SAL_DLLPRIVATE EffectSequenceHelper( css::uno::Reference< css::animations::XTimeContainer > xSequenceRoot );
     SAL_DLLPRIVATE virtual ~EffectSequenceHelper();
 
     SAL_DLLPRIVATE virtual css::uno::Reference< css::animations::XAnimationNode > getRootNode();
@@ -442,7 +443,7 @@ typedef std::shared_ptr< MainSequence > MainSequencePtr;
 class MainSequenceRebuildGuard
 {
 public:
-    MainSequenceRebuildGuard( const MainSequencePtr& pMainSequence );
+    MainSequenceRebuildGuard( MainSequencePtr pMainSequence );
     ~MainSequenceRebuildGuard();
 
 private:

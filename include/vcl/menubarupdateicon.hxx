@@ -22,12 +22,13 @@
 #include <tools/link.hxx>
 #include <vcl/idle.hxx>
 #include <vcl/image.hxx>
-#include <vcl/menu.hxx>
 
 class BubbleWindow;
+class MenuBar;
 class SystemWindow;
 class VclSimpleEvent;
 class VclWindowEvent;
+struct MenuBarButtonCallbackArg;
 
 class VCL_DLLPUBLIC MenuBarUpdateIconManager
 {
@@ -36,8 +37,10 @@ private:
     OUString maBubbleText;
     Image maBubbleImage;
     VclPtr<BubbleWindow> mpBubbleWin;
-    VclPtr<SystemWindow> mpIconSysWin;
-    VclPtr<MenuBar> mpIconMBar;
+    VclPtr<SystemWindow> mpActiveSysWin;
+    VclPtr<MenuBar> mpActiveMBar;
+    std::vector<VclPtr<MenuBar>> maIconMBars;
+    std::vector<sal_uInt16> maIconIDs;
 
     Link<VclWindowEvent&, void> maWindowEventHdl;
     Link<VclSimpleEvent&, void> maApplicationEventHdl;
@@ -45,8 +48,6 @@ private:
 
     Timer maTimeoutTimer;
     Idle maWaitIdle;
-
-    sal_uInt16 mnIconID;
 
     bool mbShowMenuIcon;
     bool mbShowBubble;
@@ -57,11 +58,17 @@ private:
     DECL_DLLPRIVATE_LINK(WindowEventHdl, VclWindowEvent&, void);
     DECL_DLLPRIVATE_LINK(ApplicationEventHdl, VclSimpleEvent&, void);
     DECL_DLLPRIVATE_LINK(WaitTimeOutHdl, Timer*, void);
-    DECL_DLLPRIVATE_LINK(ClickHdl, MenuBar::MenuBarButtonCallbackArg&, bool);
-    DECL_DLLPRIVATE_LINK(HighlightHdl, MenuBar::MenuBarButtonCallbackArg&, bool);
+    DECL_DLLPRIVATE_LINK(ClickHdl, MenuBarButtonCallbackArg&, bool);
+    DECL_DLLPRIVATE_LINK(HighlightHdl, MenuBarButtonCallbackArg&, bool);
 
     VclPtr<BubbleWindow> GetBubbleWindow();
     void SetBubbleChanged();
+
+    sal_uInt16 GetIconID(MenuBar* pMenuBar) const;
+
+    void AddMenuBarIcon(SystemWindow& rSysWin, bool bAddEventHdl);
+    void RemoveMenuBarIcon(MenuBar* pMenuBar);
+    void RemoveMenuBarIcons();
 
 public:
     MenuBarUpdateIconManager();
@@ -80,9 +87,7 @@ public:
     const OUString& GetBubbleTitle() const { return maBubbleTitle; }
     const OUString& GetBubbleText() const { return maBubbleText; }
 
-    void RemoveBubbleWindow(bool bRemoveIcon);
-
-    void AddMenuBarIcon(SystemWindow* pSysWin, bool bAddEventHdl);
+    void RemoveBubbleWindow();
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

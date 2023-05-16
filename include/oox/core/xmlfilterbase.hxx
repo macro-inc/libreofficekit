@@ -75,13 +75,6 @@ namespace oox::core {
 class FragmentHandler;
 class FastParser;
 
-struct TextField {
-    css::uno::Reference< css::text::XText >       xText;
-    css::uno::Reference< css::text::XTextCursor > xTextCursor;
-    css::uno::Reference< css::text::XTextField >  xTextField;
-};
-typedef std::vector< TextField > TextFieldStack;
-
 struct XmlFilterBaseImpl;
 
 using ShapePairs
@@ -99,6 +92,9 @@ public:
 
     /** Has to be implemented by each filter, returns the current theme. */
     virtual const ::oox::drawingml::Theme* getCurrentTheme() const = 0;
+
+    /** May be implemented by filters which handle Diagrams, default returns empty ptr */
+    virtual std::shared_ptr<::oox::drawingml::Theme> getCurrentThemePtr() const;
 
     /** Has to be implemented by each filter to return the collection of VML shapes. */
     virtual ::oox::vml::Drawing* getVmlDrawing() = 0;
@@ -180,9 +176,6 @@ public:
      */
     OUString     addRelation( const css::uno::Reference< css::io::XOutputStream >& rOutputStream, const OUString& rType, std::u16string_view rTarget, bool bExternal = false );
 
-    /** Returns a stack of used textfields, used by the pptx importer to replace links to slidepages with the real page name */
-    TextFieldStack& getTextFieldStack() const;
-
     /** Opens and returns the specified output stream from the base storage with specified media type.
 
         @param rStreamName
@@ -227,6 +220,10 @@ public:
         @return newly created ID.
      */
     sal_Int32 GetUniqueId() { return mnMaxDocId++; }
+
+    sal_Int32 GetMaxDocId() { return mnMaxDocId; }
+
+    void SetMaxDocId(sal_Int32 maxDocId) { mnMaxDocId = maxDocId; }
 
     /** Write the document properties into into the current OPC package.
 

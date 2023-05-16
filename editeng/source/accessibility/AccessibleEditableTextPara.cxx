@@ -22,9 +22,10 @@
 
 
 #include <algorithm>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 #include <editeng/flditem.hxx>
 #include <com/sun/star/uno/Any.hxx>
@@ -41,7 +42,6 @@
 #include <comphelper/accessibleeventnotifier.hxx>
 #include <comphelper/sequenceashashmap.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
 #include <com/sun/star/accessibility/AccessibleRelationType.hpp>
 #include <vcl/unohelp.hxx>
@@ -94,7 +94,6 @@ namespace accessibility
             SVX_UNOEDIT_NUMBERING_PROPERTY,
             { u"TextUserDefinedAttributes",     EE_CHAR_XMLATTRIBS,     cppu::UnoType<css::container::XNameContainer>::get(),        0,     0},
             { u"ParaUserDefinedAttributes",     EE_PARA_XMLATTRIBS,     cppu::UnoType<css::container::XNameContainer>::get(),        0,     0},
-            { u"", 0, css::uno::Type(), 0, 0 }
         };
         static SvxItemPropertySet aPropSet( aPropMap, EditEngine::GetGlobalItemPool() );
         return &aPropSet;
@@ -102,14 +101,13 @@ namespace accessibility
 
     // #i27138# - add parameter <_pParaManager>
     AccessibleEditableTextPara::AccessibleEditableTextPara(
-                                const uno::Reference< XAccessible >& rParent,
+                                uno::Reference< XAccessible > xParent,
                                 const AccessibleParaManager* _pParaManager )
-        : AccessibleTextParaInterfaceBase( m_aMutex ),
-          mnParagraphIndex( 0 ),
+        : mnParagraphIndex( 0 ),
           mnIndexInParent( 0 ),
           mpEditSource( nullptr ),
           maEEOffset( 0, 0 ),
-          mxParent( rParent ),
+          mxParent(std::move( xParent )),
           // well, that's strictly (UNO) exception safe, though not
           // really robust. We rely on the fact that this member is
           // constructed last, and that the constructor body catches
@@ -120,23 +118,16 @@ namespace accessibility
           mpParaManager( _pParaManager )
     {
 
-        try
-        {
-            // Create the state set.
-            rtl::Reference<::utl::AccessibleStateSetHelper> pStateSet  = new ::utl::AccessibleStateSetHelper ();
-            mxStateSet = pStateSet;
+        // Create the state set.
+        mnStateSet  = 0;
 
-            // these are always on
-            pStateSet->AddState( AccessibleStateType::MULTI_LINE );
-            pStateSet->AddState( AccessibleStateType::FOCUSABLE );
-            pStateSet->AddState( AccessibleStateType::VISIBLE );
-            pStateSet->AddState( AccessibleStateType::SHOWING );
-            pStateSet->AddState( AccessibleStateType::ENABLED );
-            pStateSet->AddState( AccessibleStateType::SENSITIVE );
-        }
-        catch (const uno::Exception&)
-        {
-        }
+        // these are always on
+        mnStateSet |= AccessibleStateType::MULTI_LINE;
+        mnStateSet |= AccessibleStateType::FOCUSABLE;
+        mnStateSet |= AccessibleStateType::VISIBLE;
+        mnStateSet |= AccessibleStateType::SHOWING;
+        mnStateSet |= AccessibleStateType::ENABLED;
+        mnStateSet |= AccessibleStateType::SENSITIVE;
     }
 
     AccessibleEditableTextPara::~AccessibleEditableTextPara()
@@ -272,8 +263,8 @@ namespace accessibility
                 {
                 }
                 // index and therefore description changed
-                FireEvent( AccessibleEventId::DESCRIPTION_CHANGED, uno::makeAny( getAccessibleDescription() ), aOldDesc );
-                FireEvent( AccessibleEventId::NAME_CHANGED, uno::makeAny( getAccessibleName() ), aOldName );
+                FireEvent( AccessibleEventId::DESCRIPTION_CHANGED, uno::Any( getAccessibleDescription() ), aOldDesc );
+                FireEvent( AccessibleEventId::NAME_CHANGED, uno::Any( getAccessibleName() ), aOldName );
             }
         }
         catch (const uno::Exception&) // optional behaviour
@@ -562,35 +553,27 @@ namespace accessibility
 
         AccessibleEventObject aEvent(xThis, nEventId, rNewValue, rOldValue);
 
-        // #102261# Call global queue for focus events
-        if( nEventId == AccessibleEventId::STATE_CHANGED )
-            vcl::unohelper::NotifyAccessibleStateEventGlobally( aEvent );
-
         // #106234# Delegate to EventNotifier
         if( getNotifierClientId() != -1 )
             ::comphelper::AccessibleEventNotifier::addEvent( getNotifierClientId(),
                                                              aEvent );
     }
 
-    void AccessibleEditableTextPara::SetState( const sal_Int16 nStateId )
+    void AccessibleEditableTextPara::SetState( const sal_Int64 nStateId )
     {
-        ::utl::AccessibleStateSetHelper* pStateSet = static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
-        if( pStateSet != nullptr &&
-            !pStateSet->contains(nStateId) )
+        if( !(mnStateSet & nStateId) )
         {
-            pStateSet->AddState( nStateId );
-            FireEvent( AccessibleEventId::STATE_CHANGED, uno::makeAny( nStateId ) );
+            mnStateSet |= nStateId;
+            FireEvent( AccessibleEventId::STATE_CHANGED, uno::Any( nStateId ) );
         }
     }
 
-    void AccessibleEditableTextPara::UnSetState( const sal_Int16 nStateId )
+    void AccessibleEditableTextPara::UnSetState( const sal_Int64 nStateId )
     {
-        ::utl::AccessibleStateSetHelper* pStateSet = static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
-        if( pStateSet != nullptr &&
-            pStateSet->contains(nStateId) )
+        if( mnStateSet & nStateId )
         {
-            pStateSet->RemoveState( nStateId );
-            FireEvent( AccessibleEventId::STATE_CHANGED, uno::Any(), uno::makeAny( nStateId ) );
+            mnStateSet &= ~nStateId;
+            FireEvent( AccessibleEventId::STATE_CHANGED, uno::Any(), uno::Any( nStateId ) );
         }
     }
 
@@ -657,14 +640,14 @@ namespace accessibility
     }
 
     // XAccessibleContext
-    sal_Int32 SAL_CALL AccessibleEditableTextPara::getAccessibleChildCount()
+    sal_Int64 SAL_CALL AccessibleEditableTextPara::getAccessibleChildCount()
     {
         SolarMutexGuard aGuard;
 
         return HaveChildren() ? 1 : 0;
     }
 
-    uno::Reference< XAccessible > SAL_CALL AccessibleEditableTextPara::getAccessibleChild( sal_Int32 i )
+    uno::Reference< XAccessible > SAL_CALL AccessibleEditableTextPara::getAccessibleChild( sal_Int64 i )
     {
         SolarMutexGuard aGuard;
 
@@ -702,7 +685,7 @@ namespace accessibility
         return mxParent;
     }
 
-    sal_Int32 SAL_CALL AccessibleEditableTextPara::getAccessibleIndexInParent()
+    sal_Int64 SAL_CALL AccessibleEditableTextPara::getAccessibleIndexInParent()
     {
         return mnIndexInParent;
     }
@@ -937,26 +920,23 @@ namespace accessibility
         return OUString();
     }
 
-    uno::Reference< XAccessibleStateSet > SAL_CALL AccessibleEditableTextPara::getAccessibleStateSet()
+    sal_Int64 SAL_CALL AccessibleEditableTextPara::getAccessibleStateSet()
     {
         SolarMutexGuard aGuard;
 
         // Create a copy of the state set and return it.
-        ::utl::AccessibleStateSetHelper* pStateSet = static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
 
-        if( !pStateSet )
-            return uno::Reference<XAccessibleStateSet>();
-        uno::Reference<XAccessibleStateSet> xParentStates;
+        sal_Int64 nParentStates = 0;
         if (getAccessibleParent().is())
         {
             uno::Reference<XAccessibleContext> xParentContext = getAccessibleParent()->getAccessibleContext();
-            xParentStates = xParentContext->getAccessibleStateSet();
+            nParentStates = xParentContext->getAccessibleStateSet();
         }
-        if (xParentStates.is() && xParentStates->contains(AccessibleStateType::EDITABLE) )
+        if (nParentStates & AccessibleStateType::EDITABLE)
         {
-            pStateSet->AddState(AccessibleStateType::EDITABLE);
+            mnStateSet |= AccessibleStateType::EDITABLE;
         }
-        return uno::Reference<XAccessibleStateSet>( new ::utl::AccessibleStateSetHelper (*pStateSet) );
+        return mnStateSet;
     }
 
     lang::Locale SAL_CALL AccessibleEditableTextPara::getLocale()
@@ -1525,8 +1505,7 @@ namespace accessibility
             // NumberingLevel
             if (rRes.Name == "NumberingLevel")
             {
-                const SvxNumBulletItem& rNumBullet = rCacheTF.GetParaAttribs(GetParagraphIndex()).Get(EE_PARA_NUMBULLET);
-                if(rNumBullet.GetNumRule().GetLevelCount()==0)
+                if(rCacheTF.GetParaAttribs(GetParagraphIndex()).Get(EE_PARA_NUMBULLET).GetNumRule().GetLevelCount()==0)
                 {
                     rRes.Value <<= sal_Int16(-1);
                     rRes.Handle = -1;

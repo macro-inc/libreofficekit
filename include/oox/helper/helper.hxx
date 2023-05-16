@@ -24,6 +24,7 @@
 
 #include <cstring>
 #include <limits>
+#include <optional>
 
 #include <o3tl/safeint.hxx>
 #include <osl/endian.h>
@@ -31,6 +32,7 @@
 #include <sal/macros.h>
 #include <sal/types.h>
 #include <tools/color.hxx>
+#include <utility>
 
 namespace oox {
 
@@ -168,37 +170,12 @@ inline void setFlag( Type& ornBitField, Type nMask, bool bSet = true )
 }
 
 
-/** Optional value, similar to ::std::optional<>, with convenience accessors.
- */
 template< typename Type >
-class OptValue
+void assignIfUsed( std::optional<Type>& rDestValue, const std::optional<Type>& rSourceValue )
 {
-public:
-                 OptValue() : maValue(), mbHasValue( false ) {}
-    explicit     OptValue( const Type& rValue ) : maValue( rValue ), mbHasValue( true ) {}
-    explicit     OptValue( bool bHasValue, const Type& rValue ) : maValue( rValue ), mbHasValue( bHasValue ) {}
-
-    bool         has() const { return mbHasValue; }
-    bool         operator!() const { return !mbHasValue; }
-    bool         differsFrom( const Type& rValue ) const { return mbHasValue && (maValue != rValue); }
-
-    const Type&  get() const { return maValue; }
-    const Type&  get( const Type& rDefValue ) const { return mbHasValue ? maValue : rDefValue; }
-
-    void         set( const Type& rValue ) { maValue = rValue; mbHasValue = true; }
-    Type&        use() { mbHasValue = true; return maValue; }
-
-    OptValue&    operator=( const Type& rValue ) { set( rValue ); return *this; }
-    bool         operator==( const OptValue& rValue ) const {
-                             return ( ( !mbHasValue && rValue.mbHasValue == false ) ||
-                                 ( mbHasValue == rValue.mbHasValue && maValue == rValue.maValue ) );
-                 }
-    void         assignIfUsed( const OptValue& rValue ) { if( rValue.mbHasValue ) set( rValue.maValue ); }
-
-private:
-    Type                maValue;
-    bool                mbHasValue;
-};
+    if( rSourceValue.has_value() )
+        rDestValue = rSourceValue.value();
+}
 
 
 /** Provides platform independent functions to convert from or to little-endian

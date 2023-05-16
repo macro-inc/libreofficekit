@@ -18,6 +18,8 @@
  */
 #pragma once
 
+#include <unotools/resmgr.hxx>
+
 #define NC_(Context, String) TranslateId(Context, reinterpret_cast<char const *>(u8##String))
 
 /* Resource file for the function wizard / autopilot.
@@ -1059,7 +1061,7 @@ const TranslateId SC_OPCODE_RANDOM_ARY[] =
 // -=*# Resource for function ISEVEN #*=-
 const TranslateId SC_OPCODE_IS_EVEN_ARY[] =
 {
-    NC_("SC_OPCODE_IS_EVEN", "Returns TRUE if value is an even integer."),
+    NC_("SC_OPCODE_IS_EVEN", "Returns TRUE if the value truncated to integer is even."),
     NC_("SC_OPCODE_IS_EVEN", "Value"),
     NC_("SC_OPCODE_IS_EVEN", "The value to be tested.")
 };
@@ -1067,7 +1069,7 @@ const TranslateId SC_OPCODE_IS_EVEN_ARY[] =
 // -=*# Resource for function ISODD #*=-
 const TranslateId SC_OPCODE_IS_ODD_ARY[] =
 {
-    NC_("SC_OPCODE_IS_ODD", "Returns TRUE if value is an odd integer."),
+    NC_("SC_OPCODE_IS_ODD", "Returns TRUE if the value truncated to integer is odd."),
     NC_("SC_OPCODE_IS_ODD", "Value"),
     NC_("SC_OPCODE_IS_ODD", "The value to be tested.")
 };
@@ -3746,7 +3748,7 @@ const TranslateId SC_OPCODE_FIXED_ARY[] =
     NC_("SC_OPCODE_FIXED", "Number"),
     NC_("SC_OPCODE_FIXED", "The number to be formatted."),
     NC_("SC_OPCODE_FIXED", "Decimals"),
-    NC_("SC_OPCODE_FIXED", "Decimal places. The number of fixed decimal places that are to be displayed."),
+    NC_("SC_OPCODE_FIXED", "Decimal places. The number of fixed decimal places that are to be displayed. Default 2."),
     NC_("SC_OPCODE_FIXED", "No thousands separators"),
     NC_("SC_OPCODE_FIXED", "Thousands separator. If 0 or omitted the locale group separator is used else the separator is suppressed.")
 };
@@ -4142,11 +4144,11 @@ const TranslateId SC_OPCODE_RANDOM_NV_ARY[] =
 // -=*# Resource for function RANDBETWEEN.NV #*=-
 const TranslateId SC_OPCODE_RANDBETWEEN_NV_ARY[] =
 {
-    NC_("SC_OPCODE_RANDBETWEEN_NV", "Returns a random integer between the numbers you specify, non-volatile."),
+    NC_("SC_OPCODE_RANDBETWEEN_NV", "Returns a random integer between the specified Bottom and Top values (both inclusive), non-volatile."),
     NC_("SC_OPCODE_RANDBETWEEN_NV", "Bottom"),
-    NC_("SC_OPCODE_RANDBETWEEN_NV", "The smallest integer returned."),
+    NC_("SC_OPCODE_RANDBETWEEN_NV", "The smallest integer that can be returned."),
     NC_("SC_OPCODE_RANDBETWEEN_NV", "Top"),
-    NC_("SC_OPCODE_RANDBETWEEN_NV", "The largest integer returned.")
+    NC_("SC_OPCODE_RANDBETWEEN_NV", "The largest integer that can be returned.")
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

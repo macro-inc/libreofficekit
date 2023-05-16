@@ -24,8 +24,6 @@
 #include <svl/intitem.hxx>
 #include <sfx2/objsh.hxx>
 #include <vcl/outdev.hxx>
-#include <vcl/svapp.hxx>
-#include <vcl/settings.hxx>
 #include <i18nlangtag/lang.h>
 #include <svx/svxids.hrc>
 #include <svtools/colorcfg.hxx>
@@ -113,9 +111,19 @@ void SvxNumberPreview::NotifyChange( const OUString& rPrevStr,
             mnPos = -1;
         }
     }
-    svtools::ColorConfig aColorConfig;
-    Color aWindowTextColor( aColorConfig.GetColorValue( svtools::FONTCOLOR ).nColor );
-    aPrevCol = pColor ? *pColor : aWindowTextColor;
+    if (pColor)
+        aPrevCol = *pColor;
+    else
+    {
+        svtools::ColorConfig aColorConfig;
+        Color aFgColor = aColorConfig.GetColorValue(svtools::FONTCOLOR, false).nColor;
+        if (aFgColor == COL_AUTO)
+        {
+            Color aBgColor = aColorConfig.GetColorValue(svtools::DOCCOLOR).nColor;
+            aFgColor = aBgColor.IsDark() ? COL_WHITE : COL_BLACK;
+        }
+        aPrevCol = aFgColor;
+    }
     Invalidate();
 }
 
@@ -135,8 +143,13 @@ void SvxNumberPreview::Paint(vcl::RenderContext& rRenderContext, const ::tools::
     rRenderContext.Push(vcl::PushFlags::ALL);
 
     svtools::ColorConfig aColorConfig;
-    rRenderContext.SetTextColor(aColorConfig.GetColorValue(svtools::FONTCOLOR).nColor);
-    rRenderContext.SetBackground(aColorConfig.GetColorValue(svtools::DOCCOLOR).nColor);
+    Color aBgColor = aColorConfig.GetColorValue(svtools::DOCCOLOR).nColor;
+    Color aFgColor = aColorConfig.GetColorValue(svtools::FONTCOLOR, false).nColor;
+    if (aFgColor == COL_AUTO)
+        aFgColor = aBgColor.IsDark() ? COL_WHITE : COL_BLACK;
+    rRenderContext.SetBackground(aBgColor);
+    rRenderContext.SetTextColor(aFgColor);
+    rRenderContext.Erase();
 
     vcl::Font aDrawFont = rRenderContext.GetFont();
     Size aSzWnd(GetOutputSizePixel());
@@ -189,7 +202,7 @@ SvxNumberFormatTabPage::SvxNumberFormatTabPage(weld::Container* pPage, weld::Dia
     , nInitFormat(std::numeric_limits<sal_uInt32>::max())
     , m_nLbFormatSelPosEdComment(SELPOS_NONE)
     , bLegacyAutomaticCurrency(false)
-    , sAutomaticLangEntry(CuiResId(RID_SVXSTR_AUTO_ENTRY))
+    , sAutomaticLangEntry(CuiResId(RID_CUISTR_AUTO_ENTRY))
     , m_xFtCategory(m_xBuilder->weld_label("categoryft"))
     , m_xLbCategory(m_xBuilder->weld_tree_view("categorylb"))
     , m_xFtFormat(m_xBuilder->weld_label("formatft"))
@@ -217,7 +230,7 @@ SvxNumberFormatTabPage::SvxNumberFormatTabPage(weld::Container* pPage, weld::Dia
     , m_xLbLanguage(new SvxLanguageBox(m_xBuilder->weld_combo_box("languagelb")))
     , m_xWndPreview(new weld::CustomWeld(*m_xBuilder, "preview", m_aWndPreview))
 {
-    for (size_t i = 0; i < SAL_N_ELEMENTS(NUM_CATEGORIES); ++i)
+    for (size_t i = 0; i < std::size(NUM_CATEGORIES); ++i)
         m_xLbCategory->append_text(CuiResId(NUM_CATEGORIES[i]));
 
     auto nWidth = m_xLbCategory->get_approximate_digit_width() * 22;
@@ -362,14 +375,9 @@ void SvxNumberFormatTabPage::Reset( const SfxItemSet* rSet )
     double                      nValDouble      = 0;
     OUString                    aValString;
 
-    SfxItemState eState = rSet->GetItemState( GetWhich( SID_ATTR_NUMBERFORMAT_NOLANGUAGE ),true,&pItem);
-
-    if(eState==SfxItemState::SET)
+    if(const SfxBoolItem* pBoolLangItem = rSet->GetItemIfSet( SID_ATTR_NUMBERFORMAT_NOLANGUAGE ))
     {
-        const SfxBoolItem* pBoolLangItem = static_cast<const SfxBoolItem*>(
-                      GetItem( *rSet, SID_ATTR_NUMBERFORMAT_NOLANGUAGE));
-
-        if(pBoolLangItem!=nullptr && pBoolLangItem->GetValue())
+        if(pBoolLangItem->GetValue())
         {
             HideLanguage();
         }
@@ -380,7 +388,7 @@ void SvxNumberFormatTabPage::Reset( const SfxItemSet* rSet )
 
     }
 
-    eState = rSet->GetItemState( GetWhich( SID_ATTR_NUMBERFORMAT_INFO ),true,&pItem);
+    SfxItemState eState = rSet->GetItemState( GetWhich( SID_ATTR_NUMBERFORMAT_INFO ),true,&pItem);
 
     if(eState==SfxItemState::SET)
     {
@@ -413,12 +421,12 @@ void SvxNumberFormatTabPage::Reset( const SfxItemSet* rSet )
         }
     }
 
-    eState = rSet->GetItemState( GetWhich( SID_ATTR_NUMBERFORMAT_SOURCE ) );
+    eState = rSet->GetItemState( SID_ATTR_NUMBERFORMAT_SOURCE );
 
     if ( eState == SfxItemState::SET )
     {
-        const SfxBoolItem* pBoolItem = static_cast<const SfxBoolItem*>(
-                      GetItem( *rSet, SID_ATTR_NUMBERFORMAT_SOURCE ));
+        const SfxBoolItem* pBoolItem =
+                      GetItem( *rSet, SID_ATTR_NUMBERFORMAT_SOURCE );
         if ( pBoolItem )
             m_xCbSourceFormat->set_active(pBoolItem->GetValue());
         else
@@ -482,8 +490,7 @@ void SvxNumberFormatTabPage::Reset( const SfxItemSet* rSet )
 
 
     bool bUseStarFormat = false;
-    SfxObjectShell* pDocSh  = SfxObjectShell::Current();
-    if ( pDocSh )
+    if (SfxObjectShell* pDocSh  = SfxObjectShell::Current())
     {
         // is this a calc document
         Reference< XServiceInfo > xSI( pDocSh->GetModel(), UNO_QUERY );
@@ -514,10 +521,9 @@ void SvxNumberFormatTabPage::Reset( const SfxItemSet* rSet )
     {
         SetCategory(nCatLbSelPos );
     }
-    eState = rSet->GetItemState( GetWhich( SID_ATTR_NUMBERFORMAT_ADD_AUTO ) );
+    eState = rSet->GetItemState( SID_ATTR_NUMBERFORMAT_ADD_AUTO );
     if(SfxItemState::SET == eState)
-         pAutoEntryAttr = static_cast<const SfxBoolItem*>(
-                      GetItem( *rSet, SID_ATTR_NUMBERFORMAT_ADD_AUTO ));
+         pAutoEntryAttr = GetItem( *rSet, SID_ATTR_NUMBERFORMAT_ADD_AUTO );
     // no_NO is an alias for nb_NO and normally isn't listed, we need it for
     // backwards compatibility, but only if the format passed is of
     // LanguageType no_NO.
@@ -722,11 +728,8 @@ bool SvxNumberFormatTabPage::FillItemSet( SfxItemSet* rCoreAttrs )
             else
             {
                 SfxObjectShell* pDocSh  = SfxObjectShell::Current();
-
                 DBG_ASSERT( pDocSh, "DocShell not found!" );
-
-
-                if ( pDocSh )
+                if (pDocSh)
                     pDocSh->PutItem( *pNumItem );
             }
         }
@@ -736,12 +739,11 @@ bool SvxNumberFormatTabPage::FillItemSet( SfxItemSet* rCoreAttrs )
 
         if ( m_xCbSourceFormat->get_sensitive() )
         {
-            sal_uInt16 _nWhich = GetWhich( SID_ATTR_NUMBERFORMAT_SOURCE );
-            SfxItemState _eItemState = rMyItemSet.GetItemState( _nWhich, false );
-            const SfxBoolItem* pBoolItem = static_cast<const SfxBoolItem*>(
-                        GetItem( rMyItemSet, SID_ATTR_NUMBERFORMAT_SOURCE ));
+            SfxItemState _eItemState = rMyItemSet.GetItemState( SID_ATTR_NUMBERFORMAT_SOURCE, false );
+            const SfxBoolItem* pBoolItem =
+                        GetItem( rMyItemSet, SID_ATTR_NUMBERFORMAT_SOURCE );
             bool bOld = pBoolItem && pBoolItem->GetValue();
-            rCoreAttrs->Put( SfxBoolItem( _nWhich, m_xCbSourceFormat->get_active() ) );
+            rCoreAttrs->Put( SfxBoolItem( SID_ATTR_NUMBERFORMAT_SOURCE, m_xCbSourceFormat->get_active() ) );
             if ( !bDataChanged )
                 bDataChanged = (bOld != m_xCbSourceFormat->get_active() ||
                     _eItemState != SfxItemState::SET);
@@ -1290,10 +1292,10 @@ IMPL_LINK( SvxNumberFormatTabPage, ClickHdl_Impl, weld::Button&, rIB, void)
 
 bool SvxNumberFormatTabPage::Click_Impl(const weld::Button& rIB)
 {
-    sal_uLong       nReturn = 0;
-    constexpr sal_uLong nReturnChanged  = 0x1;  // THE boolean return value
-    constexpr sal_uLong nReturnAdded    = 0x2;  // temp: format added
-    constexpr sal_uLong nReturnOneArea  = 0x4;  // temp: one area but category changed => ignored
+    sal_uInt8       nReturn = 0;
+    constexpr sal_uInt8 nReturnChanged  = 0x1;  // THE boolean return value
+    constexpr sal_uInt8 nReturnAdded    = 0x2;  // temp: format added
+    constexpr sal_uInt8 nReturnOneArea  = 0x4;  // temp: one area but category changed => ignored
 
     if (&rIB == m_xIbAdd.get())
     {   // Also called from FillItemSet() if a temporary currency format has
@@ -1673,6 +1675,16 @@ OUString SvxNumberFormatTabPage::GetExpColorString(
         default:                i=SvxNumValCategory::NoValue;break;
     }
     double fVal = fSvxNumValConst[i];
+
+    // use lower number for long NatNum12 transliteration
+    if ( ( CAT_CURRENCY == nTmpCatPos || CAT_NUMBER == nTmpCatPos ) &&
+             rFormatStr.indexOf("NatNum12") >= 0 )
+    {
+        if ( CAT_CURRENCY == nTmpCatPos )
+            fVal = 1.2;
+        else
+            fVal = 100; // show also title case for English: One Hundred
+    }
 
     OUString aPreviewString;
     pNumFmtShell->MakePrevStringFromVal( rFormatStr, aPreviewString, rpPreviewColor, fVal );

@@ -21,6 +21,7 @@
 
 #include <osl/diagnose.h>
 #include <tools/debug.hxx>
+#include <utility>
 #include <vcl/BitmapReadAccess.hxx>
 #include <vcl/cvtgrf.hxx>
 #include <vcl/svapp.hxx>
@@ -42,7 +43,7 @@ class ImgProdLockBytes : public SvLockBytes
 public:
 
     ImgProdLockBytes( SvStream* pStm, bool bOwner );
-    explicit ImgProdLockBytes( css::uno::Reference< css::io::XInputStream > const & rStreamRef );
+    explicit ImgProdLockBytes( css::uno::Reference< css::io::XInputStream > xStreamRef );
 
     virtual ErrCode     ReadAt( sal_uInt64 nPos, void* pBuffer, std::size_t nCount, std::size_t * pRead ) const override;
     virtual ErrCode     WriteAt( sal_uInt64 nPos, const void* pBuffer, std::size_t nCount, std::size_t * pWritten ) override;
@@ -59,8 +60,8 @@ ImgProdLockBytes::ImgProdLockBytes( SvStream* pStm, bool bOwner ) :
 }
 
 
-ImgProdLockBytes::ImgProdLockBytes( css::uno::Reference< css::io::XInputStream > const & rStmRef ) :
-        xStmRef( rStmRef )
+ImgProdLockBytes::ImgProdLockBytes( css::uno::Reference< css::io::XInputStream > _xStmRef ) :
+        xStmRef(std::move( _xStmRef ))
 {
     if( !xStmRef.is() )
         return;
@@ -162,7 +163,7 @@ ImageProducer::ImageProducer()
     : mnTransIndex(0)
     , mbConsInit(false)
 {
-    mpGraphic.reset( new Graphic );
+    moGraphic.emplace();
 }
 
 ImageProducer::~ImageProducer()
@@ -200,7 +201,7 @@ void ImageProducer::removeConsumer( const css::uno::Reference< css::awt::XImageC
 void ImageProducer::SetImage( const OUString& rPath )
 {
     maURL = rPath;
-    mpGraphic->Clear();
+    moGraphic->Clear();
     mbConsInit = false;
     mpStm.reset();
 
@@ -220,7 +221,7 @@ void ImageProducer::SetImage( const OUString& rPath )
 void ImageProducer::SetImage( SvStream& rStm )
 {
     maURL.clear();
-    mpGraphic->Clear();
+    moGraphic->Clear();
     mbConsInit = false;
 
     mpStm.reset( new SvStream( new ImgProdLockBytes( &rStm, false ) ) );
@@ -230,7 +231,7 @@ void ImageProducer::SetImage( SvStream& rStm )
 void ImageProducer::setImage( css::uno::Reference< css::io::XInputStream > const & rInputStmRef )
 {
     maURL.clear();
-    mpGraphic->Clear();
+    moGraphic->Clear();
     mbConsInit = false;
     mpStm.reset();
 
@@ -241,7 +242,7 @@ void ImageProducer::setImage( css::uno::Reference< css::io::XInputStream > const
 
 void ImageProducer::NewDataAvailable()
 {
-    if( ( GraphicType::NONE == mpGraphic->GetType() ) || mpGraphic->GetReaderContext() )
+    if( ( GraphicType::NONE == moGraphic->GetType() ) || moGraphic->GetReaderContext() )
         startProduction();
 }
 
@@ -254,18 +255,18 @@ void ImageProducer::startProduction()
     bool bNotifyEmptyGraphics = false;
 
     // valid stream or filled graphic? => update consumers
-    if( mpStm || ( mpGraphic->GetType() != GraphicType::NONE ) )
+    if( mpStm || ( moGraphic->GetType() != GraphicType::NONE ) )
     {
         // if we already have a graphic, we don't have to import again;
         // graphic is cleared if a new Stream is set
-        if( ( mpGraphic->GetType() == GraphicType::NONE ) || mpGraphic->GetReaderContext() )
+        if( ( moGraphic->GetType() == GraphicType::NONE ) || moGraphic->GetReaderContext() )
         {
-            if ( ImplImportGraphic( *mpGraphic ) )
-                maDoneHdl.Call( mpGraphic.get() );
+            if ( ImplImportGraphic( *moGraphic ) )
+                maDoneHdl.Call( &*moGraphic );
         }
 
-        if( mpGraphic->GetType() != GraphicType::NONE )
-            ImplUpdateData( *mpGraphic );
+        if( moGraphic->GetType() != GraphicType::NONE )
+            ImplUpdateData( *moGraphic );
         else
             bNotifyEmptyGraphics = true;
     }

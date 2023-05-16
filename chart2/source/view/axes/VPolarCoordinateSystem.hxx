@@ -27,7 +27,7 @@ class VPolarCoordinateSystem : public VCoordinateSystem
 {
 public:
     VPolarCoordinateSystem() = delete;
-    explicit VPolarCoordinateSystem( const css::uno::Reference< css::chart2::XCoordinateSystem >& xCooSys );
+    explicit VPolarCoordinateSystem( const rtl::Reference< ::chart::BaseCoordinateSystem >& xCooSys );
     virtual ~VPolarCoordinateSystem() override;
 
     //better performance for big data
@@ -35,12 +35,12 @@ public:
                                     , const css::awt::Size& rPageResolution ) override;
 
     virtual void createVAxisList(
-            const css::uno::Reference< css::chart2::XChartDocument> & xChartDoc
-            , const css::awt::Size& rFontReferenceSize
-            , const css::awt::Rectangle& rMaximumSpaceForLabels
-            , bool bLimitSpaceForLabels
-            , std::vector<std::unique_ptr<VSeriesPlotter>>& rSeriesPlotterList
-            , css::uno::Reference<css::uno::XComponentContext> const& rComponentContext) override;
+            const rtl::Reference<::chart::ChartModel> &ChartDoc,
+            const css::awt::Size& rFontReferenceSize,
+            const css::awt::Rectangle& rMaximumSpaceForLabels,
+            bool bLimitSpaceForLabels,
+            std::vector<std::unique_ptr<VSeriesPlotter>>& rSeriesPlotterList,
+            css::uno::Reference<css::uno::XComponentContext> const& rComponentContext) override;
 
     virtual void initVAxisInList() override;
     virtual void updateScalesAndIncrementsOnAxes() override;

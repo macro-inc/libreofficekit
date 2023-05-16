@@ -149,7 +149,7 @@ void SvxHatchTabPage::ActivatePage( const SfxItemSet& rSet )
 
         // determining (possibly cutting) the name
         // and displaying it in the GroupBox
-        OUString        aString = CuiResId( RID_SVXSTR_TABLE ) + ": ";
+        OUString        aString = CuiResId( RID_CUISTR_TABLE ) + ": ";
         INetURLObject   aURL( m_pHatchingList->GetPath() );
 
         aURL.Append( m_pHatchingList->GetName() );
@@ -358,13 +358,13 @@ void SvxHatchTabPage::ChangeHatchHdl_Impl()
         pHatch.reset(new XHatch( m_pHatchingList->GetHatch( static_cast<sal_uInt16>(nPos) )->GetHatch() ));
     else
     {
-        const SfxPoolItem* pPoolItem = nullptr;
-        if( SfxItemState::SET == m_rOutAttrs.GetItemState( GetWhich( XATTR_FILLSTYLE ), true, &pPoolItem ) )
+        if( const XFillStyleItem* pFillStyleItem = m_rOutAttrs.GetItemIfSet( GetWhich( XATTR_FILLSTYLE ) ) )
         {
-            if( ( drawing::FillStyle_HATCH == static_cast<const XFillStyleItem*>( pPoolItem )->GetValue() ) &&
-                ( SfxItemState::SET == m_rOutAttrs.GetItemState( GetWhich( XATTR_FILLHATCH ), true, &pPoolItem ) ) )
+            const XFillHatchItem* pFillHatchItem;
+            if( ( drawing::FillStyle_HATCH == pFillStyleItem->GetValue() ) &&
+                ( pFillHatchItem = m_rOutAttrs.GetItemIfSet( GetWhich( XATTR_FILLHATCH ) ) ) )
             {
-                pHatch.reset(new XHatch( static_cast<const XFillHatchItem*>( pPoolItem )->GetHatchValue() ));
+                pHatch.reset(new XHatch( pFillHatchItem->GetHatchValue() ));
             }
         }
         if( !pHatch )
@@ -403,7 +403,7 @@ void SvxHatchTabPage::ChangeHatchHdl_Impl()
 IMPL_LINK_NOARG(SvxHatchTabPage, ClickAddHdl_Impl, weld::Button&, void)
 {
     OUString aNewName( SvxResId( RID_SVXSTR_HATCH ) );
-    OUString aDesc( CuiResId( RID_SVXSTR_DESC_HATCH ) );
+    OUString aDesc( CuiResId( RID_CUISTR_DESC_HATCH ) );
     OUString aName;
 
     tools::Long nCount = m_pHatchingList->Count();
@@ -526,7 +526,7 @@ IMPL_LINK_NOARG(SvxHatchTabPage, ClickRenameHdl_Impl, SvxPresetListBox*, void )
     if( nPos == VALUESET_ITEM_NOTFOUND )
         return;
 
-    OUString aDesc( CuiResId( RID_SVXSTR_DESC_HATCH ) );
+    OUString aDesc( CuiResId( RID_CUISTR_DESC_HATCH ) );
     OUString aName( m_pHatchingList->GetHatch( nPos )->GetName() );
 
     SvxAbstractDialogFactory* pFact = SvxAbstractDialogFactory::Create();

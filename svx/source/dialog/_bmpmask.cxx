@@ -635,9 +635,9 @@ Animation SvxBmpMask::ImpMask( const Animation& rAnimation )
 
     for( sal_uInt16 i = 0; i < nAnimationCount; i++ )
     {
-        AnimationBitmap aAnimationBitmap( aAnimation.Get( i ) );
-        aAnimationBitmap.maBitmapEx = Mask(aAnimationBitmap.maBitmapEx).GetBitmapEx();
-        aAnimation.Replace(aAnimationBitmap, i);
+        AnimationFrame aAnimationFrame( aAnimation.Get( i ) );
+        aAnimationFrame.maBitmapEx = Mask(aAnimationFrame.maBitmapEx).GetBitmapEx();
+        aAnimation.Replace(aAnimationFrame, i);
     }
 
     return aAnimation;
@@ -783,7 +783,7 @@ GDIMetaFile SvxBmpMask::ImpMask( const GDIMetaFile& rMtf )
                     if( bReplace )
                     {
                         aFont.SetColor( aCol );
-                        pAct = new MetaFontAction( aFont );
+                        pAct = new MetaFontAction( std::move(aFont) );
                     }
 
                     aMtf.AddAction( pAct );
@@ -801,7 +801,7 @@ GDIMetaFile SvxBmpMask::ImpMask( const GDIMetaFile& rMtf )
                     if( bReplace )
                     {
                         aWall.SetColor( aCol );
-                        pAct = new MetaWallpaperAction( pAct->GetRect(), aWall );
+                        pAct = new MetaWallpaperAction( pAct->GetRect(), std::move(aWall) );
                     }
 
                     aMtf.AddAction( pAct );
@@ -892,9 +892,9 @@ Animation SvxBmpMask::ImpReplaceTransparency( const Animation& rAnim, const Colo
 
     for( sal_uInt16 i = 0; i < nAnimationCount; i++ )
     {
-        AnimationBitmap aAnimationBitmap(aAnimation.Get(i));
-        aAnimationBitmap.maBitmapEx.ReplaceTransparency(rColor);
-        aAnimation.Replace(aAnimationBitmap, i);
+        AnimationFrame aAnimationFrame(aAnimation.Get(i));
+        aAnimationFrame.maBitmapEx.ReplaceTransparency(rColor);
+        aAnimation.Replace(aAnimationFrame, i);
     }
 
     return aAnimation;

@@ -214,10 +214,10 @@ void GIFWriter::WriteAnimation( const Animation& rAnimation )
 
     for( sal_uInt16 i = 0; i < nCount; i++ )
     {
-        const AnimationBitmap& rAnimationBitmap = rAnimation.Get( i );
+        const AnimationFrame& rAnimationFrame = rAnimation.Get( i );
 
-        WriteBitmapEx(rAnimationBitmap.maBitmapEx, rAnimationBitmap.maPositionPixel, true,
-                       rAnimationBitmap.mnWait, rAnimationBitmap.meDisposal );
+        WriteBitmapEx(rAnimationFrame.maBitmapEx, rAnimationFrame.maPositionPixel, true,
+                       rAnimationFrame.mnWait, rAnimationFrame.meDisposal );
         nMinPercent = nMaxPercent;
         nMaxPercent = static_cast<sal_uInt32>(nMaxPercent + fStep);
     }
@@ -392,7 +392,7 @@ void GIFWriter::WriteImageExtension( tools::Long nTimer, Disposal eDisposal )
     m_rGIF.WriteUChar( 0x04 );
     m_rGIF.WriteUChar( cFlags );
     m_rGIF.WriteUInt16( nDelay );
-    m_rGIF.WriteUChar( m_pAcc->GetBestPaletteIndex( BMP_COL_TRANS ) );
+    m_rGIF.WriteUChar( static_cast<sal_uInt8>(m_pAcc->GetBestPaletteIndex( BMP_COL_TRANS )) );
     m_rGIF.WriteUChar( 0x00 );
 
     if( m_rGIF.GetError() )

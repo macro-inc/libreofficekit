@@ -39,7 +39,7 @@
 #include <editeng/editeng.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <strings.hrc>
 #include <editeng/outliner.hxx>
@@ -713,8 +713,8 @@ basegfx::B2DRectangle getPDFSelection(const std::unique_ptr<VectorGraphicSearch>
     // coordinates to the page relative coordinates
     basegfx::B2DHomMatrix aB2DMatrix;
 
-    aB2DMatrix.scale(aObjectB2DRectHMM.getWidth() / aPdfPageSizeHMM.getX(),
-                     aObjectB2DRectHMM.getHeight() / aPdfPageSizeHMM.getY());
+    aB2DMatrix.scale(aObjectB2DRectHMM.getWidth() / aPdfPageSizeHMM.getWidth(),
+                     aObjectB2DRectHMM.getHeight() / aPdfPageSizeHMM.getHeight());
 
     aB2DMatrix.translate(aObjectB2DRectHMM.getMinX(), aObjectB2DRectHMM.getMinY());
 
@@ -821,6 +821,14 @@ bool SdOutliner::SearchAndReplaceOnce(std::vector<sd::SearchSelection>* pSelecti
 
     if (!getOutlinerView() || !GetEditEngine().HasView(&getOutlinerView()->GetEditView()))
     {
+        std::shared_ptr<sd::DrawViewShell> pDrawViewShell (
+            std::dynamic_pointer_cast<sd::DrawViewShell>(pViewShell));
+
+        // Perhaps the user switched to a different page/slide between searches.
+        // If so, reset the starting search position to the current slide like DetectChange does
+        if (pDrawViewShell && pDrawViewShell->GetCurPagePos() != maCurrentPosition.mnPageIndex)
+            maObjectIterator = sd::outliner::OutlinerContainer(this).current();
+
         mpImpl->ProvideOutlinerView(*this, pViewShell, mpWindow);
     }
 
@@ -1152,13 +1160,13 @@ namespace
 
 bool lclIsValidTextObject(const sd::outliner::IteratorPosition& rPosition)
 {
-    auto* pObject = dynamic_cast< SdrTextObj* >( rPosition.mxObject.get() );
+    auto* pObject = DynCastSdrTextObj( rPosition.mxObject.get().get() );
     return (pObject != nullptr) && pObject->HasText() && ! pObject->IsEmptyPresObj();
 }
 
 bool isValidVectorGraphicObject(const sd::outliner::IteratorPosition& rPosition)
 {
-    auto* pGraphicObject = dynamic_cast<SdrGrafObj*>(rPosition.mxObject.get());
+    auto* pGraphicObject = dynamic_cast<SdrGrafObj*>(rPosition.mxObject.get().get());
     if (pGraphicObject)
     {
         auto const& pVectorGraphicData = pGraphicObject->GetGraphic().getVectorGraphicData();
@@ -1232,12 +1240,12 @@ void SdOutliner::ProvideNextTextObject()
                     if (meMode != SEARCH)
                         mpObj = SetObject(maCurrentPosition);
                     else
-                        mpObj = maCurrentPosition.mxObject.get();
+                        mpObj = maCurrentPosition.mxObject.get().get();
                 }
                 // Or if the object is a valid graphic object which contains vector graphic
                 else if (meMode == SEARCH && isValidVectorGraphicObject(maCurrentPosition))
                 {
-                    mpObj = maCurrentPosition.mxObject.get();
+                    mpObj = maCurrentPosition.mxObject.get().get();
                     rVectorGraphicSearchContext.mbCurrentIsVectorGraphic = true;
                 }
             }
@@ -1461,7 +1469,7 @@ bool SdOutliner::ShowWrapAroundDialog()
 
 void SdOutliner::PutTextIntoOutliner()
 {
-    mpSearchSpellTextObj = dynamic_cast<SdrTextObj*>( mpObj );
+    mpSearchSpellTextObj = DynCastSdrTextObj( mpObj );
     if ( mpSearchSpellTextObj && mpSearchSpellTextObj->HasText() && !mpSearchSpellTextObj->IsEmptyPresObj() )
     {
         SdrText* pText = mpSearchSpellTextObj->getText( maCurrentPosition.mnText );
@@ -1727,7 +1735,7 @@ SdrObject* SdOutliner::SetObject (
     SetViewMode (rPosition.mePageKind);
     SetPage (rPosition.meEditMode, static_cast<sal_uInt16>(rPosition.mnPageIndex));
     mnText = rPosition.mnText;
-    return rPosition.mxObject.get();
+    return rPosition.mxObject.get().get();
 }
 
 void SdOutliner::SetViewShell (const std::shared_ptr<sd::ViewShell>& rpViewShell)
@@ -1917,13 +1925,15 @@ weld::Window* SdOutliner::GetMessageBoxParent()
     switch (meMode)
     {
         case SEARCH:
-            pChildWindow = SfxViewFrame::Current()->GetChildWindow(
-                SvxSearchDialogWrapper::GetChildWindowId());
+            if (SfxViewFrame* pViewFrm = SfxViewFrame::Current())
+                pChildWindow = pViewFrm->GetChildWindow(
+                    SvxSearchDialogWrapper::GetChildWindowId());
             break;
 
         case SPELL:
-            pChildWindow = SfxViewFrame::Current()->GetChildWindow(
-                sd::SpellDialogChildWindow::GetChildWindowId());
+            if (SfxViewFrame* pViewFrm = SfxViewFrame::Current())
+                pChildWindow = pViewFrm->GetChildWindow(
+                    sd::SpellDialogChildWindow::GetChildWindowId());
             break;
 
         case TEXT_CONVERSION:

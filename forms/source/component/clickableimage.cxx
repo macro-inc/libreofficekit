@@ -28,13 +28,12 @@
 #include <com/sun/star/frame/XController.hpp>
 #include <com/sun/star/frame/XFrame.hpp>
 #include <com/sun/star/awt/ActionEvent.hpp>
-#include <com/sun/star/awt/XActionListener.hpp>
 #include <com/sun/star/graphic/XGraphic.hpp>
 #include <com/sun/star/graphic/GraphicObject.hpp>
 #include <com/sun/star/util/VetoException.hpp>
 #include <tools/urlobj.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/graph.hxx>
 #include <vcl/svapp.hxx>
 #include <sfx2/docfile.hxx>
@@ -42,7 +41,7 @@
 #include <osl/mutex.hxx>
 #include <property.hxx>
 #include <services.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <comphelper/property.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/types.hxx>
@@ -174,11 +173,11 @@ namespace frm
         bool bCancelled = false;
         EventObject aEvent( static_cast< XWeak* >( this ) );
 
-        ::comphelper::OInterfaceIteratorHelper2 aIter( m_aApproveActionListeners );
+        ::comphelper::OInterfaceIteratorHelper3 aIter( m_aApproveActionListeners );
         while( !bCancelled && aIter.hasMoreElements() )
         {
             // Every approveAction method must be thread-safe!
-            if( !static_cast< XApproveActionListener* >( aIter.next() )->approveAction( aEvent ) )
+            if( !aIter.next()->approveAction( aEvent ) )
                 bCancelled = true;
         }
 
@@ -302,10 +301,7 @@ namespace frm
                             FrameSearchFlag::SELF | FrameSearchFlag::PARENT |
                             FrameSearchFlag::SIBLINGS | FrameSearchFlag::CREATE );
 
-                    Sequence<PropertyValue> aArgs(1);
-                    PropertyValue& rProp = aArgs.getArray()[0];
-                    rProp.Name = "Referer";
-                    rProp.Value <<= xModel->getURL();
+                    Sequence<PropertyValue> aArgs { comphelper::makePropertyValue("Referer", xModel->getURL()) };
 
                     if (xDisp.is())
                         xDisp->dispatch( aURL, aArgs );
@@ -801,10 +797,10 @@ namespace frm
     {
         switch (nHandle)
         {
-            case PROPERTY_ID_BUTTONTYPE             : return makeAny( FormButtonType_PUSH );
+            case PROPERTY_ID_BUTTONTYPE             : return Any( FormButtonType_PUSH );
             case PROPERTY_ID_TARGET_URL             :
-            case PROPERTY_ID_TARGET_FRAME           : return makeAny( OUString() );
-            case PROPERTY_ID_DISPATCHURLINTERNAL    : return makeAny( false );
+            case PROPERTY_ID_TARGET_FRAME           : return Any( OUString() );
+            case PROPERTY_ID_DISPATCHURLINTERNAL    : return Any( false );
             default:
                 return OControlModel::getPropertyDefaultByHandle(nHandle);
         }

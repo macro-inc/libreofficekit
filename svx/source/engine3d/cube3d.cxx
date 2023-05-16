@@ -25,7 +25,6 @@
 #include <svx/svdobjkind.hxx>
 #include <basegfx/point/b3dpoint.hxx>
 #include <sdr/contact/viewcontactofe3dcube.hxx>
-#include <rtl/ustrbuf.hxx>
 
 
 // DrawContact section
@@ -86,17 +85,17 @@ void E3dCubeObj::SetDefaultAttributes(const E3dDefaultAttributes& rDefault)
 
 SdrObjKind E3dCubeObj::GetObjIdentifier() const
 {
-    return E3D_CUBEOBJ_ID;
+    return SdrObjKind::E3D_Cube;
 }
 
 // Convert the object into a group object consisting of 6 polygons
 
-SdrObjectUniquePtr E3dCubeObj::DoConvertToPolyObj(bool /*bBezier*/, bool /*bAddText*/) const
+rtl::Reference<SdrObject> E3dCubeObj::DoConvertToPolyObj(bool /*bBezier*/, bool /*bAddText*/) const
 {
     return nullptr;
 }
 
-E3dCubeObj* E3dCubeObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> E3dCubeObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new E3dCubeObj(rTargetModel, *this);
 }

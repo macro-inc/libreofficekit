@@ -27,6 +27,7 @@
 #include <unordered_set>
 #include <osl/socket.hxx>
 #include <osl/pipe.hxx>
+#include <mutex>
 
 namespace stoc_connector
 {
@@ -38,7 +39,7 @@ namespace stoc_connector
 
     {
     public:
-        explicit PipeConnection( const OUString &sConnectionDescription );
+        explicit PipeConnection( OUString sConnectionDescription );
         virtual ~PipeConnection() override;
 
         virtual sal_Int32 SAL_CALL read( css::uno::Sequence< sal_Int8 >& aReadBytes,
@@ -58,7 +59,7 @@ namespace stoc_connector
 
     {
     public:
-        explicit SocketConnection( const OUString & sConnectionDescription  );
+        explicit SocketConnection( OUString sConnectionDescription  );
         virtual ~SocketConnection() override;
 
         virtual sal_Int32 SAL_CALL read( css::uno::Sequence< sal_Int8 >& aReadBytes,
@@ -80,12 +81,12 @@ namespace stoc_connector
         oslInterlockedCount m_nStatus;
         OUString m_sDescription;
 
-        ::osl::Mutex _mutex;
+        std::mutex _mutex;
         bool     _started;
         bool     _closed;
         bool     _error;
 
-          XStreamListener_hash_set _listeners;
+        XStreamListener_hash_set _listeners;
     };
 }
 

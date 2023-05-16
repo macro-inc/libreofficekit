@@ -23,10 +23,10 @@
 #include <memory>
 
 #include <svl/undo.hxx>
-#include <tools/solar.h>
 #include "SwRewriter.hxx"
 #include "swundo.hxx"
 #include "nodeoffset.hxx"
+#include "ndindex.hxx"
 #include <o3tl/typed_flags_set.hxx>
 #include <optional>
 
@@ -37,7 +37,7 @@ class SwDoc;
 class SwTextFormatColl;
 class SwFrameFormat;
 class SwFormatAnchor;
-class SwNodeIndex;
+class SwNode;
 class SwNodeRange;
 class SwRedlineData;
 class SwRedlineSaveDatas;
@@ -200,13 +200,13 @@ public:
 // Save a complete section in nodes-array.
 class SwUndoSaveSection : private SwUndoSaveContent
 {
-    std::unique_ptr<SwNodeIndex> m_pMovedStart;
+    std::optional<SwNodeIndex> m_oMovedStart;
     std::unique_ptr<SwRedlineSaveDatas> m_pRedlineSaveData;
     SwNodeOffset m_nMoveLen;           // Index into UndoNodes-Array.
     SwNodeOffset m_nStartPos;
 
 protected:
-    SwNodeIndex* GetMvSttIdx() const { return m_pMovedStart.get(); }
+    const SwNodeIndex* GetMvSttIdx() const { return m_oMovedStart ? &*m_oMovedStart : nullptr; }
     SwNodeOffset GetMvNodeCnt() const { return m_nMoveLen; }
 
 public:
@@ -216,7 +216,7 @@ public:
     void SaveSection( const SwNodeIndex& rSttIdx );
     void SaveSection(const SwNodeRange& rRange, bool bExpandNodes = true);
     void RestoreSection( SwDoc* pDoc, SwNodeIndex* pIdx, sal_uInt16 nSectType );
-    void RestoreSection(SwDoc* pDoc, const SwNodeIndex& rInsPos, bool bForceCreateFrames = false);
+    void RestoreSection(SwDoc* pDoc, const SwNode& rInsPos, bool bForceCreateFrames = false);
 
     const SwHistory* GetHistory() const { return m_pHistory.get(); }
           SwHistory* GetHistory()       { return m_pHistory.get(); }
@@ -257,13 +257,12 @@ class SwUndoInserts : public SwUndo, public SwUndRng, private SwUndoSaveContent
     std::vector< std::shared_ptr<SwUndoInsLayFormat> > m_FlyUndos;
     std::unique_ptr<SwRedlineData> m_pRedlineData;
     SwNodeOffset m_nDeleteTextNodes;
-
-protected:
     SwNodeOffset m_nNodeDiff;
     /// start of Content in UndoNodes for Redo
-    std::unique_ptr<SwNodeIndex> m_pUndoNodeIndex;
+    std::optional<SwNodeIndex> m_oUndoNodeIndex;
     sal_uInt16 m_nSetPos;                 // Start in the history list.
 
+protected:
     SwUndoInserts( SwUndoId nUndoId, const SwPaM& );
 public:
     virtual ~SwUndoInserts() override;
@@ -283,6 +282,7 @@ public:
     void dumpAsXml(xmlTextWriterPtr pWriter) const override;
 };
 
+/// Undo for Insert -> Text from file.
 class SwUndoInsDoc final : public SwUndoInserts
 {
 public:
@@ -309,7 +309,7 @@ protected:
 
     SwUndoFlyBase( SwFrameFormat* pFormat, SwUndoId nUndoId );
 
-    SwNodeIndex* GetMvSttIdx() const { return SwUndoSaveSection::GetMvSttIdx(); }
+    const SwNodeIndex* GetMvSttIdx() const { return SwUndoSaveSection::GetMvSttIdx(); }
     SwNodeOffset GetMvNodeCnt() const { return SwUndoSaveSection::GetMvNodeCnt(); }
 
 public:

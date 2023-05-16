@@ -36,7 +36,7 @@
 #include <cppuhelper/implbase.hxx>
 #include <svtools/genericunodialog.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/mutex.hxx>
 #include <vcl/svapp.hxx>
 #include <tools/urlobj.hxx>
@@ -235,7 +235,7 @@ namespace {
         m_bInitialized = true;
     }
 
-    OString lcl_getHelpId( const OUString& _rHelpURL )
+    OString lcl_getHelpId( std::u16string_view _rHelpURL )
     {
         INetURLObject aHID( _rHelpURL );
         if ( aHID.GetProtocol() == INetProtocol::Hid )

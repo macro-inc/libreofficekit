@@ -19,11 +19,10 @@
 
 #include <showcols.hxx>
 
-#include <osl/diagnose.h>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <comphelper/types.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 constexpr OUStringLiteral CUIFM_PROP_HIDDEN = u"Hidden";
 constexpr OUStringLiteral CUIFM_PROP_LABEL = u"Label";

@@ -21,10 +21,11 @@
 #include <com/sun/star/drawing/XDrawPageSupplier.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/container/XIndexContainer.hpp>
-#include <com/sun/star/document/IndexedPropertyValues.hpp>
 #include <com/sun/star/xforms/XFormsSupplier.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 
+#include <comphelper/indexedpropertyvalues.hxx>
+#include <osl/diagnose.h>
 #include <o3tl/any.hxx>
 #include <sax/tools/converter.hxx>
 #include <svx/svdpage.hxx>
@@ -32,6 +33,7 @@
 #include <svx/xmlgrhlp.hxx>
 #include <editeng/eeitem.hxx>
 #include <svx/svddef.hxx>
+#include <tools/UnitConversion.hxx>
 #include <xmloff/namespacemap.hxx>
 #include <xmloff/xmlnamespace.hxx>
 #include <editeng/xmlcnitm.hxx>
@@ -337,9 +339,9 @@ void SwXMLExport::GetViewSettings(Sequence<PropertyValue>& aProps)
      // Currently exporting 9 properties
     PropertyValue *pValue = aProps.getArray();
 
-    Reference < XIndexContainer > xBox = IndexedPropertyValues::create( comphelper::getProcessComponentContext() );
+    rtl::Reference< comphelper::IndexedPropertyValuesContainer > xBox = new comphelper::IndexedPropertyValuesContainer();
     pValue[0].Name = "Views";
-    pValue[0].Value <<= xBox;
+    pValue[0].Value <<= uno::Reference< container::XIndexContainer >(xBox);
 
     SwDoc *pDoc = getDoc();
     const tools::Rectangle rRect =

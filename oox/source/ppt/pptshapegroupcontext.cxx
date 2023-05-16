@@ -35,6 +35,7 @@
 #include "extdrawingfragmenthandler.hxx"
 #include <oox/token/namespaces.hxx>
 #include <oox/token/tokens.hxx>
+#include <utility>
 
 using namespace oox::core;
 using namespace ::com::sun::star;
@@ -47,12 +48,12 @@ namespace oox::ppt {
 
 PPTShapeGroupContext::PPTShapeGroupContext(
         FragmentHandler2 const & rParent,
-        const oox::ppt::SlidePersistPtr& rSlidePersistPtr,
+        oox::ppt::SlidePersistPtr pSlidePersistPtr,
         const ShapeLocation eShapeLocation,
         const oox::drawingml::ShapePtr& pMasterShapePtr,
         const oox::drawingml::ShapePtr& pGroupShapePtr )
 : ShapeGroupContext( rParent, pMasterShapePtr, pGroupShapePtr )
-, mpSlidePersistPtr( rSlidePersistPtr )
+, mpSlidePersistPtr(std::move( pSlidePersistPtr ))
 , meShapeLocation( eShapeLocation )
 {
 }
@@ -69,15 +70,15 @@ ContextHandlerRef PPTShapeGroupContext::onCreateContext( sal_Int32 aElementToken
         // don't override SmartArt properties for embedded drawing's spTree
         mpGroupShapePtr->setHidden( rAttribs.getBool( XML_hidden, false ) );
         if (mpGroupShapePtr->getId().isEmpty())
-            mpGroupShapePtr->setId(rAttribs.getString(XML_id).get());
+            mpGroupShapePtr->setId(rAttribs.getStringDefaulted(XML_id));
         if (mpGroupShapePtr->getName().isEmpty())
-            mpGroupShapePtr->setName( rAttribs.getString( XML_name ).get() );
+            mpGroupShapePtr->setName( rAttribs.getStringDefaulted( XML_name ) );
         break;
     }
     case PPT_TOKEN( ph ):
         mpGroupShapePtr->setSubType( rAttribs.getToken( XML_type, FastToken::DONTKNOW ) );
         if( rAttribs.hasAttribute( XML_idx ) )
-            mpGroupShapePtr->setSubTypeIndex( rAttribs.getString( XML_idx ).get().toInt32() );
+            mpGroupShapePtr->setSubTypeIndex( rAttribs.getInteger( XML_idx, 0 ) );
         break;
     // nvSpPr CT_ShapeNonVisual end
 
@@ -90,42 +91,23 @@ ContextHandlerRef PPTShapeGroupContext::onCreateContext( sal_Int32 aElementToken
         return new ShapeStyleContext( getParser() );
 */
     case PPT_TOKEN( cxnSp ):        // connector shape
-        return new oox::drawingml::ConnectorShapeContext( *this, mpGroupShapePtr, std::make_shared<PPTShape>( meShapeLocation, "com.sun.star.drawing.ConnectorShape" ) );
+    {
+        auto pShape = std::make_shared<PPTShape>(meShapeLocation, "com.sun.star.drawing.ConnectorShape");
+        return new oox::drawingml::ConnectorShapeContext(*this, mpGroupShapePtr, pShape,
+                                                         pShape->getConnectorShapeProperties());
+    }
     case PPT_TOKEN( grpSp ):        // group shape
         return new PPTShapeGroupContext( *this, mpSlidePersistPtr, meShapeLocation, mpGroupShapePtr, std::make_shared<PPTShape>( meShapeLocation, "com.sun.star.drawing.GroupShape" ) );
     case PPT_TOKEN( sp ):           // Shape
         {
             auto pShape = std::make_shared<PPTShape>( meShapeLocation, "com.sun.star.drawing.CustomShape" );
             bool bUseBgFill = rAttribs.getBool(XML_useBgFill, false);
-            pShape->setUseBgFill(bUseBgFill);
             if (bUseBgFill)
             {
-                oox::drawingml::FillPropertiesPtr pBackgroundPropertiesPtr = mpSlidePersistPtr->getBackgroundProperties();
-                if (!pBackgroundPropertiesPtr)
-                {
-                    // The shape wants a background, but the slide doesn't have one.
-                    SlidePersistPtr pMaster = mpSlidePersistPtr->getMasterPersist();
-                    if (pMaster)
-                    {
-                        oox::drawingml::FillPropertiesPtr pMasterBackground
-                            = pMaster->getBackgroundProperties();
-                        if (pMasterBackground)
-                        {
-                            if (pMasterBackground->moFillType.has()
-                                && pMasterBackground->moFillType.get() == XML_solidFill)
-                            {
-                                // Master has a solid background, use that.
-                                pBackgroundPropertiesPtr = pMasterBackground;
-                            }
-                        }
-                    }
-                }
-                if (pBackgroundPropertiesPtr)
-                {
-                    pShape->getFillProperties().assignUsed(*pBackgroundPropertiesPtr);
-                }
+                pShape->getFillProperties().moFillType = XML_noFill;
+                pShape->getFillProperties().moUseBgFill = true;
             }
-            pShape->setModelId(rAttribs.getString( XML_modelId ).get());
+            pShape->setModelId(rAttribs.getStringDefaulted( XML_modelId ));
             return new PPTShapeContext( *this, mpSlidePersistPtr, mpGroupShapePtr, pShape );
         }
     case PPT_TOKEN( pic ):          // CT_Picture

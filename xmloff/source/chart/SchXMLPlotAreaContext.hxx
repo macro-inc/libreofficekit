@@ -57,7 +57,6 @@ class SchXMLPositionAttributesHelper
 {
 public:
     explicit SchXMLPositionAttributesHelper( SvXMLImport& rImporter );
-    ~SchXMLPositionAttributesHelper();
 
     void readPositioningAttribute( sal_Int32 nAttributeToken, std::string_view rValue );
     void readAutomaticPositioningProperties( XMLPropStyleContext const * pPropStyleContext, const SvXMLStylesContext* pStylesCtxt );
@@ -94,7 +93,7 @@ public:
                            bool & rRowHasLabels,
                            css::chart::ChartDataRowSource & rDataRowSource,
                            SeriesDefaultsAndStyles& rSeriesDefaultsAndStyles,
-                           const OUString& aChartTypeServiceName,
+                           OUString aChartTypeServiceName,
                            tSchXMLLSequencesPerIndex & rLSequencesPerIndex,
                            const css::awt::Size & rChartSize );
     virtual ~SchXMLPlotAreaContext() override;
@@ -282,9 +281,9 @@ public:
     SchXMLStatisticsObjectContext(
         SchXMLImportHelper& rImportHelper,
         SvXMLImport& rImport,
-        const OUString &rSeriesStyleName,
+        OUString aSeriesStyleName,
         ::std::vector< DataRowPointStyle >& rStyleVector,
-        const css::uno::Reference< css::chart2::XDataSeries >& xSeries,
+        css::uno::Reference< css::chart2::XDataSeries > xSeries,
         ContextType eContextType,
         tSchXMLLSequencesPerIndex & rLSequencesPerIndex );
 

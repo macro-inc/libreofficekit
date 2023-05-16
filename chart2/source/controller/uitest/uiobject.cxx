@@ -12,20 +12,21 @@
 
 #include <ChartWindow.hxx>
 #include <ChartController.hxx>
+#include <ChartModel.hxx>
 #include <ObjectHierarchy.hxx>
 #include <chartview/ExplicitValueProvider.hxx>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 
 #include <comphelper/servicehelper.hxx>
 
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <algorithm>
 #include <iterator>
 
 ChartUIObject::ChartUIObject(const VclPtr<chart::ChartWindow>& xChartWindow,
-        const OUString& rCID):
-    maCID(rCID),
+        OUString aCID):
+    maCID(std::move(aCID)),
     mxChartWindow(xChartWindow)
 {
 }
@@ -172,7 +173,7 @@ std::set<OUString> ChartWindowUIObject::get_children() const
     if (!pController)
         return aChildren;
 
-    css::uno::Reference< css::chart2::XChartDocument > xChartDoc( pController->getModel(), css::uno::UNO_QUERY );
+    rtl::Reference<::chart::ChartModel> xChartDoc( pController->getChartModel() );
 
     css::uno::Reference<css::uno::XInterface> xChartView = pController->getChartView();
     chart::ExplicitValueProvider* pValueProvider = comphelper::getFromUnoTunnel<chart::ExplicitValueProvider>( xChartView );

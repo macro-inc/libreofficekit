@@ -135,12 +135,11 @@ vcl::Window* get_top_parent(vcl::Window* pWindow)
     return get_top_parent(pParent);
 }
 
-std::vector<KeyEvent> generate_key_events_from_text(const OUString& rStr)
+std::vector<KeyEvent> generate_key_events_from_text(std::u16string_view rStr)
 {
     std::vector<KeyEvent> aEvents;
     vcl::KeyCode aCode;
-    for (sal_Int32 i = 0, n = rStr.getLength();
-            i != n; ++i)
+    for (size_t i = 0, n = rStr.size(); i != n; ++i)
     {
         aEvents.emplace_back(rStr[i], aCode);
     }
@@ -189,7 +188,7 @@ bool isFunctionKey(const OUString& rStr, sal_uInt16& rKeyCode)
     return true;
 }
 
-std::vector<KeyEvent> generate_key_events_from_keycode(const OUString& rStr)
+std::vector<KeyEvent> generate_key_events_from_keycode(std::u16string_view rStr)
 {
     std::vector<KeyEvent> aEvents;
 
@@ -894,6 +893,49 @@ std::unique_ptr<UIObject> MultiLineEditUIObject::create(vcl::Window* pWindow)
     return std::unique_ptr<UIObject>(new MultiLineEditUIObject(pEdit));
 }
 
+ExpanderUIObject::ExpanderUIObject(const VclPtr<VclExpander>& xExpander)
+    : WindowUIObject(xExpander)
+    , mxExpander(xExpander)
+{
+}
+
+ExpanderUIObject::~ExpanderUIObject()
+{
+}
+
+void ExpanderUIObject::execute(const OUString& rAction, const StringMap& rParameters)
+{
+    if (rAction == "EXPAND")
+    {
+        mxExpander->set_expanded(true);
+    }
+    else if (rAction == "COLLAPSE")
+    {
+        mxExpander->set_expanded(false);
+    }
+    else
+        WindowUIObject::execute(rAction, rParameters);
+}
+
+StringMap ExpanderUIObject::get_state()
+{
+    StringMap aMap = WindowUIObject::get_state();
+    aMap["Expanded"] = OUString::boolean(mxExpander->get_expanded());
+    return aMap;
+}
+
+OUString ExpanderUIObject::get_name() const
+{
+    return "ExpanderUIObject";
+}
+
+std::unique_ptr<UIObject> ExpanderUIObject::create(vcl::Window* pWindow)
+{
+    VclExpander* pVclExpander = dynamic_cast<VclExpander*>(pWindow);
+    assert(pVclExpander);
+    return std::unique_ptr<UIObject>(new ExpanderUIObject(pVclExpander));
+}
+
 CheckBoxUIObject::CheckBoxUIObject(const VclPtr<CheckBox>& xCheckbox):
     WindowUIObject(xCheckbox),
     mxCheckBox(xCheckbox)
@@ -976,6 +1018,7 @@ StringMap RadioButtonUIObject::get_state()
 {
     StringMap aMap = WindowUIObject::get_state();
     aMap["Checked"] = OUString::boolean(mxRadioButton->IsChecked());
+    aMap["Enabled"] = OUString::boolean(mxRadioButton->IsEnabled());
 
     return aMap;
 }

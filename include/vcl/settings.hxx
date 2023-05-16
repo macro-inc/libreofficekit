@@ -345,6 +345,9 @@ public:
     void                            SetDisableColor( const Color& rColor );
     const Color&                    GetDisableColor() const;
 
+    void                            SetWarningColor( const Color& rColor );
+    const Color&                    GetWarningColor() const;
+
     void                            SetHelpColor( const Color& rColor );
     const Color&                    GetHelpColor() const;
 
@@ -380,6 +383,18 @@ public:
 
     void                            SetMenuHighlightTextColor( const Color& rColor );
     const Color&                    GetMenuHighlightTextColor() const;
+
+    void                            SetListBoxWindowBackgroundColor( const Color& rColor );
+    const Color&                    GetListBoxWindowBackgroundColor() const;
+
+    void                            SetListBoxWindowTextColor( const Color& rColor );
+    const Color&                    GetListBoxWindowTextColor() const;
+
+    void                            SetListBoxWindowHighlightColor( const Color& rColor );
+    const Color&                    GetListBoxWindowHighlightColor() const;
+
+    void                            SetListBoxWindowHighlightTextColor( const Color& rColor );
+    const Color&                    GetListBoxWindowHighlightTextColor() const;
 
     void                            SetTabTextColor( const Color& rColor );
     const Color&                    GetTabTextColor() const;
@@ -531,9 +546,6 @@ public:
 
     static bool                     GetDockingFloatsSupported();
 
-    void                            SetFontColor( const Color& rColor );
-    const Color&                    GetFontColor() const;
-
     void                            SetToolbarIconSize( ToolbarIconSize nSize );
     ToolbarIconSize                 GetToolbarIconSize() const;
     Size                            GetToolbarIconSizePixel() const;
@@ -633,7 +645,11 @@ public:
     bool                            GetDisablePrinting() const;
     void                            SetEnableLocalizedDecimalSep( bool bEnable );
     bool                            GetEnableLocalizedDecimalSep() const;
-
+    // 0 auto, 1 light, 2, dark
+    static void                     SetDarkMode(int nMode);
+    static int                      GetDarkMode();
+    static void                     SetAppColorMode(int nMode);
+    static int                      GetAppColorMode();
     bool                            operator ==( const MiscSettings& rSet ) const;
     bool                            operator !=( const MiscSettings& rSet ) const;
 };
@@ -687,7 +703,9 @@ public:
     void                                    SetMiscSettings( const MiscSettings& rSet );
     const MiscSettings&                     GetMiscSettings() const;
 
+    IF_MERGELIBS(SAL_DLLPRIVATE)
     void                                    SetHelpSettings( const HelpSettings& rSet );
+    IF_MERGELIBS(SAL_DLLPRIVATE)
     const HelpSettings&                     GetHelpSettings() const;
 
     void                                    SetLanguageTag(const OUString& rLanguage, bool bCanonicalize);
@@ -699,20 +717,21 @@ public:
     static OUString                         GetUIRootDir();
     const LocaleDataWrapper&                GetLocaleDataWrapper() const;
     const LocaleDataWrapper&                GetUILocaleDataWrapper() const;
+    IF_MERGELIBS(SAL_DLLPRIVATE)
     const LocaleDataWrapper&                GetNeutralLocaleDataWrapper() const;
     const vcl::I18nHelper&                  GetLocaleI18nHelper() const;
     const vcl::I18nHelper&                  GetUILocaleI18nHelper() const;
 
-    static AllSettingsFlags                 GetWindowUpdate()
+    SAL_DLLPRIVATE static AllSettingsFlags GetWindowUpdate()
     { return AllSettingsFlags::MOUSE | AllSettingsFlags::STYLE | AllSettingsFlags::MISC | AllSettingsFlags::LOCALE; }
 
     AllSettingsFlags                        Update( AllSettingsFlags nFlags, const AllSettings& rSettings );
-    AllSettingsFlags                        GetChangeFlags( const AllSettings& rSettings ) const;
+    SAL_DLLPRIVATE AllSettingsFlags         GetChangeFlags( const AllSettings& rSettings ) const;
 
     bool                                    operator ==( const AllSettings& rSet ) const;
     bool                                    operator !=( const AllSettings& rSet ) const;
-    static void                             LocaleSettingsChanged( ConfigurationHints nHint );
-    SvtSysLocale&                           GetSysLocale();
+    SAL_DLLPRIVATE static void             LocaleSettingsChanged( ConfigurationHints nHint );
+    SAL_DLLPRIVATE SvtSysLocale&           GetSysLocale();
 };
 
 #endif // INCLUDED_VCL_SETTINGS_HXX

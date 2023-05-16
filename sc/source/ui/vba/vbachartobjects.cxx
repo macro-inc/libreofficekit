@@ -29,10 +29,11 @@
 #include <cellsuno.hxx>
 
 #include <string_view>
+#include <utility>
 #include <vector>
 #include <basic/sberrors.hxx>
 #include <comphelper/sequence.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::ooo::vba;
@@ -45,7 +46,7 @@ class ChartObjectEnumerationImpl : public EnumerationHelperImpl
 
 public:
     /// @throws uno::RuntimeException
-    ChartObjectEnumerationImpl( const uno::Reference< uno::XComponentContext >& xContext, const uno::Reference< container::XEnumeration >& xEnumeration, const uno::Reference< drawing::XDrawPageSupplier >& _xDrawPageSupplier, const uno::Reference< XHelperInterface >& _xParent ) : EnumerationHelperImpl( _xParent, xContext, xEnumeration ), xDrawPageSupplier( _xDrawPageSupplier ) {}
+    ChartObjectEnumerationImpl( const uno::Reference< uno::XComponentContext >& xContext, const uno::Reference< container::XEnumeration >& xEnumeration, uno::Reference< drawing::XDrawPageSupplier >  _xDrawPageSupplier, const uno::Reference< XHelperInterface >& _xParent ) : EnumerationHelperImpl( _xParent, xContext, xEnumeration ), xDrawPageSupplier(std::move( _xDrawPageSupplier )) {}
     virtual uno::Any SAL_CALL nextElement(  ) override
     {
         uno::Any ret;
@@ -82,7 +83,7 @@ public:
 
 }
 
-ScVbaChartObjects::ScVbaChartObjects( const css::uno::Reference< ov::XHelperInterface >& _xParent, const css::uno::Reference< css::uno::XComponentContext >& _xContext, const css::uno::Reference< css::table::XTableCharts >& _xTableCharts, const uno::Reference< drawing::XDrawPageSupplier >& _xDrawPageSupplier ) : ChartObjects_BASE(_xParent, _xContext, css::uno::Reference< css::container::XIndexAccess >( _xTableCharts, css::uno::UNO_QUERY ) ), xTableCharts( _xTableCharts ) , xDrawPageSupplier( _xDrawPageSupplier )
+ScVbaChartObjects::ScVbaChartObjects( const css::uno::Reference< ov::XHelperInterface >& _xParent, const css::uno::Reference< css::uno::XComponentContext >& _xContext, const css::uno::Reference< css::table::XTableCharts >& _xTableCharts, uno::Reference< drawing::XDrawPageSupplier >  _xDrawPageSupplier ) : ChartObjects_BASE(_xParent, _xContext, css::uno::Reference< css::container::XIndexAccess >( _xTableCharts, css::uno::UNO_QUERY ) ), xTableCharts( _xTableCharts ) , xDrawPageSupplier(std::move( _xDrawPageSupplier ))
 {
 
 }
@@ -146,7 +147,7 @@ ScVbaChartObjects::Add( double _nX, double _nY, double _nWidth, double _nHeight 
         xTableCharts->addNewByName(sPersistChartName, aRectangle, aCellRangeAddress, true, false );
         uno::Reference< excel::XChartObject > xChartObject( getItemByStringIndex( sPersistChartName ), uno::UNO_QUERY_THROW );
         xChartObject->getChart()->setChartType(excel::XlChartType::xlColumnClustered);
-        return uno::makeAny( xChartObject );
+        return uno::Any( xChartObject );
     }
     catch (const uno::Exception&)
     {
@@ -184,7 +185,7 @@ ScVbaChartObjects::createCollectionObject( const css::uno::Any& aSource )
 {
     uno::Reference< table::XTableChart > xTableChart( aSource, uno::UNO_QUERY_THROW );
     // correct parent object is sheet
-    return uno::makeAny( uno::Reference< excel::XChartObject > ( new ScVbaChartObject( getParent(), mxContext, xTableChart, xDrawPageSupplier ) ) );
+    return uno::Any( uno::Reference< excel::XChartObject > ( new ScVbaChartObject( getParent(), mxContext, xTableChart, xDrawPageSupplier ) ) );
 }
 
 OUString

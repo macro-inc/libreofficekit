@@ -165,7 +165,7 @@ void SdTransformOOo2xDocument::transformShapes( SdrObjList const & rShapes )
 
 void SdTransformOOo2xDocument::transformShape( SdrObject& rObj )
 {
-    SdrTextObj* pTextShape = dynamic_cast< SdrTextObj* >( &rObj );
+    SdrTextObj* pTextShape = DynCastSdrTextObj( &rObj );
     if( pTextShape )
     {
         transformTextShape( *pTextShape );
@@ -209,7 +209,7 @@ void SdTransformOOo2xDocument::transformTextShape( SdrTextObj& rTextShape )
         if( (nDepth != -1) && (!getBulletState( aParaSet, mrOutliner.GetStyleSheet( nPara ), bState ) || !bState) )
         {
             // disable bullet if text::enable-bullet="false" is found
-            if( (nDepth > 0 ) && (rTextShape.GetObjInventor()  == SdrInventor::Default) && (rTextShape.GetObjIdentifier() == OBJ_OUTLINETEXT) )
+            if( (nDepth > 0 ) && (rTextShape.GetObjInventor()  == SdrInventor::Default) && (rTextShape.GetObjIdentifier() == SdrObjKind::OutlineText) )
             {
                 // for outline object and level > 0 burn in the style sheet because it will be changed to "outline 1"
                 SfxStyleSheet* pStyleSheet = mrOutliner.GetStyleSheet( nPara );
@@ -225,7 +225,7 @@ void SdTransformOOo2xDocument::transformTextShape( SdrTextObj& rTextShape )
                     // now set all none hard attributes from the style
                     while(nWhich)
                     {
-                        if(SfxItemState::SET != aParaSet.GetItemState(nWhich))
+                        if(SfxItemState::SET != aIter.GetItemState())
                         {
                             aParaSet.Put(rStyleSet.Get(nWhich));
                             bItemChange = true;

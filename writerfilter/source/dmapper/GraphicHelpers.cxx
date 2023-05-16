@@ -32,7 +32,7 @@
 #include <sal/log.hxx>
 #include <svx/dialmgr.hxx>
 #include <svx/strings.hrc>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <iostream>
 
@@ -324,25 +324,53 @@ sal_Int32 GraphicZOrderHelper::findZOrder( sal_Int32 relativeHeight, bool bOldSt
     return 0; // this should not(?) happen
 }
 
-GraphicNamingHelper::GraphicNamingHelper()
-    : m_nCounter(0)
+ExtentHandler::ExtentHandler()
 {
 }
 
-OUString GraphicNamingHelper::NameGraphic(const OUString& rTemplate)
+ExtentHandler::~ExtentHandler()
 {
-    OUString aRet = rTemplate;
+}
 
-    if (aRet.isEmpty())
+void ExtentHandler::attribute(Id nName, Value & rValue)
+{
+    sal_Int32 nIntValue = rValue.getInt();
+    switch (nName)
     {
-        // Empty template: then auto-generate a unique name.
-        OUString aPrefix(SvxResId(STR_ObjNameSingulGRAF));
-        aRet += aPrefix + OUString::number(++m_nCounter);
+        case NS_ooxml::LN_CT_PositiveSize2D_cx:
+        {
+            m_Extent.Width = nIntValue;
+        }
+        break;
+        case NS_ooxml::LN_CT_PositiveSize2D_cy:
+        {
+            m_Extent.Height = nIntValue;
+        }
+        break;
+        default:
+        break;
     }
-
-    return aRet;
 }
 
+void ExtentHandler::sprm(Sprm & rSprm)
+{
+    sal_uInt32 nSprmId = rSprm.getId();
+    switch(nSprmId)
+    {
+        case NS_ooxml::LN_CT_Inline_extent:
+        case NS_ooxml::LN_CT_Anchor_extent:
+        {
+            writerfilter::Reference<Properties>::Pointer_t pProperties = rSprm.getProps();
+            if( pProperties )
+            {
+                pProperties->resolve(*this);
+            }
+        }
+        break;
+        default:
+        break;
+    }
+}
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

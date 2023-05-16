@@ -33,13 +33,17 @@ $(eval $(call gb_CppunitTest_add_exception_objects,svx_unit, \
 	svx/qa/unit/xoutdev \
 	svx/qa/unit/xml \
 	svx/qa/unit/XTableImportExportTest \
+	svx/qa/unit/ThemeTest \
 ))
 
 $(eval $(call gb_CppunitTest_use_libraries,svx_unit, \
 	basegfx \
+	docmodel \
 	drawinglayer \
-	editeng \
+	drawinglayercore \
+    editeng \
 	sal \
+    subsequenttest \
 	sfx \
     svl \
 	svxcore \

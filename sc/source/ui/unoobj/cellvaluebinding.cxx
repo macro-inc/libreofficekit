@@ -35,7 +35,7 @@
 #include <com/sun/star/util/NumberFormat.hpp>
 #include <cppuhelper/supportsservice.hxx>
 #include <comphelper/types.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace calc
 {
@@ -386,7 +386,7 @@ namespace calc
         if ( !bWasBoolean )
         {
             sal_Int32 nNewIndex = xTypes->getStandardFormat( NumberFormat::LOGICAL, aLocale );
-            xCellProp->setPropertyValue( sPropName, makeAny( nNewIndex ) );
+            xCellProp->setPropertyValue( sPropName, Any( nNewIndex ) );
         }
     }
 
@@ -456,12 +456,12 @@ namespace calc
         EventObject aEvent;
         aEvent.Source.set(*this);
 
-        ::comphelper::OInterfaceIteratorHelper2 aIter( m_aModifyListeners );
+        ::comphelper::OInterfaceIteratorHelper3 aIter( m_aModifyListeners );
         while ( aIter.hasMoreElements() )
         {
             try
             {
-                static_cast< XModifyListener* >( aIter.next() )->modified( aEvent );
+                aIter.next()->modified( aEvent );
             }
             catch( const RuntimeException& )
             {

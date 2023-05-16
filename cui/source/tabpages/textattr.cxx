@@ -24,7 +24,6 @@
 #include <svx/sdtaitm.hxx>
 #include <svx/sdtfsitm.hxx>
 #include <svx/sdtcfitm.hxx>
-#include <svx/svdobj.hxx>
 #include <svx/svxids.hrc>
 
 #include <textattr.hxx>
@@ -49,7 +48,7 @@ const WhichRangesContainer SvxTextAttrPage::pRanges(
 SvxTextAttrPage::SvxTextAttrPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rInAttrs)
     : SvxTabPage(pPage, pController, "cui/ui/textattrtabpage.ui", "TextAttributesPage", rInAttrs)
     , rOutAttrs(rInAttrs)
-    , m_eObjKind(OBJ_NONE)
+    , m_eObjKind(SdrObjKind::NONE)
     , bAutoGrowSizeEnabled(false)
     , bContourEnabled(false)
     , bAutoGrowWidthEnabled(false)
@@ -395,34 +394,34 @@ bool SvxTextAttrPage::FillItemSet( SfxItemSet* rAttrs)
     // #103516# Do not change values if adjust controls were disabled.
     bool bIsDisabled(m_aCtlPosition.IsCompletelyDisabled());
 
-    if(!bIsDisabled)
+    if(bIsDisabled)
+        return true;
+
+    if( m_xTsbFullWidth->get_state() == TRISTATE_TRUE )
     {
-        if( m_xTsbFullWidth->get_state() == TRISTATE_TRUE )
-        {
-            if (IsTextDirectionLeftToRight())
-                eTHA = SDRTEXTHORZADJUST_BLOCK;
-            else
-                eTVA = SDRTEXTVERTADJUST_BLOCK;
-        }
-
-        if ( rOutAttrs.GetItemState( SDRATTR_TEXT_VERTADJUST ) != SfxItemState::DONTCARE )
-        {
-            SdrTextVertAdjust eOldTVA = rOutAttrs.Get( SDRATTR_TEXT_VERTADJUST ).GetValue();
-            if( eOldTVA != eTVA )
-                rAttrs->Put( SdrTextVertAdjustItem( eTVA ) );
-        }
+        if (IsTextDirectionLeftToRight())
+            eTHA = SDRTEXTHORZADJUST_BLOCK;
         else
+            eTVA = SDRTEXTVERTADJUST_BLOCK;
+    }
+
+    if ( rOutAttrs.GetItemState( SDRATTR_TEXT_VERTADJUST ) != SfxItemState::DONTCARE )
+    {
+        SdrTextVertAdjust eOldTVA = rOutAttrs.Get( SDRATTR_TEXT_VERTADJUST ).GetValue();
+        if( eOldTVA != eTVA )
             rAttrs->Put( SdrTextVertAdjustItem( eTVA ) );
+    }
+    else
+        rAttrs->Put( SdrTextVertAdjustItem( eTVA ) );
 
-        if ( rOutAttrs.GetItemState( SDRATTR_TEXT_HORZADJUST ) != SfxItemState::DONTCARE )
-        {
-            SdrTextHorzAdjust eOldTHA = rOutAttrs.Get( SDRATTR_TEXT_HORZADJUST ).GetValue();
-            if( eOldTHA != eTHA )
-                rAttrs->Put( SdrTextHorzAdjustItem( eTHA ) );
-        }
-        else
+    if ( rOutAttrs.GetItemState( SDRATTR_TEXT_HORZADJUST ) != SfxItemState::DONTCARE )
+    {
+        SdrTextHorzAdjust eOldTHA = rOutAttrs.Get( SDRATTR_TEXT_HORZADJUST ).GetValue();
+        if( eOldTHA != eTHA )
             rAttrs->Put( SdrTextHorzAdjustItem( eTHA ) );
     }
+    else
+        rAttrs->Put( SdrTextHorzAdjustItem( eTHA ) );
 
     return true;
 }
@@ -431,17 +430,17 @@ void SvxTextAttrPage::Construct()
 {
     switch (m_eObjKind)
     {
-        case OBJ_NONE:
+        case SdrObjKind::NONE:
             // indeterminate, show them all
             bFitToSizeEnabled = bContourEnabled = bWordWrapTextEnabled =
             bAutoGrowSizeEnabled = bAutoGrowWidthEnabled = bAutoGrowHeightEnabled = true;
             m_xCustomShapeText->show();
             m_xDrawingText->show();
             break;
-        case OBJ_TEXT:
-        case OBJ_TITLETEXT:
-        case OBJ_OUTLINETEXT:
-        case OBJ_CAPTION:
+        case SdrObjKind::Text:
+        case SdrObjKind::TitleText:
+        case SdrObjKind::OutlineText:
+        case SdrObjKind::Caption:
             // contour NOT possible for pure text objects
             bContourEnabled = bWordWrapTextEnabled = bAutoGrowSizeEnabled = false;
 
@@ -450,7 +449,7 @@ void SvxTextAttrPage::Construct()
             m_xCustomShapeText->hide();
             m_xDrawingText->show();
             break;
-        case OBJ_CUSTOMSHAPE:
+        case SdrObjKind::CustomShape:
             bFitToSizeEnabled = bContourEnabled = bAutoGrowWidthEnabled = bAutoGrowHeightEnabled = false;
             bWordWrapTextEnabled = bAutoGrowSizeEnabled = true;
             m_xDrawingText->hide();

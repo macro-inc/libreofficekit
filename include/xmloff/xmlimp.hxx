@@ -36,6 +36,7 @@
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/document/XImporter.hpp>
 #include <com/sun/star/document/XFilter.hpp>
+#include <utility>
 #include <xmloff/txtimp.hxx>
 #include <xmloff/shapeimport.hxx>
 #include <xmloff/SchXMLImportHelper.hxx>
@@ -134,7 +135,7 @@ private:
         OUString    m_aPrefix;
         OUString    m_aNamespaceURI;
 
-        NamespaceDefine( const OUString& rPrefix, const OUString& rNamespaceURI ) : m_aPrefix( rPrefix ), m_aNamespaceURI( rNamespaceURI ) {}
+        NamespaceDefine( OUString sPrefix, OUString sNamespaceURI ) : m_aPrefix(std::move( sPrefix )), m_aNamespaceURI(std::move( sNamespaceURI )) {}
     };
     std::vector< NamespaceDefine > m_aNamespaceDefines;
 
@@ -157,7 +158,7 @@ private:
     std::stack<sal_uInt16> maDefaultNamespaces;
 
 public:
-    SvXMLLegacyToFastDocHandler( const rtl::Reference< SvXMLImport > & rImport );
+    SvXMLLegacyToFastDocHandler( rtl::Reference< SvXMLImport > xImport );
 
     // XImporter
     virtual void SAL_CALL setTargetDocument( const css::uno::Reference< css::lang::XComponent >& xDoc ) override;
@@ -175,7 +176,7 @@ public:
     virtual void SAL_CALL setDocumentLocator(const css::uno::Reference< css::xml::sax::XLocator > & xLocator) override;
 };
 
-class XMLOFF_DLLPUBLIC SvXMLImport : public cppu::WeakImplHelper<
+class XMLOFF_DLLPUBLIC SAL_LOPLUGIN_ANNOTATE("crosscast") SvXMLImport : public cppu::WeakImplHelper<
              css::xml::sax::XFastDocumentHandler,
              css::lang::XServiceInfo,
              css::lang::XInitialization,
@@ -393,7 +394,7 @@ public:
     static OUString getNamespacePrefixFromToken(sal_Int32 nToken, const SvXMLNamespaceMap* pMap);
     static OUString getNamespaceURIFromToken( sal_Int32 nToken );
     static OUString getNamespacePrefixFromURI( const OUString& rURI );
-    static sal_Int32 getTokenFromName(const OUString& sName);
+    static sal_Int32 getTokenFromName(std::u16string_view sName);
 
     SvXMLNamespaceMap& GetNamespaceMap() { return *mxNamespaceMap; }
     const SvXMLNamespaceMap& GetNamespaceMap() const { return *mxNamespaceMap; }
@@ -420,7 +421,7 @@ public:
 
     css::uno::Reference< css::io::XOutputStream > GetStreamForGraphicObjectURLFromBase64() const;
 
-    bool IsPackageURL( const OUString& rURL ) const;
+    bool IsPackageURL( std::u16string_view rURL ) const;
     OUString ResolveEmbeddedObjectURL( const OUString& rURL,
                                        std::u16string_view rClassId );
     css::uno::Reference< css::io::XOutputStream >

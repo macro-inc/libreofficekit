@@ -27,26 +27,13 @@
 #include <i18nlangtag/lang.h>
 #include <com/sun/star/util/NumberFormat.hpp>
 #include <unotools/localedatawrapper.hxx>
-#include <tools/link.hxx>
-#include <svl/ondemand.hxx>
-#include <svl/nfkeytab.hxx>
 
+#include <map>
 #include <unordered_map>
-#include <memory>
 
-namespace com::sun::star::i18n { class XNumberFormatCode; }
 namespace com::sun::star::i18n { struct Currency; }
-namespace com::sun::star::i18n { struct NumberFormatCode; }
 
-class Date;
-class Color;
-class CharClass;
-class CalendarWrapper;
-
-class ImpSvNumberformatScan;
-class ImpSvNumberInputScan;
 class SvNumberformat;
-namespace com::sun::star::uno { class XComponentContext; }
 
 #define SV_COUNTRY_LANGUAGE_OFFSET     10000  // Max count of formats per country/language
 #define SV_MAX_COUNT_STANDARD_FORMATS  100    // Max count of builtin default formats per CL
@@ -293,7 +280,10 @@ enum NfEvalDateFormat
 };
 
 
-typedef std::unordered_map<sal_uInt32, SvNumberformat*> SvNumberFormatTable;
+/// This table is std::map because it needs to preserve insertion order,
+/// because the formats are roughly ordered from most to least common, and some
+/// parts of the UI want to show them in that order.
+typedef std::map<sal_uInt32, SvNumberformat*> SvNumberFormatTable;
 typedef std::unordered_map<sal_uInt16, sal_uInt32> SvNumberFormatterIndexTable;
 typedef std::unordered_map< sal_uInt32, sal_uInt32> SvNumberFormatterMergeMap;
 

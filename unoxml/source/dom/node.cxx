@@ -101,7 +101,7 @@ namespace DOM
     {
         sal_Int32 nNamespaceToken = FastToken::DONTKNOW;
         OString prefix(pPrefix,
-                       strlen(reinterpret_cast<const char*>(pPrefix)));
+                       strlen(pPrefix));
 
         SAL_INFO("unoxml", "getTokenWithPrefix(): prefix " << pPrefix << ", name " << pName);
 
@@ -262,10 +262,32 @@ namespace DOM
         // default: do nothing
     }
 
-    bool CNode::IsChildTypeAllowed(NodeType const /*nodeType*/)
+    bool CNode::IsChildTypeAllowed(NodeType const /*nodeType*/, NodeType const*const)
     {
         // default: no children allowed
         return false;
+    }
+
+    void CNode::checkNoParent(Reference<XNode>const& xNode){
+        if (xNode->getParentNode() != Reference<XNode>(this)){
+            DOMException e;
+            e.Code = DOMExceptionType_HIERARCHY_REQUEST_ERR;
+            throw e;
+        }
+    }
+    void CNode::checkNoParent(const xmlNodePtr pNode){
+        if (pNode->parent != nullptr){
+            DOMException e;
+            e.Code = DOMExceptionType_HIERARCHY_REQUEST_ERR;
+            throw e;
+        }
+    }
+    void CNode::checkSameOwner(Reference<XNode>const& xNode){
+        if (xNode->getOwnerDocument() != getOwnerDocument()) {
+            DOMException e;
+            e.Code = DOMExceptionType_WRONG_DOCUMENT_ERR;
+            throw e;
+        }
     }
 
     /**
@@ -296,12 +318,9 @@ namespace DOM
             e.Code = DOMExceptionType_HIERARCHY_REQUEST_ERR;
             throw e;
         }
-        if (cur->parent != nullptr) {
-            DOMException e;
-            e.Code = DOMExceptionType_HIERARCHY_REQUEST_ERR;
-            throw e;
-        }
-        if (!IsChildTypeAllowed(pNewChild->m_aNodeType)) {
+        checkNoParent(cur);
+
+        if (!IsChildTypeAllowed(pNewChild->m_aNodeType, nullptr)) {
             DOMException e;
             e.Code = DOMExceptionType_HIERARCHY_REQUEST_ERR;
             throw e;
@@ -610,11 +629,8 @@ namespace DOM
     {
         if (!newChild.is() || !refChild.is()) { throw RuntimeException(); }
 
-        if (newChild->getOwnerDocument() != getOwnerDocument()) {
-            DOMException e;
-            e.Code = DOMExceptionType_WRONG_DOCUMENT_ERR;
-            throw e;
-        }
+        checkSameOwner(newChild);
+
         if (refChild->getParentNode() != Reference< XNode >(this)) {
             DOMException e;
             e.Code = DOMExceptionType_HIERARCHY_REQUEST_ERR;
@@ -636,13 +652,9 @@ namespace DOM
             throw e;
         }
         // already has parent
-        if (pNewChild->parent != nullptr)
-        {
-            DOMException e;
-            e.Code = DOMExceptionType_HIERARCHY_REQUEST_ERR;
-            throw e;
-        }
-        if (!IsChildTypeAllowed(pNewNode->m_aNodeType)) {
+        checkNoParent(pNewChild);
+
+        if (!IsChildTypeAllowed(pNewNode->m_aNodeType, nullptr)) {
             DOMException e;
             e.Code = DOMExceptionType_HIERARCHY_REQUEST_ERR;
             throw e;
@@ -714,11 +726,8 @@ namespace DOM
             throw RuntimeException();
         }
 
-        if (xOldChild->getOwnerDocument() != getOwnerDocument()) {
-            DOMException e;
-            e.Code = DOMExceptionType_WRONG_DOCUMENT_ERR;
-            throw e;
-        }
+        checkSameOwner(xOldChild);
+
         if (xOldChild->getParentNode() != Reference< XNode >(this)) {
             DOMException e;
             e.Code = DOMExceptionType_HIERARCHY_REQUEST_ERR;
@@ -784,16 +793,13 @@ namespace DOM
     Reference< XNode > SAL_CALL CNode::replaceChild(
             Reference< XNode > const& xNewChild,
             Reference< XNode > const& xOldChild)
-    {
+     {
         if (!xOldChild.is() || !xNewChild.is()) {
             throw RuntimeException();
         }
 
-        if (xNewChild->getOwnerDocument() != getOwnerDocument()) {
-            DOMException e;
-            e.Code = DOMExceptionType_WRONG_DOCUMENT_ERR;
-            throw e;
-        }
+        checkSameOwner(xNewChild);
+
         if (xOldChild->getParentNode() != Reference< XNode >(this)) {
             DOMException e;
             e.Code = DOMExceptionType_HIERARCHY_REQUEST_ERR;
@@ -817,12 +823,9 @@ namespace DOM
             throw e;
         }
         // already has parent
-        if (pNew->parent != nullptr) {
-            DOMException e;
-            e.Code = DOMExceptionType_HIERARCHY_REQUEST_ERR;
-            throw e;
-        }
-        if (!IsChildTypeAllowed(pNewNode->m_aNodeType)) {
+        checkNoParent(pNew);
+
+        if (!IsChildTypeAllowed(pNewNode->m_aNodeType, &pOldNode->m_aNodeType)) {
             DOMException e;
             e.Code = DOMExceptionType_HIERARCHY_REQUEST_ERR;
             throw e;

@@ -44,6 +44,7 @@
 #include <oox/helper/binaryinputstream.hxx>
 #include <oox/token/properties.hxx>
 #include <o3tl/typed_flags_set.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace {
 
@@ -1098,11 +1099,11 @@ const FunctionInfo* FunctionProvider::getFuncInfoFromMacroName( const OUString& 
     return mxFuncImpl->maMacroFuncs.get( rFuncName ).get();
 }
 
-FunctionLibraryType FunctionProvider::getFuncLibTypeFromLibraryName( const OUString& rLibraryName )
+FunctionLibraryType FunctionProvider::getFuncLibTypeFromLibraryName( std::u16string_view rLibraryName )
 {
     // the EUROTOOL add-in containing the EUROCONVERT function
-    if(   rLibraryName.equalsIgnoreAsciiCase("EUROTOOL.XLA")
-       || rLibraryName.equalsIgnoreAsciiCase("EUROTOOL.XLAM"))
+    if(   o3tl::equalsIgnoreAsciiCase(rLibraryName, u"EUROTOOL.XLA")
+       || o3tl::equalsIgnoreAsciiCase(rLibraryName, u"EUROTOOL.XLAM"))
         return FUNCLIB_EUROTOOL;
 
     // default: unknown library
@@ -1561,15 +1562,6 @@ OUString FormulaProcessorBase::generateAddress2dString( const BinAddress& rAddre
     return aBuffer.makeStringAndClear();
 }
 
-OUString FormulaProcessorBase::generateApiString( const OUString& rString )
-{
-    OUString aRetString = rString;
-    sal_Int32 nQuotePos = aRetString.getLength();
-    while( (nQuotePos = aRetString.lastIndexOf( '"', nQuotePos )) >= 0 )
-        aRetString = aRetString.replaceAt( nQuotePos, 1, u"\"\"" );
-    return "\"" + aRetString + "\"";
-}
-
 OUString FormulaProcessorBase::generateApiArray( const Matrix< Any >& rMatrix )
 {
     OSL_ENSURE( !rMatrix.empty(), "FormulaProcessorBase::generateApiArray - missing matrix values" );
@@ -1588,7 +1580,10 @@ OUString FormulaProcessorBase::generateApiArray( const Matrix< Any >& rMatrix )
             if( *aIt >>= fValue )
                 aBuffer.append( fValue );
             else if( *aIt >>= aString )
-                aBuffer.append( generateApiString( aString ) );
+            {
+                // generate Api String
+                aBuffer.append( "\"" + aString.replaceAll(u"\"", u"\"\"") + "\"" );
+            }
             else
                 aBuffer.append( "\"\"" );
         }

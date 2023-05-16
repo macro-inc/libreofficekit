@@ -28,7 +28,7 @@
  *************************************************************************/
 #include "hierarchydata.hxx"
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <com/sun/star/container/XHierarchicalNameAccess.hpp>
 #include <com/sun/star/container/XNameContainer.hpp>
@@ -37,6 +37,7 @@
 #include <com/sun/star/util/XOfficeInstallationDirectories.hpp>
 #include <com/sun/star/lang/XSingleServiceFactory.hpp>
 #include <comphelper/propertysequence.hxx>
+#include <utility>
 #include "hierarchyprovider.hxx"
 #include "hierarchyuri.hxx"
 
@@ -46,10 +47,10 @@ namespace hierarchy_ucp
 {
 
 
-static void makeXMLName( const OUString & rIn, OUStringBuffer & rBuffer  )
+static void makeXMLName( std::u16string_view rIn, OUStringBuffer & rBuffer  )
 {
-    sal_Int32 nCount = rIn.getLength();
-    for ( sal_Int32 n = 0; n < nCount; ++n )
+    size_t nCount = rIn.size();
+    for ( size_t n = 0; n < nCount; ++n )
     {
         const sal_Unicode c = rIn[ n ];
         switch ( c )
@@ -93,10 +94,10 @@ constexpr OUStringLiteral CFGPROPERTY_NODEPATH = u"nodepath";
 
 
 HierarchyEntry::HierarchyEntry(
-                const uno::Reference< uno::XComponentContext >& rxContext,
+                uno::Reference< uno::XComponentContext > xContext,
                 HierarchyContentProvider* pProvider,
                 const OUString& rURL )
-: m_xContext( rxContext ),
+: m_xContext(std::move( xContext )),
   m_xOfficeInstDirs( pProvider->getOfficeInstallationDirectories() ),
   m_bTriedToGetRootReadAccess( false )
 {
@@ -123,7 +124,6 @@ HierarchyEntry::HierarchyEntry(
 
 bool HierarchyEntry::hasData()
 {
-    osl::Guard< osl::Mutex > aGuard( m_aMutex );
     uno::Reference< container::XHierarchicalNameAccess > xRootReadAccess
         = getRootReadAccess();
 
@@ -140,8 +140,6 @@ bool HierarchyEntry::getData( HierarchyEntryData& rData )
 {
     try
     {
-        osl::Guard< osl::Mutex > aGuard( m_aMutex );
-
         uno::Reference< container::XHierarchicalNameAccess > xRootReadAccess
             = getRootReadAccess();
 
@@ -242,7 +240,7 @@ bool HierarchyEntry::setData( const HierarchyEntryData& rData )
 {
     try
     {
-        osl::Guard< osl::Mutex > aGuard( m_aMutex );
+        std::unique_lock aGuard( m_aMutex );
 
         if ( !m_xConfigProvider.is() )
             m_xConfigProvider.set(
@@ -376,7 +374,7 @@ bool HierarchyEntry::setData( const HierarchyEntryData& rData )
                     // Set Title value.
                     xNameReplace->replaceByName(
                         "Title",
-                        uno::makeAny( rData.getTitle() ) );
+                        uno::Any( rData.getTitle() ) );
 
                     // Set TargetURL value.
 
@@ -392,18 +390,18 @@ bool HierarchyEntry::setData( const HierarchyEntryData& rData )
 
                     xNameReplace->replaceByName(
                         "TargetURL",
-                        uno::makeAny( aValue ) );
+                        uno::Any( aValue ) );
 
                     // Set Type value.
                     sal_Int32 nType
                         = rData.getType() == HierarchyEntryData::LINK ? 0 : 1;
                     xNameReplace->replaceByName(
                         "Type",
-                        uno::makeAny( nType ) );
+                        uno::Any( nType ) );
 
                     if ( xContainer.is() )
                         xContainer->insertByName(
-                            m_aName, uno::makeAny( xNameReplace ) );
+                            m_aName, uno::Any( xNameReplace ) );
 
                     // Commit changes.
                     xBatch->commitChanges();
@@ -454,9 +452,9 @@ bool HierarchyEntry::setData( const HierarchyEntryData& rData )
 bool HierarchyEntry::move(
     const OUString& rNewURL, const HierarchyEntryData& rData )
 {
-    osl::Guard< osl::Mutex > aGuard( m_aMutex );
-
     OUString aNewPath = createPathFromHierarchyURL( HierarchyUri(rNewURL) );
+
+    std::unique_lock aGuard( m_aMutex );
 
     if ( aNewPath == m_aPath )
         return true;
@@ -678,7 +676,7 @@ bool HierarchyEntry::move(
 
         xNewNameReplace->replaceByName(
             "Title",
-            uno::makeAny( rData.getTitle() ) );
+            uno::Any( rData.getTitle() ) );
 
         // TargetURL property may contain a reference to the Office
         // installation directory. To ensure a reloctable office
@@ -690,11 +688,11 @@ bool HierarchyEntry::move(
             aValue = m_xOfficeInstDirs->makeRelocatableURL( aValue );
         xNewNameReplace->replaceByName(
             "TargetURL",
-            uno::makeAny( aValue ) );
+            uno::Any( aValue ) );
         sal_Int32 nType = rData.getType() == HierarchyEntryData::LINK ? 0 : 1;
         xNewNameReplace->replaceByName(
             "Type",
-            uno::makeAny( nType ) );
+            uno::Any( nType ) );
 
         xNewNameContainer->insertByName( aNewKey, aEntry );
         xNewParentBatch->commitChanges();
@@ -736,7 +734,7 @@ bool HierarchyEntry::remove()
 {
     try
     {
-        osl::Guard< osl::Mutex > aGuard( m_aMutex );
+        std::unique_lock aGuard( m_aMutex );
 
         if ( !m_xConfigProvider.is() )
             m_xConfigProvider.set(
@@ -844,8 +842,6 @@ bool HierarchyEntry::remove()
 
 bool HierarchyEntry::first( iterator & it )
 {
-    osl::Guard< osl::Mutex > aGuard( m_aMutex );
-
     if ( it.pos == -1 )
     {
         // Init...
@@ -912,8 +908,6 @@ bool HierarchyEntry::first( iterator & it )
 
 bool HierarchyEntry::next( iterator& it )
 {
-    osl::Guard< osl::Mutex > aGuard( m_aMutex );
-
     if ( it.pos == -1 )
         return first( it );
 
@@ -972,7 +966,7 @@ HierarchyEntry::getRootReadAccess()
 {
     if ( !m_xRootReadAccess.is() )
     {
-        osl::Guard< osl::Mutex > aGuard( m_aMutex );
+        std::unique_lock aGuard( m_aMutex );
         if ( !m_xRootReadAccess.is() )
         {
             if ( m_bTriedToGetRootReadAccess )

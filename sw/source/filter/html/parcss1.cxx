@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <rtl/character.hxx>
 #include <rtl/ustrbuf.hxx>
@@ -529,11 +530,11 @@ CSS1Token CSS1Parser::GetNextToken()
                 bool bEOFSave = m_bEOF;
 
                 // first try to parse a hex digit
-                OUStringBuffer sTmpBuffer(6);
+                OUStringBuffer sTmpBuffer(8);
                 do {
                     sTmpBuffer.append( m_cNextCh );
                     m_cNextCh = GetNextChar();
-                } while( sTmpBuffer.getLength() < 7 &&
+                } while( sTmpBuffer.getLength() < 9 &&
                          ( ('0'<=m_cNextCh && '9'>=m_cNextCh) ||
                            ('A'<=m_cNextCh && 'F'>=m_cNextCh) ||
                            ('a'<=m_cNextCh && 'f'>=m_cNextCh) ) &&
@@ -541,8 +542,28 @@ CSS1Token CSS1Parser::GetNextToken()
 
                 if( sTmpBuffer.getLength()==6 || sTmpBuffer.getLength()==3 )
                 {
-                    // we found a color in hex
+                    // we found a color in hex (RGB)
                     m_aToken += sTmpBuffer;
+                    nRet = CSS1_HEXCOLOR;
+                    bNextCh = false;
+
+                    break;
+                }
+
+                if( sTmpBuffer.getLength()==8 )
+                {
+                    // we found a color in hex (RGBA)
+                    // we convert it to RGB assuming white background
+                    sal_uInt32 nColor = sTmpBuffer.makeStringAndClear().toUInt32(16);
+                    sal_uInt32 nRed = (nColor & 0xff000000) >> 24;
+                    sal_uInt32 nGreen = (nColor & 0xff0000) >> 16;
+                    sal_uInt32 nBlue = (nColor & 0xff00) >> 8;
+                    double nAlpha = (nColor & 0xff) / 255.0;
+                    nRed = (1 - nAlpha) * 255 + nAlpha * nRed;
+                    nGreen = (1 - nAlpha) * 255 + nAlpha * nGreen;
+                    nBlue = (1 - nAlpha) * 255 + nAlpha * nBlue;
+                    nColor = (nRed << 16) + (nGreen << 8) + nBlue;
+                    m_aToken += OUString::number(nColor, 16);
                     nRet = CSS1_HEXCOLOR;
                     bNextCh = false;
 
@@ -612,7 +633,8 @@ CSS1Token CSS1Parser::GetNextToken()
                     ( (('u'==m_aToken[0] || 'U'==m_aToken[0]) &&
                        m_aToken.equalsIgnoreAsciiCase( "url" )) ||
                       (('r'==m_aToken[0] || 'R'==m_aToken[0]) &&
-                       m_aToken.equalsIgnoreAsciiCase( "rgb" )) ) )
+                       (m_aToken.equalsIgnoreAsciiCase( "rgb" ) || m_aToken.equalsIgnoreAsciiCase( "rgba" ) )
+                  ) ) )
                 {
                     int nNestCnt = 0;
                     OUStringBuffer sTmpBuffer2(64);
@@ -1247,25 +1269,31 @@ bool CSS1Expression::GetColor( Color &rColor ) const
     {
     case CSS1_RGB:
         {
-            sal_uInt8 aColors[3] = { 0, 0, 0 };
+            // fourth value to 255 means no alpha transparency
+            // so the right by default value
+            sal_uInt8 aColors[4] = { 0, 0, 0, 255 };
 
+            // it can be "rgb" or "rgba"
             if (!aValue.startsWithIgnoreAsciiCase( "rgb" ) || aValue.getLength() < 6 ||
-                    aValue[3] != '(' || aValue[aValue.getLength()-1] != ')')
+                    (aValue[3] != '(' && aValue[4] != '(' ) || aValue[aValue.getLength()-1] != ')')
             {
                 break;
             }
 
-            sal_Int32 nPos = 4; // start after "rgb("
-            for ( int nCol = 0; nCol < 3 && nPos > 0; ++nCol )
+            sal_Int32 nPos = aValue.startsWithIgnoreAsciiCase( "rgba" )?5:4; // start after "rgba(" or "rgb("
+            char cSep = (aValue.indexOf(',') != -1)?',':' ';
+            // alpha value can be after a "/" or ","
+            bool bIsSepAlphaDiv = (aValue.indexOf('/') != -1)?true:false;
+            for ( int nCol = 0; nCol < 4 && nPos > 0; ++nCol )
             {
-                const OUString aNumber = aValue.getToken(0, ',', nPos);
+                const std::u16string_view aNumber = o3tl::getToken(aValue, 0, cSep, nPos);
 
-                sal_Int32 nNumber = aNumber.toInt32();
+                sal_Int32 nNumber = o3tl::toInt32(aNumber);
                 if( nNumber<0 )
                 {
                     nNumber = 0;
                 }
-                else if( aNumber.indexOf('%') >= 0 )
+                else if( aNumber.find('%') != std::u16string_view::npos )
                 {
                     if( nNumber > 100 )
                         nNumber = 100;
@@ -1274,13 +1302,25 @@ bool CSS1Expression::GetColor( Color &rColor ) const
                 }
                 else if( nNumber > 255 )
                     nNumber = 255;
-
+                else if( aNumber.find('.') != std::u16string_view::npos )
+                {
+                    // in this case aNumber contains something like "0.3" so not an sal_Int32
+                    nNumber = static_cast<sal_Int32>(255.0*o3tl::toDouble(aNumber));
+                }
                 aColors[nCol] = static_cast<sal_uInt8>(nNumber);
+                // rgb with alpha and '/' has this form: rgb(255 0 0 / 50%)
+                if (bIsSepAlphaDiv && nCol == 2)
+                {
+                    // but there can be some spaces or not before and after the "/", so skip them
+                    while (aValue[nPos] == '/' || aValue[nPos] == ' ')
+                      ++nPos;
+                }
             }
 
             rColor.SetRed( aColors[0] );
             rColor.SetGreen( aColors[1] );
             rColor.SetBlue( aColors[2] );
+            rColor.SetAlpha( aColors[3] );
 
             bRet = true;    // something different than a colour isn't possible
         }

@@ -18,7 +18,7 @@
  */
 
 #include "AppDetailPageHelper.hxx"
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tabletree.hxx>
 #include <dbtreelistbox.hxx>
 #include <com/sun/star/awt/PopupMenu.hpp>
@@ -43,6 +43,7 @@
 #include <com/sun/star/util/XCloseable.hpp>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/string.hxx>
+#include <o3tl/string_view.hxx>
 #include "AppView.hxx"
 #include <helpids.h>
 #include <strings.hxx>
@@ -52,7 +53,6 @@
 #include <vcl/commandinfoprovider.hxx>
 #include <vcl/cvtgrf.hxx>
 #include <tools/stream.hxx>
-#include <rtl/ustrbuf.hxx>
 #include "AppController.hxx"
 
 #include <com/sun/star/document/XDocumentProperties.hpp>
@@ -80,11 +80,11 @@ namespace dbaui
 
 namespace
 {
-    bool lcl_findEntry_impl(const TreeListBox& rTree, const OUString& rName, weld::TreeIter& rIter)
+    bool lcl_findEntry_impl(const TreeListBox& rTree, std::u16string_view rName, weld::TreeIter& rIter)
     {
         bool bReturn = false;
         sal_Int32 nIndex = 0;
-        OUString sName( rName.getToken(0,'/',nIndex) );
+        std::u16string_view sName( o3tl::getToken(rName,0,'/',nIndex) );
 
         const weld::TreeView& rTreeView = rTree.GetWidget();
         bool bEntry = true;
@@ -94,7 +94,7 @@ namespace
             {
                 if ( nIndex != -1 )
                 {
-                    sName = rName.getToken(0,'/',nIndex);
+                    sName = o3tl::getToken(rName,0,'/',nIndex);
                     bEntry = rTreeView.iter_children(rIter);
                 }
                 else
@@ -111,11 +111,11 @@ namespace
         return bReturn;
     }
 
-    bool lcl_findEntry(const TreeListBox& rTree, const OUString& rName, weld::TreeIter& rIter)
+    bool lcl_findEntry(const TreeListBox& rTree, std::u16string_view rName, weld::TreeIter& rIter)
     {
         sal_Int32 nIndex = 0;
-        OUString sErase = rName.getToken(0,'/',nIndex); // we don't want to have the "private:forms" part
-        return nIndex != -1 && lcl_findEntry_impl(rTree, rName.copy(sErase.getLength() + 1), rIter);
+        std::u16string_view sErase = o3tl::getToken(rName,0,'/',nIndex); // we don't want to have the "private:forms" part
+        return nIndex != -1 && lcl_findEntry_impl(rTree, rName.substr(sErase.size() + 1), rIter);
     }
 }
 
@@ -875,14 +875,14 @@ IMPL_LINK_NOARG( OAppDetailPageHelper, OnDeleteEntry, LinkParamNone*, void )
 
 bool OAppDetailPageHelper::isPreviewEnabled() const
 {
-    return m_ePreviewMode != E_PREVIEWNONE;
+    return m_ePreviewMode != PreviewMode::NONE;
 }
 
 namespace
 {
     OUString stripTrailingDots(std::u16string_view rStr)
     {
-        return comphelper::string::stripEnd(rStr, '.');
+        return OUString(comphelper::string::stripEnd(rStr, '.'));
     }
 }
 
@@ -898,18 +898,18 @@ void OAppDetailPageHelper::switchPreview(PreviewMode _eMode,bool _bForce)
     OUString aCommand;
     switch ( m_ePreviewMode )
     {
-        case E_PREVIEWNONE:
+        case PreviewMode::NONE:
             aCommand = ".uno:DBDisablePreview";
             break;
-        case E_DOCUMENT:
+        case PreviewMode::Document:
             aCommand = ".uno:DBShowDocPreview";
             break;
-        case E_DOCUMENTINFO:
+        case PreviewMode::DocumentInfo:
             if ( getBorderWin().getView()->getAppController().isCommandEnabled(SID_DB_APP_VIEW_DOCINFO_PREVIEW) )
                 aCommand = ".uno:DBShowDocInfoPreview";
             else
             {
-                m_ePreviewMode = E_PREVIEWNONE;
+                m_ePreviewMode = PreviewMode::NONE;
                 aCommand = ".uno:DBDisablePreview";
             }
             break;
@@ -950,13 +950,13 @@ void OAppDetailPageHelper::showPreview(const Reference< XContent >& _xContent)
         if ( xContent.is() )
         {
             css::ucb::Command aCommand;
-            if ( m_ePreviewMode == E_DOCUMENT )
+            if ( m_ePreviewMode == PreviewMode::Document )
                 aCommand.Name = "preview";
             else
                 aCommand.Name = "getDocumentInfo";
 
             Any aPreview = xContent->execute(aCommand,xContent->createCommandIdentifier(),Reference< XCommandEnvironment >());
-            if ( m_ePreviewMode == E_DOCUMENT )
+            if ( m_ePreviewMode == PreviewMode::Document )
             {
                 m_xDocumentInfo->Hide();
                 m_xPreview->Show();
@@ -1045,7 +1045,7 @@ void OAppDetailPageHelper::showPreview( const OUString& _sDataSourceName,
     aArgs.put( "AsTemplate", false );
     aArgs.put( PROPERTY_SHOWMENU, false );
 
-    Reference< XController > xPreview( pDispatcher->openExisting( makeAny( _sDataSourceName ), _sName, aArgs ), UNO_QUERY );
+    Reference< XController > xPreview( pDispatcher->openExisting( Any( _sDataSourceName ), _sName, aArgs ), UNO_QUERY );
     bool bClearPreview = !xPreview.is();
 
     // clear the preview when the query or table could not be loaded
@@ -1105,9 +1105,9 @@ IMPL_LINK_NOARG(OAppDetailPageHelper, OnDropdownClickHdl, weld::Toggleable&, voi
     auto xFrame = getBorderWin().getView()->getAppController().getFrame();
 
     css::uno::Sequence<css::uno::Any> aArgs {
-        css::uno::makeAny(comphelper::makePropertyValue("InToolbar", true)),
-        css::uno::makeAny(comphelper::makePropertyValue("ModuleIdentifier", OUString("com.sun.star.sdb.OfficeDatabaseDocument"))),
-        css::uno::makeAny(comphelper::makePropertyValue("Frame", xFrame)) };
+        css::uno::Any(comphelper::makePropertyValue("InToolbar", true)),
+        css::uno::Any(comphelper::makePropertyValue("ModuleIdentifier", OUString("com.sun.star.sdb.OfficeDatabaseDocument"))),
+        css::uno::Any(comphelper::makePropertyValue("Frame", xFrame)) };
 
     css::uno::Reference<css::frame::XPopupMenuController> xPopupController
             (xPopupMenuFactory->createInstanceWithArgumentsAndContext(".uno:DBPreview", aArgs, xContext), css::uno::UNO_QUERY);

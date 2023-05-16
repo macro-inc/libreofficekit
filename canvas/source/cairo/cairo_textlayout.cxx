@@ -21,17 +21,17 @@
 #include <sal/log.hxx>
 
 #include <math.h>
-#include <memory>
 
 #include <com/sun/star/rendering/TextDirection.hpp>
 #include <canvas/canvastools.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/numeric/ftools.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <utility>
+#include <vcl/kernarray.hxx>
 #include <vcl/metric.hxx>
 #include <vcl/virdev.hxx>
-
 
 #include "cairo_textlayout.hxx"
 
@@ -70,15 +70,15 @@ namespace cairocanvas
         }
     }
 
-    TextLayout::TextLayout( const rendering::StringContext&     aText,
-                            sal_Int8                            nDirection,
-                            sal_Int64                           /*nRandomSeed*/,
-                            const CanvasFont::Reference&        rFont,
-                            const SurfaceProviderRef&           rRefDevice ) :
+    TextLayout::TextLayout( rendering::StringContext      aText,
+                            sal_Int8                      nDirection,
+                            sal_Int64                     /*nRandomSeed*/,
+                            CanvasFont::Reference         rFont,
+                            SurfaceProviderRef            rRefDevice ) :
         TextLayout_Base( m_aMutex ),
-        maText( aText ),
-        mpFont( rFont ),
-        mpRefDevice( rRefDevice ),
+        maText(std::move( aText )),
+        mpFont(std::move( rFont )),
+        mpRefDevice(std::move( rRefDevice )),
         mnTextDirection( nDirection )
     {
     }
@@ -263,14 +263,11 @@ namespace cairocanvas
         ::osl::MutexGuard aGuard( m_aMutex );
         setupLayoutMode( rOutDev, mnTextDirection );
 
-        std::vector<sal_Int32> aOffsets(maLogicalAdvancements.getLength());
-
-        if( maLogicalAdvancements.hasElements() )
-            setupTextOffsets( aOffsets.data(), maLogicalAdvancements, viewState, renderState );
-
         if (maLogicalAdvancements.hasElements())
         {
-            rOutDev.DrawTextArray( rOutpos, maText.Text, aOffsets,
+            KernArray aOffsets(setupTextOffsets(maLogicalAdvancements, viewState, renderState));
+
+            rOutDev.DrawTextArray( rOutpos, maText.Text, aOffsets, {},
                                    ::canvas::tools::numeric_cast<sal_uInt16>(maText.StartPosition),
                                    ::canvas::tools::numeric_cast<sal_uInt16>(maText.Length) );
         }
@@ -287,8 +284,8 @@ namespace cairocanvas
         class OffsetTransformer
         {
         public:
-            explicit OffsetTransformer( const ::basegfx::B2DHomMatrix& rMat ) :
-                maMatrix( rMat )
+            explicit OffsetTransformer( ::basegfx::B2DHomMatrix aMat ) :
+                maMatrix(std::move( aMat ))
             {
             }
 
@@ -314,14 +311,11 @@ namespace cairocanvas
         };
     }
 
-    void TextLayout::setupTextOffsets( sal_Int32*                       outputOffsets,
+    KernArray TextLayout::setupTextOffsets(
                                        const uno::Sequence< double >&   inputOffsets,
                                        const rendering::ViewState&      viewState,
                                        const rendering::RenderState&    renderState     ) const
     {
-        ENSURE_OR_THROW( outputOffsets!=nullptr,
-                          "TextLayout::setupTextOffsets offsets NULL" );
-
         ::basegfx::B2DHomMatrix aMatrix;
 
         ::canvas::tools::mergeViewAndRenderTransform(aMatrix,
@@ -329,10 +323,11 @@ namespace cairocanvas
                                                      renderState);
 
         // fill integer offsets
-        std::transform( inputOffsets.begin(),
-                          inputOffsets.end(),
-                          outputOffsets,
-                          OffsetTransformer( aMatrix ) );
+        KernArray outputOffsets;
+        OffsetTransformer aTransform(aMatrix);
+        std::for_each(inputOffsets.begin(), inputOffsets.end(),
+                      [&outputOffsets, &aTransform](double n) {outputOffsets.push_back(aTransform(n)); } );
+        return outputOffsets;
     }
 
     OUString SAL_CALL TextLayout::getImplementationName()

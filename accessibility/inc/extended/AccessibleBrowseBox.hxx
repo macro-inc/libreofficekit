@@ -24,6 +24,7 @@
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/weakref.hxx>
 #include <vcl/accessibletableprovider.hxx>
+#include <mutex>
 
 namespace accessibility {
 
@@ -61,12 +62,12 @@ protected:
     // XAccessibleContext
 
     /** @return  The count of visible children. */
-    virtual sal_Int32 SAL_CALL getAccessibleChildCount() override;
+    virtual sal_Int64 SAL_CALL getAccessibleChildCount() override;
 
     /** @return  The XAccessible interface of the specified child. */
     virtual css::uno::Reference<
         css::accessibility::XAccessible > SAL_CALL
-    getAccessibleChild( sal_Int32 nChildIndex ) override;
+    getAccessibleChild( sal_Int64 nChildIndex ) override;
 
     // XAccessibleComponent
 
@@ -165,7 +166,7 @@ protected:
         @return  The XAccessible interface of the specified child. */
     css::uno::Reference<
         css::accessibility::XAccessible >
-    implGetFixedChild( sal_Int32 nChildIndex );
+    implGetFixedChild( sal_Int64 nChildIndex );
 
     /** This method creates and returns an accessible table.
         @return  An AccessibleBrowseBoxTable. */
@@ -196,7 +197,7 @@ class AccessibleBrowseBoxAccess final :
     public ::vcl::IAccessibleBrowseBox
 {
 private:
-    ::osl::Mutex                        m_aMutex;
+    std::mutex                          m_aMutex;
     css::uno::Reference< css::accessibility::XAccessible >
                                         m_xParent;
     ::vcl::IAccessibleTableProvider&    m_rBrowseBox;
@@ -205,7 +206,7 @@ private:
 
 public:
     AccessibleBrowseBoxAccess(
-        const css::uno::Reference< css::accessibility::XAccessible >& _rxParent,
+        css::uno::Reference< css::accessibility::XAccessible > _xParent,
         ::vcl::IAccessibleTableProvider& _rBrowseBox
     );
 

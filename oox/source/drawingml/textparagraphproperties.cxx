@@ -23,6 +23,7 @@
 #include <com/sun/star/container/XIndexReplace.hpp>
 #include <com/sun/star/text/HoriOrientation.hpp>
 #include <com/sun/star/awt/FontDescriptor.hpp>
+#include <com/sun/star/awt/FontWeight.hpp>
 #include <com/sun/star/awt/XBitmap.hpp>
 #include <com/sun/star/graphic/XGraphic.hpp>
 #include <com/sun/star/beans/PropertyValue.hpp>
@@ -58,7 +59,9 @@ namespace oox::drawingml {
 
 BulletList::BulletList( )
 : maBulletColorPtr( std::make_shared<Color>() ),
-  mbBulletColorFollowText ( false )
+  mbBulletColorFollowText ( false ),
+  mbBulletFontFollowText ( false ),
+  mbBulletSizeFollowText ( false )
 {
 }
 
@@ -265,6 +268,8 @@ void BulletList::apply( const BulletList& rSource )
         mbBulletColorFollowText = rSource.mbBulletColorFollowText;
     if ( rSource.mbBulletFontFollowText.hasValue() )
         mbBulletFontFollowText = rSource.mbBulletFontFollowText;
+    if ( rSource.mbBulletSizeFollowText.hasValue() )
+        mbBulletSizeFollowText = rSource.mbBulletSizeFollowText;
     maBulletFont.assignIfUsed( rSource.maBulletFont );
     if ( rSource.msBulletChar.hasValue() )
         msBulletChar = rSource.msBulletChar;
@@ -304,9 +309,12 @@ void BulletList::pushToPropMap( const ::oox::core::XmlFilterBase* pFilterBase, P
     OUString aBulletFontName;
     sal_Int16 nBulletFontPitch = 0;
     sal_Int16 nBulletFontFamily = 0;
+    float nBulletFontWeight = css::awt::FontWeight::NORMAL;
     bool bSymbolFont = false;
     if( pFilterBase) {
-        if (maBulletFont.getFontData( aBulletFontName, nBulletFontPitch, nBulletFontFamily, *pFilterBase ) )
+        bool bFollowTextFont = false;
+        mbBulletFontFollowText >>= bFollowTextFont;
+        if (!bFollowTextFont && maBulletFont.getFontData( aBulletFontName, nBulletFontPitch, nBulletFontFamily, *pFilterBase ) )
         {
             FontDescriptor aFontDesc;
             sal_Int16 nFontSize = 0;
@@ -317,6 +325,7 @@ void BulletList::pushToPropMap( const ::oox::core::XmlFilterBase* pFilterBase, P
             aFontDesc.Name = aBulletFontName;
             aFontDesc.Pitch = nBulletFontPitch;
             aFontDesc.Family = nBulletFontFamily;
+            aFontDesc.Weight = nBulletFontWeight;
             if ( aBulletFontName.equalsIgnoreAsciiCase("Wingdings") ||
                  aBulletFontName.equalsIgnoreAsciiCase("Wingdings 2") ||
                  aBulletFontName.equalsIgnoreAsciiCase("Wingdings 3") ||
@@ -354,7 +363,9 @@ void BulletList::pushToPropMap( const ::oox::core::XmlFilterBase* pFilterBase, P
         if (xBitmap.is())
             rPropMap.setProperty(PROP_GraphicBitmap, xBitmap);
     }
-    if( mnSize.hasValue() )
+    bool bFollowTextSize = false;
+    mbBulletSizeFollowText >>= bFollowTextSize;
+    if( !bFollowTextSize && mnSize.hasValue() )
         rPropMap.setAnyProperty( PROP_BulletRelSize, mnSize);
     if ( maStyleName.hasValue() )
         rPropMap.setAnyProperty( PROP_CharStyleName, maStyleName);
@@ -384,6 +395,8 @@ void TextParagraphProperties::apply( const TextParagraphProperties& rSourceProps
         moParaLeftMargin = rSourceProps.moParaLeftMargin;
     if ( rSourceProps.moFirstLineIndentation )
         moFirstLineIndentation = rSourceProps.moFirstLineIndentation;
+    if ( rSourceProps.moDefaultTabSize )
+        moDefaultTabSize = rSourceProps.moDefaultTabSize;
     if( rSourceProps.mnLevel )
         mnLevel = rSourceProps.mnLevel;
     if( rSourceProps.moParaAdjust )
@@ -456,7 +469,7 @@ void TextParagraphProperties::pushToPropSet( const ::oox::core::XmlFilterBase* p
                     if( !rioBulletMap.hasProperty( PROP_BulletRelSize ) )
                         rioBulletMap.setProperty<sal_Int16>( PROP_BulletRelSize, 100);
                     Sequence< PropertyValue > aBulletPropSeq = rioBulletMap.makePropertyValueSequence();
-                    xNumRule->replaceByIndex( getLevel(), makeAny( aBulletPropSeq ) );
+                    xNumRule->replaceByIndex( getLevel(), Any( aBulletPropSeq ) );
                 }
 
                 aPropSet.setProperty( PROP_NumberingRules, xNumRule );
@@ -480,6 +493,11 @@ void TextParagraphProperties::pushToPropSet( const ::oox::core::XmlFilterBase* p
             Sequence< TabStop > aSeq { aTabStop };
             aPropSet.setProperty( PROP_ParaTabStops, aSeq );
         }
+    }
+
+    if ( moDefaultTabSize )
+    {
+        aPropSet.setProperty( PROP_ParaTabStopDefaultDistance, *moDefaultTabSize );
     }
 
     if ( moParaAdjust )

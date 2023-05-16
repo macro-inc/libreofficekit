@@ -16,8 +16,7 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef INCLUDED_SW_SOURCE_UI_ENVELP_SWUILABIMP_HXX
-#define INCLUDED_SW_SOURCE_UI_ENVELP_SWUILABIMP_HXX
+#pragma once
 
 #include <label.hxx>
 #include <labimg.hxx>
@@ -26,9 +25,9 @@
 
 class SwLabPage : public SfxTabPage
 {
-    SwDBManager* pDBManager;
-    OUString sActDBName;
-    SwLabItem aItem;
+    SwDBManager* m_pDBManager;
+    OUString m_sActDBName;
+    SwLabItem m_aItem;
 
     std::unique_ptr<weld::Widget> m_xAddressFrame;
     std::unique_ptr<weld::CheckButton> m_xAddrBox;
@@ -73,8 +72,8 @@ public:
     void SetToBusinessCard();
 
     void InitDatabaseBox();
-    void SetDBManager(SwDBManager* pDBManager_) { pDBManager = pDBManager_; }
-    SwDBManager* GetDBManager() const { return pDBManager; }
+    void SetDBManager(SwDBManager* pDBManager_) { m_pDBManager = pDBManager_; }
+    SwDBManager* GetDBManager() const { return m_pDBManager; }
 };
 
 class SwPrivateDataPage : public SfxTabPage
@@ -142,7 +141,5 @@ public:
     virtual bool FillItemSet(SfxItemSet* rSet) override;
     virtual void Reset(const SfxItemSet* rSet) override;
 };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

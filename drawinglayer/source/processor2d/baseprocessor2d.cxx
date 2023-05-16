@@ -17,8 +17,9 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <drawinglayer/primitive2d/Primitive2DContainer.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
-#include <comphelper/sequence.hxx>
+#include <utility>
 
 
 using namespace com::sun::star;
@@ -30,8 +31,8 @@ namespace drawinglayer::processor2d
         {
         }
 
-        BaseProcessor2D::BaseProcessor2D(const geometry::ViewInformation2D& rViewInformation)
-        :   maViewInformation2D(rViewInformation)
+        BaseProcessor2D::BaseProcessor2D(geometry::ViewInformation2D aViewInformation)
+        :   maViewInformation2D(std::move(aViewInformation))
         {
         }
 
@@ -46,16 +47,15 @@ namespace drawinglayer::processor2d
         }
 
         // Primitive2DDecompositionVisitor
-        void BaseProcessor2D::append(const primitive2d::Primitive2DReference& rCandidate)
+        void BaseProcessor2D::visit(const primitive2d::Primitive2DReference& rCandidate)
         {
-            const primitive2d::BasePrimitive2D* pBasePrimitive = static_cast< const primitive2d::BasePrimitive2D* >(rCandidate.get());
-            processBasePrimitive2D(*pBasePrimitive);
+            processBasePrimitive2D(*rCandidate);
         }
-        void BaseProcessor2D::append(const primitive2d::Primitive2DContainer& rContainer)
+        void BaseProcessor2D::visit(const primitive2d::Primitive2DContainer& rContainer)
         {
             process(rContainer);
         }
-        void BaseProcessor2D::append(primitive2d::Primitive2DContainer&& rCandidate)
+        void BaseProcessor2D::visit(primitive2d::Primitive2DContainer&& rCandidate)
         {
             process(rCandidate);
         }
@@ -64,9 +64,8 @@ namespace drawinglayer::processor2d
         {
             for (const primitive2d::Primitive2DReference& rCandidate : rSource)
             {
-                const primitive2d::BasePrimitive2D* pBasePrimitive = static_cast< const primitive2d::BasePrimitive2D* >(rCandidate.get());
-                if (pBasePrimitive)
-                    processBasePrimitive2D(*pBasePrimitive);
+                if (rCandidate)
+                    processBasePrimitive2D(*rCandidate);
             }
         }
 

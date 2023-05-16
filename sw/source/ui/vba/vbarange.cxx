@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 #include "vbarange.hxx"
+#include <utility>
 #include <vbahelper/vbahelper.hxx>
 #include <basic/sberrors.hxx>
 #include "vbarangehelper.hxx"
@@ -29,6 +30,7 @@
 #include "vbaparagraphformat.hxx"
 #include "vbastyle.hxx"
 #include "vbafont.hxx"
+#include "vbafind.hxx"
 #include "vbapalette.hxx"
 #include "vbapagesetup.hxx"
 #include "vbalistformat.hxx"
@@ -41,18 +43,18 @@
 using namespace ::ooo::vba;
 using namespace ::com::sun::star;
 
-SwVbaRange::SwVbaRange( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, const uno::Reference< text::XTextDocument >& rTextDocument, const uno::Reference< text::XTextRange >& rStart ) : SwVbaRange_BASE( rParent, rContext ), mxTextDocument( rTextDocument )
+SwVbaRange::SwVbaRange( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, uno::Reference< text::XTextDocument > xTextDocument, const uno::Reference< text::XTextRange >& rStart ) : SwVbaRange_BASE( rParent, rContext ), mxTextDocument(std::move( xTextDocument ))
 {
     uno::Reference< text::XTextRange > xEnd;
     initialize( rStart, xEnd );
 }
 
-SwVbaRange::SwVbaRange( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, const uno::Reference< text::XTextDocument >& rTextDocument, const uno::Reference< text::XTextRange >& rStart, const uno::Reference< text::XTextRange >& rEnd ) : SwVbaRange_BASE( rParent, rContext ), mxTextDocument( rTextDocument )
+SwVbaRange::SwVbaRange( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, uno::Reference< text::XTextDocument > xTextDocument, const uno::Reference< text::XTextRange >& rStart, const uno::Reference< text::XTextRange >& rEnd ) : SwVbaRange_BASE( rParent, rContext ), mxTextDocument(std::move( xTextDocument ))
 {
     initialize( rStart, rEnd );
 }
 
-SwVbaRange::SwVbaRange( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, const uno::Reference< text::XTextDocument >& rTextDocument, const uno::Reference< text::XTextRange >& rStart, const uno::Reference< text::XTextRange >& rEnd, const uno::Reference< text::XText >& rText ) : SwVbaRange_BASE( rParent, rContext ),mxTextDocument( rTextDocument ), mxText( rText )
+SwVbaRange::SwVbaRange( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, uno::Reference< text::XTextDocument > xTextDocument, const uno::Reference< text::XTextRange >& rStart, const uno::Reference< text::XTextRange >& rEnd, uno::Reference< text::XText > xText ) : SwVbaRange_BASE( rParent, rContext ),mxTextDocument(std::move( xTextDocument )), mxText(std::move( xText ))
 {
     initialize( rStart, rEnd );
 }
@@ -205,7 +207,7 @@ void SAL_CALL SwVbaRange::InsertBreak(const uno::Any& _breakType)
         }
 
         uno::Reference< beans::XPropertySet > xProp( mxTextCursor, uno::UNO_QUERY_THROW );
-        xProp->setPropertyValue("BreakType", uno::makeAny( eBreakType ) );
+        xProp->setPropertyValue("BreakType", uno::Any( eBreakType ) );
     }
 }
 
@@ -280,7 +282,7 @@ SwVbaRange::getStyle()
     uno::Reference< container::XNameAccess > xStylesAccess( xStyleSupplier->getStyleFamilies()->getByName( aStyleType ), uno::UNO_QUERY_THROW );
     uno::Reference< beans::XPropertySet > xStyleProps( xStylesAccess->getByName( aStyleName ), uno::UNO_QUERY_THROW );
     uno::Reference< frame::XModel > xModel( mxTextDocument, uno::UNO_QUERY_THROW );
-    return uno::makeAny( uno::Reference< word::XStyle >( new SwVbaStyle( this, mxContext, xModel, xStyleProps ) ) );
+    return uno::Any( uno::Reference< word::XStyle >( new SwVbaStyle( this, mxContext, xModel, xStyleProps ) ) );
 }
 
 void SAL_CALL
@@ -295,6 +297,14 @@ SwVbaRange::getFont()
 {
     VbaPalette aColors;
     return new SwVbaFont( mxParent, mxContext, aColors.getPalette(), uno::Reference< beans::XPropertySet >( getXTextRange(), uno::UNO_QUERY_THROW ) );
+}
+
+uno::Reference< word::XFind > SAL_CALL
+SwVbaRange::getFind()
+{
+    uno::Reference< text::XTextRange > xTextRange = getXTextRange();
+    uno::Reference< frame::XModel > xModel( mxTextDocument, uno::UNO_QUERY_THROW );
+    return SwVbaFind::GetOrCreateFind(this, mxContext, xModel, xTextRange);
 }
 
 uno::Reference< word::XListFormat > SAL_CALL
@@ -326,7 +336,7 @@ SwVbaRange::PageSetup( )
     uno::Reference< container::XNameAccess > xSytleFamNames( xSytleFamSupp->getStyleFamilies(), uno::UNO_SET_THROW );
     uno::Reference< container::XNameAccess > xPageStyles( xSytleFamNames->getByName("PageStyles"), uno::UNO_QUERY_THROW );
     uno::Reference< beans::XPropertySet > xPageProps( xPageStyles->getByName( aPageStyleName ), uno::UNO_QUERY_THROW );
-    return uno::makeAny( uno::Reference< word::XPageSetup >( new SwVbaPageSetup( this, mxContext, xModel, xPageProps ) ) );
+    return uno::Any( uno::Reference< word::XPageSetup >( new SwVbaPageSetup( this, mxContext, xModel, xPageProps ) ) );
 }
 
 ::sal_Int32 SAL_CALL SwVbaRange::getStart()
@@ -380,7 +390,7 @@ SwVbaRange::Revisions( const uno::Any& index )
     uno::Reference< XCollection > xCol( new SwVbaRevisions( mxParent, mxContext, xModel, xTextRange ) );
     if ( index.hasValue() )
         return xCol->Item( index, uno::Any() );
-    return uno::makeAny( xCol );
+    return uno::Any( xCol );
 }
 
 uno::Any SAL_CALL
@@ -391,7 +401,7 @@ SwVbaRange::Sections( const uno::Any& index )
     uno::Reference< XCollection > xCol( new SwVbaSections( mxParent, mxContext, xModel, xTextRange ) );
     if ( index.hasValue() )
         return xCol->Item( index, uno::Any() );
-    return uno::makeAny( xCol );
+    return uno::Any( xCol );
 }
 
 uno::Any SAL_CALL
@@ -402,7 +412,7 @@ SwVbaRange::Fields( const uno::Any& index )
     uno::Reference< XCollection > xCol( new SwVbaFields( mxParent, mxContext, xModel ) );
     if ( index.hasValue() )
         return xCol->Item( index, uno::Any() );
-    return uno::makeAny( xCol );
+    return uno::Any( xCol );
 }
 
 OUString

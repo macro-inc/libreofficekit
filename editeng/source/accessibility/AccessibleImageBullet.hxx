@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <rtl/ref.hxx>
 #include <tools/gen.hxx>
 #include <cppuhelper/implbase.hxx>
 
@@ -48,7 +49,7 @@ namespace accessibility
 
     public:
         /// Create accessible object for given parent
-        AccessibleImageBullet ( const css::uno::Reference< css::accessibility::XAccessible >& rParent );
+        AccessibleImageBullet ( css::uno::Reference< css::accessibility::XAccessible > xParent );
 
         virtual ~AccessibleImageBullet  () override;
 
@@ -56,15 +57,15 @@ namespace accessibility
         virtual css::uno::Reference< css::accessibility::XAccessibleContext > SAL_CALL getAccessibleContext(  ) override;
 
         // XAccessibleContext
-        virtual sal_Int32 SAL_CALL getAccessibleChildCount() override;
-        virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int32 i ) override;
+        virtual sal_Int64 SAL_CALL getAccessibleChildCount() override;
+        virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int64 i ) override;
         virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleParent() override;
-        virtual sal_Int32 SAL_CALL getAccessibleIndexInParent() override;
+        virtual sal_Int64 SAL_CALL getAccessibleIndexInParent() override;
         virtual sal_Int16 SAL_CALL getAccessibleRole() override;
         virtual OUString SAL_CALL getAccessibleDescription() override;
         virtual OUString SAL_CALL getAccessibleName() override;
         virtual css::uno::Reference< css::accessibility::XAccessibleRelationSet > SAL_CALL getAccessibleRelationSet() override;
-        virtual css::uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL getAccessibleStateSet() override;
+        virtual sal_Int64 SAL_CALL getAccessibleStateSet() override;
         virtual css::lang::Locale SAL_CALL getLocale() override;
 
         // XAccessibleEventBroadcaster
@@ -146,8 +147,8 @@ namespace accessibility
         AccessibleImageBullet& operator= ( const AccessibleImageBullet& ) = delete;
 
         // maintain state set and send STATE_CHANGE events
-        void SetState( const sal_Int16 nStateId );
-        void UnSetState( const sal_Int16 nStateId );
+        void SetState( const sal_Int64 nStateId );
+        void UnSetState( const sal_Int64 nStateId );
 
         SvxEditSource& GetEditSource() const;
 
@@ -186,7 +187,7 @@ namespace accessibility
         Point maEEOffset;
 
         // the current state set (updated from SetState/UnSetState and guarded by solar mutex)
-        css::uno::Reference< css::accessibility::XAccessibleStateSet > mxStateSet;
+        sal_Int64 mnStateSet = 0;
 
         /// The shape we're the accessible for (unguarded)
         css::uno::Reference< css::accessibility::XAccessible > mxParent;

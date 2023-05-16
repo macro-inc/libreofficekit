@@ -21,6 +21,7 @@
 #include "Chart2ModelContact.hxx"
 #include <DiagramHelper.hxx>
 #include <BaseGFXHelper.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 using ::com::sun::star::uno::Any;
@@ -36,9 +37,9 @@ void WrappedSceneProperty::addWrappedProperties( std::vector< std::unique_ptr<Wr
 }
 
 WrappedD3DTransformMatrixProperty::WrappedD3DTransformMatrixProperty(
-            const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact )
+            std::shared_ptr<Chart2ModelContact> spChart2ModelContact )
             : WrappedProperty("D3DTransformMatrix","D3DTransformMatrix")
-            , m_spChart2ModelContact( spChart2ModelContact )
+            , m_spChart2ModelContact(std::move( spChart2ModelContact ))
 {
 }
 
@@ -48,7 +49,7 @@ WrappedD3DTransformMatrixProperty::~WrappedD3DTransformMatrixProperty()
 
 void WrappedD3DTransformMatrixProperty::setPropertyValue( const Any& rOuterValue, const Reference< beans::XPropertySet >& xInnerPropertySet ) const
 {
-    if( DiagramHelper::isPieOrDonutChart( m_spChart2ModelContact->getChart2Diagram() ) )
+    if( DiagramHelper::isPieOrDonutChart( m_spChart2ModelContact->getDiagram() ) )
     {
         drawing::HomogenMatrix aHM;
         if( rOuterValue >>= aHM )
@@ -73,7 +74,7 @@ void WrappedD3DTransformMatrixProperty::setPropertyValue( const Any& rOuterValue
 
 Any WrappedD3DTransformMatrixProperty::getPropertyValue( const Reference< beans::XPropertySet >& xInnerPropertySet ) const
 {
-    if( DiagramHelper::isPieOrDonutChart( m_spChart2ModelContact->getChart2Diagram() ) )
+    if( DiagramHelper::isPieOrDonutChart( m_spChart2ModelContact->getDiagram() ) )
     {
         uno::Any aAMatrix( WrappedProperty::getPropertyValue( xInnerPropertySet ) );
         drawing::HomogenMatrix aHM;

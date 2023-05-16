@@ -1,3 +1,6 @@
+# -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
+#
+# This file is part of the LibreOffice project.
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -5,7 +8,7 @@
 #
 
 from uitest.framework import UITestCase
-from uitest.uihelper.common import type_text
+from uitest.uihelper.common import type_text, get_state_as_dict
 from libreoffice.uno.propertyvalue import mkPropertyValues
 
 class tdf144089(UITestCase):
@@ -32,11 +35,21 @@ class tdf144089(UITestCase):
                 xSelectionOnly = xDialog.getChild("selection")
                 xSelectionOnly.executeAction("CLICK", tuple())
 
+                # Deselect similarity before selecting regex
+                xSimilarity = xDialog.getChild("similarity")
+                if get_state_as_dict(xSimilarity)['Selected'] == 'true':
+                    xSimilarity.executeAction("CLICK", tuple())
+
                 xRegexp = xDialog.getChild("regexp")
                 xRegexp.executeAction("CLICK", tuple())
+                self.assertEqual("true", get_state_as_dict(xRegexp)['Selected'])
 
                 replaceall = xDialog.getChild("replaceall")
                 replaceall.executeAction("CLICK", tuple())
+
+                # Deselect regex button, otherwise it might affect other tests
+                xRegexp.executeAction("CLICK", tuple())
+                self.assertEqual("false", get_state_as_dict(xRegexp)['Selected'])
 
             # Without the fix in place, this test would have failed with
             # AssertionError: 'This is a test' != 'This is a AAAA'

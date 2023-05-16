@@ -14,11 +14,15 @@ $(eval $(call gb_Library_use_custom_headers,embobj,\
 	officecfg/registry \
 ))
 
-$(eval $(call gb_Library_set_componentfile,embobj,embeddedobj/util/embobj))
+$(eval $(call gb_Library_set_componentfile,embobj,embeddedobj/util/embobj,services))
 
 $(eval $(call gb_Library_set_include,embobj,\
 	-I$(SRCDIR)/embeddedobj/source/inc \
 	$$(INCLUDE) \
+))
+
+$(eval $(call gb_Library_add_defs,embobj,\
+    -DEMBOBJ_DLLIMPLEMENTATION \
 ))
 
 $(eval $(call gb_Library_use_external,embobj,boost_headers))

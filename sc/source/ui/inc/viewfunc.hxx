@@ -91,7 +91,7 @@ public:
     OUString        GetAutoSumFormula( const ScRangeList& rRangeList, bool bSubTotal, const ScAddress& rAddr, const OpCode eCode );
 
     void            EnterData( SCCOL nCol, SCROW nRow, SCTAB nTab, const OUString& rString,
-                               const EditTextObject* pData = nullptr );
+                               const EditTextObject* pData = nullptr, bool bMatrixExpand = false );
     void            EnterData( SCCOL nCol, SCROW nRow, SCTAB nTab,
                                const EditTextObject& rData, bool bTestSimple = false );
     void            EnterValue( SCCOL nCol, SCROW nRow, SCTAB nTab, const double& rValue );
@@ -104,7 +104,7 @@ public:
      */
     void            EnterBlock( const OUString& rString, const EditTextObject* pData );
 
-    void            EnterDataAtCursor( const OUString& rString );         //! Not used?
+    void            EnterDataAtCursor( const OUString& rString );
 
     SC_DLLPUBLIC void           CutToClip();
     SC_DLLPUBLIC bool           CopyToClip( ScDocument* pClipDoc, bool bCut, bool bApi = false,
@@ -356,7 +356,7 @@ private:
 
     bool PasteMultiRangesFromClip(
         InsertDeleteFlags nFlags, ScDocument* pClipDoc,
-        ScPasteFunc nFunction, bool bSkipEmptyCells, bool bIncludeFiltered,
+        ScPasteFunc nFunction, bool bSkipEmptyCells,
         bool bTranspose, bool bAsLink, bool bAllowDialogs,
         InsCellCmd eMoveMode, InsertDeleteFlags nUndoFlags );
 

@@ -35,7 +35,7 @@
 #include <model/SlsPageDescriptor.hxx>
 #include <cache/SlsPageCache.hxx>
 #include <cache/SlsPageCacheManager.hxx>
-#include <PaneDockingWindow.hxx>
+#include <titledockwin.hxx>
 
 #include <sdpage.hxx>
 #include <Window.hxx>
@@ -43,7 +43,6 @@
 #include <comphelper/lok.hxx>
 #include <osl/diagnose.h>
 #include <vcl/svapp.hxx>
-#include <vcl/scrbar.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/graphicfilter.hxx>
 
@@ -316,10 +315,10 @@ void SlideSorterView::UpdateOrientation()
     {
         // Get access to the docking window.
         vcl::Window* pWindow = mrSlideSorter.GetContentWindow();
-        PaneDockingWindow* pDockingWindow = nullptr;
+        TitledDockingWindow* pDockingWindow = nullptr;
         while (pWindow!=nullptr && pDockingWindow==nullptr)
         {
-            pDockingWindow = dynamic_cast<PaneDockingWindow*>(pWindow);
+            pDockingWindow = dynamic_cast<TitledDockingWindow*>(pWindow);
             pWindow = pWindow->GetParent();
         }
 
@@ -329,7 +328,7 @@ void SlideSorterView::UpdateOrientation()
                 Application::GetSettings().GetStyleSettings().GetScrollBarSize());
             switch (pDockingWindow->GetOrientation())
             {
-                case PaneDockingWindow::HorizontalOrientation:
+                case TitledDockingWindow::HorizontalOrientation:
                     if (SetOrientation(Layouter::HORIZONTAL))
                     {
                         const Range aRange (mpLayouter->GetValidVerticalSizeRange());
@@ -339,7 +338,7 @@ void SlideSorterView::UpdateOrientation()
                     }
                     break;
 
-                case PaneDockingWindow::VerticalOrientation:
+                case TitledDockingWindow::VerticalOrientation:
                     if (SetOrientation(Layouter::VERTICAL))
                     {
                         const Range aRange (mpLayouter->GetValidHorizontalSizeRange());
@@ -349,7 +348,7 @@ void SlideSorterView::UpdateOrientation()
                     }
                     break;
 
-                case PaneDockingWindow::UnknownOrientation:
+                case TitledDockingWindow::UnknownOrientation:
                     if (SetOrientation(Layouter::GRID))
                     {
                         const sal_Int32 nAdditionalSize (10);
@@ -741,10 +740,11 @@ void SlideSorterView::DragFinished (sal_Int8 nDropAction)
 
 void SlideSorterView::UpdatePageUnderMouse ()
 {
-    VclPtr<ScrollBar> pVScrollBar (mrSlideSorter.GetVerticalScrollBar());
-    VclPtr<ScrollBar> pHScrollBar (mrSlideSorter.GetHorizontalScrollBar());
-    if ((pVScrollBar && pVScrollBar->IsVisible() && pVScrollBar->IsTracking())
-        || (pHScrollBar && pHScrollBar->IsVisible() && pHScrollBar->IsTracking()))
+    // Tracking TODO check
+    VclPtr<ScrollAdaptor> pVScrollBar (mrSlideSorter.GetVerticalScrollBar());
+    VclPtr<ScrollAdaptor> pHScrollBar (mrSlideSorter.GetHorizontalScrollBar());
+    if ((pVScrollBar && pVScrollBar->IsVisible() && pVScrollBar->HasGrab())
+        || (pHScrollBar && pHScrollBar->IsVisible() && pHScrollBar->HasGrab()))
     {
         // One of the scroll bars is tracking mouse movement.  Do not
         // highlight the slide under the mouse in this case.

@@ -52,8 +52,8 @@ class ScValueIterator            // walk through all values in an area
 {
     typedef sc::CellStoreType::const_position_type PositionType;
 
-    ScDocument&     mrDoc;
-    ScInterpreterContext* pContext;
+    const ScDocument& mrDoc;
+    ScInterpreterContext& mrContext;
     const ScAttrArray*  pAttrArray;
     sal_uInt32      nNumFormat;     // for CalcAsShown
     sal_uInt32      nNumFmtIndex;
@@ -83,19 +83,17 @@ class ScValueIterator            // walk through all values in an area
 
 public:
 
-    ScValueIterator(
-        ScDocument& rDocument, const ScRange& rRange, SubtotalFlags nSubTotalFlags = SubtotalFlags::NONE,
+    ScValueIterator(ScInterpreterContext& rContext,
+        const ScRange& rRange, SubtotalFlags nSubTotalFlags = SubtotalFlags::NONE,
         bool bTextAsZero = false );
 
-    void GetCurNumFmtInfo( const ScInterpreterContext& rContext, SvNumFormatType& nType, sal_uInt32& nIndex );
+    void GetCurNumFmtInfo( SvNumFormatType& nType, sal_uInt32& nIndex );
 
     /// Does NOT reset rValue if no value found!
     bool GetFirst( double& rValue, FormulaError& rErr );
 
     /// Does NOT reset rValue if no value found!
     bool GetNext( double& rValue, FormulaError& rErr );
-
-    void SetInterpreterContext( ScInterpreterContext* context ) { pContext = context; }
 };
 
 class ScDBQueryDataIterator
@@ -232,11 +230,11 @@ public:
 
     const ScAddress& GetPos() const { return maCurPos; }
 
-    CellType getType() const { return maCurCell.meType;}
+    CellType getType() const { return maCurCell.getType();}
     OUString getString() const;
-    const EditTextObject* getEditText() const { return maCurCell.mpEditText;}
-    ScFormulaCell* getFormulaCell() { return maCurCell.mpFormula;}
-    const ScFormulaCell* getFormulaCell() const { return maCurCell.mpFormula;}
+    const EditTextObject* getEditText() const { return maCurCell.getEditText();}
+    ScFormulaCell* getFormulaCell() { return maCurCell.getFormula();}
+    const ScFormulaCell* getFormulaCell() const { return maCurCell.getFormula();}
     ScCellValue getCellValue() const;
     const ScRefCellValue& getRefCellValue() const { return maCurCell;}
 
@@ -246,149 +244,6 @@ public:
 
     bool first();
     bool next();
-};
-
-class ScQueryCellIterator           // walk through all non-empty cells in an area
-{
-    enum StopOnMismatchBits
-    {
-        nStopOnMismatchDisabled = 0x00,
-        nStopOnMismatchEnabled  = 0x01,
-        nStopOnMismatchOccurred  = 0x02,
-        nStopOnMismatchExecuted = nStopOnMismatchEnabled | nStopOnMismatchOccurred
-    };
-
-    enum TestEqualConditionBits
-    {
-        nTestEqualConditionDisabled = 0x00,
-        nTestEqualConditionEnabled  = 0x01,
-        nTestEqualConditionMatched  = 0x02,
-        nTestEqualConditionFulfilled = nTestEqualConditionEnabled | nTestEqualConditionMatched
-    };
-
-    typedef sc::CellStoreType::const_position_type PositionType;
-    PositionType maCurPos;
-
-    ScQueryParam    maParam;
-    ScDocument&     rDoc;
-    const ScInterpreterContext& mrContext;
-    SCTAB           nTab;
-    SCCOL           nCol;
-    SCROW           nRow;
-    sal_uInt8            nStopOnMismatch;
-    sal_uInt8            nTestEqualCondition;
-    bool            bAdvanceQuery;
-    bool            bIgnoreMismatchOnLeadingStrings;
-
-    /** Initialize position for new column. */
-    void InitPos();
-    void IncPos();
-    void IncBlock();
-    bool GetThis();
-
-                    /* Only works if no regular expression is involved, only
-                       searches for rows in one column, and only the first
-                       query entry is considered with simple conditions
-                       SC_LESS_EQUAL (sorted ascending) or SC_GREATER_EQUAL
-                       (sorted descending). Check these things before
-                       invocation! Delivers a starting point, continue with
-                       GetThis() and GetNext() afterwards. Introduced for
-                       FindEqualOrSortedLastInRange()
-                     */
-    bool BinarySearch();
-
-public:
-                    ScQueryCellIterator(ScDocument& rDocument, const ScInterpreterContext& rContext, SCTAB nTable,
-                                        const ScQueryParam& aParam, bool bMod);
-                                        // when !bMod, the QueryParam has to be filled
-                                        // (bIsString)
-    bool GetFirst();
-    bool GetNext();
-    SCCOL           GetCol() const { return nCol; }
-    SCROW           GetRow() const { return nRow; }
-
-                    // increments all Entry.nField, if column
-                    // changes, for ScInterpreter ScHLookup()
-    void            SetAdvanceQueryParamEntryField( bool bVal )
-                        { bAdvanceQuery = bVal; }
-    void            AdvanceQueryParamEntryField();
-
-                    /** If set, iterator stops on first non-matching cell
-                        content. May be used in SC_LESS_EQUAL queries where a
-                        cell range is assumed to be sorted; stops on first
-                        value being greater than the queried value and
-                        GetFirst()/GetNext() return NULL. StoppedOnMismatch()
-                        returns true then.
-                        However, the iterator's conditions are not set to end
-                        all queries, GetCol() and GetRow() return values for
-                        the non-matching cell, further GetNext() calls may be
-                        executed. */
-    void            SetStopOnMismatch( bool bVal )
-                        {
-                            nStopOnMismatch = sal::static_int_cast<sal_uInt8>(bVal ? nStopOnMismatchEnabled :
-                                nStopOnMismatchDisabled);
-                        }
-    bool            StoppedOnMismatch() const
-                        { return nStopOnMismatch == nStopOnMismatchExecuted; }
-
-                    /** If set, an additional test for SC_EQUAL condition is
-                        executed in ScTable::ValidQuery() if SC_LESS_EQUAL or
-                        SC_GREATER_EQUAL conditions are to be tested. May be
-                        used where a cell range is assumed to be sorted to stop
-                        if an equal match is found. */
-    void            SetTestEqualCondition( bool bVal )
-                        {
-                            nTestEqualCondition = sal::static_int_cast<sal_uInt8>(bVal ?
-                                nTestEqualConditionEnabled :
-                                nTestEqualConditionDisabled);
-                        }
-    bool            IsEqualConditionFulfilled() const
-                        { return nTestEqualCondition == nTestEqualConditionFulfilled; }
-
-                    /** In a range assumed to be sorted find either the last of
-                        a sequence of equal entries or the last being less than
-                        (or greater than) the queried value. Used by the
-                        interpreter for [HV]?LOOKUP() and MATCH(). Column and
-                        row position of the found entry are returned, otherwise
-                        invalid.
-
-                        The search does not stop when encountering a string and does not
-                        assume that no values follow anymore.
-                        If querying for a string a mismatch on the first
-                        entry, e.g. column header, is ignored.
-
-                        @ATTENTION! StopOnMismatch, TestEqualCondition and
-                        the internal IgnoreMismatchOnLeadingStrings and query
-                        params are in an undefined state upon return! The
-                        iterator is not usable anymore except for obtaining the
-                        number format!
-                      */
-    bool            FindEqualOrSortedLastInRange( SCCOL& nFoundCol, SCROW& nFoundRow );
-};
-
-// Used by ScInterpreter::ScCountIf.
-// Walk through all non-empty cells in an area.
-class ScCountIfCellIterator
-{
-    typedef sc::CellStoreType::const_position_type PositionType;
-    PositionType    maCurPos;
-    ScQueryParam    maParam;
-    ScDocument&     rDoc;
-    const ScInterpreterContext& mrContext;
-    SCTAB           nTab;
-    SCCOL           nCol;
-    SCROW           nRow;
-
-    /** Initialize position for new column. */
-    void            InitPos();
-    void            IncPos();
-    void            IncBlock();
-    void            AdvanceQueryParamEntryField();
-
-public:
-                    ScCountIfCellIterator(ScDocument& rDocument, const ScInterpreterContext& rContext, SCTAB nTable,
-                                        const ScQueryParam& aParam);
-    int             GetCount();
 };
 
 class ScDocAttrIterator             // all attribute areas

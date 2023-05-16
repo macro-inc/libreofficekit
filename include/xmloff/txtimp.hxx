@@ -159,7 +159,7 @@ public:
     // insert a string without special whitespace processing enabled
     void InsertString( const OUString& rChars );
     // insert a string with special whitespace processing enabled
-    void InsertString( const OUString& rChars,
+    void InsertString( std::u16string_view rChars,
                        bool& rIgnoreLeadingSpace );
     // Delete current paragraph
     void DeleteParagraph();
@@ -223,6 +223,8 @@ public:
             const OUString& rName ) const;
     XMLPropStyleContext* FindPageMaster(
             const OUString& rName ) const;
+    XMLPropStyleContext* FindAutoCharStyle(const OUString& rName) const;
+
     XMLPropStyleContext* FindDrawingPage(OUString const& rName) const;
 
     const css::uno::Reference< css::container::XNameContainer> & GetParaStyles() const;
@@ -289,7 +291,9 @@ public:
     css::uno::Reference<css::text::XFormField> popFieldCtx();
     void addFieldParam( const OUString& name, const OUString& value );
     void setCurrentFieldParamsTo(css::uno::Reference< css::text::XFormField> const &xFormField);
-    OUString getCurrentFieldType();
+    ::std::pair<OUString, OUString> getCurrentFieldType() const;
+    css::uno::Reference<css::text::XTextRange> getCurrentFieldStart() const;
+    bool hasCurrentFieldSeparator() const;
     bool hasCurrentFieldCtx() const;
 
 

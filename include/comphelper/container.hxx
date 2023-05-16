@@ -20,7 +20,6 @@
 #ifndef INCLUDED_COMPHELPER_CONTAINER_HXX
 #define INCLUDED_COMPHELPER_CONTAINER_HXX
 
-#include <config_options.h>
 #include <vector>
 #include <com/sun/star/uno/Reference.hxx>
 #include <comphelper/comphelperdllapi.h>
@@ -48,7 +47,7 @@ protected:
         // That is the path from the root node to m_xCurrentObject
 
 public:
-    IndexAccessIterator(css::uno::Reference< css::uno::XInterface> const & xStartingPoint);
+    IndexAccessIterator(css::uno::Reference< css::uno::XInterface> xStartingPoint);
 
     virtual ~IndexAccessIterator();
 

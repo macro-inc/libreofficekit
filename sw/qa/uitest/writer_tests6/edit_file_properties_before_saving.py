@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -17,7 +19,6 @@ class edit_file_properties_before_saving(UITestCase):
 
     def change_doc_info_setting(self, enabled):
         with self.ui_test.execute_dialog_through_command(".uno:OptionsTreeDialog") as xDialog:
-
             xPages = xDialog.getChild("pages")
             xLoadSaveEntry = xPages.getChild('1')
             xLoadSaveEntry.executeAction("EXPAND", tuple())
@@ -34,48 +35,13 @@ class edit_file_properties_before_saving(UITestCase):
         with TemporaryDirectory() as tempdir:
             xFilePath = os.path.join(tempdir, "tdf117895-temp.odt")
 
-            with self.ui_test.create_doc_in_start_center("writer"):
-
+            try:
                 self.change_doc_info_setting("true")
 
-                # Save Copy as
-                with self.ui_test.execute_dialog_through_command('.uno:SaveAs', close_button="") as xDialog:
-                    xFileName = xDialog.getChild('file_name')
-                    xFileName.executeAction('TYPE', mkPropertyValues({'KEYCODE':'CTRL+A'}))
-                    xFileName.executeAction('TYPE', mkPropertyValues({'KEYCODE':'BACKSPACE'}))
-                    xFileName.executeAction('TYPE', mkPropertyValues({'TEXT': xFilePath}))
+                with self.ui_test.create_doc_in_start_center("writer"):
 
-                    xOpen = xDialog.getChild("open")
-                    with self.ui_test.execute_dialog_through_action(xOpen, "CLICK") as xPropertiesDialog:
-                        xReadOnly = xPropertiesDialog.getChild("readonly")
-                        xReadOnly.executeAction("CLICK", tuple())
-                        self.assertEqual("true", get_state_as_dict(xReadOnly)['Selected'])
-
-            with self.ui_test.load_file(systemPathToFileUrl(xFilePath)) as doc2:
-
-                self.change_doc_info_setting("false")
-
-                # Without the fix in place, this test would have failed here
-                self.assertTrue(doc2.isReadonly())
-
-    def test_tdf119206(self):
-
-        with TemporaryDirectory() as tempdir:
-            xFilePath = os.path.join(tempdir, "tdf119206-temp.odt")
-
-            with self.ui_test.create_doc_in_start_center("writer"):
-
-                self.change_doc_info_setting("true")
-
-                xWriterDoc = self.xUITest.getTopFocusWindow()
-                xWriterEdit = xWriterDoc.getChild("writer_edit")
-                type_text(xWriterEdit, "XXXX")
-
-                # Close document and save
-                with self.ui_test.execute_dialog_through_command('.uno:CloseDoc', close_button="") as xConfirmationDialog:
-                    xSave = xConfirmationDialog.getChild("save")
-
-                    with self.ui_test.execute_dialog_through_action(xSave, "CLICK", close_button="") as xDialog:
+                    # Save Copy as
+                    with self.ui_test.execute_dialog_through_command('.uno:SaveAs', close_button="") as xDialog:
                         xFileName = xDialog.getChild('file_name')
                         xFileName.executeAction('TYPE', mkPropertyValues({'KEYCODE':'CTRL+A'}))
                         xFileName.executeAction('TYPE', mkPropertyValues({'KEYCODE':'BACKSPACE'}))
@@ -83,15 +49,58 @@ class edit_file_properties_before_saving(UITestCase):
 
                         xOpen = xDialog.getChild("open")
                         with self.ui_test.execute_dialog_through_action(xOpen, "CLICK") as xPropertiesDialog:
-                            # Without the fix in place, this test would have crashed here
                             xReadOnly = xPropertiesDialog.getChild("readonly")
                             xReadOnly.executeAction("CLICK", tuple())
                             self.assertEqual("true", get_state_as_dict(xReadOnly)['Selected'])
 
-            with self.ui_test.load_file(systemPathToFileUrl(xFilePath)) as doc2:
+                self.ui_test.wait_until_file_is_available(xFilePath)
 
+                with self.ui_test.load_file(systemPathToFileUrl(xFilePath)) as doc2:
+                    # Without the fix in place, this test would have failed here
+                    self.assertTrue(doc2.isReadonly())
+
+            finally:
+                # Put this setting back to false, otherwise it might affect other tests
                 self.change_doc_info_setting("false")
 
-                self.assertTrue(doc2.isReadonly())
+    def test_tdf119206(self):
+
+        with TemporaryDirectory() as tempdir:
+            xFilePath = os.path.join(tempdir, "tdf119206-temp.odt")
+
+            try:
+                self.change_doc_info_setting("true")
+
+                with self.ui_test.create_doc_in_start_center("writer"):
+
+                    xWriterDoc = self.xUITest.getTopFocusWindow()
+                    xWriterEdit = xWriterDoc.getChild("writer_edit")
+                    type_text(xWriterEdit, "XXXX")
+
+                    # Close document and save
+                    with self.ui_test.execute_dialog_through_command('.uno:CloseDoc', close_button="") as xConfirmationDialog:
+                        xSave = xConfirmationDialog.getChild("save")
+
+                        with self.ui_test.execute_dialog_through_action(xSave, "CLICK", close_button="") as xDialog:
+                            xFileName = xDialog.getChild('file_name')
+                            xFileName.executeAction('TYPE', mkPropertyValues({'KEYCODE':'CTRL+A'}))
+                            xFileName.executeAction('TYPE', mkPropertyValues({'KEYCODE':'BACKSPACE'}))
+                            xFileName.executeAction('TYPE', mkPropertyValues({'TEXT': xFilePath}))
+
+                            xOpen = xDialog.getChild("open")
+                            with self.ui_test.execute_dialog_through_action(xOpen, "CLICK") as xPropertiesDialog:
+                                # Without the fix in place, this test would have crashed here
+                                xReadOnly = xPropertiesDialog.getChild("readonly")
+                                xReadOnly.executeAction("CLICK", tuple())
+                                self.assertEqual("true", get_state_as_dict(xReadOnly)['Selected'])
+
+                self.ui_test.wait_until_file_is_available(xFilePath)
+
+                with self.ui_test.load_file(systemPathToFileUrl(xFilePath)) as doc2:
+                    self.assertTrue(doc2.isReadonly())
+
+            finally:
+                # Put this setting back to false, otherwise it might affect other tests
+                self.change_doc_info_setting("false")
 
 # vim: set shiftwidth=4 softtabstop=4 expandtab:

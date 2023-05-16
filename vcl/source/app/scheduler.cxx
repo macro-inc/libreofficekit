@@ -30,7 +30,7 @@
 #include <svdata.hxx>
 #include <tools/time.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/configmgr.hxx>
 #include <vcl/TaskStopwatch.hxx>
 #include <vcl/scheduler.hxx>
@@ -359,6 +359,13 @@ void Scheduler::CallbackTaskScheduling()
 
     for (; nTaskPriority < PRIO_COUNT; ++nTaskPriority)
     {
+        // Related: tdf#152703 Eliminate potential blocking during live resize
+        // Only higher priority tasks need to be fired to redraw the window
+        // so skip firing potentially long-running tasks, such as the Writer
+        // idle layout timer, when a window is in live resize
+        if ( ImplGetSVData()->mpWinData->mbIsLiveResize && nTaskPriority == static_cast<int>(TaskPriority::LOWEST) )
+            continue;
+
         pSchedulerData = rSchedCtx.mpFirstSchedulerData[nTaskPriority];
         pPrevSchedulerData = nullptr;
         while (pSchedulerData)

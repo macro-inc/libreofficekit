@@ -26,8 +26,6 @@
 #include <rtl/ref.hxx>
 #include <com/sun/star/frame/XTransientDocumentsDocumentContentFactory.hpp>
 #include <com/sun/star/frame/XTransientDocumentsDocumentContentIdentifierFactory.hpp>
-#include <com/sun/star/lang/XSingleServiceFactory.hpp>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <ucbhelper/providerhelper.hxx>
 #include "tdoc_uri.hxx"
 #include "tdoc_docmgr.hxx"
@@ -41,17 +39,21 @@ namespace com::sun::star::frame {
     class XModel;
 }
 
+namespace com::sun::star::util {
+    struct DateTime;
+}
+
 namespace tdoc_ucp {
 
 
-#define TDOC_ROOT_CONTENT_TYPE \
-                u"application/" TDOC_URL_SCHEME "-root"
-#define TDOC_DOCUMENT_CONTENT_TYPE \
-                u"application/" TDOC_URL_SCHEME "-document"
-#define TDOC_FOLDER_CONTENT_TYPE \
-                u"application/" TDOC_URL_SCHEME "-folder"
-#define TDOC_STREAM_CONTENT_TYPE \
-                u"application/" TDOC_URL_SCHEME "-stream"
+inline constexpr OUStringLiteral TDOC_ROOT_CONTENT_TYPE =
+                u"application/" TDOC_URL_SCHEME "-root";
+inline constexpr OUStringLiteral TDOC_DOCUMENT_CONTENT_TYPE =
+                u"application/" TDOC_URL_SCHEME "-document";
+inline constexpr OUStringLiteral TDOC_FOLDER_CONTENT_TYPE =
+                u"application/" TDOC_URL_SCHEME "-folder";
+inline constexpr OUStringLiteral TDOC_STREAM_CONTENT_TYPE =
+                u"application/" TDOC_URL_SCHEME "-stream";
 
 
 class StorageElementFactory;
@@ -131,6 +133,8 @@ public:
 
     css::uno::Reference< css::frame::XModel >
     queryDocumentModel( const OUString & rUri ) const;
+
+    css::util::DateTime queryStreamDateModified(OUString const & uri) const;
 
     // interface OfficeDocumentsEventListener
     void notifyDocumentOpened( std::u16string_view rDocId );

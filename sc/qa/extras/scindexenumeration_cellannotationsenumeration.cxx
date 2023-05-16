@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xenumeration.hxx>
 
 #include <com/sun/star/container/XEnumeration.hpp>
@@ -29,7 +29,7 @@ using namespace css::uno;
 
 namespace sc_apitest
 {
-class ScIndexEnumeration_CellAnnotationsEnumeration : public CalcUnoApiTest,
+class ScIndexEnumeration_CellAnnotationsEnumeration : public UnoApiTest,
                                                       public apitest::XEnumeration
 {
 public:
@@ -37,7 +37,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScIndexEnumeration_CellAnnotationsEnumeration);
 
@@ -46,19 +45,16 @@ public:
     CPPUNIT_TEST(testNextElement);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScIndexEnumeration_CellAnnotationsEnumeration::ScIndexEnumeration_CellAnnotationsEnumeration()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
 {
 }
 
 uno::Reference<uno::XInterface> ScIndexEnumeration_CellAnnotationsEnumeration::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     CPPUNIT_ASSERT_MESSAGE("no calc document", xDoc.is());
 
     uno::Reference<sheet::XSpreadsheets> xSheets(xDoc->getSheets(), uno::UNO_SET_THROW);
@@ -77,14 +73,8 @@ uno::Reference<uno::XInterface> ScIndexEnumeration_CellAnnotationsEnumeration::i
 
 void ScIndexEnumeration_CellAnnotationsEnumeration::setUp()
 {
-    CalcUnoApiTest::setUp();
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScIndexEnumeration_CellAnnotationsEnumeration::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    UnoApiTest::setUp();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScIndexEnumeration_CellAnnotationsEnumeration);

@@ -11,8 +11,9 @@
 
 
 #include <functional>
+#include <utility>
 #include <vector>
-#include "math.hxx"
+#include "kahan.hxx"
 
 namespace sc::op {
 
@@ -23,7 +24,7 @@ struct Op_
     const double mInitVal;
     const T maOp;
     Op_(double InitVal, T aOp):
-        mInitVal(InitVal), maOp(aOp)
+        mInitVal(InitVal), maOp(std::move(aOp))
     {
     }
     void operator()(tRes& rAccum, double fVal) const

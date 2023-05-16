@@ -36,13 +36,14 @@
 #include <com/sun/star/util/XChangesBatch.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 
-#include <cppuhelper/basemutex.hxx>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
+#include <comphelper/string.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <comphelper/sequence.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <string_view>
 #include <unordered_map>
@@ -79,7 +80,7 @@ const sal_Int16 PROPERTY_DOCKPOS                 = 14;
 const sal_Int16 PROPERTY_DOCKSIZE                = 15;
 
 // Order must be the same as WindowStateMask!!
-const char* CONFIGURATION_PROPERTIES[]           =
+rtl::OUStringConstExpr CONFIGURATION_PROPERTIES[]
 {
     WINDOWSTATE_PROPERTY_LOCKED,
     WINDOWSTATE_PROPERTY_DOCKED,
@@ -96,8 +97,7 @@ const char* CONFIGURATION_PROPERTIES[]           =
     WINDOWSTATE_PROPERTY_INTERNALSTATE,
     WINDOWSTATE_PROPERTY_STYLE,
     WINDOWSTATE_PROPERTY_DOCKPOS,
-    WINDOWSTATE_PROPERTY_DOCKSIZE,
-    nullptr
+    WINDOWSTATE_PROPERTY_DOCKSIZE
 };
 
 //  Configuration access class for WindowState supplier implementation
@@ -223,12 +223,8 @@ ConfigurationAccess_WindowState::ConfigurationAccess_WindowState( std::u16string
     m_bModified( false )
 {
     // Initialize access array with property names.
-    sal_Int32 n = 0;
-    while ( CONFIGURATION_PROPERTIES[n] )
-    {
-        m_aPropArray.push_back( OUString::createFromAscii( CONFIGURATION_PROPERTIES[n] ));
-        ++n;
-    }
+    for (const rtl::OUStringConstExpr & s : CONFIGURATION_PROPERTIES )
+        m_aPropArray.push_back(s);
 }
 
 ConfigurationAccess_WindowState::~ConfigurationAccess_WindowState()
@@ -560,7 +556,7 @@ Any ConfigurationAccess_WindowState::impl_getSequenceFromStruct( const WindowSta
         }
     }
 
-    return makeAny( comphelper::containerToSequence(aPropVec) );
+    return Any( comphelper::containerToSequence(aPropVec) );
 }
 
 Any ConfigurationAccess_WindowState::impl_insertCacheAndReturnSequence( const OUString& rResourceURL, Reference< XNameAccess > const & xNameAccess )
@@ -641,12 +637,12 @@ Any ConfigurationAccess_WindowState::impl_insertCacheAndReturnSequence( const OU
                     if ( a >>= aString )
                     {
                         sal_Int32 nToken( 0 );
-                        OUString aXStr = aString.getToken( 0, ',', nToken );
+                        std::u16string_view aXStr = o3tl::getToken(aString, 0, ',', nToken );
                         if ( nToken > 0 )
                         {
                             css::awt::Point aPos;
-                            aPos.X = aXStr.toInt32();
-                            aPos.Y = aString.getToken( 0, ',', nToken ).toInt32();
+                            aPos.X = o3tl::toInt32(aXStr);
+                            aPos.Y = o3tl::toInt32(o3tl::getToken(aString, 0, ',', nToken ));
 
                             if ( i == PROPERTY_POS )
                             {
@@ -673,12 +669,12 @@ Any ConfigurationAccess_WindowState::impl_insertCacheAndReturnSequence( const OU
                     if ( a >>= aString )
                     {
                         sal_Int32 nToken( 0 );
-                        OUString aStr = aString.getToken( 0, ',', nToken );
+                        std::u16string_view aStr = o3tl::getToken(aString, 0, ',', nToken );
                         if ( nToken > 0 )
                         {
                             css::awt::Size aSize;
-                            aSize.Width = aStr.toInt32();
-                            aSize.Height = aString.getToken( 0, ',', nToken ).toInt32();
+                            aSize.Width = o3tl::toInt32(aStr);
+                            aSize.Height = o3tl::toInt32(o3tl::getToken(aString, 0, ',', nToken ));
                             if ( i == PROPERTY_SIZE )
                             {
                                 aWindowStateInfo.aSize = aSize;
@@ -756,7 +752,7 @@ Any ConfigurationAccess_WindowState::impl_insertCacheAndReturnSequence( const OU
 
     aWindowStateInfo.nMask = nMask;
     m_aResourceURLToInfoCache.emplace( rResourceURL, aWindowStateInfo );
-    return makeAny( comphelper::containerToSequence(aPropVec) );
+    return Any( comphelper::containerToSequence(aPropVec) );
 }
 
 ConfigurationAccess_WindowState::WindowStateInfo& ConfigurationAccess_WindowState::impl_insertCacheAndReturnWinState( const OUString& rResourceURL, Reference< XNameAccess > const & rNameAccess )
@@ -834,12 +830,12 @@ ConfigurationAccess_WindowState::WindowStateInfo& ConfigurationAccess_WindowStat
                     if ( a >>= aString )
                     {
                         sal_Int32 nToken( 0 );
-                        OUString aXStr = aString.getToken( 0, ',', nToken );
+                        std::u16string_view aXStr = o3tl::getToken(aString, 0, ',', nToken );
                         if ( nToken > 0 )
                         {
                             css::awt::Point aPos;
-                            aPos.X = aXStr.toInt32();
-                            aPos.Y = aString.getToken( 0, ',', nToken ).toInt32();
+                            aPos.X = o3tl::toInt32(aXStr);
+                            aPos.Y = o3tl::toInt32(o3tl::getToken(aString, 0, ',', nToken ));
 
                             if ( i == PROPERTY_POS )
                             {
@@ -863,12 +859,12 @@ ConfigurationAccess_WindowState::WindowStateInfo& ConfigurationAccess_WindowStat
                     if ( a >>= aString )
                     {
                         sal_Int32 nToken( 0 );
-                        OUString aStr = aString.getToken( 0, ',', nToken );
+                        std::u16string_view aStr = o3tl::getToken(aString, 0, ',', nToken );
                         if ( nToken > 0 )
                         {
                             css::awt::Size aSize;
-                            aSize.Width  = aStr.toInt32();
-                            aSize.Height = aString.getToken( 0, ',', nToken ).toInt32();
+                            aSize.Width  = o3tl::toInt32(aStr);
+                            aSize.Height = o3tl::toInt32(o3tl::getToken(aString, 0, ',', nToken ));
                             if ( i == PROPERTY_SIZE )
                             {
                                 aWindowStateInfo.aSize = aSize;
@@ -1132,23 +1128,23 @@ void ConfigurationAccess_WindowState::impl_putPropertiesFromStruct( const Window
                 switch ( i )
                 {
                     case PROPERTY_LOCKED:
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( rWinStateInfo.bLocked ) ); break;
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( rWinStateInfo.bLocked ) ); break;
                     case PROPERTY_DOCKED:
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( rWinStateInfo.bDocked ) ); break;
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( rWinStateInfo.bDocked ) ); break;
                     case PROPERTY_VISIBLE:
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( rWinStateInfo.bVisible ) ); break;
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( rWinStateInfo.bVisible ) ); break;
                     case PROPERTY_CONTEXT:
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( rWinStateInfo.bContext ) ); break;
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( rWinStateInfo.bContext ) ); break;
                     case PROPERTY_HIDEFROMMENU:
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( rWinStateInfo.bHideFromMenu ) ); break;
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( rWinStateInfo.bHideFromMenu ) ); break;
                     case PROPERTY_NOCLOSE:
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( rWinStateInfo.bNoClose ) ); break;
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( rWinStateInfo.bNoClose ) ); break;
                     case PROPERTY_SOFTCLOSE:
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( rWinStateInfo.bSoftClose ) ); break;
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( rWinStateInfo.bSoftClose ) ); break;
                     case PROPERTY_CONTEXTACTIVE:
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( rWinStateInfo.bContextActive ) ); break;
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( rWinStateInfo.bContextActive ) ); break;
                     case PROPERTY_DOCKINGAREA:
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( sal_Int16( rWinStateInfo.aDockingArea ) ) ); break;
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( sal_Int16( rWinStateInfo.aDockingArea ) ) ); break;
                     case PROPERTY_POS:
                     case PROPERTY_DOCKPOS:
                     {
@@ -1162,7 +1158,7 @@ void ConfigurationAccess_WindowState::impl_putPropertiesFromStruct( const Window
                             aPosStr += OUString::number( rWinStateInfo.aPos.Y );
                         else
                             aPosStr += OUString::number( rWinStateInfo.aDockPos.Y );
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( aPosStr ) );
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( aPosStr ) );
                         break;
                     }
                     case PROPERTY_SIZE:
@@ -1178,15 +1174,15 @@ void ConfigurationAccess_WindowState::impl_putPropertiesFromStruct( const Window
                             aSizeStr += OUString::number( rWinStateInfo.aSize.Height );
                         else
                             aSizeStr += OUString::number( rWinStateInfo.aDockSize.Height );
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( aSizeStr ) );
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( aSizeStr ) );
                         break;
                     }
                     case PROPERTY_UINAME:
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( rWinStateInfo.aUIName ) ); break;
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( rWinStateInfo.aUIName ) ); break;
                     case PROPERTY_INTERNALSTATE:
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( sal_Int32( rWinStateInfo.nInternalState )) ); break;
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( sal_Int32( rWinStateInfo.nInternalState )) ); break;
                     case PROPERTY_STYLE:
-                        xPropSet->setPropertyValue( m_aPropArray[i], makeAny( sal_Int32( rWinStateInfo.nStyle )) ); break;
+                        xPropSet->setPropertyValue( m_aPropArray[i], Any( sal_Int32( rWinStateInfo.nStyle )) ); break;
                     default:
                        assert( false && "Wrong value for ConfigurationAccess_WindowState. Who has forgotten to add this new property!" );
                 }
@@ -1227,11 +1223,10 @@ void ConfigurationAccess_WindowState::impl_initializeConfigAccess()
     }
 }
 
-typedef ::cppu::WeakComponentImplHelper< css::container::XNameAccess,
+typedef comphelper::WeakComponentImplHelper< css::container::XNameAccess,
         css::lang::XServiceInfo> WindowStateConfiguration_BASE;
 
-class WindowStateConfiguration : private cppu::BaseMutex,
-                                 public WindowStateConfiguration_BASE
+class WindowStateConfiguration : public WindowStateConfiguration_BASE
 {
 public:
     explicit WindowStateConfiguration( const css::uno::Reference< css::uno::XComponentContext >& rxContext );
@@ -1276,7 +1271,6 @@ private:
 };
 
 WindowStateConfiguration::WindowStateConfiguration( const Reference< XComponentContext >& rxContext ) :
-    WindowStateConfiguration_BASE(m_aMutex),
     m_xContext( rxContext )
 {
     css::uno::Reference< css::frame::XModuleManager2 > xModuleManager =
@@ -1322,14 +1316,14 @@ WindowStateConfiguration::WindowStateConfiguration( const Reference< XComponentC
 
 WindowStateConfiguration::~WindowStateConfiguration()
 {
-    osl::MutexGuard g(cppu::WeakComponentImplHelperBase::rBHelper.rMutex);
+    std::unique_lock g(m_aMutex);
     m_aModuleToFileHashMap.clear();
     m_aModuleToWindowStateHashMap.clear();
 }
 
 Any SAL_CALL WindowStateConfiguration::getByName( const OUString& aModuleIdentifier )
 {
-    osl::MutexGuard g(cppu::WeakComponentImplHelperBase::rBHelper.rMutex);
+    std::unique_lock g(m_aMutex);
 
     ModuleToWindowStateFileMap::const_iterator pIter = m_aModuleToFileHashMap.find( aModuleIdentifier );
     if ( pIter != m_aModuleToFileHashMap.end() )
@@ -1358,14 +1352,14 @@ Any SAL_CALL WindowStateConfiguration::getByName( const OUString& aModuleIdentif
 
 Sequence< OUString > SAL_CALL WindowStateConfiguration::getElementNames()
 {
-    osl::MutexGuard g(cppu::WeakComponentImplHelperBase::rBHelper.rMutex);
+    std::unique_lock g(m_aMutex);
 
     return comphelper::mapKeysToSequence( m_aModuleToFileHashMap );
 }
 
 sal_Bool SAL_CALL WindowStateConfiguration::hasByName( const OUString& aName )
 {
-    osl::MutexGuard g(cppu::WeakComponentImplHelperBase::rBHelper.rMutex);
+    std::unique_lock g(m_aMutex);
 
     ModuleToWindowStateFileMap::const_iterator pIter = m_aModuleToFileHashMap.find( aName );
     return ( pIter != m_aModuleToFileHashMap.end() );

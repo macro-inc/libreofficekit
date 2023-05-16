@@ -17,6 +17,8 @@
 
 #include "clang/AST/Attr.h"
 
+#include "config_clang.h"
+
 #include "plugin.hxx"
 
 /**
@@ -71,6 +73,8 @@ public:
 
     virtual void run() override
     {
+        handler.enableTreeWideAnalysisMode();
+
         TraverseDecl(compiler.getASTContext().getTranslationUnitDecl());
 
         // dump all our output in one write call - this is to try and limit IO "crosstalk" between multiple processes
@@ -126,10 +130,6 @@ MyFuncInfo MethodCycles::niceName(const FunctionDecl* functionDecl)
 {
     if (functionDecl->getInstantiatedFromMemberFunction())
         functionDecl = functionDecl->getInstantiatedFromMemberFunction();
-#if CLANG_VERSION < 90000
-    else if (functionDecl->getClassScopeSpecializationPattern())
-        functionDecl = functionDecl->getClassScopeSpecializationPattern();
-#endif
     else if (functionDecl->getTemplateInstantiationPattern())
         functionDecl = functionDecl->getTemplateInstantiationPattern();
 

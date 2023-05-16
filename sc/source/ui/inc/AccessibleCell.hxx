@@ -50,7 +50,7 @@ public:
         const css::uno::Reference<css::accessibility::XAccessible>& rxParent,
         ScTabViewShell* pViewShell,
         const ScAddress& rCellAddress,
-        sal_Int32 nIndex,
+        sal_Int64 nIndex,
         ScSplitPos eSplitPos,
         ScAccessibleDocument* pAccDoc);
 
@@ -59,7 +59,7 @@ private:
         const css::uno::Reference<css::accessibility::XAccessible>& rxParent,
         ScTabViewShell* pViewShell,
         const ScAddress& rCellAddress,
-        sal_Int32 nIndex,
+        sal_Int64 nIndex,
         ScSplitPos eSplitPos,
         ScAccessibleDocument* pAccDoc);
 
@@ -101,17 +101,16 @@ public:
 
     /// Return the number of currently visible children.
     /// override to calculate this on demand
-    virtual sal_Int32 SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getAccessibleChildCount() override;
 
     /// Return the specified child or NULL if index is invalid.
     /// override to calculate this on demand
     virtual css::uno::Reference< css::accessibility::XAccessible> SAL_CALL
-        getAccessibleChild(sal_Int32 nIndex) override;
+        getAccessibleChild(sal_Int64 nIndex) override;
 
     /// Return the set of current states.
-    virtual css::uno::Reference<
-            css::accessibility::XAccessibleStateSet> SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getAccessibleStateSet() override;
 
     virtual css::uno::Reference<
@@ -140,11 +139,10 @@ private:
 
     ScSplitPos meSplitPos;
 
-    bool IsDefunc(
-        const css::uno::Reference<css::accessibility::XAccessibleStateSet>& rxParentStates);
-    virtual bool IsEditable(
-        const css::uno::Reference<css::accessibility::XAccessibleStateSet>& rxParentStates) override;
+    bool IsDefunc(sal_Int64 nParentStates);
+    virtual bool IsEditable(sal_Int64 nParentStates) override;
     bool IsOpaque() const;
+    bool IsFocused() const;
     bool IsSelected();
 
     static ScDocument* GetDocument(ScTabViewShell* mpViewShell);

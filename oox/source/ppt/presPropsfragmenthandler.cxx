@@ -12,7 +12,6 @@
 #include <com/sun/star/presentation/XPresentationSupplier.hpp>
 #include <com/sun/star/presentation/XCustomPresentationSupplier.hpp>
 #include <com/sun/star/container/XNamed.hpp>
-#include <com/sun/star/container/XIndexContainer.hpp>
 #include <com/sun/star/drawing/XDrawPages.hpp>
 #include <com/sun/star/drawing/XDrawPagesSupplier.hpp>
 
@@ -77,10 +76,10 @@ core::ContextHandlerRef PresPropsFragmentHandler::onCreateContext(sal_Int32 aEle
             m_bTiming = rAttribs.getBool(XML_useTimings, true);
             return this;
         case PPT_TOKEN(custShow):
-            m_sId = rAttribs.getString(XML_id).get();
+            m_sId = rAttribs.getStringDefaulted(XML_id);
             return this;
         case PPT_TOKEN(sldRg):
-            m_sSt = rAttribs.getString(XML_st).get();
+            m_sSt = rAttribs.getStringDefaulted(XML_st);
             return this;
     }
     return this;

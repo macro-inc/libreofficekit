@@ -17,16 +17,25 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <sal/config.h>
+
+#include <cassert>
+#include <utility>
+
 #include <basegfx/polygon/b2dpolypolygon.hxx>
-#include <osl/diagnose.h>
 #include <basegfx/polygon/b2dpolygon.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/utils/systemdependentdata.hxx>
 
+namespace basegfx
+{
+
 class ImplB2DPolyPolygon
 {
     basegfx::B2DPolygonVector                               maPolygons;
-    std::unique_ptr< basegfx::SystemDependentDataHolder >   mpSystemDependentDataHolder;
+    // we do not want to 'modify' the ImplB2DPolyPolygon,
+    // but add buffered data that is valid for all referencing instances
+    mutable std::unique_ptr<basegfx::SystemDependentDataHolder> mpSystemDependentDataHolder;
 
 public:
     ImplB2DPolyPolygon()
@@ -54,7 +63,7 @@ public:
         return *this;
     }
 
-    void addOrReplaceSystemDependentData(basegfx::SystemDependentData_SharedPtr& rData)
+    void addOrReplaceSystemDependentData(basegfx::SystemDependentData_SharedPtr& rData) const
     {
         if(!mpSystemDependentDataHolder)
         {
@@ -81,46 +90,55 @@ public:
 
     const basegfx::B2DPolygon& getB2DPolygon(sal_uInt32 nIndex) const
     {
+        assert(nIndex < maPolygons.size());
         return maPolygons[nIndex];
     }
 
     void setB2DPolygon(sal_uInt32 nIndex, const basegfx::B2DPolygon& rPolygon)
     {
+        assert(nIndex < maPolygons.size());
         maPolygons[nIndex] = rPolygon;
     }
 
     void insert(sal_uInt32 nIndex, const basegfx::B2DPolygon& rPolygon, sal_uInt32 nCount)
     {
-        if(nCount)
-        {
-            // add nCount copies of rPolygon
-            basegfx::B2DPolygonVector::iterator aIndex(maPolygons.begin());
-            if( nIndex )
-                aIndex += nIndex;
-            maPolygons.insert(aIndex, nCount, rPolygon);
-        }
+        assert(nCount > 0);
+        assert(nIndex <= maPolygons.size());
+        // add nCount copies of rPolygon
+        maPolygons.insert(maPolygons.begin() + nIndex, nCount, rPolygon);
+    }
+
+    void append(const basegfx::B2DPolygon& rPolygon, sal_uInt32 nCount)
+    {
+        insert(maPolygons.size(), rPolygon, nCount);
+    }
+
+    void reserve(sal_uInt32 nCount)
+    {
+        maPolygons.reserve(nCount);
     }
 
     void insert(sal_uInt32 nIndex, const basegfx::B2DPolyPolygon& rPolyPolygon)
     {
+        assert(nIndex <= maPolygons.size());
         // add nCount polygons from rPolyPolygon
-        basegfx::B2DPolygonVector::iterator aIndex(maPolygons.begin());
-        if( nIndex )
-            aIndex += nIndex;
-        maPolygons.insert(aIndex, rPolyPolygon.begin(), rPolyPolygon.end());
+        maPolygons.insert(maPolygons.begin() + nIndex, rPolyPolygon.begin(), rPolyPolygon.end());
+    }
+
+    void append(const basegfx::B2DPolyPolygon& rPolyPolygon)
+    {
+        insert(maPolygons.size(), rPolyPolygon);
     }
 
     void remove(sal_uInt32 nIndex, sal_uInt32 nCount)
     {
-        if(nCount)
-        {
-            // remove polygon data
-            basegfx::B2DPolygonVector::iterator aStart(maPolygons.begin());
-            aStart += nIndex;
-            const basegfx::B2DPolygonVector::iterator aEnd(aStart + nCount);
+        assert(nCount > 0);
+        assert(nIndex + nCount <= maPolygons.size());
+        // remove polygon data
+        auto aStart(maPolygons.begin() + nIndex);
+        auto aEnd(aStart + nCount);
 
-            maPolygons.erase(aStart, aEnd);
-        }
+        maPolygons.erase(aStart, aEnd);
     }
 
     sal_uInt32 count() const
@@ -193,13 +211,7 @@ public:
     }
 };
 
-namespace basegfx
-{
-
-    static o3tl::cow_wrapper<ImplB2DPolyPolygon> DEFAULT;
-
-    B2DPolyPolygon::B2DPolyPolygon() :
-        mpPolyPolygon(DEFAULT) {}
+    B2DPolyPolygon::B2DPolyPolygon() = default;
 
     B2DPolyPolygon::B2DPolyPolygon(const B2DPolyPolygon&) = default;
 
@@ -218,8 +230,7 @@ namespace basegfx
 
     void B2DPolyPolygon::makeUnique()
     {
-        mpPolyPolygon.make_unique();
-        mpPolyPolygon->makeUnique();
+        mpPolyPolygon->makeUnique(); // non-const cow_wrapper::operator-> calls make_unique
     }
 
     bool B2DPolyPolygon::operator==(const B2DPolyPolygon& rPolyPolygon) const
@@ -242,26 +253,20 @@ namespace basegfx
 
     B2DPolygon const & B2DPolyPolygon::getB2DPolygon(sal_uInt32 nIndex) const
     {
-        OSL_ENSURE(nIndex < mpPolyPolygon->count(), "B2DPolyPolygon access outside range (!)");
-
         return mpPolyPolygon->getB2DPolygon(nIndex);
     }
 
     void B2DPolyPolygon::setB2DPolygon(sal_uInt32 nIndex, const B2DPolygon& rPolygon)
     {
-        OSL_ENSURE(nIndex < std::as_const(*mpPolyPolygon).count(), "B2DPolyPolygon access outside range (!)");
-
         if(getB2DPolygon(nIndex) != rPolygon)
             mpPolyPolygon->setB2DPolygon(nIndex, rPolygon);
     }
 
     bool B2DPolyPolygon::areControlPointsUsed() const
     {
-        for(sal_uInt32 a(0); a < mpPolyPolygon->count(); a++)
+        for(sal_uInt32 a(0); a < count(); a++)
         {
-            const B2DPolygon& rPolygon = mpPolyPolygon->getB2DPolygon(a);
-
-            if(rPolygon.areControlPointsUsed())
+            if(getB2DPolygon(a).areControlPointsUsed())
             {
                 return true;
             }
@@ -272,8 +277,6 @@ namespace basegfx
 
     void B2DPolyPolygon::insert(sal_uInt32 nIndex, const B2DPolygon& rPolygon, sal_uInt32 nCount)
     {
-        OSL_ENSURE(nIndex <= std::as_const(*mpPolyPolygon).count(), "B2DPolyPolygon Insert outside range (!)");
-
         if(nCount)
             mpPolyPolygon->insert(nIndex, rPolygon, nCount);
     }
@@ -281,16 +284,27 @@ namespace basegfx
     void B2DPolyPolygon::append(const B2DPolygon& rPolygon, sal_uInt32 nCount)
     {
         if(nCount)
-            mpPolyPolygon->insert(std::as_const(*mpPolyPolygon).count(), rPolygon, nCount);
+            mpPolyPolygon->append(rPolygon, nCount);
+    }
+
+    void B2DPolyPolygon::reserve(sal_uInt32 nCount)
+    {
+        if(nCount)
+            mpPolyPolygon->reserve(nCount);
     }
 
     B2DPolyPolygon B2DPolyPolygon::getDefaultAdaptiveSubdivision() const
     {
         B2DPolyPolygon aRetval;
-
-        for(sal_uInt32 a(0); a < mpPolyPolygon->count(); a++)
+        if (count())
         {
-            aRetval.append(mpPolyPolygon->getB2DPolygon(a).getDefaultAdaptiveSubdivision());
+            ImplB2DPolyPolygon& dest = *aRetval.mpPolyPolygon;
+            dest.reserve(count());
+
+            for (sal_uInt32 a(0); a < count(); a++)
+            {
+                dest.append(getB2DPolygon(a).getDefaultAdaptiveSubdivision(), 1);
+            }
         }
 
         return aRetval;
@@ -300,9 +314,9 @@ namespace basegfx
     {
         B2DRange aRetval;
 
-        for(sal_uInt32 a(0); a < mpPolyPolygon->count(); a++)
+        for(sal_uInt32 a(0); a < count(); a++)
         {
-            aRetval.expand(mpPolyPolygon->getB2DPolygon(a).getB2DRange());
+            aRetval.expand(getB2DPolygon(a).getB2DRange());
         }
 
         return aRetval;
@@ -310,8 +324,6 @@ namespace basegfx
 
     void B2DPolyPolygon::insert(sal_uInt32 nIndex, const B2DPolyPolygon& rPolyPolygon)
     {
-        OSL_ENSURE(nIndex <= std::as_const(*mpPolyPolygon).count(), "B2DPolyPolygon Insert outside range (!)");
-
         if(rPolyPolygon.count())
             mpPolyPolygon->insert(nIndex, rPolyPolygon);
     }
@@ -319,13 +331,11 @@ namespace basegfx
     void B2DPolyPolygon::append(const B2DPolyPolygon& rPolyPolygon)
     {
         if(rPolyPolygon.count())
-            mpPolyPolygon->insert(std::as_const(*mpPolyPolygon).count(), rPolyPolygon);
+            mpPolyPolygon->append(rPolyPolygon);
     }
 
     void B2DPolyPolygon::remove(sal_uInt32 nIndex, sal_uInt32 nCount)
     {
-        OSL_ENSURE(nIndex + nCount <= std::as_const(*mpPolyPolygon).count(), "B2DPolyPolygon Remove outside range (!)");
-
         if(nCount)
             mpPolyPolygon->remove(nIndex, nCount);
     }
@@ -337,19 +347,15 @@ namespace basegfx
 
     bool B2DPolyPolygon::isClosed() const
     {
-        bool bRetval(true);
-
         // PolyPOlygon is closed when all contained Polygons are closed or
         // no Polygon exists.
-        for(sal_uInt32 a(0); bRetval && a < mpPolyPolygon->count(); a++)
+        for(sal_uInt32 a(0); a < count(); a++)
         {
-            if(!mpPolyPolygon->getB2DPolygon(a).isClosed())
-            {
-                bRetval = false;
-            }
+            if(!getB2DPolygon(a).isClosed())
+                return false;
         }
 
-        return bRetval;
+        return true;
     }
 
     void B2DPolyPolygon::setClosed(bool bNew)
@@ -360,7 +366,7 @@ namespace basegfx
 
     void B2DPolyPolygon::flip()
     {
-        if(std::as_const(*mpPolyPolygon).count())
+        if(count())
         {
             mpPolyPolygon->flip();
         }
@@ -368,17 +374,13 @@ namespace basegfx
 
     bool B2DPolyPolygon::hasDoublePoints() const
     {
-        bool bRetval(false);
-
-        for(sal_uInt32 a(0); !bRetval && a < mpPolyPolygon->count(); a++)
+        for(sal_uInt32 a(0); a < count(); a++)
         {
-            if(mpPolyPolygon->getB2DPolygon(a).hasDoublePoints())
-            {
-                bRetval = true;
-            }
+            if(getB2DPolygon(a).hasDoublePoints())
+                return true;
         }
 
-        return bRetval;
+        return false;
     }
 
     void B2DPolyPolygon::removeDoublePoints()
@@ -389,7 +391,7 @@ namespace basegfx
 
     void B2DPolyPolygon::transform(const B2DHomMatrix& rMatrix)
     {
-        if(std::as_const(*mpPolyPolygon).count() && !rMatrix.isIdentity())
+        if(count() && !rMatrix.isIdentity())
         {
             mpPolyPolygon->transform(rMatrix);
         }
@@ -417,14 +419,7 @@ namespace basegfx
 
     void B2DPolyPolygon::addOrReplaceSystemDependentDataInternal(SystemDependentData_SharedPtr& rData) const
     {
-        // Need to get ImplB2DPolyPolygon* from cow_wrapper *without*
-        // calling make_unique() here - we do not want to
-        // 'modify' the ImplB2DPolyPolygon, but add buffered data that
-        // is valid for all referencing instances
-        const B2DPolyPolygon* pMe(this);
-        const ImplB2DPolyPolygon* pMyImpl(pMe->mpPolyPolygon.get());
-
-        const_cast<ImplB2DPolyPolygon*>(pMyImpl)->addOrReplaceSystemDependentData(rData);
+        mpPolyPolygon->addOrReplaceSystemDependentData(rData);
     }
 
     SystemDependentData_SharedPtr B2DPolyPolygon::getSystemDependantDataInternal(size_t hash_code) const

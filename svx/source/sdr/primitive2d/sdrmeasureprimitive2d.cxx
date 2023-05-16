@@ -27,6 +27,7 @@
 #include <svx/sdr/primitive2d/svx_primitivetypes2d.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <drawinglayer/primitive2d/hiddengeometryprimitive2d.hxx>
+#include <osl/diagnose.h>
 
 
 using namespace com::sun::star;
@@ -429,7 +430,7 @@ namespace drawinglayer::primitive2d
                     getSdrLSTAttribute().getShadow());
             }
 
-            rContainer.insert(rContainer.end(), aRetval.begin(), aRetval.end());
+            rContainer.append(std::move(aRetval));
         }
 
         SdrMeasurePrimitive2D::SdrMeasurePrimitive2D(

@@ -16,8 +16,7 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef INCLUDED_SW_INC_UNOSTYLE_HXX
-#define INCLUDED_SW_INC_UNOSTYLE_HXX
+#pragma once
 
 #include <svl/listener.hxx>
 #include <svl/style.hxx>
@@ -189,7 +188,7 @@ private:
 
 public:
 
-    SwXAutoStyle( SwDoc* pDoc, std::shared_ptr<SfxItemSet> const & pInitSet, IStyleAccess::SwAutoStyleFamily eFam );
+    SwXAutoStyle( SwDoc* pDoc, std::shared_ptr<SfxItemSet> pInitSet, IStyleAccess::SwAutoStyleFamily eFam );
     virtual ~SwXAutoStyle() override;
 
     //XPropertySet
@@ -340,9 +339,9 @@ class SwXTextCellStyle final : public cppu::WeakImplHelper
     bool m_bPhysical;
 
  public:
-    SwXTextCellStyle(SwDocShell* pDocShell, SwBoxAutoFormat* pBoxAutoFormat, const OUString& sParentStyle);
+    SwXTextCellStyle(SwDocShell* pDocShell, SwBoxAutoFormat* pBoxAutoFormat, OUString sParentStyle);
     /// Create non physical style
-    SwXTextCellStyle(SwDocShell* pDocShell, const OUString& sName);
+    SwXTextCellStyle(SwDocShell* pDocShell, OUString  sName);
 
     /**
     * This function looks for a SwBoxAutoFormat with given name. Parses the name and returns parent name.
@@ -351,7 +350,7 @@ class SwXTextCellStyle final : public cppu::WeakImplHelper
     * @param pParentName Optional output. Pointer to an OUString where parsed parent name will be returned.
     * @return Pointer to a SwBoxAutoFormat, nullptr if not found.
     */
-    static SwBoxAutoFormat* GetBoxAutoFormat(SwDocShell* pDocShell, const OUString& sName, OUString* pParentName);
+    static SwBoxAutoFormat* GetBoxAutoFormat(SwDocShell* pDocShell, std::u16string_view sName, OUString* pParentName);
     /// returns box format assigned to this style
     SwBoxAutoFormat* GetBoxFormat();
     /// Sets the address of SwBoxAutoFormat this style is bound to. Usable only when style is physical.
@@ -391,6 +390,5 @@ class SwXTextCellStyle final : public cppu::WeakImplHelper
 
     static css::uno::Reference<css::style::XStyle> CreateXTextCellStyle(SwDocShell* pDocShell, const OUString& sName);
 };
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

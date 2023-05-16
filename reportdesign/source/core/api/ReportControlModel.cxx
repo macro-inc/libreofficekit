@@ -20,6 +20,7 @@
 #include <com/sun/star/beans/XMultiPropertySet.hpp>
 #include <com/sun/star/beans/XPropertyState.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
+#include <o3tl/safeint.hxx>
 namespace reportdesign
 {
 using namespace com::sun::star;
@@ -62,7 +63,7 @@ void OReportControlModel::insertByIndex(::sal_Int32 Index, const uno::Any& Eleme
     }
 
     // notify our container listeners
-    container::ContainerEvent aEvent(xBroadcaster, uno::makeAny(Index), Element, uno::Any());
+    container::ContainerEvent aEvent(xBroadcaster, uno::Any(Index), Element, uno::Any());
     aContainerListeners.notifyEach(&container::XContainerListener::elementInserted, aEvent);
 }
 
@@ -77,7 +78,7 @@ void OReportControlModel::removeByIndex(::sal_Int32 Index)
         Element <<= m_aFormatConditions[Index];
         m_aFormatConditions.erase(m_aFormatConditions.begin() + Index);
     }
-    container::ContainerEvent aEvent(xBroadcaster, uno::makeAny(Index), Element, uno::Any());
+    container::ContainerEvent aEvent(xBroadcaster, uno::Any(Index), Element, uno::Any());
     aContainerListeners.notifyEach(&container::XContainerListener::elementRemoved, aEvent);
 }
 
@@ -94,7 +95,7 @@ void OReportControlModel::replaceByIndex(::sal_Int32 Index, const uno::Any& Elem
         checkIndex(Index);
         m_aFormatConditions[Index] = xElement;
     }
-    container::ContainerEvent aEvent(xBroadcaster, uno::makeAny(Index), Element, uno::Any());
+    container::ContainerEvent aEvent(xBroadcaster, uno::Any(Index), Element, uno::Any());
     aContainerListeners.notifyEach(&container::XContainerListener::elementReplaced, aEvent);
 }
 
@@ -118,7 +119,7 @@ uno::Any OReportControlModel::getByIndex(::sal_Int32 Index)
 
 void OReportControlModel::checkIndex(sal_Int32 _nIndex)
 {
-    if (_nIndex < 0 || static_cast<sal_Int32>(m_aFormatConditions.size()) <= _nIndex)
+    if (_nIndex < 0 || m_aFormatConditions.size() <= o3tl::make_unsigned(_nIndex))
         throw lang::IndexOutOfBoundsException();
 }
 

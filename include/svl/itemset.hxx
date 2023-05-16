@@ -23,6 +23,7 @@
 #include <cassert>
 #include <cstddef>
 #include <memory>
+#include <optional>
 #include <utility>
 
 #include <svl/svldllapi.h>
@@ -35,6 +36,7 @@ class SfxItemPool;
 class SAL_WARN_UNUSED SVL_DLLPUBLIC SfxItemSet
 {
     friend class SfxItemIter;
+    friend class SfxWhichIter;
 
     SfxItemPool*      m_pPool;         ///< pool that stores the items
     const SfxItemSet* m_pParent;       ///< derivation
@@ -48,8 +50,6 @@ friend class SfxAllItemSet;
 
 private:
     SVL_DLLPRIVATE void       RecreateRanges_Impl(const WhichRangesContainer& pNewRanges);
-
-    SfxItemSet( SfxItemPool & pool, const WhichRangesContainer& wids, std::size_t items );
 
 public:
     SfxPoolItem const**         GetItems_Impl() const { return m_ppItems; }
@@ -75,8 +75,7 @@ public:
     SfxItemSet( const SfxItemSet& );
     SfxItemSet( SfxItemSet&& ) noexcept;
     SfxItemSet( SfxItemPool& );
-    SfxItemSet( SfxItemPool&, const WhichRangesContainer& ranges );
-    SfxItemSet( SfxItemPool&, WhichRangesContainer&& ranges );
+    SfxItemSet( SfxItemPool&, WhichRangesContainer ranges );
 
     SfxItemSet( SfxItemPool& rPool, sal_uInt16 nWhichStart, sal_uInt16 nWhichEnd )
         : SfxItemSet(rPool, WhichRangesContainer(nWhichStart, nWhichEnd)) {}
@@ -88,7 +87,9 @@ public:
     virtual ~SfxItemSet();
 
     virtual std::unique_ptr<SfxItemSet> Clone(bool bItems = true, SfxItemPool *pToPool = nullptr) const;
-    virtual SfxItemSet CloneAsValue(bool bItems = true, SfxItemPool *pToPool = nullptr) const;
+    /** note that this only works if you know for sure that you are dealing with an SfxItemSet
+        and not one of it's subclasses. */
+    SfxItemSet CloneAsValue(bool bItems = true, SfxItemPool *pToPool = nullptr) const;
 
     // Get number of items
     sal_uInt16                  Count() const { return m_nCount; }
@@ -145,7 +146,27 @@ public:
                                                 bool bSrchInParent = true,
                                                 const SfxPoolItem **ppItem = nullptr ) const;
 
+    template <class T>
+    SfxItemState                GetItemState(   TypedWhichId<T> nWhich,
+                                                bool bSrchInParent = true,
+                                                const T **ppItem = nullptr ) const
+    { return GetItemState(sal_uInt16(nWhich), bSrchInParent, reinterpret_cast<SfxPoolItem const**>(ppItem)); }
+
+    /// Templatized version of GetItemState() to directly return the correct type.
+    template<class T>
+    const T *                   GetItemIfSet(   TypedWhichId<T> nWhich,
+                                                bool bSrchInParent = true ) const
+    {
+        const SfxPoolItem * pItem = nullptr;
+        if( SfxItemState::SET == GetItemState(sal_uInt16(nWhich), bSrchInParent, &pItem) )
+            return static_cast<const T*>(pItem);
+        return nullptr;
+    }
+
     bool                        HasItem(sal_uInt16 nWhich, const SfxPoolItem** ppItem = nullptr) const;
+    template<class T>
+    bool                        HasItem(TypedWhichId<T> nWhich, const T** ppItem = nullptr) const
+    { return HasItem(sal_uInt16(nWhich), reinterpret_cast<const SfxPoolItem**>(ppItem)); }
 
     void                        DisableItem(sal_uInt16 nWhich);
     void                        InvalidateItem( sal_uInt16 nWhich );
@@ -201,6 +222,14 @@ public:
     bool                        Equals(const SfxItemSet &, bool bComparePool) const;
 
     void dumpAsXml(xmlTextWriterPtr pWriter) const;
+
+private:
+    sal_uInt16 ClearSingleItemImpl( sal_uInt16 nWhich, std::optional<sal_uInt16> oItemOffsetHint );
+    sal_uInt16 ClearAllItemsImpl();
+    SfxItemState  GetItemStateImpl( sal_uInt16 nWhich,
+                                bool bSrchInParent,
+                                const SfxPoolItem **ppItem,
+                                std::optional<sal_uInt16> oItemsOffsetHint) const;
 };
 
 inline void SfxItemSet::SetParent( const SfxItemSet* pNew )
@@ -219,7 +248,6 @@ public:
                                 SfxAllItemSet( const SfxAllItemSet & );
 
     virtual std::unique_ptr<SfxItemSet> Clone( bool bItems = true, SfxItemPool *pToPool = nullptr ) const override;
-    virtual SfxItemSet CloneAsValue( bool bItems = true, SfxItemPool *pToPool = nullptr ) const override;
 private:
     virtual const SfxPoolItem*  PutImpl( const SfxPoolItem&, sal_uInt16 nWhich, bool bPassingOwnership ) override;
 };

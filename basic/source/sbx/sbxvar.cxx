@@ -28,11 +28,13 @@
 #include "sbxconv.hxx"
 #include <rtlproto.hxx>
 #include <sbunoobj.hxx>
-#include <rtl/character.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
+#include <global.hxx>
+#include <unotools/transliterationwrapper.hxx>
 
 #include <com/sun/star/uno/XInterface.hpp>
+#include <utility>
 using namespace com::sun::star::uno;
 
 // SbxVariable
@@ -180,10 +182,17 @@ void SbxVariable::SetParameters( SbxArray* p )
 
 // Name of the variables
 
+// static
+OUString SbxVariable::NameToCaseInsensitiveName(const OUString& rName)
+{
+    return SbGlobal::GetTransliteration().transliterate(rName, 0, rName.getLength());
+}
+
 void SbxVariable::SetName( const OUString& rName )
 {
     maName = rName;
     nHash = MakeHashCode( rName );
+    maNameCI.clear();
 }
 
 const OUString& SbxVariable::GetName( SbxNameType t ) const
@@ -192,6 +201,12 @@ const OUString& SbxVariable::GetName( SbxNameType t ) const
     if( t == SbxNameType::NONE )
     {
         return maName;
+    }
+    if (t == SbxNameType::CaseInsensitive)
+    {
+        if (maNameCI.isEmpty() && !maName.isEmpty())
+            maNameCI = NameToCaseInsensitiveName(maName);
+        return maNameCI;
     }
     // Request parameter-information (not for objects)
     const_cast<SbxVariable*>(this)->GetInfo();
@@ -549,15 +564,15 @@ SbxInfo::SbxInfo()
         :  nHelpId(0)
 {}
 
-SbxInfo::SbxInfo( const OUString& r, sal_uInt32 n )
-       : aHelpFile( r ), nHelpId( n )
+SbxInfo::SbxInfo( OUString a, sal_uInt32 n )
+       : aHelpFile(std::move( a )), nHelpId( n )
 {}
 
 void SbxVariable::Dump( SvStream& rStrm, bool bFill )
 {
     OString aBNameStr(OUStringToOString(GetName( SbxNameType::ShortTypes ), RTL_TEXTENCODING_ASCII_US));
     rStrm.WriteCharPtr( "Variable( " )
-         .WriteOString( OString::number(reinterpret_cast<sal_Int64>(this)) ).WriteCharPtr( "==" )
+         .WriteOString( OString::number(reinterpret_cast<sal_IntPtr>(this)) ).WriteCharPtr( "==" )
          .WriteOString( aBNameStr );
     OString aBParentNameStr(OUStringToOString(GetParent()->GetName(), RTL_TEXTENCODING_ASCII_US));
     if ( GetParent() )

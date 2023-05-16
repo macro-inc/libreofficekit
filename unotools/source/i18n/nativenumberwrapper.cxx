@@ -19,10 +19,9 @@
 
 #include <sal/config.h>
 
-#include <sal/log.hxx>
 #include <unotools/nativenumberwrapper.hxx>
 #include <com/sun/star/i18n/NativeNumberSupplier2.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 

@@ -24,20 +24,18 @@
 #include "mysqlc_types.hxx"
 
 #include <com/sun/star/beans/PropertyValue.hpp>
-#include <com/sun/star/lang/DisposedException.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/lang/XUnoTunnel.hpp>
-#include <com/sun/star/sdbc/ColumnSearch.hpp>
 #include <com/sun/star/sdbc/ColumnValue.hpp>
-#include <com/sun/star/sdbc/DataType.hpp>
 #include <com/sun/star/sdbc/SQLWarning.hpp>
 #include <com/sun/star/sdbc/XConnection.hpp>
 #include <com/sun/star/sdbc/XWarningsSupplier.hpp>
 #include <com/sun/star/util/XStringSubstitution.hpp>
 
-#include <cppuhelper/compbase3.hxx>
-#include <cppuhelper/weakref.hxx>
-#include <rtl/string.hxx>
+#include <com/sun/star/sdbcx/XTablesSupplier.hpp>
+
+#include <cppuhelper/basemutex.hxx>
+#include <cppuhelper/compbase.hxx>
 #include <rtl/ref.hxx>
 
 #include <mysql.h>
@@ -56,12 +54,8 @@ class ODatabaseMetaData;
 
 namespace mysqlc
 {
-using ::com::sun::star::sdbc::SQLException;
-using ::com::sun::star::sdbc::SQLWarning;
-using ::com::sun::star::uno::RuntimeException;
-
-typedef ::cppu::WeakComponentImplHelper3<css::sdbc::XConnection, css::sdbc::XWarningsSupplier,
-                                         css::lang::XServiceInfo>
+typedef ::cppu::WeakComponentImplHelper<css::sdbc::XConnection, css::sdbc::XWarningsSupplier,
+                                        css::lang::XUnoTunnel, css::lang::XServiceInfo>
     OMetaConnection_BASE;
 
 struct ConnectionSettings
@@ -82,7 +76,7 @@ typedef OMetaConnection_BASE OConnection_BASE;
 
 typedef std::vector<css::uno::WeakReferenceHelper> OWeakRefArray;
 
-class OConnection final : public OBase_Mutex, public OConnection_BASE
+class OConnection final : public cppu::BaseMutex, public OConnection_BASE
 {
 private:
     MYSQL m_mysql;
@@ -92,6 +86,7 @@ private:
 
     // Data attributes
 
+    css::uno::WeakReference<css::sdbcx::XTablesSupplier> m_xCatalog;
     css::uno::WeakReference<css::sdbc::XDatabaseMetaData> m_xMetaData;
 
     OWeakRefArray m_aStatements; // vector containing a list
@@ -114,6 +109,12 @@ public:
 
     rtl_TextEncoding getConnectionEncoding() const { return m_settings.encoding; }
 
+    /**
+     * Create and/or connect to the sdbcx Catalog. This is completely
+     * unrelated to the SQL "Catalog".
+     */
+    css::uno::Reference<css::sdbcx::XTablesSupplier> createCatalog();
+
     // OComponentHelper
     virtual void SAL_CALL disposing() override;
 
@@ -123,6 +124,10 @@ public:
     virtual sal_Bool SAL_CALL supportsService(OUString const& ServiceName) override;
 
     virtual css::uno::Sequence<OUString> SAL_CALL getSupportedServiceNames() override;
+
+    // XUnoTunnel
+    virtual sal_Int64 SAL_CALL getSomething(const css::uno::Sequence<sal_Int8>& rId) override;
+    static const css::uno::Sequence<sal_Int8>& getUnoTunnelId();
 
     // XConnection
     css::uno::Reference<css::sdbc::XStatement> SAL_CALL createStatement() override;

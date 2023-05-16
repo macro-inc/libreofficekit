@@ -20,14 +20,15 @@
 #include <sal/config.h>
 
 #include <o3tl/any.hxx>
-#include <osl/mutex.hxx>
+#include <o3tl/safeint.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <svl/hint.hxx>
 
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/exc_hlp.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <comphelper/extract.hxx>
 #include <comphelper/processfactory.hxx>
 #include <cppuhelper/weakref.hxx>
@@ -968,6 +969,12 @@ static Type getUnoTypeForSbxValue( const SbxValue* pVal )
     // No object, convert basic type
     else
     {
+        if (eBaseType == SbxBYTE && pVal->GetByte() > 127)
+        {
+            // Basic Byte type is unsigned; cppu::UnoType<sal_uInt8> corresponds to UNO boolean,
+            // so values 128-255 are only representable starting with UNO short types
+            eBaseType = SbxUSHORT;
+        }
         aRetType = getUnoTypeForSbxBaseType( eBaseType );
     }
     return aRetType;
@@ -1048,19 +1055,10 @@ static Any sbxToUnoValueImpl( const SbxValue* pVar, bool bBlockConversionToSmall
                     aType = ::cppu::UnoType<sal_Int16>::get();
                 break;
             }
-            case TypeClass_UNSIGNED_SHORT:
-            {
-                sal_uInt16 n = pVar->GetUShort();
-                if( n <= 255 )
-                    aType = cppu::UnoType<sal_uInt8>::get();
-                break;
-            }
             case TypeClass_UNSIGNED_LONG:
             {
                 sal_uInt32 n = pVar->GetLong();
-                if( n <= 255 )
-                    aType = cppu::UnoType<sal_uInt8>::get();
-                else if( n <= SbxMAXUINT )
+                if( n <= SbxMAXUINT )
                     aType = cppu::UnoType<cppu::UnoUnsignedShortType>::get();
                 break;
             }
@@ -1534,7 +1532,7 @@ static Any invokeAutomationMethod( const OUString& Name, Sequence< Any > const &
         for( sal_uInt32 j = 0 ; j < nLen ; j++ )
         {
             sal_Int16 iTarget = pIndices[ j ];
-            if( iTarget >= static_cast<sal_Int16>(nParamCount) )
+            if( o3tl::make_unsigned(iTarget) >= nParamCount )
                 break;
             unoToSbxValue(pParams->Get(j + 1), pNewValues[j]);
         }
@@ -2052,7 +2050,7 @@ void SbUnoObject::Notify( SfxBroadcaster& rBC, const SfxHint& rHint )
                         {
                             if ( pProp->isUnoStruct() )
                             {
-                                SbUnoStructRefObject* pSbUnoObject = new SbUnoStructRefObject( pProp->GetName(), aMember );
+                                SbUnoStructRefObject* pSbUnoObject = new SbUnoStructRefObject( pProp->GetName(), std::move(aMember) );
                                 SbxObjectRef xWrapper = static_cast<SbxObject*>(pSbUnoObject);
                                 pVar->PutObject( xWrapper.get() );
                             }
@@ -2312,11 +2310,8 @@ SbUnoObject::SbUnoObject( const OUString& aName_, const Any& aUnoObj_ )
             return;
     }
 
-    Reference< XTypeProvider > xTypeProvider;
     // Did the object have an invocation itself?
     mxInvocation.set( x, UNO_QUERY );
-
-    xTypeProvider.set( x, UNO_QUERY );
 
     if( mxInvocation.is() )
     {
@@ -2325,6 +2320,7 @@ SbUnoObject::SbUnoObject( const OUString& aName_, const Any& aUnoObj_ )
         mxExactNameInvocation.set( mxInvocation, UNO_QUERY );
 
         // The remainder refers only to the introspection
+        Reference< XTypeProvider > xTypeProvider( x, UNO_QUERY );
         if( !xTypeProvider.is() )
         {
             bNeedIntrospection = false;
@@ -2566,13 +2562,13 @@ SbUnoProperty::SbUnoProperty
     const OUString& aName_,
     SbxDataType eSbxType,
     SbxDataType eRealSbxType,
-    const Property& aUnoProp_,
+    Property aUnoProp_,
     sal_Int32 nId_,
     bool bInvocation,
     bool bUnoStruct
 )
     : SbxProperty( aName_, eSbxType )
-    , aUnoProp( aUnoProp_ )
+    , aUnoProp(std::move( aUnoProp_ ))
     , nId( nId_ )
     , mbInvocation( bInvocation )
     , mRealType( eRealSbxType )
@@ -3272,14 +3268,14 @@ void VBAConstantHelper::init()
 }
 
 bool
-VBAConstantHelper::isVBAConstantType( const OUString& rName )
+VBAConstantHelper::isVBAConstantType( std::u16string_view rName )
 {
     init();
     bool bConstant = false;
 
     for (auto const& elem : aConstCache)
     {
-        if( rName.equalsIgnoreAsciiCase(elem) )
+        if( o3tl::equalsIgnoreAsciiCase(rName, elem) )
         {
             bConstant = true;
             break;
@@ -3784,7 +3780,7 @@ public:
     SbxObjectRef    xSbxObj;
     OUString        aPrefixName;
 
-    explicit BasicAllListener_Impl( const OUString& aPrefixName );
+    explicit BasicAllListener_Impl( OUString aPrefixName );
 
     // Methods of XAllListener
     virtual void SAL_CALL firing(const AllEventObject& Event) override;
@@ -3796,8 +3792,8 @@ public:
 
 }
 
-BasicAllListener_Impl::BasicAllListener_Impl(const OUString& aPrefixName_)
-    : aPrefixName( aPrefixName_ )
+BasicAllListener_Impl::BasicAllListener_Impl(OUString aPrefixName_)
+    : aPrefixName(std::move( aPrefixName_ ))
 {
 }
 
@@ -3882,7 +3878,7 @@ class InvocationToAllListenerMapper : public WeakImplHelper< XInvocation >
 {
 public:
     InvocationToAllListenerMapper( const Reference< XIdlClass >& ListenerType,
-        const Reference< XAllListener >& AllListener, const Any& Helper );
+        const Reference< XAllListener >& AllListener, Any Helper );
 
     // XInvocation
     virtual Reference< XIntrospectionAccess > SAL_CALL getIntrospection() override;
@@ -3923,10 +3919,10 @@ static Reference< XInterface > createAllListenerAdapter
 
 // InvocationToAllListenerMapper
 InvocationToAllListenerMapper::InvocationToAllListenerMapper
-    ( const Reference< XIdlClass >& ListenerType, const Reference< XAllListener >& AllListener, const Any& Helper )
+    ( const Reference< XIdlClass >& ListenerType, const Reference< XAllListener >& AllListener, Any Helper )
         : m_xAllListener( AllListener )
         , m_xListenerType( ListenerType )
-        , m_Helper( Helper )
+        , m_Helper(std::move( Helper ))
 {
 }
 
@@ -4166,12 +4162,12 @@ namespace {
 
 class ModuleInvocationProxy : public WeakImplHelper< XInvocation, XComponent >
 {
-    ::osl::Mutex        m_aMutex;
+    std::mutex          m_aMutex;
     OUString            m_aPrefix;
     SbxObjectRef        m_xScopeObj;
     bool                m_bProxyIsClassModuleObject;
 
-    ::comphelper::OInterfaceContainerHelper2 m_aListeners;
+    ::comphelper::OInterfaceContainerHelper4<XEventListener> m_aListeners;
 
 public:
     ModuleInvocationProxy( std::u16string_view aPrefix, SbxObjectRef const & xScopeObj );
@@ -4199,7 +4195,6 @@ public:
 ModuleInvocationProxy::ModuleInvocationProxy( std::u16string_view  aPrefix, SbxObjectRef const & xScopeObj )
     : m_aPrefix( OUString::Concat(aPrefix) + "_" )
     , m_xScopeObj( xScopeObj )
-    , m_aListeners( m_aMutex )
 {
     m_bProxyIsClassModuleObject = xScopeObj.is() && dynamic_cast<const SbClassModuleObject*>( xScopeObj.get() ) != nullptr;
 }
@@ -4355,22 +4350,24 @@ Any SAL_CALL ModuleInvocationProxy::invoke( const OUString& rFunction,
 
 void SAL_CALL ModuleInvocationProxy::dispose()
 {
-    ::osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     EventObject aEvent( static_cast<XComponent*>(this) );
-    m_aListeners.disposeAndClear( aEvent );
+    m_aListeners.disposeAndClear( aGuard, aEvent );
 
     m_xScopeObj = nullptr;
 }
 
 void SAL_CALL ModuleInvocationProxy::addEventListener( const Reference< XEventListener >& xListener )
 {
-    m_aListeners.addInterface( xListener );
+    std::unique_lock aGuard( m_aMutex );
+    m_aListeners.addInterface( aGuard, xListener );
 }
 
 void SAL_CALL ModuleInvocationProxy::removeEventListener( const Reference< XEventListener >& xListener )
 {
-    m_aListeners.removeInterface( xListener );
+    std::unique_lock aGuard( m_aMutex );
+    m_aListeners.removeInterface( aGuard, xListener );
 }
 
 
@@ -4631,7 +4628,7 @@ TypeClass StructRefInfo::getTypeClass() const
     return maType.getTypeClass();
 }
 
-SbUnoStructRefObject::SbUnoStructRefObject( const OUString& aName_, const StructRefInfo& rMemberInfo ) :  SbxObject( aName_ ), maMemberInfo( rMemberInfo ), mbMemberCacheInit( false )
+SbUnoStructRefObject::SbUnoStructRefObject( const OUString& aName_, StructRefInfo aMemberInfo ) :  SbxObject( aName_ ), maMemberInfo(std::move( aMemberInfo )), mbMemberCacheInit( false )
 {
    SetClassName( maMemberInfo.getTypeName() );
 }
@@ -4679,7 +4676,8 @@ SbxVariable* SbUnoStructRefObject::Find( const OUString& rName, SbxClassType t )
             Property aProp;
             aProp.Name = rName;
             aProp.Type = css::uno::Type( it->second->getTypeClass(), it->second->getTypeName() );
-            SbUnoProperty* pProp = new SbUnoProperty( rName, eSbxType, eRealSbxType, aProp, 0, false, ( aProp.Type.getTypeClass() == css::uno::TypeClass_STRUCT) );
+            const bool bIsStruct = aProp.Type.getTypeClass() == css::uno::TypeClass_STRUCT;
+            SbUnoProperty* pProp = new SbUnoProperty( rName, eSbxType, eRealSbxType, std::move(aProp), 0, false, bIsStruct );
             SbxVariableRef xVarRef = pProp;
             QuickInsert( xVarRef.get() );
             pRes = xVarRef.get();
@@ -4717,7 +4715,7 @@ void SbUnoStructRefObject::implCreateDbgProperties()
     QuickInsert( xVarRef.get() );
 
     // Id == -3: output the Methods
-    xVarRef = new SbUnoProperty( ID_DBG_METHODS, SbxSTRING, SbxSTRING, aProp, -3, false, false );
+    xVarRef = new SbUnoProperty( ID_DBG_METHODS, SbxSTRING, SbxSTRING, std::move(aProp), -3, false, false );
     QuickInsert( xVarRef.get() );
 }
 
@@ -4739,7 +4737,8 @@ void SbUnoStructRefObject::implCreateAll()
         Property aProp;
         aProp.Name = rName;
         aProp.Type = css::uno::Type( field.second->getTypeClass(), field.second->getTypeName() );
-        SbUnoProperty* pProp = new SbUnoProperty( rName, eSbxType, eRealSbxType, aProp, 0, false, ( aProp.Type.getTypeClass() == css::uno::TypeClass_STRUCT) );
+        const bool bIsStruct = aProp.Type.getTypeClass() == css::uno::TypeClass_STRUCT;
+        SbUnoProperty* pProp = new SbUnoProperty( rName, eSbxType, eRealSbxType, std::move(aProp), 0, false, bIsStruct );
         SbxVariableRef xVarRef = pProp;
         QuickInsert( xVarRef.get() );
     }

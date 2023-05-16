@@ -21,7 +21,7 @@
 
 #include <sal/log.hxx>
 #include <unotools/pathoptions.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <com/sun/star/uno/Any.hxx>
 #include <com/sun/star/uno/Sequence.hxx>
@@ -38,12 +38,12 @@
 #include <com/sun/star/util/XStringSubstitution.hpp>
 #include <com/sun/star/util/theMacroExpander.hpp>
 #include <o3tl/enumarray.hxx>
+#include <o3tl/string_view.hxx>
 
 #include "itemholder1.hxx"
 
 #include <set>
 #include <unordered_map>
-#include <vector>
 
 using namespace osl;
 using namespace utl;
@@ -82,7 +82,7 @@ class SvtPathOptions_Impl
         VarNameSet                          m_aSystemPathVarNames;
 
         OUString                            m_aEmptyString;
-        mutable ::osl::Mutex                m_aMutex;
+        mutable std::mutex                  m_aMutex;
 
     public:
                         SvtPathOptions_Impl();
@@ -210,7 +210,7 @@ const VarNameAttribute aVarNameAttribute[] =
 
 const OUString& SvtPathOptions_Impl::GetPath( SvtPathOptions::Paths ePath )
 {
-    ::osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     try
     {
@@ -263,7 +263,7 @@ const OUString& SvtPathOptions_Impl::GetPath( SvtPathOptions::Paths ePath )
 
 void SvtPathOptions_Impl::SetPath( SvtPathOptions::Paths ePath, const OUString& rNewPath )
 {
-    ::osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     OUString    aResult;
     OUString    aNewValue;
@@ -434,9 +434,9 @@ SvtPathOptions_Impl::SvtPathOptions_Impl()
 
 namespace
 {
-    ::osl::Mutex& lclMutex()
+    std::mutex& lclMutex()
     {
-        static ::osl::Mutex SINGLETON;
+        static std::mutex SINGLETON;
         return SINGLETON;
     }
 }
@@ -444,12 +444,13 @@ namespace
 SvtPathOptions::SvtPathOptions()
 {
     // Global access, must be guarded (multithreading)
-    ::osl::MutexGuard aGuard( lclMutex() );
+    std::unique_lock aGuard( lclMutex() );
     pImpl = g_pOptions.lock();
     if ( !pImpl )
     {
         pImpl = std::make_shared<SvtPathOptions_Impl>();
         g_pOptions = pImpl;
+        aGuard.unlock(); // because holdConfigItem will call this constructor
         ItemHolder1::holdConfigItem(EItem::PathOptions);
     }
 }
@@ -457,7 +458,7 @@ SvtPathOptions::SvtPathOptions()
 SvtPathOptions::~SvtPathOptions()
 {
     // Global access, must be guarded (multithreading)
-    ::osl::MutexGuard aGuard( lclMutex() );
+    std::unique_lock aGuard( lclMutex() );
 
     pImpl.reset();
 }
@@ -740,7 +741,7 @@ bool SvtPathOptions::SearchFile( OUString& rIniFile, SvtPathOptions::Paths ePath
             sal_Int32 nIniIndex = 0;
             do
             {
-                OUString aToken = aIniFile.getToken( 0, '/', nIniIndex );
+                std::u16string_view aToken = o3tl::getToken(aIniFile, 0, '/', nIniIndex );
                 aObj.insertName(aToken);
             }
             while ( nIniIndex >= 0 );
@@ -799,7 +800,7 @@ bool SvtPathOptions::SearchFile( OUString& rIniFile, SvtPathOptions::Paths ePath
             do
             {
                 bool bIsURL = true;
-                OUString aPathToken = aPath.getToken( 0, SEARCHPATH_DELIMITER, nPathIndex );
+                OUString aPathToken( aPath.getToken( 0, SEARCHPATH_DELIMITER, nPathIndex ) );
                 INetURLObject aObj( aPathToken );
                 if ( aObj.HasError() )
                 {
@@ -819,7 +820,7 @@ bool SvtPathOptions::SearchFile( OUString& rIniFile, SvtPathOptions::Paths ePath
                 sal_Int32 nIniIndex = 0;
                 do
                 {
-                    OUString aToken = aIniFile.getToken( 0, '/', nIniIndex );
+                    std::u16string_view aToken = o3tl::getToken(aIniFile, 0, '/', nIniIndex );
                     aObj.insertName(aToken);
                 }
                 while ( nIniIndex >= 0 );

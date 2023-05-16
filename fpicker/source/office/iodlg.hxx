@@ -77,8 +77,6 @@ private:
                                 m_pCurrentAsyncAction;
     bool                        m_bInExecuteAsync;
     bool                        m_bHasFilename;
-    css::uno::Reference < css::uno::XComponentContext >
-                                m_xContext;
 
     DECL_LINK(            FilterSelectHdl_Impl, weld::ComboBox&, void );
     DECL_LINK(            FilterSelectTimerHdl_Impl, Timer*, void );
@@ -232,7 +230,7 @@ private:
     virtual void                enableControl( sal_Int16 _nControlId, bool _bEnable ) override;
     virtual OUString            getCurFilter( ) const override;
 
-    OUString                    implGetInitialURL( const OUString& _rPath, const OUString& _rFallback );
+    OUString                    implGetInitialURL( const OUString& _rPath, std::u16string_view _rFallback );
 
     /// executes a certain FileView action asynchronously
     void                        executeAsync(

@@ -31,10 +31,10 @@ enum class Master_CollCondition;
 struct CommandStruct
 {
     Master_CollCondition nCnd;
-    sal_uLong nSubCond;
+    sal_uInt32 nSubCond;
 };
 
-sal_Int16       GetCommandContextIndex( const OUString &rContextName );
+sal_Int16 GetCommandContextIndex( std::u16string_view rContextName );
 OUString   GetCommandContextByIndex( sal_Int16 nIndex );
 
 class SW_DLLPUBLIC SwCondCollItem final : public SfxPoolItem

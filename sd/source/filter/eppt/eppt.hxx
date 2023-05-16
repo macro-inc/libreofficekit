@@ -19,6 +19,7 @@
 
 #pragma once
 #include <memory>
+#include <utility>
 #include <vector>
 #include "escherex.hxx"
 #include <sal/types.h>
@@ -69,8 +70,8 @@ struct EPPTHyperlink
                             // bit 8-23: index
                             // bit 31  : hyperlink is attached to a shape
 
-    EPPTHyperlink( const OUString& rURL, sal_uInt32 nT ) :
-        aURL        ( rURL ),
+    EPPTHyperlink( OUString _aURL, sal_uInt32 nT ) :
+        aURL        (std::move( _aURL )),
         nType       ( nT ){};
 };
 
@@ -163,7 +164,7 @@ class PPTWriter final : public PPTWriterBase, public PPTExBulletProvider
         sal_uInt32          ImplMasterSlideListContainer( SvStream* pOutStrm );
 
     public:
-        static void         WriteCString( SvStream&, const OUString&, sal_uInt32 nInstance = 0 );
+        static void         WriteCString( SvStream&, std::u16string_view, sal_uInt32 nInstance = 0 );
 
     private:
 
@@ -175,7 +176,7 @@ class PPTWriter final : public PPTWriterBase, public PPTExBulletProvider
         virtual bool        ImplCreateDocument() override;
         void                ImplCreateHyperBlob( SvMemoryStream& rStream );
         sal_uInt32          ImplInsertBookmarkURL( const OUString& rBookmark, const sal_uInt32 nType,
-                                const OUString& rStringVer0, const OUString& rStringVer1, const OUString& rStringVer2, const OUString& rStringVer3 );
+                                std::u16string_view aStringVer0, std::u16string_view aStringVer1, std::u16string_view aStringVer2, std::u16string_view aStringVer3 );
         virtual bool        ImplCreateMainNotes() override;
         void                ImplWriteBackground( css::uno::Reference< css::beans::XPropertySet > const & rXBackgroundPropSet );
         void                ImplWriteVBA();
@@ -216,7 +217,7 @@ class PPTWriter final : public PPTWriterBase, public PPTExBulletProvider
         virtual void        ImplWriteSlideMaster( sal_uInt32 nPageNum, css::uno::Reference< css::beans::XPropertySet > const & aXBackgroundPropSet ) override;
 
     public:
-                                PPTWriter( tools::SvRef<SotStorage> const & rSvStorage,
+                                PPTWriter( tools::SvRef<SotStorage> xSvStorage,
                                             css::uno::Reference< css::frame::XModel > const & rModel,
                                             css::uno::Reference< css::task::XStatusIndicator > const & rStatInd,
                                             SvMemoryStream* pVBA, sal_uInt32 nCnvrtFlags );

@@ -48,8 +48,7 @@ namespace sd::framework {
 SlideSorterModule::SlideSorterModule (
     const Reference<frame::XController>& rxController,
     const OUString& rsLeftPaneURL)
-    : SlideSorterModuleBase(MutexOwner::maMutex),
-      mxResourceId(FrameworkHelper::CreateResourceId(FrameworkHelper::msSlideSorterURL, rsLeftPaneURL)),
+    : mxResourceId(FrameworkHelper::CreateResourceId(FrameworkHelper::msSlideSorterURL, rsLeftPaneURL)),
       mxMainViewAnchorId(FrameworkHelper::CreateResourceId(FrameworkHelper::msCenterPaneURL)),
       mxViewTabBarId(FrameworkHelper::CreateResourceId(
           FrameworkHelper::msViewTabBarURL,
@@ -69,11 +68,11 @@ SlideSorterModule::SlideSorterModule (
             mxConfigurationController->addConfigurationChangeListener(
                 this,
                 FrameworkHelper::msResourceActivationRequestEvent,
-                makeAny(ResourceActivationRequestEvent));
+                Any(ResourceActivationRequestEvent));
             mxConfigurationController->addConfigurationChangeListener(
                 this,
                 FrameworkHelper::msResourceDeactivationRequestEvent,
-                makeAny(ResourceDeactivationRequestEvent));
+                Any(ResourceDeactivationRequestEvent));
         }
     }
     if (!mxConfigurationController.is())
@@ -231,7 +230,7 @@ bool SlideSorterModule::IsResourceActive (
     return (maActiveMainViewContainer.find(rsMainViewURL) != maActiveMainViewContainer.end());
 }
 
-void SAL_CALL SlideSorterModule::disposing()
+void SlideSorterModule::disposing(std::unique_lock<std::mutex>&)
 {
     if (mxConfigurationController.is())
     {

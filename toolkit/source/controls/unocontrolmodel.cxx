@@ -33,7 +33,7 @@
 #include <toolkit/controls/unocontrolmodel.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/debug.hxx>
 #include <tools/long.hxx>
 #include <toolkit/helper/property.hxx>
@@ -208,7 +208,9 @@ css::uno::Any UnoControlModel::ImplGetDefaultValue( sal_uInt16 nPropId ) const
             case BASEPROPERTY_SCROLLVALUE:
             case BASEPROPERTY_VISIBLESIZE:
             case BASEPROPERTY_BACKGROUNDCOLOR:
-            case BASEPROPERTY_FILLCOLOR:            break;  // Void
+            case BASEPROPERTY_FILLCOLOR:
+            case BASEPROPERTY_HIGHLIGHT_COLOR:
+            case BASEPROPERTY_HIGHLIGHT_TEXT_COLOR:            break;  // Void
 
             case BASEPROPERTY_FONTRELIEF:
             case BASEPROPERTY_FONTEMPHASISMARK:
@@ -330,8 +332,7 @@ css::uno::Any UnoControlModel::ImplGetDefaultValue( sal_uInt16 nPropId ) const
                 }
 
                 // the remaining is the locale
-                LanguageTag aLanguageTag( sDefaultCurrency);
-                LocaleDataWrapper aLocaleInfo( m_xContext, aLanguageTag );
+                LocaleDataWrapper aLocaleInfo( m_xContext, LanguageTag(sDefaultCurrency) );
                 if ( sBankSymbol.isEmpty() )
                     sBankSymbol = aLocaleInfo.getCurrBankSymbol();
 
@@ -1289,6 +1290,9 @@ void UnoControlModel::setPropertyValues( const css::uno::Sequence< OUString >& r
     ::osl::ClearableMutexGuard aGuard( GetMutex() );
 
     sal_Int32 nProps = rPropertyNames.getLength();
+    if (nProps != Values.getLength())
+        throw css::lang::IllegalArgumentException("lengths do not match",
+                                                  static_cast<cppu::OWeakObject*>(this), -1);
 
 //  sal_Int32* pHandles = new sal_Int32[nProps];
         // don't do this - it leaks in case of an exception

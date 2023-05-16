@@ -71,7 +71,7 @@ ESelection toESelection(const text::TextRangeSelection& rSel)
 
 #define QUERYINT( xint ) \
     if( rType == cppu::UnoType<xint>::get() ) \
-        return uno::makeAny(uno::Reference< xint >(this))
+        return uno::Any(uno::Reference< xint >(this))
 
 const SvxItemPropertySet* ImplGetSvxUnoOutlinerTextCursorSvxPropertySet()
 {
@@ -79,7 +79,7 @@ const SvxItemPropertySet* ImplGetSvxUnoOutlinerTextCursorSvxPropertySet()
     return &aTextCursorSvxPropertySet;
 }
 
-const SfxItemPropertyMapEntry* ImplGetSvxTextPortionPropertyMap()
+o3tl::span<const SfxItemPropertyMapEntry> ImplGetSvxTextPortionPropertyMap()
 {
     // Propertymap for an Outliner Text
     static const SfxItemPropertyMapEntry aSvxTextPortionPropertyMap[] =
@@ -92,7 +92,6 @@ const SfxItemPropertyMapEntry* ImplGetSvxTextPortionPropertyMap()
         { u"TextPortionType",               WID_PORTIONTYPE,    ::cppu::UnoType<OUString>::get(), beans::PropertyAttribute::READONLY, 0 },
         { u"TextUserDefinedAttributes",     EE_CHAR_XMLATTRIBS,     cppu::UnoType<css::container::XNameContainer>::get(),        0,     0},
         { u"ParaUserDefinedAttributes",     EE_PARA_XMLATTRIBS,     cppu::UnoType<css::container::XNameContainer>::get(),        0,     0},
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
     return aSvxTextPortionPropertyMap;
 }
@@ -108,7 +107,7 @@ static const SfxItemPropertySet* ImplGetSvxTextPortionSfxPropertySet()
     return &aSvxTextPortionSfxPropertySet;
 }
 
-const SfxItemPropertyMapEntry* ImplGetSvxUnoOutlinerTextCursorPropertyMap()
+o3tl::span<const SfxItemPropertyMapEntry> ImplGetSvxUnoOutlinerTextCursorPropertyMap()
 {
     // Propertymap for an Outliner Text
     static const SfxItemPropertyMapEntry aSvxUnoOutlinerTextCursorPropertyMap[] =
@@ -119,7 +118,6 @@ const SfxItemPropertyMapEntry* ImplGetSvxUnoOutlinerTextCursorPropertyMap()
         SVX_UNOEDIT_PARA_PROPERTIES,
         { u"TextUserDefinedAttributes",         EE_CHAR_XMLATTRIBS,     cppu::UnoType<css::container::XNameContainer>::get(),        0,     0},
         { u"ParaUserDefinedAttributes",         EE_PARA_XMLATTRIBS,     cppu::UnoType<css::container::XNameContainer>::get(),        0,     0},
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
 
     return aSvxUnoOutlinerTextCursorPropertyMap;
@@ -509,7 +507,7 @@ bool SvxUnoTextRangeBase::SetPropertyValueHelper( const SfxItemPropertyMapEntry*
             return !aValue.hasValue() || ((aValue >>= xRule) && !xRule.is());
         }
 
-    case WID_NUMLEVEL:
+    case EE_PARA_OUTLLEVEL:
         {
             SvxTextForwarder* pForwarder = pEditSource? pEditSource->GetTextForwarder() : nullptr;
             if(pForwarder && pSelection)
@@ -521,7 +519,8 @@ bool SvxUnoTextRangeBase::SetPropertyValueHelper( const SfxItemPropertyMapEntry*
                     if(! pForwarder->SetDepth( pSelection->nStartPara, nLevel ) )
                         throw lang::IllegalArgumentException();
 
-                    return true;
+                    // If valid, then not yet finished. Also needs to be added to paragraph props.
+                    return nLevel < -1 || nLevel > 9;
                 }
             }
         }
@@ -583,7 +582,7 @@ uno::Any SAL_CALL SvxUnoTextRangeBase::getPropertyValue(const OUString& Property
         aSel.Start.PositionInParagraph = rSel.nStartPos;
         aSel.End.Paragraph = rSel.nEndPara;
         aSel.End.PositionInParagraph = rSel.nEndPos;
-        return uno::makeAny(aSel);
+        return uno::Any(aSel);
     }
 
     return _getPropertyValue( PropertyName );
@@ -601,16 +600,16 @@ uno::Any SvxUnoTextRangeBase::_getPropertyValue(const OUString& PropertyName, sa
         const SfxItemPropertyMapEntry* pMap = mpPropSet->getPropertyMapEntry(PropertyName );
         if( pMap )
         {
-            std::unique_ptr<SfxItemSet> pAttribs;
+            std::optional<SfxItemSet> oAttribs;
             if( nPara != -1 )
-                pAttribs = pForwarder->GetParaAttribs( nPara ).Clone();
+                oAttribs.emplace(pForwarder->GetParaAttribs( nPara ).CloneAsValue());
             else
-                pAttribs = pForwarder->GetAttribs( GetSelection() ).Clone();
+                oAttribs.emplace(pForwarder->GetAttribs( GetSelection() ).CloneAsValue());
 
             //  Replace Dontcare with Default, so that one always has a mirror
-            pAttribs->ClearInvalidItems();
+            oAttribs->ClearInvalidItems();
 
-            getPropertyValue( pMap, aAny, *pAttribs );
+            getPropertyValue( pMap, aAny, *oAttribs );
 
             return aAny;
         }
@@ -686,7 +685,7 @@ bool SvxUnoTextRangeBase::GetPropertyValueHelper(  SfxItemSet const & rSet, cons
         }
         break;
 
-    case WID_NUMLEVEL:
+    case EE_PARA_OUTLLEVEL:
         {
             SvxTextForwarder* pForwarder = pEditSource? pEditSource->GetTextForwarder() : nullptr;
             if(pForwarder && pSelection)
@@ -747,6 +746,10 @@ void SAL_CALL SvxUnoTextRangeBase::setPropertyValues( const uno::Sequence< OUStr
 
 void SvxUnoTextRangeBase::_setPropertyValues( const uno::Sequence< OUString >& aPropertyNames, const uno::Sequence< uno::Any >& aValues, sal_Int32 nPara )
 {
+    if (aPropertyNames.getLength() != aValues.getLength())
+        throw lang::IllegalArgumentException("lengths do not match",
+                                             static_cast<css::beans::XPropertySet*>(this), -1);
+
     SolarMutexGuard aGuard;
 
     SvxTextForwarder* pForwarder = mpEditSource ? mpEditSource->GetTextForwarder() : nullptr;
@@ -879,13 +882,13 @@ uno::Sequence< uno::Any > SvxUnoTextRangeBase::_getPropertyValues( const uno::Se
     SvxTextForwarder* pForwarder = mpEditSource ? mpEditSource->GetTextForwarder() : nullptr;
     if( pForwarder )
     {
-        std::unique_ptr<SfxItemSet> pAttribs;
+        std::optional<SfxItemSet> oAttribs;
         if( nPara != -1 )
-            pAttribs = pForwarder->GetParaAttribs( nPara ).Clone();
+            oAttribs.emplace(pForwarder->GetParaAttribs( nPara ).CloneAsValue());
         else
-            pAttribs = pForwarder->GetAttribs( GetSelection() ).Clone();
+            oAttribs.emplace(pForwarder->GetAttribs( GetSelection() ).CloneAsValue() );
 
-        pAttribs->ClearInvalidItems();
+        oAttribs->ClearInvalidItems();
 
         const OUString* pPropertyNames = aPropertyNames.getConstArray();
         uno::Any* pValues = aValues.getArray();
@@ -895,7 +898,7 @@ uno::Sequence< uno::Any > SvxUnoTextRangeBase::_getPropertyValues( const uno::Se
             const SfxItemPropertyMapEntry* pMap = mpPropSet->getPropertyMapEntry( *pPropertyNames );
             if( pMap )
             {
-                getPropertyValue( pMap, *pValues, *pAttribs );
+                getPropertyValue( pMap, *pValues, *oAttribs );
             }
         }
     }
@@ -978,7 +981,6 @@ beans::PropertyState SvxUnoTextRangeBase::_getPropertyState(const SfxItemPropert
                 }
                 break;
 
-            case WID_NUMLEVEL:
             case WID_NUMBERINGSTARTVALUE:
             case WID_PARAISNUMBERINGRESTART:
                 eItemState = SfxItemState::SET;
@@ -1064,121 +1066,141 @@ uno::Sequence< beans::PropertyState > SvxUnoTextRangeBase::_getPropertyStates(co
 
 bool SvxUnoTextRangeBase::_getOnePropertyStates(const SfxItemSet* pSet, const SfxItemPropertyMapEntry* pMap, beans::PropertyState& rState)
 {
+    if(!pSet || !pMap)
+        return true;
+    SfxItemState eItemState = SfxItemState::DEFAULT;
+    bool bItemStateSet(false);
+
     bool bUnknownPropertyFound = false;
-    if(pSet && pMap)
+    switch( pMap->nWID )
     {
-        SfxItemState eItemState = SfxItemState::DEFAULT;
-        bool bItemStateSet(false);
-
-        switch( pMap->nWID )
-        {
-            case WID_FONTDESC:
-                {
-                    const sal_uInt16* pWhichId = aSvxUnoFontDescriptorWhichMap;
-                    while( *pWhichId )
-                    {
-                        const SfxItemState eTempItemState(pSet->GetItemState( *pWhichId ));
-
-                        switch( eTempItemState )
-                        {
-                        case SfxItemState::DISABLED:
-                        case SfxItemState::DONTCARE:
-                            eItemState = SfxItemState::DONTCARE;
-                            bItemStateSet = true;
-                            break;
-
-                        case SfxItemState::DEFAULT:
-                            if( !bItemStateSet )
-                            {
-                                eItemState = SfxItemState::DEFAULT;
-                                bItemStateSet = true;
-                            }
-                            break;
-
-                        case SfxItemState::SET:
-                            if( !bItemStateSet )
-                            {
-                                eItemState = SfxItemState::SET;
-                                bItemStateSet = true;
-                            }
-                            break;
-                        default:
-                            bUnknownPropertyFound = true;
-                            break;
-                        }
-
-                        pWhichId++;
-                    }
-                }
-                break;
-
-            case WID_NUMLEVEL:
-            case WID_NUMBERINGSTARTVALUE:
-            case WID_PARAISNUMBERINGRESTART:
-                eItemState = SfxItemState::SET;
-                bItemStateSet = true;
-                break;
-
-            default:
-                if(0 != pMap->nWID)
-                {
-                    eItemState = pSet->GetItemState( pMap->nWID, false );
-                    bItemStateSet = true;
-                }
-                break;
-        }
-
-        if( bUnknownPropertyFound )
-            return false;
-
-        if(bItemStateSet)
-        {
-            if (pMap->nWID == EE_CHAR_COLOR)
+        case WID_FONTDESC:
             {
-                // Theme & effects can be DEFAULT_VALUE, even if the same pool item has a color
-                // which is a DIRECT_VALUE.
-                const SvxColorItem* pColor = pSet->GetItem<SvxColorItem>(EE_CHAR_COLOR);
-                switch (pMap->nMemberId)
+                const sal_uInt16* pWhichId = aSvxUnoFontDescriptorWhichMap;
+                while( *pWhichId )
                 {
-                    case MID_COLOR_THEME_INDEX:
-                        if (pColor->GetThemeColor().GetThemeIndex() == -1)
+                    const SfxItemState eTempItemState(pSet->GetItemState( *pWhichId ));
+
+                    switch( eTempItemState )
+                    {
+                    case SfxItemState::DISABLED:
+                    case SfxItemState::DONTCARE:
+                        eItemState = SfxItemState::DONTCARE;
+                        bItemStateSet = true;
+                        break;
+
+                    case SfxItemState::DEFAULT:
+                        if( !bItemStateSet )
                         {
                             eItemState = SfxItemState::DEFAULT;
+                            bItemStateSet = true;
                         }
                         break;
-                    case MID_COLOR_LUM_MOD:
-                        if (pColor->GetThemeColor().GetLumMod() == 10000)
+
+                    case SfxItemState::SET:
+                        if( !bItemStateSet )
                         {
-                            eItemState = SfxItemState::DEFAULT;
+                            eItemState = SfxItemState::SET;
+                            bItemStateSet = true;
                         }
                         break;
-                    case MID_COLOR_LUM_OFF:
-                        if (pColor->GetThemeColor().GetLumOff() == 0)
-                        {
-                            eItemState = SfxItemState::DEFAULT;
-                        }
+                    default:
+                        bUnknownPropertyFound = true;
                         break;
+                    }
+
+                    pWhichId++;
                 }
             }
+            break;
 
-            switch( eItemState )
+        case WID_NUMBERINGSTARTVALUE:
+        case WID_PARAISNUMBERINGRESTART:
+            eItemState = SfxItemState::SET;
+            bItemStateSet = true;
+            break;
+
+        default:
+            if(0 != pMap->nWID)
             {
-                case SfxItemState::SET:
-                    rState = beans::PropertyState_DIRECT_VALUE;
+                eItemState = pSet->GetItemState( pMap->nWID, false );
+                bItemStateSet = true;
+            }
+            break;
+    }
+
+    if( bUnknownPropertyFound )
+        return false;
+
+    if(bItemStateSet)
+    {
+        if (pMap->nWID == EE_CHAR_COLOR)
+        {
+            // Theme & effects can be DEFAULT_VALUE, even if the same pool item has a color
+            // which is a DIRECT_VALUE.
+            const SvxColorItem* pColor = pSet->GetItem<SvxColorItem>(EE_CHAR_COLOR);
+            switch (pMap->nMemberId)
+            {
+                case MID_COLOR_THEME_INDEX:
+                    if (pColor->GetThemeColor().getType() == model::ThemeColorType::Unknown)
+                    {
+                        eItemState = SfxItemState::DEFAULT;
+                    }
                     break;
-                case SfxItemState::DEFAULT:
-                    rState = beans::PropertyState_DEFAULT_VALUE;
+                case MID_COLOR_LUM_MOD:
+                {
+                    sal_Int16 nLumMod = 10000;
+                    for (auto const& rTransform : pColor->GetThemeColor().getTransformations())
+                    {
+                        if (rTransform.meType == model::TransformationType::LumMod)
+                            nLumMod = rTransform.mnValue;
+                    }
+                    if (nLumMod == 10000)
+                    {
+                        eItemState = SfxItemState::DEFAULT;
+                    }
                     break;
+                }
+                case MID_COLOR_LUM_OFF:
+                {
+                    sal_Int16 nLumOff = 0;
+                    for (auto const& rTransform : pColor->GetThemeColor().getTransformations())
+                    {
+                        if (rTransform.meType == model::TransformationType::LumOff)
+                            nLumOff = rTransform.mnValue;
+                    }
+                    if (nLumOff == 0)
+                    {
+                        eItemState = SfxItemState::DEFAULT;
+                    }
+                    break;
+                }
+                case MID_COLOR_THEME_REFERENCE:
+                    if (pColor->GetThemeColor().getType() == model::ThemeColorType::Unknown)
+                    {
+                        eItemState = SfxItemState::DEFAULT;
+                    }
+                    break;
+            }
+        }
+
+        switch( eItemState )
+        {
+            case SfxItemState::SET:
+                rState = beans::PropertyState_DIRECT_VALUE;
+                break;
+            case SfxItemState::DEFAULT:
+                rState = beans::PropertyState_DEFAULT_VALUE;
+                break;
 //                  case SfxItemState::DONTCARE:
 //                  case SfxItemState::DISABLED:
-                default:
-                    rState = beans::PropertyState_AMBIGUOUS_VALUE;
-            }
+            default:
+                rState = beans::PropertyState_AMBIGUOUS_VALUE;
         }
-        else
-        {
-            rState = beans::PropertyState_AMBIGUOUS_VALUE;
-        }
+    }
+    else
+    {
+        rState = beans::PropertyState_AMBIGUOUS_VALUE;
     }
     return true;
 }
@@ -1217,12 +1239,6 @@ void SvxUnoTextRangeBase::_setPropertyToDefault(SvxTextForwarder* pForwarder, co
         if( pMap->nWID == WID_FONTDESC )
         {
             SvxUnoFontDescriptor::setPropertyToDefault( aSet );
-        }
-        else if( pMap->nWID == WID_NUMLEVEL )
-        {
-            // #101004# Call interface method instead of unsafe cast
-            pForwarder->SetDepth( maSelection.nStartPara, -1 );
-            return;
         }
         else if( pMap->nWID == WID_NUMBERINGSTARTVALUE )
         {
@@ -1266,7 +1282,7 @@ uno::Any SAL_CALL SvxUnoTextRangeBase::getPropertyDefault( const OUString& aProp
             case WID_FONTDESC:
                 return SvxUnoFontDescriptor::getPropertyDefault( pPool );
 
-            case WID_NUMLEVEL:
+            case EE_PARA_OUTLLEVEL:
                 {
                     uno::Any aAny;
                     return aAny;
@@ -1396,41 +1412,42 @@ bool SvxUnoTextRangeBase::GoLeft(sal_Int32 nCount, bool Expand) noexcept
 
 bool SvxUnoTextRangeBase::GoRight(sal_Int32 nCount, bool Expand)  noexcept
 {
-    SvxTextForwarder* pForwarder = mpEditSource ? mpEditSource->GetTextForwarder() : nullptr;
-    if( pForwarder )
+    if (!mpEditSource)
+        return false;
+    SvxTextForwarder* pForwarder = mpEditSource->GetTextForwarder();
+    if( !pForwarder )
+        return false;
+
+    CheckSelection( maSelection, pForwarder );
+
+    sal_Int32 nNewPos = maSelection.nEndPos + nCount;
+    sal_Int32 nNewPar = maSelection.nEndPara;
+
+    bool bOk = true;
+    sal_Int32 nParCount = pForwarder->GetParagraphCount();
+    sal_Int32 nThisLen = pForwarder->GetTextLen( nNewPar );
+    while ( nNewPos > nThisLen && bOk )
     {
-        CheckSelection( maSelection, pForwarder );
-
-        sal_Int32 nNewPos = maSelection.nEndPos + nCount;
-        sal_Int32 nNewPar = maSelection.nEndPara;
-
-        bool bOk = true;
-        sal_Int32 nParCount = pForwarder->GetParagraphCount();
-        sal_Int32 nThisLen = pForwarder->GetTextLen( nNewPar );
-        while ( nNewPos > nThisLen && bOk )
+        if ( nNewPar + 1 >= nParCount )
+            bOk = false;
+        else
         {
-            if ( nNewPar + 1 >= nParCount )
-                bOk = false;
-            else
-            {
-                nNewPos -= nThisLen+1;
-                ++nNewPar;
-                nThisLen = pForwarder->GetTextLen( nNewPar );
-            }
+            nNewPos -= nThisLen+1;
+            ++nNewPar;
+            nThisLen = pForwarder->GetTextLen( nNewPar );
         }
-
-        if (bOk)
-        {
-            maSelection.nEndPara = nNewPar;
-            maSelection.nEndPos  = nNewPos;
-        }
-
-        if (!Expand)
-            CollapseToEnd();
-
-        return bOk;
     }
-    return false;
+
+    if (bOk)
+    {
+        maSelection.nEndPara = nNewPar;
+        maSelection.nEndPos  = nNewPos;
+    }
+
+    if (!Expand)
+        CollapseToEnd();
+
+    return bOk;
 }
 
 void SvxUnoTextRangeBase::GotoStart(bool Expand) noexcept
@@ -1543,13 +1560,13 @@ uno::Any SAL_CALL SvxUnoTextRange::queryAggregation( const uno::Type & rType )
 {
     QUERYINT( text::XTextRange );
     else if( rType == cppu::UnoType<beans::XMultiPropertyStates>::get())
-        return uno::makeAny(uno::Reference< beans::XMultiPropertyStates >(this));
+        return uno::Any(uno::Reference< beans::XMultiPropertyStates >(this));
     else if( rType == cppu::UnoType<beans::XPropertySet>::get())
-        return uno::makeAny(uno::Reference< beans::XPropertySet >(this));
+        return uno::Any(uno::Reference< beans::XPropertySet >(this));
     else QUERYINT( beans::XPropertyState );
     else QUERYINT( text::XTextRangeCompare );
     else if( rType == cppu::UnoType<beans::XMultiPropertySet>::get())
-        return uno::makeAny(uno::Reference< beans::XMultiPropertySet >(this));
+        return uno::Any(uno::Reference< beans::XMultiPropertySet >(this));
     else QUERYINT( lang::XServiceInfo );
     else QUERYINT( lang::XTypeProvider );
     else QUERYINT( lang::XUnoTunnel );
@@ -1646,7 +1663,7 @@ uno::Any SAL_CALL SvxUnoTextBase::queryAggregation( const uno::Type & rType )
     QUERYINT( text::XText );
     QUERYINT( text::XSimpleText );
     if( rType == cppu::UnoType<text::XTextRange>::get())
-        return uno::makeAny(uno::Reference< text::XTextRange >(static_cast<text::XText*>(this)));
+        return uno::Any(uno::Reference< text::XTextRange >(static_cast<text::XText*>(this)));
     QUERYINT(container::XEnumerationAccess );
     QUERYINT( container::XElementAccess );
     QUERYINT( beans::XMultiPropertyStates );
@@ -1822,7 +1839,8 @@ void SAL_CALL SvxUnoTextBase::insertControlCharacter( const uno::Reference< text
             aRange.nEndPos  = aRange.nStartPos;
 
             pRange->SetSelection( aRange );
-            pRange->setString( "\x0D" );
+            static constexpr OUStringLiteral CR = u"\x0D";
+            pRange->setString( CR );
 
             aRange.nStartPos = 0;
             aRange.nStartPara += 1;
@@ -1867,14 +1885,14 @@ void SAL_CALL SvxUnoTextBase::insertTextContent( const uno::Reference< text::XTe
     GetEditSource()->UpdateData();
 
     uno::Reference<beans::XPropertySet> xPropSetContent(xContent, uno::UNO_QUERY);
-    if (!xContent.is())
+    if (!xPropSetContent.is())
         throw lang::IllegalArgumentException();
 
-    xPropSetContent->setPropertyValue(UNO_TC_PROP_ANCHOR, uno::makeAny(xRange));
+    xPropSetContent->setPropertyValue(UNO_TC_PROP_ANCHOR, uno::Any(xRange));
 
     aSel.End.PositionInParagraph += 1;
     aSel.Start.PositionInParagraph = aSel.End.PositionInParagraph;
-    xPropSet->setPropertyValue(UNO_TR_PROP_SELECTION, uno::makeAny(aSel));
+    xPropSet->setPropertyValue(UNO_TR_PROP_SELECTION, uno::Any(aSel));
 }
 
 void SAL_CALL SvxUnoTextBase::removeTextContent( const uno::Reference< text::XTextContent >& )
@@ -1970,8 +1988,8 @@ static void SvxPropertyValuesToItemSet(
         SfxItemSet &rItemSet,
         const uno::Sequence< beans::PropertyValue >& rPropertyValues,
         const SfxItemPropertySet *pPropSet,
-        SvxTextForwarder *pForwarder /*needed for WID_NUMLEVEL*/,
-        sal_Int32 nPara /*needed for WID_NUMLEVEL*/)
+        SvxTextForwarder *pForwarder,
+        sal_Int32 nPara)
 {
     for (const beans::PropertyValue& rProp : rPropertyValues)
     {
@@ -1993,18 +2011,6 @@ static void SvxPropertyValuesToItemSet(
             awt::FontDescriptor aDesc;
             if (rProp.Value >>= aDesc)
                 SvxUnoFontDescriptor::FillItemSet( aDesc, rItemSet );
-        }
-        else if (pEntry->nWID == WID_NUMLEVEL)
-        {
-            if (pForwarder)
-            {
-                sal_Int16 nLevel = -1;
-                rProp.Value >>= nLevel;
-
-                // #101004# Call interface method instead of unsafe cast
-                if (!pForwarder->SetDepth( nPara, nLevel ))
-                    throw lang::IllegalArgumentException();
-            }
         }
         else if (pEntry->nWID == WID_NUMBERINGSTARTVALUE )
         {

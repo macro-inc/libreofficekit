@@ -19,6 +19,8 @@
 
 #pragma once
 
+enum class UnoMSAAEvent;
+
 #include <stdio.h>
 #include "AccEventListener.hxx"
 #include <com/sun/star/accessibility/XAccessibleEventListener.hpp>
@@ -65,15 +67,15 @@ public:
             css::uno::Any oldValue, css::uno::Any newValue);
 
     //state changed
-    virtual void SetComponentState(short state, bool enable) override;
-    virtual void FireStatePropertyChange(short state, bool set) override;
+    virtual void SetComponentState(sal_Int64 state, bool enable) override;
+    virtual void FireStatePropertyChange(sal_Int64 state, bool set) override;
     virtual void FireStateFocusedChange(bool enable) override;
     virtual bool IsEditable(css::uno::Reference<css::accessibility::XAccessibleContext> const & xContext);
 
     // update all children's state
     void UpdateAllChildrenState( css::accessibility::XAccessible* pXAccessible);
 
-    bool NotifyChildEvent(short nWinEvent, const css::uno::Any &Value);
+    bool NotifyChildEvent(UnoMSAAEvent eWinEvent, const css::uno::Any& Value);
 
     virtual void HandleSelectionChangedAddEvent(
             const css::uno::Any &oldValue, const css::uno::Any &newValue);

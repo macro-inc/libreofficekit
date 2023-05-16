@@ -28,25 +28,23 @@
 #include <basegfx/utils/unopolypolygon.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
 namespace basegfx::unotools
 {
-    UnoPolyPolygon::UnoPolyPolygon( const B2DPolyPolygon& rPolyPoly ) :
-        UnoPolyPolygonBase( m_aMutex ),
-        maPolyPoly( rPolyPoly ),
+    UnoPolyPolygon::UnoPolyPolygon( B2DPolyPolygon aPolyPoly ) :
+        maPolyPoly(std::move( aPolyPoly )),
         meFillRule( rendering::FillRule_EVEN_ODD )
     {
-        // or else races will haunt us.
-        maPolyPoly.makeUnique();
     }
 
     void SAL_CALL UnoPolyPolygon::addPolyPolygon(
         const geometry::RealPoint2D&                        position,
         const uno::Reference< rendering::XPolyPolygon2D >&  polyPolygon )
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         modifying();
 
         // TODO(F1): Correctly fulfill the UNO API
@@ -124,14 +122,14 @@ namespace basegfx::unotools
 
     sal_Int32 SAL_CALL UnoPolyPolygon::getNumberOfPolygons()
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         return maPolyPoly.count();
     }
 
     sal_Int32 SAL_CALL UnoPolyPolygon::getNumberOfPolygonPoints(
         sal_Int32 polygon )
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         checkIndex( polygon );
 
         return maPolyPoly.getB2DPolygon(polygon).count();
@@ -139,14 +137,14 @@ namespace basegfx::unotools
 
     rendering::FillRule SAL_CALL UnoPolyPolygon::getFillRule()
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         return meFillRule;
     }
 
     void SAL_CALL UnoPolyPolygon::setFillRule(
         rendering::FillRule fillRule )
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         modifying();
 
         meFillRule = fillRule;
@@ -155,7 +153,7 @@ namespace basegfx::unotools
     sal_Bool SAL_CALL UnoPolyPolygon::isClosed(
         sal_Int32 index )
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         checkIndex( index );
 
         return maPolyPoly.getB2DPolygon(index).isClosed();
@@ -165,7 +163,7 @@ namespace basegfx::unotools
         sal_Int32 index,
         sal_Bool closedState )
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         modifying();
 
         if( index == -1 )
@@ -192,8 +190,6 @@ namespace basegfx::unotools
         sal_Int32 nPointIndex,
         sal_Int32 nNumberOfPoints )
     {
-        osl::MutexGuard const guard( m_aMutex );
-
         return unotools::pointSequenceSequenceFromB2DPolyPolygon(
             getSubsetPolyPolygon( nPolygonIndex,
                                   nNumberOfPolygons,
@@ -205,7 +201,7 @@ namespace basegfx::unotools
         const uno::Sequence< uno::Sequence< geometry::RealPoint2D > >& points,
         sal_Int32 nPolygonIndex )
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         modifying();
 
         const B2DPolyPolygon& rNewPolyPoly(
@@ -227,12 +223,12 @@ namespace basegfx::unotools
         sal_Int32 nPolygonIndex,
         sal_Int32 nPointIndex )
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         checkIndex( nPolygonIndex );
 
         const B2DPolygon& rPoly( maPolyPoly.getB2DPolygon( nPolygonIndex ) );
 
-        if( nPointIndex < 0 || nPointIndex >= static_cast<sal_Int32>(rPoly.count()) )
+        if( nPointIndex < 0 || o3tl::make_unsigned(nPointIndex) >= rPoly.count() )
             throw lang::IndexOutOfBoundsException();
 
         return unotools::point2DFromB2DPoint( rPoly.getB2DPoint( nPointIndex ) );
@@ -243,13 +239,13 @@ namespace basegfx::unotools
         sal_Int32 nPolygonIndex,
         sal_Int32 nPointIndex )
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         checkIndex( nPolygonIndex );
         modifying();
 
         B2DPolygon aPoly( maPolyPoly.getB2DPolygon( nPolygonIndex ) );
 
-        if( nPointIndex < 0 || nPointIndex >= static_cast<sal_Int32>(aPoly.count()) )
+        if( nPointIndex < 0 || o3tl::make_unsigned(nPointIndex) >= aPoly.count() )
             throw lang::IndexOutOfBoundsException();
 
         aPoly.setB2DPoint( nPointIndex,
@@ -263,7 +259,6 @@ namespace basegfx::unotools
         sal_Int32 nPointIndex,
         sal_Int32 nNumberOfPoints )
     {
-        osl::MutexGuard const guard( m_aMutex );
         return unotools::bezierSequenceSequenceFromB2DPolyPolygon(
             getSubsetPolyPolygon( nPolygonIndex,
                                   nNumberOfPolygons,
@@ -275,7 +270,7 @@ namespace basegfx::unotools
         const uno::Sequence< uno::Sequence< geometry::RealBezierSegment2D > >&  points,
         sal_Int32                                                               nPolygonIndex )
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         modifying();
         const B2DPolyPolygon& rNewPolyPoly(
             unotools::polyPolygonFromBezier2DSequenceSequence( points ) );
@@ -295,13 +290,13 @@ namespace basegfx::unotools
     geometry::RealBezierSegment2D SAL_CALL UnoPolyPolygon::getBezierSegment( sal_Int32 nPolygonIndex,
                                                                              sal_Int32 nPointIndex )
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         checkIndex( nPolygonIndex );
 
         const B2DPolygon& rPoly( maPolyPoly.getB2DPolygon( nPolygonIndex ) );
         const sal_uInt32  nPointCount(rPoly.count());
 
-        if( nPointIndex < 0 || nPointIndex >= static_cast<sal_Int32>(nPointCount) )
+        if( nPointIndex < 0 || o3tl::make_unsigned(nPointIndex) >= nPointCount )
             throw lang::IndexOutOfBoundsException();
 
         const B2DPoint& rPt( rPoly.getB2DPoint( nPointIndex ) );
@@ -320,14 +315,14 @@ namespace basegfx::unotools
                                                          sal_Int32                       nPolygonIndex,
                                                          sal_Int32                       nPointIndex )
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         checkIndex( nPolygonIndex );
         modifying();
 
         B2DPolygon aPoly( maPolyPoly.getB2DPolygon( nPolygonIndex ) );
         const sal_uInt32 nPointCount(aPoly.count());
 
-        if( nPointIndex < 0 || nPointIndex >= static_cast<sal_Int32>(nPointCount) )
+        if( nPointIndex < 0 || o3tl::make_unsigned(nPointIndex) >= nPointCount )
             throw lang::IndexOutOfBoundsException();
 
         aPoly.setB2DPoint( nPointIndex,
@@ -347,7 +342,7 @@ namespace basegfx::unotools
         sal_Int32 nPointIndex,
         sal_Int32 nNumberOfPoints ) const
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
         checkIndex( nPolygonIndex );
 
         const sal_Int32 nPolyCount( maPolyPoly.count() );
@@ -441,12 +436,9 @@ namespace basegfx::unotools
 
     B2DPolyPolygon UnoPolyPolygon::getPolyPolygon() const
     {
-        osl::MutexGuard const guard( m_aMutex );
+        std::unique_lock const guard( m_aMutex );
 
-        // detach result from us
-        B2DPolyPolygon aRet( maPolyPoly );
-        aRet.makeUnique();
-        return aRet;
+        return maPolyPoly;
     }
 
 }

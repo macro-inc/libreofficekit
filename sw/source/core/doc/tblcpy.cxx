@@ -21,7 +21,6 @@
 
 #include <osl/diagnose.h>
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <frmfmt.hxx>
 #include <doc.hxx>
 #include <IDocumentUndoRedo.hxx>
@@ -516,9 +515,9 @@ static void lcl_CpyBox( const SwTable& rCpyTable, const SwTableBox* pCpyBox,
 
     SwNodeIndex aSavePos( aInsIdx, -1 );
     if (pRg)
-        pCpyDoc->GetDocumentContentOperationsManager().CopyWithFlyInFly(*pRg, aInsIdx, nullptr, false);
+        pCpyDoc->GetDocumentContentOperationsManager().CopyWithFlyInFly(*pRg, aInsIdx.GetNode(), nullptr, false);
     else
-        pDoc->GetNodes().MakeTextNode( aInsIdx, pDoc->GetDfltTextFormatColl() );
+        pDoc->GetNodes().MakeTextNode( aInsIdx.GetNode(), pDoc->GetDfltTextFormatColl() );
     ++aSavePos;
 
     SwTableLine* pLine = pDstBox->GetUpper();
@@ -534,8 +533,9 @@ static void lcl_CpyBox( const SwTable& rCpyTable, const SwTableBox* pCpyBox,
         // Move Bookmarks
         {
             SwPosition aMvPos( aInsIdx );
-            SwContentNode* pCNd = SwNodes::GoPrevious( &aMvPos.nNode );
-            aMvPos.nContent.Assign( pCNd, pCNd->Len() );
+            SwContentNode* pCNd = SwNodes::GoPrevious( &aMvPos );
+            assert(pCNd); // keep coverity happy
+            aMvPos.SetContent( pCNd->Len() );
             SwDoc::CorrAbs( aInsIdx, aEndNdIdx, aMvPos );
         }
 
@@ -543,11 +543,11 @@ static void lcl_CpyBox( const SwTable& rCpyTable, const SwTableBox* pCpyBox,
         for( const auto pFly : *pDoc->GetSpzFrameFormats() )
         {
             SwFormatAnchor const*const pAnchor = &pFly->GetAnchor();
-            SwPosition const*const pAPos = pAnchor->GetContentAnchor();
-            if (pAPos &&
+            SwNode const*const pAnchorNode = pAnchor->GetAnchorNode();
+            if (pAnchorNode &&
                 ((RndStdIds::FLY_AT_PARA == pAnchor->GetAnchorId()) ||
                  (RndStdIds::FLY_AT_CHAR == pAnchor->GetAnchorId())) &&
-                aInsIdx <= pAPos->nNode && pAPos->nNode <= aEndNdIdx )
+                aInsIdx <= *pAnchorNode && *pAnchorNode <= aEndNdIdx.GetNode() )
             {
                 pDoc->getIDocumentLayoutAccess().DelLayoutFormat( pFly );
             }
@@ -623,12 +623,12 @@ static void lcl_CpyBox( const SwTable& rCpyTable, const SwTableBox* pCpyBox,
     if( !aBoxAttrSet.Count() )
         return;
 
-    const SfxPoolItem* pItem;
+    const SwTableBoxNumFormat* pItem;
     SvNumberFormatter* pN = pDoc->GetNumberFormatter( false );
-    if( pN && pN->HasMergeFormatTable() && SfxItemState::SET == aBoxAttrSet.
-        GetItemState( RES_BOXATR_FORMAT, false, &pItem ) )
+    if( pN && pN->HasMergeFormatTable() &&
+        (pItem = aBoxAttrSet.GetItemIfSet( RES_BOXATR_FORMAT, false )) )
     {
-        sal_uLong nOldIdx = static_cast<const SwTableBoxNumFormat*>(pItem)->GetValue();
+        sal_uLong nOldIdx = pItem->GetValue();
         sal_uLong nNewIdx = pN->GetMergeFormatIndex( nOldIdx );
         if( nNewIdx != nOldIdx )
             aBoxAttrSet.Put( SwTableBoxNumFormat( nNewIdx ));
@@ -708,7 +708,7 @@ bool SwTable::InsTable( const SwTable& rCpyTable, const SwNodeIndex& rSttBox,
 
     SwDoc* pDoc = GetFrameFormat()->GetDoc();
 
-    SwTableNode* pTableNd = pDoc->IsIdxInTable( rSttBox );
+    SwTableNode* pTableNd = SwDoc::IsIdxInTable( rSttBox );
 
     // Find the Box, to which should be copied:
     SwTableBox* pMyBox = GetTableBox(

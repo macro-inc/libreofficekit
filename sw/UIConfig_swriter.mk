@@ -75,6 +75,17 @@ $(eval $(call gb_UIConfig_add_toolbarfiles,modules/swriter,\
 	sw/uiconfig/swriter/toolbar/optimizetablebar \
 	sw/uiconfig/swriter/toolbar/previewobjectbar \
 	sw/uiconfig/swriter/toolbar/singlemode \
+	sw/uiconfig/swriter/toolbar/singlemode-annotation \
+	sw/uiconfig/swriter/toolbar/singlemode-draw \
+	sw/uiconfig/swriter/toolbar/singlemode-drawtext \
+	sw/uiconfig/swriter/toolbar/singlemode-form \
+	sw/uiconfig/swriter/toolbar/singlemode-frame \
+	sw/uiconfig/swriter/toolbar/singlemode-graphic \
+	sw/uiconfig/swriter/toolbar/singlemode-media \
+	sw/uiconfig/swriter/toolbar/singlemode-ole \
+	sw/uiconfig/swriter/toolbar/singlemode-printpreview \
+	sw/uiconfig/swriter/toolbar/singlemode-table \
+	sw/uiconfig/swriter/toolbar/singlemode-text \
 	sw/uiconfig/swriter/toolbar/standardbar \
 	sw/uiconfig/swriter/toolbar/starshapes \
 	sw/uiconfig/swriter/toolbar/symbolshapes \
@@ -154,7 +165,6 @@ $(eval $(call gb_UIConfig_add_uifiles,modules/swriter,\
 	sw/uiconfig/swriter/ui/fldfuncpage \
 	sw/uiconfig/swriter/ui/fldrefpage \
 	sw/uiconfig/swriter/ui/fldvarpage \
-	sw/uiconfig/swriter/ui/floatingnavigation \
 	sw/uiconfig/swriter/ui/floatingsync \
 	sw/uiconfig/swriter/ui/formatsectiondialog \
 	sw/uiconfig/swriter/ui/formattablepage \
@@ -198,6 +208,7 @@ $(eval $(call gb_UIConfig_add_uifiles,modules/swriter,\
 	sw/uiconfig/swriter/ui/newuserindexdialog \
 	sw/uiconfig/swriter/ui/numparapage \
 	sw/uiconfig/swriter/ui/numberingnamedialog \
+	sw/uiconfig/swriter/ui/numberinput \
 	sw/uiconfig/swriter/ui/objectdialog \
 	sw/uiconfig/swriter/ui/optcomparison \
 	sw/uiconfig/swriter/ui/optcompatpage \
@@ -216,7 +227,6 @@ $(eval $(call gb_UIConfig_add_uifiles,modules/swriter,\
 	sw/uiconfig/swriter/ui/querycontinuebegindialog \
 	sw/uiconfig/swriter/ui/querycontinueenddialog \
 	sw/uiconfig/swriter/ui/querydefaultcompatdialog \
-	sw/uiconfig/swriter/ui/queryredlinedialog \
 	sw/uiconfig/swriter/ui/querysavelabeldialog \
 	sw/uiconfig/swriter/ui/mailmerge \
 	sw/uiconfig/swriter/ui/managechangessidebar \
@@ -243,6 +253,7 @@ $(eval $(call gb_UIConfig_add_uifiles,modules/swriter,\
 	sw/uiconfig/swriter/ui/notebookbar_online \
 	sw/uiconfig/swriter/ui/pagecolumncontrol \
 	sw/uiconfig/swriter/ui/pagemargincontrol \
+	sw/uiconfig/swriter/ui/pagenumberdlg \
 	sw/uiconfig/swriter/ui/pageorientationcontrol \
 	sw/uiconfig/swriter/ui/pagesizecontrol \
 	sw/uiconfig/swriter/ui/pagestylemenu \

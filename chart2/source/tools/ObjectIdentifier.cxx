@@ -19,28 +19,33 @@
 
 #include <sal/config.h>
 
+#include <cstddef>
 #include <map>
 
 #include <ObjectIdentifier.hxx>
 #include <TitleHelper.hxx>
 #include <ChartModel.hxx>
 #include <ChartModelHelper.hxx>
+#include <ChartType.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <servicenames_charttypes.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
 #include <unonames.hxx>
+#include <BaseCoordinateSystem.hxx>
+#include <DataSeries.hxx>
+#include <RegressionCurveModel.hxx>
 
-#include <com/sun/star/chart2/XCoordinateSystemContainer.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
-#include <com/sun/star/chart2/XChartTypeContainer.hpp>
-#include <com/sun/star/chart2/XDataSeriesContainer.hpp>
 #include <com/sun/star/chart2/XAxis.hpp>
-#include <com/sun/star/chart2/XRegressionCurveContainer.hpp>
 #include <com/sun/star/awt/Point.hpp>
 #include <com/sun/star/drawing/XShape.hpp>
 
 #include <rtl/ustrbuf.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
+#include <utility>
 
 namespace com::sun::star::drawing { class XShape; }
 
@@ -52,10 +57,10 @@ using namespace ::com::sun::star::chart2;
 using ::com::sun::star::uno::Reference;
 using ::com::sun::star::uno::Any;
 
-const char m_aMultiClick[] = "MultiClick";
-const char m_aDragMethodEquals[] = "DragMethod=";
-const char m_aDragParameterEquals[] = "DragParameter=";
-const char m_aProtocol[] = "CID/";
+const sal_Unicode m_aMultiClick[] = u"MultiClick";
+const sal_Unicode m_aDragMethodEquals[] = u"DragMethod=";
+const sal_Unicode m_aDragParameterEquals[] = u"DragParameter=";
+const sal_Unicode m_aProtocol[] = u"CID/";
 const OUString m_aPieSegmentDragMethodServiceName("PieSegmentDragging");
 
 namespace
@@ -126,30 +131,20 @@ OUString lcl_getTitleParentParticle( TitleHelper::eTitleType aTitleType )
     return aRet;
 }
 
-Reference<XChartType> lcl_getFirstStockChartType( const Reference< frame::XModel >& xChartModel )
+rtl::Reference<ChartType> lcl_getFirstStockChartType( const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
-    Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
+    rtl::Reference< Diagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
     if(!xDiagram.is())
         return nullptr;
 
     //iterate through all coordinate systems
-    Reference< XCoordinateSystemContainer > xCooSysContainer( xDiagram, uno::UNO_QUERY );
-    if( !xCooSysContainer.is())
-        return nullptr;
 
-    const uno::Sequence< Reference< XCoordinateSystem > > aCooSysList( xCooSysContainer->getCoordinateSystems() );
-    for( Reference< XCoordinateSystem > const & coords : aCooSysList )
+    const std::vector< rtl::Reference< BaseCoordinateSystem > > & aCooSysList( xDiagram->getBaseCoordinateSystems() );
+    for( rtl::Reference< BaseCoordinateSystem > const & coords : aCooSysList )
     {
         //iterate through all chart types in the current coordinate system
-        Reference< XChartTypeContainer > xChartTypeContainer( coords, uno::UNO_QUERY );
-        if( !xChartTypeContainer.is() )
-            continue;
-
-        const uno::Sequence< Reference< XChartType > > aChartTypeList( xChartTypeContainer->getChartTypes() );
-        for( Reference< XChartType > const & xChartType : aChartTypeList )
+        for( rtl::Reference< ChartType > const & xChartType : coords->getChartTypes2() )
         {
-            if(!xChartType.is())
-                continue;
             OUString aChartType = xChartType->getChartType();
             if( aChartType.equalsIgnoreAsciiCase(CHART2_SERVICE_NAME_CHARTTYPE_CANDLESTICK) )
                 return xChartType;
@@ -158,67 +153,62 @@ Reference<XChartType> lcl_getFirstStockChartType( const Reference< frame::XModel
     return nullptr;
 }
 
-OUString lcl_getIndexStringAfterString( const OUString& rString, const OUString& rSearchString )
+std::u16string_view lcl_getIndexStringAfterString( std::u16string_view rString, std::u16string_view rSearchString )
 {
-    OUStringBuffer aRet;
-
-    sal_Int32 nIndexStart = rString.lastIndexOf( rSearchString );
-    if( nIndexStart != -1 )
-    {
-        nIndexStart += rSearchString.getLength();
-        sal_Int32 nIndexEnd = rString.getLength();
-        sal_Int32 nNextColon = rString.indexOf( ':', nIndexStart );
-        if( nNextColon != -1 )
-            nIndexEnd = nNextColon;
-        aRet = rString.subView(nIndexStart,nIndexEnd-nIndexStart);
-    }
-
-    return aRet.makeStringAndClear();
+    size_t nIndexStart = rString.rfind( rSearchString );
+    if( nIndexStart == std::u16string_view::npos )
+        return std::u16string_view();
+    nIndexStart += rSearchString.size();
+    size_t nIndexEnd = rString.size();
+    size_t nNextColon = rString.find( ':', nIndexStart );
+    if( nNextColon != std::u16string_view::npos )
+        nIndexEnd = nNextColon;
+    return rString.substr(nIndexStart,nIndexEnd-nIndexStart);
 }
 
-sal_Int32 lcl_StringToIndex( const OUString& rIndexString )
+sal_Int32 lcl_StringToIndex( std::u16string_view rIndexString )
 {
     sal_Int32 nRet = -1;
-    if( !rIndexString.isEmpty() )
+    if( !rIndexString.empty() )
     {
-        nRet = rIndexString.toInt32();
+        nRet = o3tl::toInt32(rIndexString);
         if( nRet < -1 )
             nRet = -1;
     }
     return nRet;
 }
 
-void lcl_parseCooSysIndices( sal_Int32& rnDiagram, sal_Int32& rnCooSys, const OUString& rString )
+void lcl_parseCooSysIndices( sal_Int32& rnDiagram, sal_Int32& rnCooSys, std::u16string_view rString )
 {
-    rnDiagram = lcl_StringToIndex( lcl_getIndexStringAfterString( rString, "D=" ) );
-    rnCooSys = lcl_StringToIndex( lcl_getIndexStringAfterString( rString, "CS=" ) );
+    rnDiagram = lcl_StringToIndex( lcl_getIndexStringAfterString( rString, u"D=" ) );
+    rnCooSys = lcl_StringToIndex( lcl_getIndexStringAfterString( rString, u"CS=" ) );
 }
 
-void lcl_parseAxisIndices( sal_Int32& rnDimensionIndex, sal_Int32& rnAxisIndex, const OUString& rString )
+void lcl_parseAxisIndices( sal_Int32& rnDimensionIndex, sal_Int32& rnAxisIndex, std::u16string_view rString )
 {
-    OUString aAxisIndexString = lcl_getIndexStringAfterString( rString, ":Axis=" );
+    std::u16string_view aAxisIndexString = lcl_getIndexStringAfterString( rString, u":Axis=" );
     sal_Int32 nCharacterIndex=0;
-    rnDimensionIndex = lcl_StringToIndex( aAxisIndexString.getToken( 0, ',', nCharacterIndex ) );
-    rnAxisIndex = lcl_StringToIndex( aAxisIndexString.getToken( 0, ',', nCharacterIndex ) );
+    rnDimensionIndex = lcl_StringToIndex( o3tl::getToken(aAxisIndexString, 0, ',', nCharacterIndex ) );
+    rnAxisIndex = lcl_StringToIndex( o3tl::getToken(aAxisIndexString, 0, ',', nCharacterIndex ) );
 }
 
-void lcl_parseGridIndices( sal_Int32& rnSubGridIndex, const OUString& rString )
+void lcl_parseGridIndices( sal_Int32& rnSubGridIndex, std::u16string_view rString )
 {
     rnSubGridIndex = -1;
-    rnSubGridIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rString, ":SubGrid=" ) );
+    rnSubGridIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rString, u":SubGrid=" ) );
 }
 
-void lcl_parseSeriesIndices( sal_Int32& rnChartTypeIndex, sal_Int32& rnSeriesIndex, sal_Int32& rnPointIndex, const OUString& rString )
+void lcl_parseSeriesIndices( sal_Int32& rnChartTypeIndex, sal_Int32& rnSeriesIndex, sal_Int32& rnPointIndex, std::u16string_view rString )
 {
-    rnChartTypeIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rString, "CT=" ) );
-    rnSeriesIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rString, "Series=" ) );
-    rnPointIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rString, "Point=" ) );
+    rnChartTypeIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rString, u"CT=" ) );
+    rnSeriesIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rString, u"Series=" ) );
+    rnPointIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rString, u"Point=" ) );
 }
 
-void lcl_getDiagramAndCooSys( const OUString& rObjectCID
-                , const Reference< frame::XModel >& xChartModel
-                , Reference< XDiagram >& xDiagram
-                , Reference< XCoordinateSystem >& xCooSys )
+void lcl_getDiagramAndCooSys( std::u16string_view rObjectCID
+                , const rtl::Reference<::chart::ChartModel>& xChartModel
+                , rtl::Reference< Diagram >& xDiagram
+                , rtl::Reference< BaseCoordinateSystem >& xCooSys )
 {
     sal_Int32 nDiagramIndex = -1;
     sal_Int32 nCooSysIndex = -1;
@@ -229,13 +219,9 @@ void lcl_getDiagramAndCooSys( const OUString& rObjectCID
 
     if( nCooSysIndex > -1 )
     {
-        Reference< XCoordinateSystemContainer > xCooSysContainer( xDiagram, uno::UNO_QUERY );
-        if( xCooSysContainer.is() )
-        {
-            uno::Sequence< Reference< XCoordinateSystem > > aCooSysList( xCooSysContainer->getCoordinateSystems() );
-            if( nCooSysIndex < aCooSysList.getLength() )
-                xCooSys = aCooSysList[nCooSysIndex];
-        }
+        const std::vector< rtl::Reference< BaseCoordinateSystem > > aCooSysList( xDiagram->getBaseCoordinateSystems() );
+        if( o3tl::make_unsigned(nCooSysIndex) < aCooSysList.size() )
+            xCooSys = aCooSysList[nCooSysIndex];
     }
 }
 
@@ -245,8 +231,8 @@ ObjectIdentifier::ObjectIdentifier()
 {
 }
 
-ObjectIdentifier::ObjectIdentifier( const OUString& rObjectCID )
-    :m_aObjectCID( rObjectCID )
+ObjectIdentifier::ObjectIdentifier( OUString aObjectCID )
+    :m_aObjectCID(std::move( aObjectCID ))
 {
 }
 
@@ -303,97 +289,15 @@ bool ObjectIdentifier::operator<( const ObjectIdentifier& rOID ) const
 
 OUString ObjectIdentifier::createClassifiedIdentifierForObject(
           const Reference< uno::XInterface >& xObject
-        , ChartModel& rModel)
+        , const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
     OUString aRet;
 
     enum ObjectType eObjectType = OBJECTTYPE_UNKNOWN;
-    const OUString aObjectID;
+    const std::u16string_view aObjectID;
     OUString aParentParticle;
-    const OUString aDragMethodServiceName;
-    const OUString aDragParameterString;
-
-    try
-    {
-        //title
-        Reference< XTitle > xTitle( xObject, uno::UNO_QUERY );
-        if( xTitle.is() )
-        {
-            TitleHelper::eTitleType aTitleType;
-            if( TitleHelper::getTitleType( aTitleType, xTitle, rModel ) )
-            {
-                eObjectType = OBJECTTYPE_TITLE;
-                aParentParticle = lcl_getTitleParentParticle( aTitleType );
-                aRet = ObjectIdentifier::createClassifiedIdentifierWithParent(
-                    eObjectType, aObjectID, aParentParticle, aDragMethodServiceName, aDragParameterString );
-            }
-            return aRet;
-
-        }
-
-        //axis
-        Reference< XAxis > xAxis( xObject, uno::UNO_QUERY );
-        if( xAxis.is() )
-        {
-            Reference< XCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemOfAxis( xAxis, rModel.getFirstDiagram() ) );
-            OUString aCooSysParticle( createParticleForCoordinateSystem( xCooSys, rModel ) );
-            sal_Int32 nDimensionIndex=-1;
-            sal_Int32 nAxisIndex=-1;
-            AxisHelper::getIndicesForAxis( xAxis, xCooSys, nDimensionIndex, nAxisIndex );
-            OUString aAxisParticle( createParticleForAxis( nDimensionIndex, nAxisIndex ) );
-            return createClassifiedIdentifierForParticles( aCooSysParticle, aAxisParticle );
-        }
-
-        //legend
-        Reference< XLegend > xLegend( xObject, uno::UNO_QUERY );
-        if( xLegend.is() )
-        {
-            return createClassifiedIdentifierForParticle( createParticleForLegend( rModel ) );
-        }
-
-        //diagram
-        Reference< XDiagram > xDiagram( xObject, uno::UNO_QUERY );
-        if( xDiagram.is() )
-        {
-            return createClassifiedIdentifierForParticle( createParticleForDiagram() );
-        }
-
-        //todo
-        //XDataSeries
-        //CooSys
-        //charttype
-        //datapoint?
-        //Gridproperties
-    }
-    catch(const uno::Exception&)
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
-
-    if( eObjectType != OBJECTTYPE_UNKNOWN )
-    {
-        aRet = ObjectIdentifier::createClassifiedIdentifierWithParent(
-            eObjectType, aObjectID, aParentParticle, aDragMethodServiceName, aDragParameterString );
-    }
-    else
-    {
-        OSL_FAIL("give object could not be identified in createClassifiedIdentifierForObject");
-    }
-
-    return aRet;
-}
-
-OUString ObjectIdentifier::createClassifiedIdentifierForObject(
-          const Reference< uno::XInterface >& xObject
-        , const Reference< frame::XModel >& xChartModel )
-{
-    OUString aRet;
-
-    enum ObjectType eObjectType = OBJECTTYPE_UNKNOWN;
-    const OUString aObjectID;
-    OUString aParentParticle;
-    const OUString aDragMethodServiceName;
-    const OUString aDragParameterString;
+    const std::u16string_view aDragMethodServiceName;
+    const std::u16string_view aDragParameterString;
 
     try
     {
@@ -423,7 +327,7 @@ OUString ObjectIdentifier::createClassifiedIdentifierForObject(
         Reference< XAxis > xAxis( xObject, uno::UNO_QUERY );
         if( xAxis.is() )
         {
-            Reference< XCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemOfAxis( xAxis, ChartModelHelper::findDiagram( xChartModel ) ) );
+            rtl::Reference< BaseCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemOfAxis( xAxis, ChartModelHelper::findDiagram( xChartModel ) ) );
             OUString aCooSysParticle( createParticleForCoordinateSystem( xCooSys, xChartModel ) );
             sal_Int32 nDimensionIndex=-1;
             sal_Int32 nAxisIndex=-1;
@@ -471,15 +375,64 @@ OUString ObjectIdentifier::createClassifiedIdentifierForObject(
     return aRet;
 }
 
-OUString ObjectIdentifier::createClassifiedIdentifierForParticle(
-        const OUString& rParticle )
+OUString ObjectIdentifier::createClassifiedIdentifierForObject(
+          const rtl::Reference< Legend >& xLegend
+        , const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
-    return ObjectIdentifier::createClassifiedIdentifierForParticles( rParticle, OUString() );
+    try
+    {
+        if( xLegend.is() )
+        {
+            return createClassifiedIdentifierForParticle( createParticleForLegend( xChartModel ) );
+        }
+    }
+    catch(const uno::Exception&)
+    {
+        DBG_UNHANDLED_EXCEPTION("chart2");
+    }
+
+    OSL_FAIL("give object could not be identified in createClassifiedIdentifierForObject");
+
+    return OUString();
+}
+
+OUString ObjectIdentifier::createClassifiedIdentifierForObject(
+          const rtl::Reference<::chart::Axis>& xAxis
+        , const rtl::Reference<::chart::ChartModel>& xChartModel )
+{
+    try
+    {
+        //axis
+        if( xAxis.is() )
+        {
+            rtl::Reference< BaseCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemOfAxis( xAxis, ChartModelHelper::findDiagram( xChartModel ) ) );
+            OUString aCooSysParticle( createParticleForCoordinateSystem( xCooSys, xChartModel ) );
+            sal_Int32 nDimensionIndex=-1;
+            sal_Int32 nAxisIndex=-1;
+            AxisHelper::getIndicesForAxis( xAxis, xCooSys, nDimensionIndex, nAxisIndex );
+            OUString aAxisParticle( createParticleForAxis( nDimensionIndex, nAxisIndex ) );
+            return createClassifiedIdentifierForParticles( aCooSysParticle, aAxisParticle );
+        }
+    }
+    catch(const uno::Exception&)
+    {
+        DBG_UNHANDLED_EXCEPTION("chart2");
+    }
+
+    OSL_FAIL("give object could not be identified in createClassifiedIdentifierForObject");
+
+    return OUString();
+}
+
+OUString ObjectIdentifier::createClassifiedIdentifierForParticle(
+         std::u16string_view rParticle )
+{
+    return ObjectIdentifier::createClassifiedIdentifierForParticles( rParticle, u"" );
 }
 
 OUString ObjectIdentifier::createClassifiedIdentifierForParticles(
-            const OUString& rParentParticle
-          , const OUString& rChildParticle
+            std::u16string_view rParentParticle
+          , std::u16string_view rChildParticle
           , std::u16string_view rDragMethodServiceName
           , std::u16string_view rDragParameterString )
 {
@@ -489,13 +442,13 @@ OUString ObjectIdentifier::createClassifiedIdentifierForParticles(
 
     OUStringBuffer aRet( m_aProtocol );
     aRet.append( lcl_createClassificationStringForType( eObjectType, rDragMethodServiceName, rDragParameterString ));
-    if(aRet.getLength() > static_cast<sal_Int32>(strlen(m_aProtocol)))
+    if(o3tl::make_unsigned(aRet.getLength()) >= std::size(m_aProtocol))
         aRet.append("/");
 
-    if(!rParentParticle.isEmpty())
+    if(!rParentParticle.empty())
     {
         aRet.append(rParentParticle);
-        if( !rChildParticle.isEmpty() )
+        if( !rChildParticle.empty() )
             aRet.append(":");
     }
     aRet.append(rChildParticle);
@@ -510,47 +463,19 @@ OUString ObjectIdentifier::createParticleForDiagram()
 }
 
 OUString ObjectIdentifier::createParticleForCoordinateSystem(
-          const Reference< XCoordinateSystem >& xCooSys
-        , ChartModel& rModel )
+          const rtl::Reference< BaseCoordinateSystem >& xCooSys
+        , const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
     OUString aRet;
 
-    Reference< XDiagram > xDiagram( rModel.getFirstDiagram() );
-    Reference< XCoordinateSystemContainer > xCooSysContainer( xDiagram, uno::UNO_QUERY );
-    if( xCooSysContainer.is() )
+    rtl::Reference< Diagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
+    if( xDiagram.is() )
     {
-        sal_Int32 nCooSysIndex = 0;
-        uno::Sequence< Reference< XCoordinateSystem > > aCooSysList( xCooSysContainer->getCoordinateSystems() );
-        for( ; nCooSysIndex < aCooSysList.getLength(); ++nCooSysIndex )
+        std::size_t nCooSysIndex = 0;
+        const std::vector< rtl::Reference< BaseCoordinateSystem > > & aCooSysList( xDiagram->getBaseCoordinateSystems() );
+        for( ; nCooSysIndex < aCooSysList.size(); ++nCooSysIndex )
         {
-            Reference< XCoordinateSystem > xCurrentCooSys( aCooSysList[nCooSysIndex] );
-            if( xCooSys == xCurrentCooSys )
-            {
-                aRet = ObjectIdentifier::createParticleForDiagram() + ":CS=" + OUString::number( nCooSysIndex );
-                break;
-            }
-        }
-    }
-
-    return aRet;
-}
-
-OUString ObjectIdentifier::createParticleForCoordinateSystem(
-          const Reference< XCoordinateSystem >& xCooSys
-        , const Reference< frame::XModel >& xChartModel )
-{
-    OUString aRet;
-
-    Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
-    Reference< XCoordinateSystemContainer > xCooSysContainer( xDiagram, uno::UNO_QUERY );
-    if( xCooSysContainer.is() )
-    {
-        sal_Int32 nCooSysIndex = 0;
-        uno::Sequence< Reference< XCoordinateSystem > > aCooSysList( xCooSysContainer->getCoordinateSystems() );
-        for( ; nCooSysIndex < aCooSysList.getLength(); ++nCooSysIndex )
-        {
-            Reference< XCoordinateSystem > xCurrentCooSys( aCooSysList[nCooSysIndex] );
-            if( xCooSys == xCurrentCooSys )
+            if( xCooSys == aCooSysList[nCooSysIndex] )
             {
                 aRet = ObjectIdentifier::createParticleForDiagram() + ":CS=" + OUString::number( nCooSysIndex );
                 break;
@@ -583,7 +508,7 @@ OUString ObjectIdentifier::createParticleForGrid(
 
 OUString ObjectIdentifier::createClassifiedIdentifierForGrid(
           const Reference< XAxis >& xAxis
-        , const Reference< frame::XModel >& xChartModel
+        , const rtl::Reference<::chart::ChartModel>& xChartModel
         , sal_Int32 nSubGridIndex )
 {
     //-1: main grid, 0: first subgrid etc
@@ -611,22 +536,16 @@ OUString ObjectIdentifier::createParticleForSeries(
         OUString::number( nSeriesIndex );
 }
 
-OUString ObjectIdentifier::createParticleForLegend( ChartModel&  )
-{
-    //todo: if more than one diagram is implemented, find the correct diagram which is owner of the given legend
-
-    return ObjectIdentifier::createParticleForDiagram() + ":" + getStringForType( OBJECTTYPE_LEGEND ) + "=";
-}
 
 OUString ObjectIdentifier::createParticleForLegend(
-        const Reference< frame::XModel >& )
+        const rtl::Reference<::chart::ChartModel>& )
 {
     //todo: if more than one diagram is implemented, find the correct diagram which is owner of the given legend
 
     return ObjectIdentifier::createParticleForDiagram() + ":" + getStringForType( OBJECTTYPE_LEGEND ) + "=";
 }
 
-OUString ObjectIdentifier::createParticleForDataTable(const css::uno::Reference< css::frame::XModel >& /*xChartModel*/)
+OUString ObjectIdentifier::createParticleForDataTable(const rtl::Reference<::chart::ChartModel>& /* xChartModel */)
 {
     return ObjectIdentifier::createParticleForDiagram() + ":" + getStringForType(OBJECTTYPE_DATA_TABLE) + "=";
 }
@@ -652,7 +571,7 @@ OUString ObjectIdentifier::createClassifiedIdentifierWithParent(
 
     OUStringBuffer aRet( m_aProtocol );
     aRet.append( lcl_createClassificationStringForType( eObjectType, rDragMethodServiceName, rDragParameterString ));
-    if(aRet.getLength() > static_cast<sal_Int32>(strlen(m_aProtocol)))
+    if(o3tl::make_unsigned(aRet.getLength()) >= std::size(m_aProtocol))
         aRet.append("/");
     aRet.append(rParentPartical);
     if(!rParentPartical.empty())
@@ -684,89 +603,89 @@ OUString ObjectIdentifier::createPieSegmentDragParameterString(
 }
 
 bool ObjectIdentifier::parsePieSegmentDragParameterString(
-          const OUString& rDragParameterString
+          std::u16string_view rDragParameterString
         , sal_Int32& rOffsetPercent
         , awt::Point& rMinimumPosition
         , awt::Point& rMaximumPosition )
 {
     sal_Int32 nCharacterIndex = 0;
 
-    OUString aValueString( rDragParameterString.getToken( 0, ',', nCharacterIndex ) );
-    rOffsetPercent = aValueString.toInt32();
+    std::u16string_view aValueString( o3tl::getToken(rDragParameterString, 0, ',', nCharacterIndex ) );
+    rOffsetPercent = o3tl::toInt32(aValueString);
     if( nCharacterIndex < 0 )
         return false;
 
-    aValueString = rDragParameterString.getToken( 0, ',', nCharacterIndex );
-    rMinimumPosition.X = aValueString.toInt32();
+    aValueString = o3tl::getToken(rDragParameterString, 0, ',', nCharacterIndex );
+    rMinimumPosition.X = o3tl::toInt32(aValueString);
     if( nCharacterIndex < 0 )
         return false;
 
-    aValueString = rDragParameterString.getToken( 0, ',', nCharacterIndex );
-    rMinimumPosition.Y = aValueString.toInt32();
+    aValueString = o3tl::getToken(rDragParameterString, 0, ',', nCharacterIndex );
+    rMinimumPosition.Y = o3tl::toInt32(aValueString);
     if( nCharacterIndex < 0 )
         return false;
 
-    aValueString = rDragParameterString.getToken( 0, ',', nCharacterIndex );
-    rMaximumPosition.X = aValueString.toInt32();
+    aValueString = o3tl::getToken(rDragParameterString, 0, ',', nCharacterIndex );
+    rMaximumPosition.X = o3tl::toInt32(aValueString);
     if( nCharacterIndex < 0 )
         return false;
 
-    aValueString = rDragParameterString.getToken( 0, ',', nCharacterIndex );
-    rMaximumPosition.Y = aValueString.toInt32();
+    aValueString = o3tl::getToken(rDragParameterString, 0, ',', nCharacterIndex );
+    rMaximumPosition.Y = o3tl::toInt32(aValueString);
     return nCharacterIndex >= 0;
 }
 
-OUString ObjectIdentifier::getDragMethodServiceName( const OUString& rCID )
+std::u16string_view ObjectIdentifier::getDragMethodServiceName( std::u16string_view rCID )
 {
-    OUString aRet;
+    std::u16string_view aRet;
 
-    sal_Int32 nIndexStart = rCID.indexOf( m_aDragMethodEquals );
-    if( nIndexStart != -1 )
+    size_t nIndexStart = rCID.find( m_aDragMethodEquals );
+    if( nIndexStart != std::u16string_view::npos )
     {
-        nIndexStart = rCID.indexOf( '=', nIndexStart );
-        if( nIndexStart != -1 )
+        nIndexStart = rCID.find( '=', nIndexStart );
+        if( nIndexStart != std::u16string_view::npos )
         {
             nIndexStart++;
-            sal_Int32 nNextSlash = rCID.indexOf( '/', nIndexStart );
-            if( nNextSlash != -1 )
+            size_t nNextSlash = rCID.find( '/', nIndexStart );
+            if( nNextSlash != std::u16string_view::npos )
             {
                 sal_Int32 nIndexEnd = nNextSlash;
-                sal_Int32 nNextColon = rCID.indexOf( ':', nIndexStart );
-                if( nNextColon < nNextSlash )
+                size_t nNextColon = rCID.find( ':', nIndexStart );
+                if( nNextColon == std::u16string_view::npos || nNextColon < nNextSlash )
                     nIndexEnd = nNextColon;
-                aRet = rCID.copy(nIndexStart,nIndexEnd-nIndexStart);
+                aRet = rCID.substr(nIndexStart,nIndexEnd-nIndexStart);
             }
         }
     }
     return aRet;
 }
 
-OUString ObjectIdentifier::getDragParameterString( const OUString& rCID )
+std::u16string_view ObjectIdentifier::getDragParameterString( std::u16string_view rCID )
 {
-    OUString aRet;
+    std::u16string_view aRet;
 
-    sal_Int32 nIndexStart = rCID.indexOf( m_aDragParameterEquals );
-    if( nIndexStart != -1 )
+    size_t nIndexStart = rCID.find( m_aDragParameterEquals );
+    if( nIndexStart != std::u16string_view::npos )
     {
-        nIndexStart = rCID.indexOf( '=', nIndexStart );
-        if( nIndexStart != -1 )
+        nIndexStart = rCID.find( '=', nIndexStart );
+        if( nIndexStart != std::u16string_view::npos )
         {
             nIndexStart++;
-            sal_Int32 nNextSlash = rCID.indexOf( '/', nIndexStart );
-            if( nNextSlash != -1 )
+            size_t nNextSlash = rCID.find( '/', nIndexStart );
+            if( nNextSlash != std::u16string_view::npos )
             {
                 sal_Int32 nIndexEnd = nNextSlash;
-                sal_Int32 nNextColon = rCID.indexOf( ':', nIndexStart );
-                if( nNextColon < nNextSlash )
+                size_t nNextColon = rCID.find( ':', nIndexStart );
+                if( nNextColon == std::u16string_view::npos || nNextColon < nNextSlash )
                     nIndexEnd = nNextColon;
-                aRet = rCID.copy(nIndexStart,nIndexEnd-nIndexStart);
+                aRet = rCID.substr(nIndexStart,nIndexEnd-nIndexStart);
             }
         }
     }
     return aRet;
 }
 
-bool ObjectIdentifier::isDragableObject( const OUString& rClassifiedIdentifier )
+bool ObjectIdentifier::isDragableObject( std::u16string_view rClassifiedIdentifier )
 {
     bool bReturn = false;
     ObjectType eObjectType = ObjectIdentifier::getObjectType( rClassifiedIdentifier );
@@ -781,8 +700,8 @@ bool ObjectIdentifier::isDragableObject( const OUString& rClassifiedIdentifier )
             bReturn = true;
             break;
         default:
-            OUString aDragMethodServiceName( ObjectIdentifier::getDragMethodServiceName( rClassifiedIdentifier ) );
-            bReturn = !aDragMethodServiceName.isEmpty();
+            std::u16string_view aDragMethodServiceName( ObjectIdentifier::getDragMethodServiceName( rClassifiedIdentifier ) );
+            bReturn = !aDragMethodServiceName.empty();
             break;
     }
     return bReturn;
@@ -802,7 +721,7 @@ bool ObjectIdentifier::isDragableObject() const
     return bReturn;
 }
 
-bool ObjectIdentifier::isRotateableObject( const OUString& rClassifiedIdentifier )
+bool ObjectIdentifier::isRotateableObject( std::u16string_view rClassifiedIdentifier )
 {
     bool bReturn = false;
     ObjectType eObjectType = ObjectIdentifier::getObjectType( rClassifiedIdentifier );
@@ -819,7 +738,7 @@ bool ObjectIdentifier::isRotateableObject( const OUString& rClassifiedIdentifier
     return bReturn;
 }
 
-bool ObjectIdentifier::isMultiClickObject( const OUString& rClassifiedIdentifier )
+bool ObjectIdentifier::isMultiClickObject( std::u16string_view rClassifiedIdentifier )
 {
     //the name of a shape is it's ClassifiedIdentifier
 
@@ -828,27 +747,27 @@ bool ObjectIdentifier::isMultiClickObject( const OUString& rClassifiedIdentifier
     //was selected before;
 
     //!!!!! by definition the name of a MultiClickObject starts with "CID/MultiClick:"
-    bool bRet = rClassifiedIdentifier.match( m_aMultiClick, strlen(m_aProtocol) );
+    bool bRet = o3tl::starts_with(rClassifiedIdentifier.substr( std::size(m_aProtocol)-1 ), m_aMultiClick);
     return bRet;
 }
 
-bool ObjectIdentifier::areSiblings( const OUString& rCID1, const OUString& rCID2 )
+bool ObjectIdentifier::areSiblings( std::u16string_view rCID1, std::u16string_view rCID2 )
 {
     bool bRet=false;
-    sal_Int32 nLastSign1 = rCID1.lastIndexOf( '=' );
-    sal_Int32 nLastSign2 = rCID2.lastIndexOf( '=' );
-    if( nLastSign1 == rCID1.indexOf( '=' ) )//CID cannot be sibling if only one "=" occurs
+    size_t nLastSign1 = rCID1.rfind( '=' );
+    size_t nLastSign2 = rCID2.rfind( '=' );
+    if( nLastSign1 == rCID1.find( '=' ) )//CID cannot be sibling if only one "=" occurs
         bRet=false;
-    else if( nLastSign2 == rCID2.indexOf( '=' ) )//CID cannot be sibling if only one "=" occurs
+    else if( nLastSign2 == rCID2.find( '=' ) )//CID cannot be sibling if only one "=" occurs
         bRet=false;
     else if( ObjectIdentifier::areIdenticalObjects( rCID1, rCID2 ) )
         bRet=false;
     else
     {
-        OUString aParent1( ObjectIdentifier::getFullParentParticle( rCID1 ) );
-        if( !aParent1.isEmpty() )
+        std::u16string_view aParent1( ObjectIdentifier::getFullParentParticle( rCID1 ) );
+        if( !aParent1.empty() )
         {
-            OUString aParent2( ObjectIdentifier::getFullParentParticle( rCID2 ) );
+            std::u16string_view aParent2( ObjectIdentifier::getFullParentParticle( rCID2 ) );
             bRet=aParent1 == aParent2;
         }
         //legend entries are special:
@@ -862,14 +781,14 @@ bool ObjectIdentifier::areSiblings( const OUString& rCID1, const OUString& rCID2
     return bRet;
 }
 
-bool ObjectIdentifier::areIdenticalObjects( const OUString& rCID1, const OUString& rCID2 )
+bool ObjectIdentifier::areIdenticalObjects( std::u16string_view rCID1, std::u16string_view rCID2 )
 {
     if( rCID1 == rCID2 )
         return true;
     //draggable pie or donut segments need special treatment, as their CIDs do change with offset
     {
-        if( rCID1.indexOf( m_aPieSegmentDragMethodServiceName ) < 0
-            || rCID2.indexOf( m_aPieSegmentDragMethodServiceName ) < 0 )
+        if( rCID1.find( m_aPieSegmentDragMethodServiceName ) == std::u16string_view::npos
+            || rCID2.find( m_aPieSegmentDragMethodServiceName ) == std::u16string_view::npos )
             return false;
 
         OUString aID1( ObjectIdentifier::getObjectID( rCID1 ) );
@@ -966,71 +885,72 @@ OUString ObjectIdentifier::getStringForType( ObjectType eObjectType )
     return aRet;
 }
 
-ObjectType ObjectIdentifier::getObjectType( const OUString& rCID )
+ObjectType ObjectIdentifier::getObjectType( std::u16string_view aCID )
 {
     ObjectType eRet;
-    sal_Int32 nLastSign = rCID.lastIndexOf( ':' );//last sign before the type string
-    if(nLastSign==-1)
-        nLastSign = rCID.lastIndexOf( '/' );
-    if(nLastSign==-1)
+    size_t nLastSign = aCID.rfind( ':' );//last sign before the type string
+    if(nLastSign == std::u16string_view::npos)
+        nLastSign = aCID.rfind( '/' );
+    if(nLastSign == std::u16string_view::npos)
     {
-        sal_Int32 nEndIndex = rCID.lastIndexOf( '=' );
-        if(nEndIndex==-1)
+        size_t nEndIndex = aCID.rfind( '=' );
+        if(nEndIndex == std::u16string_view::npos)
             return OBJECTTYPE_UNKNOWN;
         nLastSign = 0;
     }
     if( nLastSign>0 )
         nLastSign++;
 
-    if( rCID.match("Page",nLastSign) )
+    aCID = aCID.substr(nLastSign);
+    if( o3tl::starts_with(aCID, u"Page") )
         eRet = OBJECTTYPE_PAGE;
-    else if( rCID.match("Title",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"Title") )
         eRet = OBJECTTYPE_TITLE;
-    else if( rCID.match("LegendEntry",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"LegendEntry") )
         eRet = OBJECTTYPE_LEGEND_ENTRY;
-    else if( rCID.match("Legend",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"Legend") )
         eRet = OBJECTTYPE_LEGEND;
-    else if( rCID.match("DiagramWall",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"DiagramWall") )
         eRet = OBJECTTYPE_DIAGRAM_WALL;
-    else if( rCID.match("DiagramFloor",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"DiagramFloor") )
         eRet = OBJECTTYPE_DIAGRAM_FLOOR;
-    else if( rCID.match("D=",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"D=") )
         eRet = OBJECTTYPE_DIAGRAM;
-    else if( rCID.match("AxisUnitLabel",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"AxisUnitLabel") )
         eRet = OBJECTTYPE_AXIS_UNITLABEL;
-    else if( rCID.match("Axis",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"Axis") )
         eRet = OBJECTTYPE_AXIS;
-    else if( rCID.match("Grid",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"Grid") )
         eRet = OBJECTTYPE_GRID;
-    else if( rCID.match("SubGrid",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"SubGrid") )
         eRet = OBJECTTYPE_SUBGRID;
-    else if( rCID.match("Series",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"Series") )
         eRet = OBJECTTYPE_DATA_SERIES;
-    else if( rCID.match("Point",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"Point") )
         eRet = OBJECTTYPE_DATA_POINT;
-    else if( rCID.match("DataLabels",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"DataLabels") )
         eRet = OBJECTTYPE_DATA_LABELS;
-    else if( rCID.match("DataLabel",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"DataLabel") )
         eRet = OBJECTTYPE_DATA_LABEL;
-    else if( rCID.match("ErrorsX",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"ErrorsX") )
         eRet = OBJECTTYPE_DATA_ERRORS_X;
-    else if( rCID.match("ErrorsY",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"ErrorsY") )
         eRet = OBJECTTYPE_DATA_ERRORS_Y;
-    else if( rCID.match("ErrorsZ",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"ErrorsZ") )
         eRet = OBJECTTYPE_DATA_ERRORS_Z;
-    else if( rCID.match("Curve",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"Curve") )
         eRet = OBJECTTYPE_DATA_CURVE;
-    else if( rCID.match("Equation",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"Equation") )
         eRet = OBJECTTYPE_DATA_CURVE_EQUATION;
-    else if( rCID.match("Average",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"Average") )
         eRet = OBJECTTYPE_DATA_AVERAGE_LINE;
-    else if( rCID.match("StockRange",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"StockRange") )
         eRet = OBJECTTYPE_DATA_STOCK_RANGE;
-    else if( rCID.match("StockLoss",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"StockLoss") )
         eRet = OBJECTTYPE_DATA_STOCK_LOSS;
-    else if( rCID.match("StockGain",nLastSign) )
+    else if( o3tl::starts_with(aCID, u"StockGain") )
         eRet = OBJECTTYPE_DATA_STOCK_GAIN;
-    else if( rCID.match("DataTable", nLastSign) )
+    else if( o3tl::starts_with(aCID, u"DataTable") )
         eRet = OBJECTTYPE_DATA_TABLE;
     else
         eRet = OBJECTTYPE_UNKNOWN;
@@ -1093,14 +1013,14 @@ OUString ObjectIdentifier::createChildParticleWithIndex( ObjectType eObjectType,
     return aRet.makeStringAndClear();
 }
 
-sal_Int32 ObjectIdentifier::getIndexFromParticleOrCID( const OUString& rParticleOrCID )
+sal_Int32 ObjectIdentifier::getIndexFromParticleOrCID( std::u16string_view rParticleOrCID )
 {
-    const OUString aIndexString = lcl_getIndexStringAfterString( rParticleOrCID, "=" );
-    return lcl_StringToIndex( aIndexString.getToken( 0, ',' ) );
+    const std::u16string_view aIndexString = lcl_getIndexStringAfterString( rParticleOrCID, u"=" );
+    return lcl_StringToIndex( o3tl::getToken(aIndexString, 0, ',' ) );
 }
 
 OUString ObjectIdentifier::createSeriesSubObjectStub( ObjectType eSubObjectType
-                    , const OUString& rSeriesParticle
+                    , std::u16string_view rSeriesParticle
                     , std::u16string_view rDragMethodServiceName
                     , std::u16string_view rDragParameterString )
 {
@@ -1116,67 +1036,59 @@ OUString ObjectIdentifier::createPointCID( std::u16string_view rPointCID_Stub, s
     return rPointCID_Stub + OUString::number( nIndex );
 }
 
-OUString ObjectIdentifier::getParticleID( const OUString& rCID )
+std::u16string_view ObjectIdentifier::getParticleID( std::u16string_view rCID )
 {
-    OUString aRet;
-    sal_Int32 nLast = rCID.lastIndexOf('=');
-    if(nLast>=0)
-        aRet = rCID.copy(++nLast);
+    std::u16string_view aRet;
+    size_t nLast = rCID.rfind('=');
+    if(nLast != std::u16string_view::npos)
+        aRet = rCID.substr(++nLast);
     return aRet;
 }
 
-OUString ObjectIdentifier::getFullParentParticle( const OUString& rCID )
+std::u16string_view ObjectIdentifier::getFullParentParticle( std::u16string_view rCID )
 {
-    OUString aRet;
+    std::u16string_view aRet;
 
-    sal_Int32 nStartPos = rCID.lastIndexOf('/');
-    if( nStartPos>=0 )
+    size_t nStartPos = rCID.rfind('/');
+    if( nStartPos != std::u16string_view::npos )
     {
         nStartPos++;
-        sal_Int32 nEndPos = rCID.lastIndexOf(':');
-        if( nEndPos>=0 && nStartPos < nEndPos )
+        size_t nEndPos = rCID.rfind(':');
+        if( nEndPos != std::u16string_view::npos && nStartPos < nEndPos )
         {
-            aRet = rCID.copy(nStartPos,nEndPos-nStartPos);
+            aRet = rCID.substr(nStartPos,nEndPos-nStartPos);
         }
     }
 
     return aRet;
 }
 
-OUString ObjectIdentifier::getObjectID( const OUString& rCID )
+OUString ObjectIdentifier::getObjectID( std::u16string_view rCID )
 {
     OUString aRet;
 
-    sal_Int32 nStartPos = rCID.lastIndexOf('/');
-    if( nStartPos>=0 )
+    size_t nStartPos = rCID.rfind('/');
+    if( nStartPos != std::u16string_view::npos )
     {
         nStartPos++;
-        sal_Int32 nEndPos = rCID.getLength();
-        aRet = rCID.copy(nStartPos,nEndPos-nStartPos);
+        size_t nEndPos = rCID.size();
+        aRet = rCID.substr(nStartPos,nEndPos-nStartPos);
     }
 
     return aRet;
 }
 
-bool ObjectIdentifier::isCID( const OUString& rName )
+bool ObjectIdentifier::isCID( std::u16string_view rName )
 {
-    return !rName.isEmpty() && rName.match( m_aProtocol );
+    return !rName.empty() && o3tl::starts_with( rName, m_aProtocol );
 }
 
 Reference< beans::XPropertySet > ObjectIdentifier::getObjectPropertySet(
-    const OUString& rObjectCID,
-    const Reference< chart2::XChartDocument >& xChartDocument )
-{
-    return ObjectIdentifier::getObjectPropertySet(
-        rObjectCID, Reference< frame::XModel >( xChartDocument ));
-}
-
-Reference< beans::XPropertySet > ObjectIdentifier::getObjectPropertySet(
-                const OUString& rObjectCID
-                , const Reference< frame::XModel >& xChartModel )
+                std::u16string_view rObjectCID
+                , const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
     //return the model object that is indicated by rObjectCID
-    if(rObjectCID.isEmpty())
+    if(rObjectCID.empty())
         return nullptr;
     if(!xChartModel.is())
         return nullptr;
@@ -1185,19 +1097,17 @@ Reference< beans::XPropertySet > ObjectIdentifier::getObjectPropertySet(
     try
     {
         ObjectType eObjectType = ObjectIdentifier::getObjectType( rObjectCID );
-        OUString aParticleID = ObjectIdentifier::getParticleID( rObjectCID );
+        std::u16string_view aParticleID = ObjectIdentifier::getParticleID( rObjectCID );
 
-        Reference< XDiagram > xDiagram;
-        Reference< XCoordinateSystem > xCooSys;
+        rtl::Reference< Diagram > xDiagram;
+        rtl::Reference< BaseCoordinateSystem > xCooSys;
         lcl_getDiagramAndCooSys( rObjectCID, xChartModel, xDiagram, xCooSys );
 
         switch(eObjectType)
         {
             case OBJECTTYPE_PAGE:
                 {
-                    Reference< XChartDocument > xChartDocument( xChartModel, uno::UNO_QUERY );
-                    if( xChartDocument.is())
-                        xObjectProperties.set( xChartDocument->getPageBackground() );
+                    xObjectProperties.set( xChartModel->getPageBackground() );
                 }
                 break;
             case OBJECTTYPE_TITLE:
@@ -1217,7 +1127,7 @@ Reference< beans::XPropertySet > ObjectIdentifier::getObjectPropertySet(
                     break;
             case OBJECTTYPE_DIAGRAM:
                 {
-                    xObjectProperties.set( xDiagram, uno::UNO_QUERY );
+                    xObjectProperties = xDiagram;
                 }
                 break;
             case OBJECTTYPE_DIAGRAM_WALL:
@@ -1238,10 +1148,10 @@ Reference< beans::XPropertySet > ObjectIdentifier::getObjectPropertySet(
                     sal_Int32 nAxisIndex = -1;
                     lcl_parseAxisIndices( nDimensionIndex, nAxisIndex, rObjectCID );
 
-                    Reference< chart2::XAxis > xAxis(
-                        AxisHelper::getAxis( nDimensionIndex, nAxisIndex, xCooSys ) );
+                    rtl::Reference< Axis > xAxis =
+                        AxisHelper::getAxis( nDimensionIndex, nAxisIndex, xCooSys );
                     if( xAxis.is() )
-                        xObjectProperties.set( xAxis, uno::UNO_QUERY );
+                        xObjectProperties = xAxis;
                 }
                 break;
             case OBJECTTYPE_AXIS_UNITLABEL:
@@ -1262,21 +1172,21 @@ Reference< beans::XPropertySet > ObjectIdentifier::getObjectPropertySet(
             case OBJECTTYPE_DATA_LABELS:
             case OBJECTTYPE_DATA_SERIES:
                 {
-                    Reference< XDataSeries > xSeries( ObjectIdentifier::getDataSeriesForCID(
+                    rtl::Reference< DataSeries > xSeries( ObjectIdentifier::getDataSeriesForCID(
                         rObjectCID, xChartModel ) );
                     if( xSeries.is() )
-                        xObjectProperties.set( xSeries, uno::UNO_QUERY );
+                        xObjectProperties = xSeries;
 
                     break;
                 }
             case OBJECTTYPE_DATA_LABEL:
             case OBJECTTYPE_DATA_POINT:
                 {
-                    Reference< XDataSeries > xSeries( ObjectIdentifier::getDataSeriesForCID(
-                        rObjectCID, xChartModel ) );
+                    rtl::Reference< DataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID(
+                        rObjectCID, xChartModel );
                     if(xSeries.is())
                     {
-                        sal_Int32 nIndex = aParticleID.toInt32();
+                        sal_Int32 nIndex = o3tl::toInt32(aParticleID);
                         xObjectProperties = xSeries->getDataPointByIndex( nIndex );
                     }
                     break;
@@ -1285,26 +1195,22 @@ Reference< beans::XPropertySet > ObjectIdentifier::getObjectPropertySet(
             case OBJECTTYPE_DATA_ERRORS_Y:
             case OBJECTTYPE_DATA_ERRORS_Z:
                 {
-                    Reference< XDataSeries > xSeries( ObjectIdentifier::getDataSeriesForCID(
-                        rObjectCID, xChartModel ) );
+                    rtl::Reference< DataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID(
+                        rObjectCID, xChartModel );
                     if(xSeries.is())
                     {
-                        Reference< beans::XPropertySet > xSeriesProp( xSeries, uno::UNO_QUERY );
                         Reference< beans::XPropertySet > xErrorBarProp;
-                        if( xSeriesProp.is() )
-                        {
-                            OUString errorBar;
+                        OUString errorBar;
 
-                            if ( eObjectType == OBJECTTYPE_DATA_ERRORS_X)
-                                errorBar = CHART_UNONAME_ERRORBAR_X;
-                            else if (eObjectType == OBJECTTYPE_DATA_ERRORS_Y)
-                                errorBar = CHART_UNONAME_ERRORBAR_Y;
-                            else
-                                errorBar = "ErrorBarZ";
+                        if ( eObjectType == OBJECTTYPE_DATA_ERRORS_X)
+                            errorBar = CHART_UNONAME_ERRORBAR_X;
+                        else if (eObjectType == OBJECTTYPE_DATA_ERRORS_Y)
+                            errorBar = CHART_UNONAME_ERRORBAR_Y;
+                        else
+                            errorBar = "ErrorBarZ";
 
-                            xSeriesProp->getPropertyValue( errorBar ) >>= xErrorBarProp;
-                            xObjectProperties = xErrorBarProp;
-                        }
+                        xSeries->getPropertyValue( errorBar ) >>= xErrorBarProp;
+                        xObjectProperties = xErrorBarProp;
                     }
                     break;
                 }
@@ -1312,19 +1218,19 @@ Reference< beans::XPropertySet > ObjectIdentifier::getObjectPropertySet(
             case OBJECTTYPE_DATA_CURVE:
             case OBJECTTYPE_DATA_CURVE_EQUATION:
                 {
-                    Reference< XRegressionCurveContainer > xRegressionContainer( ObjectIdentifier::getDataSeriesForCID(
-                        rObjectCID, xChartModel ), uno::UNO_QUERY );
+                    rtl::Reference< DataSeries > xRegressionContainer = ObjectIdentifier::getDataSeriesForCID(
+                        rObjectCID, xChartModel );
                     if(xRegressionContainer.is())
                     {
-                        sal_Int32 nIndex = aParticleID.toInt32();
-                        uno::Sequence< Reference< XRegressionCurve > > aCurveList =
-                            xRegressionContainer->getRegressionCurves();
-                        if( nIndex >= 0 && nIndex <aCurveList.getLength() )
+                        sal_Int32 nIndex = o3tl::toInt32(aParticleID);
+                        const std::vector< rtl::Reference< RegressionCurveModel > > & aCurveList =
+                            xRegressionContainer->getRegressionCurves2();
+                        if( nIndex >= 0 && o3tl::make_unsigned(nIndex) < aCurveList.size() )
                         {
                             if( eObjectType == OBJECTTYPE_DATA_CURVE_EQUATION )
-                                xObjectProperties.set( aCurveList[nIndex]->getEquationProperties());
+                                xObjectProperties = aCurveList[nIndex]->getEquationProperties();
                             else
-                                xObjectProperties.set( aCurveList[nIndex], uno::UNO_QUERY );
+                                xObjectProperties = aCurveList[nIndex];
                         }
                     }
                     break;
@@ -1333,18 +1239,16 @@ Reference< beans::XPropertySet > ObjectIdentifier::getObjectPropertySet(
                     break;
             case OBJECTTYPE_DATA_STOCK_LOSS:
                     {
-                        Reference<XChartType> xChartType( lcl_getFirstStockChartType( xChartModel ) );
-                        Reference< beans::XPropertySet > xChartTypeProps( xChartType, uno::UNO_QUERY );
-                        if(xChartTypeProps.is())
-                            xChartTypeProps->getPropertyValue( "BlackDay" ) >>= xObjectProperties;
+                        rtl::Reference<ChartType> xChartType( lcl_getFirstStockChartType( xChartModel ) );
+                        if(xChartType.is())
+                            xChartType->getPropertyValue( "BlackDay" ) >>= xObjectProperties;
                     }
                     break;
             case OBJECTTYPE_DATA_STOCK_GAIN:
                     {
-                        Reference<XChartType> xChartType( lcl_getFirstStockChartType( xChartModel ) );
-                        Reference< beans::XPropertySet > xChartTypeProps( xChartType, uno::UNO_QUERY );
-                        if(xChartTypeProps.is())
-                            xChartTypeProps->getPropertyValue( "WhiteDay" ) >>= xObjectProperties;
+                        rtl::Reference<ChartType> xChartType( lcl_getFirstStockChartType( xChartModel ) );
+                        if(xChartType.is())
+                            xChartType->getPropertyValue( "WhiteDay" ) >>= xObjectProperties;
                     }
                     break;
             case OBJECTTYPE_DATA_TABLE:
@@ -1365,12 +1269,12 @@ Reference< beans::XPropertySet > ObjectIdentifier::getObjectPropertySet(
     return xObjectProperties;
 }
 
-Reference< XAxis > ObjectIdentifier::getAxisForCID(
-                const OUString& rObjectCID
-                , const Reference< frame::XModel >& xChartModel )
+rtl::Reference< Axis > ObjectIdentifier::getAxisForCID(
+                std::u16string_view rObjectCID
+                , const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
-    Reference< XDiagram > xDiagram;
-    Reference< XCoordinateSystem > xCooSys;
+    rtl::Reference< Diagram > xDiagram;
+    rtl::Reference< BaseCoordinateSystem > xCooSys;
     lcl_getDiagramAndCooSys( rObjectCID, xChartModel, xDiagram, xCooSys );
 
     sal_Int32 nDimensionIndex = -1;
@@ -1380,14 +1284,12 @@ Reference< XAxis > ObjectIdentifier::getAxisForCID(
     return AxisHelper::getAxis( nDimensionIndex, nAxisIndex, xCooSys );
 }
 
-Reference< XDataSeries > ObjectIdentifier::getDataSeriesForCID(
-                const OUString& rObjectCID
-                , const Reference< frame::XModel >& xChartModel )
+rtl::Reference< DataSeries > ObjectIdentifier::getDataSeriesForCID(
+                std::u16string_view rObjectCID
+                , const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
-    Reference< XDataSeries > xSeries;
-
-    Reference< XDiagram > xDiagram;
-    Reference< XCoordinateSystem > xCooSys;
+    rtl::Reference< Diagram > xDiagram;
+    rtl::Reference< BaseCoordinateSystem > xCooSys;
     lcl_getDiagramAndCooSys( rObjectCID, xChartModel, xDiagram, xCooSys );
 
     sal_Int32 nChartTypeIndex = -1;
@@ -1395,34 +1297,34 @@ Reference< XDataSeries > ObjectIdentifier::getDataSeriesForCID(
     sal_Int32 nPointIndex = -1;
     lcl_parseSeriesIndices( nChartTypeIndex, nSeriesIndex, nPointIndex, rObjectCID );
 
-    Reference< XDataSeriesContainer > xDataSeriesContainer( DiagramHelper::getChartTypeByIndex( xDiagram, nChartTypeIndex ), uno::UNO_QUERY );
+    rtl::Reference< DataSeries > xSeries;
+    rtl::Reference< ChartType > xDataSeriesContainer( DiagramHelper::getChartTypeByIndex( xDiagram, nChartTypeIndex ) );
     if( xDataSeriesContainer.is() )
     {
-        uno::Sequence< uno::Reference< XDataSeries > > aDataSeriesSeq( xDataSeriesContainer->getDataSeries() );
-        if( nSeriesIndex >= 0 && nSeriesIndex < aDataSeriesSeq.getLength() )
-            xSeries.set( aDataSeriesSeq[nSeriesIndex] );
+        const std::vector< rtl::Reference< DataSeries > > & aDataSeriesSeq( xDataSeriesContainer->getDataSeries2() );
+        if( nSeriesIndex >= 0 && o3tl::make_unsigned(nSeriesIndex) < aDataSeriesSeq.size() )
+            xSeries = aDataSeriesSeq[nSeriesIndex];
     }
 
     return xSeries;
 }
 
-Reference< XDiagram > ObjectIdentifier::getDiagramForCID(
-                  const OUString& rObjectCID
-                , const uno::Reference< frame::XModel >& xChartModel )
+rtl::Reference< Diagram > ObjectIdentifier::getDiagramForCID(
+                  std::u16string_view rObjectCID
+                , const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
-    Reference< XDiagram > xDiagram;
-
-    Reference< XCoordinateSystem > xCooSys;
+    rtl::Reference< Diagram > xDiagram;
+    rtl::Reference< BaseCoordinateSystem > xCooSys;
     lcl_getDiagramAndCooSys( rObjectCID, xChartModel, xDiagram, xCooSys );
 
     return xDiagram;
 }
 
-TitleHelper::eTitleType ObjectIdentifier::getTitleTypeForCID( const OUString& rCID )
+TitleHelper::eTitleType ObjectIdentifier::getTitleTypeForCID( std::u16string_view rCID )
 {
     TitleHelper::eTitleType eRet( TitleHelper::MAIN_TITLE );
 
-    OUString aParentParticle = ObjectIdentifier::getFullParentParticle( rCID );
+    std::u16string_view aParentParticle = ObjectIdentifier::getFullParentParticle( rCID );
     const tTitleMap& rMap = lcl_getTitleMap();
     tTitleMap::const_iterator aIt = std::find_if(rMap.begin(), rMap.end(),
         [&aParentParticle](tTitleMap::const_reference rEntry) { return aParentParticle == rEntry.second; });
@@ -1432,7 +1334,7 @@ TitleHelper::eTitleType ObjectIdentifier::getTitleTypeForCID( const OUString& rC
     return eRet;
 }
 
-OUString ObjectIdentifier::getSeriesParticleFromCID( const OUString& rCID )
+OUString ObjectIdentifier::getSeriesParticleFromCID( std::u16string_view rCID )
 {
     sal_Int32 nDiagramIndex = -1;
     sal_Int32 nCooSysIndex = -1;
@@ -1446,12 +1348,12 @@ OUString ObjectIdentifier::getSeriesParticleFromCID( const OUString& rCID )
     return ObjectIdentifier::createParticleForSeries( nDiagramIndex, nCooSysIndex, nChartTypeIndex, nSeriesIndex );
 }
 
-OUString ObjectIdentifier::getMovedSeriesCID( const OUString& rObjectCID, bool bForward )
+OUString ObjectIdentifier::getMovedSeriesCID( std::u16string_view rObjectCID, bool bForward )
 {
-    sal_Int32 nDiagramIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rObjectCID, "CID/D=" ) );
-    sal_Int32 nCooSysIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rObjectCID, "CS=" ) );
-    sal_Int32 nChartTypeIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rObjectCID, "CT=" ) );
-    sal_Int32 nSeriesIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rObjectCID, "Series=" ) );
+    sal_Int32 nDiagramIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rObjectCID, u"CID/D=" ) );
+    sal_Int32 nCooSysIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rObjectCID, u"CS=" ) );
+    sal_Int32 nChartTypeIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rObjectCID, u"CT=" ) );
+    sal_Int32 nSeriesIndex = lcl_StringToIndex( lcl_getIndexStringAfterString( rObjectCID, u"Series=" ) );
 
     if( bForward )
         nSeriesIndex--;

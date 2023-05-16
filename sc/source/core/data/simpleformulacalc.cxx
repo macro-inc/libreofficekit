@@ -15,7 +15,7 @@
 #include <compiler.hxx>
 #include <sfx2/linkmgr.hxx>
 
-#define DISPLAY_LEN 15
+#define DISPLAY_LEN 66
 
 ScSimpleFormulaCalculator::ScSimpleFormulaCalculator( ScDocument& rDoc, const ScAddress& rAddr,
         const OUString& rFormula, bool bMatrixFormula, formula::FormulaGrammar::Grammar eGram )
@@ -64,12 +64,15 @@ void ScSimpleFormulaCalculator::Calculate()
 
         if (mbLimitString)
         {
-            size_t n = aStr.getLength();
-            for (size_t i = DISPLAY_LEN; i < n; ++i)
+            const sal_Unicode cCol = ScCompiler::GetNativeSymbol(ocArrayColSep)[0];
+            const sal_Unicode cRow = ScCompiler::GetNativeSymbol(ocArrayRowSep)[0];
+            const sal_Int32 n = aStr.getLength();
+            for (sal_Int32 i = DISPLAY_LEN; i < n; ++i)
             {
-                if (aStr[i] == ',' || aStr[i] == ';')
+                const sal_Unicode c = aStr[i];
+                if (c == cCol || c == cRow)
                 {
-                    aStr.truncate(i);
+                    aStr.truncate(i+1);
                     aStr.append("...");
                     break;
                 }

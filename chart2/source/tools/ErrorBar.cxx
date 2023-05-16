@@ -33,7 +33,7 @@
 #include <com/sun/star/util/Color.hpp>
 #include <com/sun/star/drawing/LineJoint.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 
 using namespace ::com::sun::star;
@@ -68,7 +68,6 @@ const SfxItemPropertySet* GetErrorBarPropertySet()
         {u"LineColor",12,cppu::UnoType<css::util::Color>::get(),0,0},
         {u"LineTransparence",13,cppu::UnoType<sal_Int16>::get(),0,0},
         {u"LineJoint",14,cppu::UnoType<css::drawing::LineJoint>::get(),0,0},
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
     static SfxItemPropertySet aPropSet( aErrorBarPropertyMap_Impl );
     return &aPropSet;
@@ -91,7 +90,7 @@ ErrorBar::ErrorBar() :
     mfNegativeError(0),
     mfWeight(1),
     meStyle(css::chart::ErrorBarStyle::NONE),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {}
 
 ErrorBar::ErrorBar( const ErrorBar & rOther ) :
@@ -109,7 +108,7 @@ ErrorBar::ErrorBar( const ErrorBar & rOther ) :
     mfNegativeError(rOther.mfNegativeError),
     mfWeight(rOther.mfWeight),
     meStyle(rOther.meStyle),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {
     if( ! rOther.m_aDataSequences.empty())
     {
@@ -401,28 +400,12 @@ void ErrorBar::removeVetoableChangeListener( const OUString&, const css::uno::Re
 // ____ XModifyBroadcaster ____
 void SAL_CALL ErrorBar::addModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL ErrorBar::removeModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 // ____ XModifyListener ____

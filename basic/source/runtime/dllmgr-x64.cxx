@@ -27,10 +27,12 @@
 #include <algorithm>
 #include <cstddef>
 #include <map>
+#include <string_view>
 #include <vector>
 
 #include <basic/sbx.hxx>
 #include <basic/sbxvar.hxx>
+#include <comphelper/string.hxx>
 #include <runtime.hxx>
 #include <osl/thread.h>
 #include <osl/diagnose.h>
@@ -40,6 +42,7 @@
 #include <sal/log.hxx>
 #include <salhelper/simplereferenceobject.hxx>
 #include <o3tl/char16_t2wchar_t.hxx>
+#include <o3tl/string_view.hxx>
 
 #undef max
 
@@ -481,7 +484,7 @@ struct ProcData {
 };
 
 ErrCode call(
-    OUString const & dll, ProcData const & proc, SbxArray * arguments,
+    std::u16string_view dll, ProcData const & proc, SbxArray * arguments,
     SbxVariable & result)
 {
     if (arguments && arguments->Count() > 20)
@@ -495,7 +498,7 @@ ErrCode call(
     // requires special handling in unmarshalString; other functions might
     // require similar treatment, too:
     bool special =
-        dll.equalsIgnoreAsciiCase("KERNEL32.DLL") &&
+        o3tl::equalsIgnoreAsciiCase(dll, u"KERNEL32.DLL") &&
         (proc.name == "GetLogicalDriveStringsA");
     for (sal_uInt32 i = 1; i < (arguments == nullptr ? 0 : arguments->Count()); ++i)
     {
@@ -608,7 +611,7 @@ ErrCode getProcData(HMODULE handle, OUString const & name, ProcData * proc)
 {
     assert(proc != nullptr);
     if (name.getLength() != 0 && name[0] == '@') { //TODO: "@" vs. "#"???
-        sal_Int32 n = name.copy(1).toInt32(); //TODO: handle bad input
+        sal_Int32 n = o3tl::toInt32(name.subView(1)); //TODO: handle bad input
         if (n <= 0 || n > 0xFFFF) {
             return ERRCODE_BASIC_BAD_ARGUMENT; //TODO: more specific errcode?
         }

@@ -30,7 +30,7 @@ class SfxRequest;
 class ConstCustomShape final : public SwDrawBase
 {
 
-    OUString aCustomShape;
+    OUString m_aCustomShape;
 
     void SetAttributes( SdrObject* pObj );
 
@@ -47,6 +47,7 @@ class ConstCustomShape final : public SwDrawBase
     static OUString GetShapeTypeFromRequest( SfxRequest const & rReq );
 
     virtual void CreateDefaultObject() override;
+    virtual void CreateDefaultObjectAtPosWithSize(Point aPos, Size aSize) override;
 
     // #i33136#
     virtual bool doConstructOrthogonal() const override;

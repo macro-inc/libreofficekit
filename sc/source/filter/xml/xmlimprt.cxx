@@ -22,11 +22,9 @@
 #include <osl/diagnose.h>
 
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 
 #include <xmloff/namespacemap.hxx>
 #include <xmloff/xmlnamespace.hxx>
-#include <xmloff/xmltkmap.hxx>
 #include <xmloff/xmlictxt.hxx>
 #include <xmloff/xmlmetai.hxx>
 #include <sfx2/objsh.hxx>
@@ -846,7 +844,7 @@ sal_Int32 ScXMLImport::SetCurrencySymbol(const sal_Int32 nKey, std::u16string_vi
     return nKey;
 }
 
-bool ScXMLImport::IsCurrencySymbol(const sal_Int32 nNumberFormat, const OUString& sCurrentCurrency, std::u16string_view sBankSymbol)
+bool ScXMLImport::IsCurrencySymbol(const sal_Int32 nNumberFormat, std::u16string_view sCurrentCurrency, std::u16string_view sBankSymbol)
 {
     uno::Reference <util::XNumberFormatsSupplier> xNumberFormatsSupplier(GetNumberFormatsSupplier());
     if (xNumberFormatsSupplier.is())
@@ -871,7 +869,7 @@ bool ScXMLImport::IsCurrencySymbol(const sal_Int32 nNumberFormat, const OUString
                         // sCurrentCurrency is the ISO code obtained through
                         // XMLNumberFormatAttributesExportHelper::GetCellType()
                         // and sBankSymbol is the currency symbol.
-                        if (sCurrentCurrency.getLength() == 3 && sBankSymbol == sTemp)
+                        if (sCurrentCurrency.size() == 3 && sBankSymbol == sTemp)
                             return true;
                         // #i61657# This may be a legacy currency symbol that changed in the meantime.
                         if (SvNumberFormatter::GetLegacyOnlyCurrencyEntry( sCurrentCurrency, sBankSymbol) != nullptr)
@@ -951,14 +949,14 @@ void ScXMLImport::SetType(const uno::Reference <beans::XPropertySet>& rPropertie
                         {
                             if (!xNumberFormatTypes.is())
                                 xNumberFormatTypes.set(uno::Reference <util::XNumberFormatTypes>(xNumberFormats, uno::UNO_QUERY));
-                            rProperties->setPropertyValue( SC_UNONAME_NUMFMT, uno::makeAny(xNumberFormatTypes->getStandardFormat(nCellType, aLocale)) );
+                            rProperties->setPropertyValue( SC_UNONAME_NUMFMT, uno::Any(xNumberFormatTypes->getStandardFormat(nCellType, aLocale)) );
                         }
                     }
                     else if (!rCurrency.empty() && !sCurrentCurrency.isEmpty())
                     {
                         if (sCurrentCurrency != rCurrency)
                             if (!IsCurrencySymbol(rNumberFormat, sCurrentCurrency, rCurrency))
-                                rProperties->setPropertyValue( SC_UNONAME_NUMFMT, uno::makeAny(SetCurrencySymbol(rNumberFormat, rCurrency)));
+                                rProperties->setPropertyValue( SC_UNONAME_NUMFMT, uno::Any(SetCurrencySymbol(rNumberFormat, rCurrency)));
                     }
                 }
             }
@@ -972,7 +970,7 @@ void ScXMLImport::SetType(const uno::Reference <beans::XPropertySet>& rPropertie
     {
         if ((nCellType == util::NumberFormat::CURRENCY) && !rCurrency.empty() && !sCurrentCurrency.isEmpty() &&
             sCurrentCurrency != rCurrency && !IsCurrencySymbol(rNumberFormat, sCurrentCurrency, rCurrency))
-            rProperties->setPropertyValue( SC_UNONAME_NUMFMT, uno::makeAny(SetCurrencySymbol(rNumberFormat, rCurrency)));
+            rProperties->setPropertyValue( SC_UNONAME_NUMFMT, uno::Any(SetCurrencySymbol(rNumberFormat, rCurrency)));
     }
 }
 
@@ -1023,7 +1021,7 @@ void ScXMLImport::SetStyleToRanges()
             }
             else
             {
-                xProperties->setPropertyValue(SC_UNONAME_CELLSTYL, uno::makeAny(GetStyleDisplayName( XmlStyleFamily::TABLE_CELL, sPrevStyleName )));
+                xProperties->setPropertyValue(SC_UNONAME_CELLSTYL, uno::Any(GetStyleDisplayName( XmlStyleFamily::TABLE_CELL, sPrevStyleName )));
                 sal_Int32 nNumberFormat(GetStyleNumberFormats()->GetStyleNumberFormat(sPrevStyleName));
                 bool bInsert(nNumberFormat == -1);
                 SetType(xProperties, nNumberFormat, nPrevCellType, sPrevCurrency);
@@ -1187,14 +1185,14 @@ void SAL_CALL ScXMLImport::startDocument()
     UnlockSolarMutex();
 }
 
-sal_Int32 ScXMLImport::GetRangeType(const OUString& sRangeType)
+sal_Int32 ScXMLImport::GetRangeType(std::u16string_view sRangeType)
 {
     sal_Int32 nRangeType(0);
     OUStringBuffer sBuffer;
-    sal_Int32 i = 0;
-    while (i <= sRangeType.getLength())
+    size_t i = 0;
+    while (i <= sRangeType.size())
     {
-        if ((i == sRangeType.getLength()) || (sRangeType[i] == ' '))
+        if ((i == sRangeType.size()) || (sRangeType[i] == ' '))
         {
             OUString sTemp = sBuffer.makeStringAndClear();
             if (sTemp == "repeat-column")
@@ -1206,7 +1204,7 @@ sal_Int32 ScXMLImport::GetRangeType(const OUString& sRangeType)
             else if (sTemp == SC_PRINT_RANGE)
                 nRangeType |= sheet::NamedRangeFlag::PRINT_AREA;
         }
-        else if (i < sRangeType.getLength())
+        else if (i < sRangeType.size())
             sBuffer.append(sRangeType[i]);
         ++i;
     }
@@ -1260,10 +1258,11 @@ class RangeNameInserter
 {
     ScDocument&  mrDoc;
     ScRangeName& mrRangeName;
+    SCTAB        mnTab;
 
 public:
-    RangeNameInserter(ScDocument& rDoc, ScRangeName& rRangeName) :
-        mrDoc(rDoc), mrRangeName(rRangeName) {}
+    RangeNameInserter(ScDocument& rDoc, ScRangeName& rRangeName, SCTAB nTab) :
+        mrDoc(rDoc), mrRangeName(rRangeName), mnTab(nTab) {}
 
     void operator() (const ScMyNamedExpression& p) const
     {
@@ -1283,6 +1282,17 @@ public:
         sal_Int32 nOffset = 0;
         bool bSuccess = ScRangeStringConverter::GetAddressFromString(
             aPos, p.sBaseCellAddress, mrDoc, FormulaGrammar::CONV_OOO, nOffset);
+
+        if (!bSuccess)
+        {
+            SAL_WARN("sc.filter", "No conversion from table:base-cell-address '" << p.sBaseCellAddress
+                    << "' for name '" << p.sName << "' on sheet " << mnTab);
+            // Do not lose the defined name. Relative addressing in
+            // content/expression, if any, will be broken though.
+            // May had happened due to tdf#150312.
+            aPos.SetTab(mnTab < 0 ? 0 : mnTab);
+            bSuccess = true;
+        }
 
         if (bSuccess)
         {
@@ -1309,7 +1319,8 @@ void ScXMLImport::SetNamedRanges()
 
     // Insert the namedRanges
     ScRangeName* pRangeNames = pDoc->GetRangeName();
-    ::std::for_each(m_aMyNamedExpressions.begin(), m_aMyNamedExpressions.end(), RangeNameInserter(*pDoc, *pRangeNames));
+    ::std::for_each(m_aMyNamedExpressions.begin(), m_aMyNamedExpressions.end(),
+            RangeNameInserter(*pDoc, *pRangeNames, -1));
 }
 
 void ScXMLImport::SetSheetNamedRanges()
@@ -1325,7 +1336,7 @@ void ScXMLImport::SetSheetNamedRanges()
             continue;
 
         const ScMyNamedExpressions& rNames = itr.second;
-        ::std::for_each(rNames.begin(), rNames.end(), RangeNameInserter(*pDoc, *pRangeNames));
+        ::std::for_each(rNames.begin(), rNames.end(), RangeNameInserter(*pDoc, *pRangeNames, nTab));
     }
 }
 
@@ -1737,8 +1748,8 @@ extern "C" SAL_DLLPUBLIC_EXPORT bool TestImportXLSX(SvStream &rStream)
     uno::Reference<document::XImporter> xImporter(xFilter, uno::UNO_QUERY_THROW);
     uno::Sequence<beans::PropertyValue> aArgs(comphelper::InitPropertySequence(
     {
-        { "InputStream", uno::makeAny(xStream) },
-        { "InputMode", uno::makeAny(true) },
+        { "InputStream", uno::Any(xStream) },
+        { "InputMode", uno::Any(true) },
     }));
     xImporter->setTargetDocument(xModel);
 

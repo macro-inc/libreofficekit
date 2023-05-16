@@ -29,15 +29,14 @@
 #include <comphelper/sequence.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <comphelper/componentguard.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <o3tl/safeint.hxx>
 #include <rtl/ref.hxx>
-#include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <vector>
 
@@ -88,7 +87,7 @@ public:
 private:
     typedef ::std::vector< css::uno::Reference< css::awt::grid::XGridColumn > >   Columns;
 
-    ::comphelper::OInterfaceContainerHelper2   m_aContainerListeners;
+    ::comphelper::OInterfaceContainerHelper3<XContainerListener> m_aContainerListeners;
     Columns                             m_aColumns;
 };
 
@@ -232,7 +231,7 @@ private:
     {
         ::comphelper::ComponentGuard aGuard( *this, rBHelper );
 
-        if ( index >=0 && index < static_cast<sal_Int32>(m_aColumns.size()))
+        if ( index >=0 && o3tl::make_unsigned(index) < m_aColumns.size())
             return m_aColumns[index];
 
         throw css::lang::IndexOutOfBoundsException();

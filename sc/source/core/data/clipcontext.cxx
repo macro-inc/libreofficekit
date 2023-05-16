@@ -21,6 +21,7 @@
 #include <svl/numformat.hxx>
 #include <formula/errorcodes.hxx>
 #include <refdata.hxx>
+#include <listenercontext.hxx>
 
 namespace sc {
 
@@ -113,6 +114,52 @@ InsertDeleteFlags CopyFromClipContext::getDeleteFlag() const
     return mnDeleteFlag;
 }
 
+void CopyFromClipContext::setListeningFormulaSpans(
+    SCTAB nTab, SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2 )
+{
+    for (SCCOL nCol = nCol1; nCol <= nCol2; ++nCol)
+        maListeningFormulaSpans.set(mrDestDoc, nTab, nCol, nRow1, nRow2, true);
+}
+
+namespace {
+
+class StartListeningAction : public sc::ColumnSpanSet::Action
+{
+    ScDocument& mrDestDoc;
+    sc::StartListeningContext& mrStartCxt;
+    sc::EndListeningContext& mrEndCxt;
+
+public:
+    StartListeningAction( ScDocument& rDestDoc, sc::StartListeningContext& rStartCxt, sc::EndListeningContext& rEndCxt ) :
+        mrDestDoc(rDestDoc), mrStartCxt(rStartCxt), mrEndCxt(rEndCxt)
+    {
+    }
+
+    virtual void execute( const ScAddress& rPos, SCROW nLength, bool bVal ) override
+    {
+        if (!bVal)
+            return;
+
+        SCROW nRow1 = rPos.Row();
+        SCROW nRow2 = nRow1 + nLength - 1;
+
+        mrDestDoc.StartListeningFromClip(
+            mrStartCxt, mrEndCxt, rPos.Tab(), rPos.Col(), nRow1, rPos.Col(), nRow2);
+    }
+};
+
+}
+
+void CopyFromClipContext::startListeningFormulas()
+{
+    auto pSet = std::make_shared<sc::ColumnBlockPositionSet>(mrDestDoc);
+    sc::StartListeningContext aStartCxt(mrDestDoc, pSet);
+    sc::EndListeningContext aEndCxt(mrDestDoc, pSet, nullptr);
+
+    StartListeningAction aAction(mrDestDoc, aStartCxt, aEndCxt);
+    maListeningFormulaSpans.executeAction(mrDestDoc, aAction);
+}
+
 void CopyFromClipContext::setSingleCellColumnSize( size_t nSize )
 {
     maSingleCells.resize(nSize);
@@ -170,7 +217,7 @@ void CopyFromClipContext::setSingleCell( const ScAddress& rSrcPos, const ScColum
     bool bBoolean  = (nFlags & InsertDeleteFlags::SPECIAL_BOOLEAN) != InsertDeleteFlags::NONE;
     bool bFormula  = (nFlags & InsertDeleteFlags::FORMULA) != InsertDeleteFlags::NONE;
 
-    switch (rSrcCell.meType)
+    switch (rSrcCell.getType())
     {
         case CELLTYPE_VALUE:
         {
@@ -193,7 +240,7 @@ void CopyFromClipContext::setSingleCell( const ScAddress& rSrcPos, const ScColum
             if (bBoolean)
             {
                 // Check if this formula cell is a boolean cell, and if so, go ahead and paste it.
-                const ScTokenArray* pCode = rSrcCell.mpFormula->GetCode();
+                const ScTokenArray* pCode = rSrcCell.getFormula()->GetCode();
                 if (pCode && pCode->GetLen() == 1)
                 {
                     const formula::FormulaToken* p = pCode->FirstToken();
@@ -207,7 +254,7 @@ void CopyFromClipContext::setSingleCell( const ScAddress& rSrcPos, const ScColum
                 // Good.
                 break;
 
-            FormulaError nErr = rSrcCell.mpFormula->GetErrCode();
+            FormulaError nErr = rSrcCell.getFormula()->GetErrCode();
             if (nErr != FormulaError::NONE)
             {
                 // error codes are cloned with values
@@ -222,12 +269,12 @@ void CopyFromClipContext::setSingleCell( const ScAddress& rSrcPos, const ScColum
                     rSrcCell.set(pErrCell);
                 }
             }
-            else if (rSrcCell.mpFormula->IsEmptyDisplayedAsString())
+            else if (rSrcCell.getFormula()->IsEmptyDisplayedAsString())
             {
                 // Empty stays empty and doesn't become 0.
                 rSrcCell.clear();
             }
-            else if (rSrcCell.mpFormula->IsValue())
+            else if (rSrcCell.getFormula()->IsValue())
             {
                 bool bPaste = isDateCell(rSrcCol, rSrcPos.Row()) ? bDateTime : bNumeric;
                 if (!bPaste)
@@ -238,11 +285,11 @@ void CopyFromClipContext::setSingleCell( const ScAddress& rSrcPos, const ScColum
                 }
 
                 // Turn this into a numeric cell.
-                rSrcCell.set(rSrcCell.mpFormula->GetValue());
+                rSrcCell.set(rSrcCell.getFormula()->GetValue());
             }
             else if (bString)
             {
-                svl::SharedString aStr = rSrcCell.mpFormula->GetString();
+                svl::SharedString aStr = rSrcCell.getFormula()->GetString();
                 if (aStr.isEmpty())
                 {
                     // do not clone empty string
@@ -251,18 +298,14 @@ void CopyFromClipContext::setSingleCell( const ScAddress& rSrcPos, const ScColum
                 }
 
                 // Turn this into a string or edit cell.
-                if (rSrcCell.mpFormula->IsMultilineResult())
+                if (rSrcCell.getFormula()->IsMultilineResult())
                 {
-                    // TODO : Add shared string support to the edit engine to
-                    // make this process simpler.
-                    ScFieldEditEngine& rEngine = mrDestDoc.GetEditEngine();
-                    rEngine.SetTextCurrentDefaults(rSrcCell.mpFormula->GetString().getString());
-                    std::unique_ptr<EditTextObject> pObj(rEngine.CreateTextObject());
-                    pObj->NormalizeString(mrDestDoc.GetSharedStringPool());
+                    std::unique_ptr<EditTextObject> pObj(mrDestDoc.CreateSharedStringTextObject(
+                                rSrcCell.getFormula()->GetString()));
                     rSrcCell.set(*pObj);
                 }
                 else
-                    rSrcCell.set(rSrcCell.mpFormula->GetString());
+                    rSrcCell.set(rSrcCell.getFormula()->GetString());
             }
             else
                 // We don't want to paste this.

@@ -24,9 +24,9 @@
 #include "calbck.hxx"
 #include "nodeoffset.hxx"
 
+#include <com/sun/star/beans/XPropertySet.hpp>
 #include <cppuhelper/weakref.hxx>
 #include <editeng/svxenum.hxx>
-#include <tools/solar.h>
 #include <vector>
 #include <climits>
 
@@ -38,7 +38,6 @@ class SwRootFrame;
 class SvNumberFormatter;
 class IDocumentRedlineAccess;
 class SwGetRefField;
-namespace com::sun::star::beans { class XPropertySet; }
 namespace com::sun::star::uno { class Any; }
 
 typedef struct _xmlTextWriter* xmlTextWriterPtr;
@@ -234,6 +233,7 @@ enum SwDateTimeSubType {
 
 /// General tools.
 OUString  FormatNumber(sal_uInt32 nNum, SvxNumType nFormat, LanguageType nLang = LANGUAGE_NONE);
+SwFieldTypesEnum SwFieldTypeFromString(std::u16string_view rString);
 
 /** Instances of SwFields and those derived from it occur 0 to n times.
  For each class there is one instance of the associated type class.
@@ -273,7 +273,6 @@ public:
 
     SwFieldIds              Which() const { return m_nWhich; }
 
-    void UpdateFields() const;
     void PrintHiddenPara();
     virtual void dumpAsXml(xmlTextWriterPtr pWriter) const;
     SwFormatField* FindFormatForField(const SwField*) const;
@@ -299,6 +298,8 @@ private:
     LanguageType        m_nLang;                ///< Always change via SetLanguage!
     bool                m_bUseFieldValueCache;  /// control the usage of the cached field value
     bool                m_bIsAutomaticLanguage;
+    /// Used for tooltip purposes when it's not-empty.
+    OUString m_aTitle;
 
     virtual OUString    ExpandImpl(SwRootFrame const* pLayout) const = 0;
     virtual std::unique_ptr<SwField> Copy() const = 0;
@@ -391,6 +392,8 @@ public:
     /// Is this field clickable?
     bool IsClickable() const;
     virtual void dumpAsXml(xmlTextWriterPtr pWriter) const;
+    const OUString & GetTitle() const { return m_aTitle; }
+    void SetTitle(const OUString& rTitle) { m_aTitle = rTitle; }
 };
 
 inline SwFieldType* SwField::GetTyp() const

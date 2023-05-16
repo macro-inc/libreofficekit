@@ -1,3 +1,6 @@
+# -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
+#
+# This file is part of the LibreOffice project.
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -45,3 +48,4 @@ class tdf93068(UITestCase):
             # Check the table is no longer selected
             self.assertNotEqual("SwXTextTableCursor", document.CurrentSelection.getImplementationName())
 
+# vim: set shiftwidth=4 softtabstop=4 expandtab:

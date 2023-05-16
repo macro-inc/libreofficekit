@@ -57,7 +57,7 @@
 #include <sfx2/childwin.hxx>
 #include <sfx2/objitem.hxx>
 #include <sfx2/objsh.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/confignode.hxx>
 #include <vcl/stdtext.hxx>
 #include <vcl/svapp.hxx>
@@ -176,6 +176,7 @@ FmPropBrw::FmPropBrw(const Reference< XComponentContext >& _xORB, SfxBindings* _
     , m_bInitialStateChange(true)
     , m_pParent(_pParent)
     , m_nAsyncGetFocusId(nullptr)
+    , m_xDialogBox(m_xBuilder->weld_box("dialog-vbox1"))
     , m_xContainer(m_xBuilder->weld_container("container"))
     , m_xORB(_xORB)
 {
@@ -373,7 +374,7 @@ void FmPropBrw::implSetNewSelection( const InterfaceBag& _rSelection )
             xSingleSelection->getPropertyValue( FM_PROP_CLASSID ) >>= nClassID;
 
             sTitle = SvxResId(RID_STR_PROPERTIES_CONTROL) +
-                GetUIHeadlineName(nClassID, makeAny(xSingleSelection));
+                GetUIHeadlineName(nClassID, Any(xSingleSelection));
         }
         else if ( Reference< XForm >( xSingleSelection, UNO_QUERY ).is() )
             sTitle = SvxResId(RID_STR_PROPERTIES_FORM);
@@ -393,6 +394,7 @@ void FmPropBrw::FillInfo( SfxChildWinInfo& rInfo ) const
 
 IMPL_LINK_NOARG( FmPropBrw, OnAsyncGetFocus, void*, void )
 {
+    m_xDialogBox->child_grab_focus();
     m_nAsyncGetFocusId = nullptr;
 }
 
@@ -449,10 +451,10 @@ void FmPropBrw::impl_createPropertyBrowser_throw( FmFormShell* _pFormShell )
     // a ComponentContext for the
     ::cppu::ContextEntry_Init aHandlerContextInfo[] =
     {
-        ::cppu::ContextEntry_Init( "ContextDocument", makeAny( xDocument ) ),
-        ::cppu::ContextEntry_Init( "DialogParentWindow", makeAny( xParentWindow ) ),
-        ::cppu::ContextEntry_Init( "ControlContext", makeAny( xControlContext ) ),
-        ::cppu::ContextEntry_Init( "ControlShapeAccess", makeAny( xControlMap ) )
+        ::cppu::ContextEntry_Init( "ContextDocument", Any( xDocument ) ),
+        ::cppu::ContextEntry_Init( "DialogParentWindow", Any( xParentWindow ) ),
+        ::cppu::ContextEntry_Init( "ControlContext", Any( xControlContext ) ),
+        ::cppu::ContextEntry_Init( "ControlShapeAccess", Any( xControlMap ) )
     };
     m_xInspectorContext.set(
         ::cppu::createComponentContext( aHandlerContextInfo, SAL_N_ELEMENTS( aHandlerContextInfo ),
@@ -554,7 +556,7 @@ void FmPropBrw::StateChangedAtToolBoxControl(sal_uInt16 nSID, SfxItemState eStat
                     try
                     {
                         if ( m_xBrowserController.is() )
-                            m_xBrowserController->restoreViewData( makeAny( m_sLastActivePage ) );
+                            m_xBrowserController->restoreViewData( Any( m_sLastActivePage ) );
                     }
                     catch( const Exception& )
                     {

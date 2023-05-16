@@ -20,12 +20,12 @@ class SwContentControl;
 class SwContentControlButton : public Control
 {
 public:
-    SwContentControlButton(SwEditWin* pEditWin,
-                           const std::shared_ptr<SwContentControl>& pContentControl);
+    SwContentControlButton(SwEditWin* pEditWin, std::shared_ptr<SwContentControl> pContentControl);
     virtual ~SwContentControlButton() override;
     virtual void dispose() override;
 
     void CalcPosAndSize(const SwRect& rPortionPaintArea);
+    void SetRTL(bool bRTL) { m_bRTL = bRTL; }
 
     virtual void MouseButtonDown(const MouseEvent& rMEvt) override;
     DECL_LINK(PopupModeEndHdl, weld::Popover&, void);
@@ -47,6 +47,7 @@ protected:
     std::shared_ptr<SwContentControl> m_pContentControl;
     std::unique_ptr<weld::Builder> m_xPopupBuilder;
     std::unique_ptr<weld::Popover> m_xPopup;
+    bool m_bRTL = false;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

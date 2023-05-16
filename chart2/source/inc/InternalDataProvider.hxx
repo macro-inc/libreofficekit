@@ -29,6 +29,7 @@
 #include <com/sun/star/util/XCloneable.hpp>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/weakref.hxx>
+#include <rtl/ref.hxx>
 
 #include <map>
 
@@ -36,6 +37,8 @@ namespace com::sun::star::chart2 { class XChartDocument; }
 
 namespace chart
 {
+class ChartModel;
+class UncachedDataSequence;
 
 namespace impl
 {
@@ -61,7 +64,7 @@ typedef ::cppu::WeakImplHelper<
     <p>The format for a complete range is "all". (Do we need more than
     that?)</p>
  */
-class InternalDataProvider :
+class InternalDataProvider final :
         public impl::InternalDataProvider_Base
 {
 public:
@@ -70,7 +73,7 @@ public:
     // #i120559# allow handing over a default for data orientation
     // (DataInColumns) that will be used when no data is available
     explicit InternalDataProvider(
-        const css::uno::Reference< css::chart2::XChartDocument > & xChartDoc,
+        const rtl::Reference< ::chart::ChartModel > & xChartDoc,
         bool bConnectToModel,
         bool bDefaultDataInColumns );
     explicit InternalDataProvider( const InternalDataProvider & rOther );
@@ -180,10 +183,10 @@ private:
     css::uno::Reference< css::chart2::data::XDataSequence >
         createDataSequenceAndAddToMap( const OUString & rRangeRepresentation,
                                        const OUString & rRole );
-    css::uno::Reference< css::chart2::data::XDataSequence >
+    rtl::Reference< UncachedDataSequence >
         createDataSequenceAndAddToMap( const OUString & rRangeRepresentation );
 
-    css::uno::Reference<css::chart2::data::XDataSequence>
+    rtl::Reference<UncachedDataSequence>
         createDataSequenceFromArray( const OUString& rArrayStr, std::u16string_view rRole,
             std::u16string_view rRoleQualifier);
 

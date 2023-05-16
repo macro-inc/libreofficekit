@@ -32,7 +32,6 @@
 #include <sal/log.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <comphelper/processfactory.hxx>
-#include <comphelper/interfacecontainer2.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <com/sun/star/lang/IllegalArgumentException.hpp>
 #include <com/sun/star/ucb/DuplicateProviderException.hpp>
@@ -44,10 +43,10 @@
 #include <com/sun/star/container/XHierarchicalNameAccess.hpp>
 #include <com/sun/star/container/XNameAccess.hpp>
 #include <com/sun/star/uno/Any.hxx>
+#include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/weak.hxx>
 #include <ucbhelper/cancelcommandexecution.hxx>
-#include <ucbhelper/macros.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include "identify.hxx"
 #include "ucbcmds.hxx"
 
@@ -137,10 +136,10 @@ bool fillPlaceholders(OUString const & rInput,
 }
 
 void makeAndAppendXMLName(
-                OUStringBuffer & rBuffer, const OUString & rIn )
+                OUStringBuffer & rBuffer, std::u16string_view rIn )
 {
-    sal_Int32 nCount = rIn.getLength();
-    for ( sal_Int32 n = 0; n < nCount; ++n )
+    size_t nCount = rIn.size();
+    for ( size_t n = 0; n < nCount; ++n )
     {
         const sal_Unicode c = rIn[ n ];
         switch ( c )
@@ -265,7 +264,7 @@ void SAL_CALL UniversalContentBroker::addEventListener(
                             const Reference< XEventListener >& Listener )
 {
     if ( !m_pDisposeEventListeners )
-        m_pDisposeEventListeners.reset( new OInterfaceContainerHelper2( m_aMutex ) );
+        m_pDisposeEventListeners.reset( new OInterfaceContainerHelper3<css::lang::XEventListener>( m_aMutex ) );
 
     m_pDisposeEventListeners->addInterface( Listener );
 }
@@ -584,7 +583,7 @@ Any SAL_CALL UniversalContentBroker::execute(
             if ( !( aCommand.Argument >>= aArg ) )
             {
                 ucbhelper::cancelCommandExecution(
-                    makeAny( IllegalArgumentException(
+                    Any( IllegalArgumentException(
                                     "Wrong argument type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -608,7 +607,7 @@ Any SAL_CALL UniversalContentBroker::execute(
         if ( !( aCommand.Argument >>= aCheckinArg ) )
         {
             ucbhelper::cancelCommandExecution(
-                makeAny( IllegalArgumentException(
+                Any( IllegalArgumentException(
                                 "Wrong argument type!",
                                 static_cast< cppu::OWeakObject * >( this ),
                                 -1 ) ),
@@ -624,7 +623,7 @@ Any SAL_CALL UniversalContentBroker::execute(
 
 
         ucbhelper::cancelCommandExecution(
-            makeAny( UnsupportedCommandException(
+            Any( UnsupportedCommandException(
                             OUString(),
                             static_cast< cppu::OWeakObject * >( this ) ) ),
             Environment );
@@ -768,11 +767,11 @@ void UniversalContentBroker::prepareAndRegister(
 
 
 bool UniversalContentBroker::getContentProviderData(
-            const OUString & rKey1,
-            const OUString & rKey2,
+            std::u16string_view rKey1,
+            std::u16string_view rKey2,
             ContentProviderDataList & rListToFill )
 {
-    if ( !m_xContext.is() || rKey1.isEmpty() || rKey2.isEmpty() )
+    if ( !m_xContext.is() || rKey1.empty() || rKey2.empty() )
     {
         OSL_FAIL( "UniversalContentBroker::getContentProviderData - Invalid argument!" );
         return false;
@@ -835,7 +834,7 @@ bool UniversalContentBroker::getContentProviderData(
 
                     OSL_VERIFY(
                         createContentProviderData(
-                            aElemBuffer.makeStringAndClear(), xHierNameAccess,
+                            aElemBuffer, xHierNameAccess,
                             aInfo));
 
                     rListToFill.push_back( aInfo );

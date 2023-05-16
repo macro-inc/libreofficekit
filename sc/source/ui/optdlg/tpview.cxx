@@ -25,6 +25,7 @@
 #include <scresid.hxx>
 #include <docsh.hxx>
 #include <sc.hrc>
+#include <strings.hrc>
 #include <units.hrc>
 #include <appoptio.hxx>
 #include <scmod.hxx>
@@ -71,6 +72,7 @@ ScTpContentOptions::ScTpContentOptions(weld::Container* pPage, weld::DialogContr
     m_xFormulaCB->connect_toggled(aCBHdl);
     m_xNilCB->connect_toggled(aCBHdl);
     m_xAnnotCB->connect_toggled(aCBHdl);
+    m_xAnnotCB->set_accessible_description(ScResId(STR_A11Y_DESC_ANNOT));
     m_xValueCB->connect_toggled(aCBHdl);
     m_xAnchorCB->connect_toggled(aCBHdl);
     m_xClipMarkCB->connect_toggled(aCBHdl);
@@ -150,10 +152,8 @@ bool    ScTpContentOptions::FillItemSet( SfxItemSet* rCoreSet )
 
 void    ScTpContentOptions::Reset( const SfxItemSet* rCoreSet )
 {
-    const SfxPoolItem* pItem;
-    if(SfxItemState::SET == rCoreSet->GetItemState(SID_SCVIEWOPTIONS, false , &pItem))
-        m_xLocalOptions.reset( new ScViewOptions(
-                            static_cast<const ScTpViewItem*>(pItem)->GetViewOptions() ) );
+    if(const ScTpViewItem* pViewItem = rCoreSet->GetItemIfSet(SID_SCVIEWOPTIONS, false))
+        m_xLocalOptions.reset( new ScViewOptions( pViewItem->GetViewOptions() ) );
     else
         m_xLocalOptions.reset( new ScViewOptions );
     m_xFormulaCB ->set_active(m_xLocalOptions->GetOption(VOPT_FORMULAS));
@@ -183,10 +183,10 @@ void    ScTpContentOptions::Reset( const SfxItemSet* rCoreSet )
     m_xBreakCB->set_active( m_xLocalOptions->GetOption(VOPT_PAGEBREAKS) );
     m_xGuideLineCB->set_active( m_xLocalOptions->GetOption(VOPT_HELPLINES) );
 
-    if(SfxItemState::SET == rCoreSet->GetItemState(SID_SC_INPUT_RANGEFINDER, false, &pItem))
-        m_xRangeFindCB->set_active(static_cast<const SfxBoolItem*>(pItem)->GetValue());
-    if(SfxItemState::SET == rCoreSet->GetItemState(SID_SC_OPT_SYNCZOOM, false, &pItem))
-        m_xSyncZoomCB->set_active(static_cast<const SfxBoolItem*>(pItem)->GetValue());
+    if(const SfxBoolItem* pFinderItem = rCoreSet->GetItemIfSet(SID_SC_INPUT_RANGEFINDER, false))
+        m_xRangeFindCB->set_active(pFinderItem->GetValue());
+    if(const SfxBoolItem* pZoomItem = rCoreSet->GetItemIfSet(SID_SC_OPT_SYNCZOOM, false))
+        m_xSyncZoomCB->set_active(pZoomItem->GetValue());
 
     m_xRangeFindCB->save_state();
     m_xSyncZoomCB->save_state();
@@ -215,9 +215,8 @@ void    ScTpContentOptions::Reset( const SfxItemSet* rCoreSet )
 
 void ScTpContentOptions::ActivatePage( const SfxItemSet& rSet)
 {
-    const SfxPoolItem* pItem;
-    if(SfxItemState::SET == rSet.GetItemState(SID_SCVIEWOPTIONS, false , &pItem))
-        *m_xLocalOptions = static_cast<const ScTpViewItem*>(pItem)->GetViewOptions();
+    if(const ScTpViewItem* pViewItem = rSet.GetItemIfSet(SID_SCVIEWOPTIONS, false))
+        *m_xLocalOptions = pViewItem->GetViewOptions();
 }
 
 DeactivateRC ScTpContentOptions::DeactivatePage( SfxItemSet* pSetP )
@@ -326,7 +325,6 @@ ScTpLayoutOptions::ScTpLayoutOptions(weld::Container* pPage, weld::DialogControl
     , m_xExpRefCB(m_xBuilder->weld_check_button("exprefcb"))
     , m_xSortRefUpdateCB(m_xBuilder->weld_check_button("sortrefupdatecb"))
     , m_xMarkHdrCB(m_xBuilder->weld_check_button("markhdrcb"))
-    , m_xTextFmtCB(m_xBuilder->weld_check_button("textfmtcb"))
     , m_xReplWarnCB(m_xBuilder->weld_check_button("replwarncb"))
     , m_xLegacyCellSelectionCB(m_xBuilder->weld_check_button("legacy_cell_selection_cb"))
     , m_xEnterPasteModeCB(m_xBuilder->weld_check_button("enter_paste_mode_cb"))
@@ -457,12 +455,6 @@ bool    ScTpLayoutOptions::FillItemSet( SfxItemSet* rCoreSet )
         bRet = true;
     }
 
-    if (m_xTextFmtCB->get_state_changed_from_saved())
-    {
-        rCoreSet->Put(SfxBoolItem(SID_SC_INPUT_TEXTWYSIWYG, m_xTextFmtCB->get_active()));
-        bRet = true;
-    }
-
     if (m_xReplWarnCB->get_state_changed_from_saved())
     {
         rCoreSet->Put( SfxBoolItem( SID_SC_INPUT_REPLCELLSWARN, m_xReplWarnCB->get_active() ) );
@@ -504,9 +496,8 @@ void    ScTpLayoutOptions::Reset( const SfxItemSet* rCoreSet )
     }
     m_xUnitLB->save_value();
 
-    const SfxPoolItem* pItem;
-    if(SfxItemState::SET == rCoreSet->GetItemState(SID_ATTR_DEFTABSTOP, false, &pItem))
-        m_xTabMF->set_value(m_xTabMF->normalize(static_cast<const SfxUInt16Item*>(pItem)->GetValue()), FieldUnit::TWIP);
+    if(const SfxUInt16Item* pTabStopItem = rCoreSet->GetItemIfSet(SID_ATTR_DEFTABSTOP, false))
+        m_xTabMF->set_value(m_xTabMF->normalize(pTabStopItem->GetValue()), FieldUnit::TWIP);
     m_xTabMF->save_value();
 
     m_xUnitLB->save_value();
@@ -535,38 +526,35 @@ void    ScTpLayoutOptions::Reset( const SfxItemSet* rCoreSet )
             // added to avoid warnings
         }
     }
-    if(SfxItemState::SET == rCoreSet->GetItemState(SID_SC_INPUT_SELECTION, false, &pItem))
-        m_xAlignCB->set_active(static_cast<const SfxBoolItem*>(pItem)->GetValue());
+    if(const SfxBoolItem* pSelectionItem = rCoreSet->GetItemIfSet(SID_SC_INPUT_SELECTION, false))
+        m_xAlignCB->set_active(pSelectionItem->GetValue());
 
-    if(SfxItemState::SET == rCoreSet->GetItemState(SID_SC_INPUT_SELECTIONPOS, false, &pItem))
-        m_xAlignLB->set_active(static_cast<const SfxUInt16Item*>(pItem)->GetValue());
+    if(const SfxUInt16Item* pPosItem = rCoreSet->GetItemIfSet(SID_SC_INPUT_SELECTIONPOS, false))
+        m_xAlignLB->set_active(pPosItem->GetValue());
 
-    if(SfxItemState::SET == rCoreSet->GetItemState(SID_SC_INPUT_EDITMODE, false, &pItem))
-        m_xEditModeCB->set_active(static_cast<const SfxBoolItem*>(pItem)->GetValue());
+    if(const SfxBoolItem* pEditModeItem = rCoreSet->GetItemIfSet(SID_SC_INPUT_EDITMODE, false))
+        m_xEditModeCB->set_active(pEditModeItem->GetValue());
 
-    if(SfxItemState::SET == rCoreSet->GetItemState(SID_SC_INPUT_FMT_EXPAND, false, &pItem))
-        m_xFormatCB->set_active(static_cast<const SfxBoolItem*>(pItem)->GetValue());
+    if(const SfxBoolItem* pExpandItem = rCoreSet->GetItemIfSet(SID_SC_INPUT_FMT_EXPAND, false))
+        m_xFormatCB->set_active(pExpandItem->GetValue());
 
-    if(SfxItemState::SET == rCoreSet->GetItemState(SID_SC_INPUT_REF_EXPAND, false, &pItem))
-        m_xExpRefCB->set_active(static_cast<const SfxBoolItem*>(pItem)->GetValue());
+    if(const SfxBoolItem* pExpandItem = rCoreSet->GetItemIfSet(SID_SC_INPUT_REF_EXPAND, false))
+        m_xExpRefCB->set_active(pExpandItem->GetValue());
 
-    if (rCoreSet->HasItem(SID_SC_OPT_SORT_REF_UPDATE, &pItem))
-        m_xSortRefUpdateCB->set_active(static_cast<const SfxBoolItem*>(pItem)->GetValue());
+    if (const SfxBoolItem* pUpdateItem = rCoreSet->GetItemIfSet(SID_SC_OPT_SORT_REF_UPDATE))
+        m_xSortRefUpdateCB->set_active(pUpdateItem->GetValue());
 
-    if(SfxItemState::SET == rCoreSet->GetItemState(SID_SC_INPUT_MARK_HEADER, false, &pItem))
-        m_xMarkHdrCB->set_active(static_cast<const SfxBoolItem*>(pItem)->GetValue());
+    if(const SfxBoolItem* pHeaderItem = rCoreSet->GetItemIfSet(SID_SC_INPUT_MARK_HEADER, false))
+        m_xMarkHdrCB->set_active(pHeaderItem->GetValue());
 
-    if(SfxItemState::SET == rCoreSet->GetItemState(SID_SC_INPUT_TEXTWYSIWYG, false, &pItem))
-        m_xTextFmtCB->set_active(static_cast<const SfxBoolItem*>(pItem)->GetValue());
+    if( const SfxBoolItem* pWarnItem = rCoreSet->GetItemIfSet( SID_SC_INPUT_REPLCELLSWARN, false ) )
+        m_xReplWarnCB->set_active( pWarnItem->GetValue() );
 
-    if( SfxItemState::SET == rCoreSet->GetItemState( SID_SC_INPUT_REPLCELLSWARN, false, &pItem ) )
-        m_xReplWarnCB->set_active( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
+    if( const SfxBoolItem* pSelectionItem = rCoreSet->GetItemIfSet( SID_SC_INPUT_LEGACY_CELL_SELECTION, false ) )
+        m_xLegacyCellSelectionCB->set_active( pSelectionItem->GetValue() );
 
-    if( SfxItemState::SET == rCoreSet->GetItemState( SID_SC_INPUT_LEGACY_CELL_SELECTION, false, &pItem ) )
-        m_xLegacyCellSelectionCB->set_active( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
-
-    if( SfxItemState::SET == rCoreSet->GetItemState( SID_SC_INPUT_ENTER_PASTE_MODE, false, &pItem ) )
-        m_xEnterPasteModeCB->set_active( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
+    if( const SfxBoolItem* pPasteModeItem = rCoreSet->GetItemIfSet( SID_SC_INPUT_ENTER_PASTE_MODE, false ) )
+        m_xEnterPasteModeCB->set_active( pPasteModeItem->GetValue() );
 
     m_xAlignCB->save_state();
     m_xAlignLB->save_value();
@@ -576,7 +564,6 @@ void    ScTpLayoutOptions::Reset( const SfxItemSet* rCoreSet )
     m_xExpRefCB->save_state();
     m_xSortRefUpdateCB->save_state();
     m_xMarkHdrCB->save_state();
-    m_xTextFmtCB->save_state();
     m_xReplWarnCB->save_state();
 
     m_xLegacyCellSelectionCB->save_state();

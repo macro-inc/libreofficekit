@@ -21,6 +21,7 @@
 
 #include <wmfemfhelper.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
+#include <drawinglayer/attribute/linestartendattribute.hxx>
 #include <tools/stream.hxx>
 #include <basegfx/point/b2dpoint.hxx>
 #include <map>
@@ -53,8 +54,8 @@ namespace emfplushelper
     #define EmfPlusRecordTypeFillRegion 0x4013
     #define EmfPlusRecordTypeFillPath 0x4014
     #define EmfPlusRecordTypeDrawPath 0x4015
-    //TODO EmfPlusRecordTypeFillClosedCurve 0x4016
-    //TODO EmfPlusRecordTypeDrawClosedCurve 0x4017
+    #define EmfPlusRecordTypeFillClosedCurve 0x4016
+    #define EmfPlusRecordTypeDrawClosedCurve 0x4017
     //TODO EmfPlusRecordTypeDrawCurve 0x4018
     #define EmfPlusRecordTypeDrawBeziers 0x4019
     #define EmfPlusRecordTypeDrawImage 0x401A
@@ -218,6 +219,7 @@ namespace emfplushelper
         /// data holders
         wmfemfhelper::TargetHolders&    mrTargetHolders;
         wmfemfhelper::PropertyHolders&  mrPropertyHolders;
+        wmfemfhelper::PropertyHolder    aGetDCState;
         bool                            bIsGetDCProcessing;
 
         // readers
@@ -229,7 +231,10 @@ namespace emfplushelper
 
         // stack actions
         void GraphicStatePush(GraphicStateMap& map, sal_Int32 index);
-        void GraphicStatePop (GraphicStateMap& map, sal_Int32 index, wmfemfhelper::PropertyHolder& rState);
+        void GraphicStatePop(GraphicStateMap& map, sal_Int32 index);
+
+        drawinglayer::attribute::LineStartEndAttribute CreateLineEnd(const sal_Int32 aCap,
+                                                                     const float aPenWidth) const;
 
         // primitive creators
         void EMFPPlusDrawPolygon(const ::basegfx::B2DPolyPolygon& polygon, sal_uInt32 penIndex);

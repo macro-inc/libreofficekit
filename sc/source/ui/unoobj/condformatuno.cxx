@@ -24,6 +24,7 @@
 #include <convuno.hxx>
 
 #include <o3tl/safeint.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <rtl/ustring.hxx>
 #include <sal/log.hxx>
@@ -45,13 +46,12 @@ enum CondFormatProperties
     CondFormat_Range
 };
 
-const SfxItemPropertyMapEntry* getCondFormatPropset()
+o3tl::span<const SfxItemPropertyMapEntry> getCondFormatPropset()
 {
     static const SfxItemPropertyMapEntry aCondFormatPropertyMap_Impl[] =
     {
         {u"ID", ID, cppu::UnoType<sal_Int32>::get(), 0, 0},
         {u"Range", CondFormat_Range, cppu::UnoType<sheet::XSheetCellRanges>::get(), 0, 0},
-        {u"", 0, css::uno::Type(), 0, 0}
     };
     return aCondFormatPropertyMap_Impl;
 }
@@ -64,7 +64,7 @@ enum ConditionEntryProperties
     Operator
 };
 
-const SfxItemPropertyMapEntry* getConditionEntryrPropSet()
+o3tl::span<const SfxItemPropertyMapEntry> getConditionEntryrPropSet()
 {
     static const SfxItemPropertyMapEntry aConditionEntryPropertyMap_Impl[] =
     {
@@ -72,7 +72,6 @@ const SfxItemPropertyMapEntry* getConditionEntryrPropSet()
         {u"Formula1", Formula1, cppu::UnoType<OUString>::get(), 0, 0},
         {u"Formula2", Formula2, cppu::UnoType<OUString>::get(), 0, 0},
         {u"Operator", Operator, cppu::UnoType<decltype(sheet::ConditionFormatOperator::EQUAL)>::get(), 0, 0 },
-        {u"", 0, css::uno::Type(), 0, 0}
     };
     return aConditionEntryPropertyMap_Impl;
 }
@@ -118,12 +117,11 @@ enum ColorScaleProperties
     ColorScaleEntries
 };
 
-const SfxItemPropertyMapEntry* getColorScalePropSet()
+o3tl::span<const SfxItemPropertyMapEntry> getColorScalePropSet()
 {
     static const SfxItemPropertyMapEntry aColorScalePropertyMap_Impl[] =
     {
         {u"ColorScaleEntries", ColorScaleEntries, cppu::UnoType<uno::Sequence< sheet::XColorScaleEntry >>::get(), 0, 0 },
-        {u"", 0, css::uno::Type(), 0, 0}
     };
     return aColorScalePropertyMap_Impl;
 }
@@ -158,7 +156,7 @@ enum DataBarProperties
     MaximumLength
 };
 
-const SfxItemPropertyMapEntry* getDataBarPropSet()
+o3tl::span<const SfxItemPropertyMapEntry> getDataBarPropSet()
 {
     static const SfxItemPropertyMapEntry aDataBarPropertyMap_Impl[] =
     {
@@ -172,7 +170,6 @@ const SfxItemPropertyMapEntry* getDataBarPropSet()
         {u"DataBarEntries", DataBarEntries, cppu::UnoType<uno::Sequence< sheet::XDataBarEntry >>::get(), 0, 0 },
         {u"MinimumLength", MinimumLength, cppu::UnoType<double>::get(), 0, 0 },
         {u"MaximumLength", MaximumLength, cppu::UnoType<double>::get(), 0, 0 },
-        {u"", 0, css::uno::Type(), 0, 0}
     };
     return aDataBarPropertyMap_Impl;
 }
@@ -215,7 +212,7 @@ enum IconSetProperties
     IconSetEntries
 };
 
-const SfxItemPropertyMapEntry* getIconSetPropSet()
+o3tl::span<const SfxItemPropertyMapEntry> getIconSetPropSet()
 {
     static const SfxItemPropertyMapEntry aIconSetPropertyMap_Impl[] =
     {
@@ -223,7 +220,6 @@ const SfxItemPropertyMapEntry* getIconSetPropSet()
         {u"Reverse", Reverse, cppu::UnoType<bool>::get(), 0, 0 },
         {u"ShowValue", ShowValue, cppu::UnoType<bool>::get(), 0, 0 },
         {u"IconSetEntries", IconSetEntries, cppu::UnoType<uno::Sequence< sheet::XIconSetEntry >>::get(), 0, 0 },
-        {u"", 0, css::uno::Type(), 0, 0}
     };
     return aIconSetPropertyMap_Impl;
 }
@@ -278,13 +274,12 @@ enum DateProperties
     DateType
 };
 
-const SfxItemPropertyMapEntry* getCondDatePropSet()
+o3tl::span<const SfxItemPropertyMapEntry> getCondDatePropSet()
 {
     static const SfxItemPropertyMapEntry aCondDatePropertyMap_Impl[] =
     {
         {u"StyleName", StyleName, cppu::UnoType<OUString>::get(), 0, 0},
         {u"DateType", Icons, cppu::UnoType<decltype(sheet::DateType::TODAY)>::get(), 0, 0 },
-        {u"", 0, css::uno::Type(), 0, 0}
     };
     return aCondDatePropertyMap_Impl;
 }
@@ -440,9 +435,9 @@ uno::Reference<beans::XPropertySet> createConditionEntry(const ScFormatEntry* pE
 
 }
 
-ScCondFormatObj::ScCondFormatObj(ScDocShell* pDocShell, rtl::Reference<ScCondFormatsObj> const & xCondFormats,
+ScCondFormatObj::ScCondFormatObj(ScDocShell* pDocShell, rtl::Reference<ScCondFormatsObj> xCondFormats,
         sal_Int32 nKey):
-    mxCondFormatList(xCondFormats),
+    mxCondFormatList(std::move(xCondFormats)),
     mpDocShell(pDocShell),
     maPropSet(getCondFormatPropset()),
     mnKey(nKey)
@@ -831,9 +826,9 @@ void SAL_CALL ScConditionEntryObj::removeVetoableChangeListener( const OUString&
     SAL_WARN("sc", "not implemented");
 }
 
-ScColorScaleFormatObj::ScColorScaleFormatObj(rtl::Reference<ScCondFormatObj> const & xParent,
+ScColorScaleFormatObj::ScColorScaleFormatObj(rtl::Reference<ScCondFormatObj> xParent,
         const ScColorScaleFormat* pFormat):
-    mxParent(xParent),
+    mxParent(std::move(xParent)),
     maPropSet(getColorScalePropSet()),
     mpFormat(pFormat)
 {
@@ -992,9 +987,9 @@ void SAL_CALL ScColorScaleFormatObj::removeVetoableChangeListener( const OUStrin
     SAL_WARN("sc", "not implemented");
 }
 
-ScColorScaleEntryObj::ScColorScaleEntryObj(rtl::Reference<ScColorScaleFormatObj> const & xParent,
+ScColorScaleEntryObj::ScColorScaleEntryObj(rtl::Reference<ScColorScaleFormatObj> xParent,
         size_t nPos):
-    mxParent(xParent),
+    mxParent(std::move(xParent)),
     mnPos(nPos)
 {
 }
@@ -1082,9 +1077,9 @@ void ScColorScaleEntryObj::setFormula(const OUString& rFormula)
 }
 
 
-ScDataBarFormatObj::ScDataBarFormatObj(rtl::Reference<ScCondFormatObj> const & xParent,
+ScDataBarFormatObj::ScDataBarFormatObj(rtl::Reference<ScCondFormatObj> xParent,
         const ScDataBarFormat* pFormat):
-    mxParent(xParent),
+    mxParent(std::move(xParent)),
     maPropSet(getDataBarPropSet()),
     mpFormat(pFormat)
 {
@@ -1376,9 +1371,9 @@ void SAL_CALL ScDataBarFormatObj::removeVetoableChangeListener( const OUString&,
     SAL_WARN("sc", "not implemented");
 }
 
-ScDataBarEntryObj::ScDataBarEntryObj(rtl::Reference<ScDataBarFormatObj> const & xParent,
+ScDataBarEntryObj::ScDataBarEntryObj(rtl::Reference<ScDataBarFormatObj> xParent,
         size_t nPos):
-    mxParent(xParent),
+    mxParent(std::move(xParent)),
     mnPos(nPos)
 {
 }
@@ -1458,9 +1453,9 @@ void ScDataBarEntryObj::setFormula(const OUString& rFormula)
 }
 
 
-ScIconSetFormatObj::ScIconSetFormatObj(rtl::Reference<ScCondFormatObj> const & xParent,
+ScIconSetFormatObj::ScIconSetFormatObj(rtl::Reference<ScCondFormatObj> xParent,
         const ScIconSetFormat* pFormat):
-    mxParent(xParent),
+    mxParent(std::move(xParent)),
     maPropSet(getIconSetPropSet()),
     mpFormat(pFormat)
 {
@@ -1676,9 +1671,9 @@ void SAL_CALL ScIconSetFormatObj::removeVetoableChangeListener( const OUString&,
     SAL_WARN("sc", "not implemented");
 }
 
-ScIconSetEntryObj::ScIconSetEntryObj(rtl::Reference<ScIconSetFormatObj> const & xParent,
+ScIconSetEntryObj::ScIconSetEntryObj(rtl::Reference<ScIconSetFormatObj> xParent,
         size_t nPos):
-    mxParent(xParent),
+    mxParent(std::move(xParent)),
     mnPos(nPos)
 {
 }
@@ -1762,9 +1757,9 @@ void ScIconSetEntryObj::setFormula(const OUString& rFormula)
     }
 }
 
-ScCondDateFormatObj::ScCondDateFormatObj(rtl::Reference<ScCondFormatObj> const & xParent,
+ScCondDateFormatObj::ScCondDateFormatObj(rtl::Reference<ScCondFormatObj> xParent,
         const ScCondDateFormatEntry* pFormat):
-    mxParent(xParent),
+    mxParent(std::move(xParent)),
     maPropSet(getCondDatePropSet()),
     mpFormat(pFormat)
 {

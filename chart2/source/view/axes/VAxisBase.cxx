@@ -21,12 +21,10 @@
 #include <ShapeFactory.hxx>
 #include <ExplicitCategoriesProvider.hxx>
 #include "Tickmarks.hxx"
-#include <com/sun/star/drawing/XShapes.hpp>
+#include <Axis.hxx>
 #include <VSeriesPlotter.hxx>
 #include <com/sun/star/chart2/AxisType.hpp>
-#include <com/sun/star/chart2/XAxis.hpp>
 #include <com/sun/star/chart2/data/XTextualDataSequence.hpp>
-#include <com/sun/star/beans/XPropertySet.hpp>
 
 #include <osl/diagnose.h>
 
@@ -86,10 +84,10 @@ void VAxisBase::initAxisLabelProperties( const css::awt::Size& rFontReferenceSiz
         m_bUseTextLabels = true;
     }
 
-    m_aAxisLabelProperties.nNumberFormatKey = m_aAxisProperties.m_nNumberFormatKey;
+    m_aAxisLabelProperties.m_nNumberFormatKey = m_aAxisProperties.m_nNumberFormatKey;
     m_aAxisLabelProperties.init(m_aAxisProperties.m_xAxisModel);
     if( m_aAxisProperties.m_bComplexCategories && m_aAxisProperties.m_nAxisType == AxisType::CATEGORY )
-        m_aAxisLabelProperties.eStaggering = AxisLabelStaggering::SideBySide;
+        m_aAxisLabelProperties.m_eStaggering = AxisLabelStaggering::SideBySide;
 }
 
 bool VAxisBase::isDateAxis() const
@@ -101,9 +99,9 @@ bool VAxisBase::isComplexCategoryAxis() const
     return m_aAxisProperties.m_bComplexCategories && m_bUseTextLabels;
 }
 
-void VAxisBase::recordMaximumTextSize( const Reference< drawing::XShape >& xShape, double fRotationAngleDegree )
+void VAxisBase::recordMaximumTextSize( SvxShape& xShape, double fRotationAngleDegree )
 {
-    if( m_bRecordMaximumTextSize && xShape.is() )
+    if( m_bRecordMaximumTextSize )
     {
         awt::Size aSize( ShapeFactory::getSizeAfterRotation(
                             xShape, fRotationAngleDegree ) );
@@ -133,15 +131,14 @@ bool VAxisBase::isAnythingToDraw()
     if( !m_aAxisProperties.m_xAxisModel.is() )
         return false;
 
-    OSL_ENSURE(m_pShapeFactory&&m_xLogicTarget.is()&&m_xFinalTarget.is(),"Axis is not proper initialized");
-    if(!(m_pShapeFactory&&m_xLogicTarget.is()&&m_xFinalTarget.is()))
+    OSL_ENSURE(m_xLogicTarget.is()&&m_xFinalTarget.is(),"Axis is not proper initialized");
+    if(!(m_xLogicTarget.is()&&m_xFinalTarget.is()))
         return false;
 
-    uno::Reference< beans::XPropertySet > xProps( m_aAxisProperties.m_xAxisModel, uno::UNO_QUERY );
-    if( xProps.is() )
+    if( m_aAxisProperties.m_xAxisModel.is() )
     {
         bool bShow = false;
-        xProps->getPropertyValue( "Show" ) >>= bShow;
+        m_aAxisProperties.m_xAxisModel->getPropertyValue( "Show" ) >>= bShow;
         if( !bShow )
             return false;
     }
@@ -187,10 +184,10 @@ bool VAxisBase::prepareShapeCreation()
     //create named group shape
     m_xGroupShape_Shapes = createGroupShape( m_xLogicTarget, m_nDimension==2 ? m_aCID : "");
 
-    if( m_aAxisProperties.m_bDisplayLabels )
-        m_xTextTarget = m_pShapeFactory->createGroup2D( m_xFinalTarget, m_aCID );
+    if (m_aAxisProperties.m_bDisplayLabels)
+        m_xTextTarget = ShapeFactory::createGroup2D( m_xFinalTarget, m_aCID );
     if (m_aAxisProperties.m_bDisplayDataTable)
-        m_xDataTableTarget = m_pShapeFactory->createGroup2D(m_xFinalTarget, m_aCID);
+        m_xDataTableTarget = ShapeFactory::createGroup2D(m_xFinalTarget);
 
     return true;
 }
@@ -247,8 +244,8 @@ void VAxisBase::updateUnscaledValuesAtTicks( TickIter& rIter )
 
 void VAxisBase::createDataTableView(std::vector<std::unique_ptr<VSeriesPlotter>>& /*rSeriesPlotterList*/,
                                     uno::Reference<util::XNumberFormatsSupplier> const& /*xNumberFormatsSupplier*/,
-                                    uno::Reference<chart2::XChartDocument> const& /*xChartDoc*/,
-                                    uno::Reference<uno::XComponentContext> const& /*rComponentContext*/)
+                                    rtl::Reference<::chart::ChartModel> const& /*xChartDoc*/,
+                                    css::uno::Reference<css::uno::XComponentContext> const& /*rComponentContext*/)
 {
 }
 

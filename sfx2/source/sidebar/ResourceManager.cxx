@@ -31,9 +31,10 @@
 #include <comphelper/sequence.hxx>
 #include <comphelper/types.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 #include <vcl/EnumContext.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <com/sun/star/frame/ModuleManager.hpp>
 #include <com/sun/star/ui/XSidebarPanel.hpp>
@@ -259,8 +260,7 @@ void ResourceManager::ReadDeckList()
         if (comphelper::LibreOfficeKit::isActive())
         {
             // Hide these decks in LOK as they aren't fully functional.
-            if (aDeckName == "GalleryDeck" || aDeckName == "NavigatorDeck"
-                || aDeckName == "StyleListDeck")
+            if (aDeckName == "GalleryDeck" || aDeckName == "StyleListDeck")
                 continue;
         }
 
@@ -321,9 +321,9 @@ void ResourceManager::SaveDeckSettings(const DeckDescriptor* pDeckDesc)
 
     utl::OConfigurationNode aDeckNode (aDeckRootNode.openNode(pDeckDesc->msNodeName));
 
-    css::uno::Any aTitle(makeAny(pDeckDesc->msTitle));
-    css::uno::Any aOrder(makeAny(pDeckDesc->mnOrderIndex));
-    css::uno::Any aContextList(makeAny(sContextList));
+    css::uno::Any aTitle(Any(pDeckDesc->msTitle));
+    css::uno::Any aOrder(Any(pDeckDesc->mnOrderIndex));
+    css::uno::Any aContextList(sContextList);
 
     bool bChanged = false;
     if (aTitle != aDeckNode.getNodeValue("Title"))
@@ -500,7 +500,7 @@ void ResourceManager::ReadContextList (
     for (const OUString& sValue : std::as_const(aValues))
     {
         sal_Int32 nCharacterIndex (0);
-        const OUString sApplicationName (sValue.getToken(0, ',', nCharacterIndex).trim());
+        const OUString sApplicationName (o3tl::trim(o3tl::getToken(sValue, 0, ',', nCharacterIndex)));
         if (nCharacterIndex < 0)
         {
             if (sApplicationName.getLength() == 0)
@@ -517,20 +517,20 @@ void ResourceManager::ReadContextList (
             }
         }
 
-        const OUString sContextName(sValue.getToken(0, ',', nCharacterIndex).trim());
+        const OUString sContextName(o3tl::trim(o3tl::getToken(sValue, 0, ',', nCharacterIndex)));
         if (nCharacterIndex < 0)
         {
             OSL_FAIL("expecting three or four values per ContextList entry, separated by comma");
             continue;
         }
 
-        const OUString sInitialState(sValue.getToken(0, ',', nCharacterIndex).trim());
+        const std::u16string_view sInitialState(o3tl::trim(o3tl::getToken(sValue, 0, ',', nCharacterIndex)));
 
         // The fourth argument is optional.
         const OUString sMenuCommandOverride(
             nCharacterIndex < 0
                 ? OUString()
-                : sValue.getToken(0, ',', nCharacterIndex).trim());
+                : OUString(o3tl::trim(o3tl::getToken(sValue, 0, ',', nCharacterIndex))));
 
         const OUString sMenuCommand(
             sMenuCommandOverride.getLength() > 0
@@ -605,9 +605,9 @@ void ResourceManager::ReadContextList (
         // Setup the flag that controls whether a deck/pane is
         // initially visible/expanded.
         bool bIsInitiallyVisible;
-        if (sInitialState == "visible")
+        if (sInitialState == u"visible")
             bIsInitiallyVisible = true;
-        else if (sInitialState == "hidden")
+        else if (sInitialState == u"hidden")
             bIsInitiallyVisible = false;
         else
         {

@@ -116,7 +116,6 @@ public:
     virtual void                SetIcon( sal_uInt16 nIcon ) override;
     virtual void                SetRepresentedURL( const OUString& ) override;
     virtual void                SetMenu( SalMenu* pSalMenu ) override;
-    virtual void                DrawMenuBar() override;
     virtual void                Show( bool bVisible, bool bNoActivate = false ) override;
     virtual void                SetMinClientSize( tools::Long nWidth, tools::Long nHeight )
         override;
@@ -126,8 +125,8 @@ public:
     virtual void                GetClientSize( tools::Long& rWidth, tools::Long& rHeight ) override;
     virtual void                GetWorkArea( tools::Rectangle& rRect ) override;
     virtual SalFrame*           GetParent() const override;
-    virtual void                SetWindowState( const SalFrameState* pState ) override;
-    virtual bool                GetWindowState( SalFrameState* pState ) override;
+    virtual void SetWindowState(const vcl::WindowData*) override;
+    virtual bool GetWindowState(vcl::WindowData*) override;
     virtual void                ShowFullScreen( bool bFullScreen, sal_Int32 nDisplay ) override;
     virtual void                StartPresentation( bool bStart ) override;
     virtual void                SetAlwaysOnTop( bool bOnTop ) override;
@@ -164,6 +163,7 @@ public:
         tools::Long nX, tools::Long nY, tools::Long nWidth, tools::Long nHeight ) override;
     // done setting up the clipregion
     virtual void EndSetClipRegion() override;
+    virtual void UpdateDarkMode() override;
 
     void UpdateFrameGeometry();
 

@@ -27,12 +27,11 @@
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <cppuhelper/supportsservice.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
 #include <toolkit/awt/vclxfont.hxx>
 #include <toolkit/helper/convert.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <i18nlangtag/languagetag.hxx>
@@ -200,25 +199,25 @@ OUString AccessibleDialogControlShape::GetModelStringProperty( OUString const & 
 }
 
 
-void AccessibleDialogControlShape::FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet )
+void AccessibleDialogControlShape::FillAccessibleStateSet( sal_Int64& rStateSet )
 {
-    rStateSet.AddState( AccessibleStateType::ENABLED );
+    rStateSet |= AccessibleStateType::ENABLED;
 
-    rStateSet.AddState( AccessibleStateType::VISIBLE );
+    rStateSet |= AccessibleStateType::VISIBLE;
 
-    rStateSet.AddState( AccessibleStateType::SHOWING );
+    rStateSet |= AccessibleStateType::SHOWING;
 
-    rStateSet.AddState( AccessibleStateType::FOCUSABLE );
+    rStateSet |= AccessibleStateType::FOCUSABLE;
 
     if ( IsFocused() )
-        rStateSet.AddState( AccessibleStateType::FOCUSED );
+        rStateSet |= AccessibleStateType::FOCUSED;
 
-    rStateSet.AddState( AccessibleStateType::SELECTABLE );
+    rStateSet |= AccessibleStateType::SELECTABLE;
 
     if ( IsSelected() )
-        rStateSet.AddState( AccessibleStateType::SELECTED );
+        rStateSet |= AccessibleStateType::SELECTED;
 
-    rStateSet.AddState( AccessibleStateType::RESIZABLE );
+    rStateSet |= AccessibleStateType::RESIZABLE;
 }
 
 // OCommonAccessibleComponent
@@ -305,13 +304,13 @@ Reference< XAccessibleContext > AccessibleDialogControlShape::getAccessibleConte
 }
 
 // XAccessibleContext
-sal_Int32 AccessibleDialogControlShape::getAccessibleChildCount()
+sal_Int64 AccessibleDialogControlShape::getAccessibleChildCount()
 {
     return 0;
 }
 
 
-Reference< XAccessible > AccessibleDialogControlShape::getAccessibleChild( sal_Int32 i )
+Reference< XAccessible > AccessibleDialogControlShape::getAccessibleChild( sal_Int64 i )
 {
     OExternalLockGuard aGuard( this );
 
@@ -334,18 +333,18 @@ Reference< XAccessible > AccessibleDialogControlShape::getAccessibleParent(  )
 }
 
 
-sal_Int32 AccessibleDialogControlShape::getAccessibleIndexInParent(  )
+sal_Int64 AccessibleDialogControlShape::getAccessibleIndexInParent(  )
 {
     OExternalLockGuard aGuard( this );
 
-    sal_Int32 nIndexInParent = -1;
+    sal_Int64 nIndexInParent = -1;
     Reference< XAccessible > xParent( getAccessibleParent() );
     if ( xParent.is() )
     {
         Reference< XAccessibleContext > xParentContext( xParent->getAccessibleContext() );
         if ( xParentContext.is() )
         {
-            for ( sal_Int32 i = 0, nCount = xParentContext->getAccessibleChildCount(); i < nCount; ++i )
+            for ( sal_Int64 i = 0, nCount = xParentContext->getAccessibleChildCount(); i < nCount; ++i )
             {
                 Reference< XAccessible > xChild( xParentContext->getAccessibleChild( i ) );
                 if ( xChild.is() )
@@ -397,22 +396,22 @@ Reference< XAccessibleRelationSet > AccessibleDialogControlShape::getAccessibleR
 }
 
 
-Reference< XAccessibleStateSet > AccessibleDialogControlShape::getAccessibleStateSet(  )
+sal_Int64 AccessibleDialogControlShape::getAccessibleStateSet(  )
 {
     OExternalLockGuard aGuard( this );
 
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSetHelper = new utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if ( !rBHelper.bDisposed && !rBHelper.bInDispose )
     {
-        FillAccessibleStateSet( *pStateSetHelper );
+        FillAccessibleStateSet( nStateSet );
     }
     else
     {
-        pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+        nStateSet |= AccessibleStateType::DEFUNC;
     }
 
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 

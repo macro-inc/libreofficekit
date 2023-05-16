@@ -35,7 +35,7 @@ protected:
     // Set states for getAccessibleStateSet.
     // This derived class additionally sets SELECTABLE(1), SELECTED(+),
     // FOCUSABLE(1) and FOCUSED(+)
-    virtual void GetStates( ::utl::AccessibleStateSetHelper& rStateSet ) override;
+    virtual void GetStates( sal_Int64& rStateSet ) override;
     SwFlyFrame* getFlyFrame() const;
     bool GetSelectedState( );
     SwPaM* GetCursor();
@@ -57,7 +57,7 @@ public:
 
     // The object is not visible any longer and should be destroyed
     virtual void Dispose(bool bRecursive, bool bCanSkipInvisible = true) override;
-    virtual bool SetSelectedState( bool bSeleted ) override;
+    virtual bool SetSelectedState( bool bSelected ) override;
 };
 
 #endif

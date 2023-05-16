@@ -19,6 +19,7 @@
 #include <rtl/ustring.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace oox::formulaimport;
 
@@ -382,7 +383,7 @@ OUString SmOoxmlImport::handleEqArr()
         ret.append(" ");
     } while( !m_rStream.atEnd() && m_rStream.findTag( OPENING( M_TOKEN( e ))));
     m_rStream.ensureClosingTag( M_TOKEN( eqArr ));
-    return "stack {" + ret.makeStringAndClear() + "}";
+    return "stack {" + ret + "}";
 }
 
 OUString SmOoxmlImport::handleF()
@@ -499,7 +500,7 @@ OUString SmOoxmlImport::handleM()
         m_rStream.ensureClosingTag( M_TOKEN( mr ));
     } while( !m_rStream.atEnd() && m_rStream.findTag( OPENING( M_TOKEN( mr ))));
     m_rStream.ensureClosingTag( M_TOKEN( m ));
-    return "matrix {" + allrows.makeStringAndClear() + "}";
+    return "matrix {" + allrows + "}";
 }
 
 OUString SmOoxmlImport::handleNary()
@@ -602,7 +603,7 @@ OUString SmOoxmlImport::handleR()
             {
                 XmlStream::Tag rtag = m_rStream.ensureOpeningTag( M_TOKEN( t ));
                 if( rtag.attribute( OOX_TOKEN( xml, space )) != "preserve" )
-                    text.append(rtag.text.trim());
+                    text.append(o3tl::trim(rtag.text));
                 else
                     text.append(rtag.text);
                 m_rStream.ensureClosingTag( M_TOKEN( t ));

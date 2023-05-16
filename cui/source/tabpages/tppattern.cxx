@@ -147,7 +147,7 @@ void SvxPatternTabPage::ActivatePage( const SfxItemSet& rSet )
 
     // determining (possibly cutting) the name and
     // displaying it in the GroupBox
-    OUString        aString = CuiResId( RID_SVXSTR_TABLE ) + ": ";
+    OUString        aString = CuiResId( RID_CUISTR_TABLE ) + ": ";
     INetURLObject   aURL( m_pPatternList->GetPath() );
 
     aURL.Append( m_pPatternList->GetName() );
@@ -253,15 +253,14 @@ IMPL_LINK_NOARG(SvxPatternTabPage, ChangePatternHdl_Impl, ValueSet*, void)
     }
     else
     {
-        const SfxPoolItem* pPoolItem = nullptr;
-
-        if(SfxItemState::SET == m_rOutAttrs.GetItemState(GetWhich(XATTR_FILLSTYLE), true, &pPoolItem))
+        if(const XFillStyleItem* pFillStyleItem = m_rOutAttrs.GetItemIfSet(GetWhich(XATTR_FILLSTYLE)))
         {
-            const drawing::FillStyle eXFS(static_cast<const XFillStyleItem*>(pPoolItem)->GetValue());
+            const drawing::FillStyle eXFS(pFillStyleItem->GetValue());
 
-            if((drawing::FillStyle_BITMAP == eXFS) && (SfxItemState::SET == m_rOutAttrs.GetItemState(GetWhich(XATTR_FILLBITMAP), true, &pPoolItem)))
+            const XFillBitmapItem* pBitmapItem;
+            if((drawing::FillStyle_BITMAP == eXFS) && (pBitmapItem = m_rOutAttrs.GetItemIfSet(GetWhich(XATTR_FILLBITMAP))))
             {
-                pGraphicObject.reset(new GraphicObject(static_cast<const XFillBitmapItem*>(pPoolItem)->GetGraphicObject()));
+                pGraphicObject.reset(new GraphicObject(pBitmapItem->GetGraphicObject()));
             }
         }
 
@@ -323,7 +322,7 @@ IMPL_LINK_NOARG(SvxPatternTabPage, ClickAddHdl_Impl, weld::Button&, void)
 {
 
     OUString aNewName( SvxResId( RID_SVXSTR_PATTERN_UNTITLED ) );
-    OUString aDesc( CuiResId( RID_SVXSTR_DESC_NEW_PATTERN ) );
+    OUString aDesc( CuiResId( RID_CUISTR_DESC_NEW_PATTERN ) );
     OUString aName;
 
     tools::Long nCount = m_pPatternList->Count();
@@ -370,12 +369,8 @@ IMPL_LINK_NOARG(SvxPatternTabPage, ClickAddHdl_Impl, weld::Button&, void)
         }
         else // it must be a not existing imported bitmap
         {
-            const SfxPoolItem* pPoolItem = nullptr;
-
-            if(SfxItemState::SET == m_rOutAttrs.GetItemState(XATTR_FILLBITMAP, true, &pPoolItem))
+            if(const XFillBitmapItem* pFillBmpItem = m_rOutAttrs.GetItemIfSet(XATTR_FILLBITMAP))
             {
-                auto pFillBmpItem = dynamic_cast<const XFillBitmapItem*>(pPoolItem);
-                assert(pFillBmpItem);
                 pEntry.reset(new XBitmapEntry(pFillBmpItem->GetGraphicObject(), aName));
             }
             else
@@ -436,7 +431,7 @@ IMPL_LINK_NOARG(SvxPatternTabPage, ClickRenameHdl_Impl, SvxPresetListBox*, void)
     if ( nPos == VALUESET_ITEM_NOTFOUND )
         return;
 
-    OUString aDesc(CuiResId(RID_SVXSTR_DESC_NEW_PATTERN));
+    OUString aDesc(CuiResId(RID_CUISTR_DESC_NEW_PATTERN));
     OUString aName(m_pPatternList->GetBitmap(nPos)->GetName());
 
     SvxAbstractDialogFactory* pFact = SvxAbstractDialogFactory::Create();

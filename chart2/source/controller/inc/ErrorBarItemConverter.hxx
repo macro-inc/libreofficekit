@@ -29,11 +29,11 @@ class SdrModel;
 namespace chart::wrapper
 {
 
-class ErrorBarItemConverter : public ItemConverter
+class ErrorBarItemConverter final : public ItemConverter
 {
 public:
     ErrorBarItemConverter(
-        const css::uno::Reference< css::frame::XModel > & xChartModel,
+        css::uno::Reference< css::frame::XModel > xChartModel,
         const css::uno::Reference< css::beans::XPropertySet > & rPropertySet,
         SfxItemPool& rItemPool,
         SdrModel& rDrawModel,

@@ -26,7 +26,7 @@
 #include <i18nlangtag/languagetag.hxx>
 #include "swdllapi.h"
 
-enum class SvtScriptType;
+enum class SvtScriptType : sal_uInt8;
 namespace com::sun::star::i18n { class XBreakIterator; }
 namespace com::sun::star::uno { class XComponentContext; }
 
@@ -48,7 +48,7 @@ class SW_DLLPUBLIC SwBreakIt
     SwBreakIt& operator=(SwBreakIt const&) = delete;
 
     // private (see @ Create_, Delete_).
-    explicit SwBreakIt(const css::uno::Reference<css::uno::XComponentContext> & rxContext);
+    explicit SwBreakIt(css::uno::Reference<css::uno::XComponentContext> xContext);
 
 public:
     // private (see @ source/core/bastyp/init.cxx).

@@ -22,8 +22,11 @@
 #include <cppuhelper/weakref.hxx>
 #include <sfx2/Metadatable.hxx>
 #include <vcl/keycod.hxx>
+#include <unotools/weakref.hxx>
 #include <memory>
+#include <optional>
 #include <string_view>
+#include <com/sun/star/text/XTextContent.hpp>
 
 #include <rtl/ustring.hxx>
 #include <osl/diagnose.h>
@@ -32,13 +35,12 @@
 #include <swrect.hxx>
 #include "FormFieldButton.hxx"
 
-namespace com::sun::star::text { class XTextContent; }
-
 class SwDoc;
 class SwEditWin;
 class SwServerObject;
 class SvNumberFormatter;
 class SfxViewShell;
+class SwXBookmark;
 
 namespace sw::mark {
         class MarkBase
@@ -47,13 +49,13 @@ namespace sw::mark {
         public:
             //getters
             SwPosition& GetMarkPos() const override
-                { return *m_pPos1; }
+                { return const_cast<SwPosition&>(*m_oPos1); }
             const OUString& GetName() const override
                 { return m_aName; }
             SwPosition& GetOtherMarkPos() const override
             {
                 OSL_PRECOND(IsExpanded(), "<SwPosition::GetOtherMarkPos(..)> - I have no other Pos set." );
-                return *m_pPos2;
+                return const_cast<SwPosition&>(*m_oPos2);
             }
             SwPosition& GetMarkStart() const override
             {
@@ -74,14 +76,14 @@ namespace sw::mark {
 
             bool IsCoveringPosition(const SwPosition& rPos) const override;
             bool IsExpanded() const override
-                { return static_cast< bool >(m_pPos2); }
+                { return m_oPos2.has_value(); }
 
             void SetName(const OUString& rName)
                 { m_aName = rName; }
             virtual void SetMarkPos(const SwPosition& rNewPos);
             virtual void SetOtherMarkPos(const SwPosition& rNewPos);
             virtual void ClearOtherMarkPos()
-                { m_pPos2.reset(); }
+                { m_oPos2.reset(); }
 
             virtual auto InvalidateFrames() -> void;
 
@@ -90,8 +92,8 @@ namespace sw::mark {
 
             void Swap()
             {
-                if(m_pPos2)
-                    m_pPos1.swap(m_pPos2);
+                if(m_oPos2)
+                    m_oPos1.swap(m_oPos2);
             }
 
             virtual void InitDoc(SwDoc&, sw::mark::InsertMode, SwPosition const*)
@@ -100,22 +102,21 @@ namespace sw::mark {
 
             ~MarkBase() override;
 
-            const css::uno::WeakReference< css::text::XTextContent> & GetXBookmark() const
+            const unotools::WeakReference<SwXBookmark> & GetXBookmark() const
                     { return m_wXBookmark; }
-            void SetXBookmark(css::uno::Reference< css::text::XTextContent> const& xBkmk)
-                    { m_wXBookmark = xBkmk; }
+            void SetXBookmark(rtl::Reference<SwXBookmark> const& xBkmk);
 
         protected:
             // SwClient
             void SwClientNotify(const SwModify&, const SfxHint&) override;
 
-            MarkBase(const SwPaM& rPaM, const OUString& rName);
-            std::unique_ptr<SwPosition> m_pPos1;
-            std::unique_ptr<SwPosition> m_pPos2;
+            MarkBase(const SwPaM& rPaM, OUString aName);
+            std::optional<SwPosition> m_oPos1;
+            std::optional<SwPosition> m_oPos2;
             OUString m_aName;
             static OUString GenerateNewName(std::u16string_view rPrefix);
 
-            css::uno::WeakReference< css::text::XTextContent> m_wXBookmark;
+            unotools::WeakReference<SwXBookmark> m_wXBookmark;
         };
 
         class NavigatorReminder final
@@ -187,6 +188,7 @@ namespace sw::mark {
             bool IsInClipboard() const override;
             bool IsInUndo() const override;
             bool IsInContent() const override;
+            void sendLOKDeleteCallback();
             css::uno::Reference< css::rdf::XMetadatable > MakeUnoObject() override;
 
         private:
@@ -222,7 +224,6 @@ namespace sw::mark {
             virtual void ReleaseDoc(SwDoc&) = 0;
 
             void SetMarkStartPos( const SwPosition& rNewStartPos );
-            void SetMarkEndPos( const SwPosition& rNewEndPos );
 
             void Invalidate() override;
             OUString ToString() const override;
@@ -239,6 +240,7 @@ namespace sw::mark {
         {
         public:
             TextFieldmark(const SwPaM& rPaM, const OUString& rName);
+            ~TextFieldmark();
             void InitDoc(SwDoc& io_rDoc, sw::mark::InsertMode eMode, SwPosition const* pSepPos) override;
             void ReleaseDoc(SwDoc& rDoc) override;
 
@@ -282,6 +284,7 @@ namespace sw::mark {
 
             virtual void ShowButton(SwEditWin* pEditWin) = 0;
             virtual void RemoveButton();
+            void LaunchPopup();
 
         protected:
             VclPtr<FormFieldButton> m_pButton;
@@ -316,6 +319,10 @@ namespace sw::mark {
         };
 
         /// Fieldmark representing a date form field.
+        /// TODO: this was an SDT in DOCX, which is modelled suboptimally here
+        /// as a fieldmark; as it cannot contain paragraph breaks, must be
+        /// well-formed XML element, and does not have field separator, it
+        /// should be a nesting text attribute similar to SwTextMeta.
         class DateFieldmark final
             : virtual public IDateFieldmark
             , public FieldmarkWithDropDownButton
@@ -351,7 +358,7 @@ namespace sw::mark {
         };
 
         /// return position of the CH_TXT_ATR_FIELDSEP for rMark
-        SW_DLLPUBLIC SwPosition FindFieldSep(IFieldmark const& rMark);
+        SwPosition FindFieldSep(IFieldmark const& rMark);
 
         /// check if rPaM is valid range of new fieldmark
         bool IsFieldmarkOverlap(SwPaM const& rPaM);

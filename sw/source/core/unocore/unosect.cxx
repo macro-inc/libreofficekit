@@ -24,7 +24,7 @@
 #include <com/sun/star/lang/WrappedTargetRuntimeException.hpp>
 #include <com/sun/star/text/SectionFileLink.hpp>
 
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/supportsservice.hxx>
 
@@ -36,7 +36,6 @@
 #include <editeng/xmlcnitm.hxx>
 #include <sfx2/linkmgr.hxx>
 #include <sfx2/lnkbase.hxx>
-#include <osl/mutex.hxx>
 #include <osl/diagnose.h>
 #include <vcl/svapp.hxx>
 #include <fmtclds.hxx>
@@ -63,6 +62,7 @@
 #include <editeng/lrspitem.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <comphelper/string.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace ::com::sun::star;
 
@@ -109,14 +109,12 @@ struct SwTextSectionProperties_Impl
 class SwXTextSection::Impl
     : public SvtListener
 {
-private:
-    ::osl::Mutex m_Mutex; // just for OInterfaceContainerHelper2
-
 public:
     SwXTextSection &            m_rThis;
-    uno::WeakReference<uno::XInterface> m_wThis;
+    unotools::WeakReference<SwXTextSection> m_wThis;
     const SfxItemPropertySet &  m_rPropSet;
-    ::comphelper::OInterfaceContainerHelper2 m_EventListeners;
+    std::mutex m_Mutex; // just for OInterfaceContainerHelper4
+    ::comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_EventListeners;
     const bool                  m_bIndexHeader;
     bool                        m_bIsDescriptor;
     OUString             m_sName;
@@ -127,7 +125,6 @@ public:
             SwSectionFormat* const pFormat, const bool bIndexHeader)
         : m_rThis(rThis)
         , m_rPropSet(*aSwMapProvider.GetPropertySet(PROPERTY_MAP_SECTION))
-        , m_EventListeners(m_Mutex)
         , m_bIndexHeader(bIndexHeader)
         , m_bIsDescriptor(nullptr == pFormat)
         , m_pProps(pFormat ? nullptr : new SwTextSectionProperties_Impl())
@@ -183,7 +180,8 @@ void SwXTextSection::Impl::Notify(const SfxHint& rHint)
             return;
         }
         lang::EventObject const ev(xThis);
-        m_EventListeners.disposeAndClear(ev);
+        std::unique_lock aGuard(m_Mutex);
+        m_EventListeners.disposeAndClear(aGuard, ev);
     }
 }
 
@@ -192,27 +190,27 @@ SwSectionFormat * SwXTextSection::GetFormat() const
     return m_pImpl->GetSectionFormat();
 }
 
-uno::Reference< text::XTextSection >
+rtl::Reference< SwXTextSection >
 SwXTextSection::CreateXTextSection(
         SwSectionFormat *const pFormat, const bool bIndexHeader)
 {
     // re-use existing SwXTextSection
     // #i105557#: do not iterate over the registered clients: race condition
-    uno::Reference< text::XTextSection > xSection;
+    rtl::Reference< SwXTextSection > xSection;
     if (pFormat)
     {
-        xSection.set(pFormat->GetXTextSection());
+        xSection = pFormat->GetXTextSection();
     }
     if ( !xSection.is() )
     {
         rtl::Reference<SwXTextSection> pNew = new SwXTextSection(pFormat, bIndexHeader);
-        xSection.set(pNew);
+        xSection = pNew;
         if (pFormat)
         {
             pFormat->SetXTextSection(xSection);
         }
         // need a permanent Reference to initialize m_wThis
-        pNew->m_pImpl->m_wThis = xSection;
+        pNew->m_pImpl->m_wThis = xSection.get();
     }
     return xSection;
 }
@@ -437,7 +435,7 @@ SwXTextSection::getAnchor()
 {
     SolarMutexGuard aGuard;
 
-    uno::Reference< text::XTextRange >  xRet;
+    rtl::Reference<SwXTextRange> xRet;
     SwSectionFormat *const pSectFormat = m_pImpl->GetSectionFormat();
     if(pSectFormat)
     {
@@ -450,8 +448,8 @@ SwXTextSection::getAnchor()
             SwPaM aPaM(*pIdx);
             aPaM.Move( fnMoveForward, GoInContent );
             assert(pIdx->GetNode().IsSectionNode());
-            if (aPaM.GetPoint()->nNode.GetNode().FindTableNode() != pIdx->GetNode().FindTableNode()
-                || aPaM.GetPoint()->nNode.GetNode().FindSectionNode() != &pIdx->GetNode())
+            if (aPaM.GetPoint()->GetNode().FindTableNode() != pIdx->GetNode().FindTableNode()
+                || aPaM.GetPoint()->GetNode().FindSectionNode() != &pIdx->GetNode())
             {
                 isMoveIntoTable = true;
             }
@@ -459,8 +457,8 @@ SwXTextSection::getAnchor()
             const SwEndNode* pEndNode = pIdx->GetNode().EndOfSectionNode();
             SwPaM aEnd(*pEndNode);
             aEnd.Move( fnMoveBackward, GoInContent );
-            if (aEnd.GetPoint()->nNode.GetNode().FindTableNode() != pIdx->GetNode().FindTableNode()
-                || aEnd.GetPoint()->nNode.GetNode().FindSectionNode() != &pIdx->GetNode())
+            if (aEnd.GetPoint()->GetNode().FindTableNode() != pIdx->GetNode().FindTableNode()
+                || aEnd.GetPoint()->GetNode().FindSectionNode() != &pIdx->GetNode())
             {
                 isMoveIntoTable = true;
             }
@@ -495,14 +493,16 @@ void SAL_CALL SwXTextSection::addEventListener(
         const uno::Reference< lang::XEventListener > & xListener)
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.addInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.addInterface(aGuard, xListener);
 }
 
 void SAL_CALL SwXTextSection::removeEventListener(
         const uno::Reference< lang::XEventListener > & xListener)
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.removeInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.removeInterface(aGuard, xListener);
 }
 
 uno::Reference< beans::XPropertySetInfo > SAL_CALL
@@ -698,7 +698,7 @@ void SwXTextSection::Impl::SetPropertyValues_Impl(
                     const OUString sFileName(
                         sTmp + OUStringChar(sfx2::cTokenSeparator) +
                         aLink.FilterName + OUStringChar(sfx2::cTokenSeparator) +
-                        pSectionData->GetLinkFileName().getToken(2, sfx2::cTokenSeparator));
+                        o3tl::getToken(pSectionData->GetLinkFileName(), 2, sfx2::cTokenSeparator));
                     pSectionData->SetLinkFileName(sFileName);
                     if (sFileName.getLength() < 3)
                     {
@@ -948,10 +948,7 @@ void SwXTextSection::setPropertyValue(
 {
     SolarMutexGuard aGuard;
 
-    uno::Sequence< OUString > aPropertyNames { rPropertyName };
-    uno::Sequence< uno::Any > aValues(1);
-    aValues.getArray()[0] = rValue;
-    m_pImpl->SetPropertyValues_Impl( aPropertyNames, aValues );
+    m_pImpl->SetPropertyValues_Impl( { rPropertyName } , { rValue } );
 }
 
 uno::Sequence< uno::Any >
@@ -1143,8 +1140,8 @@ SwXTextSection::Impl::GetPropertyValues_Impl(
                     pFormat->GetDoc()->getIDocumentRedlineAccess().GetRedlineTable();
                 for (SwRangeRedline* pRedline : rRedTable)
                 {
-                    const SwNode& rRedPointNode = pRedline->GetNode();
-                    const SwNode& rRedMarkNode = pRedline->GetNode(false);
+                    const SwNode& rRedPointNode = pRedline->GetPointNode();
+                    const SwNode& rRedMarkNode = pRedline->GetMarkNode();
                     if ((&rRedPointNode == pSectNode) ||
                         (&rRedMarkNode == pSectNode))
                     {

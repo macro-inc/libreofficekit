@@ -30,7 +30,7 @@ struct SwDBData;
 // exchange database at fields
 class SwChangeDBDlg final : public SfxDialogController
 {
-    SwWrtShell      *pSh;
+    SwWrtShell      *m_pSh;
 
     std::unique_ptr<weld::TreeView> m_xUsedDBTLB;
     std::unique_ptr<SwDBTreeList> m_xAvailDBTLB;
@@ -46,7 +46,7 @@ class SwChangeDBDlg final : public SfxDialogController
 
     void            UpdateFields();
     void            FillDBPopup();
-    std::unique_ptr<weld::TreeIter> Insert(const OUString& rDBName);
+    std::unique_ptr<weld::TreeIter> Insert(std::u16string_view rDBName);
     void            ShowDBName(const SwDBData& rDBData);
 
 public:

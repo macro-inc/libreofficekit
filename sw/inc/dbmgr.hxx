@@ -32,6 +32,7 @@
 #include <com/sun/star/beans/PropertyValue.hpp>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace com::sun::star{
@@ -119,10 +120,10 @@ struct SwDSParam : public SwDBData
         {}
 
     SwDSParam(const SwDBData& rData,
-        const css::uno::Reference< css::sdbc::XResultSet>&    xResSet,
+        css::uno::Reference< css::sdbc::XResultSet> xResSet,
         const css::uno::Sequence<  css::uno::Any >&   rSelection) :
         SwDBData(rData),
-        xResultSet(xResSet),
+        xResultSet(std::move(xResSet)),
         aSelection(rSelection),
         bScrollable(true),
         bEndOfDB(false),
@@ -412,7 +413,7 @@ public:
      Convenience function, which calls GetDBunoURI and has just one mandatory parameter.
      In case of success it returns the registered name, otherwise an empty string.
      */
-    static OUString            LoadAndRegisterDataSource(const OUString& rURI, const OUString *pDestDir);
+    static OUString            LoadAndRegisterDataSource(std::u16string_view rURI, const OUString *pDestDir);
 
     /// Load the embedded data source of the document and also register it.
     void LoadAndRegisterEmbeddedDataSource(const SwDBData& rData, const SwDocShell& rDocShell);

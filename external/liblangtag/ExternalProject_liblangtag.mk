@@ -30,11 +30,9 @@ $(call gb_ExternalProject_get_state_target,liblangtag,build):
 		$(if $(verbose),--disable-silent-rules,--enable-silent-rules) \
 		$(if $(filter TRUE,$(HAVE_GCC_BUILTIN_ATOMIC)),"lt_cv_has_atomic=yes","lt_cv_has_atomic=no") \
 		CFLAGS='$(CFLAGS) -pthread \
-				$(if $(ENABLE_OPTIMIZED), \
-					$(gb_COMPILEROPTFLAGS),$(gb_COMPILERNOOPTFLAGS)) \
-				$(if $(call gb_Module__symbols_enabled,liblangtag),$(gb_DEBUGINFO_FLAGS))' \
-		$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) \
-		    $(if $(filter WNT,$(OS)),"lt_cv_c99_vsnprintf=yes" "ac_cv_va_copy=yes","ac_cv_va_copy=no")) \
+			$(call gb_ExternalProject_get_build_flags,liblangtag)' \
+		$(gb_CONFIGURE_PLATFORMS) \
+		$(if $(CROSS_COMPILING),$(if $(filter WNT,$(OS)),"lt_cv_c99_vsnprintf=yes" "ac_cv_va_copy=yes","ac_cv_va_copy=no")) \
 		LIBXML2_CFLAGS="$(LIBXML_CFLAGS)" \
 		LIBXML2_LIBS="$(if $(filter WNT,$(OS)),-L$(call gb_UnpackedTarball_get_dir,libxml2)/win32/bin.msvc -llibxml2,$(LIBXML_LIBS))" \
 		$(if $(filter MACOSX,$(OS)),--prefix=/@.__________________________________________________URELIB) \

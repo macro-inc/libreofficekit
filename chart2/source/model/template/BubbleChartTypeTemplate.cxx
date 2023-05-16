@@ -18,14 +18,14 @@
  */
 
 #include "BubbleChartTypeTemplate.hxx"
+#include "BubbleChartType.hxx"
 #include "BubbleDataInterpreter.hxx"
-#include <servicenames_charttypes.hxx>
+#include <DataSeries.hxx>
 #include <DataSeriesHelper.hxx>
 #include <com/sun/star/drawing/LineStyle.hpp>
 #include <PropertyHelper.hxx>
 #include <com/sun/star/uno/XComponentContext.hpp>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 
@@ -99,8 +99,7 @@ BubbleChartTypeTemplate::BubbleChartTypeTemplate(
     Reference<
         uno::XComponentContext > const & xContext,
     const OUString & rServiceName ) :
-        ChartTypeTemplate( xContext, rServiceName ),
-        ::property::OPropertySet( m_aMutex )
+        ChartTypeTemplate( xContext, rServiceName )
 {
 }
 
@@ -108,13 +107,14 @@ BubbleChartTypeTemplate::~BubbleChartTypeTemplate()
 {}
 
 // ____ OPropertySet ____
-uno::Any BubbleChartTypeTemplate::GetDefaultValue( sal_Int32 nHandle ) const
+void BubbleChartTypeTemplate::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = *StaticBubbleChartTypeTemplateDefaults::get();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 ::cppu::IPropertyArrayHelper & SAL_CALL BubbleChartTypeTemplate::getInfoHelper()
@@ -138,13 +138,13 @@ StackMode BubbleChartTypeTemplate::getStackMode( sal_Int32 /* nChartTypeIndex */
     return StackMode::NONE;
 }
 
-void SAL_CALL BubbleChartTypeTemplate::applyStyle(
-    const Reference< chart2::XDataSeries >& xSeries,
+void BubbleChartTypeTemplate::applyStyle2(
+    const rtl::Reference< DataSeries >& xSeries,
     ::sal_Int32 nChartTypeIndex,
     ::sal_Int32 nSeriesIndex,
     ::sal_Int32 nSeriesCount )
 {
-    ChartTypeTemplate::applyStyle( xSeries, nChartTypeIndex, nSeriesIndex, nSeriesCount );
+    ChartTypeTemplate::applyStyle2( xSeries, nChartTypeIndex, nSeriesIndex, nSeriesCount );
     DataSeriesHelper::setPropertyAlsoToAllAttributedDataPoints( xSeries, "BorderStyle", uno::Any( drawing::LineStyle_NONE ) );
 }
 
@@ -154,36 +154,19 @@ sal_Bool SAL_CALL BubbleChartTypeTemplate::supportsCategories()
     return false;
 }
 
-Reference< chart2::XChartType > BubbleChartTypeTemplate::getChartTypeForIndex( sal_Int32 /*nChartTypeIndex*/ )
+rtl::Reference< ChartType > BubbleChartTypeTemplate::getChartTypeForIndex( sal_Int32 /*nChartTypeIndex*/ )
 {
-    Reference< chart2::XChartType > xResult;
-
-    try
-    {
-        Reference< lang::XMultiServiceFactory > xFact(
-            GetComponentContext()->getServiceManager(), uno::UNO_QUERY_THROW );
-        xResult.set( xFact->createInstance(
-                         CHART2_SERVICE_NAME_CHARTTYPE_BUBBLE ), uno::UNO_QUERY_THROW );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
-
-    return xResult;
+    return new BubbleChartType();
 }
 
-Reference< chart2::XChartType > SAL_CALL BubbleChartTypeTemplate::getChartTypeForNewSeries(
-        const uno::Sequence< Reference< chart2::XChartType > >& aFormerlyUsedChartTypes )
+rtl::Reference< ChartType > BubbleChartTypeTemplate::getChartTypeForNewSeries2(
+        const std::vector< rtl::Reference< ChartType > >& aFormerlyUsedChartTypes )
 {
-    Reference< chart2::XChartType > xResult;
+    rtl::Reference< ChartType > xResult;
 
     try
     {
-        Reference< lang::XMultiServiceFactory > xFact(
-            GetComponentContext()->getServiceManager(), uno::UNO_QUERY_THROW );
-        xResult.set( xFact->createInstance(
-                         CHART2_SERVICE_NAME_CHARTTYPE_BUBBLE ), uno::UNO_QUERY_THROW );
+        xResult = new BubbleChartType();
 
         ChartTypeTemplate::copyPropertiesFromOldToNewCoordinateSystem( aFormerlyUsedChartTypes, xResult );
     }
@@ -195,7 +178,7 @@ Reference< chart2::XChartType > SAL_CALL BubbleChartTypeTemplate::getChartTypeFo
     return xResult;
 }
 
-Reference< chart2::XDataInterpreter > SAL_CALL BubbleChartTypeTemplate::getDataInterpreter()
+rtl::Reference< DataInterpreter > BubbleChartTypeTemplate::getDataInterpreter2()
 {
     if( ! m_xDataInterpreter.is())
         m_xDataInterpreter.set( new BubbleDataInterpreter );

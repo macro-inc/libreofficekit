@@ -38,7 +38,7 @@ class SdrObject;
 class OutputDevice;
 class ScDrawLayer;
 class EditTextObject;
-enum class SvtScriptType;
+enum class SvtScriptType : sal_uInt8;
 namespace editeng { class SvxBorderLine; }
 
 namespace sc {
@@ -116,7 +116,6 @@ class ScHTMLExport : public ScExportBase
     VclPtr<OutputDevice> pAppWin;        // for Pixel-work
     FileNameMapPtr   pFileNameMap;        // for CopyLocalFileToINet
     OUString         aNonConvertibleChars;   // collect nonconvertible characters
-    rtl_TextEncoding eDestEnc;
     SCTAB            nUsedTables;
     short            nIndent;
     char             sIndent[nIndentMax+1];
@@ -147,7 +146,7 @@ class ScHTMLExport : public ScExportBase
     bool WriteFieldText( const EditTextObject* pData );
 
     // copy a local file to internet if needed
-    void CopyLocalFileToINet( OUString& rFileNm, const OUString& rTargetNm );
+    void CopyLocalFileToINet( OUString& rFileNm, std::u16string_view rTargetNm );
 
     void PrepareGraphics( ScDrawLayer*, SCTAB nTab,
                           SCCOL nStartCol, SCROW nStartRow,
@@ -173,8 +172,8 @@ class ScHTMLExport : public ScExportBase
     }
 
 public:
-                        ScHTMLExport( SvStream&, const OUString&, ScDocument*, const ScRange&,
-                                      bool bAll, const OUString& aStreamPath, std::u16string_view rFilterOptions );
+                        ScHTMLExport( SvStream&, OUString , ScDocument*, const ScRange&,
+                                      bool bAll, OUString aStreamPath, std::u16string_view aFilterOptions );
     virtual             ~ScHTMLExport() override;
     void                Write();
     const OUString&     GetNonConvertibleChars() const

@@ -23,11 +23,13 @@
 #include <sal/config.h>
 
 #include <o3tl/safeint.hxx>
+#include <utility>
 #include <vcl/toolkit/button.hxx>
 #include <vcl/toolkit/floatwin.hxx>
 #include <vcl/quickselectionengine.hxx>
-#include <vcl/glyphitem.hxx>
 #include <vcl/vcllayout.hxx>
+
+#include "glyphid.hxx"
 
 #include <set>
 #include <vector>
@@ -59,9 +61,9 @@ struct ImplEntryType
 
     tools::Long getHeightWithMargin() const;
 
-    ImplEntryType( const OUString& rStr, const Image& rImage ) :
-        maStr( rStr ),
-        maImage( rImage ),
+    ImplEntryType( OUString aStr, Image aImage ) :
+        maStr(std::move( aStr )),
+        maImage(std::move( aImage )),
         mnFlags( ListBoxEntryFlags::NONE ),
         mnHeight( 0 )
     {
@@ -69,8 +71,8 @@ struct ImplEntryType
         mpUserData = nullptr;
     }
 
-    ImplEntryType( const OUString& rStr ) :
-        maStr( rStr ),
+    ImplEntryType( OUString aStr ) :
+        maStr(std::move( aStr )),
         mnFlags( ListBoxEntryFlags::NONE ),
         mnHeight( 0 )
     {
@@ -482,8 +484,10 @@ public:
     void            SetCallSelectionChangedHdl( bool bCall )    { maLBWindow->GetEntryList().SetCallSelectionChangedHdl( bCall ); }
     bool            IsSelectionChanged() const                  { return maLBWindow->IsSelectionChanged(); }
     sal_uInt16      GetSelectModifier() const                   { return maLBWindow->GetSelectModifier(); }
+    void            SetHighlightColor(const Color& rColor);
+    void            SetHighlightTextColor(const Color& rColor);
 
-    void            SetMRUEntries( const OUString& rEntries, sal_Unicode cSep );
+    void            SetMRUEntries( std::u16string_view rEntries, sal_Unicode cSep );
     OUString        GetMRUEntries( sal_Unicode cSep ) const;
     void            SetMaxMRUCount( sal_Int32  n )                  { maLBWindow->GetEntryList().SetMaxMRUCount( n ); }
     sal_Int32       GetMaxMRUCount() const                      { return maLBWindow->GetEntryList().GetMaxMRUCount(); }
@@ -555,7 +559,6 @@ public:
     virtual void    Resize() override;
     virtual void    GetFocus() override;
     virtual void    LoseFocus() override;
-    virtual bool    PreNotify( NotifyEvent& rNEvt ) override;
 
     sal_Int32       GetItemPos() const { return mnItemPos; }
     void            SetItemPos( sal_Int32  n ) { mnItemPos = n; }

@@ -19,27 +19,35 @@
 
 $(eval $(call gb_Module_Module,vcl))
 
+ifneq ($(ENABLE_WASM_STRIP_PINGUSER),TRUE)
+$(eval $(call gb_Module_add_targets,vcl,\
+    Package_tipoftheday \
+))
+endif
+
 $(eval $(call gb_Module_add_targets,vcl,\
     Library_vcl \
     Package_theme_definitions \
-    Package_tipoftheday \
     Package_toolbarmode \
     UIConfig_vcl \
     $(if $(filter WNT,$(OS)), \
         Package_opengl_denylist ) \
     $(if $(filter SKIA,$(BUILD_TYPE)), \
         Package_skia_denylist ) \
-    $(if $(filter DESKTOP,$(BUILD_TYPE)), \
+    $(if $(filter DESKTOP FUZZERS,$(BUILD_TYPE)), \
         StaticLibrary_vclmain \
-        $(if $(ENABLE_MACOSX_SANDBOX),, \
-            $(if $(DISABLE_GUI),, \
-                Executable_ui-previewer)) \
-        $(if $(filter LINUX MACOSX SOLARIS WNT %BSD,$(OS)), \
-            $(if $(DISABLE_GUI),, \
+        $(if $(or $(DISABLE_GUI),$(DISABLE_DYNLOADING)), \
+            $(if $(filter EMSCRIPTEN,$(OS)), \
+                $(if $(ENABLE_QT5),Executable_vcldemo) \
+            ) \
+        , \
+            $(if $(filter LINUX MACOSX SOLARIS WNT %BSD,$(OS)), \
                 Executable_vcldemo \
                 Executable_icontest \
                 Executable_visualbackendtest \
-                Executable_mtfdemo ))) \
+                Executable_mtfdemo \
+            ) \
+    )) \
 ))
 
 ifeq ($(CROSS_COMPILING)$(DISABLE_DYNLOADING),)
@@ -47,8 +55,11 @@ ifeq ($(CROSS_COMPILING)$(DISABLE_DYNLOADING),)
 $(eval $(call gb_Module_add_targets,vcl,\
     $(if $(filter-out ANDROID iOS WNT,$(OS)), \
         Executable_svdemo \
+        Executable_minvcl \
         Executable_fftester \
         Executable_svptest \
+        Executable_listfonts \
+        Executable_listglyphs \
         Executable_svpclient) \
 ))
 
@@ -60,48 +71,52 @@ $(eval $(call gb_Module_add_l10n_targets,vcl,\
 
 ifeq ($(USING_X11),TRUE)
 $(eval $(call gb_Module_add_targets,vcl,\
-    Library_vclplug_gen \
+    $(if $(ENABLE_GEN),Library_vclplug_gen) \
     Library_desktop_detector \
-    StaticLibrary_glxtest \
     Package_fontunxppds \
     Package_fontunxpsprint \
 ))
+endif
 
 ifneq ($(ENABLE_GTK3),)
 $(eval $(call gb_Module_add_targets,vcl,\
     Library_vclplug_gtk3 \
 ))
 endif
+
 ifneq ($(ENABLE_GTK4),)
 $(eval $(call gb_Module_add_targets,vcl,\
     Library_vclplug_gtk4 \
 ))
 endif
+
 ifneq ($(ENABLE_KF5),)
 $(eval $(call gb_Module_add_targets,vcl,\
     CustomTarget_kf5_moc \
     Library_vclplug_kf5 \
 ))
 endif
+
 ifneq ($(ENABLE_QT5),)
 $(eval $(call gb_Module_add_targets,vcl,\
     CustomTarget_qt5_moc \
     Library_vclplug_qt5 \
 ))
 endif
+
 ifneq ($(ENABLE_QT6),)
 $(eval $(call gb_Module_add_targets,vcl,\
     CustomTarget_qt6_moc \
     Library_vclplug_qt6 \
 ))
 endif
+
 ifneq ($(ENABLE_GTK3_KDE5),)
 $(eval $(call gb_Module_add_targets,vcl,\
     CustomTarget_gtk3_kde5_moc \
     Library_vclplug_gtk3_kde5 \
     Executable_lo_kde5filepicker \
 ))
-endif
 endif
 
 ifeq ($(OS),MACOSX)
@@ -118,36 +133,13 @@ $(eval $(call gb_Module_add_targets,vcl,\
 ))
 endif
 
-ifeq ($(OS),HAIKU)
-ifneq ($(ENABLE_QT5),)
-$(eval $(call gb_Module_add_targets,vcl,\
-    CustomTarget_qt5_moc \
-    Library_vclplug_qt5 \
-))
-endif
-ifneq ($(ENABLE_QT6),)
-$(eval $(call gb_Module_add_targets,vcl,\
-    CustomTarget_qt6_moc \
-    Library_vclplug_qt6 \
-))
-endif
-
-ifneq ($(ENABLE_KF5),)
-$(eval $(call gb_Module_add_targets,vcl,\
-    CustomTarget_kf5_moc \
-    Library_vclplug_kf5 \
-))
-endif
-endif
-
-ifneq ($(ENABLE_FUZZERS),)
+ifneq (,$(filter FUZZERS,$(BUILD_TYPE)))
 $(eval $(call gb_Module_add_targets,vcl,\
     CustomTarget_nativecore \
     CustomTarget_nativecalc \
     CustomTarget_nativedraw \
     CustomTarget_nativewriter \
     CustomTarget_nativemath \
-    StaticLibrary_fuzzerstubs \
     StaticLibrary_fuzzer_core \
     StaticLibrary_fuzzer_calc \
     StaticLibrary_fuzzer_draw \
@@ -200,6 +192,7 @@ $(eval $(call gb_Module_add_targets,vcl,\
     Executable_sftfuzzer \
     Executable_dbffuzzer \
     Executable_webpfuzzer \
+    Executable_lockfuzzer \
 ))
 endif
 
@@ -208,6 +201,7 @@ $(eval $(call gb_Module_add_check_targets,vcl,\
     CppunitTest_vcl_lifecycle \
     CppunitTest_vcl_bitmap_test \
     CppunitTest_vcl_bitmapprocessor_test \
+    CppunitTest_vcl_cjk \
     CppunitTest_vcl_graphic_test \
     CppunitTest_vcl_fontcharmap \
     CppunitTest_vcl_font \
@@ -217,6 +211,7 @@ $(eval $(call gb_Module_add_check_targets,vcl,\
     CppunitTest_vcl_filters_test \
     CppunitTest_vcl_mnemonic \
     CppunitTest_vcl_outdev \
+    CppunitTest_vcl_gradient \
     CppunitTest_vcl_app_test \
     CppunitTest_vcl_jpeg_read_write_test \
     CppunitTest_vcl_svm_test \
@@ -228,6 +223,7 @@ $(eval $(call gb_Module_add_check_targets,vcl,\
     CppunitTest_vcl_backend_test \
     CppunitTest_vcl_blocklistparser_test \
     CppunitTest_vcl_type_serializer_test \
+    CppunitTest_vcl_animation \
     $(call gb_Helper_optional, PDFIUM, \
         CppunitTest_vcl_pdfium_library_test) \
     $(if $(filter SKIA,$(BUILD_TYPE)), \

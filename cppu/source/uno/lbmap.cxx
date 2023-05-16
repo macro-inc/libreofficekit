@@ -27,6 +27,7 @@
 #include <mutex>
 #include <set>
 #include <unordered_map>
+#include <utility>
 
 #include <rtl/ustring.hxx>
 #include <rtl/ustrbuf.hxx>
@@ -125,11 +126,11 @@ struct MappingEntry
 
     MappingEntry(
         uno_Mapping * pMapping_, uno_freeMappingFunc freeMapping_,
-        const OUString & rMappingName_ )
+        OUString aMappingName_ )
         : nRef( 1 )
         , pMapping( pMapping_ )
         , freeMapping( freeMapping_ )
-        , aMappingName( rMappingName_ )
+        , aMappingName(std::move( aMappingName_ ))
         {}
 };
 
@@ -154,7 +155,7 @@ struct MappingsData
     t_OUString2Entry    aName2Entry;
     t_Mapping2Entry     aMapping2Entry;
 
-    Mutex               aCallbacksMutex;
+    std::mutex          aCallbacksMutex;
     std::set< uno_getMappingFunc >
                         aCallbacks;
 
@@ -192,9 +193,9 @@ struct uno_Mediate_Mapping : public uno_Mapping
     OUString    aAddPurpose;
 
     uno_Mediate_Mapping(
-        const Environment & rFrom_, const Environment & rTo_,
-        const Mapping & rFrom2Uno_, const Mapping & rUno2To_,
-        const OUString & rAddPurpose );
+        Environment aFrom_, Environment aTo_,
+        Mapping aFrom2Uno_, Mapping aUno2To_,
+        OUString aAddPurpose );
 };
 
 }
@@ -265,15 +266,15 @@ static void mediate_mapInterface(
 }
 
 uno_Mediate_Mapping::uno_Mediate_Mapping(
-    const Environment & rFrom_, const Environment & rTo_,
-    const Mapping & rFrom2Uno_, const Mapping & rUno2To_,
-    const OUString & rAddPurpose_ )
+    Environment aFrom_, Environment aTo_,
+    Mapping aFrom2Uno_, Mapping aUno2To_,
+    OUString aAddPurpose_ )
     : nRef( 1 )
-    , aFrom( rFrom_ )
-    , aTo( rTo_ )
-    , aFrom2Uno( rFrom2Uno_ )
-    , aUno2To( rUno2To_ )
-    , aAddPurpose( rAddPurpose_ )
+    , aFrom(std::move( aFrom_ ))
+    , aTo(std::move( aTo_ ))
+    , aFrom2Uno(std::move( aFrom2Uno_ ))
+    , aUno2To(std::move( aUno2To_ ))
+    , aAddPurpose(std::move( aAddPurpose_ ))
 {
     uno_Mapping::acquire        = mediate_acquire;
     uno_Mapping::release        = mediate_release;
@@ -421,6 +422,7 @@ static Mapping loadExternalMapping(
             OSL_ASSERT( aExt.is() );
             if (aExt.is())
                 return aExt;
+            SAL_INFO("cppu", "Could not load external mapping for " << aName);
         }
 #else
         // find proper lib
@@ -620,7 +622,7 @@ void SAL_CALL uno_getMapping(
 
         // try callback chain
         {
-            MutexGuard aGuard(rData.aCallbacksMutex);
+            std::unique_lock aGuard(rData.aCallbacksMutex);
             for (const auto& rCallback : rData.aCallbacks)
             {
                 (*rCallback)(ppMapping, pFrom, pTo, aAddPurpose.pData);
@@ -734,7 +736,7 @@ void SAL_CALL uno_registerMappingCallback(
 {
     OSL_ENSURE( pCallback, "### null ptr!" );
     MappingsData & rData = getMappingsData();
-    MutexGuard aGuard( rData.aCallbacksMutex );
+    std::unique_lock aGuard( rData.aCallbacksMutex );
     rData.aCallbacks.insert( pCallback );
 }
 
@@ -744,7 +746,7 @@ void SAL_CALL uno_revokeMappingCallback(
 {
     OSL_ENSURE( pCallback, "### null ptr!" );
     MappingsData & rData = getMappingsData();
-    MutexGuard aGuard( rData.aCallbacksMutex );
+    std::unique_lock aGuard( rData.aCallbacksMutex );
     rData.aCallbacks.erase( pCallback );
 }
 } // extern "C"

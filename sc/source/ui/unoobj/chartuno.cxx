@@ -37,6 +37,7 @@
 #include <toolkit/helper/vclunohelper.hxx>
 #include <tools/globname.hxx>
 #include <svtools/embedhlp.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <ChartTools.hxx>
@@ -83,9 +84,10 @@ void ScChartsObj::Notify( SfxBroadcaster&, const SfxHint& rHint )
 
 rtl::Reference<ScChartObj> ScChartsObj::GetObjectByIndex_Impl(tools::Long nIndex) const
 {
-    OUString aName;
     if ( pDocShell )
     {
+        OUString aName;
+
         ScDocument& rDoc = pDocShell->GetDocument();
         ScDrawLayer* pDrawLayer = rDoc.GetDrawLayer();
         if (pDrawLayer)
@@ -99,7 +101,7 @@ rtl::Reference<ScChartObj> ScChartsObj::GetObjectByIndex_Impl(tools::Long nIndex
                 SdrObject* pObject = aIter.Next();
                 while (pObject)
                 {
-                    if ( pObject->GetObjIdentifier() == OBJ_OLE2 && ScDocument::IsChart(pObject) )
+                    if ( pObject->GetObjIdentifier() == SdrObjKind::OLE2 && ScDocument::IsChart(pObject) )
                     {
                         if ( nPos == nIndex )
                         {
@@ -114,10 +116,11 @@ rtl::Reference<ScChartObj> ScChartsObj::GetObjectByIndex_Impl(tools::Long nIndex
                 }
             }
         }
+
+        if (!aName.isEmpty())
+            return new ScChartObj( pDocShell, nTab, aName );
     }
 
-    if (!aName.isEmpty())
-        return new ScChartObj( pDocShell, nTab, aName );
     return nullptr;
 }
 
@@ -153,7 +156,7 @@ void SAL_CALL ScChartsObj::addNewByName( const OUString& rName,
 
     OUString aName = rName;
     SCTAB nDummy;
-    if ( !aName.isEmpty() && pModel->GetNamedObject( aName, OBJ_OLE2, nDummy ) )
+    if ( !aName.isEmpty() && pModel->GetNamedObject( aName, SdrObjKind::OLE2, nDummy ) )
     {
         //  object exists - only RuntimeException is specified
         throw uno::RuntimeException();
@@ -226,16 +229,16 @@ void SAL_CALL ScChartsObj::addNewByName( const OUString& rName,
         uno::Sequence< beans::PropertyValue > aArgs{
             beans::PropertyValue(
                     "CellRangeRepresentation", -1,
-                    uno::makeAny( sRangeStr ), beans::PropertyState_DIRECT_VALUE ),
+                    uno::Any( sRangeStr ), beans::PropertyState_DIRECT_VALUE ),
             beans::PropertyValue(
                     "HasCategories", -1,
-                    uno::makeAny( bRowHeaders ), beans::PropertyState_DIRECT_VALUE ),
+                    uno::Any( bRowHeaders ), beans::PropertyState_DIRECT_VALUE ),
             beans::PropertyValue(
                     "FirstCellAsLabel", -1,
-                    uno::makeAny( bColumnHeaders ), beans::PropertyState_DIRECT_VALUE ),
+                    uno::Any( bColumnHeaders ), beans::PropertyState_DIRECT_VALUE ),
             beans::PropertyValue(
                     "DataRowSource", -1,
-                    uno::makeAny( chart::ChartDataRowSource_COLUMNS ), beans::PropertyState_DIRECT_VALUE )
+                    uno::Any( chart::ChartDataRowSource_COLUMNS ), beans::PropertyState_DIRECT_VALUE )
         };
         xReceiver->setArguments( aArgs );
     }
@@ -245,7 +248,7 @@ void SAL_CALL ScChartsObj::addNewByName( const OUString& rName,
     rDoc.GetChartListenerCollection()->insert( pChartListener );
     pChartListener->StartListeningTo();
 
-    SdrOle2Obj* pObj = new SdrOle2Obj(
+    rtl::Reference<SdrOle2Obj> pObj = new SdrOle2Obj(
             *pModel,
             ::svt::EmbeddedObjectRef(xObj, embed::Aspects::MSOLE_CONTENT),
             aName,
@@ -259,7 +262,7 @@ void SAL_CALL ScChartsObj::addNewByName( const OUString& rName,
     // Add here again if this is wanted (see task description for details)
     // ChartHelper::AdaptDefaultsForChart( xObj );
 
-    pPage->InsertObject( pObj );
+    pPage->InsertObject( pObj.get() );
     pModel->AddUndo( std::make_unique<SdrUndoInsertObj>( *pObj ) );
 }
 
@@ -309,7 +312,7 @@ sal_Int32 SAL_CALL ScChartsObj::getCount()
                 SdrObject* pObject = aIter.Next();
                 while (pObject)
                 {
-                    if ( pObject->GetObjIdentifier() == OBJ_OLE2 && ScDocument::IsChart(pObject) )
+                    if ( pObject->GetObjIdentifier() == SdrObjKind::OLE2 && ScDocument::IsChart(pObject) )
                         ++nCount;
                     pObject = aIter.Next();
                 }
@@ -326,12 +329,11 @@ uno::Any SAL_CALL ScChartsObj::getByIndex( sal_Int32 nIndex )
     if (!xChart.is())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xChart);
+    return uno::Any(xChart);
 }
 
 uno::Type SAL_CALL ScChartsObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<table::XTableChart>::get();
 }
 
@@ -348,7 +350,7 @@ uno::Any SAL_CALL ScChartsObj::getByName( const OUString& aName )
     if (!xChart.is())
         throw container::NoSuchElementException();
 
-    return uno::makeAny(xChart);
+    return uno::Any(xChart);
 }
 
 uno::Sequence<OUString> SAL_CALL ScChartsObj::getElementNames()
@@ -374,7 +376,7 @@ uno::Sequence<OUString> SAL_CALL ScChartsObj::getElementNames()
                 SdrObject* pObject = aIter.Next();
                 while (pObject)
                 {
-                    if ( pObject->GetObjIdentifier() == OBJ_OLE2 && ScDocument::IsChart(pObject) )
+                    if ( pObject->GetObjIdentifier() == SdrObjKind::OLE2 && ScDocument::IsChart(pObject) )
                     {
                         OUString aName;
                         uno::Reference < embed::XEmbeddedObject > xObj = static_cast<SdrOle2Obj*>(pObject)->GetObjRef();
@@ -403,12 +405,12 @@ sal_Bool SAL_CALL ScChartsObj::hasByName( const OUString& aName )
     return aOle2Obj != nullptr;
 }
 
-ScChartObj::ScChartObj(ScDocShell* pDocSh, SCTAB nT, const OUString& rN)
+ScChartObj::ScChartObj(ScDocShell* pDocSh, SCTAB nT, OUString aN)
     :ScChartObj_Base( m_aMutex )
     ,ScChartObj_PBase( ScChartObj_Base::rBHelper )
     ,pDocShell( pDocSh )
     ,nTab( nT )
-    ,aChartName( rN )
+    ,aChartName(std::move( aN ))
 {
     pDocShell->GetDocument().AddUnoObject(*this);
 
@@ -724,7 +726,6 @@ OUString SAL_CALL ScChartObj::getName()
 
 void SAL_CALL ScChartObj::setName( const OUString& /* aName */ )
 {
-    SolarMutexGuard aGuard;
     throw uno::RuntimeException();      // name cannot be changed
 }
 

@@ -51,7 +51,7 @@ namespace {
 class SwASCIIParser
 {
     SwDoc& m_rDoc;
-    std::unique_ptr<SwPaM> m_pPam;
+    std::optional<SwPaM> m_oPam;
     SvStream& m_rInput;
     std::unique_ptr<char[]> m_pArr;
     const SwAsciiOptions& m_rOpt;
@@ -86,17 +86,18 @@ ErrCode AsciiReader::Read( SwDoc& rDoc, const OUString&, SwPaM &rPam, const OUSt
         return ERR_SWG_READ_ERROR;
     }
 
-    std::unique_ptr<SwASCIIParser> xParser(new SwASCIIParser( rDoc, rPam, *m_pStream,
-                                        !m_bInsertMode, m_aOption.GetASCIIOpts() ));
-    ErrCode nRet = xParser->CallParser();
+    ErrCode nRet;
+    {
+        SwASCIIParser aParser( rDoc, rPam, *m_pStream,
+                                !m_bInsertMode, m_aOption.GetASCIIOpts() );
+        nRet = aParser.CallParser();
 
-    OUString optionsString;
-    xParser->GetUsedAsciiOptions().WriteUserData(optionsString);
+        OUString optionsString;
+        aParser.GetUsedAsciiOptions().WriteUserData(optionsString);
 
-    if(m_pMedium != nullptr && m_pMedium->GetItemSet() != nullptr)
-        m_pMedium->GetItemSet()->Put(SfxStringItem(SID_FILE_FILTEROPTIONS, optionsString));
-
-    xParser.reset();
+        if(m_pMedium != nullptr && m_pMedium->GetItemSet() != nullptr)
+            m_pMedium->GetItemSet()->Put(SfxStringItem(SID_FILE_FILTEROPTIONS, optionsString));
+    }
     // after Read reset the options
     m_aOption.ResetASCIIOpts();
     return nRet;
@@ -112,7 +113,7 @@ SwASCIIParser::SwASCIIParser(SwDoc& rD, const SwPaM& rCursor, SvStream& rIn, boo
     , m_nScript(SvtScriptType::NONE)
     , m_bNewDoc(bReadNewDoc)
 {
-    m_pPam.reset(new SwPaM(*rCursor.GetPoint()));
+    m_oPam.emplace(*rCursor.GetPoint());
     m_pArr.reset(new char[ASC_BUFFLEN + 2]);
 
     m_oItemSet.emplace(
@@ -159,9 +160,9 @@ ErrCode SwASCIIParser::CallParser()
     sal_Int32 nSttContent = 0;
     if (!m_bNewDoc)
     {
-        const SwNodeIndex& rTmp = m_pPam->GetPoint()->nNode;
+        const SwNode& rTmp = m_oPam->GetPoint()->GetNode();
         pInsPam.emplace( rTmp, rTmp, SwNodeOffset(0), SwNodeOffset(-1) );
-        nSttContent = m_pPam->GetPoint()->nContent.GetIndex();
+        nSttContent = m_oPam->GetPoint()->GetContentIndex();
     }
 
     SwTextFormatColl *pColl = nullptr;
@@ -174,7 +175,7 @@ ErrCode SwASCIIParser::CallParser()
             pColl = m_rDoc.getIDocumentStylePoolAccess().GetTextCollFromPool(RES_POOLCOLL_STANDARD,
                                                                              false);
         if (pColl)
-            m_rDoc.SetTextFormatColl(*m_pPam, pColl);
+            m_rDoc.SetTextFormatColl(*m_oPam, pColl);
     }
 
     ErrCode nError = ReadChars();
@@ -238,10 +239,9 @@ ErrCode SwASCIIParser::CallParser()
             else if( pInsPam )
             {
                 // then set over the insert range the defined attributes
-                *pInsPam->GetMark() = *m_pPam->GetPoint();
-                ++pInsPam->GetPoint()->nNode;
-                pInsPam->GetPoint()->nContent.Assign(
-                                    pInsPam->GetContentNode(), nSttContent );
+                *pInsPam->GetMark() = *m_oPam->GetPoint();
+                pInsPam->GetPoint()->Assign(pInsPam->GetPoint()->GetNode(), SwNodeOffset(1),
+                                    nSttContent );
 
                 // !!!!!
                 OSL_ENSURE( false, "Have to change - hard attr. to para. style" );
@@ -394,7 +394,7 @@ ErrCode SwASCIIParser::ReadChars()
                 nLineLen = 0;
                 // We skip the last one at the end
                 if (!m_rInput.eof() || !(pEnd == pStt || (!*pEnd && pEnd == pStt + 1)))
-                    m_rDoc.getIDocumentContentOperations().SplitNode(*m_pPam->GetPoint(), false);
+                    m_rDoc.getIDocumentContentOperations().SplitNode(*m_oPam->GetPoint(), false);
             }
         }
 
@@ -446,10 +446,10 @@ ErrCode SwASCIIParser::ReadChars()
                         {
                             InsertText( OUString( pLastStt ));
                         }
-                        m_rDoc.getIDocumentContentOperations().SplitNode(*m_pPam->GetPoint(),
+                        m_rDoc.getIDocumentContentOperations().SplitNode(*m_oPam->GetPoint(),
                                                                          false);
                         m_rDoc.getIDocumentContentOperations().InsertPoolItem(
-                            *m_pPam, SvxFormatBreakItem(SvxBreak::PageBefore, RES_BREAK));
+                            *m_oPam, SvxFormatBreakItem(SvxBreak::PageBefore, RES_BREAK));
                         pLastStt = pStt;
                         nLineLen = 0;
                         bIns = false;
@@ -480,7 +480,7 @@ ErrCode SwASCIIParser::ReadChars()
                 sal_Unicode c = *pStt;
                 *pStt = 0;
                 InsertText( OUString( pLastStt ));
-                m_rDoc.getIDocumentContentOperations().SplitNode(*m_pPam->GetPoint(), false);
+                m_rDoc.getIDocumentContentOperations().SplitNode(*m_oPam->GetPoint(), false);
                 pLastStt = pStt;
                 nLineLen = 0;
                 *pStt = c;
@@ -493,9 +493,9 @@ ErrCode SwASCIIParser::ReadChars()
             // We found a CR/LF, thus save the text
             InsertText( OUString( pLastStt ));
             if (m_bNewDoc)
-                m_rDoc.getIDocumentContentOperations().AppendTextNode(*m_pPam->GetPoint());
+                m_rDoc.getIDocumentContentOperations().AppendTextNode(*m_oPam->GetPoint());
             else
-                m_rDoc.getIDocumentContentOperations().SplitNode(*m_pPam->GetPoint(), false);
+                m_rDoc.getIDocumentContentOperations().SplitNode(*m_oPam->GetPoint(), false);
             pLastStt = pStt;
             nLineLen = 0;
         }
@@ -511,7 +511,7 @@ ErrCode SwASCIIParser::ReadChars()
 
 void SwASCIIParser::InsertText( const OUString& rStr )
 {
-    m_rDoc.getIDocumentContentOperations().InsertString(*m_pPam, rStr);
+    m_rDoc.getIDocumentContentOperations().InsertString(*m_oPam, rStr);
 
     if (m_oItemSet && g_pBreakIt
         && m_nScript != (SvtScriptType::LATIN | SvtScriptType::ASIAN | SvtScriptType::COMPLEX))

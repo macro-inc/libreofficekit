@@ -7,43 +7,34 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <sal/config.h>
-
-#include <string_view>
-
 #include <swmodeltestbase.hxx>
 
+#include <comphelper/processfactory.hxx>
 #include <svx/svddef.hxx>
-#include <svx/unoapi.hxx>
 #include <svx/sdmetitm.hxx>
 #include <svx/svdobj.hxx>
 
-#include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/drawing/FillStyle.hpp>
+#include <com/sun/star/lang/Locale.hpp>
+#include <com/sun/star/packages/zip/ZipFileAccess.hpp>
+#include <com/sun/star/text/XChapterNumberingSupplier.hpp>
 #include <com/sun/star/text/XEndnotesSupplier.hpp>
 #include <com/sun/star/text/XFootnotesSupplier.hpp>
 #include <com/sun/star/text/XTextFieldsSupplier.hpp>
-#include <com/sun/star/text/XTextViewCursorSupplier.hpp>
-#include <com/sun/star/text/XTextTable.hpp>
-#include <com/sun/star/text/XTextTablesSupplier.hpp>
 #include <com/sun/star/text/XTextFrame.hpp>
-#include <com/sun/star/packages/zip/ZipFileAccess.hpp>
+#include <com/sun/star/text/XTextFramesSupplier.hpp>
+#include <com/sun/star/text/XTextTablesSupplier.hpp>
+#include <com/sun/star/text/XTextViewCursorSupplier.hpp>
 #include <com/sun/star/view/XViewCursor.hpp>
-#include <comphelper/configuration.hxx>
-#include <comphelper/propertysequence.hxx>
 #include <comphelper/sequenceashashmap.hxx>
-#include <editeng/escapementitem.hxx>
 #include <unotools/fltrcfg.hxx>
-#include <textboxhelper.hxx>
 #include <unoprnms.hxx>
-#include <unotxdoc.hxx> //XChapterNumberingSupplier
-
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/extras/ooxmlexport/data/";
+#include <o3tl/string_view.hxx>
 
 class Test : public SwModelTestBase
 {
 public:
-    Test() : SwModelTestBase(DATA_DIRECTORY, "Office Open XML Text") {}
+    Test() : SwModelTestBase("/sw/qa/extras/ooxmlexport/data/", "Office Open XML Text") {}
 
 virtual std::unique_ptr<Resetter> preTest(const char* filename) override
     {
@@ -62,20 +53,11 @@ virtual std::unique_ptr<Resetter> preTest(const char* filename) override
         }
         return nullptr;
     }
-
-protected:
-    /**
-     * Denylist handling
-     */
-    bool mustTestImportOf(const char* filename) const override {
-        // If the testcase is stored in some other format, it's pointless to test.
-        return OString(filename).endsWith(".docx");
-    }
 };
 
-DECLARE_OOXMLEXPORT_EXPORTONLY_TEST(testTdf143860NonPrimitiveCustomShape,
-                                    "tdf143860_NonPrimitiveCustomShape.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf143860NonPrimitiveCustomShape)
 {
+    loadAndReload("tdf143860_NonPrimitiveCustomShape.odt");
     CPPUNIT_ASSERT_EQUAL(1, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // The document has a custom shape of type non-primitive without handles. Make sure that the shape
@@ -121,9 +103,9 @@ CPPUNIT_TEST_FIXTURE(Test, testWrapPolygonLineShape)
     CPPUNIT_ASSERT_EQUAL(sal_Int32(0), nXCoord);
 }
 
-DECLARE_OOXMLEXPORT_EXPORTONLY_TEST(testWrapPolygonCustomShape,
-                                    "tdf142433_WrapPolygonCustomShape.odt")
+CPPUNIT_TEST_FIXTURE(Test, testWrapPolygonCustomShape)
 {
+    loadAndReload("tdf142433_WrapPolygonCustomShape.odt");
     CPPUNIT_ASSERT_EQUAL(1, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // Document has 4-point star with contour wrap. Error was, that the enhanced path was written
@@ -167,7 +149,7 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf134219ContourWrap_glow_rotate)
                                      getProperty<sal_Int32>(getShape(1), "BottomMargin"), 1);
     };
     // Given a document with a shape with contour wrap, that has glow effect and rotation.
-    load(mpTestDocumentPath, "tdf143219ContourWrap_glow_rotate.docx");
+    createSwDoc("tdf143219ContourWrap_glow_rotate.docx");
 
     // Error was, that the margins, which were added on import to approximate Word's rendering of
     // contour wrap, contained the effect extent for rotation. But LibreOffice extents the wrap
@@ -193,7 +175,7 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf134219ContourWrap_stroke_shadow)
                                      getProperty<sal_Int32>(getShape(1), "BottomMargin"), 1);
     };
     // Given a document with a shape with contour wrap, that has a fat stroke and large shadow.
-    load(mpTestDocumentPath, "tdf143219ContourWrap_stroke_shadow.docx");
+    createSwDoc("tdf143219ContourWrap_stroke_shadow.docx");
 
     // Error was, that the margins, which were added on import to approximate Word's rendering of
     // contour wrap, were not removed on export and so used twice on reload.
@@ -204,8 +186,9 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf134219ContourWrap_stroke_shadow)
     verify();
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf123569_rotWriterImage, "tdf123569_rotWriterImage_46deg.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf123569_rotWriterImage)
 {
+    loadAndReload("tdf123569_rotWriterImage_46deg.odt");
     CPPUNIT_ASSERT_EQUAL(1, getShapes());
     CPPUNIT_ASSERT_EQUAL(2, getPages());
     uno::Reference<beans::XPropertySet> xFrame(getShape(1), uno::UNO_QUERY);
@@ -228,8 +211,21 @@ DECLARE_OOXMLEXPORT_TEST(testTdf142486_LeftMarginShadowLeft, "tdf142486_LeftMarg
     CPPUNIT_ASSERT_DOUBLES_EQUAL(sal_Int32(953), getProperty<sal_Int32>(xFrame, "LeftMargin"), 1);
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf142486_FrameShadow, "tdf142486_FrameShadow.odt")
+DECLARE_OOXMLEXPORT_TEST(testTdf66039, "tdf66039.docx")
 {
+    // This bugdoc has a groupshape (WPG) with a table inside its each member shape.
+    // Before there was no table after import at all. From now, there must be 2 tables.
+    uno::Reference<text::XTextTablesSupplier> xTablesSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<container::XIndexAccess> xTables(xTablesSupplier->getTextTables(),
+                                                    uno::UNO_QUERY);
+    // This was 0 before:
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Where are the tables?!", static_cast<sal_Int32>(2),
+                                 xTables->getCount());
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf142486_FrameShadow)
+{
+    loadAndReload("tdf142486_FrameShadow.odt");
     CPPUNIT_ASSERT_EQUAL(1, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
@@ -248,8 +244,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf142486_FrameShadow, "tdf142486_FrameShadow.odt")
     CPPUNIT_ASSERT(sText.startsWith("e"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf136059, "tdf136059.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf136059)
 {
+    loadAndReload("tdf136059.odt");
     CPPUNIT_ASSERT_EQUAL(1, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Contour has not been exported!", true,
@@ -489,10 +486,28 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf69635)
     assertXPath(pXmlSettings, "/w:settings/w:evenAndOddHeaders", 0);
 }
 
+DECLARE_OOXMLEXPORT_TEST(testTdf148671, "tdf148671.docx")
+{
+    // Don't assert with 'pFieldMark' failed when document is opened
+    CPPUNIT_ASSERT_EQUAL(1, getPages());
+
+    if (!isExported())
+        return;
+    // Preserve tag on SDT blocks. (Before the fix, these were all lost)
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+    assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w:tag", 3);
+}
+
 DECLARE_OOXMLEXPORT_TEST(testTdf140668, "tdf140668.docx")
 {
     // Don't crash when document is opened
     CPPUNIT_ASSERT_EQUAL(1, getPages());
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf149649, "tdf149649.docx")
+{
+    // Don't crash when document is opened
+    CPPUNIT_ASSERT_EQUAL(2, getPages());
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTdf138771, "tdf138771.docx")
@@ -543,8 +558,9 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf135773_numberingShading)
     assertXPath(pXmlStyles, "/w:numbering/w:abstractNum[@w:abstractNumId='1']/w:lvl[@w:ilvl='0']/w:rPr/w:shd", "fill", "ED4C05");
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf140336_paraNoneShading, "tdf140336_paraNoneShading.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf140336_paraNoneShading)
 {
+    loadAndReload("tdf140336_paraNoneShading.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // Before the fix, the background from a style was exported to dis-inheriting paragraphs/styles.
     CPPUNIT_ASSERT_EQUAL(sal_uInt32(COL_AUTO), getProperty<sal_uInt32>(getParagraph(1), "ParaBackColor"));
@@ -555,8 +571,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf140336_paraNoneShading, "tdf140336_paraNoneShadi
     CPPUNIT_ASSERT_EQUAL(sal_uInt32(16744272), getProperty<sal_uInt32>(getParagraph(2), "ParaBackColor"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf141173_missingFrames, "tdf141173_missingFrames.rtf")
+CPPUNIT_TEST_FIXTURE(Test, testTdf141173_missingFrames)
 {
+    loadAndReload("tdf141173_missingFrames.rtf");
     // Without the fix in place, almost all of the text and textboxes were missing.
     // Without the fix, there were only 2 shapes (mostly unseen).
     CPPUNIT_ASSERT_EQUAL(13, getShapes());
@@ -584,34 +601,34 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf142404_tabOverSpacingC15)
     // The original 3-page ODT saved as DOCX would fit on one page in MS Word 2010, but 3 in Word 2013.
     CPPUNIT_ASSERT_EQUAL_MESSAGE("too big for two pages", 3, getPages());
     // The tab goes over the paragraph margin
-    CPPUNIT_ASSERT_EQUAL(OUString("A left tab positioned at"), parseDump("//page[1]/body/txt[2]/Text[1]", "Portion"));
-    sal_Int32 nTextLen = parseDump("//page[1]/body/txt[2]/Text[1]", "nWidth").toInt32();
-    CPPUNIT_ASSERT_EQUAL(OUString("*"), parseDump("//page[1]/body/txt[2]/Text[2]", "Portion"));
-    sal_Int32 nTabLen = parseDump("//page[1]/body/txt[2]/Text[2]", "nWidth").toInt32();
+    CPPUNIT_ASSERT_EQUAL(OUString("A left tab positioned at"), parseDump("//page[1]/body/txt[2]/SwParaPortion/SwLineLayout[1]/SwLinePortion[1]", "portion"));
+    sal_Int32 nTextLen = parseDump("//page[1]/body/txt[2]/SwParaPortion/SwLineLayout[1]/SwLinePortion[1]", "width").toInt32();
+    CPPUNIT_ASSERT_EQUAL(OUString("*"), parseDump("//page[1]/body/txt[2]/SwParaPortion/SwLineLayout[1]/SwFixPortion[1]", "portion"));
+    sal_Int32 nTabLen = parseDump("//page[1]/body/txt[2]/SwParaPortion/SwLineLayout[1]/SwFixPortion[1]", "width").toInt32();
     CPPUNIT_ASSERT_MESSAGE("Large left tab", nTextLen < nTabLen);
     // Not 1 line high (Word 2010 DOCX), or 3 lines high (LO DOCX) or 5 lines high (ODT), but 4 lines high
     sal_Int32 nHeight = parseDump("//page[1]/body/txt[2]/infos/bounds", "height").toInt32();
     CPPUNIT_ASSERT_MESSAGE("4 lines high", 1100 < nHeight);
     CPPUNIT_ASSERT_MESSAGE("4 lines high", nHeight < 1300);
 
-    CPPUNIT_ASSERT_EQUAL(OUString("TabOverflow does what?"), parseDump("//page[1]/body/txt[7]/Text[1]", "Portion"));
+    CPPUNIT_ASSERT_EQUAL(OUString("TabOverflow does what?"), parseDump("//page[1]/body/txt[7]/SwParaPortion/SwLineLayout[1]/SwLinePortion[1]", "portion"));
     // Not 1 line high (Word 2010 DOCX), or 4 lines high (prev LO DOCX) or 8 lines high (ODT).
     // but two lines high. (3 in Word 2016 because it pulls down "what?" to the second line - weird)
     nHeight = parseDump("//page[1]/body/txt[7]/infos/bounds", "height").toInt32();
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("2 lines high (but 3 in Word)", 242*2.5, nHeight, 242);
 
-    CPPUNIT_ASSERT_EQUAL(OUString("A centered tab positioned at"), parseDump("//page[1]/body/txt[3]/Text[1]", "Portion"));
-    sal_Int32 nLineWidth = parseDump("//page[1]/body/txt[3]/Text[2]", "nWidth").toInt32();
+    CPPUNIT_ASSERT_EQUAL(OUString("A centered tab positioned at"), parseDump("//page[1]/body/txt[3]/SwParaPortion/SwLineLayout[1]/SwLinePortion[1]", "portion"));
+    sal_Int32 nLineWidth = parseDump("//page[1]/body/txt[3]/SwParaPortion/SwLineLayout[1]/SwFixPortion[1]", "width").toInt32();
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Big tab: full paragraph area used", 737, nLineWidth, 100);
 
     // Pages 2/3 are TabOverMargin - in this particular case tabs should not go over margin.
-    CPPUNIT_ASSERT_EQUAL(OUString("A right tab positioned at"), parseDump("//page[2]/body/txt[6]/Text[1]", "Portion"));
+    CPPUNIT_ASSERT_EQUAL(OUString("A right tab positioned at"), parseDump("//page[2]/body/txt[6]/SwParaPortion/SwLineLayout[1]/SwLinePortion[1]", "portion"));
     sal_Int32 nParaWidth = parseDump("//page[2]/body/txt[6]/infos/prtBounds", "width").toInt32();
     // the clearest non-first-line visual example is this second tab in the right-tab paragraph.
-    nLineWidth = parseDump("//page[2]/body/txt[6]/LineBreak[4]", "nWidth").toInt32();
+    nLineWidth = parseDump("//page[2]/body/txt[6]/SwParaPortion/SwLineLayout[4]", "width").toInt32();
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Full paragraph area used", nLineWidth, nParaWidth);
 
-    CPPUNIT_ASSERT_EQUAL(OUString("TabOverflow does what?"), parseDump("//page[3]/body/txt[2]/Text[1]", "Portion"));
+    CPPUNIT_ASSERT_EQUAL(OUString("TabOverflow does what?"), parseDump("//page[3]/body/txt[2]/SwParaPortion/SwLineLayout[1]/SwLinePortion[1]", "portion"));
     // Not 1 line high (Word 2010 DOCX and ODT), or 4 lines high (prev LO DOCX),
     // but 8 lines high.
     nHeight = parseDump("//page[3]/body/txt[2]/infos/bounds", "height").toInt32();
@@ -628,7 +645,7 @@ DECLARE_OOXMLEXPORT_TEST(testShapeHyperlink, "hyperlinkshape.docx")
 CPPUNIT_TEST_FIXTURE(Test, testTextframeHyperlink)
 {
     // Make sure hyperlink is imported correctly
-    load(mpTestDocumentPath, "docxopenhyperlinkbox.docx");
+    createSwDoc("docxopenhyperlinkbox.docx");
     uno::Reference<text::XTextFramesSupplier> xTextFramesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XIndexAccess> xIndexAccess(xTextFramesSupplier->getTextFrames(), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(sal_Int32(1), xIndexAccess->getCount());
@@ -640,7 +657,7 @@ CPPUNIT_TEST_FIXTURE(Test, testTextframeHyperlink)
     // (Currently the Writer text frame becomes a text box (shape based)). See tdf#140961
     reload(mpFilter, "docxopenhyperlinkbox.docx");
 
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     // DML
     assertXPath(pXmlDoc, "//w:drawing/wp:anchor/wp:docPr/a:hlinkClick", 1);
     // VML
@@ -649,7 +666,7 @@ CPPUNIT_TEST_FIXTURE(Test, testTextframeHyperlink)
 
 CPPUNIT_TEST_FIXTURE(Test, testTdf146171_invalid_change_date)
 {
-    load(mpTestDocumentPath, "tdf146171.docx");
+    createSwDoc("tdf146171.docx");
     // false alarm? during ODF roundtrip:
     // 'Error: "1970-01-01" does not satisfy the "dateTime" type'
     // disable and check only the conversion of the invalid (zeroed) change date
@@ -657,27 +674,36 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf146171_invalid_change_date)
     // reload("writer8", "tdf146171.odt");
     reload("Office Open XML Text", "tdf146171.docx");
 
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     // This was 0
-    assertXPath(pXmlDoc, "//w:ins", 4);
+    assertXPath(pXmlDoc, "//w:ins", 5);
     // This was 0
-    assertXPath(pXmlDoc, "//w:del", 1);
+    assertXPath(pXmlDoc, "//w:del", 2);
     // no date (anonymized change)
     // This failed, date was exported as w:date="1970-01-01T00:00:00Z" before fixing tdf#147760
-    assertXPathNoAttribute(pXmlDoc, "//w:del", "date");
+    assertXPathNoAttribute(pXmlDoc, "//w:del[1]", "date");
+    assertXPathNoAttribute(pXmlDoc, "//w:del[2]", "date");
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf139580, "tdf139580.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf139580)
 {
+    loadAndReload("tdf139580.odt");
     // Without the fix in place, this test would have crashed at export time
     CPPUNIT_ASSERT_EQUAL(2, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
 }
 
+DECLARE_OOXMLEXPORT_TEST(testTdf149198, "tdf149198.docx")
+{
+    // Without the fix in place, this test would have crashed at export time
+    CPPUNIT_ASSERT_EQUAL(1, getPages());
+    CPPUNIT_ASSERT_EQUAL(OUString("Documentation"), getParagraph(1)->getString());
+}
+
 CPPUNIT_TEST_FIXTURE(Test, testFooterMarginLost)
 {
     loadAndSave("footer-margin-lost.docx");
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     // Without the accompanying fix in place, this test would have failed with:
     // - Expected: 709
     // - Actual  : 0
@@ -694,7 +720,7 @@ CPPUNIT_TEST_FIXTURE(Test, testEffectExtentLineWidth)
 
     // Given a document with a shape that has a non-zero line width and effect extent:
     // When loading the document:
-    load(mpTestDocumentPath, "effect-extent-line-width.docx");
+    createSwDoc("effect-extent-line-width.docx");
     // Then make sure that the line width is not taken twice (once as part of the margin, and then
     // also as the line width):
     // Without the accompanying fix in place, this test would have failed with:
@@ -709,7 +735,7 @@ CPPUNIT_TEST_FIXTURE(Test, testEffectExtentLineWidth)
 CPPUNIT_TEST_FIXTURE(Test, testRtlGutter)
 {
     // Given a document with RTL gutter:
-    load(mpTestDocumentPath, "rtl-gutter.docx");
+    createSwDoc("rtl-gutter.docx");
     uno::Reference<beans::XPropertySet> xStandard(getStyles("PageStyles")->getByName("Standard"),
             uno::UNO_QUERY);
     CPPUNIT_ASSERT(getProperty<bool>(xStandard, "RtlGutter"));
@@ -718,7 +744,7 @@ CPPUNIT_TEST_FIXTURE(Test, testRtlGutter)
     reload(mpFilter, "rtl-gutter.docx");
 
     // Then make sure the section's gutter is still RTL:
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     // Without the accompanying fix in place, this test would have failed as the XML element was
     // missing.
     assertXPath(pXmlDoc, "/w:document/w:body/w:sectPr/w:rtlGutter", 1);
@@ -752,8 +778,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf136841, "tdf136841.docx")
     CPPUNIT_ASSERT_EQUAL( Color(228,71,69), bitmap.GetPixelColor(38,38));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf138953, "croppedAndRotated.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf138953)
 {
+    loadAndReload("croppedAndRotated.odt");
     CPPUNIT_ASSERT_EQUAL(1, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // Make sure the rotation is exported correctly, and size not distorted
@@ -766,8 +793,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf138953, "croppedAndRotated.odt")
     CPPUNIT_ASSERT_EQUAL(sal_Int32(8664), frameRect.Width);
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf118535, "tdf118535.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf118535)
 {
+    loadAndReload("tdf118535.odt");
     CPPUNIT_ASSERT_EQUAL(2, getShapes());
     CPPUNIT_ASSERT_EQUAL(2, getPages());
     uno::Reference<packages::zip::XZipFileAccess2> xNameAccess = packages::zip::ZipFileAccess::createWithURL(comphelper::getComponentContext(m_xSFactory), maTempFile.GetURL());
@@ -793,6 +821,18 @@ DECLARE_OOXMLEXPORT_TEST(testTdf133473_shadowSize, "tdf133473.docx")
     // I.e. Shadow size will be smaller than actual.
 
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(200000), nSize1);
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf153874, "image_through_shape.docx")
+{
+    uno::Reference<beans::XPropertySet> const xShape1(getShapeByName(u"Test1"),  uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> const xShape2(getShapeByName(u"Rectangle 1"), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(text::TextContentAnchorType_AS_CHARACTER, xShape1->getPropertyValue("AnchorType").get<text::TextContentAnchorType>());
+    CPPUNIT_ASSERT_EQUAL(text::TextContentAnchorType_AT_CHARACTER, xShape2->getPropertyValue("AnchorType").get<text::TextContentAnchorType>());
+    CPPUNIT_ASSERT_LESS(xShape2->getPropertyValue("ZOrder").get<sal_uInt64>(), xShape1->getPropertyValue("ZOrder").get<sal_uInt64>());
+    CPPUNIT_ASSERT(xShape1->getPropertyValue("Decorative").get<bool>());
+    // not implemented on shape yet
+    //CPPUNIT_ASSERT(xShape2->getPropertyValue("Decorative").get<bool>());
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTextBoxZOrder, "testTextBoxZOrder.docx")
@@ -852,6 +892,24 @@ DECLARE_OOXMLEXPORT_TEST(testTdf105688, "tdf105688.docx")
     CPPUNIT_ASSERT_EQUAL(2, getPages());
 }
 
+CPPUNIT_TEST_FIXTURE(Test, testCommentReply)
+{
+    loadAndSave("CommentReply.docx");
+    xmlDocUniquePtr pXmlComm = parseExport("word/comments.xml");
+    xmlDocUniquePtr pXmlCommExt = parseExport("word/commentsExtended.xml");
+    CPPUNIT_ASSERT(pXmlComm);
+    CPPUNIT_ASSERT(pXmlCommExt);
+    OUString sParentId = getXPath(pXmlComm, "/w:comments/w:comment[1]/w:p[1]", "paraId");
+    OUString sChildId = getXPath(pXmlComm, "/w:comments/w:comment[2]/w:p[1]", "paraId");
+    OUString sChildIdEx = getXPath(pXmlCommExt, "/w15:commentsEx/w15:commentEx", "paraId");
+    OUString sChildParentId = getXPath(pXmlCommExt,
+        "/w15:commentsEx/w15:commentEx", "paraIdParent");
+    // Make sure exported extended paraId matches the one in comments.xml
+    CPPUNIT_ASSERT_EQUAL(sChildId, sChildIdEx);
+    // Make sure the paraIdParent matches the id of its parent
+    CPPUNIT_ASSERT_EQUAL(sParentId, sChildParentId);
+}
+
 CPPUNIT_TEST_FIXTURE(Test, testCommentDone)
 {
     loadAndSave("CommentDone.docx");
@@ -888,7 +946,7 @@ DECLARE_OOXMLEXPORT_TEST(testCommentDoneModel, "CommentDone.docx")
     css::uno::Any aComment = xFields->nextElement();
     css::uno::Reference<css::beans::XPropertySet> xComment(aComment, css::uno::UNO_QUERY_THROW);
 
-    if (!mbExported)
+    if (!isExported())
     {
         // Check that it's resolved when initially read
         CPPUNIT_ASSERT_EQUAL(true, xComment->getPropertyValue("Resolved").get<bool>());
@@ -906,7 +964,7 @@ DECLARE_OOXMLEXPORT_TEST(testCommentDoneModel, "CommentDone.docx")
     aComment = xFields->nextElement();
     xComment.set(aComment, css::uno::UNO_QUERY_THROW);
 
-    if (!mbExported)
+    if (!isExported())
     {
         // Check that it's unresolved when initially read
         CPPUNIT_ASSERT_EQUAL(false, xComment->getPropertyValue("Resolved").get<bool>());
@@ -934,6 +992,27 @@ CPPUNIT_TEST_FIXTURE(Test, Test_ShadowDirection)
                 "/w:document/w:body/w:p[1]/w:r[1]/mc:AlternateContent/mc:Choice/w:drawing/"
                 "wp:anchor/a:graphic/a:graphicData/wps:wsp/wps:spPr/a:effectLst/a:outerShdw",
                 "rotWithShape", "0");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf150542)
+{
+    loadAndSave("tdf150542.docx");
+
+    xmlDocUniquePtr pSettingsDoc = parseExport("word/settings.xml");
+    // Ensure that all docvars from input are written back and with correct values.
+    // Order of document variables is not checked. So this can fail at some time if order is changed.
+    assertXPath(pSettingsDoc,
+                "/w:settings/w:docVars/w:docVar[1]", "name", u"LocalChars\u00C1\u0072\u0076\u00ED\u007A\u0074\u0075\u0072\u006F\u0054\u00FC\u006B\u00F6\u0072\u0066\u00FA\u0072\u00F3\u0067\u00E9\u0070");
+    assertXPath(pSettingsDoc,
+                "/w:settings/w:docVars/w:docVar[1]", "val", u"Correct value (\u00E1\u0072\u0076\u00ED\u007A\u0074\u0075\u0072\u006F\u0020\u0074\u00FC\u006B\u00F6\u0072\u0066\u00FA\u0072\u00F3\u0067\u00E9\u0070)");
+    assertXPath(pSettingsDoc,
+                "/w:settings/w:docVars/w:docVar[2]", "name", "DocVar1");
+    assertXPath(pSettingsDoc,
+                "/w:settings/w:docVars/w:docVar[2]", "val", "DocVar1 Value");
+    assertXPath(pSettingsDoc,
+                "/w:settings/w:docVars/w:docVar[3]", "name", "DocVar3");
+    assertXPath(pSettingsDoc,
+                "/w:settings/w:docVars/w:docVar[3]", "val", "DocVar3 Value");
 }
 
 CPPUNIT_TEST_FIXTURE(Test, testTdf139549)
@@ -977,14 +1056,55 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf139549)
 }
 
 
-DECLARE_OOXMLEXPORT_TEST(testTdf143726, "Simple-TOC.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf143726)
 {
+    loadAndReload("Simple-TOC.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     xmlDocUniquePtr pXmlStyles = parseExport("word/styles.xml");
     CPPUNIT_ASSERT(pXmlStyles);
     // Without the fix this was "TOA Heading" which belongs to the "Table of Authorities" index in Word
     // TOC's heading style should be exported as "TOC Heading" as that's the default Word style name
-    assertXPath(pXmlStyles, "/w:styles/w:style[@w:styleId='ContentsHeading']/w:name", "val", "TOC Heading");
+    assertXPath(pXmlStyles, "/w:styles/w:style[@w:styleId='TOCHeading']/w:name", "val", "TOC Heading");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf152153)
+{
+    loadAndReload("embedded_images.odt");
+
+    uno::Reference<packages::zip::XZipFileAccess2> xNameAccess
+        = packages::zip::ZipFileAccess::createWithURL(comphelper::getComponentContext(m_xSFactory),
+                                                      maTempFile.GetURL());
+    const uno::Sequence<OUString> aNames(xNameAccess->getElementNames());
+    int nImageFiles = 0;
+    for (const auto& rElementName : aNames)
+        if (rElementName.startsWith("word/media/image"))
+            nImageFiles++;
+
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 4
+    // - Actual  : 3
+    // i.e. the once embedded picture wouldn't have been saved.
+    CPPUNIT_ASSERT_EQUAL(4, nImageFiles);
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf152152)
+{
+    loadAndReload("artistic_effects.docx");
+
+    uno::Reference<packages::zip::XZipFileAccess2> xNameAccess
+        = packages::zip::ZipFileAccess::createWithURL(comphelper::getComponentContext(m_xSFactory),
+                                                      maTempFile.GetURL());
+    const uno::Sequence<OUString> aNames(xNameAccess->getElementNames());
+    int nImageFiles = 0;
+    for (const auto& rElementName : aNames)
+        if (rElementName.startsWith("word/media/hdphoto"))
+            nImageFiles++;
+
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 2
+    // - Actual  : 1
+    // i.e. the once WDP picture wouldn't have been saved.
+    CPPUNIT_ASSERT_EQUAL(2, nImageFiles);
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

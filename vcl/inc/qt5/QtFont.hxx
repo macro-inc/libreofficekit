@@ -21,7 +21,7 @@
 
 #include <sal/config.h>
 
-#include <fontinstance.hxx>
+#include <font/LogicalFontInstance.hxx>
 
 #include <QtGui/QFont>
 
@@ -34,8 +34,6 @@ class QtFont final : public QFont, public LogicalFontInstance
 
     bool GetGlyphOutline(sal_GlyphId, basegfx::B2DPolyPolygon&, bool) const override;
     bool ImplGetGlyphBoundRect(sal_GlyphId, tools::Rectangle&, bool) const override;
-
-    virtual hb_font_t* ImplInitHbFont() override;
 
     explicit QtFont(const vcl::font::PhysicalFontFace&, const vcl::font::FontSelectPattern&);
 };

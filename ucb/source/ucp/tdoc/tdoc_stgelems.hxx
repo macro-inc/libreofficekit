@@ -33,16 +33,17 @@
 
 #include "tdoc_storage.hxx"
 
-#include <memory>
 #include <mutex>
 
 namespace tdoc_ucp {
+
+class OfficeDocumentsManager;
 
 class ParentStorageHolder
 {
 public:
     ParentStorageHolder(
-        const css::uno::Reference< css::embed::XStorage > & xParentStorage,
+        css::uno::Reference< css::embed::XStorage > xParentStorage,
         const OUString & rUri );
 
     bool isParentARootStorage() const
@@ -73,7 +74,7 @@ class Storage : public StorageUNOBase, public ParentStorageHolder
 public:
     Storage(
         const css::uno::Reference< css::uno::XComponentContext > & rxContext,
-        const rtl::Reference< StorageElementFactory >  & xFactory,
+        rtl::Reference< StorageElementFactory > xFactory,
         const OUString & rUri,
         const css::uno::Reference< css::embed::XStorage > & xParentStorage,
         const css::uno::Reference< css::embed::XStorage > & xStorageToWrap );
@@ -247,6 +248,7 @@ class Stream : public StreamUNOBase, public ParentStorageHolder
 public:
     Stream(
         const css::uno::Reference< css::uno::XComponentContext > & rxContext,
+        rtl::Reference<OfficeDocumentsManager> const & docsMgr,
         const OUString & rUri,
         const css::uno::Reference< css::embed::XStorage >  & xParentStorage,
         const css::uno::Reference< css::io::XStream > & xStreamToWrap );
@@ -316,6 +318,8 @@ private:
     /// @throws css::io::IOException
     void commitChanges();
 
+    rtl::Reference<OfficeDocumentsManager> m_docsMgr;
+    OUString m_uri;
     css::uno::Reference<
         css::uno::XAggregation >     m_xAggProxy;
     css::uno::Reference<

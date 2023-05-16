@@ -105,7 +105,7 @@ namespace reportdesign
             BoundListeners l;
             {
                 ::osl::MutexGuard aGuard(m_aMutex);
-                prepareSet(_sProperty, css::uno::makeAny(_member), css::uno::makeAny(Value), &l);
+                prepareSet(_sProperty, css::uno::Any(_member), css::uno::Any(Value), &l);
                 _member = Value;
             }
             l.notify();
@@ -118,7 +118,7 @@ namespace reportdesign
             BoundListeners l;
             {
                 ::osl::MutexGuard aGuard(m_aMutex);
-                prepareSet(_sProperty, css::uno::makeAny(_member), css::uno::makeAny(Value), &l);
+                prepareSet(_sProperty, css::uno::Any(_member), css::uno::Any(Value), &l);
                 _member = Value;
             }
             l.notify();
@@ -188,7 +188,7 @@ namespace reportdesign
 
     public:
         //TTTT Needed? Or same as above?
-        static css::uno::Sequence< sal_Int8 > getUnoTunnelId();
+        static const css::uno::Sequence< sal_Int8 > & getUnoTunnelId();
         static std::shared_ptr<rptui::OReportModel> getSdrModel(const css::uno::Reference< css::report::XReportDefinition >& _xReportDefinition);
 
     private:

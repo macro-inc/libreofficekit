@@ -59,11 +59,6 @@ bool ExternAndNotDefined::VisitFunctionDecl(const FunctionDecl * functionDecl) {
     {
         return true;
     }
-    StringRef fileName { getFilenameOfLocation(functionDecl->getLocation()) };
-    // the filters use some kind of dynamic loading stunt
-    if (loplugin::hasPathnamePrefix(fileName, SRCDIR "/filter/qa/")) {
-        return true;
-    }
     report(
         DiagnosticsEngine::Warning,
         "extern prototype in main file without definition",

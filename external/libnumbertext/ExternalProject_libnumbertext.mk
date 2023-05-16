@@ -16,9 +16,9 @@ $(eval $(call gb_ExternalProject_register_targets,libnumbertext,\
 	build \
 ))
 
-libnumbertext_CXXFLAGS=$(CXXFLAGS) $(CXXFLAGS_CXX11)
+libnumbertext_CXXFLAGS=$(CXXFLAGS) $(CXXFLAGS_CXX11) $(gb_EMSCRIPTEN_CXXFLAGS)
 
-libnumbertext_CPPFLAGS+=$(gb_COMPILERDEFS_STDLIB_DEBUG)
+libnumbertext_CPPFLAGS+=$(gb_COMPILERDEFS_STDLIB_DEBUG) $(gb_EMSCRIPTEN_CPPFLAGS)
 
 $(call gb_ExternalProject_get_state_target,libnumbertext,build):
 	$(call gb_Trace_StartRange,libnumbertext,EXTERNAL)
@@ -27,10 +27,13 @@ $(call gb_ExternalProject_get_state_target,libnumbertext,build):
 		$(SHELL) $(gb_RUN_CONFIGURE) ./configure --disable-shared --with-pic \
 			$(if $(verbose),--disable-silent-rules,--enable-silent-rules) \
 			$(if $(ENABLE_WERROR),--enable-werror,--disable-werror) \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM))\
+			$(gb_CONFIGURE_PLATFORMS) \
 			$(if $(filter AIX,$(OS)),CFLAGS="-D_LINUX_SOURCE_COMPAT") \
 			$(if $(libnumbertext_CPPFLAGS),CPPFLAGS='$(libnumbertext_CPPFLAGS)') \
-			CXXFLAGS="$(libnumbertext_CXXFLAGS) $(if $(ENABLE_OPTIMIZED),$(gb_COMPILEROPTFLAGS),$(gb_COMPILERNOOPTFLAGS)) $(if $(debug),$(gb_DEBUGINFO_FLAGS)) $(gb_VISIBILITY_FLAGS) $(gb_VISIBILITY_FLAGS_CXX)" \
+			CXXFLAGS="$(libnumbertext_CXXFLAGS) \
+				$(call gb_ExternalProject_get_build_flags,libnumbertext) \
+				$(gb_VISIBILITY_FLAGS) $(gb_VISIBILITY_FLAGS_CXX)" \
+			LDFLAGS="$(call gb_ExternalProject_get_link_flags,libnumbertext)" \
 		&& cd src && $(MAKE) \
 	)
 	$(call gb_Trace_EndRange,libnumbertext,EXTERNAL)

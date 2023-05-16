@@ -537,15 +537,15 @@ void XMLPropStyleContext::Finish( bool bOverwrite )
 
     if ( xPropSetInfo->hasPropertyByName( "Hidden" ) )
     {
-        xPropSet->setPropertyValue( "Hidden", uno::makeAny( IsHidden( ) ) );
+        xPropSet->setPropertyValue( "Hidden", uno::Any( IsHidden( ) ) );
     }
 
 }
 
 bool XMLPropStyleContext::doNewDrawingLayerFillStyleDefinitionsExist(
-    const OUString& rFillStyleTag) const
+    std::u16string_view rFillStyleTag) const
 {
-    if(!maProperties.empty() && rFillStyleTag.getLength())
+    if(!maProperties.empty() && !rFillStyleTag.empty())
     {
         // no & to avoid non-obvious UAF due to the 2nd temp Reference
         const rtl::Reference<XMLPropertySetMapper> rMapper = GetStyles()->GetImportPropertyMapper(GetFamily())->getPropertySetMapper();
@@ -624,10 +624,10 @@ void XMLPropStyleContext::translateNameBasedDrawingLayerFillStyleDefinitionsToSt
     if(!rMapper.is())
         return;
 
-    static OUString s_FillGradientName("FillGradientName");
-    static OUString s_FillHatchName("FillHatchName");
-    static OUString s_FillBitmapName("FillBitmapName");
-    static OUString s_FillTransparenceGradientName("FillTransparenceGradientName");
+    static constexpr OUStringLiteral s_FillGradientName(u"FillGradientName");
+    static constexpr OUStringLiteral s_FillHatchName(u"FillHatchName");
+    static constexpr OUStringLiteral s_FillBitmapName(u"FillBitmapName");
+    static constexpr OUStringLiteral s_FillTransparenceGradientName(u"FillTransparenceGradientName");
 
     for(auto& a : maProperties)
     {

@@ -22,29 +22,20 @@
 #include <drawinglayer/drawinglayerdllapi.h>
 
 #include <drawinglayer/primitive2d/baseprimitive2d.hxx>
-#include <drawinglayer/primitive2d/Primitive2DVisitor.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
-
-namespace com::sun::star::awt
-{
-class XBitmap;
-}
+#include <vcl/bitmapex.hxx>
 
 namespace drawinglayer::primitive2d
 {
 /** BitmapPrimitive2D class
 
     This class is the central primitive for Bitmap-based primitives.
-    To keep it independent of Bitmap implementations, use UNO API
-    XBitmap object as wrapper due to formally used class Bitmap being
-    vcl-dependent and requiring linking against it. Use VCLUnoHelper
-    to convert awt::XBitmap <-> Bitmap
  */
 class DRAWINGLAYER_DLLPUBLIC BitmapPrimitive2D final : public BasePrimitive2D
 {
 private:
     /// the Bitmap-data
-    css::uno::Reference<css::awt::XBitmap> maXBitmap;
+    BitmapEx maBitmap;
 
     /** the object transformation from unit coordinates, defining
         size, shear, rotate and position
@@ -53,11 +44,10 @@ private:
 
 public:
     /// constructor
-    BitmapPrimitive2D(const css::uno::Reference<css::awt::XBitmap>& rXBitmap,
-                      const basegfx::B2DHomMatrix& rTransform);
+    BitmapPrimitive2D(BitmapEx xBitmap, basegfx::B2DHomMatrix aTransform);
 
     /// data read access
-    const css::uno::Reference<css::awt::XBitmap>& getXBitmap() const { return maXBitmap; }
+    const BitmapEx& getBitmap() const { return maBitmap; }
     const basegfx::B2DHomMatrix& getTransform() const { return maTransform; }
 
     /// compare operator
@@ -68,7 +58,7 @@ public:
     getB2DRange(const geometry::ViewInformation2D& rViewInformation) const override;
 
     // XAccounting
-    virtual sal_Int64 SAL_CALL estimateUsage() override;
+    virtual sal_Int64 estimateUsage() override;
 
     /// provide unique ID
     virtual sal_uInt32 getPrimitive2DID() const override;

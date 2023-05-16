@@ -34,7 +34,7 @@ private:
     std::unique_ptr<weld::Button> m_xBtCreate;
     std::unique_ptr<weld::TreeView> m_xLbDocTypes;
 
-    bool                ImplGetURLObject( const OUString& rPath, const OUString& rBase, INetURLObject& aURLObject ) const;
+    bool                ImplGetURLObject( const OUString& rPath, std::u16string_view rBase, INetURLObject& aURLObject ) const;
     void                FillDocumentList ();
 
     DECL_LINK (ClickNewHdl_Impl, weld::Button&, void );
@@ -52,7 +52,6 @@ public:
 
     static std::unique_ptr<IconChoicePage> Create(weld::Container* pWindow, SvxHpLinkDlg* pDlg, const SfxItemSet* pItemSet);
 
-    virtual bool        AskApply () override;
     virtual void        DoApply () override;
 
     virtual void        SetInitFocus() override;

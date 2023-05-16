@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xelementaccess.hxx>
 #include <test/container/xenumerationaccess.hxx>
 #include <test/container/xindexaccess.hxx>
@@ -36,7 +36,7 @@ using namespace com::sun::star;
 
 namespace sc_apitest
 {
-class ScDDELinksObj : public CalcUnoApiTest,
+class ScDDELinksObj : public UnoApiTest,
                       public apitest::XDDELinks,
                       public apitest::XElementAccess,
                       public apitest::XEnumerationAccess,
@@ -49,7 +49,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScDDELinksObj);
 
@@ -78,33 +77,27 @@ public:
     CPPUNIT_TEST(testSupportsService);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScDDELinksObj::ScDDELinksObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
-    , XDDELinks(m_directories.getURLFromSrc(u"/sc/qa/unoapi/testdocuments/ScDDELinksObj.ods"))
+    : UnoApiTest("/sc/qa/extras/testdocuments")
+    , XDDELinks(createFileURL(u"ScDDELinksObj.ods"))
     , XElementAccess(cppu::UnoType<sheet::XDDELink>::get())
     , XIndexAccess(1)
-    , XNameAccess("soffice|"
-                  + m_directories.getURLFromSrc(u"/sc/qa/unoapi/testdocuments/ScDDELinksObj.ods")
-                  + "!Sheet1.A1")
+    , XNameAccess("soffice|" + createFileURL(u"ScDDELinksObj.ods") + "!Sheet1.A1")
     , XServiceInfo("ScDDELinksObj", "com.sun.star.sheet.DDELinks")
 {
 }
 
 uno::Reference<uno::XInterface> ScDDELinksObj::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
 
     uno::Reference<sheet::XSpreadsheets> xSheets(xDoc->getSheets(), uno::UNO_SET_THROW);
     uno::Reference<container::XIndexAccess> xIA(xSheets, uno::UNO_QUERY_THROW);
     uno::Reference<sheet::XSpreadsheet> xSheet(xIA->getByIndex(0), uno::UNO_QUERY_THROW);
 
-    const OUString testdoc
-        = m_directories.getURLFromSrc(u"/sc/qa/unoapi/testdocuments/ScDDELinksObj.ods");
+    const OUString testdoc = createFileURL(u"ScDDELinksObj.ods");
 
     xSheet->getCellByPosition(5, 5)->setFormula("=DDE(\"soffice\";\"" + testdoc
                                                 + "\";\"Sheet1.A1\")");
@@ -123,15 +116,9 @@ uno::Reference<uno::XInterface> ScDDELinksObj::init()
 void ScDDELinksObj::setUp()
 {
     Application::SetAppName("soffice"); // Enable DDE
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScDDELinksObj::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScDDELinksObj);

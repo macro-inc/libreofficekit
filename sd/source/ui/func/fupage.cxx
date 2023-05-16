@@ -48,6 +48,7 @@
 #include <editeng/pbinitem.hxx>
 #include <sfx2/opengrf.hxx>
 #include <sal/log.hxx>
+#include <docmodel/theme/Theme.hxx>
 
 #include <strings.hrc>
 #include <sdpage.hxx>
@@ -135,8 +136,7 @@ void FuPage::DoExecute(SfxRequest& rReq)
         return;
 
     // if there are no arguments given, open the dialog
-    const SfxPoolItem* pItem;
-    if (!mpArgs || mpArgs->GetItemState(SID_SELECT_BACKGROUND, true, &pItem) == SfxItemState::SET)
+    if (!mpArgs || mpArgs->GetItemState(SID_SELECT_BACKGROUND) == SfxItemState::SET)
     {
         mpView->SdrEndTextEdit();
         mpArgs = ExecuteDialog(mpWindow ? mpWindow->GetFrameWeld() : nullptr, rReq);
@@ -266,7 +266,7 @@ const SfxItemSet* FuPage::ExecuteDialog(weld::Window* pParent, const SfxRequest&
     if (mpDoc->GetDocumentType() == DocumentType::Impress && mpPage->IsMasterPage())
     {
         // A master slide may have a theme.
-        svx::Theme* pTheme = mpPage->getSdrPageProperties().GetTheme();
+        auto const& pTheme = mpPage->getSdrPageProperties().GetTheme();
         if (pTheme)
         {
             uno::Any aTheme;
@@ -325,8 +325,8 @@ const SfxItemSet* FuPage::ExecuteDialog(weld::Window* pParent, const SfxRequest&
             OUString aFileName(static_cast<const SfxStringItem*>(pItem)->GetValue());
             OUString aFilterName;
 
-            if (pArgs->GetItemState(FN_PARAM_FILTER, true, &pItem) == SfxItemState::SET)
-                aFilterName = static_cast<const SfxStringItem*>(pItem)->GetValue();
+            if (const SfxStringItem* pFilterItem = pArgs->GetItemIfSet(FN_PARAM_FILTER))
+                aFilterName = pFilterItem->GetValue();
 
             nError = GraphicFilter::LoadGraphic(aFileName, aFilterName, aGraphic,
                                                 &GraphicFilter::GetGraphicFilter());
@@ -350,7 +350,7 @@ const SfxItemSet* FuPage::ExecuteDialog(weld::Window* pParent, const SfxRequest&
 
             // MigrateItemSet makes sure the XFillBitmapItem will have a unique name
             SfxItemSetFixed<XATTR_FILLBITMAP, XATTR_FILLBITMAP> aMigrateSet( mpDoc->GetPool() );
-            aMigrateSet.Put(XFillBitmapItem("background", aGraphic));
+            aMigrateSet.Put(XFillBitmapItem("background", std::move(aGraphic)));
             SdrModel::MigrateItemSet( &aMigrateSet, &*pTempSet, mpDoc );
 
             pTempSet->Put( XFillBmpStretchItem( true ));
@@ -466,10 +466,9 @@ const SfxItemSet* FuPage::ExecuteDialog(weld::Window* pParent, const SfxRequest&
                 pTempSet->Put(XFillStyleItem(drawing::FillStyle_NONE));
             }
 
-            const SfxPoolItem *pItem;
-            if( SfxItemState::SET == pTempSet->GetItemState( EE_PARA_WRITINGDIR, false, &pItem ) )
+            if( const SvxFrameDirectionItem* pItem = pTempSet->GetItemIfSet( EE_PARA_WRITINGDIR, false ) )
             {
-                SvxFrameDirection nVal = static_cast<const SvxFrameDirectionItem*>(pItem)->GetValue();
+                SvxFrameDirection nVal = pItem->GetValue();
                 mpDoc->SetDefaultWritingMode( nVal == SvxFrameDirection::Horizontal_RL_TB ? css::text::WritingMode_RL_TB : css::text::WritingMode_LR_TB );
             }
 
@@ -575,8 +574,8 @@ void FuPage::ApplyItemSet( const SfxItemSet* pArgs )
             auto it = pGrabBag->GetGrabBag().find("Theme");
             if (it != pGrabBag->GetGrabBag().end())
             {
-                std::unique_ptr<svx::Theme> pTheme = svx::Theme::FromAny(it->second);
-                pMasterPage->getSdrPageProperties().SetTheme(std::move(pTheme));
+                std::shared_ptr<model::Theme> pTheme = model::Theme::FromAny(it->second);
+                pMasterPage->getSdrPageProperties().SetTheme(pTheme);
             }
             else
             {

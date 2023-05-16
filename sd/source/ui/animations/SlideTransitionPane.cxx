@@ -36,7 +36,7 @@
 #include <sal/log.hxx>
 #include <tools/debug.hxx>
 #include <svx/gallery.hxx>
-#include <svx/colorwindow.hxx>
+#include <utility>
 #include <vcl/stdtext.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
@@ -47,7 +47,6 @@
 #include <optsitem.hxx>
 
 #include <o3tl/safeint.hxx>
-#include <sfx2/sidebar/Theme.hxx>
 
 #include <algorithm>
 
@@ -255,8 +254,8 @@ void lcl_CreateUndoForPages(
 
 struct lcl_EqualsSoundFileName
 {
-    explicit lcl_EqualsSoundFileName( const OUString & rStr ) :
-            maStr( rStr )
+    explicit lcl_EqualsSoundFileName( OUString aStr ) :
+            maStr(std::move( aStr ))
     {}
 
     bool operator() ( const OUString & rStr ) const
@@ -277,7 +276,7 @@ private:
 
 // returns -1 if no object was found
 bool lcl_findSoundInList( const ::std::vector< OUString > & rSoundList,
-                          const OUString & rFileName,
+                          std::u16string_view rFileName,
                           ::std::vector< OUString >::size_type & rOutPosition )
 {
     INetURLObject aURL(rFileName);
@@ -317,7 +316,7 @@ struct lcl_AppendSoundToListBox
         : mrListBox( rListBox )
     {}
 
-    void operator() ( const OUString & rString ) const
+    void operator() ( std::u16string_view rString ) const
     {
         INetURLObject aURL( rString );
         mrListBox.append_text( aURL.GetBase() );
@@ -414,9 +413,7 @@ constexpr sal_uInt16 nNoneId = std::numeric_limits<sal_uInt16>::max();
 
 void SlideTransitionPane::Initialize(SdDrawDocument* pDoc)
 {
-    mxFT_VARIANT = m_xBuilder->weld_label("variant_label");
     mxLB_VARIANT = m_xBuilder->weld_combo_box("variant_list");
-    mxFT_duration = m_xBuilder->weld_label("duration_label");
     mxCBX_duration = m_xBuilder->weld_metric_spin_button("transition_duration", FieldUnit::SECOND);
     mxFT_SOUND = m_xBuilder->weld_label("sound_label");
     mxLB_SOUND = m_xBuilder->weld_combo_box("sound_list");
@@ -486,9 +483,7 @@ SlideTransitionPane::~SlideTransitionPane()
     removeListener();
     mxVS_TRANSITION_ICONSWin.reset();
     mxVS_TRANSITION_ICONS.reset();
-    mxFT_VARIANT.reset();
     mxLB_VARIANT.reset();
-    mxFT_duration.reset();
     mxCBX_duration.reset();
     mxFT_SOUND.reset();
     mxLB_SOUND.reset();

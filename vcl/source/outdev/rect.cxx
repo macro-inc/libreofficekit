@@ -17,17 +17,16 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <cassert>
-
 #include <sal/types.h>
-
 #include <tools/poly.hxx>
 #include <tools/helpers.hxx>
+
 #include <vcl/metaact.hxx>
-#include <vcl/outdev.hxx>
 #include <vcl/virdev.hxx>
 
 #include <salgdi.hxx>
+
+#include <cassert>
 
 void OutputDevice::DrawBorder(tools::Rectangle aBorderRect)
 {
@@ -63,7 +62,7 @@ void OutputDevice::DrawRect( const tools::Rectangle& rRect )
     if ( aRect.IsEmpty() )
         return;
 
-    aRect.Justify();
+    aRect.Normalize();
 
     if ( !mpGraphics && !AcquireGraphics() )
         return;
@@ -156,7 +155,7 @@ void OutputDevice::Invert( const tools::Rectangle& rRect, InvertFlags nFlags )
 
     if ( aRect.IsEmpty() )
         return;
-    aRect.Justify();
+    aRect.Normalize();
 
     // we need a graphics
     if ( !mpGraphics && !AcquireGraphics() )

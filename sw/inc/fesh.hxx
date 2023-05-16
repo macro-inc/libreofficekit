@@ -20,6 +20,7 @@
 #define INCLUDED_SW_INC_FESH_HXX
 
 #include <com/sun/star/text/RelOrientation.hpp>
+#include <com/sun/star/text/XPasteListener.hpp>
 
 #include <svx/svdobj.hxx>
 #include "swdllapi.h"
@@ -30,7 +31,7 @@
 #include <sot/formats.hxx>
 #include <rtl/ustring.hxx>
 #include <o3tl/typed_flags_set.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 
 #include <vector>
 #include <memory>
@@ -205,7 +206,7 @@ private:
     std::unique_ptr<SdrDropMarkerOverlay> m_pChainTo;
     std::unique_ptr<SdrDropMarkerOverlay> m_pChainFrom;
     bool m_bCheckForOLEInCaption;
-    comphelper::OInterfaceContainerHelper2 m_aPasteListeners;
+    comphelper::OInterfaceContainerHelper3<css::text::XPasteListener> m_aPasteListeners;
     /// insert table rows or columns instead of overwriting the existing table cells
     SwTable::SearchType m_eTableInsertMode;
     /// table copied to the clipboard by the last private copy
@@ -332,7 +333,7 @@ public:
                         const RndStdIds _nAnchorId,
                         const sal_Int16 _eHoriRelOrient = css::text::RelOrientation::FRAME,
                         const sal_Int16 _eVertRelOrient = css::text::RelOrientation::FRAME,
-                        const SwPosition* _pToCharContentPos = nullptr,
+                        const SwFormatAnchor* _pToCharContentPos = nullptr,
                         const bool _bFollowTextFlow = false,
                         bool _bMirror = false,
                         Point* _opRef = nullptr,
@@ -496,7 +497,9 @@ public:
     bool GetObjAttr( SfxItemSet &rSet ) const;
     void SetObjAttr( const SfxItemSet &rSet );
 
-    const SdrObject* GetBestObject( bool bNext, GotoObjFlags eType, bool bFlat = true, const svx::ISdrObjectFilter* pFilter = nullptr );
+    const SdrObject* GetBestObject(bool bNext, GotoObjFlags eType, bool bFlat = true,
+                                   const svx::ISdrObjectFilter* pFilter = nullptr,
+                                   bool* pbWrapped = nullptr);
     bool GotoObj( bool bNext, GotoObjFlags eType = GotoObjFlags::DrawAny);
 
     /// Set DragMode (e.g. Rotate), but do nothing when frame is selected.
@@ -541,7 +544,7 @@ public:
     bool EndMark  ();
 
     /// Create and destroy group, don't when frame is selected.
-    bool IsGroupSelected();     ///< Can be a mixed selection!
+    bool IsGroupSelected(bool bAllowDiagams);     ///< Can be a mixed selection!
     void GroupSelection();          ///< Afterwards the group is selected.
     void UnGroupSelection();        /**< The individual objects are selected, but
                                     it is possible that there are groups included. */
@@ -566,7 +569,7 @@ public:
     void Paste( SvStream& rStm, SwPasteSdr nAction, const Point* pPt );
     bool Paste( const Graphic &rGrf, const OUString& rURL );
 
-    comphelper::OInterfaceContainerHelper2& GetPasteListeners();
+    comphelper::OInterfaceContainerHelper3<css::text::XPasteListener>& GetPasteListeners();
 
     bool IsAlignPossible() const;
     void SetCalcFieldValueHdl(Outliner* pOutliner);

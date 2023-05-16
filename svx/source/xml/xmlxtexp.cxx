@@ -19,7 +19,7 @@
 
 #include <sal/config.h>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/container/XNameContainer.hpp>
@@ -154,6 +154,7 @@ SvxXMLXTableExportComponent::SvxXMLXTableExportComponent(
     GetNamespaceMap_().Add( GetXMLToken(XML_NP_DRAW), GetXMLToken(XML_N_DRAW), XML_NAMESPACE_DRAW );
     GetNamespaceMap_().Add( GetXMLToken(XML_NP_XLINK), GetXMLToken(XML_N_XLINK), XML_NAMESPACE_XLINK );
     GetNamespaceMap_().Add( GetXMLToken(XML_NP_SVG), GetXMLToken(XML_N_SVG),  XML_NAMESPACE_SVG );
+    GetNamespaceMap_().Add( GetXMLToken(XML_NP_LO_EXT), GetXMLToken(XML_N_LO_EXT), XML_NAMESPACE_LO_EXT);
     SetGraphicStorageHandler(xGraphicStorageHandler);
 }
 
@@ -172,10 +173,10 @@ static void initializeStreamMetadata( const uno::Reference< uno::XInterface > &x
 
     try
     {
-        xProps->setPropertyValue("MediaType",  uno::makeAny( OUString( "text/xml" ) ) );
+        xProps->setPropertyValue("MediaType",  uno::Any( OUString( "text/xml" ) ) );
 
         // use stock encryption
-        xProps->setPropertyValue("UseCommonStoragePasswordEncryption", uno::makeAny( true ) );
+        xProps->setPropertyValue("UseCommonStoragePasswordEncryption", uno::Any( true ) );
     } catch ( const uno::Exception & )
     {
         TOOLS_WARN_EXCEPTION("svx", "exception setting stream metadata");

@@ -301,6 +301,7 @@ SvxSearchDialog::SvxSearchDialog(weld::Window* pParent, SfxChildWindow* pChildWi
     , m_xSearchFormattedCB(m_xBuilder->weld_check_button("searchformatted"))
     , m_xWordBtn(m_xBuilder->weld_check_button("wholewords"))
     , m_xCloseBtn(m_xBuilder->weld_button("close"))
+    , m_xHelpBtn(m_xBuilder->weld_button("help"))
     , m_xIncludeDiacritics(m_xBuilder->weld_check_button("includediacritics"))
     , m_xIncludeKashida(m_xBuilder->weld_check_button("includekashida"))
     , m_xOtherOptionsExpander(m_xBuilder->weld_expander("OptionsExpander"))
@@ -327,12 +328,17 @@ SvxSearchDialog::SvxSearchDialog(weld::Window* pParent, SfxChildWindow* pChildWi
     , m_xAllSheetsCB(m_xBuilder->weld_check_button("allsheets"))
     , m_xCalcStrFT(m_xBuilder->weld_label("entirecells"))
 {
+    if (comphelper::LibreOfficeKit::isActive())
+    {
+        m_xCloseBtn->hide();
+        m_xHelpBtn->hide();
+    }
+
     m_aPresentIdle.SetTimeout(50);
     m_aPresentIdle.SetInvokeHandler(LINK(this, SvxSearchDialog, PresentTimeoutHdl_Impl));
 
     m_xSearchTmplLB->make_sorted();
     m_xSearchAttrText->hide();
-    m_xSearchLabel->show();
 
     m_xReplaceTmplLB->make_sorted();
     m_xReplaceAttrText->hide();
@@ -574,6 +580,13 @@ void SvxSearchDialog::SetSaveToModule(bool b)
 void SvxSearchDialog::SetSearchLabel(const OUString& rStr)
 {
     m_xSearchLabel->set_label(rStr);
+    if (!rStr.isEmpty())
+    {
+        // hide/show to fire SHOWING state change event so search label text
+        // is announced by screen reader
+        m_xSearchLabel->hide();
+        m_xSearchLabel->show();
+    }
 
     if (rStr == SvxResId(RID_SVXSTR_SEARCH_NOT_FOUND))
         m_xSearchLB->set_entry_message_type(weld::EntryMessageType::Error);
@@ -800,8 +813,6 @@ void SvxSearchDialog::Init_Impl( bool bSearchPattern )
     m_xIncludeDiacritics->set_active( !aOpt.IsIgnoreDiacritics_CTL() );
     if ( m_xIncludeKashida->get_visible() )
         m_xIncludeKashida->set_active( !aOpt.IsIgnoreKashida_CTL() );
-    if ( SvxSearchDialog::IsOtherOptionsExpanded() )
-        m_xOtherOptionsExpander->set_expanded( true );
     ApplyTransliterationFlags_Impl( pSearchItem->GetTransliterationFlags() );
 
     ShowOptionalControls_Impl();
@@ -1754,8 +1765,12 @@ void SvxSearchDialog::EnableControls_Impl( const SearchOptionFlags nFlags )
     }
 
     if ( pSearchItem )
+    {
         Init_Impl( pSearchItem->GetPattern() &&
                    ( !pSearchList || !pSearchList->Count() ) );
+        if (SvxSearchDialog::IsOtherOptionsExpanded())
+            m_xOtherOptionsExpander->set_expanded(true);
+    }
 }
 
 void SvxSearchDialog::EnableControl_Impl(const weld::Widget& rCtrl)
@@ -2002,7 +2017,7 @@ IMPL_LINK_NOARG(SvxSearchDialog, FormatHdl_Impl, weld::Button&, void)
     if( aOutSet.Count() )
         pList->Put( aOutSet );
 
-    PaintAttrText_Impl(); // Set AttributText in GroupBox
+    PaintAttrText_Impl(); // Set AttributeText in GroupBox
 }
 
 IMPL_LINK_NOARG(SvxSearchDialog, NoFormatHdl_Impl, weld::Button&, void)
@@ -2203,7 +2218,8 @@ void SvxSearchDialog::SetModifyFlag_Impl( const weld::Widget* pCtrl )
     {
         nModifyFlag |= ModifyFlags::Search;
         m_xSearchLB->set_entry_message_type(weld::EntryMessageType::Normal);
-        SvxSearchDialogWrapper::SetSearchLabel("");
+        if (!SvxSearchDialogWrapper::GetSearchLabel().isEmpty())
+            SvxSearchDialogWrapper::SetSearchLabel("");
     }
     else if ( m_xReplaceLB.get() == pCtrl )
         nModifyFlag |= ModifyFlags::Replace;

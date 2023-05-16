@@ -29,8 +29,9 @@
 #include <svl/undo.hxx>
 #include <tools/gen.hxx>
 #include <tools/color.hxx>
+#include <utility>
 #include <vcl/outdev.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <tools/link.hxx>
 #include <editeng/editengdllapi.h>
 
@@ -76,6 +77,7 @@ class SvxFieldData;
 enum class PointerStyle;
 class SvxNumRule;
 enum class TextRotation;
+enum class SdrCompatibilityFlag;
 
 namespace com::sun::star::linguistic2 {
     class XSpellChecker1;
@@ -95,7 +97,6 @@ enum class ParaFlag
 {
     NONE               = 0x0000,
     HOLDDEPTH          = 0x4000,
-    SETBULLETTEXT      = 0x8000,
     ISPAGE             = 0x0100,
 };
 namespace o3tl
@@ -402,6 +403,7 @@ public:
     sal_Int32           mnPara;
     const SvxFont&      mrFont;
     o3tl::span<const sal_Int32> mpDXArray;
+    o3tl::span<const sal_Bool> mpKashidaArray;
 
     const EEngineData::WrongSpellVector*  mpWrongSpellVector;
     const SvxFieldData* mpFieldData;
@@ -422,12 +424,13 @@ public:
 
     DrawPortionInfo(
         const Point& rPos,
-        const OUString& rTxt,
+        OUString aTxt,
         sal_Int32 nTxtStart,
         sal_Int32 nTxtLen,
         const SvxFont& rFnt,
         sal_Int32 nPar,
         o3tl::span<const sal_Int32> pDXArr,
+        o3tl::span<const sal_Bool> pKashidaArr,
         const EEngineData::WrongSpellVector* pWrongSpellVector,
         const SvxFieldData* pFieldData,
         const css::lang::Locale* pLocale,
@@ -440,12 +443,13 @@ public:
         bool bEndOfParagraph,
         bool bEndOfBullet)
     :   mrStartPos(rPos),
-        maText(rTxt),
+        maText(std::move(aTxt)),
         mnTextStart(nTxtStart),
         mnTextLen(nTxtLen),
         mnPara(nPar),
         mrFont(rFnt),
         mpDXArray(pDXArr),
+        mpKashidaArray(pKashidaArr),
         mpWrongSpellVector(pWrongSpellVector),
         mpFieldData(pFieldData),
         mpLocale(pLocale),
@@ -819,7 +823,9 @@ public:
 
     void DrawingText( const Point& rStartPos, const OUString& rText,
                               sal_Int32 nTextStart, sal_Int32 nTextLen,
-                              o3tl::span<const sal_Int32> pDXArray, const SvxFont& rFont,
+                              o3tl::span<const sal_Int32> pDXArray,
+                              o3tl::span<const sal_Bool> pKashidaArray,
+                              const SvxFont& rFont,
                               sal_Int32 nPara, sal_uInt8 nRightToLeft,
                               const EEngineData::WrongSpellVector* pWrongSpellVector,
                               const SvxFieldData* pFieldData,
@@ -925,8 +931,10 @@ public:
     bool            IsTextPos( const Point& rPaperPos, sal_uInt16 nBorder );
     bool            IsTextPos( const Point& rPaperPos, sal_uInt16 nBorder, bool* pbBulletPos );
 
-    void            SetGlobalCharStretching( sal_uInt16 nX = 100, sal_uInt16 nY = 100 );
-    void            GetGlobalCharStretching( sal_uInt16& rX, sal_uInt16& rY ) const;
+    void setGlobalScale(double rFontX = 100.0, double rFontY = 100.0, double rSpacingX = 100.0, double rSpacingY = 100.0);
+    void getGlobalScale(double& rFontX, double& rFontY, double& rSpacingX, double& rSpacingY) const;
+    void setRoundFontSizeToPt(bool bRound) const;
+
     void            EraseVirtualDevice();
 
     bool            ShouldCreateBigTextObject() const;
@@ -982,6 +990,9 @@ public:
 
     // convenient method to determine the bullets/numbering status for all paragraphs
     sal_Int32 GetBulletsNumberingStatus() const;
+
+    // overriden in SdrOutliner
+    virtual std::optional<bool> GetCompatFlag(SdrCompatibilityFlag /*eFlag*/) const { return {}; };
 };
 
 #endif

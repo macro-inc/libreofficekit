@@ -12,7 +12,6 @@
 #include <com/sun/star/awt/FontSlant.hpp>
 #include <com/sun/star/awt/XBitmap.hpp>
 #include <com/sun/star/drawing/FillStyle.hpp>
-#include <com/sun/star/graphic/XGraphic.hpp>
 #include <com/sun/star/style/BreakType.hpp>
 #include <com/sun/star/text/FontEmphasis.hpp>
 #include <com/sun/star/text/HoriOrientation.hpp>
@@ -32,6 +31,7 @@
 #include <comphelper/sequenceashashmap.hxx>
 #include <comphelper/processfactory.hxx>
 #include <tools/UnitConversion.hxx>
+#include <frameformats.hxx>
 
 class Test : public SwModelTestBase
 {
@@ -39,20 +39,6 @@ public:
     Test() : SwModelTestBase("/sw/qa/extras/ooxmlexport/data/", "Office Open XML Text") {}
 
 protected:
-    /**
-     * Denylist handling
-     */
-    bool mustTestImportOf(const char* filename) const override {
-        const char* aDenylist[] = {
-            "math-escape.docx",
-            "math-mso2k7.docx",
-        };
-        std::vector<const char*> vDenylist(aDenylist, aDenylist + SAL_N_ELEMENTS(aDenylist));
-
-        // If the testcase is stored in some other format, it's pointless to test.
-        return (OString(filename).endsWith(".docx") && std::find(vDenylist.begin(), vDenylist.end(), filename) == vDenylist.end());
-    }
-
     /**
      * Validation handling
      */
@@ -77,7 +63,7 @@ CPPUNIT_TEST_FIXTURE(Test, testfdo81381)
 CPPUNIT_TEST_FIXTURE(Test, testSdtAlias)
 {
     loadAndSave("sdt-alias.docx");
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     // <w:alias> was completely missing.
     assertXPath(pXmlDoc, "/w:document/w:body/w:p/w:sdt/w:sdtPr/w:alias", "val", "Subtitle");
@@ -86,7 +72,7 @@ CPPUNIT_TEST_FIXTURE(Test, testSdtAlias)
 CPPUNIT_TEST_FIXTURE(Test, testFooterBodyDistance)
 {
     loadAndSave("footer-body-distance.docx");
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     // Page break was exported as section break, this was 0
     assertXPath(pXmlDoc, "/w:document/w:body/w:p/w:r/w:br", 1);
 }
@@ -94,8 +80,9 @@ CPPUNIT_TEST_FIXTURE(Test, testFooterBodyDistance)
 // Check for correct header/footer with special first page with TOC inside:
 // - DECLARE_ODFEXPORT_TEST(testTdf118393, "tdf118393.odt")
 // - DECLARE_OOXMLEXPORT_TEST(testTdf118393, "tdf118393.odt")
-DECLARE_OOXMLEXPORT_TEST(testTdf118393, "tdf118393.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf118393)
 {
+    loadAndReload("tdf118393.odt");
     CPPUNIT_ASSERT_EQUAL( 7, getPages() );
 
     // First page has no header/footer
@@ -156,7 +143,7 @@ CPPUNIT_TEST_FIXTURE(Test, testPlausableBorder)
 {
     loadAndSave("plausable-border.docx");
     // sw::util::IsPlausableSingleWordSection() did not merge two page styles due to borders.
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     // Page break was exported as section break, this was 0
     assertXPath(pXmlDoc, "/w:document/w:body/w:p/w:r/w:br", 1);
 
@@ -166,7 +153,7 @@ CPPUNIT_TEST_FIXTURE(Test, testPlausableBorder)
 CPPUNIT_TEST_FIXTURE(Test, testUnwantedSectionBreak)
 {
     loadAndSave("unwanted-section-break.docx");
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     // This was 2: an additional sectPr was added to the document.
     assertXPath(pXmlDoc, "//w:sectPr", 1);
 }
@@ -174,7 +161,7 @@ CPPUNIT_TEST_FIXTURE(Test, testUnwantedSectionBreak)
 CPPUNIT_TEST_FIXTURE(Test, testfdo80897 )
 {
     loadAndSave("fdo80897.docx");
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     assertXPath(pXmlDoc, "/w:document/w:body/w:p/w:r/mc:AlternateContent/mc:Choice/w:drawing/wp:anchor/a:graphic/a:graphicData/wps:wsp/wps:bodyPr/a:prstTxWarp", "prst", "textTriangle");
 }
 
@@ -226,8 +213,9 @@ DECLARE_OOXMLEXPORT_TEST(testFirstHeaderFooter, "first-header-footer.docx")
     CPPUNIT_ASSERT_EQUAL(OUString("Even page footer 2"),  parseDump("/root/page[6]/footer/txt/text()"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testFirstHeaderFooterB, "first-header-footerB.odt")
+CPPUNIT_TEST_FIXTURE(Test, testFirstHeaderFooterB)
 {
+    loadAndReload("first-header-footerB.odt");
     CPPUNIT_ASSERT_EQUAL( 6, getPages() );
 
     CPPUNIT_ASSERT_EQUAL(OUString("First page header"),  parseDump("/root/page[1]/header/txt/text()"));
@@ -271,8 +259,9 @@ CPPUNIT_TEST_FIXTURE(Test, testShapeInFloattable)
     assertXPath(pXmlDoc, "/w:document/w:body/w:tbl", 1);
 }
 
-DECLARE_OOXMLEXPORT_EXPORTONLY_TEST(testEmptyAnnotationMark, "empty-annotation-mark.docx")
+CPPUNIT_TEST_FIXTURE(Test, testEmptyAnnotationMark)
 {
+    loadAndReload("empty-annotation-mark.docx");
     // Delete the word that is commented, and save again.
     uno::Reference<text::XTextRange> xRun = getRun(getParagraph(1), 3);
     CPPUNIT_ASSERT_EQUAL(OUString("with"), xRun->getString());
@@ -307,7 +296,7 @@ DECLARE_OOXMLEXPORT_TEST(testDropdownInCell, "dropdown-in-cell.docx")
         uno::Reference<text::XTextRangeCompare> xTextRangeCompare(xCell, uno::UNO_QUERY);
         CPPUNIT_ASSERT_EQUAL(sal_Int16(0), xTextRangeCompare->compareRegionStarts(xAnchor, xCell));
     }
-    else if (!mbExported)
+    else if (!isExported())
     {
         // ComboBox was imported as DropDown text field
         uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
@@ -377,10 +366,11 @@ DECLARE_OOXMLEXPORT_TEST(testChartDupe, "chart-dupe.docx")
     // This was 2, on second import we got a duplicated chart copy.
     CPPUNIT_ASSERT_EQUAL(sal_Int32(1), xEmbeddedObjects->getCount());
 
-    xmlDocUniquePtr pXmlDocCT = parseExport("[Content_Types].xml");
 
-    if (!pXmlDocCT)
+    if (!isExported())
        return; // initial import
+
+    xmlDocUniquePtr pXmlDocCT = parseExport("[Content_Types].xml");
 
     assertXPath(pXmlDocCT,
         "/ContentType:Types/ContentType:Override[@PartName='/word/charts/chart1.xml']",
@@ -434,8 +424,9 @@ DECLARE_OOXMLEXPORT_TEST(testNumberingFont, "numbering-font.docx")
     CPPUNIT_ASSERT_EQUAL(OUString("Verdana"), sOverrideFontName);
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf106541_noinheritChapterNumbering, "tdf106541_noinheritChapterNumbering.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf106541_noinheritChapterNumbering)
 {
+    loadAndReload("tdf106541_noinheritChapterNumbering.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // in LO, it appears that styles based on the Chapter Numbering style explicitly set the
     // numbering style/outline level to 0 by default, and that LO prevents inheriting directly from "Outline" style.
@@ -448,11 +439,11 @@ DECLARE_OOXMLEXPORT_TEST(testTdf106541_noinheritChapterNumbering, "tdf106541_noi
     CPPUNIT_ASSERT_EQUAL(sPara3NumberingStyle, getProperty<OUString>(getParagraph(4), "NumberingStyleName"));
 
     xmlDocUniquePtr pXmlDoc = parseLayoutDump();
-    assertXPath(pXmlDoc, "//body/txt/Special", 3);  //three of the four paragraphs have numbering
-    assertXPath(pXmlDoc, "//body/txt[1]/Special", "rText", "1");
-    assertXPath(pXmlDoc, "//body/txt[2]/Special", 0); //second paragraph style disables numbering
-    assertXPath(pXmlDoc, "//body/txt[3]/Special", "rText", "I.");
-    assertXPath(pXmlDoc, "//body/txt[4]/Special", "rText", "II.");
+    assertXPath(pXmlDoc, "//body/txt/SwParaPortion/SwLineLayout/child::*[@type='PortionType::Number']", 3);  //three of the four paragraphs have numbering
+    assertXPath(pXmlDoc, "//body/txt[1]/SwParaPortion/SwLineLayout/child::*[@type='PortionType::Number']", "expand", "1");
+    assertXPath(pXmlDoc, "//body/txt[2]/SwParaPortion/SwLineLayout/child::*[@type='PortionType::Number']", 0); //second paragraph style disables numbering
+    assertXPath(pXmlDoc, "//body/txt[3]/SwParaPortion/SwLineLayout/child::*[@type='PortionType::Number']", "expand", "I.");
+    assertXPath(pXmlDoc, "//body/txt[4]/SwParaPortion/SwLineLayout/child::*[@type='PortionType::Number']", "expand", "II.");
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTdf53856_conflictingStyle, "tdf53856_conflictingStyle.docx")
@@ -554,7 +545,7 @@ DECLARE_OOXMLEXPORT_TEST(testWpsCharColor, "wps-char-color.docx")
 {
     uno::Reference<text::XTextRange> xShape(getShape(1), uno::UNO_QUERY);
     // This was -1, i.e. the character color was default (-1), not white.
-    CPPUNIT_ASSERT_EQUAL(COL_WHITE, Color(ColorTransparency, getProperty<sal_Int32>(xShape->getStart(), "CharColor")));
+    CPPUNIT_ASSERT_EQUAL(COL_WHITE, getProperty<Color>(xShape->getStart(), "CharColor"));
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTableStyleCellBackColor, "table-style-cell-back-color.docx")
@@ -565,7 +556,7 @@ DECLARE_OOXMLEXPORT_TEST(testTableStyleCellBackColor, "table-style-cell-back-col
     uno::Reference<text::XTextTable> xTable(xTables->getByIndex(0), uno::UNO_QUERY);
     uno::Reference<table::XCell> xCell = xTable->getCellByName("A1");
     // This was 0xffffff.
-    CPPUNIT_ASSERT_EQUAL(Color(0x00ff00), Color(ColorTransparency, getProperty<sal_Int32>(xCell, "BackColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x00ff00), getProperty<Color>(xCell, "BackColor"));
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTableStyleBorder, "table-style-border.docx")
@@ -709,7 +700,7 @@ CPPUNIT_TEST_FIXTURE(Test, testParagraphMarkNonempty)
 {
     loadAndSave("paragraph-mark-nonempty.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     // There were two <w:sz> elements, make sure the 40 one is dropped and the 20 one is kept.
     assertXPath(pXmlDoc, "//w:p/w:pPr/w:rPr/w:sz", "val", "20");
 }
@@ -727,6 +718,15 @@ DECLARE_OOXMLEXPORT_TEST(testTableRtl, "table-rtl.docx")
     uno::Reference<text::XTextTable> xTable(xTables->getByIndex(0), uno::UNO_QUERY);
     // This was text::WritingMode2::LR_TB, i.e. direction of the table was ignored.
     CPPUNIT_ASSERT_EQUAL(text::WritingMode2::RL_TB, getProperty<sal_Int16>(xTable, "WritingMode"));
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTableLr, "table-ltr.docx")
+{
+    uno::Reference<text::XTextTablesSupplier> xTablesSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<container::XIndexAccess> xTables(xTablesSupplier->getTextTables(), uno::UNO_QUERY);
+    uno::Reference<text::XTextTable> xTable(xTables->getByIndex(0), uno::UNO_QUERY);
+    // This was text::WritingMode2::RL_TB, i.e. direction of the table was wrongly guessed.
+    CPPUNIT_ASSERT_EQUAL(text::WritingMode2::CONTEXT, getProperty<sal_Int16>(xTable, "WritingMode"));
 }
 
 DECLARE_OOXMLEXPORT_TEST(testOoxmlCjklist30, "cjklist30.docx")
@@ -861,7 +861,7 @@ DECLARE_OOXMLEXPORT_TEST(testNumOverrideLvltext, "num-override-lvltext.docx")
     CPPUNIT_ASSERT_EQUAL(OUString("1.1"), getProperty<OUString>(xPara, "ListLabelString"));
 
     // The paragraph marker's red font color was inherited by the number portion, this was ff0000.
-    CPPUNIT_ASSERT_EQUAL(OUString("ffffffff"), parseDump("//Special[@nType='PortionType::Number']/SwFont", "color"));
+    CPPUNIT_ASSERT_EQUAL(OUString("ffffffff"), parseDump("//SwParaPortion/SwLineLayout/child::*[@type='PortionType::Number']", "font-color"));
 }
 
 DECLARE_OOXMLEXPORT_TEST(testNumOverrideStart, "num-override-start.docx")
@@ -899,8 +899,9 @@ DECLARE_OOXMLEXPORT_TEST(testEffectExtentMargin, "effectextent-margin.docx")
     CPPUNIT_ASSERT_EQUAL(oox::drawingml::convertEmuToHmm(114300+95250), getProperty<sal_Int32>(getShape(1), "LeftMargin"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf88583, "tdf88583.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf88583)
 {
+    loadAndReload("tdf88583.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     CPPUNIT_ASSERT_EQUAL(drawing::FillStyle_SOLID, getProperty<drawing::FillStyle>(getParagraph(1), "FillStyle"));
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0x00cc00), getProperty<sal_Int32>(getParagraph(1), "FillColor"));
@@ -911,7 +912,7 @@ DECLARE_OOXMLEXPORT_TEST(testTdf97090, "tdf97090.docx")
     uno::Reference<text::XTextTablesSupplier> xTablesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XIndexAccess> xTables(xTablesSupplier->getTextTables(), uno::UNO_QUERY);
     uno::Reference<text::XTextTable> xTable(xTables->getByIndex(0), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(Color(0x95B3D7), Color(ColorTransparency, getProperty<sal_Int32>(xTable->getCellByName("A1"), "BackColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x95B3D7), getProperty<Color>(xTable->getCellByName("A1"), "BackColor"));
 
     uno::Reference<container::XEnumerationAccess> paraEnumAccess(xTable->getCellByName("A1"), uno::UNO_QUERY);
     assert( paraEnumAccess.is() );
@@ -921,12 +922,12 @@ DECLARE_OOXMLEXPORT_TEST(testTdf97090, "tdf97090.docx")
     uno::Reference<beans::XPropertySet> paragraphProperties(paraEnum->nextElement(), uno::UNO_QUERY);
     assert( paragraphProperties.is() );
     CPPUNIT_ASSERT_EQUAL(drawing::FillStyle_NONE, getProperty<drawing::FillStyle>(paragraphProperties, "FillStyle"));
-    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0xffffff), getProperty<sal_Int32>(paragraphProperties, "FillColor"));
+    CPPUNIT_ASSERT_EQUAL(Color(0xffffff), getProperty<Color>(paragraphProperties, "FillColor"));
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTdf89791, "tdf89791.docx")
 {
-    if (mbExported)
+    if (isExported())
     {
         uno::Reference<packages::zip::XZipFileAccess2> xNameAccess = packages::zip::ZipFileAccess::createWithURL(comphelper::getComponentContext(m_xSFactory), maTempFile.GetURL());
         CPPUNIT_ASSERT_EQUAL(false, bool(xNameAccess->hasByName("docProps/custom.xml")));
@@ -1027,7 +1028,7 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf118682)
 {
     loadAndSave("tdf118682.fodt");
     // Support cell references in table formulas
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     // Formula fields were completely missing.
     assertXPath(pXmlDoc, "/w:document/w:body/w:tbl/w:tr[3]/w:tc/w:p/w:r/w:fldChar", 3);
@@ -1041,7 +1042,7 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf118682)
 CPPUNIT_TEST_FIXTURE(Test, testTdf133163)
 {
     loadAndSave("tdf133163.fodt");
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     // Formula cells were completely missing.
     assertXPath(pXmlDoc, "/w:document/w:body/w:tbl/w:tr[3]/w:tc/w:p/w:r/w:fldChar", 3);
@@ -1055,7 +1056,7 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf133163)
 CPPUNIT_TEST_FIXTURE(Test, testTdf133647)
 {
     loadAndSave("tdf133647.docx");
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     // Keep original formula during round-trip
     assertXPathContent(pXmlDoc, "/w:document/w:body/w:tbl/w:tr[4]/w:tc[4]/w:p/w:r[2]/w:instrText", " =SUM(A1,B1)");
@@ -1071,7 +1072,7 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf133647)
 CPPUNIT_TEST_FIXTURE(Test, testTdf123386)
 {
     loadAndSave("tdf123386.docx");
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     // Keep original formula during round-trip
     assertXPathContent(pXmlDoc, "/w:document/w:body/w:tbl/w:tr[3]/w:tc[4]/w:p/w:r[2]/w:instrText", " =A1 < 2");
@@ -1089,7 +1090,7 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf123386)
 CPPUNIT_TEST_FIXTURE(Test, testTdf123389)
 {
     loadAndSave("tdf123389.docx");
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     // Keep original formula during round-trip
     assertXPathContent(pXmlDoc, "/w:document/w:body/w:tbl/w:tr[3]/w:tc[4]/w:p/w:r[2]/w:instrText", " =ROUND(2.345,1)");
@@ -1105,7 +1106,18 @@ DECLARE_OOXMLEXPORT_TEST(testTdf106953, "tdf106953.docx")
 
 CPPUNIT_TEST_FIXTURE(Test, testTdf115094v3)
 {
-    loadAndSave("tdf115094v3.docx");
+    createSwDoc("tdf115094v3.docx");
+    {
+        SwDoc* pDoc = getSwDoc();
+        SwFrameFormats& rSpzFormats = *pDoc->GetSpzFrameFormats();
+        SwFrameFormat* pFormat = rSpzFormats[0];
+        // Without the fix, this has failed with:
+        // - Expected: 1991
+        // - Actual  : 1883
+        // i.e. some unwanted ~-2mm left margin appeared.
+        CPPUNIT_ASSERT_EQUAL(static_cast<SwTwips>(1991), pFormat->GetHoriOrient().GetPos());
+    }
+    save(OUString::createFromAscii(mpFilter));
     // floating table is now exported directly without surrounding frame
     xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 

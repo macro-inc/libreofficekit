@@ -28,8 +28,7 @@
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <rtl/ustring.hxx>
 #include <rtl/ref.hxx>
-#include <osl/mutex.hxx>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 #include <tools/link.hxx>
 #include <memory>
 
@@ -45,24 +44,23 @@ namespace sfx2
     class FileDialogHelper;
 }
 
-typedef ::cppu::WeakComponentImplHelper<
+typedef comphelper::WeakComponentImplHelper<
     css::lang::XInitialization,
     css::frame::XTerminateListener,
     css::lang::XServiceInfo,
     css::beans::XFastPropertySet > ShutdownIconServiceBase;
 
-#define WRITER_URL          "private:factory/swriter"
-#define CALC_URL            "private:factory/scalc"
-#define IMPRESS_URL         "private:factory/simpress"
-#define IMPRESS_WIZARD_URL  "private:factory/simpress?slot=6686"
-#define DRAW_URL            "private:factory/sdraw"
-#define MATH_URL            "private:factory/smath"
-#define BASE_URL            "private:factory/sdatabase?Interactive"
-#define STARTMODULE_URL     ".uno:ShowStartModule"
+inline constexpr OUStringLiteral WRITER_URL          = u"private:factory/swriter";
+inline constexpr OUStringLiteral CALC_URL            = u"private:factory/scalc";
+inline constexpr OUStringLiteral IMPRESS_URL         = u"private:factory/simpress";
+inline constexpr OUStringLiteral IMPRESS_WIZARD_URL  = u"private:factory/simpress?slot=6686";
+inline constexpr OUStringLiteral DRAW_URL            = u"private:factory/sdraw";
+inline constexpr OUStringLiteral MATH_URL            = u"private:factory/smath";
+inline constexpr OUStringLiteral BASE_URL            = u"private:factory/sdatabase?Interactive";
+inline constexpr OUStringLiteral STARTMODULE_URL     = u".uno:ShowStartModule";
 
 class ShutdownIcon : public ShutdownIconServiceBase
 {
-        ::osl::Mutex            m_aMutex;
         bool                    m_bVeto;
         bool                    m_bListenForTermination;
         bool                    m_bSystemDialogs;
@@ -82,7 +80,7 @@ class ShutdownIcon : public ShutdownIconServiceBase
         friend class SfxNotificationListener_Impl;
 
     public:
-        explicit ShutdownIcon( const css::uno::Reference< css::uno::XComponentContext > & rxContext );
+        explicit ShutdownIcon( css::uno::Reference< css::uno::XComponentContext > xContext );
 
         virtual ~ShutdownIcon() override;
 
@@ -110,7 +108,7 @@ class ShutdownIcon : public ShutdownIconServiceBase
         /// @throws css::uno::Exception
         void init();
 
-        static OUString GetUrlDescription( const OUString& aUrl );
+        static OUString GetUrlDescription( std::u16string_view aUrl );
 
         void SetVeto( bool bVeto )  { m_bVeto = bVeto;}
 
@@ -120,7 +118,7 @@ class ShutdownIcon : public ShutdownIconServiceBase
         static bool IsQuickstarterInstalled();
 
         // Component Helper - force override
-        virtual void SAL_CALL disposing() override;
+        virtual void disposing(std::unique_lock<std::mutex>&) override;
 
         // XEventListener
         virtual void SAL_CALL disposing( const css::lang::EventObject& Source ) override;

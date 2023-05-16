@@ -42,6 +42,7 @@ namespace uno
 {
 
 class OWeakRefListener;
+class XWeak;
 
 /** The WeakReferenceHelper holds a weak reference to an object.
 
@@ -79,6 +80,16 @@ public:
     */
     WeakReferenceHelper( const css::uno::Reference< css::uno::XInterface > & xInt );
 
+#if defined LIBO_INTERNAL_ONLY
+    /** Initialize this reference with the hard interface reference xWeak. This
+         is faster than the XInterface constructor because we can skip doing an
+         UNO_QUERY.
+
+        @param xWeak another hard interface reference
+    */
+    WeakReferenceHelper( const css::uno::Reference< css::uno::XWeak > & xWeak );
+#endif
+
     /** Releases this reference.
     */
     ~WeakReferenceHelper();
@@ -90,7 +101,7 @@ public:
     WeakReferenceHelper & SAL_CALL operator = ( const WeakReferenceHelper & rWeakRef );
 
 #if defined LIBO_INTERNAL_ONLY
-    WeakReferenceHelper & SAL_CALL operator =(WeakReferenceHelper && other);
+    WeakReferenceHelper & operator =(WeakReferenceHelper && other);
 #endif
 
     /** Releases this reference and takes over hard reference xInt.
@@ -101,6 +112,17 @@ public:
     */
     WeakReferenceHelper & SAL_CALL operator = (
             const css::uno::Reference< css::uno::XInterface > & xInt );
+
+#if defined LIBO_INTERNAL_ONLY
+    /** Releases this reference and takes over hard reference xWeak. This
+         is faster than the XInterface constructor because we can skip doing an
+         UNO_QUERY.
+
+        @param xWeak another hard reference
+    */
+    WeakReferenceHelper & operator = (
+            const css::uno::Reference< css::uno::XWeak > & xWeak );
+#endif
 
     /** Returns true if both weak refs reference to the same object.
 
@@ -177,9 +199,15 @@ public:
         { WeakReferenceHelper::operator=(xInt); return *this; }
 
 #if defined LIBO_INTERNAL_ONLY
-    WeakReference & SAL_CALL operator = (
-            css::uno::Reference< interface_type > && xInt )
-        { WeakReferenceHelper::operator=(std::move(xInt)); return *this; }
+    /** Releases this reference and takes over hard reference xWeak. This
+         is faster than the XInterface constructor because we can skip doing an
+         UNO_QUERY.
+
+        @param xWeak another hard reference
+    */
+    WeakReference & operator = (
+            const css::uno::Reference< css::uno::XWeak > & xWeak )
+        { WeakReferenceHelper::operator=(xWeak); return *this; }
 #endif
 
     /**  Gets a hard reference to the object.

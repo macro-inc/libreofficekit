@@ -27,11 +27,12 @@ class SwUibaseDochdlTest : public SwModelTestBase
 CPPUNIT_TEST_FIXTURE(SwUibaseDochdlTest, testSelectPasteFormat)
 {
     // Create a new document and cut a character.
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     SwDocShell* pDocShell = pDoc->GetDocShell();
     SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
     pWrtShell->Insert2("x");
-    pWrtShell->Left(CRSR_SKIP_CHARS, /*bSelect=*/true, 1, /*bBasicCall=*/false);
+    pWrtShell->Left(SwCursorSkipMode::Chars, /*bSelect=*/true, 1, /*bBasicCall=*/false);
     rtl::Reference<SwTransferable> pTransfer = new SwTransferable(*pWrtShell);
     pTransfer->Cut();
 
@@ -53,12 +54,13 @@ CPPUNIT_TEST_FIXTURE(SwUibaseDochdlTest, testSelectPasteFormat)
 CPPUNIT_TEST_FIXTURE(SwUibaseDochdlTest, testComplexSelection)
 {
     // Given a document where a text node has hints, but no as-char images.
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     SwDocShell* pDocShell = pDoc->GetDocShell();
     SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
     pWrtShell->Insert2("abc");
-    pWrtShell->Left(CRSR_SKIP_CHARS, /*bSelect=*/false, 1, /*bBasicCall=*/false);
-    pWrtShell->Left(CRSR_SKIP_CHARS, /*bSelect=*/true, 1, /*bBasicCall=*/false);
+    pWrtShell->Left(SwCursorSkipMode::Chars, /*bSelect=*/false, 1, /*bBasicCall=*/false);
+    pWrtShell->Left(SwCursorSkipMode::Chars, /*bSelect=*/true, 1, /*bBasicCall=*/false);
     SfxItemSet aSet(pWrtShell->GetView().GetPool(),
                     svl::Items<RES_CHRATR_BEGIN, RES_CHRATR_END - 1>);
     // Bold, italic, underline.

@@ -19,8 +19,10 @@
 
 #include <res_LegendPosition.hxx>
 #include <ChartModelHelper.hxx>
+#include <Legend.hxx>
 #include <LegendHelper.hxx>
 #include <ChartModel.hxx>
+#include <Diagram.hxx>
 
 #include <com/sun/star/chart2/LegendPosition.hpp>
 #include <com/sun/star/chart/ChartLegendExpansion.hpp>
@@ -29,7 +31,8 @@
 #include <chartview/ChartSfxItemIds.hxx>
 #include <svl/intitem.hxx>
 #include <svl/eitem.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <utility>
 #include <vcl/weld.hxx>
 
 namespace chart
@@ -48,8 +51,8 @@ LegendPositionResources::LegendPositionResources(weld::Builder& rBuilder)
 }
 
 LegendPositionResources::LegendPositionResources(weld::Builder& rBuilder,
-    const uno::Reference< uno::XComponentContext >& xCC)
-    : m_xCC(xCC)
+    uno::Reference< uno::XComponentContext > xCC)
+    : m_xCC(std::move(xCC))
     , m_xCbxShow(rBuilder.weld_check_button("show"))
     , m_xRbtLeft(rBuilder.weld_radio_button("left"))
     , m_xRbtRight(rBuilder.weld_radio_button("right"))
@@ -72,11 +75,11 @@ LegendPositionResources::~LegendPositionResources()
 {
 }
 
-void LegendPositionResources::writeToResources( const uno::Reference< frame::XModel >& xChartModel )
+void LegendPositionResources::writeToResources( const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
     try
     {
-        uno::Reference< XDiagram > xDiagram = ChartModelHelper::findDiagram( xChartModel );
+        rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram( xChartModel );
         uno::Reference< beans::XPropertySet > xProp( xDiagram->getLegend(), uno::UNO_QUERY );
         if( xProp.is() )
         {
@@ -114,13 +117,13 @@ void LegendPositionResources::writeToResources( const uno::Reference< frame::XMo
     }
 }
 
-void LegendPositionResources::writeToModel( const css::uno::Reference< frame::XModel >& xChartModel ) const
+void LegendPositionResources::writeToModel( const rtl::Reference<::chart::ChartModel>& xChartModel ) const
 {
     try
     {
         bool bShowLegend = m_xCbxShow && m_xCbxShow->get_active();
-        ChartModel& rModel = dynamic_cast<ChartModel&>(*xChartModel);
-        uno::Reference< beans::XPropertySet > xProp(LegendHelper::getLegend(rModel, m_xCC, bShowLegend), uno::UNO_QUERY);
+        ChartModel& rModel = *xChartModel;
+        rtl::Reference< Legend > xProp = LegendHelper::getLegend(rModel, m_xCC, bShowLegend);
         if( xProp.is() )
         {
             //show
@@ -177,10 +180,9 @@ void LegendPositionResources::PositionEnable()
 
 void LegendPositionResources::initFromItemSet( const SfxItemSet& rInAttrs )
 {
-    const SfxPoolItem* pPoolItem = nullptr;
-    if( rInAttrs.GetItemState( SCHATTR_LEGEND_POS, true, &pPoolItem ) == SfxItemState::SET )
+    if( const SfxInt32Item* pPosItem = rInAttrs.GetItemIfSet( SCHATTR_LEGEND_POS ) )
     {
-        chart2::LegendPosition nLegendPosition = static_cast<chart2::LegendPosition>(static_cast<const SfxInt32Item*>(pPoolItem)->GetValue());
+        chart2::LegendPosition nLegendPosition = static_cast<chart2::LegendPosition>(pPosItem->GetValue());
         switch( nLegendPosition )
         {
             case chart2::LegendPosition_LINE_START:
@@ -200,10 +202,10 @@ void LegendPositionResources::initFromItemSet( const SfxItemSet& rInAttrs )
         }
     }
 
-    if( m_xCbxShow && rInAttrs.GetItemState( SCHATTR_LEGEND_SHOW, true, &pPoolItem ) == SfxItemState::SET )
+    const SfxBoolItem* pShowItem;
+    if( m_xCbxShow && (pShowItem = rInAttrs.GetItemIfSet( SCHATTR_LEGEND_SHOW )) )
     {
-        bool bShow = static_cast< const SfxBoolItem * >( pPoolItem )->GetValue();
-        m_xCbxShow->set_active(bShow);
+        m_xCbxShow->set_active(pShowItem->GetValue());
     }
 }
 

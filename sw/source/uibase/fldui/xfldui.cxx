@@ -18,7 +18,7 @@
  */
 
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/container/XNameAccess.hpp>
 #include <com/sun/star/sdbc/DataType.hpp>
 #include <com/sun/star/sdbc/XConnection.hpp>
@@ -51,8 +51,16 @@ bool SwFieldMgr::IsDBNumeric( const OUString& rDBName, const OUString& rTableQry
 {
     bool bNumeric = true;
 
-    SwDBManager* pDBManager = m_pWrtShell ? m_pWrtShell->GetDBManager() :
-                            ::GetActiveView()->GetWrtShell().GetDBManager();
+    SwDBManager* pDBManager;
+    if (m_pWrtShell)
+        pDBManager = m_pWrtShell->GetDBManager();
+    else
+    {
+        if (SwView* pView = GetActiveView())
+            pDBManager = pView->GetWrtShell().GetDBManager();
+        else
+            return bNumeric;
+    }
 
     Reference< XConnection> xConnection =
                     pDBManager->RegisterConnection(rDBName);

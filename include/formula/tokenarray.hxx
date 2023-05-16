@@ -337,6 +337,7 @@ public:
     }
 
     FormulaToken* FirstRPNToken() const;
+    FormulaToken* LastRPNToken() const;
 
     bool HasReferences() const;
 
@@ -429,6 +430,11 @@ public:
                         example OOXML. */
     bool            IsRecalcModeMustAfterImport() const
                                 { return (nMode & ScRecalcMode::EMask) <= ScRecalcMode::ONLOAD_ONCE; }
+    void            ClearRecalcModeMustAfterImport()
+                                {
+                                    if (IsRecalcModeMustAfterImport() && !IsRecalcModeAlways())
+                                        SetExclusiveRecalcModeNormal();
+                                }
 
                             /** Get OpCode of the most outer function */
     inline OpCode           GetOuterFuncOpCode() const;

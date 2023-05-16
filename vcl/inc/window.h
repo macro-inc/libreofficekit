@@ -45,11 +45,11 @@ class VirtualDevice;
 namespace vcl::font { class PhysicalFontCollection; }
 class ImplFontCache;
 class VCLXWindow;
-class WindowStateData;
+namespace vcl { class WindowData; }
 class SalFrame;
 class SalObject;
 enum class MouseEventModifiers;
-enum class MouseNotifyEvent;
+enum class NotifyEventType;
 enum class ActivateModeFlags;
 enum class DialogControlFlags;
 enum class GetFocusFlags;
@@ -193,7 +193,6 @@ struct ImplAccessibleInfos
                         pAccessibleDescription;
     VclPtr<vcl::Window> pLabeledByWindow;
     VclPtr<vcl::Window> pLabelForWindow;
-    VclPtr<vcl::Window> pMemberOfWindow;
 
     ImplAccessibleInfos();
     ~ImplAccessibleInfos();
@@ -257,6 +256,8 @@ public:
     vcl::Cursor*        mpCursor;
     PointerStyle        maPointer;
     Fraction            maZoom;
+    double              mfPartialScrollX;
+    double              mfPartialScrollY;
     OUString            maText;
     std::optional<vcl::Font>
                         mpControlFont;
@@ -424,17 +425,15 @@ typedef std::unique_ptr<PaintBufferGuard, o3tl::default_delete<PaintBufferGuard>
 
 // helper methods
 
-bool ImplHandleMouseEvent( const VclPtr<vcl::Window>& xWindow, MouseNotifyEvent nSVEvent, bool bMouseLeave,
+bool ImplHandleMouseEvent( const VclPtr<vcl::Window>& xWindow, NotifyEventType nSVEvent, bool bMouseLeave,
                            tools::Long nX, tools::Long nY, sal_uInt64 nMsgTime,
                            sal_uInt16 nCode, MouseEventModifiers nMode );
 
-bool ImplLOKHandleMouseEvent( const VclPtr<vcl::Window>& xWindow, MouseNotifyEvent nSVEvent, bool bMouseLeave,
+bool ImplLOKHandleMouseEvent( const VclPtr<vcl::Window>& xWindow, NotifyEventType nSVEvent, bool bMouseLeave,
                               tools::Long nX, tools::Long nY, sal_uInt64 nMsgTime,
                               sal_uInt16 nCode, MouseEventModifiers nMode, sal_uInt16 nClicks);
 
 void ImplHandleResize( vcl::Window* pWindow, tools::Long nNewWidth, tools::Long nNewHeight );
-
-VCL_DLLPUBLIC void ImplWindowStateFromStr(WindowStateData& rData, const OString& rStr);
 
 VCL_DLLPUBLIC css::uno::Reference<css::accessibility::XAccessibleEditableText>
 FindFocusedEditableText(css::uno::Reference<css::accessibility::XAccessibleContext> const&);

@@ -27,11 +27,9 @@
 #include <FactoryIds.hxx>
 
 #include <svx/svxids.hrc>
-#include <vcl/scrbar.hxx>
 #include <svx/svdpagv.hxx>
 #include <sfx2/dispatch.hxx>
 #include <svx/ruler.hxx>
-#include <editeng/outlobj.hxx>
 #include <editeng/outliner.hxx>
 #include <svtools/ehdl.hxx>
 #include <svx/svdoole2.hxx>
@@ -124,21 +122,16 @@ void ViewShell::UpdateScrollBars()
 /**
  * Handling for horizontal Scrollbars
  */
-IMPL_LINK(ViewShell, HScrollHdl, ScrollBar *, pHScroll, void )
+IMPL_LINK_NOARG(ViewShell, HScrollHdl, weld::Scrollbar&, void)
 {
-    VirtHScrollHdl(pHScroll);
+    VirtHScrollHdl(mpHorizontalScrollBar);
 }
 
 /**
  * virtual scroll handler for horizontal Scrollbars
  */
-void ViewShell::VirtHScrollHdl(ScrollBar* pHScroll)
+void ViewShell::VirtHScrollHdl(ScrollAdaptor* pHScroll)
 {
-    ::tools::Long nDelta = pHScroll->GetDelta();
-
-    if (nDelta == 0)
-        return;
-
     double fX = static_cast<double>(pHScroll->GetThumbPos()) / pHScroll->GetRange().Len();
 
     // scroll all windows of the column
@@ -177,15 +170,15 @@ void ViewShell::VirtHScrollHdl(ScrollBar* pHScroll)
 /**
  * handling for vertical Scrollbars
  */
-IMPL_LINK(ViewShell, VScrollHdl, ScrollBar *, pVScroll, void )
+IMPL_LINK_NOARG(ViewShell, VScrollHdl, weld::Scrollbar&, void)
 {
-    VirtVScrollHdl(pVScroll);
+    VirtVScrollHdl(mpVerticalScrollBar);
 }
 
 /**
  * handling for vertical Scrollbars
  */
-void ViewShell::VirtVScrollHdl(ScrollBar* pVScroll)
+void ViewShell::VirtVScrollHdl(ScrollAdaptor* pVScroll)
 {
     if(IsPageFlipMode())
     {
@@ -858,9 +851,6 @@ void ViewShell::SetScrollBarsVisible(bool bVisible)
 
     if (mpHorizontalScrollBar)
         mpHorizontalScrollBar->Show( bVisible );
-
-    if (mpScrollBarBox)
-        mpScrollBarBox->Show(bVisible);
 }
 
 sal_Int8 ViewShell::AcceptDrop (

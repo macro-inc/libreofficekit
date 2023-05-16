@@ -18,6 +18,7 @@
  */
 
 #include "dlgunit.hxx"
+#include <utility>
 #include <vcl/fieldvalues.hxx>
 #include <vcl/graph.hxx>
 #include <vcl/graphicfilter.hxx>
@@ -39,6 +40,23 @@
 #include <tools/stream.hxx>
 #include <unotools/localedatawrapper.hxx>
 
+// tdf#146929 - remember user settings within the current session
+// memp is filled in dtor and restored after initialization
+namespace
+{
+    struct memParam {
+        bool ReduceResolutionCB = false;
+        int  MFNewWidth = 1;
+        int  MFNewHeight = 1;
+        bool LosslessRB = true;
+        bool JpegCompRB = false;
+        int  CompressionMF = 6;
+        int  QualityMF = 80;
+        int  InterpolationCombo = 3;
+    };
+    memParam memp;
+}
+
 using namespace com::sun::star::uno;
 using namespace com::sun::star::beans;
 
@@ -54,22 +72,42 @@ CompressGraphicsDialog::CompressGraphicsDialog( weld::Window* pParent, SdrGrafOb
     m_aCropRectangle = tools::Rectangle(rCrop.GetLeft(), rCrop.GetTop(), rCrop.GetRight(), rCrop.GetBottom());
 
     Initialize();
+    recallParameter();
 }
 
-CompressGraphicsDialog::CompressGraphicsDialog( weld::Window* pParent, Graphic const & rGraphic, Size rViewSize100mm, tools::Rectangle const & rCropRectangle, SfxBindings& rBindings ) :
+CompressGraphicsDialog::CompressGraphicsDialog( weld::Window* pParent, Graphic aGraphic, Size rViewSize100mm, tools::Rectangle const & rCropRectangle, SfxBindings& rBindings ) :
     GenericDialogController( pParent, "svx/ui/compressgraphicdialog.ui", "CompressGraphicDialog" ),
     m_xGraphicObj     ( nullptr ),
-    m_aGraphic        ( rGraphic ),
+    m_aGraphic        (std::move( aGraphic )),
     m_aViewSize100mm  ( rViewSize100mm ),
     m_aCropRectangle  ( rCropRectangle ),
     m_rBindings       ( rBindings ),
     m_dResolution     ( 300 )
 {
     Initialize();
+    recallParameter();
 }
 
 CompressGraphicsDialog::~CompressGraphicsDialog()
 {
+}
+
+void CompressGraphicsDialog::recallParameter()
+{
+    m_xReduceResolutionCB->set_active( memp.ReduceResolutionCB );
+    if (memp.ReduceResolutionCB && (memp.MFNewWidth > 1))
+        m_xMFNewWidth->set_value( memp.MFNewWidth );
+    if (memp.ReduceResolutionCB && (memp.MFNewHeight > 1))
+        m_xMFNewHeight->set_value( memp.MFNewHeight );
+
+    m_xLosslessRB->set_active( memp.LosslessRB );
+    m_xJpegCompRB->set_active( memp.JpegCompRB );
+    m_xCompressionMF->set_value( memp.CompressionMF );
+    m_xCompressionSlider->set_value( memp.CompressionMF );
+    m_xQualityMF->set_value( memp.QualityMF );
+    m_xQualitySlider->set_value( memp.QualityMF );
+
+    m_xInterpolationCombo->set_active( memp.InterpolationCombo );
 }
 
 void CompressGraphicsDialog::Initialize()
@@ -91,6 +129,7 @@ void CompressGraphicsDialog::Initialize()
     m_xResolutionLB = m_xBuilder->weld_combo_box("combo-resolution");
     m_xBtnCalculate = m_xBuilder->weld_button("calculate");
     m_xInterpolationCombo = m_xBuilder->weld_combo_box("interpolation-method-combo");
+    m_xBtnOkay = m_xBuilder->weld_button("ok");
 
     m_xInterpolationCombo->set_active_text("Lanczos");
 
@@ -115,6 +154,7 @@ void CompressGraphicsDialog::Initialize()
     m_xJpegCompRB->set_active(true);
     m_xReduceResolutionCB->set_active(true);
 
+    m_xBtnOkay->connect_clicked( LINK( this, CompressGraphicsDialog, OkayClickHdl ) );
     UpdateNewWidthMF();
     UpdateNewHeightMF();
     UpdateResolutionLB();
@@ -232,7 +272,20 @@ void CompressGraphicsDialog::Compress(SvStream& aStream)
     OUString aGraphicFormatName = m_xLosslessRB->get_active() ? OUString( "png" ) : OUString( "jpg" );
 
     sal_uInt16 nFilterFormat = rFilter.GetExportFormatNumberForShortName( aGraphicFormatName );
-    rFilter.ExportGraphic( aScaledGraphic, "none", aStream, nFilterFormat, &aFilterData );
+    rFilter.ExportGraphic( aScaledGraphic, u"none", aStream, nFilterFormat, &aFilterData );
+}
+
+IMPL_LINK_NOARG( CompressGraphicsDialog, OkayClickHdl, weld::Button&, void )
+{
+    memp.ReduceResolutionCB = m_xReduceResolutionCB->get_active();
+    memp.MFNewWidth =         m_xMFNewWidth->get_value();
+    memp.MFNewHeight =        m_xMFNewHeight->get_value();
+    memp.LosslessRB =         m_xLosslessRB->get_active();
+    memp.JpegCompRB =         m_xJpegCompRB->get_active();
+    memp.CompressionMF =      m_xCompressionMF->get_value();
+    memp.QualityMF =          m_xQualityMF->get_value();
+    memp.InterpolationCombo = m_xInterpolationCombo->get_active();
+    CompressGraphicsDialog::response(RET_OK);
 }
 
 IMPL_LINK_NOARG( CompressGraphicsDialog, NewWidthModifiedHdl, weld::Entry&, void )
@@ -324,7 +377,11 @@ IMPL_LINK_NOARG( CompressGraphicsDialog, CalculateClickHdl, weld::Button&, void 
     {
         OUString aSizeAsString = OUString::number(aSize / 1024);
 
-        OUString aReductionSizeAsString = OUString::number( m_aNativeSize > 0 ? (m_aNativeSize - aSize) * 100 / m_aNativeSize : 0 );
+        OUString aReductionSizeAsString;
+        if (m_aNativeSize > 0 )
+           aReductionSizeAsString = OUString::number( static_cast<sal_Int32>((m_aNativeSize - aSize) * 100.0 / m_aNativeSize) );
+        else
+           aReductionSizeAsString = "0";
 
         OUString aNewSizeString = SvxResId(STR_IMAGE_CAPACITY_WITH_REDUCTION);
         aNewSizeString = aNewSizeString.replaceAll("$(CAPACITY)", aSizeAsString);
@@ -365,18 +422,18 @@ Graphic CompressGraphicsDialog::GetCompressedGraphic()
         aMemStream.Seek( STREAM_SEEK_TO_BEGIN );
         Graphic aResultGraphic;
         GraphicFilter& rFilter = GraphicFilter::GetGraphicFilter();
-        rFilter.ImportGraphic( aResultGraphic, OUString("import"), aMemStream );
+        rFilter.ImportGraphic( aResultGraphic, u"import", aMemStream );
 
         return aResultGraphic;
     }
     return Graphic();
 }
 
-SdrGrafObj* CompressGraphicsDialog::GetCompressedSdrGrafObj()
+rtl::Reference<SdrGrafObj> CompressGraphicsDialog::GetCompressedSdrGrafObj()
 {
     if ( m_dResolution > 0.0  )
     {
-        SdrGrafObj* pNewObject(m_xGraphicObj->CloneSdrObject(m_xGraphicObj->getSdrModelFromSdrObject()));
+        rtl::Reference<SdrGrafObj> pNewObject = SdrObject::Clone(*m_xGraphicObj, m_xGraphicObj->getSdrModelFromSdrObject());
 
         if ( m_xReduceResolutionCB->get_active() )
         {

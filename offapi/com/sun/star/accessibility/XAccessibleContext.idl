@@ -17,20 +17,11 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef __com_sun_star_accessibility_XAccessibleContext_idl__
-#define __com_sun_star_accessibility_XAccessibleContext_idl__
-
-#include <com/sun/star/accessibility/IllegalAccessibleComponentStateException.idl>
-#include <com/sun/star/lang/IndexOutOfBoundsException.idl>
-#include <com/sun/star/beans/XPropertyChangeListener.idl>
-#include <com/sun/star/lang/Locale.idl>
-
 module com { module sun { module star { module accessibility {
 
  interface XAccessible;
  interface XAccessibleRelationSet;
  interface XAccessibleSelection;
- interface XAccessibleStateSet;
 
 /** Implement this interface for exposing various aspects of a class's
     content.
@@ -55,7 +46,7 @@ interface XAccessibleContext : ::com::sun::star::uno::XInterface
         @return
             The returned value is non-negative.
     */
-    long getAccessibleChildCount();
+    hyper getAccessibleChildCount();
 
     /** Returns the i-th child of this object.
 
@@ -76,7 +67,7 @@ interface XAccessibleContext : ::com::sun::star::uno::XInterface
             ::com::sun::star::lang::IndexOutOfBoundsException
             exception is thrown.
     */
-    XAccessible getAccessibleChild ([in] long i)
+    XAccessible getAccessibleChild ([in] hyper i)
         raises (::com::sun::star::lang::IndexOutOfBoundsException);
 
     /** Returns the parent of this object.
@@ -100,7 +91,7 @@ interface XAccessibleContext : ::com::sun::star::uno::XInterface
         @return
            The returned index is zero based.
     */
-    long getAccessibleIndexInParent ();
+    hyper getAccessibleIndexInParent ();
 
     /** Returns the role of this object.
 
@@ -161,18 +152,12 @@ interface XAccessibleContext : ::com::sun::star::uno::XInterface
     /** Returns the set of states that are currently active for this
         object.
 
-        <p>The returned state set is a copy: Changing the returned state set
-        will not be reflected by changing the object's set of states.  See
-        the documentation of XAccessibleStateSet for a
+        <p>See the documentation of XAccessibleStateType for a
         description of the individual states.</p>
 
-        @return
-            A reference to this object's state set or an empty reference if
-            states are not supported.
-
-        @see XAccessibleStateSet
+        @see XAccessibleStateType
     */
-    XAccessibleStateSet getAccessibleStateSet ();
+    hyper getAccessibleStateSet ();
 
     /** Returns the locale of the component.
 
@@ -192,7 +177,5 @@ interface XAccessibleContext : ::com::sun::star::uno::XInterface
 };
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

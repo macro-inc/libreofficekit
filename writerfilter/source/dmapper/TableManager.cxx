@@ -24,7 +24,7 @@
 #include "DomainMapper_Impl.hxx"
 #include "util.hxx"
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace writerfilter::dmapper
 {
@@ -51,7 +51,11 @@ bool TableManager::isIgnore() const { return isRowEnd(); }
 
 sal_uInt32 TableManager::getGridBefore(sal_uInt32 nRow)
 {
-    assert(isInTable());
+    if (!isInTable())
+    {
+        SAL_WARN("writerfilter", "TableManager::getGridBefore called while not in table");
+        return 0;
+    }
     if (nRow >= mTableDataStack.top()->getRowCount())
         return 0;
     return mTableDataStack.top()->getRow(nRow)->getGridBefore();
@@ -69,7 +73,11 @@ void TableManager::setCurrentGridBefore(sal_uInt32 nSkipGrids)
 
 sal_uInt32 TableManager::getGridAfter(sal_uInt32 nRow)
 {
-    assert(isInTable());
+    if (!isInTable())
+    {
+        SAL_WARN("writerfilter", "TableManager::getGridAfter called while not in table");
+        return 0;
+    }
     if (nRow >= mTableDataStack.top()->getRowCount())
         return 0;
     return mTableDataStack.top()->getRow(nRow)->getGridAfter();
@@ -529,10 +537,10 @@ void TableManager::endRow()
                     aBorderLine.InnerLineWidth = 0;
                     aBorderLine.OuterLineWidth = 0;
                     TablePropertyMapPtr pCellProperties(new TablePropertyMap);
-                    pCellProperties->Insert(PROP_TOP_BORDER, css::uno::makeAny(aBorderLine));
-                    pCellProperties->Insert(PROP_LEFT_BORDER, css::uno::makeAny(aBorderLine));
-                    pCellProperties->Insert(PROP_BOTTOM_BORDER, css::uno::makeAny(aBorderLine));
-                    pCellProperties->Insert(PROP_RIGHT_BORDER, css::uno::makeAny(aBorderLine));
+                    pCellProperties->Insert(PROP_TOP_BORDER, css::uno::Any(aBorderLine));
+                    pCellProperties->Insert(PROP_LEFT_BORDER, css::uno::Any(aBorderLine));
+                    pCellProperties->Insert(PROP_BOTTOM_BORDER, css::uno::Any(aBorderLine));
+                    pCellProperties->Insert(PROP_RIGHT_BORDER, css::uno::Any(aBorderLine));
                     pTableData->getCurrentRow()->addCell(xRowStart, pCellProperties,
                                                          /*bAddBefore=*/true);
                 }

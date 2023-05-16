@@ -18,6 +18,7 @@
  */
 
 #include <svgmarkernode.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace svgio::svgreader
 {
@@ -32,7 +33,7 @@ namespace svgio::svgreader
             maMarkerWidth(3),
             maMarkerHeight(3),
             mfAngle(0.0),
-            mbOrientAuto(false)
+            maMarkerOrient(MarkerOrient::notset)
         {
         }
 
@@ -51,7 +52,7 @@ namespace svgio::svgreader
             SvgNode::parseAttribute(rTokenName, aSVGToken, aContent);
 
             // read style attributes
-            maSvgStyleAttributes.parseStyleAttribute(aSVGToken, aContent, false);
+            maSvgStyleAttributes.parseStyleAttribute(aSVGToken, aContent);
 
             // parse own
             switch(aSVGToken)
@@ -100,11 +101,11 @@ namespace svgio::svgreader
                 {
                     if(!aContent.isEmpty())
                     {
-                        if(aContent.startsWith("strokeWidth"))
+                        if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), u"strokeWidth"))
                         {
                             setMarkerUnits(MarkerUnits::strokeWidth);
                         }
-                        else if(aContent.match(commonStrings::aStrUserSpaceOnUse))
+                        else if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), commonStrings::aStrUserSpaceOnUse))
                         {
                             setMarkerUnits(MarkerUnits::userSpaceOnUse);
                         }
@@ -143,9 +144,13 @@ namespace svgio::svgreader
 
                     if(nLen)
                     {
-                        if(aContent.startsWith("auto"))
+                        if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), u"auto"))
                         {
-                            mbOrientAuto = true;
+                            setMarkerOrient(MarkerOrient::auto_start);
+                        }
+                        else if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), u"auto-start-reverse"))
+                        {
+                            setMarkerOrient(MarkerOrient::auto_start_reverse);
                         }
                         else
                         {

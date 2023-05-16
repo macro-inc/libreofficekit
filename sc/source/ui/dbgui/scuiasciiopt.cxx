@@ -38,6 +38,7 @@
 #include <osl/diagnose.h>
 #include <vcl/svapp.hxx>
 #include <comphelper/lok.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <unicode/ucsdet.h>
 
@@ -109,17 +110,17 @@ CSVImportOptionsIndex getSkipEmptyCellsIndex( ScImportAsciiCall eCall )
 }
 }
 
-static void lcl_FillCombo(weld::ComboBox& rCombo, const OUString& rList, sal_Unicode cSelect)
+static void lcl_FillCombo(weld::ComboBox& rCombo, std::u16string_view rList, sal_Unicode cSelect)
 {
     OUString aStr;
-    if (!rList.isEmpty())
+    if (!rList.empty())
     {
         sal_Int32 nIdx {0};
         do
         {
-            const OUString sEntry {rList.getToken(0, '\t', nIdx)};
+            const OUString sEntry {o3tl::getToken(rList, 0, '\t', nIdx)};
             rCombo.append_text(sEntry);
-            if (nIdx>0 && static_cast<sal_Unicode>(rList.getToken(0, '\t', nIdx).toInt32()) == cSelect)
+            if (nIdx>0 && static_cast<sal_Unicode>(o3tl::toInt32(o3tl::getToken(rList, 0, '\t', nIdx))) == cSelect)
                 aStr = sEntry;
         }
         while (nIdx>0);
@@ -134,23 +135,23 @@ static void lcl_FillCombo(weld::ComboBox& rCombo, const OUString& rList, sal_Uni
     }
 }
 
-static sal_Unicode lcl_CharFromCombo(const weld::ComboBox& rCombo, const OUString& rList)
+static sal_Unicode lcl_CharFromCombo(const weld::ComboBox& rCombo, std::u16string_view rList)
 {
     sal_Unicode c = 0;
     OUString aStr = rCombo.get_active_text();
-    if ( !aStr.isEmpty() && !rList.isEmpty() )
+    if ( !aStr.isEmpty() && !rList.empty() )
     {
         sal_Int32 nIdx {0};
-        OUString sToken {rList.getToken(0, '\t', nIdx)};
+        OUString sToken {o3tl::getToken(rList, 0, '\t', nIdx)};
         while (nIdx>0)
         {
             if ( ScGlobal::GetTransliteration().isEqual( aStr, sToken ) )
             {
                 sal_Int32 nTmpIdx {nIdx};
-                c = static_cast<sal_Unicode>(rList.getToken(0, '\t', nTmpIdx).toInt32());
+                c = static_cast<sal_Unicode>(o3tl::toInt32(o3tl::getToken(rList, 0, '\t', nTmpIdx)));
             }
             // Skip to next token at even position
-            sToken = rList.getToken(1, '\t', nIdx);
+            sToken = o3tl::getToken(rList, 1, '\t', nIdx);
         }
         if (!c)
         {
@@ -306,8 +307,6 @@ static void lcl_SaveSeparators(
 
     aItem.PutProperties(aNames, aValues);
 }
-
-constexpr OUStringLiteral gaTextSepList(u"" SCSTR_TEXTSEP);
 
 ScImportAsciiDlg::ScImportAsciiDlg(weld::Window* pParent, const OUString& aDatName,
                                    SvStream* pInStream, ScImportAsciiCall eCall)
@@ -487,10 +486,10 @@ ScImportAsciiDlg::ScImportAsciiDlg(weld::Window* pParent, const OUString& aDatNa
     mxNfRow->connect_value_changed( LINK( this, ScImportAsciiDlg, FirstRowHdl ) );
 
     // *** Separator characters ***
-    lcl_FillCombo( *mxCbTextSep, gaTextSepList, mcTextSep );
+    lcl_FillCombo( *mxCbTextSep, SCSTR_TEXTSEP, mcTextSep );
     mxCbTextSep->set_entry_text(sTextSeparators);
     // tdf#69207 - use selected text delimiter to parse the provided data
-    mcTextSep = lcl_CharFromCombo(*mxCbTextSep, gaTextSepList);
+    mcTextSep = lcl_CharFromCombo(*mxCbTextSep, SCSTR_TEXTSEP);
 
     Link<weld::Toggleable&,void> aSeparatorClickHdl =LINK( this, ScImportAsciiDlg, SeparatorClickHdl );
     mxCbTextSep->connect_changed( LINK( this, ScImportAsciiDlg, SeparatorComboBoxHdl ) );
@@ -678,7 +677,7 @@ void ScImportAsciiDlg::GetOptions( ScAsciiOptions& rOpt )
         rOpt.SetFieldSeps( GetSeparators() );
         rOpt.SetMergeSeps( mxCkbAsOnce->get_active() );
         rOpt.SetRemoveSpace( mxCkbRemoveSpace->get_active() );
-        rOpt.SetTextSep( lcl_CharFromCombo( *mxCbTextSep, gaTextSepList ) );
+        rOpt.SetTextSep( lcl_CharFromCombo( *mxCbTextSep, SCSTR_TEXTSEP ) );
     }
 
     rOpt.SetQuotedAsText(mxCkbQuotedAsText->get_active());
@@ -836,7 +835,7 @@ void ScImportAsciiDlg::SeparatorHdl(const weld::Widget* pCtrl)
     OUString aOldFldSeps( maFieldSeparators);
     maFieldSeparators = GetSeparators();
     sal_Unicode cOldSep = mcTextSep;
-    mcTextSep = lcl_CharFromCombo( *mxCbTextSep, gaTextSepList );
+    mcTextSep = lcl_CharFromCombo( *mxCbTextSep, SCSTR_TEXTSEP );
     // Any separator changed may result in completely different lines due to
     // embedded line breaks.
     if (cOldSep != mcTextSep || aOldFldSeps != maFieldSeparators)

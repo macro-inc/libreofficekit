@@ -1,8 +1,12 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+
 # tests for tracked changes ; tdf912270
 
 from uitest.framework import UITestCase
@@ -15,8 +19,7 @@ import datetime
 class CalcTrackedChanges(UITestCase):
 
     def test_tdf131907(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf131907.ods")) as calc_doc:
-            xCalcDoc = self.xUITest.getTopFocusWindow()
+        with self.ui_test.load_file(get_url_for_data_file("tdf131907.ods")):
             with self.ui_test.execute_modeless_dialog_through_command(".uno:AcceptChanges", close_button="close") as xTrackDlg:
 
                 xChangesList = xTrackDlg.getChild("calcchanges")
@@ -37,10 +40,8 @@ class CalcTrackedChanges(UITestCase):
 
 
     def test_tdf66263_Protect_Records(self):
-        with self.ui_test.create_doc_in_start_center("calc") as document:
+        with self.ui_test.create_doc_in_start_center("calc"):
             self.ui_test.wait_until_child_is_available("grid_window")
-            xCalcDoc = self.xUITest.getTopFocusWindow()
-            gridwin = xCalcDoc.getChild("grid_window")
             self.xUITest.executeCommand(".uno:TraceChangeMode")
             #protect dialog
             with self.ui_test.execute_dialog_through_command(".uno:ProtectTraceChangeMode") as xDialog:
@@ -284,5 +285,27 @@ class CalcTrackedChanges(UITestCase):
                 self.assertEqual('A~ccept All', get_state_as_dict(xAcceptAllBtn)['Text'])
                 self.assertEqual('~Accept', get_state_as_dict(xAcceptBtn)['Text'])
 
+    def test_tdf85353(self):
+        with self.ui_test.create_doc_in_start_center("calc"):
+            xCalcDoc = self.xUITest.getTopFocusWindow()
+            gridwin = xCalcDoc.getChild("grid_window")
+
+            enter_text_to_cell(gridwin, "A1", "15")
+            enter_text_to_cell(gridwin, "D1", "0")
+            enter_text_to_cell(gridwin, "E1", "0")
+
+            with self.ui_test.execute_dialog_through_command(".uno:CompareDocuments", close_button="") as xOpenDialog:
+                xFileName = xOpenDialog.getChild("file_name")
+                xFileName.executeAction("TYPE", mkPropertyValues({"TEXT": get_url_for_data_file("tdf85353.ods")}))
+                xOpenBtn = xOpenDialog.getChild("open")
+
+                with self.ui_test.execute_dialog_through_action(xOpenBtn, 'CLICK', close_button="close") as xTrackDlg:
+                    changesList = xTrackDlg.getChild("calcchanges")
+
+                    # Without the fix in place, this test would have failed with
+                    # AssertionError: 1 != 0
+                    self.assertEqual(1, len(changesList.getChildren()))
+                    self.assertTrue(get_state_as_dict(changesList.getChild('0'))['Text'].startswith("Changed contents\tSheet1.E1"))
+                    self.assertTrue(get_state_as_dict(changesList.getChild('0'))['Text'].endswith("(Cell E1 changed from '5' to '0')"))
 
 # vim: set shiftwidth=4 softtabstop=4 expandtab:

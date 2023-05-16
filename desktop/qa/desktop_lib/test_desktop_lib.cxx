@@ -21,6 +21,7 @@
 #include <com/sun/star/text/TextContentAnchorType.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
+#include <com/sun/star/util/XCloseable.hpp>
 
 #include <vcl/scheduler.hxx>
 #include <vcl/svapp.hxx>
@@ -36,10 +37,8 @@
 #include <sfx2/lokhelper.hxx>
 #include <test/unoapi_test.hxx>
 #include <comphelper/lok.hxx>
-#include <comphelper/dispatchcommand.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <osl/conditn.hxx>
-#include <osl/thread.hxx>
 #include <svl/srchitem.hxx>
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
 #include <unotools/tempfile.hxx>
@@ -54,16 +53,18 @@
 #include <comphelper/scopeguard.hxx>
 #include <cairo.h>
 #include <config_features.h>
+#include <config_fonts.h>
 #include <config_mpl.h>
 #include <tools/json_writer.hxx>
 #include <o3tl/unit_conversion.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <lib/init.hxx>
 #include <svx/svxids.hrc>
 
 #include <cppunit/TestAssert.h>
 #include <vcl/BitmapTools.hxx>
-#include <vcl/pngwrite.hxx>
+#include <vcl/filter/PngImageWriter.hxx>
 #include <vcl/filter/PDFiumLibrary.hxx>
 
 #if USE_TLS_NSS
@@ -116,28 +117,27 @@ public:
         comphelper::LibreOfficeKit::setActive(true);
 
         UnoApiTest::setUp();
-        mxDesktop.set(frame::Desktop::create(comphelper::getComponentContext(getMultiServiceFactory())));
-        SfxApplication::GetOrCreate();
     }
 
     virtual void tearDown() override
     {
         closeDoc();
 
-        UnoApiTest::tearDown();
+        // documents are already closed, no need to call UnoApiTest::tearDown
+        test::BootstrapFixture::tearDown();
 
         comphelper::LibreOfficeKit::setActive(false);
     }
 
-    std::pair<std::unique_ptr<LibLODocument_Impl>, uno::Reference<lang::XComponent>>
+    std::unique_ptr<LibLODocument_Impl>
     loadDocImpl(const char* pName, LibreOfficeKitDocumentType eType);
 
 private:
-    std::pair<std::unique_ptr<LibLODocument_Impl>, uno::Reference<lang::XComponent>>
+    std::unique_ptr<LibLODocument_Impl>
     loadDocImpl(const char* pName);
 
 public:
-    std::pair<std::unique_ptr<LibLODocument_Impl>, uno::Reference<lang::XComponent>>
+    std::unique_ptr<LibLODocument_Impl>
     loadDocUrlImpl(const OUString& rFileURL, LibreOfficeKitDocumentType eType);
 
     LibLODocument_Impl* loadDocUrl(const OUString& rFileURL, LibreOfficeKitDocumentType eType);
@@ -147,9 +147,8 @@ public:
         return loadDoc(pName, getDocumentTypeFromName(pName));
     }
 
-    void closeDoc(std::unique_ptr<LibLODocument_Impl>& loDocument,
-                  uno::Reference<lang::XComponent>& xComponent);
-    void closeDoc() { closeDoc(m_pDocument, mxComponent); }
+    void closeDoc(std::unique_ptr<LibLODocument_Impl>& loDocument);
+    void closeDoc() { closeDoc(m_pDocument); }
     static void callback(int nType, const char* pPayload, void* pData);
     void callbackImpl(int nType, const char* pPayload);
 
@@ -291,7 +290,6 @@ public:
     CPPUNIT_TEST(testABI);
     CPPUNIT_TEST_SUITE_END();
 
-    uno::Reference<lang::XComponent> mxComponent;
     OString m_aTextSelection;
     OString m_aTextSelectionStart;
     OString m_aTextSelectionEnd;
@@ -340,7 +338,7 @@ static Control* GetFocusControl(vcl::Window const * pParent)
     return nullptr;
 }
 
-std::pair<std::unique_ptr<LibLODocument_Impl>, uno::Reference<lang::XComponent>>
+std::unique_ptr<LibLODocument_Impl>
 DesktopLOKTest::loadDocUrlImpl(const OUString& rFileURL, LibreOfficeKitDocumentType eType)
 {
     OUString aService;
@@ -362,23 +360,22 @@ DesktopLOKTest::loadDocUrlImpl(const OUString& rFileURL, LibreOfficeKitDocumentT
 
     static int nDocumentIdCounter = 0;
     SfxViewShell::SetCurrentDocId(ViewShellDocId(nDocumentIdCounter));
-    uno::Reference<lang::XComponent> xComponent = loadFromDesktop(rFileURL, aService);
+    mxComponent = loadFromDesktop(rFileURL, aService);
 
-    std::unique_ptr<LibLODocument_Impl> pDocument(new LibLODocument_Impl(xComponent, nDocumentIdCounter));
+    std::unique_ptr<LibLODocument_Impl> pDocument(new LibLODocument_Impl(mxComponent, nDocumentIdCounter));
     ++nDocumentIdCounter;
 
-    return std::make_pair(std::move(pDocument), xComponent);
+    return pDocument;
 }
 
-std::pair<std::unique_ptr<LibLODocument_Impl>, uno::Reference<lang::XComponent>>
+std::unique_ptr<LibLODocument_Impl>
 DesktopLOKTest::loadDocImpl(const char* pName, LibreOfficeKitDocumentType eType)
 {
-    OUString aFileURL;
-    createFileURL(OUString::createFromAscii(pName), aFileURL);
+    OUString aFileURL = createFileURL(OUString::createFromAscii(pName));
     return loadDocUrlImpl(aFileURL, eType);
 }
 
-std::pair<std::unique_ptr<LibLODocument_Impl>, uno::Reference<lang::XComponent>>
+std::unique_ptr<LibLODocument_Impl>
 DesktopLOKTest::loadDocImpl(const char* pName)
 {
     return loadDocImpl(pName, getDocumentTypeFromName(pName));
@@ -386,18 +383,17 @@ DesktopLOKTest::loadDocImpl(const char* pName)
 
 LibLODocument_Impl* DesktopLOKTest::loadDocUrl(const OUString& rFileURL, LibreOfficeKitDocumentType eType)
 {
-    std::tie(m_pDocument, mxComponent) = loadDocUrlImpl(rFileURL, eType);
+    m_pDocument = loadDocUrlImpl(rFileURL, eType);
     return m_pDocument.get();
 }
 
 LibLODocument_Impl* DesktopLOKTest::loadDoc(const char* pName, LibreOfficeKitDocumentType eType)
 {
-    std::tie(m_pDocument, mxComponent) = loadDocImpl(pName, eType);
+    m_pDocument = loadDocImpl(pName, eType);
     return m_pDocument.get();
 }
 
-void DesktopLOKTest::closeDoc(std::unique_ptr<LibLODocument_Impl>& pDocument,
-                              uno::Reference<lang::XComponent>& xComponent)
+void DesktopLOKTest::closeDoc(std::unique_ptr<LibLODocument_Impl>& pDocument)
 {
     if (pDocument)
     {
@@ -405,10 +401,11 @@ void DesktopLOKTest::closeDoc(std::unique_ptr<LibLODocument_Impl>& pDocument,
         pDocument.reset();
     }
 
-    if (xComponent.is())
+    if (mxComponent.is())
     {
-        closeDocument(xComponent);
-        xComponent.clear();
+        css::uno::Reference<util::XCloseable> xCloseable(mxComponent, css::uno::UNO_QUERY_THROW);
+        xCloseable->close(false);
+        mxComponent.clear();
     }
 }
 
@@ -604,11 +601,11 @@ void DesktopLOKTest::testSearchCalc()
 
     uno::Sequence<beans::PropertyValue> aPropertyValues(comphelper::InitPropertySequence(
     {
-        {"SearchItem.SearchString", uno::makeAny(OUString("foo"))},
-        {"SearchItem.Backward", uno::makeAny(false)},
-        {"SearchItem.Command", uno::makeAny(static_cast<sal_uInt16>(SvxSearchCmd::FIND_ALL))},
+        {"SearchItem.SearchString", uno::Any(OUString("foo"))},
+        {"SearchItem.Backward", uno::Any(false)},
+        {"SearchItem.Command", uno::Any(static_cast<sal_uInt16>(SvxSearchCmd::FIND_ALL))},
     }));
-    comphelper::dispatchCommand(".uno:ExecuteSearch", aPropertyValues);
+    dispatchCommand(mxComponent, ".uno:ExecuteSearch", aPropertyValues);
     Scheduler::ProcessEventsToIdle();
 
     std::vector<OString> aSelections;
@@ -635,11 +632,11 @@ void DesktopLOKTest::testSearchAllNotificationsCalc()
 
     uno::Sequence<beans::PropertyValue> aPropertyValues(comphelper::InitPropertySequence(
     {
-        {"SearchItem.SearchString", uno::makeAny(OUString("foo"))},
-        {"SearchItem.Backward", uno::makeAny(false)},
-        {"SearchItem.Command", uno::makeAny(static_cast<sal_uInt16>(SvxSearchCmd::FIND_ALL))},
+        {"SearchItem.SearchString", uno::Any(OUString("foo"))},
+        {"SearchItem.Backward", uno::Any(false)},
+        {"SearchItem.Command", uno::Any(static_cast<sal_uInt16>(SvxSearchCmd::FIND_ALL))},
     }));
-    comphelper::dispatchCommand(".uno:ExecuteSearch", aPropertyValues);
+    dispatchCommand(mxComponent, ".uno:ExecuteSearch", aPropertyValues);
     Scheduler::ProcessEventsToIdle();
 
     // This was 1, make sure that we get no notifications about selection changes during search.
@@ -677,9 +674,7 @@ void DesktopLOKTest::testPaintTile()
 void DesktopLOKTest::testSaveAs()
 {
     LibLODocument_Impl* pDocument = loadDoc("blank_text.odt");
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, aTempFile.GetURL().toUtf8().getStr(), "png", nullptr));
+    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, maTempFile.GetURL().toUtf8().getStr(), "png", nullptr));
 }
 
 void DesktopLOKTest::testSaveAsJsonOptions()
@@ -688,19 +683,16 @@ void DesktopLOKTest::testSaveAsJsonOptions()
     LibLODocument_Impl* pDocument = loadDoc("3page.odg");
 
     // When exporting that document to PDF, skipping the first page:
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
     OString aOptions("{\"PageRange\":{\"type\":\"string\",\"value\":\"2-\"}}");
-    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, aTempFile.GetURL().toUtf8().getStr(), "pdf", aOptions.getStr()));
+    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, maTempFile.GetURL().toUtf8().getStr(), "pdf", aOptions.getStr()));
+
+    std::shared_ptr<vcl::pdf::PDFium> pPDFium = vcl::pdf::PDFiumLibrary::get();
+    if (!pPDFium)
+        return;
 
     // Then make sure the resulting PDF has 2 pages:
-    SvFileStream aFile(aTempFile.GetURL(), StreamMode::READ);
-    SvMemoryStream aMemory;
-    aMemory.WriteStream(aFile);
-    std::shared_ptr<vcl::pdf::PDFium> pPDFium = vcl::pdf::PDFiumLibrary::get();
     std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument
-        = pPDFium->openDocument(aMemory.GetData(), aMemory.GetSize(), OString());
-    CPPUNIT_ASSERT(pPdfDocument);
+        = parsePDFExport();
     // Without the accompanying fix in place, this test would have failed with:
     // - Expected: 2
     // - Actual  : 3
@@ -711,9 +703,7 @@ void DesktopLOKTest::testSaveAsJsonOptions()
 void DesktopLOKTest::testSaveAsCalc()
 {
     LibLODocument_Impl* pDocument = loadDoc("search.ods");
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, aTempFile.GetURL().toUtf8().getStr(), "png", nullptr));
+    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, maTempFile.GetURL().toUtf8().getStr(), "png", nullptr));
 }
 
 void DesktopLOKTest::testPasteWriter()
@@ -757,8 +747,7 @@ void DesktopLOKTest::testPasteWriterJPEG()
 {
     LibLODocument_Impl* pDocument = loadDoc("blank_text.odt");
 
-    OUString aFileURL;
-    createFileURL(u"paste.jpg", aFileURL);
+    OUString aFileURL = createFileURL(u"paste.jpg");
     std::ifstream aImageStream(aFileURL.toUtf8().copy(strlen("file://")).getStr());
     std::vector<char> aImageContents((std::istreambuf_iterator<char>(aImageStream)), std::istreambuf_iterator<char>());
 
@@ -777,9 +766,9 @@ void DesktopLOKTest::testPasteWriterJPEG()
     uno::Reference<lang::XComponent>(xShape, uno::UNO_QUERY_THROW)->dispose();
     uno::Sequence<beans::PropertyValue> aPropertyValues(comphelper::InitPropertySequence(
     {
-        {"AnchorType", uno::makeAny(static_cast<sal_uInt16>(text::TextContentAnchorType_AT_CHARACTER))},
+        {"AnchorType", uno::Any(static_cast<sal_uInt16>(text::TextContentAnchorType_AT_CHARACTER))},
     }));
-    comphelper::dispatchCommand(".uno:Paste", aPropertyValues);
+    dispatchCommand(mxComponent, ".uno:Paste", aPropertyValues);
     xShape.set(xDrawPage->getByIndex(0), uno::UNO_QUERY);
     // This was text::TextContentAnchorType_AS_CHARACTER, AnchorType argument was ignored.
     CPPUNIT_ASSERT_EQUAL(text::TextContentAnchorType_AT_CHARACTER, xShape->getPropertyValue("AnchorType").get<text::TextContentAnchorType>());
@@ -862,7 +851,7 @@ void DesktopLOKTest::testRowColumnHeaders()
     bool bNotEnoughHeaders = true;
     for (const boost::property_tree::ptree::value_type& rValue : aTree.get_child("rows"))
     {
-        sal_Int32 nSize = OString(rValue.second.get<std::string>("size").c_str()).toInt32();
+        sal_Int32 nSize = o3tl::toInt32(rValue.second.get<std::string>("size"));
         nSize = o3tl::convert(nSize, o3tl::Length::px, o3tl::Length::twip);
         OString aText(rValue.second.get<std::string>("text").c_str());
 
@@ -891,7 +880,7 @@ void DesktopLOKTest::testRowColumnHeaders()
     bNotEnoughHeaders = true;
     for (const boost::property_tree::ptree::value_type& rValue : aTree.get_child("columns"))
     {
-        sal_Int32 nSize = OString(rValue.second.get<std::string>("size").c_str()).toInt32();
+        sal_Int32 nSize = o3tl::toInt32(rValue.second.get<std::string>("size"));
         nSize = o3tl::convert(nSize, o3tl::Length::px, o3tl::Length::twip);
         OString aText(rValue.second.get<std::string>("text").c_str());
         if (bFirstHeader)
@@ -941,7 +930,7 @@ void DesktopLOKTest::testHiddenRowHeaders()
     sal_Int32 nIndex = 0;
     for (const boost::property_tree::ptree::value_type& rValue : aTree.get_child("rows"))
     {
-        sal_Int32 nSize = OString(rValue.second.get<std::string>("size").c_str()).toInt32();
+        sal_Int32 nSize = o3tl::toInt32(rValue.second.get<std::string>("size"));
 
         if (nIndex++ == 2)
         {
@@ -2045,7 +2034,6 @@ void DesktopLOKTest::testBinaryCallback()
 
 void DesktopLOKTest::testDialogInput()
 {
-    comphelper::LibreOfficeKit::setActive();
     LibLODocument_Impl* pDocument = loadDoc("blank_text.odt");
     pDocument->pClass->postUnoCommand(pDocument, ".uno:HyperlinkDialog", nullptr, false);
     Scheduler::ProcessEventsToIdle();
@@ -2113,7 +2101,7 @@ void DesktopLOKTest::testRedlineWriter()
     // Load a Writer document, enable change recording and press a key.
     LibLODocument_Impl* pDocument = loadDoc("blank_text.odt");
     uno::Reference<beans::XPropertySet> xPropertySet(mxComponent, uno::UNO_QUERY);
-    xPropertySet->setPropertyValue("RecordChanges", uno::makeAny(true));
+    xPropertySet->setPropertyValue("RecordChanges", uno::Any(true));
     pDocument->pClass->postKeyEvent(pDocument, LOK_KEYEVENT_KEYINPUT, 't', 0);
     pDocument->pClass->postKeyEvent(pDocument, LOK_KEYEVENT_KEYUP, 't', 0);
     Scheduler::ProcessEventsToIdle();
@@ -2140,7 +2128,7 @@ void DesktopLOKTest::testRedlineCalc()
     // Load a Writer document, enable change recording and press a key.
     LibLODocument_Impl* pDocument = loadDoc("sheets.ods");
     uno::Reference<beans::XPropertySet> xPropertySet(mxComponent, uno::UNO_QUERY);
-    xPropertySet->setPropertyValue("RecordChanges", uno::makeAny(true));
+    xPropertySet->setPropertyValue("RecordChanges", uno::Any(true));
     pDocument->pClass->postKeyEvent(pDocument, LOK_KEYEVENT_KEYINPUT, 't', 0);
     pDocument->pClass->postKeyEvent(pDocument, LOK_KEYEVENT_KEYUP, 't', 0);
     pDocument->pClass->postKeyEvent(pDocument, LOK_KEYEVENT_KEYINPUT, 0, KEY_RETURN);
@@ -2675,8 +2663,7 @@ void DesktopLOKTest::testExtractParameter()
 void DesktopLOKTest::readFileIntoByteVector(std::u16string_view sFilename, std::vector<unsigned char> & rByteVector)
 {
     rByteVector.clear();
-    OUString aURL;
-    createFileURL(sFilename, aURL);
+    OUString aURL = createFileURL(sFilename);
     SvFileStream aStream(aURL, StreamMode::READ);
     rByteVector.resize(aStream.remainingSize());
     aStream.ReadBytes(rByteVector.data(), aStream.remainingSize());
@@ -2728,12 +2715,10 @@ void DesktopLOKTest::testInsertCertificate_DER_ODT()
 {
     // Load the document, save it into a temp file and load that file again
     LibLODocument_Impl* pDocument = loadDoc("blank_text.odt");
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, aTempFile.GetURL().toUtf8().getStr(), "odt", nullptr));
+    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, maTempFile.GetURL().toUtf8().getStr(), "odt", nullptr));
     closeDoc();
 
-    pDocument = loadDocUrl(aTempFile.GetURL(), LOK_DOCTYPE_TEXT);
+    pDocument = loadDocUrl(maTempFile.GetURL(), LOK_DOCTYPE_TEXT);
 
     Scheduler::ProcessEventsToIdle();
     CPPUNIT_ASSERT(mxComponent.is());
@@ -2778,12 +2763,10 @@ void DesktopLOKTest::testInsertCertificate_PEM_ODT()
 {
     // Load the document, save it into a temp file and load that file again
     LibLODocument_Impl* pDocument = loadDoc("blank_text.odt");
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, aTempFile.GetURL().toUtf8().getStr(), "odt", nullptr));
+    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, maTempFile.GetURL().toUtf8().getStr(), "odt", nullptr));
     closeDoc();
 
-    pDocument = loadDocUrl(aTempFile.GetURL(), LOK_DOCTYPE_TEXT);
+    pDocument = loadDocUrl(maTempFile.GetURL(), LOK_DOCTYPE_TEXT);
 
     Scheduler::ProcessEventsToIdle();
     CPPUNIT_ASSERT(mxComponent.is());
@@ -2835,12 +2818,10 @@ void DesktopLOKTest::testInsertCertificate_PEM_DOCX()
 {
     // Load the document, save it into a temp file and load that file again
     LibLODocument_Impl* pDocument = loadDoc("blank_text.docx");
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, aTempFile.GetURL().toUtf8().getStr(), "docx", nullptr));
+    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, maTempFile.GetURL().toUtf8().getStr(), "docx", nullptr));
     closeDoc();
 
-    pDocument = loadDocUrl(aTempFile.GetURL(), LOK_DOCTYPE_TEXT);
+    pDocument = loadDocUrl(maTempFile.GetURL(), LOK_DOCTYPE_TEXT);
 
     Scheduler::ProcessEventsToIdle();
     CPPUNIT_ASSERT(mxComponent.is());
@@ -2892,8 +2873,6 @@ void DesktopLOKTest::testSignDocument_PEM_PDF()
 {
     // Load the document, save it into a temp file and load that file again
     LibLODocument_Impl* pDocument = loadDoc("blank_text.odt");
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
 
     Scheduler::ProcessEventsToIdle();
     CPPUNIT_ASSERT(mxComponent.is());
@@ -2927,7 +2906,7 @@ void DesktopLOKTest::testSignDocument_PEM_PDF()
         CPPUNIT_ASSERT(bResult);
     }
 
-    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, aTempFile.GetURL().toUtf8().getStr(), "pdf", nullptr));
+    CPPUNIT_ASSERT(pDocument->pClass->saveAs(pDocument, maTempFile.GetURL().toUtf8().getStr(), "pdf", nullptr));
 
     closeDoc();
 
@@ -2937,7 +2916,7 @@ void DesktopLOKTest::testSignDocument_PEM_PDF()
     readFileIntoByteVector(u"test-PK-signing.pem", aPrivateKey);
 
     LibLibreOffice_Impl aOffice;
-    bool bResult = aOffice.m_pOfficeClass->signDocument(&aOffice, aTempFile.GetURL().toUtf8().getStr(),
+    bool bResult = aOffice.m_pOfficeClass->signDocument(&aOffice, maTempFile.GetURL().toUtf8().getStr(),
                                          aCertificate.data(), int(aCertificate.size()),
                                          aPrivateKey.data(), int(aPrivateKey.size()));
 
@@ -3053,8 +3032,7 @@ void DesktopLOKTest::testComplexSelection()
                                                                  "", nullptr, nullptr));
 
     // Paste an image.
-    OUString aFileURL;
-    createFileURL(u"paste.jpg", aFileURL);
+    OUString aFileURL = createFileURL(u"paste.jpg");
     std::ifstream aImageStream(aFileURL.toUtf8().copy(strlen("file://")).getStr());
     std::vector<char> aImageContents((std::istreambuf_iterator<char>(aImageStream)), std::istreambuf_iterator<char>());
     CPPUNIT_ASSERT(pDocument->pClass->paste(pDocument, "image/jpeg", aImageContents.data(), aImageContents.size()));
@@ -3091,8 +3069,6 @@ void DesktopLOKTest::testComplexSelection()
 
 void DesktopLOKTest::testCalcSaveAs()
 {
-    comphelper::LibreOfficeKit::setActive();
-
     LibLODocument_Impl* pDocument = loadDoc("sheets.ods");
     CPPUNIT_ASSERT(pDocument);
 
@@ -3102,13 +3078,11 @@ void DesktopLOKTest::testCalcSaveAs()
     Scheduler::ProcessEventsToIdle();
 
     // Save as a new file.
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    pDocument->pClass->saveAs(pDocument, aTempFile.GetURL().toUtf8().getStr(), "ods", nullptr);
+    pDocument->pClass->saveAs(pDocument, maTempFile.GetURL().toUtf8().getStr(), "ods", nullptr);
     closeDoc();
 
     // Load the new document and verify that the in-flight changes are saved.
-    pDocument = loadDocUrl(aTempFile.GetURL(), LOK_DOCTYPE_SPREADSHEET);
+    pDocument = loadDocUrl(maTempFile.GetURL(), LOK_DOCTYPE_SPREADSHEET);
     CPPUNIT_ASSERT(pDocument);
 
     ViewCallback aView(pDocument);
@@ -3178,9 +3152,7 @@ void DesktopLOKTest::testMultiDocuments()
     for (int i = 0; i < 3; i++)
     {
         // Load a document.
-        uno::Reference<lang::XComponent> xComponent1;
-        std::unique_ptr<LibLODocument_Impl> document1;
-        std::tie(document1, xComponent1) = loadDocImpl("blank_text.odt");
+        std::unique_ptr<LibLODocument_Impl> document1 = loadDocImpl("blank_text.odt");
         LibLODocument_Impl* pDocument1 = document1.get();
         CPPUNIT_ASSERT_EQUAL(1, pDocument1->m_pDocumentClass->getViewsCount(pDocument1));
         const int nDocId1 = pDocument1->mnDocumentId;
@@ -3209,9 +3181,7 @@ void DesktopLOKTest::testMultiDocuments()
         CPPUNIT_ASSERT_EQUAL(2, pDocument1->m_pDocumentClass->getViewsCount(pDocument1));
 
         // Load another document.
-        uno::Reference<lang::XComponent> xComponent2;
-        std::unique_ptr<LibLODocument_Impl> document2;
-        std::tie(document2, xComponent2) = loadDocImpl("blank_presentation.odp");
+        std::unique_ptr<LibLODocument_Impl> document2 = loadDocImpl("blank_presentation.odp");
         LibLODocument_Impl* pDocument2 = document2.get();
         CPPUNIT_ASSERT_EQUAL(1, pDocument2->m_pDocumentClass->getViewsCount(pDocument2));
         const int nDocId2 = pDocument2->mnDocumentId;
@@ -3263,9 +3233,9 @@ void DesktopLOKTest::testMultiDocuments()
         pDocument2->m_pDocumentClass->destroyView(pDocument2, nDoc2View1);
         CPPUNIT_ASSERT_EQUAL(1, pDocument2->m_pDocumentClass->getViewsCount(pDocument2));
 
-        closeDoc(document2, xComponent2);
+        closeDoc(document2);
 
-        closeDoc(document1, xComponent1);
+        closeDoc(document1);
     }
 }
 
@@ -3273,7 +3243,7 @@ namespace
 {
     SfxChildWindow* lcl_initializeSidebar()
     {
-        // in init.cxx we do setupSidebar which creaes the controller, do it here
+        // in init.cxx we do setupSidebar which creates the controller, do it here
 
         SfxViewShell* pViewShell = SfxViewShell::Current();
         CPPUNIT_ASSERT(pViewShell);
@@ -3395,8 +3365,8 @@ void DesktopLOKTest::testRenderSearchResult_WriterNode()
     if (bDumpBitmap)
     {
         SvFileStream aStream("~/SearchResultBitmap.png", StreamMode::WRITE | StreamMode::TRUNC);
-        vcl::PNGWriter aPNGWriter(aBitmap);
-        aPNGWriter.Write(aStream);
+        vcl::PngImageWriter aPNGWriter(aStream);
+        aPNGWriter.write(aBitmap);
     }
     CPPUNIT_ASSERT_EQUAL(tools::Long(642), aBitmap.GetSizePixel().Width());
     CPPUNIT_ASSERT_EQUAL(tools::Long(561), aBitmap.GetSizePixel().Height());
@@ -3440,8 +3410,8 @@ void DesktopLOKTest::testRenderSearchResult_CommonNode()
     if (bDumpBitmap)
     {
         SvFileStream aStream("~/SearchResultBitmap.png", StreamMode::WRITE | StreamMode::TRUNC);
-        vcl::PNGWriter aPNGWriter(aBitmap);
-        aPNGWriter.Write(aStream);
+        vcl::PngImageWriter aPNGWriter(aStream);
+        aPNGWriter.write(aBitmap);
     }
     CPPUNIT_ASSERT_EQUAL(tools::Long(192), aBitmap.GetSizePixel().Width());
     CPPUNIT_ASSERT_EQUAL(tools::Long(96), aBitmap.GetSizePixel().Height());
@@ -3460,7 +3430,6 @@ static void lcl_repeatKeyStroke(LibLODocument_Impl *pDocument, int nCharCode, in
 
 void DesktopLOKTest::testNoDuplicateTableSelection()
 {
-    comphelper::LibreOfficeKit::setActive();
     LibLODocument_Impl* pDocument = loadDoc("table-selection.odt");
 
     // Create view 1.
@@ -3494,7 +3463,6 @@ void DesktopLOKTest::testNoDuplicateTableSelection()
 
 void DesktopLOKTest::testMultiViewTableSelection()
 {
-    comphelper::LibreOfficeKit::setActive();
     LibLODocument_Impl* pDocument = loadDoc("table-selection.odt");
 
     // Create view 1.
@@ -3585,6 +3553,16 @@ void DesktopLOKTest::testABI()
     CPPUNIT_ASSERT_EQUAL(classOffset(9), offsetof(struct _LibreOfficeKitClass, getVersionInfo));
     CPPUNIT_ASSERT_EQUAL(classOffset(10), offsetof(struct _LibreOfficeKitClass, runMacro));
     CPPUNIT_ASSERT_EQUAL(classOffset(11), offsetof(struct _LibreOfficeKitClass, signDocument));
+    CPPUNIT_ASSERT_EQUAL(classOffset(12), offsetof(struct _LibreOfficeKitClass, runLoop));
+    CPPUNIT_ASSERT_EQUAL(classOffset(13), offsetof(struct _LibreOfficeKitClass, sendDialogEvent));
+    CPPUNIT_ASSERT_EQUAL(classOffset(14), offsetof(struct _LibreOfficeKitClass, setOption));
+    CPPUNIT_ASSERT_EQUAL(classOffset(15), offsetof(struct _LibreOfficeKitClass, dumpState));
+    CPPUNIT_ASSERT_EQUAL(classOffset(16), offsetof(struct _LibreOfficeKitClass, extractRequest));
+    CPPUNIT_ASSERT_EQUAL(classOffset(17), offsetof(struct _LibreOfficeKitClass, trimMemory));
+
+    // When extending LibreOfficeKit with a new function pointer,  add new assert for the offsetof the
+    // new function pointer and bump this assert for the size of the class.
+    CPPUNIT_ASSERT_EQUAL(classOffset(18), sizeof(struct _LibreOfficeKitClass));
 
     CPPUNIT_ASSERT_EQUAL(documentClassOffset(0), offsetof(struct _LibreOfficeKitDocumentClass, destroy));
     CPPUNIT_ASSERT_EQUAL(documentClassOffset(1), offsetof(struct _LibreOfficeKitDocumentClass, saveAs));
@@ -3660,10 +3638,17 @@ void DesktopLOKTest::testABI()
     CPPUNIT_ASSERT_EQUAL(documentClassOffset(65), offsetof(struct _LibreOfficeKitDocumentClass, getSelectionTypeAndText));
     CPPUNIT_ASSERT_EQUAL(documentClassOffset(66), offsetof(struct _LibreOfficeKitDocumentClass, getDataArea));
     CPPUNIT_ASSERT_EQUAL(documentClassOffset(67), offsetof(struct _LibreOfficeKitDocumentClass, getEditMode));
+    CPPUNIT_ASSERT_EQUAL(documentClassOffset(68),
+                         offsetof(struct _LibreOfficeKitDocumentClass, setViewTimezone));
+    CPPUNIT_ASSERT_EQUAL(documentClassOffset(69),
+                         offsetof(struct _LibreOfficeKitDocumentClass, setAccessibilityState));
+    CPPUNIT_ASSERT_EQUAL(documentClassOffset(70),
+                         offsetof(struct _LibreOfficeKitDocumentClass, getA11yFocusedParagraph));
+    CPPUNIT_ASSERT_EQUAL(documentClassOffset(71),
+                         offsetof(struct _LibreOfficeKitDocumentClass, getA11yCaretPosition));
 
-    // Extending is fine, update this, and add new assert for the offsetof the
-    // new method
-    CPPUNIT_ASSERT_EQUAL(documentClassOffset(68), sizeof(struct _LibreOfficeKitDocumentClass));
+    // As above
+    CPPUNIT_ASSERT_EQUAL(documentClassOffset(72), sizeof(struct _LibreOfficeKitDocumentClass));
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(DesktopLOKTest);

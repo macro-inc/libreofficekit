@@ -21,10 +21,8 @@
 #pragma once
 
 #include <memory>
-#include <list>
 #include <map>
-#include <osl/mutex.hxx>
-#include <rtl/uri.hxx>
+#include <mutex>
 #include <rtl/ustring.hxx>
 #include <com/sun/star/uno/Any.hxx>
 
@@ -93,7 +91,7 @@ namespace http_dav_ucp
 
         DAVOptions( const DAVOptions & rOther );
 
-        virtual ~DAVOptions();
+        ~DAVOptions();
 
         bool isClass1() const { return m_isClass1; };
         void setClass1( bool Class1 = true ) { m_isClass1 = Class1; };
@@ -161,7 +159,7 @@ namespace http_dav_ucp
     class DAVOptionsCache
     {
         DAVOptionsMap m_aTheCache;
-        osl::Mutex         m_aMutex;
+        std::mutex    m_aMutex;
     public:
         explicit DAVOptionsCache();
         ~DAVOptionsCache();
@@ -193,9 +191,9 @@ namespace http_dav_ucp
         css::uno::Any const       value;
 
         ProppatchValue( const ProppatchOperation o,
-                        const OUString & n,
-                        const css::uno::Any & v )
-            : operation( o ), name( n ), value( v ) {}
+                        OUString n,
+                        css::uno::Any v )
+            : operation( o ), name( std::move(n) ), value( std::move(v) ) {}
     };
 } // namespace http_dav_ucp
 

@@ -37,9 +37,10 @@
 #include <filter/msfilter/escherex.hxx>
 #include <filter/msfilter/msfilterdllapi.h>
 #include <rtl/ustring.hxx>
+#include <rtl/ref.hxx>
 #include <sal/types.h>
 #include <svx/msdffdef.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <tools/degree.hxx>
 #include <tools/gen.hxx>
 #include <tools/ref.hxx>
@@ -215,7 +216,7 @@ struct MSFILTER_DLLPUBLIC SvxMSDffImportRec
 {
     static const int RELTO_DEFAULT = 2;
 
-    SdrObject*      pObj;
+    rtl::Reference<SdrObject> pObj;
     std::optional<tools::Polygon>
                     pWrapPolygon;
     std::unique_ptr<char[]>
@@ -228,7 +229,7 @@ struct MSFILTER_DLLPUBLIC SvxMSDffImportRec
     std::optional<sal_uInt32> nXRelTo;
     sal_uInt32      nYAlign;
     std::optional<sal_uInt32> nYRelTo;
-    sal_uInt32      nLayoutInTableCell;
+    sal_uInt32      nGroupShapeBooleanProperties;
     ShapeFlag       nFlags;
     sal_Int32       nDxTextLeft;    ///< distance of text box from surrounding shape
     sal_Int32       nDyTextTop;
@@ -454,6 +455,8 @@ protected:
     tools::Long            nPntMul;
     tools::Long            nPntDiv;
     bool            bNeedMap;
+    sal_Int32       nMinAllowedVal;
+    sal_Int32       nMaxAllowedVal;
     sal_uInt32      nSvxMSDffSettings;
     sal_uInt32      nSvxMSDffOLEConvFlags;
 
@@ -480,11 +483,11 @@ protected:
                                 sal_uInt64 nPosGroup,
                                 sal_uInt16 nDrawingContainerId );
 
-    SdrObject* ImportGraphic( SvStream&, SfxItemSet&, const DffObjData& );
+    rtl::Reference<SdrObject> ImportGraphic( SvStream&, SfxItemSet&, const DffObjData& );
     // #i32596# - pass <nCalledByGroup> to method
     // Needed in Writer's Microsoft Word import to avoid import of OLE objects
     // inside groups. Instead a graphic object is created.
-    virtual SdrObject* ImportOLE( sal_uInt32 nOLEId,
+    virtual rtl::Reference<SdrObject> ImportOLE( sal_uInt32 nOLEId,
                                   const Graphic& rGraf,
                                   const tools::Rectangle& rBoundRect,
                                   const tools::Rectangle& rVisArea,
@@ -508,7 +511,7 @@ protected:
                                         sal_uInt32 nDatLen,
                                         std::unique_ptr<char[]>& rpBuff,
                                         sal_uInt32& rBuffLen );
-    virtual SdrObject* ProcessObj( SvStream& rSt,
+    virtual rtl::Reference<SdrObject> ProcessObj( SvStream& rSt,
                                    DffObjData& rData,
                                    SvxMSDffClientData& rClientData,
                                    tools::Rectangle& rTextRect,
@@ -537,7 +540,7 @@ protected:
                                     ) const;
 
     /** Prevent that (rounded) rectangles with wrapped text will always be
-        converted into SdrRectObj( OBJ_TEXT ).
+        converted into SdrRectObj( SdrObjKind::Text ).
 
         @return true means "conversion".
     */
@@ -600,7 +603,7 @@ public:
         @param bSkipImages         skipping images for text extraction/indexing
     */
     SvxMSDffManager( SvStream& rStCtrl,
-                     const OUString& rBaseURL,
+                     OUString  aBaseURL,
                      sal_uInt32 nOffsDgg,
                      SvStream* pStData,
                      SdrModel* pSdrModel_,
@@ -611,7 +614,7 @@ public:
 
     // in PPT the parameters DGGContainerOffset and PicStream are provided by an
     // init method
-    SvxMSDffManager( SvStream& rStCtrl, const OUString& rBaseURL );
+    SvxMSDffManager( SvStream& rStCtrl, OUString aBaseURL );
     void InitSvxMSDffManager( sal_uInt32 nOffsDgg_,
                               SvStream* pStData_,
                               sal_uInt32 nSvxMSDffOLEConvFlags);
@@ -662,22 +665,22 @@ public:
     */
     static bool GetBLIPDirect(SvStream& rBLIPStream, Graphic& rData, tools::Rectangle* pVisArea = nullptr );
 
-    bool GetShape(sal_uLong nId, SdrObject*& rpData, SvxMSDffImportData& rData);
+    bool GetShape(sal_uLong nId, rtl::Reference<SdrObject>& rpData, SvxMSDffImportData& rData);
 
-    SdrObject* ImportObj( SvStream& rSt,
+    rtl::Reference<SdrObject> ImportObj( SvStream& rSt,
                           SvxMSDffClientData& rData,
                           tools::Rectangle& rClientRect,
                           const tools::Rectangle& rGlobalChildRect,
                           int nCalledByGroup,
                           sal_Int32* pShapeId);
-    SdrObject* ImportGroup( const DffRecordHeader& rHd,
+    rtl::Reference<SdrObject> ImportGroup( const DffRecordHeader& rHd,
                             SvStream& rSt,
                             SvxMSDffClientData& rData,
                             tools::Rectangle& rClientRect,
                             const tools::Rectangle& rGlobalChildRect,
                             int nCalledByGroup,
                             sal_Int32* pShapeId );
-    SdrObject* ImportShape( const DffRecordHeader& rHd,
+    rtl::Reference<SdrObject> ImportShape( const DffRecordHeader& rHd,
                             SvStream& rSt,
                             SvxMSDffClientData& rData,
                             tools::Rectangle& rClientRect,
@@ -712,7 +715,7 @@ public:
 
     void RemoveFromShapeOrder( SdrObject const * pObject ) const;
 
-    static SdrOle2Obj* CreateSdrOLEFromStorage(
+    static rtl::Reference<SdrOle2Obj> CreateSdrOLEFromStorage(
         SdrModel& rSdrModel,
         const OUString& rStorageName,
         tools::SvRef<SotStorage> const & rSrcStorage,

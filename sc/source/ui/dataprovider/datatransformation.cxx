@@ -15,6 +15,7 @@
 #include <svl/numformat.hxx>
 #include <svl/zforlist.hxx>
 #include <unotools/charclass.hxx>
+#include <utility>
 
 namespace {
 
@@ -49,9 +50,11 @@ ColumnRemoveTransformation::~ColumnRemoveTransformation()
 
 void ColumnRemoveTransformation::Transform(ScDocument& rDoc) const
 {
+    sal_Int32 nIncrementIndex = 0;
     for (auto& rCol : maColumns)
     {
-        rDoc.DeleteCol(0, 0, rDoc.MaxRow(), 0, rCol, 1);
+        rDoc.DeleteCol(0, 0, rDoc.MaxRow(), 0, rCol - nIncrementIndex, 1);
+        nIncrementIndex++;
     }
 }
 
@@ -73,6 +76,9 @@ SplitColumnTransformation::SplitColumnTransformation(SCCOL nCol, sal_Unicode cSe
 
 void SplitColumnTransformation::Transform(ScDocument& rDoc) const
 {
+    if (mnCol == -1)
+        return;
+
     rDoc.InsertCol(0, 0, rDoc.MaxRow(), 0, mnCol + 1, 1);
 
     SCROW nEndRow = getLastRow(rDoc, mnCol);
@@ -107,9 +113,9 @@ sal_Unicode SplitColumnTransformation::getSeparator() const
     return mcSeparator;
 }
 
-MergeColumnTransformation::MergeColumnTransformation( std::set<SCCOL>&& rColumns, const OUString& rMergeString):
+MergeColumnTransformation::MergeColumnTransformation( std::set<SCCOL>&& rColumns, OUString aMergeString):
     maColumns(std::move(rColumns)),
-    maMergeString(rMergeString)
+    maMergeString(std::move(aMergeString))
 {
 }
 
@@ -492,7 +498,7 @@ void NumberTransformation::Transform(ScDocument& rDoc) const
                         double nVal = rDoc.GetValue(rCol, nRow, 0);
                         if (nVal > 0)
                         {
-                            rDoc.SetValue(rCol, nRow, 0, rtl::math::log1p(nVal-1));
+                            rDoc.SetValue(rCol, nRow, 0, std::log1p(nVal-1));
                         }
                         else
                         {
@@ -645,9 +651,9 @@ const std::set<SCCOL>& NumberTransformation::getColumn() const
 }
 
 ReplaceNullTransformation::ReplaceNullTransformation(std::set<SCCOL>&& nCol,
-                                                     const OUString& sReplaceWith)
+                                                     OUString sReplaceWith)
     : mnCol(std::move(nCol))
-    , msReplaceWith(sReplaceWith)
+    , msReplaceWith(std::move(sReplaceWith))
 {
 }
 
@@ -1131,10 +1137,10 @@ const std::set<SCCOL>& DateTimeTransformation::getColumn() const
     return mnCol;
 }
 
-FindReplaceTransformation::FindReplaceTransformation(SCCOL nCol, const OUString& aFindString, const OUString& aReplaceString)
+FindReplaceTransformation::FindReplaceTransformation(SCCOL nCol, OUString aFindString, OUString aReplaceString)
     : mnCol(nCol)
-    , maFindString(aFindString)
-    , maReplaceString(aReplaceString)
+    , maFindString(std::move(aFindString))
+    , maReplaceString(std::move(aReplaceString))
 {
 }
 
@@ -1176,9 +1182,9 @@ const OUString& FindReplaceTransformation::getReplaceString() const
     return maReplaceString;
 }
 
-DeleteRowTransformation::DeleteRowTransformation(SCCOL nCol, const OUString& aFindString)
+DeleteRowTransformation::DeleteRowTransformation(SCCOL nCol, OUString aFindString)
     : mnCol(nCol)
-    , maFindString(aFindString)
+    , maFindString(std::move(aFindString))
 {
 }
 

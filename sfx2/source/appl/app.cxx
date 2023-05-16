@@ -17,7 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <config_feature_desktop.h>
 #include <sal/log.hxx>
 #include <tools/debug.hxx>
 
@@ -50,12 +49,11 @@
 #include <sfx2/sfxdlg.hxx>
 #include <sfx2/stbitem.hxx>
 #include <sfx2/dockwin.hxx>
-#include <sidebar/ControllerFactory.hxx>
 
 #include <officecfg/Office/Common.hxx>
-#include <unotools/viewoptions.hxx>
 #include <rtl/strbuf.hxx>
 #include <memory>
+#include <mutex>
 #include <framework/sfxhelperfunctions.hxx>
 #include <fwkhelper.hxx>
 
@@ -88,22 +86,12 @@ SfxModule* SfxApplication::GetModule(SfxToolsModule nSharedLib)
     return g_pSfxApplication->pImpl->aModules[nSharedLib].get();
 }
 
-namespace {
-    css::uno::Reference<css::frame::XToolbarController> SfxWeldToolBoxControllerFactory( const css::uno::Reference< css::frame::XFrame >& rFrame, weld::Toolbar* pToolbar, weld::Builder* pBuilder, const OUString& aCommandURL )
-    {
-        SolarMutexGuard aGuard;
-
-        return sfx2::sidebar::ControllerFactory::CreateToolBoxController(
-                *pToolbar, *pBuilder, aCommandURL, rFrame, rFrame->getController(), false);
-    }
-}
-
 SfxApplication* SfxApplication::GetOrCreate()
 {
-    static osl::Mutex theApplicationMutex;
+    static std::mutex theApplicationMutex;
 
     // SFX on demand
-    ::osl::MutexGuard aGuard(theApplicationMutex);
+    std::unique_lock aGuard(theApplicationMutex);
     if (!g_pSfxApplication)
     {
         SAL_INFO( "sfx.appl", "SfxApplication::SetApp" );
@@ -117,12 +105,13 @@ SfxApplication* SfxApplication::GetOrCreate()
 
         ::framework::SetRefreshToolbars( RefreshToolbars );
         ::framework::SetToolBoxControllerCreator( SfxToolBoxControllerFactory );
-        ::framework::SetWeldToolBoxControllerCreator( SfxWeldToolBoxControllerFactory );
         ::framework::SetStatusBarControllerCreator( SfxStatusBarControllerFactory );
         ::framework::SetDockingWindowCreator( SfxDockingWindowFactory );
         ::framework::SetIsDockingWindowVisible( IsDockingWindowVisible );
 #if HAVE_FEATURE_XMLHELP
         Application::SetHelp( pSfxHelp );
+#endif
+#if HAVE_FEATURE_XMLHELP || defined(EMSCRIPTEN)
         bool bHelpTip = officecfg::Office::Common::Help::Tip::get();
         bool bExtendedHelpTip = officecfg::Office::Common::Help::ExtendedTip::get();
         if (!utl::ConfigManager::IsFuzzing() && bHelpTip)
@@ -378,6 +367,11 @@ std::vector<SfxViewShell*>& SfxApplication::GetViewShells_Impl() const
     return pImpl->maViewShells;
 }
 
+std::unordered_map<OUString, css::uno::Reference<css::ui::XAcceleratorConfiguration>>& SfxApplication::GetAcceleratorConfs_Impl() const
+{
+    return pImpl->maAcceleratorConfs;
+}
+
 std::vector<SfxObjectShell*>& SfxApplication::GetObjectShells_Impl() const
 {
     return pImpl->maObjShells;
@@ -394,12 +388,12 @@ void SfxApplication::Invalidate( sal_uInt16 nId )
 #ifndef DISABLE_DYNLOADING
 
 typedef long (*basicide_handle_basic_error)(void const *);
-typedef void (*basicide_macro_organizer)(void *, sal_Int16);
+typedef void (*basicide_macro_organizer)(void *, void *, sal_Int16);
 
 #else
 
 extern "C" long basicide_handle_basic_error(void const*);
-extern "C" void basicide_macro_organizer(void*, sal_Int16);
+extern "C" void basicide_macro_organizer(void*, void*, sal_Int16);
 
 #endif
 
@@ -421,10 +415,11 @@ IMPL_STATIC_LINK( SfxApplication, GlobalBasicErrorHdl_Impl, StarBASIC*, pStarBas
             const SfxViewFrame* pViewFrame = SfxViewFrame::Current();
             std::shared_ptr<weld::MessageDialog> xBox;
             xBox.reset(Application::CreateMessageDialog(
-                           pViewFrame->GetFrameWeld(),
+                           pViewFrame ? pViewFrame->GetFrameWeld() : nullptr,
                            VclMessageType::Error,
                            VclButtonsType::Ok,
-                           aError));
+                           aError,
+                           GetpApp()));
 
             xBox->runAsync(xBox, [](sal_Int32 /*nResult*/) {});
         }
@@ -510,7 +505,7 @@ SfxApplication::ChooseScript(weld::Window *pParent)
     return aScriptURL;
 }
 
-void SfxApplication::MacroOrganizer(weld::Window* pParent, sal_Int16 nTabId)
+void SfxApplication::MacroOrganizer(weld::Window* pParent, const uno::Reference<frame::XFrame>& xDocFrame, sal_Int16 nTabId)
 {
 #if !HAVE_FEATURE_SCRIPTING
     (void) pParent;
@@ -521,11 +516,11 @@ void SfxApplication::MacroOrganizer(weld::Window* pParent, sal_Int16 nTabId)
     basicide_macro_organizer pSymbol = reinterpret_cast<basicide_macro_organizer>(sfx2::getBasctlFunction("basicide_macro_organizer"));
 
     // call basicide_macro_organizer in basctl
-    pSymbol(pParent, nTabId);
+    pSymbol(pParent, xDocFrame.get(), nTabId);
 
 #else
 
-    basicide_macro_organizer(pParent, nTabId);
+    basicide_macro_organizer(pParent, xDocFrame.get(), nTabId);
 
 #endif
 

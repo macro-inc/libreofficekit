@@ -66,7 +66,6 @@
 #include <svx/xfillit0.hxx>
 #include <svx/xflftrit.hxx>
 #include <svx/drawitem.hxx>
-#include <editeng/eeitem.hxx>
 
 using namespace com::sun::star;
 
@@ -387,7 +386,7 @@ void SwStyleSheetIterator::SwPoolFormatList::RemoveName(SfxStyleFamily eFam,
                                                      const OUString& rName)
 {
     sal_uInt32 nTmpPos = FindName( eFam, rName );
-    if( nTmpPos < maImpl.size() )
+    if (nTmpPos != SAL_MAX_UINT32)
         maImpl.erase(maImpl.begin() + nTmpPos);
 
     // assumption: this seldom occurs, the iterator is built, then emptied.
@@ -505,8 +504,7 @@ void SwDocStyleSheet::SetGrabBagItem(const uno::Any& rVal)
     {
         dynamic_cast<SwDocStyleSheetPool&>(*m_pPool).InvalidateIterator();
         m_pPool->Broadcast(SfxStyleSheetHint(SfxHintId::StyleSheetModified, *this));
-        SwEditShell* pSh = m_rDoc.GetEditShell();
-        if (pSh)
+        if (SwEditShell* pSh = m_rDoc.GetEditShell())
             pSh->CallChgLnk();
     }
 }
@@ -616,8 +614,7 @@ void SwDocStyleSheet::SetHidden( bool bValue )
         // calling pPool->First() here would be quite slow...
         dynamic_cast<SwDocStyleSheetPool&>(*m_pPool).InvalidateIterator(); // internal list has to be updated
         m_pPool->Broadcast( SfxStyleSheetHint( SfxHintId::StyleSheetModified, *this ) );
-        SwEditShell* pSh = m_rDoc.GetEditShell();
-        if( pSh )
+        if (SwEditShell* pSh = m_rDoc.GetEditShell())
             pSh->CallChgLnk();
     }
 }
@@ -1056,7 +1053,7 @@ bool  SwDocStyleSheet::SetName(const OUString& rStr, bool bReindexNow)
                 if (!m_pCharFormat->GetName().isEmpty())
                     m_rDoc.RenameFormat(*m_pCharFormat, rStr);
                 else
-                    m_pCharFormat->SetName(rStr);
+                    m_pCharFormat->SetFormatName(rStr);
 
                 bChg = true;
             }
@@ -1070,7 +1067,7 @@ bool  SwDocStyleSheet::SetName(const OUString& rStr, bool bReindexNow)
                 if (!m_pColl->GetName().isEmpty())
                     m_rDoc.RenameFormat(*m_pColl, rStr);
                 else
-                    m_pColl->SetName(rStr);
+                    m_pColl->SetFormatName(rStr);
 
                 bChg = true;
             }
@@ -1084,7 +1081,7 @@ bool  SwDocStyleSheet::SetName(const OUString& rStr, bool bReindexNow)
                 if (!m_pFrameFormat->GetName().isEmpty())
                     m_rDoc.RenameFormat(*m_pFrameFormat, rStr);
                 else
-                    m_pFrameFormat->SetName( rStr );
+                    m_pFrameFormat->SetFormatName( rStr );
 
                 bChg = true;
             }
@@ -1149,8 +1146,7 @@ bool  SwDocStyleSheet::SetName(const OUString& rStr, bool bReindexNow)
     {
         m_pPool->First(nFamily);  // internal list has to be updated
         m_pPool->Broadcast( SfxStyleSheetHint( SfxHintId::StyleSheetModified, *this ) );
-        SwEditShell* pSh = m_rDoc.GetEditShell();
-        if( pSh )
+        if (SwEditShell* pSh = m_rDoc.GetEditShell())
             pSh->CallChgLnk();
     }
     return true;
@@ -1484,16 +1480,12 @@ void SwDocStyleSheet::SetItemSet( const SfxItemSet& rSet,
         case SfxStyleFamily::Para :
         {
             OSL_ENSURE(m_pColl, "Where's Collection");
-            const SfxPoolItem* pAutoUpdate;
-            if(SfxItemState::SET == rSet.GetItemState(SID_ATTR_AUTO_STYLE_UPDATE,false, &pAutoUpdate ))
+            if(const SfxBoolItem* pAutoUpdate = rSet.GetItemIfSet(SID_ATTR_AUTO_STYLE_UPDATE,false))
             {
-                m_pColl->SetAutoUpdateFormat(static_cast<const SfxBoolItem*>(pAutoUpdate)->GetValue());
+                m_pColl->SetAutoUpdateFormat(pAutoUpdate->GetValue());
             }
 
-            const SwCondCollItem* pCondItem;
-            if( SfxItemState::SET != rSet.GetItemState( FN_COND_COLL, false,
-                reinterpret_cast<const SfxPoolItem**>(&pCondItem) ))
-                pCondItem = nullptr;
+            const SwCondCollItem* pCondItem = rSet.GetItemIfSet( FN_COND_COLL, false );
 
             if( RES_CONDTXTFMTCOLL == m_pColl->Which() && pCondItem )
             {
@@ -1558,8 +1550,7 @@ void SwDocStyleSheet::SetItemSet( const SfxItemSet& rSet,
             // we have to create a physical instance of the numbering style. If we do not and
             // neither the paragraph style nor the numbering style is used in the document
             // the numbering style will not be saved with the document and the assignment got lost.
-            const SfxPoolItem* pNumRuleItem = nullptr;
-            if( SfxItemState::SET == rSet.GetItemState( RES_PARATR_NUMRULE, false, &pNumRuleItem ) )
+            if( const SfxPoolItem* pNumRuleItem = rSet.GetItemIfSet( RES_PARATR_NUMRULE, false ) )
             {   // Setting a numbering rule?
                 const OUString sNumRule = static_cast<const SwNumRuleItem*>(pNumRuleItem)->GetValue();
                 if (!sNumRule.isEmpty())
@@ -1608,8 +1599,8 @@ void SwDocStyleSheet::SetItemSet( const SfxItemSet& rSet,
         case SfxStyleFamily::Frame:
         {
             OSL_ENSURE(m_pFrameFormat, "Where's FrameFormat");
-            const SfxPoolItem* pAutoUpdate;
-            if(SfxItemState::SET == rSet.GetItemState(SID_ATTR_AUTO_STYLE_UPDATE,false, &pAutoUpdate ))
+
+            if(const SfxPoolItem* pAutoUpdate = rSet.GetItemIfSet(SID_ATTR_AUTO_STYLE_UPDATE,false))
             {
                 m_pFrameFormat->SetAutoUpdateFormat(static_cast<const SfxBoolItem*>(pAutoUpdate)->GetValue());
             }
@@ -1735,27 +1726,27 @@ static void lcl_SaveStyles( SfxStyleFamily nFamily, std::vector<void*>& rArr, Sw
     case SfxStyleFamily::Char:
         {
             const SwCharFormats& rTable = *rDoc.GetCharFormats();
-            for( size_t n = 0, nCnt = rTable.size(); n < nCnt; ++n )
+            for(auto const& rChar: rTable)
             {
-                rArr.push_back( rTable[ n ] );
+                rArr.push_back(rChar);
             }
         }
         break;
     case SfxStyleFamily::Para:
         {
             const SwTextFormatColls& rTable = *rDoc.GetTextFormatColls();
-            for( size_t n = 0, nCnt = rTable.size(); n < nCnt; ++n )
+            for(auto const& rPara : rTable)
             {
-                rArr.push_back( rTable[ n ] );
+                rArr.push_back(rPara);
             }
         }
         break;
     case SfxStyleFamily::Frame:
         {
             const SwFrameFormats& rTable = *rDoc.GetFrameFormats();
-            for( size_t n = 0, nCnt = rTable.size(); n < nCnt; ++n )
+            for(auto const& rFrame: rTable)
             {
-                rArr.push_back( rTable[ n ] );
+                rArr.push_back(rFrame);
             }
         }
         break;
@@ -1772,9 +1763,9 @@ static void lcl_SaveStyles( SfxStyleFamily nFamily, std::vector<void*>& rArr, Sw
     case SfxStyleFamily::Pseudo:
         {
             const SwNumRuleTable& rTable = rDoc.GetNumRuleTable();
-            for( size_t n = 0, nCnt = rTable.size(); n < nCnt; ++n )
+            for(auto const& rPseudo: rTable)
             {
-                rArr.push_back( rTable[ n ] );
+                rArr.push_back(rPseudo);
             }
         }
         break;
@@ -1801,8 +1792,8 @@ static void lcl_DeleteInfoStyles( SfxStyleFamily nFamily, std::vector<void*> con
                 if( !lcl_Contains( rArr, rTable[ n ] ))
                     aDelArr.push_front( n );
             }
-            for( n = 0, nCnt = aDelArr.size(); n < nCnt; ++n )
-                rDoc.DelCharFormat( aDelArr[ n ] );
+            for(auto const& rDelArr: aDelArr)
+                rDoc.DelCharFormat( rDelArr );
         }
         break;
 
@@ -1815,8 +1806,8 @@ static void lcl_DeleteInfoStyles( SfxStyleFamily nFamily, std::vector<void*> con
                 if( !lcl_Contains( rArr, rTable[ n ] ))
                     aDelArr.push_front( n );
             }
-            for( n = 0, nCnt = aDelArr.size(); n < nCnt; ++n )
-                rDoc.DelTextFormatColl( aDelArr[ n ] );
+            for(auto const& rDelArr: aDelArr)
+                rDoc.DelTextFormatColl( rDelArr );
         }
         break;
 
@@ -1824,13 +1815,13 @@ static void lcl_DeleteInfoStyles( SfxStyleFamily nFamily, std::vector<void*> con
         {
             std::deque<SwFrameFormat*> aDelArr;
             const SwFrameFormats& rTable = *rDoc.GetFrameFormats();
-            for( n = 0, nCnt = rTable.size(); n < nCnt; ++n )
+            for( auto const& rFrame: rTable )
             {
-                if( !lcl_Contains( rArr, rTable[ n ] ))
-                    aDelArr.push_front( rTable[ n ] );
+                if( !lcl_Contains( rArr, rFrame ))
+                    aDelArr.push_front( rFrame );
             }
-            for( n = 0, nCnt = aDelArr.size(); n < nCnt; ++n )
-                rDoc.DelFrameFormat( aDelArr[ n ] );
+            for( auto const& rDelArr: aDelArr)
+                rDoc.DelFrameFormat( rDelArr );
         }
         break;
 
@@ -1842,8 +1833,8 @@ static void lcl_DeleteInfoStyles( SfxStyleFamily nFamily, std::vector<void*> con
                 if( !lcl_Contains( rArr, &rDoc.GetPageDesc( n ) ))
                     aDelArr.push_front( n );
             }
-            for( n = 0, nCnt = aDelArr.size(); n < nCnt; ++n )
-                rDoc.DelPageDesc( aDelArr[ n ] );
+            for( auto const& rDelArr: aDelArr )
+                rDoc.DelPageDesc( rDelArr);
         }
         break;
 
@@ -1851,13 +1842,13 @@ static void lcl_DeleteInfoStyles( SfxStyleFamily nFamily, std::vector<void*> con
         {
             std::deque<SwNumRule*> aDelArr;
             const SwNumRuleTable& rTable = rDoc.GetNumRuleTable();
-            for( n = 0, nCnt = rTable.size(); n < nCnt; ++n )
+            for( auto const& rPseudo: rTable)
             {
-                if( !lcl_Contains( rArr, rTable[ n ] ))
-                    aDelArr.push_front( rTable[ n ] );
+                if( !lcl_Contains( rArr, rPseudo ))
+                    aDelArr.push_front( rPseudo );
             }
-            for( n = 0, nCnt = aDelArr.size(); n < nCnt; ++n )
-                rDoc.DelNumRule( aDelArr[ n ]->GetName() );
+            for( auto const& rDelArr: aDelArr)
+                rDoc.DelNumRule( rDelArr->GetName() );
         }
         break;
     default: break;
@@ -2590,8 +2581,8 @@ bool  SwDocStyleSheetPool::SetParent( SfxStyleFamily eFam,
     return bRet;
 }
 
-SfxStyleSheetBase* SwDocStyleSheetPool::Find( const OUString& rName,
-                                              SfxStyleFamily eFam, SfxStyleSearchBits n )
+SfxStyleSheetBase* SwDocStyleSheetPool::Find(const OUString& rName,
+                                             SfxStyleFamily eFam, SfxStyleSearchBits n) const
 {
     SfxStyleSearchBits nSMask = n;
     if( SfxStyleFamily::Para == eFam &&  m_rDoc.getIDocumentSettingAccess().get(DocumentSettingId::HTML_MODE) )
@@ -2663,10 +2654,9 @@ SfxStyleSheetBase* SwDocStyleSheetPool::Find( const OUString& rName,
                         : static_cast<const SwFormat*>(pMod)->GetPoolFormatId();
 
         if( ( nSMask & ~SfxStyleSearchBits::Used) == SfxStyleSearchBits::UserDefined
-            ? !(nId & USER_FMT)
+            && !(nId & USER_FMT) )
                 // searched for used and found none
-            : bSearchUsed )
-            bFnd = false;
+                bFnd = false;
     }
     return bFnd ? mxStyleSheet.get() : nullptr;
 }
@@ -2718,14 +2708,14 @@ SfxStyleSheetBase*  SwStyleSheetIterator::First()
     // Delete current
     mxIterSheet->Reset();
 
-    SwDoc& rDoc = static_cast<SwDocStyleSheetPool*>(pBasePool)->GetDoc();
+    const SwDoc& rDoc = static_cast<const SwDocStyleSheetPool*>(pBasePool)->GetDoc();
     const SfxStyleSearchBits nSrchMask = nMask;
     const bool bIsSearchUsed = SearchUsed();
 
     bool bSearchHidden( nMask & SfxStyleSearchBits::Hidden );
     bool bOnlyHidden = nMask == SfxStyleSearchBits::Hidden;
 
-    const bool bOrganizer = static_cast<SwDocStyleSheetPool*>(pBasePool)->IsOrganizerMode();
+    const bool bOrganizer = static_cast<const SwDocStyleSheetPool*>(pBasePool)->IsOrganizerMode();
     bool bAll = ( nSrchMask & SfxStyleSearchBits::AllVisible ) == SfxStyleSearchBits::AllVisible;
 
     if( nSearchFamily == SfxStyleFamily::Char
@@ -3033,9 +3023,9 @@ SfxStyleSheetBase*  SwStyleSheetIterator::First()
         nSearchFamily == SfxStyleFamily::All )
     {
         const SwNumRuleTable& rNumTable = rDoc.GetNumRuleTable();
-        for(size_t i = 0; i < rNumTable.size(); ++i)
+        for(auto const& rNum: rNumTable)
         {
-            const SwNumRule& rRule = *rNumTable[ i ];
+            const SwNumRule& rRule = *rNum;
             if( !rRule.IsAutoRule() )
             {
                 if ( nSrchMask == SfxStyleSearchBits::Hidden && !rRule.IsHidden( ) )
@@ -3166,7 +3156,7 @@ void SwStyleSheetIterator::AppendStyleList(const std::vector<OUString>& rList,
                                             bool bTestUsed, bool bTestHidden, bool bOnlyHidden,
                                             SwGetPoolIdFromName nSection, SfxStyleFamily eFamily )
 {
-    SwDoc& rDoc = static_cast<SwDocStyleSheetPool*>(pBasePool)->GetDoc();
+    const SwDoc& rDoc = static_cast<const SwDocStyleSheetPool*>(pBasePool)->GetDoc();
     bool bUsed = false;
     for (const auto & i : rList)
     {

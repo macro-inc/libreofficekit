@@ -27,15 +27,21 @@
 #include <sal/log.hxx>
 #include <tools/debug.hxx>
 #include <tools/time.hxx>
+#include <comphelper/processfactory.hxx>
 #include <comphelper/solarmutex.hxx>
 #include <comphelper/windowserrorstring.hxx>
+#include <com/sun/star/uno/Reference.h>
 #include <o3tl/char16_t2wchar_t.hxx>
 
+#include <dndhelper.hxx>
 #include <vcl/inputtypes.hxx>
 #include <vcl/opengl/OpenGLContext.hxx>
+#include <vcl/sysdata.hxx>
 #include <vcl/timer.hxx>
 #include <vclpluginapi.h>
 
+#include <win/dnd_source.hxx>
+#include <win/dnd_target.hxx>
 #include <win/wincomp.hxx>
 #include <win/salids.hrc>
 #include <win/saldata.hxx>
@@ -57,15 +63,6 @@
 #include <salsys.hxx>
 
 #include <desktop/crashreport.hxx>
-
-#if defined _MSC_VER
-#ifndef min
-#define min(a,b)    (((a) < (b)) ? (a) : (b))
-#endif
-#ifndef max
-#define max(a,b)    (((a) > (b)) ? (a) : (b))
-#endif
-#endif
 
 #include <prewin.h>
 
@@ -238,11 +235,15 @@ void SalData::initKeyCodeMap()
     initKey( L';', KEY_SEMICOLON );
     initKey( L'\'', KEY_QUOTERIGHT );
     initKey( L'}', KEY_RIGHTCURLYBRACKET );
+    initKey( L':', KEY_COLON );
 }
 
 // SalData
 
 SalData::SalData()
+    : sal::systools::CoInitializeGuard(COINIT_APARTMENTTHREADED, false,
+                                       sal::systools::CoInitializeGuard::WhenFailed::NoThrow)
+         // put main thread in Single Threaded Apartment (STA)
 {
     mhInst = nullptr;           // default instance handle
     mnCmdShow = 0;              // default frame show style
@@ -282,7 +283,6 @@ SalData::SalData()
     mbObjClassInit = false;     // is SALOBJECTCLASS initialised
     mbInPalChange = false;      // is in WM_QUERYNEWPALETTE
     mnAppThreadId = 0;          // Id from Application-Thread
-    mbScrSvrEnabled = FALSE;    // ScreenSaver enabled
     mpFirstIcon = nullptr;      // icon cache, points to first icon, NULL if none
     mpSharedTempFontItem = nullptr;
     mpOtherTempFontItem = nullptr;
@@ -297,7 +297,6 @@ SalData::SalData()
     SetSalData( this );
     initNWF();
 
-    CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED); // put main thread in Single Threaded Apartment (STA)
     static Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
 }
@@ -307,10 +306,49 @@ SalData::~SalData()
     deInitNWF();
     SetSalData( nullptr );
 
-    CoUninitialize();
-
     if (gdiplusToken)
         Gdiplus::GdiplusShutdown(gdiplusToken);
+}
+
+bool OSSupportsDarkMode()
+{
+    bool bRet = false;
+    if (HMODULE h_ntdll = GetModuleHandleW(L"ntdll.dll"))
+    {
+        typedef LONG(WINAPI* RtlGetVersion_t)(PRTL_OSVERSIONINFOW);
+        if (auto RtlGetVersion
+            = reinterpret_cast<RtlGetVersion_t>(GetProcAddress(h_ntdll, "RtlGetVersion")))
+        {
+            RTL_OSVERSIONINFOW vi2{};
+            vi2.dwOSVersionInfoSize = sizeof(vi2);
+            if (RtlGetVersion(&vi2) == 0)
+            {
+                if (vi2.dwMajorVersion > 10)
+                    bRet = true;
+                else if (vi2.dwMajorVersion == 10)
+                {
+                    if (vi2.dwMinorVersion > 0)
+                        bRet = true;
+                    else if (vi2.dwBuildNumber >= 18362)
+                        bRet = true;
+                }
+            }
+        }
+    }
+    return bRet;
+}
+
+namespace {
+
+enum PreferredAppMode
+{
+    Default,
+    AllowDark,
+    ForceDark,
+    ForceLight,
+    Max
+};
+
 }
 
 extern "C" {
@@ -325,6 +363,18 @@ VCLPLUG_WIN_PUBLIC SalInstance* create_SalInstance()
     pSalData->mnCmdShow = aSI.wShowWindow;
 
     pSalData->mnAppThreadId = GetCurrentThreadId();
+
+    static bool bSetAllowDarkMode = OSSupportsDarkMode(); // too early to additionally check LibreOffice's config
+    if (bSetAllowDarkMode)
+    {
+        typedef PreferredAppMode(WINAPI* SetPreferredAppMode_t)(PreferredAppMode);
+        if (HINSTANCE hUxthemeLib = LoadLibraryExW(L"uxtheme.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32))
+        {
+            if (auto SetPreferredAppMode = reinterpret_cast<SetPreferredAppMode_t>(GetProcAddress(hUxthemeLib, MAKEINTRESOURCEA(135))))
+                SetPreferredAppMode(AllowDark);
+            FreeLibrary(hUxthemeLib);
+        }
+    }
 
     // register frame class
     WNDCLASSEXW aWndClassEx;
@@ -407,6 +457,15 @@ WinSalInstance::~WinSalInstance()
 #if HAVE_FEATURE_SKIA
     SkiaHelper::cleanup();
 #endif
+}
+
+void WinSalInstance::AfterAppInit()
+{
+// (1) Ideally this would be done at the place that creates the thread, but since this thread is normally
+// just the default/main thread, that is not possible.
+// (2) Don't do this on unix, where it causes tools like pstree on Linux to
+// confusingly report soffice.bin as VCL Main instead.
+    osl_setThreadName("VCL Main");
 }
 
 static LRESULT ImplSalDispatchMessage( const MSG* pMsg )
@@ -933,6 +992,18 @@ OUString WinSalInstance::getOSVersion()
 void WinSalInstance::BeforeAbort(const OUString&, bool)
 {
     ImplFreeSalGDI();
+}
+
+css::uno::Reference<css::uno::XInterface> WinSalInstance::ImplCreateDragSource(const SystemEnvData* pSysEnv)
+{
+    return vcl::OleDnDHelper(new DragSource(comphelper::getProcessComponentContext()),
+                             reinterpret_cast<sal_IntPtr>(pSysEnv->hWnd), vcl::DragOrDrop::Drag);
+}
+
+css::uno::Reference<css::uno::XInterface> WinSalInstance::ImplCreateDropTarget(const SystemEnvData* pSysEnv)
+{
+    return vcl::OleDnDHelper(new DropTarget(comphelper::getProcessComponentContext()),
+                             reinterpret_cast<sal_IntPtr>(pSysEnv->hWnd), vcl::DragOrDrop::Drop);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

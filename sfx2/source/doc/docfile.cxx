@@ -52,6 +52,7 @@
 #include <com/sun/star/ucb/CommandFailedException.hpp>
 #include <com/sun/star/ucb/CommandAbortedException.hpp>
 #include <com/sun/star/ucb/InteractiveLockingLockedException.hpp>
+#include <com/sun/star/ucb/InteractiveNetworkReadException.hpp>
 #include <com/sun/star/ucb/InteractiveNetworkWriteException.hpp>
 #include <com/sun/star/ucb/Lock.hpp>
 #include <com/sun/star/ucb/NameClashException.hpp>
@@ -78,6 +79,7 @@
 #include <comphelper/interaction.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/simplefileaccessinteraction.hxx>
+#include <comphelper/string.hxx>
 #include <framework/interaction.hxx>
 #include <utility>
 #include <svl/stritem.hxx>
@@ -105,7 +107,6 @@
 #include <ucbhelper/content.hxx>
 #include <ucbhelper/interactionrequest.hxx>
 #include <sot/storage.hxx>
-#include <unotools/saveopt.hxx>
 #include <svl/documentlockfile.hxx>
 #include <svl/msodocumentlockfile.hxx>
 #include <com/sun/star/document/DocumentRevisionListPersistence.hpp>
@@ -122,13 +123,13 @@
 #include <comphelper/propertysequence.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/svapp.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/fltrcfg.hxx>
 #include <sfx2/digitalsignatures.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <comphelper/threadpool.hxx>
+#include <o3tl/string_view.hxx>
 #include <condition_variable>
-#include <comphelper/scopeguard.hxx>
 
 #include <com/sun/star/io/WrongFormatException.hpp>
 
@@ -149,8 +150,8 @@ struct ReadOnlyMediumEntry
 {
     ReadOnlyMediumEntry(std::shared_ptr<std::recursive_mutex> pMutex,
                         std::shared_ptr<bool> pIsDestructed)
-        : _pMutex(pMutex)
-        , _pIsDestructed(pIsDestructed)
+        : _pMutex(std::move(pMutex))
+        , _pIsDestructed(std::move(pIsDestructed))
     {
     }
     std::shared_ptr<std::recursive_mutex> _pMutex;
@@ -347,6 +348,7 @@ class SfxMedium_Impl
 public:
     StreamMode m_nStorOpenMode;
     ErrCode    m_eError;
+    ErrCode    m_eWarningError;
 
     ::ucbhelper::Content aContent;
     bool bUpdatePickList:1;
@@ -399,7 +401,7 @@ public:
 
     uno::Sequence < util::RevisionTag > aVersions;
 
-    std::unique_ptr<::utl::TempFile> pTempFile;
+    std::unique_ptr<::utl::TempFileNamed> pTempFile;
 
     uno::Reference<embed::XStorage> xStorage;
     uno::Reference<embed::XStorage> m_xZipStorage;
@@ -436,6 +438,7 @@ public:
 SfxMedium_Impl::SfxMedium_Impl() :
     m_nStorOpenMode(SFX_STREAM_READWRITE),
     m_eError(ERRCODE_NONE),
+    m_eWarningError(ERRCODE_NONE),
     bUpdatePickList(true),
     bIsTemp( false ),
     bDownloadDone( true ),
@@ -486,6 +489,11 @@ void SfxMedium::ResetError()
         pImpl->m_pOutStream->ResetError();
 }
 
+ErrCode SfxMedium::GetWarningError() const
+{
+    return pImpl->m_eWarningError;
+}
+
 ErrCode const & SfxMedium::GetLastStorageCreationState() const
 {
     return pImpl->nLastStorageError;
@@ -494,6 +502,11 @@ ErrCode const & SfxMedium::GetLastStorageCreationState() const
 void SfxMedium::SetError(ErrCode nError)
 {
     pImpl->m_eError = nError;
+}
+
+void SfxMedium::SetWarningError(ErrCode nWarningError)
+{
+    pImpl->m_eWarningError = nWarningError;
 }
 
 ErrCode SfxMedium::GetErrorCode() const
@@ -524,7 +537,7 @@ void SfxMedium::CheckFileDate( const util::DateTime& aInitDate )
 
     try
     {
-        ::rtl::Reference< ::ucbhelper::InteractionRequest > xInteractionRequestImpl = new ::ucbhelper::InteractionRequest( uno::makeAny(
+        ::rtl::Reference< ::ucbhelper::InteractionRequest > xInteractionRequestImpl = new ::ucbhelper::InteractionRequest( uno::Any(
             document::ChangedByOthersRequest() ) );
         uno::Sequence< uno::Reference< task::XInteractionContinuation > > aContinuations{
             new ::ucbhelper::InteractionAbort( xInteractionRequestImpl.get() ),
@@ -829,9 +842,9 @@ bool SfxMedium::Commit()
     if( pImpl->xStorage.is() )
         StorageCommit_Impl();
     else if( pImpl->m_pOutStream  )
-        pImpl->m_pOutStream->Flush();
+        pImpl->m_pOutStream->FlushBuffer();
     else if( pImpl->m_pInStream  )
-        pImpl->m_pInStream->Flush();
+        pImpl->m_pInStream->FlushBuffer();
 
     if ( GetError() == ERRCODE_NONE )
     {
@@ -971,7 +984,7 @@ void SfxMedium::SetEncryptionDataToStorage_Impl()
 
     // replace the password with encryption data
     pImpl->m_pSet->ClearItem( SID_PASSWORD );
-    pImpl->m_pSet->Put( SfxUnoAnyItem( SID_ENCRYPTIONDATA, uno::makeAny( aEncryptionData ) ) );
+    pImpl->m_pSet->Put( SfxUnoAnyItem( SID_ENCRYPTIONDATA, uno::Any( aEncryptionData ) ) );
 
     try
     {
@@ -1005,7 +1018,7 @@ void SfxMedium::SetEncryptionDataToStorage_Impl()
 namespace
 {
 
-OUString tryMSOwnerFiles(const OUString& sDocURL)
+OUString tryMSOwnerFiles(std::u16string_view sDocURL)
 {
     svt::MSODocumentLockFile aMSOLockFile(sDocURL);
     LockFileEntry aData;
@@ -1026,7 +1039,7 @@ OUString tryMSOwnerFiles(const OUString& sDocURL)
     return sUserData;
 }
 
-OUString tryForeignLockfiles(const OUString& sDocURL)
+OUString tryForeignLockfiles(std::u16string_view sDocURL)
 {
     OUString sUserData = tryMSOwnerFiles(sDocURL);
     // here we can test for empty result, and add other known applications' lockfile testing
@@ -1060,7 +1073,7 @@ SfxMedium::ShowLockResult SfxMedium::ShowLockedDocumentDialog(const LockFileEntr
         {
             aInfo = aData[LockFileComponent::EDITTIME];
 
-            xInteractionRequestImpl = new ::ucbhelper::InteractionRequest( uno::makeAny(
+            xInteractionRequestImpl = new ::ucbhelper::InteractionRequest( uno::Any(
                 document::OwnLockOnDocumentRequest( OUString(), uno::Reference< uno::XInterface >(), aDocumentURL, aInfo, !bIsLoading ) ) );
         }
         else
@@ -1085,13 +1098,13 @@ SfxMedium::ShowLockResult SfxMedium::ShowLockedDocumentDialog(const LockFileEntr
 
             if (!bIsLoading) // so, !bHandleSysLocked
             {
-                xInteractionRequestImpl = new ::ucbhelper::InteractionRequest(uno::makeAny(
+                xInteractionRequestImpl = new ::ucbhelper::InteractionRequest(uno::Any(
                     document::LockedOnSavingRequest(OUString(), uno::Reference< uno::XInterface >(), aDocumentURL, aInfo)));
                 // Currently, only the last "Retry" continuation (meaning ignore the lock and try overwriting) can be returned.
             }
             else /*logically therefore bIsLoading is set */
             {
-                xInteractionRequestImpl = new ::ucbhelper::InteractionRequest( uno::makeAny(
+                xInteractionRequestImpl = new ::ucbhelper::InteractionRequest( uno::Any(
                     document::LockedDocumentRequest( OUString(), uno::Reference< uno::XInterface >(), aDocumentURL, aInfo ) ) );
             }
         }
@@ -1189,10 +1202,10 @@ bool SfxMedium::ShowLockFileProblemDialog(MessageDlg nWhichDlg)
         switch (nWhichDlg)
         {
             case MessageDlg::LockFileIgnore:
-                xIgnoreRequestImpl = new ::ucbhelper::InteractionRequest(uno::makeAny( document::LockFileIgnoreRequest() ));
+                xIgnoreRequestImpl = new ::ucbhelper::InteractionRequest(uno::Any( document::LockFileIgnoreRequest() ));
                 break;
             case MessageDlg::LockFileCorrupt:
-                xIgnoreRequestImpl = new ::ucbhelper::InteractionRequest(uno::makeAny( document::LockFileCorruptRequest() ));
+                xIgnoreRequestImpl = new ::ucbhelper::InteractionRequest(uno::Any( document::LockFileCorruptRequest() ));
                 break;
         }
 
@@ -1243,6 +1256,37 @@ namespace
     }
 }
 
+namespace
+{
+
+// for LOCK request, suppress dialog on 403, typically indicates read-only
+// document and there's a 2nd dialog prompting to open a copy anyway
+class LockInteractionHandler : public ::cppu::WeakImplHelper<task::XInteractionHandler>
+{
+private:
+    uno::Reference<task::XInteractionHandler> m_xHandler;
+
+public:
+    explicit LockInteractionHandler(uno::Reference<task::XInteractionHandler> const& xHandler)
+        : m_xHandler(xHandler)
+    {
+    }
+
+    virtual void SAL_CALL handle(uno::Reference<task::XInteractionRequest> const& xRequest) override
+    {
+        ucb::InteractiveNetworkWriteException readException;
+        ucb::InteractiveNetworkReadException writeException;
+        if ((xRequest->getRequest() >>= readException)
+            || (xRequest->getRequest() >>= writeException))
+        {
+            return; // 403 gets reported as one of these; ignore to avoid dialog
+        }
+        m_xHandler->handle(xRequest);
+    }
+};
+
+} // namespace
+
 #endif // HAVE_FEATURE_MULTIUSER_ENVIRONMENT
 
 // sets SID_DOC_READONLY if the document cannot be opened for editing
@@ -1270,7 +1314,6 @@ SfxMedium::LockFileResult SfxMedium::LockOrigFileOnDemand(bool bLoading, bool bN
         if (!IsWebDAVLockingUsed())
             return LockFileResult::Succeeded;
 
-        try
         {
             bool bResult = pImpl->m_bLocked;
             bool bIsTemplate = false;
@@ -1290,6 +1333,13 @@ SfxMedium::LockFileResult SfxMedium::LockOrigFileOnDemand(bool bLoading, bool bN
                     if( !bResult )
                     {
                         uno::Reference< task::XInteractionHandler > xCHandler = GetInteractionHandler( true );
+                        // Dialog with error is superfluous:
+                        // on loading, will result in read-only with infobar.
+                        // bNoUI case for Reload failing, will open dialog later.
+                        if (bLoading || bNoUI)
+                        {
+                            xCHandler = new LockInteractionHandler(xCHandler);
+                        }
                         Reference< css::ucb::XCommandEnvironment > xComEnv = new ::ucbhelper::CommandEnvironment(
                             xCHandler, Reference< css::ucb::XProgressHandler >() );
 
@@ -1362,7 +1412,9 @@ SfxMedium::LockFileResult SfxMedium::LockOrigFileOnDemand(bool bLoading, bool bN
                             // exception available
                         }
                         catch( uno::Exception& )
-                        {}
+                        {
+                            TOOLS_WARN_EXCEPTION( "sfx.doc", "Locking exception: WebDAV while trying to lock the file" );
+                        }
                     }
                 } while( !bResult && bUIStatus == ShowLockResult::Try );
             }
@@ -1387,10 +1439,6 @@ SfxMedium::LockFileResult SfxMedium::LockOrigFileOnDemand(bool bLoading, bool bN
 
             if ( bResult )
                 eResult = LockFileResult::Succeeded;
-        }
-        catch ( const uno::Exception& )
-        {
-            TOOLS_WARN_EXCEPTION( "sfx.doc", "Locking exception: WebDAV while trying to lock the file" );
         }
         return eResult;
     }
@@ -1710,7 +1758,7 @@ uno::Reference < embed::XStorage > SfxMedium::GetStorage( bool bCreateTempFile )
             aArgs.realloc(3); // ??? this may re-write the data added above for pRepairItem
             pArgs = aArgs.getArray();
             uno::Sequence<beans::PropertyValue> aProperties(
-                comphelper::InitPropertySequence({ { "NoFileSync", uno::makeAny(true) } }));
+                comphelper::InitPropertySequence({ { "NoFileSync", uno::Any(true) } }));
             pArgs[2] <<= aProperties;
         }
     }
@@ -1788,8 +1836,7 @@ uno::Reference < embed::XStorage > SfxMedium::GetStorage( bool bCreateTempFile )
                 if ( pStream && pStream->GetError() == ERRCODE_NONE )
                 {
                     // Unpack Stream  in TempDir
-                    ::utl::TempFile aTempFile;
-                    const OUString& aTmpName = aTempFile.GetURL();
+                    const OUString aTmpName = ::utl::CreateTempURL();
                     SvFileStream    aTmpStream( aTmpName, SFX_STREAM_READWRITE );
 
                     pStream->ReadStream( aTmpStream );
@@ -2099,7 +2146,7 @@ void SfxMedium::TransactedTransferForFS_Impl( const INetURLObject& aSource,
                     {
                         Reference< XInputStream > aTempInput = aTempCont.openStream();
                         bTransactStarted = true;
-                        aOriginalContent.setPropertyValue( "Size", uno::makeAny( sal_Int64(0) ) );
+                        aOriginalContent.setPropertyValue( "Size", uno::Any( sal_Int64(0) ) );
                         aOriginalContent.writeStream( aTempInput, bOverWrite );
                         bResult = true;
                     }
@@ -2147,7 +2194,7 @@ void SfxMedium::TransactedTransferForFS_Impl( const INetURLObject& aSource,
                 pImpl->pTempFile.reset();
             }
         }
-        else if ( bTransactStarted )
+        else if ( bTransactStarted && pImpl->m_eError != ERRCODE_ABORT )
         {
             UseBackupToRestore_Impl( aOriginalContent, xDummyEnv );
         }
@@ -2321,7 +2368,8 @@ void SfxMedium::Transfer_Impl()
     // a special case, an interaction handler should be used for
     // authentication in case it is available
     Reference< css::ucb::XCommandEnvironment > xComEnv;
-    Reference< css::task::XInteractionHandler > xInteractionHandler = GetInteractionHandler();
+    bool bForceInteractionHandler = GetURLObject().isAnyKnownWebDAVScheme();
+    Reference< css::task::XInteractionHandler > xInteractionHandler = GetInteractionHandler(bForceInteractionHandler);
     if (xInteractionHandler.is())
         xComEnv = new ::ucbhelper::CommandEnvironment( xInteractionHandler,
                                                   Reference< css::ucb::XProgressHandler >() );
@@ -2515,14 +2563,14 @@ void SfxMedium::Transfer_Impl()
 
 
 void SfxMedium::DoInternalBackup_Impl( const ::ucbhelper::Content& aOriginalContent,
-                                       const OUString& aPrefix,
-                                       const OUString& aExtension,
+                                       std::u16string_view aPrefix,
+                                       std::u16string_view aExtension,
                                        const OUString& aDestDir )
 {
     if ( !pImpl->m_aBackupURL.isEmpty() )
         return; // the backup was done already
 
-    ::utl::TempFile aTransactTemp( aPrefix, true, &aExtension, &aDestDir );
+    ::utl::TempFileNamed aTransactTemp( aPrefix, true, aExtension, &aDestDir );
 
     INetURLObject aBackObj( aTransactTemp.GetURL() );
     OUString aBackupName = aBackObj.getName( INetURLObject::LAST_SEGMENT, true, INetURLObject::DecodeMechanism::WithCharset );
@@ -2759,7 +2807,7 @@ void SfxMedium::GetMedium_Impl()
             if( !(pImpl->m_nStorOpenMode & StreamMode::WRITE) )
                 GetItemSet()->Put( SfxBoolItem( SID_DOC_READONLY, true ) );
             if (xInteractionHandler.is())
-                GetItemSet()->Put( SfxUnoAnyItem( SID_INTERACTIONHANDLER, makeAny(xInteractionHandler) ) );
+                GetItemSet()->Put( SfxUnoAnyItem( SID_INTERACTIONHANDLER, Any(xInteractionHandler) ) );
         }
 
         if ( pImpl->m_xInputStreamToLoadFrom.is() )
@@ -2818,9 +2866,9 @@ void SfxMedium::GetMedium_Impl()
         {
             //TODO/MBA: need support for SID_STREAM
             if ( pImpl->xStream.is() )
-                GetItemSet()->Put( SfxUnoAnyItem( SID_STREAM, makeAny( pImpl->xStream ) ) );
+                GetItemSet()->Put( SfxUnoAnyItem( SID_STREAM, Any( pImpl->xStream ) ) );
 
-            GetItemSet()->Put( SfxUnoAnyItem( SID_INPUTSTREAM, makeAny( pImpl->xInputStream ) ) );
+            GetItemSet()->Put( SfxUnoAnyItem( SID_INPUTSTREAM, Any( pImpl->xInputStream ) ) );
         }
     }
 
@@ -2937,7 +2985,7 @@ void SfxMedium::Init_Impl()
         }
     }
 
-    if ( pSalvageItem && !pSalvageItem->GetValue().isEmpty() )
+    if ( pSalvageItem )
     {
         std::unique_lock<std::recursive_mutex> chkEditLock;
         if (pImpl->m_pCheckEditableWorkerMutex != nullptr)
@@ -3044,11 +3092,11 @@ const std::shared_ptr<const SfxFilter>& SfxMedium::GetFilter() const
     return pImpl->m_pFilter;
 }
 
-sal_uInt32 SfxMedium::CreatePasswordToModifyHash( const OUString& aPasswd, bool bWriter )
+sal_uInt32 SfxMedium::CreatePasswordToModifyHash( std::u16string_view aPasswd, bool bWriter )
 {
     sal_uInt32 nHash = 0;
 
-    if ( !aPasswd.isEmpty() )
+    if ( !aPasswd.empty() )
     {
         if ( bWriter )
         {
@@ -3327,7 +3375,7 @@ void SfxMedium::CompleteReOpen()
     bool bUseInteractionHandler = pImpl->bUseInteractionHandler;
     pImpl->bUseInteractionHandler = false;
 
-    std::unique_ptr<::utl::TempFile> pTmpFile;
+    std::unique_ptr<::utl::TempFileNamed> pTmpFile;
     if ( pImpl->pTempFile )
     {
         pTmpFile = std::move(pImpl->pTempFile);
@@ -3390,12 +3438,12 @@ SfxMedium::SfxMedium( const uno::Sequence<beans::PropertyValue>& aArgs ) :
 
     OUString aFilterProvider, aFilterName;
     {
-        const SfxPoolItem* pItem = nullptr;
-        if (pImpl->m_pSet->HasItem(SID_FILTER_PROVIDER, &pItem))
-            aFilterProvider = static_cast<const SfxStringItem*>(pItem)->GetValue();
+        const SfxStringItem* pItem = nullptr;
+        if ((pItem = pImpl->m_pSet->GetItemIfSet(SID_FILTER_PROVIDER)))
+            aFilterProvider = pItem->GetValue();
 
-        if (pImpl->m_pSet->HasItem(SID_FILTER_NAME, &pItem))
-            aFilterName = static_cast<const SfxStringItem*>(pItem)->GetValue();
+        if ((pItem = pImpl->m_pSet->GetItemIfSet(SID_FILTER_NAME)))
+            aFilterName = pItem->GetValue();
     }
 
     if (aFilterProvider.isEmpty())
@@ -3450,9 +3498,11 @@ SfxMedium::SfxMedium( const uno::Sequence<beans::PropertyValue>& aArgs ) :
 
 void SfxMedium::SetArgs(const uno::Sequence<beans::PropertyValue>& rArgs)
 {
+    static constexpr OUStringLiteral sStream(u"Stream");
+    static constexpr OUStringLiteral sInputStream(u"InputStream");
     comphelper::SequenceAsHashMap aArgsMap(rArgs);
-    aArgsMap.erase("Stream");
-    aArgsMap.erase("InputStream");
+    aArgsMap.erase(sStream);
+    aArgsMap.erase(sInputStream);
     pImpl->m_aArgs = aArgsMap.getAsConstPropertyValueList();
 }
 
@@ -3662,7 +3712,7 @@ void SfxMedium::AddVersion_Impl( util::RevisionTag& rRevision )
     sal_Int32 nLength = pImpl->aVersions.getLength();
     for ( const auto& rVersion : std::as_const(pImpl->aVersions) )
     {
-        sal_uInt32 nVer = static_cast<sal_uInt32>( rVersion.Identifier.copy(7).toInt32());
+        sal_uInt32 nVer = static_cast<sal_uInt32>( o3tl::toInt32(rVersion.Identifier.subView(7)));
         size_t n;
         for ( n=0; n<aLongs.size(); ++n )
             if ( nVer<aLongs[n] )
@@ -3832,7 +3882,7 @@ void SfxMedium::CreateTempFile( bool bReplace )
     }
 
     OUString aLogicBase = GetLogicBase(GetURLObject(), pImpl);
-    pImpl->pTempFile.reset(new ::utl::TempFile(&aLogicBase));
+    pImpl->pTempFile.reset(new ::utl::TempFileNamed(&aLogicBase));
     pImpl->pTempFile->EnableKillingFile();
     pImpl->m_aName = pImpl->pTempFile->GetFileName();
     OUString aTmpURL = pImpl->pTempFile->GetURL();
@@ -3928,7 +3978,7 @@ void SfxMedium::CreateTempFileNoCopy()
     pImpl->pTempFile.reset();
 
     OUString aLogicBase = GetLogicBase(GetURLObject(), pImpl);
-    pImpl->pTempFile.reset(new ::utl::TempFile(&aLogicBase));
+    pImpl->pTempFile.reset(new ::utl::TempFileNamed(&aLogicBase));
     pImpl->pTempFile->EnableKillingFile();
     pImpl->m_aName = pImpl->pTempFile->GetFileName();
     if ( pImpl->m_aName.isEmpty() )
@@ -4264,16 +4314,16 @@ bool SfxMedium::IsOpen() const
     return pImpl->m_pInStream || pImpl->m_pOutStream || pImpl->xStorage.is();
 }
 
-OUString SfxMedium::CreateTempCopyWithExt( const OUString& aURL )
+OUString SfxMedium::CreateTempCopyWithExt( std::u16string_view aURL )
 {
     OUString aResult;
 
-    if ( !aURL.isEmpty() )
+    if ( !aURL.empty() )
     {
-        sal_Int32 nPrefixLen = aURL.lastIndexOf( '.' );
-        OUString aExt = ( nPrefixLen == -1 ) ? OUString() :  aURL.copy( nPrefixLen );
+        size_t nPrefixLen = aURL.rfind( '.' );
+        std::u16string_view aExt = ( nPrefixLen == std::u16string_view::npos ) ? std::u16string_view() : aURL.substr( nPrefixLen );
 
-        OUString aNewTempFileURL = ::utl::TempFile( OUString(), true, &aExt ).GetURL();
+        OUString aNewTempFileURL = ::utl::CreateTempURL( u"", true, aExt );
         if ( !aNewTempFileURL.isEmpty() )
         {
             INetURLObject aSource( aURL );
@@ -4343,10 +4393,10 @@ OUString SfxMedium::SwitchDocumentToTempFile()
     if ( !aOrigURL.isEmpty() )
     {
         sal_Int32 nPrefixLen = aOrigURL.lastIndexOf( '.' );
-        OUString const aExt = (nPrefixLen == -1)
-                                ? OUString()
-                                : aOrigURL.copy(nPrefixLen);
-        OUString aNewURL = ::utl::TempFile( OUString(), true, &aExt ).GetURL();
+        std::u16string_view aExt = (nPrefixLen == -1)
+                                ? std::u16string_view()
+                                : aOrigURL.subView(nPrefixLen);
+        OUString aNewURL = ::utl::CreateTempURL( u"", true, aExt );
 
         // TODO/LATER: In future the aLogicName should be set to shared folder URL
         //             and a temporary file should be created. Transport_Impl should be impossible then.
@@ -4388,17 +4438,18 @@ OUString SfxMedium::SwitchDocumentToTempFile()
                     {}
                 }
 
+                if (bWasReadonly)
+                {
+                    // set the readonly state back
+                    pImpl->m_nStorOpenMode = SFX_STREAM_READONLY;
+                    GetItemSet()->Put(SfxBoolItem(SID_DOC_READONLY, true));
+                }
+
                 if ( aResult.isEmpty() )
                 {
                     Close();
                     SetPhysicalName_Impl( OUString() );
                     SetName( aOrigURL );
-                    if ( bWasReadonly )
-                    {
-                        // set the readonly state back
-                        pImpl->m_nStorOpenMode = SFX_STREAM_READONLY;
-                        GetItemSet()->Put( SfxBoolItem(SID_DOC_READONLY, true));
-                    }
                     GetMedium_Impl();
                     pImpl->xStorage = xStorage;
                 }
@@ -4581,7 +4632,7 @@ IMPL_STATIC_LINK(SfxMedium, ShowReloadEditableDialog, void*, p, void)
         OUString aDocumentURL
             = pMed->GetURLObject().GetLastName(INetURLObject::DecodeMechanism::WithCharset);
         ::rtl::Reference<::ucbhelper::InteractionRequest> xInteractionRequestImpl
-            = new ::ucbhelper::InteractionRequest(uno::makeAny(document::ReloadEditableRequest(
+            = new ::ucbhelper::InteractionRequest(uno::Any(document::ReloadEditableRequest(
                 OUString(), uno::Reference<uno::XInterface>(), aDocumentURL)));
         if (xInteractionRequestImpl != nullptr)
         {

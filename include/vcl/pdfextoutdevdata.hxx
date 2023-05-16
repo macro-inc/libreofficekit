@@ -25,10 +25,12 @@
 #include <vcl/pdfwriter.hxx>
 #include <vcl/extoutdevdata.hxx>
 #include <vector>
+#include <map>
 #include <memory>
 
 class Graphic;
 class GDIMetaFile;
+class SdrObject;
 
 namespace vcl
 {
@@ -72,6 +74,7 @@ class VCL_DLLPUBLIC PDFExtOutDevData final : public ExtOutDevData
 
     bool                        mbTaggedPDF;
     bool                        mbExportNotes;
+    bool                        mbExportNotesInMargin;
     bool                        mbExportNotesPages;
     bool                        mbTransitionEffects;
     bool                        mbUseLosslessCompression;
@@ -90,6 +93,8 @@ class VCL_DLLPUBLIC PDFExtOutDevData final : public ExtOutDevData
 
     std::vector< PDFExtOutDevBookmarkEntry > maBookmarks;
     std::vector<OUString> maChapterNames;
+    // map from annotation SdrObject to annotation index
+    ::std::map<SdrObject const*, ::std::vector<sal_Int32>> m_ScreenAnnotations;
 
 public:
 
@@ -103,6 +108,9 @@ public:
 
     bool    GetIsExportNotes() const { return mbExportNotes;}
     void        SetIsExportNotes( const bool bExportNotes );
+
+    bool    GetIsExportNotesInMargin() const { return mbExportNotesInMargin;}
+    void        SetIsExportNotesInMargin( const bool bExportNotesInMargin );
 
     bool    GetIsExportNotesPages() const { return mbExportNotesPages;}
     void        SetIsExportNotesPages( const bool bExportNotesPages );
@@ -252,14 +260,20 @@ public:
     number of page the link is on (as returned by NewPage)
     or -1 in which case the current page is used
 
+    @param rAltText
+    Alt text for the link
+
     @returns
     the link id (to be used in SetLinkDest, SetLinkURL) or
     -1 if page id does not exist
     */
-    sal_Int32 CreateLink( const tools::Rectangle& rRect, sal_Int32 nPageNr = -1 );
+    sal_Int32 CreateLink(const tools::Rectangle& rRect, OUString const& rAltText, sal_Int32 nPageNr = -1);
 
     /// Create a Screen annotation.
-    sal_Int32 CreateScreen(const tools::Rectangle& rRect, sal_Int32 nPageNr);
+    sal_Int32 CreateScreen(const tools::Rectangle& rRect, OUString const& rAltText, sal_Int32 nPageNr, SdrObject const* pObj);
+
+    /// Get back the annotations created for one SdrObject.
+    ::std::vector<sal_Int32> const& GetScreenAnnotIds(SdrObject const* pObj) const;
 
     /** Set the destination for a link
         <p>will change a URL type link to a dest link if necessary</p>
@@ -430,6 +444,11 @@ public:
     the new bounding box for the structural element
      */
     void SetStructureBoundingBox( const tools::Rectangle& rRect );
+
+    /** set the annotations that should be referenced as children of the
+        current structural element.
+     */
+    void SetStructureAnnotIds(::std::vector<sal_Int32> const& rAnnotIds);
 
     /** set the ActualText attribute of a structural element
 

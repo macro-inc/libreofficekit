@@ -35,7 +35,7 @@ class PieChart : public VSeriesPlotter
 public:
     PieChart() = delete;
 
-    PieChart( const css::uno::Reference< css::chart2::XChartType >& xChartTypeModel
+    PieChart( const rtl::Reference< ::chart::ChartType >& xChartTypeModel
             , sal_Int32 nDimensionCount, bool bExcludingPositioning );
     virtual ~PieChart() override;
 
@@ -63,12 +63,13 @@ public:
     virtual bool isSeparateStackingForDifferentSigns( sal_Int32 nDimensionIndex ) override;
 
 private: //methods
-    css::uno::Reference<css::drawing::XShape>
+    rtl::Reference<SvxShape>
         createDataPoint(
-            const css::uno::Reference<css::drawing::XShapes>& xTarget,
+            const rtl::Reference<SvxShapeGroupAnyD>& xTarget,
             const css::uno::Reference<css::beans::XPropertySet>& xObjectProperties,
-            tPropertyNameValueMap const * pOverWritePropertiesMap,
-            const ShapeParam& rParam );
+            const ShapeParam& rParam,
+            const sal_Int32 nPointCount,
+            const bool bConcentricExplosion);
 
     /** This method creates a text shape for a label of a data point.
      *
@@ -82,7 +83,7 @@ private: //methods
      *      ShapeParam object.
      */
     void createTextLabelShape(
-        const css::uno::Reference<css::drawing::XShapes>& xTextTarget,
+        const rtl::Reference<SvxShapeGroupAnyD>& xTextTarget,
         VDataSeries& rSeries, sal_Int32 nPointIndex, ShapeParam& rParam );
 
     /** This method sets `m_fMaxOffset` to the maximum `Offset` property and
@@ -120,8 +121,8 @@ private: //member
         bool moveAwayFrom( const PieLabelInfo* pFix, const css::awt::Size& rPageSize
             , bool bMoveHalfWay, bool bMoveClockwise );
 
-        css::uno::Reference< css::drawing::XShape > xTextShape;
-        css::uno::Reference< css::drawing::XShape > xLabelGroupShape;
+        rtl::Reference< SvxShapeText > xTextShape;
+        rtl::Reference< SvxShapeGroupAnyD > xLabelGroupShape;
         ::basegfx::B2IVector aFirstPosition;
         ::basegfx::B2IVector aOuterPosition;
         ::basegfx::B2IVector aOrigin;
@@ -129,7 +130,7 @@ private: //member
         bool bMovementAllowed;
         bool bMoved;
         bool bShowLeaderLine;
-        css::uno::Reference< css::drawing::XShapes > xTextTarget;
+        rtl::Reference<SvxShapeGroupAnyD> xTextTarget;
         PieLabelInfo* pPrevious;
         PieLabelInfo* pNext;
         css::awt::Point aPreviousPosition;

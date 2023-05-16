@@ -18,13 +18,13 @@
  */
 
 #include "backingwindow.hxx"
+#include <utility>
 #include <vcl/event.hxx>
 #include <vcl/help.hxx>
 #include <vcl/ptrstyle.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/syswin.hxx>
-#include <vcl/virdev.hxx>
 
 #include <unotools/historyoptions.hxx>
 #include <unotools/moduleoptions.hxx>
@@ -39,7 +39,7 @@
 #include <sfx2/app.hxx>
 #include <officecfg/Office/Common.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/configuration/theDefaultProvider.hpp>
 #include <com/sun/star/container/XNameAccess.hpp>
@@ -69,11 +69,16 @@ private:
     Size m_BmpSize;
 
 public:
-    Size getSize() { return m_BmpSize; }
+    const Size & getSize() { return m_BmpSize; }
 
     virtual void SetDrawingArea(weld::DrawingArea* pDrawingArea) override
     {
         weld::CustomWidgetController::SetDrawingArea(pDrawingArea);
+
+        const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
+        OutputDevice& rDevice = pDrawingArea->get_ref_device();
+        rDevice.SetBackground(Wallpaper(rStyleSettings.GetWindowColor()));
+
         SetPointer(PointerStyle::RefHand);
     }
 
@@ -143,11 +148,13 @@ float const g_fMultiplier = 1.2f;
 BackingWindow::BackingWindow(vcl::Window* i_pParent)
     : InterimItemWindow(i_pParent, "sfx/ui/startcenter.ui", "StartCenter", false)
     , mxOpenButton(m_xBuilder->weld_button("open_all"))
-    , mxRecentButton(m_xBuilder->weld_menu_toggle_button("open_recent"))
+    , mxRecentButton(m_xBuilder->weld_toggle_button("open_recent"))
     , mxRemoteButton(m_xBuilder->weld_button("open_remote"))
-    , mxTemplateButton(m_xBuilder->weld_menu_toggle_button("templates_all"))
+    , mxTemplateButton(m_xBuilder->weld_toggle_button("templates_all"))
     , mxCreateLabel(m_xBuilder->weld_label("create_label"))
     , mxAltHelpLabel(m_xBuilder->weld_label("althelplabel"))
+    , mxFilter(m_xBuilder->weld_combo_box("cbFilter"))
+    , mxActions(m_xBuilder->weld_menu_button("mbActions"))
     , mxWriterAllButton(m_xBuilder->weld_button("writer_all"))
     , mxCalcAllButton(m_xBuilder->weld_button("calc_all"))
     , mxImpressAllButton(m_xBuilder->weld_button("impress_all"))
@@ -170,9 +177,12 @@ BackingWindow::BackingWindow(vcl::Window* i_pParent)
     , mbLocalViewInitialized(false)
     , mbInitControls(false)
 {
-    // init background
+    // init background, undo InterimItemWindow defaults for this widget
     SetPaintTransparent(false);
-    SetBackground(svtools::ColorConfig().GetColorValue(::svtools::APPBACKGROUND).nColor);
+
+    // square action button
+    auto nHeight = mxFilter->get_preferred_size().getHeight();
+    mxActions->set_size_request(nHeight, nHeight);
 
     //set an alternative help label that doesn't hotkey the H of the Help menu
     mxHelpButton->set_label(mxAltHelpLabel->get_label());
@@ -227,6 +237,8 @@ void BackingWindow::dispose()
     mxTemplateButton.reset();
     mxCreateLabel.reset();
     mxAltHelpLabel.reset();
+    mxFilter.reset();
+    mxActions.reset();
     mxWriterAllButton.reset();
     mxCalcAllButton.reset();
     mxImpressAllButton.reset();
@@ -278,11 +290,9 @@ void BackingWindow::initControls()
     mxAllRecentThumbnails->mnFileTypes |= sfx2::ApplicationType::TYPE_OTHER;
     mxAllRecentThumbnails->Reload();
     mxAllRecentThumbnails->ShowTooltips( true );
-    mxRecentButton->set_active(true);
-    mxRecentButton->grab_focus();
 
-    //initialize Template view
-    mxLocalView->Hide();
+    mxRecentButton->set_active(true);
+    ToggleHdl(*mxRecentButton);
 
     //set handlers
     mxLocalView->setCreateContextMenuHdl(LINK(this, BackingWindow, CreateContextMenuHdl));
@@ -296,8 +306,6 @@ void BackingWindow::initControls()
 
     mxOpenButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
     mxRemoteButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
-    mxRecentButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
-    mxTemplateButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
     mxWriterAllButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
     mxDrawAllButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
     mxCalcAllButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
@@ -305,8 +313,11 @@ void BackingWindow::initControls()
     mxImpressAllButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
     mxMathAllButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
 
-    mxRecentButton->connect_selected(LINK(this, BackingWindow, MenuSelectHdl));
-    mxTemplateButton->connect_selected(LINK(this, BackingWindow, MenuSelectHdl));
+    mxRecentButton->connect_toggled(LINK(this, BackingWindow, ToggleHdl));
+    mxTemplateButton->connect_toggled(LINK(this, BackingWindow, ToggleHdl));
+
+    mxFilter->connect_changed(LINK(this, BackingWindow, FilterHdl));
+    mxActions->connect_selected(LINK(this, BackingWindow, MenuSelectHdl));
 
     ApplyStyleSettings();
 }
@@ -355,6 +366,7 @@ void BackingWindow::ApplyStyleSettings()
 
     mxAllButtonsBox->set_background(aButtonsBackground);
     mxSmallButtonsBox->set_background(aButtonsBackground);
+    SetBackground(aButtonsBackground);
 
     // compute the menubar height
     sal_Int32 nMenuHeight = 0;
@@ -402,7 +414,7 @@ void BackingWindow::checkInstalledModules()
 
 bool BackingWindow::PreNotify(NotifyEvent& rNEvt)
 {
-    if( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT )
+    if( rNEvt.GetType() == NotifyEventType::KEYINPUT )
     {
         const KeyEvent* pEvt = rNEvt.GetKeyEvent();
         const vcl::KeyCode& rKeyCode(pEvt->GetKeyCode());
@@ -547,6 +559,61 @@ IMPL_LINK(BackingWindow, ExtLinkClickHdl, weld::Button&, rButton, void)
     }
 }
 
+void BackingWindow::applyFilter()
+{
+    const int nFilter = mxFilter->get_active();
+    if (mxLocalView->IsVisible())
+    {
+        FILTER_APPLICATION aFilter = static_cast<FILTER_APPLICATION>(nFilter);
+        mxLocalView->filterItems(ViewFilter_Application(aFilter));
+    }
+    else
+    {
+        sfx2::ApplicationType aFilter;
+        if (nFilter == 0)
+            aFilter = sfx2::ApplicationType::TYPE_NONE;
+        else
+            aFilter = static_cast<sfx2::ApplicationType>(1 << (nFilter - 1));
+        mxAllRecentThumbnails->setFilter(aFilter);
+    }
+}
+
+IMPL_LINK_NOARG( BackingWindow, FilterHdl, weld::ComboBox&, void )
+{
+    applyFilter();
+}
+
+IMPL_LINK( BackingWindow, ToggleHdl, weld::Toggleable&, rButton, void )
+{
+    bool bRecentMode;
+    if (&rButton == mxRecentButton.get())
+        bRecentMode = rButton.get_active();
+    else
+        bRecentMode = !rButton.get_active();
+
+    if (bRecentMode)
+    {
+        mxLocalView->Hide();
+        mxAllRecentThumbnails->Show();
+        mxAllRecentThumbnails->GrabFocus();
+        mxRecentButton->set_active(true);
+        mxTemplateButton->set_active(false);
+        mxActions->set_sensitive(true);
+    }
+    else
+    {
+        mxAllRecentThumbnails->Hide();
+        initializeLocalView();
+        mxLocalView->Show();
+        mxLocalView->reload();
+        mxLocalView->GrabFocus();
+        mxRecentButton->set_active(false);
+        mxTemplateButton->set_active(true);
+        mxActions->set_sensitive(false);
+    }
+    applyFilter();
+}
+
 IMPL_LINK( BackingWindow, ClickHdl, weld::Button&, rButton, void )
 {
     // dispatch the appropriate URL and end the dialog
@@ -566,39 +633,13 @@ IMPL_LINK( BackingWindow, ClickHdl, weld::Button&, rButton, void )
     {
         Reference< XDispatchProvider > xFrame( mxFrame, UNO_QUERY );
 
-        Sequence< css::beans::PropertyValue > aArgs(1);
-        PropertyValue* pArg = aArgs.getArray();
-        pArg[0].Name = "Referer";
-        pArg[0].Value <<= OUString("private:user");
-
-        dispatchURL( ".uno:Open", OUString(), xFrame, aArgs );
+        dispatchURL( ".uno:Open", OUString(), xFrame, { comphelper::makePropertyValue("Referer", OUString("private:user")) } );
     }
     else if( &rButton == mxRemoteButton.get() )
     {
         Reference< XDispatchProvider > xFrame( mxFrame, UNO_QUERY );
 
-        Sequence< css::beans::PropertyValue > aArgs(0);
-
-        dispatchURL( ".uno:OpenRemote", OUString(), xFrame, aArgs );
-    }
-    else if( &rButton == mxRecentButton.get() )
-    {
-        mxLocalView->Hide();
-        mxAllRecentThumbnails->Show();
-        mxAllRecentThumbnails->GrabFocus();
-        mxRecentButton->set_active(true);
-        mxTemplateButton->set_active(false);
-    }
-    else if( &rButton == mxTemplateButton.get() )
-    {
-        mxAllRecentThumbnails->Hide();
-        initializeLocalView();
-        mxLocalView->filterItems(ViewFilter_Application(FILTER_APPLICATION::NONE));
-        mxLocalView->Show();
-        mxLocalView->reload();
-        mxLocalView->GrabFocus();
-        mxRecentButton->set_active(false);
-        mxTemplateButton->set_active(true);
+        dispatchURL( ".uno:OpenRemote", OUString(), xFrame, {} );
     }
 }
 
@@ -610,45 +651,9 @@ IMPL_LINK (BackingWindow, MenuSelectHdl, const OString&, rId, void)
         mxAllRecentThumbnails->Reload();
         return;
     }
-    else if (!rId.isEmpty())
+    else if(rId == "clear_unavailable")
     {
-        initializeLocalView();
-
-        if( rId == "filter_writer" )
-        {
-            mxLocalView->filterItems(ViewFilter_Application(FILTER_APPLICATION::WRITER));
-        }
-        else if( rId == "filter_calc" )
-        {
-            mxLocalView->filterItems(ViewFilter_Application(FILTER_APPLICATION::CALC));
-        }
-        else if( rId == "filter_impress" )
-        {
-            mxLocalView->filterItems(ViewFilter_Application(FILTER_APPLICATION::IMPRESS));
-        }
-        else if( rId == "filter_draw" )
-        {
-            mxLocalView->filterItems(ViewFilter_Application(FILTER_APPLICATION::DRAW));
-        }
-        else if( rId == "manage" )
-        {
-            Reference< XDispatchProvider > xFrame( mxFrame, UNO_QUERY );
-
-            Sequence< css::beans::PropertyValue > aArgs(1);
-            PropertyValue* pArg = aArgs.getArray();
-            pArg[0].Name = "Referer";
-            pArg[0].Value <<= OUString("private:user");
-
-            dispatchURL( ".uno:NewDoc", OUString(), xFrame, aArgs );
-            return;
-        }
-
-        mxAllRecentThumbnails->Hide();
-        mxLocalView->Show();
-        mxLocalView->reload();
-        mxLocalView->GrabFocus();
-        mxRecentButton->set_active(false);
-        mxTemplateButton->set_active(true);
+        mxAllRecentThumbnails->clearUnavailableFiles();
     }
 }
 
@@ -712,10 +717,10 @@ struct ImplDelayedDispatch
     Sequence< PropertyValue >   aArgs;
 
     ImplDelayedDispatch( const Reference< XDispatch >& i_xDispatch,
-                         const css::util::URL& i_rURL,
+                         css::util::URL i_aURL,
                          const Sequence< PropertyValue >& i_rArgs )
     : xDispatch( i_xDispatch ),
-      aDispatchURL( i_rURL ),
+      aDispatchURL(std::move( i_aURL )),
       aArgs( i_rArgs )
     {
     }
@@ -767,7 +772,7 @@ void BackingWindow::dispatchURL( const OUString& i_rURL,
         // dispatch the URL
         if ( xDispatch.is() )
         {
-            std::unique_ptr<ImplDelayedDispatch> pDisp(new ImplDelayedDispatch( xDispatch, aDispatchURL, i_rArgs ));
+            std::unique_ptr<ImplDelayedDispatch> pDisp(new ImplDelayedDispatch( xDispatch, std::move(aDispatchURL), i_rArgs ));
             if( Application::PostUserEvent( Link<void*,void>( nullptr, implDispatchDelayed ), pDisp.get() ) )
                 pDisp.release();
         }

@@ -44,6 +44,8 @@ class SwXMLTextBlocks final : public SwImpBlocks
     SwXmlFlags              m_nFlags;
     OUString                m_aPackageName;
     tools::SvRef<SfxMedium> m_xMedium;
+    css::uno::Reference < css::embed::XStorage > m_xBlkRoot;
+    css::uno::Reference < css::embed::XStorage > m_xRoot;
 
     void ReadInfo();
     void WriteInfo();
@@ -51,8 +53,6 @@ class SwXMLTextBlocks final : public SwImpBlocks
     void ResetBlockMode();
 
 public:
-    css::uno::Reference < css::embed::XStorage > m_xBlkRoot;
-    css::uno::Reference < css::embed::XStorage > m_xRoot;
     SwXMLTextBlocks( const OUString& rFile );
     SwXMLTextBlocks( const css::uno::Reference < css::embed::XStorage >&, const OUString& rFile );
     void   AddName( const OUString&, const OUString&, const OUString&, bool bOnlyText );
@@ -61,6 +61,7 @@ public:
     virtual ~SwXMLTextBlocks() override;
     virtual ErrCode Delete( sal_uInt16 ) override;
     virtual ErrCode Rename( sal_uInt16, const OUString& ) override;
+    virtual ErrCode CopyBlock( SwImpBlocks& rImp, OUString& rShort, const OUString& rLong) override;
     virtual void  ClearDoc() override;
     virtual ErrCode GetDoc( sal_uInt16 ) override;
     virtual ErrCode BeginPutDoc( const OUString&, const OUString& ) override;
@@ -90,8 +91,8 @@ public:
     ErrCode StartPutBlock( const OUString& rShort, const OUString& rPackageName );
     ErrCode PutBlock();
     ErrCode GetBlockText( std::u16string_view rShort, OUString& rText );
-    ErrCode PutBlockText( const OUString& rShort, const OUString& rText, const OUString& rPackageName );
-    void MakeBlockText( const OUString& rText );
+    ErrCode PutBlockText( const OUString& rShort, std::u16string_view rText, const OUString& rPackageName );
+    void MakeBlockText( std::u16string_view rText );
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

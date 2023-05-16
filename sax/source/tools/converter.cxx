@@ -30,6 +30,7 @@
 #include <rtl/math.hxx>
 #include <rtl/character.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 #include <o3tl/typed_flags_set.hxx>
 #include <o3tl/unit_conversion.hxx>
 #include <osl/diagnose.h>
@@ -687,6 +688,22 @@ bool Converter::convertDouble(double& rValue,
 }
 
 /** convert string to double number (using ::rtl::math) */
+bool Converter::convertDouble(double& rValue,
+    std::string_view rString, sal_Int16 nSourceUnit, sal_Int16 nTargetUnit)
+{
+    if (!convertDouble(rValue, rString))
+        return false;
+
+    OStringBuffer sUnit;
+    // fdo#48969: switch source and target because factor is used to divide!
+    double const fFactor =
+        GetConversionFactor(sUnit, nTargetUnit, nSourceUnit);
+    if(fFactor != 1.0 && fFactor != 0.0)
+        rValue /= fFactor;
+    return true;
+}
+
+/** convert string to double number (using ::rtl::math) */
 bool Converter::convertDouble(double& rValue, std::u16string_view rString)
 {
     rtl_math_ConversionStatus eStatus;
@@ -1030,7 +1047,7 @@ static bool convertDurationHelper(double& rfTime, V pStr)
         double fHour = nHours;
         double fMin = nMins;
         double fSec = nSecs;
-        double fFraction = sDoubleStr.makeStringAndClear().toDouble();
+        double fFraction = o3tl::toDouble(sDoubleStr);
         double fTempTime = fHour / 24;
         fTempTime += fMin / (24 * 60);
         fTempTime += fSec / (24 * 60 * 60);
@@ -1045,16 +1062,6 @@ static bool convertDurationHelper(double& rfTime, V pStr)
         rfTime = fTempTime;
     }
     return bSuccess;
-}
-
-/** convert ISO "duration" string to double; negative durations allowed */
-bool Converter::convertDuration(double& rfTime,
-                                std::u16string_view rString)
-{
-    std::u16string_view aTrimmed = trim(rString);
-    const sal_Unicode* pStr = aTrimmed.data();
-
-    return convertDurationHelper(rfTime, pStr);
 }
 
 /** convert ISO "duration" string to double; negative durations allowed */
@@ -1216,8 +1223,9 @@ readUnsignedNumberMaxDigits(int maxDigits,
     return bOverflow ? R_OVERFLOW : R_SUCCESS;
 }
 
+template<typename V>
 static bool
-readDurationT(std::u16string_view rString, size_t & io_rnPos)
+readDurationT(V rString, size_t & io_rnPos)
 {
     if ((io_rnPos < rString.size()) &&
         (rString[io_rnPos] == 'T' || rString[io_rnPos] == 't'))
@@ -1228,8 +1236,9 @@ readDurationT(std::u16string_view rString, size_t & io_rnPos)
     return false;
 }
 
+template<typename V>
 static bool
-readDurationComponent(std::u16string_view rString,
+readDurationComponent(V rString,
     size_t & io_rnPos, sal_Int32 & io_rnTemp, bool & io_rbTimePart,
     sal_Int32 & o_rnTarget, const sal_Unicode cLower, const sal_Unicode cUpper)
 {
@@ -1258,11 +1267,9 @@ readDurationComponent(std::u16string_view rString,
     return true;
 }
 
-/** convert ISO8601 "duration" string to util::Duration */
-bool Converter::convertDuration(util::Duration& rDuration,
-                                std::u16string_view rString)
+template <typename V>
+static bool convertDurationHelper(util::Duration& rDuration, V string)
 {
-    std::u16string_view string = trim(rString);
     size_t nPos(0);
 
     bool bIsNegativeDuration(false);
@@ -1418,6 +1425,19 @@ bool Converter::convertDuration(util::Duration& rDuration,
     return bSuccess;
 }
 
+/** convert ISO8601 "duration" string to util::Duration */
+bool Converter::convertDuration(util::Duration& rDuration,
+                                std::u16string_view rString)
+{
+    return convertDurationHelper(rDuration, trim(rString));
+}
+
+/** convert ISO8601 "duration" string to util::Duration */
+bool Converter::convertDuration(util::Duration& rDuration,
+                                std::string_view rString)
+{
+    return convertDurationHelper(rDuration, trim(rString));
+}
 
 static void
 lcl_AppendTimezone(OUStringBuffer & i_rBuffer, int const nOffset)
@@ -2114,6 +2134,25 @@ double Converter::GetConversionFactor(OUStringBuffer& rUnit, sal_Int16 nSourceUn
 
         if (const auto sUnit = Measure2UnitString(nTargetUnit); sUnit.size() > 0)
             rUnit.appendAscii(sUnit.data(), sUnit.size());
+    }
+
+    return fRetval;
+}
+
+double Converter::GetConversionFactor(OStringBuffer& rUnit, sal_Int16 nSourceUnit, sal_Int16 nTargetUnit)
+{
+    double fRetval(1.0);
+    rUnit.setLength(0);
+
+
+    if(nSourceUnit != nTargetUnit)
+    {
+        const o3tl::Length eFrom = Measure2O3tlUnit(nSourceUnit);
+        const o3tl::Length eTo = Measure2O3tlUnit(nTargetUnit);
+        fRetval = o3tl::convert(1.0, eFrom, eTo);
+
+        if (const auto sUnit = Measure2UnitString(nTargetUnit); sUnit.size() > 0)
+            rUnit.append(sUnit.data(), sUnit.size());
     }
 
     return fRetval;

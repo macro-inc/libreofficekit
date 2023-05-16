@@ -20,7 +20,6 @@
 #pragma once
 
 #include "address.hxx"
-#include <algorithm>
 #include "document.hxx"
 
 // This is used by change tracking. References there may be located also outside of the document
@@ -135,8 +134,8 @@ public:
     ScRange  MakeRange( const ScDocument& rDoc ) const
                 { return ScRange( aStart.MakeAddress( rDoc ), aEnd.MakeAddress( rDoc ) ); }
 
-    inline bool In( const ScBigAddress& ) const;    ///< is Address& in range?
-    inline bool In( const ScBigRange& ) const;      ///< is Range& in range?
+    inline bool Contains( const ScBigAddress& ) const;    ///< is Address& in range?
+    inline bool Contains( const ScBigRange& ) const;      ///< is Range& in range?
     inline bool Intersects( const ScBigRange& ) const;  ///< do two ranges overlap?
 
     ScBigRange&     operator=( const ScBigRange& r )
@@ -152,7 +151,7 @@ public:
     constexpr static sal_Int64 nRangeMax = ::std::numeric_limits<sal_Int64>::max();;
 };
 
-inline bool ScBigRange::In( const ScBigAddress& rAddr ) const
+inline bool ScBigRange::Contains( const ScBigAddress& rAddr ) const
 {
     return
         aStart.Col() <= rAddr.Col() && rAddr.Col() <= aEnd.Col() &&
@@ -160,7 +159,7 @@ inline bool ScBigRange::In( const ScBigAddress& rAddr ) const
         aStart.Tab() <= rAddr.Tab() && rAddr.Tab() <= aEnd.Tab();
 }
 
-inline bool ScBigRange::In( const ScBigRange& r ) const
+inline bool ScBigRange::Contains( const ScBigRange& r ) const
 {
     return
         aStart.Col() <= r.aStart.Col() && r.aEnd.Col() <= aEnd.Col() &&
@@ -170,11 +169,10 @@ inline bool ScBigRange::In( const ScBigRange& r ) const
 
 inline bool ScBigRange::Intersects( const ScBigRange& r ) const
 {
-    return !(
-        std::min( aEnd.Col(), r.aEnd.Col() ) < std::max( aStart.Col(), r.aStart.Col() )
-     || std::min( aEnd.Row(), r.aEnd.Row() ) < std::max( aStart.Row(), r.aStart.Row() )
-     || std::min( aEnd.Tab(), r.aEnd.Tab() ) < std::max( aStart.Tab(), r.aStart.Tab() )
-        );
+    return
+        aStart.Col() <= r.aEnd.Col() && r.aStart.Col() <= aEnd.Col() &&
+        aStart.Row() <= r.aEnd.Row() && r.aStart.Row() <= aEnd.Row() &&
+        aStart.Tab() <= r.aEnd.Tab() && r.aStart.Tab() <= aEnd.Tab();
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

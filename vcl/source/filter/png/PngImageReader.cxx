@@ -100,7 +100,6 @@ bool reader(SvStream& rStream, BitmapEx& rBitmapEx,
     Size prefSize;
     BitmapScopedWriteAccess pWriteAccessInstance;
     AlphaScopedWriteAccess pWriteAccessAlphaInstance;
-    std::vector<std::vector<png_byte>> aRows;
     const bool bFuzzing = utl::ConfigManager::IsFuzzing();
     const bool bSupportsBitmap32 = bFuzzing || ImplGetSVData()->mpDefInst->supportsBitmap32();
     const bool bOnlyCreateBitmap
@@ -291,7 +290,9 @@ bool reader(SvStream& rStream, BitmapEx& rBitmapEx,
                     png_read_row(pPng, pScanline, nullptr);
                 }
             }
+#if !ENABLE_WASM_STRIP_PREMULTIPLY
             const vcl::bitmap::lookup_table& premultiply = vcl::bitmap::get_premultiply_table();
+#endif
             if (eFormat == ScanlineFormat::N32BitTcAbgr || eFormat == ScanlineFormat::N32BitTcArgb)
             { // alpha first and premultiply
                 for (png_uint_32 y = 0; y < height; y++)
@@ -300,9 +301,15 @@ bool reader(SvStream& rStream, BitmapEx& rBitmapEx,
                     for (size_t i = 0; i < aRowSizeBytes; i += 4)
                     {
                         const sal_uInt8 alpha = pScanline[i + 3];
+#if ENABLE_WASM_STRIP_PREMULTIPLY
+                        pScanline[i + 3] = vcl::bitmap::premultiply(alpha, pScanline[i + 2]);
+                        pScanline[i + 2] = vcl::bitmap::premultiply(alpha, pScanline[i + 1]);
+                        pScanline[i + 1] = vcl::bitmap::premultiply(alpha, pScanline[i]);
+#else
                         pScanline[i + 3] = premultiply[alpha][pScanline[i + 2]];
                         pScanline[i + 2] = premultiply[alpha][pScanline[i + 1]];
                         pScanline[i + 1] = premultiply[alpha][pScanline[i]];
+#endif
                         pScanline[i] = alpha;
                     }
                 }
@@ -315,9 +322,15 @@ bool reader(SvStream& rStream, BitmapEx& rBitmapEx,
                     for (size_t i = 0; i < aRowSizeBytes; i += 4)
                     {
                         const sal_uInt8 alpha = pScanline[i + 3];
+#if ENABLE_WASM_STRIP_PREMULTIPLY
+                        pScanline[i] = vcl::bitmap::premultiply(alpha, pScanline[i]);
+                        pScanline[i + 1] = vcl::bitmap::premultiply(alpha, pScanline[i + 1]);
+                        pScanline[i + 2] = vcl::bitmap::premultiply(alpha, pScanline[i + 2]);
+#else
                         pScanline[i] = premultiply[alpha][pScanline[i]];
                         pScanline[i + 1] = premultiply[alpha][pScanline[i + 1]];
                         pScanline[i + 2] = premultiply[alpha][pScanline[i + 2]];
+#endif
                     }
                 }
             }
@@ -328,17 +341,15 @@ bool reader(SvStream& rStream, BitmapEx& rBitmapEx,
             if (eFormat == ScanlineFormat::N24BitTcBgr)
                 png_set_bgr(pPng);
 
-            aRows = std::vector<std::vector<png_byte>>(height);
-            for (auto& rRow : aRows)
-                rRow.resize(aRowSizeBytes, 0);
-
-            for (int pass = 0; pass < nNumberOfPasses; pass++)
+            if (nNumberOfPasses == 1)
             {
+                // optimise the common case, where we can use a buffer of only a single row
+                std::vector<png_byte> aRow(aRowSizeBytes, 0);
                 for (png_uint_32 y = 0; y < height; y++)
                 {
                     Scanline pScanline = pWriteAccess->GetScanline(y);
                     Scanline pScanAlpha = pWriteAccessAlpha->GetScanline(y);
-                    png_bytep pRow = aRows[y].data();
+                    png_bytep pRow = aRow.data();
                     png_read_row(pPng, pRow, nullptr);
                     size_t iAlpha = 0;
                     size_t iColor = 0;
@@ -348,6 +359,31 @@ bool reader(SvStream& rStream, BitmapEx& rBitmapEx,
                         pScanline[iColor++] = pRow[i + 1];
                         pScanline[iColor++] = pRow[i + 2];
                         pScanAlpha[iAlpha++] = 0xFF - pRow[i + 3];
+                    }
+                }
+            }
+            else
+            {
+                std::vector<std::vector<png_byte>> aRows(height);
+                for (auto& rRow : aRows)
+                    rRow.resize(aRowSizeBytes, 0);
+                for (int pass = 0; pass < nNumberOfPasses; pass++)
+                {
+                    for (png_uint_32 y = 0; y < height; y++)
+                    {
+                        Scanline pScanline = pWriteAccess->GetScanline(y);
+                        Scanline pScanAlpha = pWriteAccessAlpha->GetScanline(y);
+                        png_bytep pRow = aRows[y].data();
+                        png_read_row(pPng, pRow, nullptr);
+                        size_t iAlpha = 0;
+                        size_t iColor = 0;
+                        for (size_t i = 0; i < aRowSizeBytes; i += 4)
+                        {
+                            pScanline[iColor++] = pRow[i + 0];
+                            pScanline[iColor++] = pRow[i + 1];
+                            pScanline[iColor++] = pRow[i + 2];
+                            pScanAlpha[iAlpha++] = 0xFF - pRow[i + 3];
+                        }
                     }
                 }
             }
@@ -385,12 +421,10 @@ bool reader(SvStream& rStream, BitmapEx& rBitmapEx,
     return true;
 }
 
-std::unique_ptr<sal_uInt8[]> getMsGifChunk(SvStream& rStream, sal_Int32* chunkSize)
+BinaryDataContainer getMsGifChunk(SvStream& rStream)
 {
-    if (chunkSize)
-        *chunkSize = 0;
     if (!isPng(rStream))
-        return nullptr;
+        return {};
     // It's easier to read manually the contents and find the chunk than
     // try to get it using libpng.
     // https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_format
@@ -402,7 +436,7 @@ std::unique_ptr<sal_uInt8[]> getMsGifChunk(SvStream& rStream, sal_Int32* chunkSi
         rStream.ReadUInt32(length);
         rStream.ReadUInt32(type);
         if (!rStream.good())
-            return nullptr;
+            return {};
         constexpr sal_uInt32 PNGCHUNK_msOG = 0x6d734f47; // Microsoft Office Animated GIF
         constexpr sal_uInt64 MSGifHeaderSize = 11; // "MSOFFICE9.0"
         if (type == PNGCHUNK_msOG && length > MSGifHeaderSize)
@@ -415,32 +449,30 @@ std::unique_ptr<sal_uInt8[]> getMsGifChunk(SvStream& rStream, sal_Int32* chunkSi
             sal_uInt32 computedCrc = rtl_crc32(0, &typeForCrc, 4);
             const sal_uInt64 pos = rStream.Tell();
             if (pos + length >= rStream.TellEnd())
-                return nullptr; // broken PNG
+                return {}; // broken PNG
 
             char msHeader[MSGifHeaderSize];
             if (rStream.ReadBytes(msHeader, MSGifHeaderSize) != MSGifHeaderSize)
-                return nullptr;
+                return {};
             computedCrc = rtl_crc32(computedCrc, msHeader, MSGifHeaderSize);
             length -= MSGifHeaderSize;
 
-            std::unique_ptr<sal_uInt8[]> chunk(new sal_uInt8[length]);
-            if (rStream.ReadBytes(chunk.get(), length) != length)
-                return nullptr;
-            computedCrc = rtl_crc32(computedCrc, chunk.get(), length);
+            BinaryDataContainer chunk(rStream, length);
+            if (chunk.isEmpty())
+                return {};
+            computedCrc = rtl_crc32(computedCrc, chunk.getData(), chunk.getSize());
             rStream.ReadUInt32(crc);
             if (!ignoreCrc && crc != computedCrc)
                 continue; // invalid chunk, ignore
-            if (chunkSize)
-                *chunkSize = length;
             return chunk;
         }
         if (rStream.remainingSize() < length)
-            return nullptr;
+            return {};
         rStream.SeekRel(length);
         rStream.ReadUInt32(crc);
         constexpr sal_uInt32 PNGCHUNK_IEND = 0x49454e44;
         if (type == PNGCHUNK_IEND)
-            return nullptr;
+            return {};
     }
 }
 #if defined __GNUC__ && __GNUC__ == 8 && !defined __clang__
@@ -465,13 +497,12 @@ BitmapEx PngImageReader::read()
     return bitmap;
 }
 
-std::unique_ptr<sal_uInt8[]> PngImageReader::getMicrosoftGifChunk(SvStream& rStream,
-                                                                  sal_Int32* chunkSize)
+BinaryDataContainer PngImageReader::getMicrosoftGifChunk(SvStream& rStream)
 {
     sal_uInt64 originalPosition = rStream.Tell();
     SvStreamEndian originalEndian = rStream.GetEndian();
     rStream.SetEndian(SvStreamEndian::BIG);
-    std::unique_ptr<sal_uInt8[]> chunk = getMsGifChunk(rStream, chunkSize);
+    auto chunk = getMsGifChunk(rStream);
     rStream.SetEndian(originalEndian);
     rStream.Seek(originalPosition);
     return chunk;

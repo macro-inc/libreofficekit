@@ -48,6 +48,7 @@
 #include <vcl/filter/PngImageReader.hxx>
 #include <vcl/filter/SvmReader.hxx>
 #include <vcl/svapp.hxx>
+#include <vcl/virdev.hxx>
 #include <vcl/wmf.hxx>
 #include <vcl/wrkwin.hxx>
 #include <fltcall.hxx>
@@ -69,6 +70,7 @@
 #include <rtl/bootstrap.hxx>
 #include <tools/stream.hxx>
 #include <vcl/gdimtf.hxx>
+#include <fontsubset.hxx>
 
 #include "../source/filter/igif/gifread.hxx"
 #include "../source/filter/ixbm/xbmread.hxx"
@@ -180,13 +182,6 @@ SAL_IMPLEMENT_MAIN_WITH_ARGS(argc, argv)
             SvFileStream aFileStream(out, StreamMode::READ);
             ret = static_cast<int>(ReadDIB(aTarget, aFileStream, true));
         }
-        else if (strcmp(argv[2], "svm") == 0)
-        {
-            GDIMetaFile aGDIMetaFile;
-            SvFileStream aFileStream(out, StreamMode::READ);
-            SvmReader aReader(aFileStream);
-            aReader.Read(aGDIMetaFile);
-        }
         else if (strcmp(argv[2], "pcd") == 0)
         {
             Graphic aGraphic;
@@ -258,6 +253,13 @@ SAL_IMPLEMENT_MAIN_WITH_ARGS(argc, argv)
             Graphic aGraphic;
             SvFileStream aFileStream(out, StreamMode::READ);
             ret = static_cast<int>(ImportWebpGraphic(aFileStream, aGraphic));
+        }
+        else if (strcmp(argv[2], "sft") == 0)
+        {
+            SvFileStream aFileStream(out, StreamMode::READ);
+            std::vector<sal_uInt8> aData(aFileStream.remainingSize());
+            aFileStream.ReadBytes(aData.data(), aData.size());
+            ret = TestFontSubset(aData.data(), aData.size());
         }
 #ifndef DISABLE_DYNLOADING
         else if ((strcmp(argv[2], "doc") == 0) || (strcmp(argv[2], "ww8") == 0))
@@ -425,7 +427,7 @@ SAL_IMPLEMENT_MAIN_WITH_ARGS(argc, argv)
             static FFilterCall pfnImport(nullptr);
             if (!pfnImport)
             {
-                pfnImport = load(u"libsdfiltlo.so", "TestImportPPT");
+                pfnImport = load(u"libsdlo.so", "TestImportPPT");
             }
             SvFileStream aFileStream(out, StreamMode::READ);
             ret = static_cast<int>((*pfnImport)(aFileStream));
@@ -520,14 +522,16 @@ SAL_IMPLEMENT_MAIN_WITH_ARGS(argc, argv)
             SvFileStream aFileStream(out, StreamMode::READ);
             ret = static_cast<int>((*pfnImport)(aFileStream));
         }
-        else if (strcmp(argv[2], "sft") == 0)
+        else if (strcmp(argv[2], "svm") == 0)
         {
+            static FFilterCall pfnImport(nullptr);
+            if (!pfnImport)
+            {
+                pfnImport = load(u"libvcllo.so", "TestImportSVM");
+            }
             SvFileStream aFileStream(out, StreamMode::READ);
-            std::vector<sal_uInt8> aData(aFileStream.remainingSize());
-            aFileStream.ReadBytes(aData.data(), aData.size());
-            (void)vcl::Font::identifyFont(aData.data(), aData.size());
+            ret = static_cast<int>((*pfnImport)(aFileStream));
         }
-
 #endif
     }
     catch (...)

@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -59,7 +61,7 @@ class AutofilterTest(UITestCase):
             self.assertFalse(is_row_hidden(doc, 4))
 
     def test_tdf133160(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf133160.ods")) as doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf133160.ods")):
 
             xGridWin = self.xUITest.getTopFocusWindow().getChild("grid_window")
             xGridWin.executeAction("LAUNCH", mkPropertyValues({"AUTOFILTER": "", "COL": "1", "ROW": "3"}))
@@ -190,7 +192,7 @@ class AutofilterTest(UITestCase):
 
 
     def test_tdf89244(self):
-        with self.ui_test.create_doc_in_start_center("calc") as document:
+        with self.ui_test.create_doc_in_start_center("calc"):
             xCalcDoc = self.xUITest.getTopFocusWindow()
             gridwin = xCalcDoc.getChild("grid_window")
 
@@ -219,7 +221,7 @@ class AutofilterTest(UITestCase):
 
 
     def test_tdf116818(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf116818.xlsx")) as doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf116818.xlsx")):
 
             xGridWin = self.xUITest.getTopFocusWindow().getChild("grid_window")
 
@@ -235,7 +237,8 @@ class AutofilterTest(UITestCase):
             xFloatWindow = self.xUITest.getFloatWindow()
             xCheckListMenu = xFloatWindow.getChild("FilterDropDown")
             xTreeList = xCheckListMenu.getChild("check_list_box")
-            self.assertEqual(5, len(xTreeList.getChildren()))
+            # since tdf#117267, we are showing the hidden filter rows as inactive elements (5 active + 3 inactive)
+            self.assertEqual(8, len(xTreeList.getChildren()))
             xOkBtn = xFloatWindow.getChild("cancel")
             xOkBtn.executeAction("CLICK", tuple())
 
@@ -243,12 +246,13 @@ class AutofilterTest(UITestCase):
             xFloatWindow = self.xUITest.getFloatWindow()
             xCheckListMenu = xFloatWindow.getChild("FilterDropDown")
             xTreeList = xCheckListMenu.getChild("check_list_box")
-            self.assertEqual(3, len(xTreeList.getChildren()))
+            # since tdf#117267, we are showing the hidden filter rows as inactive elements (3 active + 9 inactive)
+            self.assertEqual(12, len(xTreeList.getChildren()))
             xOkBtn = xFloatWindow.getChild("cancel")
             xOkBtn.executeAction("CLICK", tuple())
 
     def test_tdf140469(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf140469.xlsx")) as doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf140469.xlsx")):
 
             xGridWin = self.xUITest.getTopFocusWindow().getChild("grid_window")
 
@@ -256,12 +260,13 @@ class AutofilterTest(UITestCase):
             xFloatWindow = self.xUITest.getFloatWindow()
             xCheckListMenu = xFloatWindow.getChild("FilterDropDown")
             xTreeList = xCheckListMenu.getChild("check_list_box")
-            self.assertEqual(9, len(xTreeList.getChildren()))
+            # since tdf#117267, we are showing the hidden filter rows as inactive elements (9 active + 3 inactive)
+            self.assertEqual(12, len(xTreeList.getChildren()))
             xOkBtn = xFloatWindow.getChild("cancel")
             xOkBtn.executeAction("CLICK", tuple())
 
     def test_tdf140462(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf140462.ods")) as doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf140462.ods")):
 
             xGridWin = self.xUITest.getTopFocusWindow().getChild("grid_window")
 
@@ -277,7 +282,8 @@ class AutofilterTest(UITestCase):
             xFloatWindow = self.xUITest.getFloatWindow()
             xCheckListMenu = xFloatWindow.getChild("FilterDropDown")
             xTreeList = xCheckListMenu.getChild("check_list_box")
-            self.assertEqual(3, len(xTreeList.getChildren()))
+            # since tdf#117267, we are showing the hidden filter rows as inactive elements (3 active + 5 inactive)
+            self.assertEqual(8, len(xTreeList.getChildren()))
             xOkBtn = xFloatWindow.getChild("cancel")
             xOkBtn.executeAction("CLICK", tuple())
 
@@ -285,12 +291,13 @@ class AutofilterTest(UITestCase):
             xFloatWindow = self.xUITest.getFloatWindow()
             xCheckListMenu = xFloatWindow.getChild("FilterDropDown")
             xTreeList = xCheckListMenu.getChild("check_list_box")
-            self.assertEqual(4, len(xTreeList.getChildren()))
+            # since tdf#117267, we are showing the hidden filter rows as inactive elements (4 active + 8 inactive)
+            self.assertEqual(12, len(xTreeList.getChildren()))
             xOkBtn = xFloatWindow.getChild("cancel")
             xOkBtn.executeAction("CLICK", tuple())
 
     def test_tdf137626(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf137626.xlsx")) as doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf137626.xlsx")):
 
             xGridWin = self.xUITest.getTopFocusWindow().getChild("grid_window")
 
@@ -298,12 +305,13 @@ class AutofilterTest(UITestCase):
             xFloatWindow = self.xUITest.getFloatWindow()
             xCheckListMenu = xFloatWindow.getChild("FilterDropDown")
             xTreeList = xCheckListMenu.getChild("check_list_box")
-            self.assertEqual(3, len(xTreeList.getChildren()))
+            # since tdf#117267, we are showing the hidden filter rows as inactive elements (3 active + 1 inactive)
+            self.assertEqual(4, len(xTreeList.getChildren()))
             xOkBtn = xFloatWindow.getChild("cancel")
             xOkBtn.executeAction("CLICK", tuple())
 
     def test_time_value(self):
-        with self.ui_test.load_file(get_url_for_data_file("time_value.xlsx")) as doc:
+        with self.ui_test.load_file(get_url_for_data_file("time_value.xlsx")):
 
             xGridWin = self.xUITest.getTopFocusWindow().getChild("grid_window")
 
@@ -324,7 +332,8 @@ class AutofilterTest(UITestCase):
             xFloatWindow = self.xUITest.getFloatWindow()
             xCheckListMenu = xFloatWindow.getChild("FilterDropDown")
             xTreeList = xCheckListMenu.getChild("check_list_box")
-            self.assertEqual(2, len(xTreeList.getChildren()))
+            # since tdf#117267, we are showing the hidden filter rows as inactive elements (2 active + 1 inactive)
+            self.assertEqual(3, len(xTreeList.getChildren()))
             xOkBtn = xFloatWindow.getChild("cancel")
             xOkBtn.executeAction("CLICK", tuple())
 
@@ -366,6 +375,45 @@ class AutofilterTest(UITestCase):
             self.assertFalse(is_row_hidden(doc, 5))
             self.assertFalse(is_row_hidden(doc, 6))
             self.assertFalse(is_row_hidden(doc, 7))
+
+    def test_tdf36383_row_height(self):
+        with self.ui_test.create_doc_in_start_center("calc") as document:
+            calcDoc = self.xUITest.getTopFocusWindow()
+            gridwin = calcDoc.getChild("grid_window")
+
+            enter_text_to_cell(gridwin, "A1", "A")
+            enter_text_to_cell(gridwin, "A2", "1")
+            enter_text_to_cell(gridwin, "A3", "2")
+            enter_text_to_cell(gridwin, "A4", "3")
+            gridwin.executeAction("SELECT", mkPropertyValues({"RANGE": "A1:A4"}))
+
+            self.xUITest.executeCommand(".uno:DataFilterAutoFilter")
+            gridwin.executeAction("LAUNCH", mkPropertyValues({"AUTOFILTER": "", "COL": "0", "ROW": "0"}))
+            xFloatWindow = self.xUITest.getFloatWindow()
+            xCheckListMenu = xFloatWindow.getChild("FilterDropDown")
+            xTreeList = xCheckListMenu.getChild("check_list_box")
+            xEntry = xTreeList.getChild("1")
+            xEntry.executeAction("CLICK", tuple())
+
+            xOkButton = xFloatWindow.getChild("ok")
+            xOkButton.executeAction("CLICK", tuple())
+
+            self.assertTrue(is_row_hidden(document, 2))
+
+            # row height
+            with self.ui_test.execute_dialog_through_command(".uno:RowHeight") as xDialog:
+                xvalue = xDialog.getChild("value")
+                xvalue.executeAction("TYPE", mkPropertyValues({"KEYCODE":"CTRL+A"}))
+                xvalue.executeAction("TYPE", mkPropertyValues({"KEYCODE":"BACKSPACE"}))
+                xvalue.executeAction("TYPE", mkPropertyValues({"TEXT":"1 cm"}))
+
+            self.assertTrue(is_row_hidden(document, 2))
+
+            # optimal row height
+            with self.ui_test.execute_dialog_through_command(".uno:SetOptimalRowHeight"):
+                pass
+
+            self.assertTrue(is_row_hidden(document, 2))
 
     def test_tdf142350(self):
         with self.ui_test.create_doc_in_start_center("calc") as document:
@@ -419,13 +467,19 @@ class AutofilterTest(UITestCase):
 
             xGridWin = self.xUITest.getTopFocusWindow().getChild("grid_window")
 
-            # Top 10 filer
+            # Top 10 filter
             xGridWin.executeAction("LAUNCH", mkPropertyValues({"AUTOFILTER": "", "COL": "1", "ROW": "0"}))
             xFloatWindow = self.xUITest.getFloatWindow()
             xMenu = xFloatWindow.getChild("menu")
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
+            xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"RETURN"}))
+            xSubFloatWindow = self.xUITest.getFloatWindow()
+            xSubMenu = xSubFloatWindow.getChild("menu")
+            xSubMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
+            xSubMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
+            xSubMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"RETURN"}))
 
             self.assertFalse(is_row_hidden(doc, 0))
             self.assertTrue(is_row_hidden(doc, 1))

@@ -28,21 +28,17 @@
   */
 
 #include <string.h>
-#include <sstream>
-#include <iostream>
 
 #ifdef SYSTEM_LIBEXTTEXTCAT
 #include <libexttextcat/textcat.h>
 #include <libexttextcat/common.h>
 #include <libexttextcat/constants.h>
 #include <libexttextcat/fingerprint.h>
-#include <libexttextcat/utf8misc.h>
 #else
 #include <textcat.h>
 #include <common.h>
 #include <constants.h>
 #include <fingerprint.h>
-#include <utf8misc.h>
 #endif
 
 #include <sal/types.h>
@@ -127,7 +123,7 @@ std::vector<Guess> SimpleGuesser::GuessLanguage(const char* text)
 
     int current_pointer = 0;
 
-    for(int i = 0; guess_list[current_pointer] != '\0'; i++)
+    while(guess_list[current_pointer] != '\0')
     {
         while (guess_list[current_pointer] != GUESS_SEPARATOR_OPEN && guess_list[current_pointer] != '\0')
             current_pointer++;

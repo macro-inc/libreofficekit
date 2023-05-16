@@ -31,6 +31,7 @@
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
 #include <com/sun/star/linguistic2/XProofreadingIterator.hpp>
 #include <com/sun/star/linguistic2/XDictionary.hpp>
+#include <comphelper/propertyvalue.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <SwCapObjType.hxx>
 #include <SwStyleNameMapper.hxx>
@@ -45,9 +46,10 @@
 #include <sfx2/sfxdlg.hxx>
 #include <sfx2/filedlghelper.hxx>
 #include <editeng/langitem.hxx>
+#include <svx/linkwarn.hxx>
+#include <svx/statusitem.hxx>
 #include <svx/viewlayoutitem.hxx>
 #include <svx/zoomslideritem.hxx>
-#include <svx/linkwarn.hxx>
 #include <sfx2/htmlmode.hxx>
 #include <vcl/svapp.hxx>
 #include <sfx2/app.hxx>
@@ -87,6 +89,7 @@
 #include <IDocumentSettingAccess.hxx>
 #include <IDocumentDrawModelAccess.hxx>
 #include <IDocumentStatistics.hxx>
+#include <IDocumentOutlineNodes.hxx>
 #include <wrtsh.hxx>
 #include <viewopt.hxx>
 #include <basesh.hxx>
@@ -115,6 +118,8 @@
 #include <dbmgr.hxx>
 #include <reffld.hxx>
 #include <comphelper/lok.hxx>
+#include <comphelper/string.hxx>
+#include <comphelper/docpasswordhelper.hxx>
 
 #include <PostItMgr.hxx>
 
@@ -150,6 +155,9 @@
 
 #include <ndtxt.hxx>
 
+#include <svx/srchdlg.hxx>
+#include <o3tl/string_view.hxx>
+
 const char sStatusDelim[] = " : ";
 
 using namespace sfx2;
@@ -163,6 +171,66 @@ using namespace ::com::sun::star::beans;
 using namespace ::com::sun::star::container;
 using namespace ::com::sun::star::sdb;
 using namespace ::com::sun::star::ui::dialogs;
+
+namespace {
+
+class SwNumberInputDlg : public SfxDialogController
+{
+private:
+    std::unique_ptr<weld::Label> m_xLabel1;
+    std::unique_ptr<weld::SpinButton> m_xSpinButton;
+    std::unique_ptr<weld::Label> m_xLabel2;
+    std::unique_ptr<weld::Button> m_xOKButton;
+
+    DECL_LINK(InputModifiedHdl, weld::Entry&, void);
+public:
+    SwNumberInputDlg(weld::Window* pParent, const OUString& rTitle,
+        const OUString& rLabel1, const sal_Int64 nValue, const sal_Int64 min, const sal_Int64 max,
+        OUString rLabel2 = OUString())
+        : SfxDialogController(pParent, "modules/swriter/ui/numberinput.ui", "NumberInputDialog")
+        , m_xLabel1(m_xBuilder->weld_label("label1"))
+        , m_xSpinButton(m_xBuilder->weld_spin_button("spinbutton"))
+        , m_xLabel2(m_xBuilder->weld_label("label2"))
+        , m_xOKButton(m_xBuilder->weld_button("ok"))
+    {
+        m_xDialog->set_title(rTitle);
+        m_xLabel1->set_label(rLabel1);
+        m_xSpinButton->set_value(nValue);
+        m_xSpinButton->set_range(min, max);
+        m_xSpinButton->set_position(-1);
+        m_xSpinButton->select_region(0, -1);
+        m_xSpinButton->connect_changed(LINK(this, SwNumberInputDlg, InputModifiedHdl));
+        if (!rLabel2.isEmpty())
+        {
+            m_xLabel2->set_label(rLabel2);
+            m_xLabel2->show();
+        }
+    }
+
+    auto GetNumber()
+    {
+        return m_xSpinButton->get_text().toInt32();
+    }
+};
+
+IMPL_LINK_NOARG(SwNumberInputDlg, InputModifiedHdl, weld::Entry&, void)
+{
+    m_xOKButton->set_sensitive(!m_xSpinButton->get_text().isEmpty());
+    if (!m_xOKButton->get_sensitive())
+        return;
+
+    auto nValue = m_xSpinButton->get_text().toInt32();
+    if (nValue <= m_xSpinButton->get_min())
+        m_xSpinButton->set_value(m_xSpinButton->get_min());
+    else if (nValue > m_xSpinButton->get_max())
+        m_xSpinButton->set_value(m_xSpinButton->get_max());
+    else
+        m_xSpinButton->set_value(nValue);
+
+    m_xSpinButton->set_position(-1);
+}
+
+}
 
 static void lcl_SetAllTextToDefaultLanguage( SwWrtShell &rWrtSh, sal_uInt16 nWhichId )
 {
@@ -319,7 +387,7 @@ bool SwView::InsertGraphicDlg( SfxRequest& rReq )
     uno::Reference < XFilePickerControlAccess > xCtrlAcc(xFP, UNO_QUERY);
     if(nHtmlMode & HTMLMODE_ON)
     {
-        xCtrlAcc->setValue( ExtendedFilePickerElementIds::CHECKBOX_LINK, 0, makeAny(true));
+        xCtrlAcc->setValue( ExtendedFilePickerElementIds::CHECKBOX_LINK, 0, Any(true));
         xCtrlAcc->enableControl( ExtendedFilePickerElementIds::CHECKBOX_LINK, false);
     }
 
@@ -584,7 +652,7 @@ void SwView::Execute(SfxRequest &rReq)
         case SID_ZOOM_IN:
         case SID_ZOOM_OUT:
         {
-            tools::Long nFact = m_pWrtShell->GetViewOptions()->GetZoom();
+            sal_uInt16 nFact = m_pWrtShell->GetViewOptions()->GetZoom();
             if (SID_ZOOM_IN == nSlot)
                 nFact = basegfx::zoomtools::zoomIn(nFact);
             else
@@ -678,34 +746,48 @@ void SwView::Execute(SfxRequest &rReq)
                 {
                     OSL_ENSURE( !static_cast<const SfxBoolItem*>(pItem)->GetValue(), "SwView::Execute(): password set and redlining off doesn't match!" );
 
-                    // dummy password from OOXML import: only confirmation dialog
+                    // xmlsec05:    new password dialog
+                    SfxPasswordDialog aPasswdDlg(GetFrameWeld());
+                    aPasswdDlg.SetMinLen(1);
+                    //#i69751# the result of Execute() can be ignored
+                    (void)aPasswdDlg.run();
+                    OUString sNewPasswd(aPasswdDlg.GetPassword());
+
+                    // password verification
+                    bool bPasswordOk = false;
                     if (aPasswd.getLength() == 1 && aPasswd[0] == 1)
                     {
-                        std::unique_ptr<weld::MessageDialog> xWarn(Application::CreateMessageDialog(m_pWrtShell->GetView().GetFrameWeld(),
-                                                   VclMessageType::Warning, VclButtonsType::YesNo,
-                                                   SfxResId(RID_SVXSTR_END_REDLINING_WARNING)));
-                        xWarn->set_default_response(RET_NO);
-                        if (xWarn->run() == RET_YES)
-                            rIDRA.SetRedlinePassword(Sequence <sal_Int8> ());
-                        else
-                            break;
+                        // dummy RedlinePassword from OOXML import: get real password info
+                        // from the grab-bag to verify the password
+                        const css::uno::Sequence< css::beans::PropertyValue > aDocumentProtection =
+                            static_cast<SfxObjectShell*>(GetDocShell())->
+                                                   GetDocumentProtectionFromGrabBag();
+
+                        bPasswordOk =
+                            // password is ok, if there is no DocumentProtection in the GrabBag,
+                            // i.e. the dummy RedlinePassword imported from an OpenDocument file
+                            !aDocumentProtection.hasElements() ||
+                            // verify password with the password info imported from OOXML
+                            ::comphelper::DocPasswordHelper::IsModifyPasswordCorrect(sNewPasswd,
+                                ::comphelper::DocPasswordHelper::ConvertPasswordInfo ( aDocumentProtection ) );
                     }
                     else
                     {
-                        // xmlsec05:    new password dialog
-                        SfxPasswordDialog aPasswdDlg(GetFrameWeld());
-                        aPasswdDlg.SetMinLen(1);
-                        //#i69751# the result of Execute() can be ignored
-                        (void)aPasswdDlg.run();
-                        OUString sNewPasswd(aPasswdDlg.GetPassword());
+                        // the simplified RedlinePassword
                         Sequence <sal_Int8> aNewPasswd = rIDRA.GetRedlinePassword();
                         SvPasswordHelper::GetHashPassword( aNewPasswd, sNewPasswd );
-                        if(SvPasswordHelper::CompareHashPassword(aPasswd, sNewPasswd))
-                            rIDRA.SetRedlinePassword(Sequence <sal_Int8> ());
-                        else
-                        {   // xmlsec05: message box for wrong password
-                            break;
-                        }
+                        bPasswordOk = SvPasswordHelper::CompareHashPassword(aPasswd, sNewPasswd);
+                    }
+
+                    if (bPasswordOk)
+                        rIDRA.SetRedlinePassword(Sequence <sal_Int8> ());
+                    else
+                    {   // xmlsec05: message box for wrong password
+                        std::unique_ptr<weld::MessageDialog> xInfoBox(Application::CreateMessageDialog(nullptr,
+                                                      VclMessageType::Info, VclButtonsType::Ok,
+                                                      SfxResId(RID_SVXSTR_INCORRECT_PASSWORD)));
+                        xInfoBox->run();
+                        break;
                     }
                 }
 
@@ -845,7 +927,7 @@ void SwView::Execute(SfxRequest &rReq)
                 if ( !pRedline && m_pWrtShell->IsCursorInTable() )
                 {
                     nRedline = 0;
-                    auto pTabLine = pCursor->Start()->nNode.GetNode().GetTableBox()->GetUpper();
+                    auto pTabLine = pCursor->Start()->GetNode().GetTableBox()->GetUpper();
 
                     if ( RedlineType::None != pTabLine->GetRedlineType() )
                     {
@@ -874,7 +956,7 @@ void SwView::Execute(SfxRequest &rReq)
                                 pRedline = rRedlineTable[nRedline];
 
                                 // until next redline is not in the same row
-                                SwTableBox* pTableBox = pRedline->Start()->nNode.GetNode().GetTableBox();
+                                SwTableBox* pTableBox = pRedline->Start()->GetNode().GetTableBox();
                                 if ( !pTableBox || pTableBox->GetUpper() != pTabLine )
                                     break;
 
@@ -977,21 +1059,21 @@ void SwView::Execute(SfxRequest &rReq)
 
                 if( pArgs )
                 {
-                    if( SfxItemState::SET == pArgs->GetItemState( SID_FILE_NAME, false, &pItem ))
-                        sFileName = static_cast<const SfxStringItem*>(pItem)->GetValue();
+                    if( const SfxStringItem* pFileItem = pArgs->GetItemIfSet( SID_FILE_NAME, false ))
+                        sFileName = pFileItem->GetValue();
                     bHasFileName = !sFileName.isEmpty();
 
-                    if( SfxItemState::SET == pArgs->GetItemState( SID_FILTER_NAME, false, &pItem ))
-                        sFilterName = static_cast<const SfxStringItem*>(pItem)->GetValue();
+                    if( const SfxStringItem* pFilterNameItem = pArgs->GetItemIfSet( SID_FILTER_NAME, false ))
+                        sFilterName = pFilterNameItem->GetValue();
 
-                    if( SfxItemState::SET == pArgs->GetItemState( SID_VERSION, false, &pItem ))
+                    if( const SfxInt16Item* pVersionItem = pArgs->GetItemIfSet( SID_VERSION, false ))
                     {
-                        nVersion = static_cast<const SfxInt16Item *>(pItem)->GetValue();
+                        nVersion = pVersionItem->GetValue();
                         m_pViewImpl->SetParam( nVersion );
                     }
-                    if( SfxItemState::SET == pArgs->GetItemState( SID_NO_ACCEPT_DIALOG, false, &pItem ))
+                    if( const SfxBoolItem* pDialogItem = pArgs->GetItemIfSet( SID_NO_ACCEPT_DIALOG, false ))
                     {
-                        bNoAcceptDialog = static_cast<const SfxBoolItem *>(pItem)->GetValue();
+                        bNoAcceptDialog = pDialogItem->GetValue();
                     }
                 }
 
@@ -1217,21 +1299,25 @@ void SwView::Execute(SfxRequest &rReq)
 
         case SID_ATTR_DEFTABSTOP:
         {
-            if(pArgs && SfxItemState::SET == pArgs->GetItemState(SID_ATTR_DEFTABSTOP, false, &pItem))
+            const SfxUInt16Item* pTabStopItem = nullptr;
+            if(pArgs && (pTabStopItem = pArgs->GetItemIfSet(SID_ATTR_DEFTABSTOP, false)))
             {
                 SvxTabStopItem aDefTabs( 0, 0, SvxTabAdjust::Default, RES_PARATR_TABSTOP );
-                const sal_uInt16 nTab = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+                const sal_uInt16 nTab = pTabStopItem->GetValue();
                 MakeDefTabs( nTab, aDefTabs );
                 m_pWrtShell->SetDefault( aDefTabs );
             }
         }
         break;
         case SID_ATTR_LANGUAGE  :
-        if(pArgs && SfxItemState::SET == pArgs->GetItemState(SID_ATTR_LANGUAGE, false, &pItem))
         {
-            SvxLanguageItem aLang(static_cast<const SvxLanguageItem*>(pItem)->GetLanguage(), RES_CHRATR_LANGUAGE);
-            m_pWrtShell->SetDefault( aLang );
-            lcl_SetAllTextToDefaultLanguage( *m_pWrtShell, RES_CHRATR_LANGUAGE );
+            const SvxLanguageItem* pLangItem;
+            if(pArgs && (pLangItem = pArgs->GetItemIfSet(SID_ATTR_LANGUAGE, false)))
+            {
+                SvxLanguageItem aLang(pLangItem->GetLanguage(), RES_CHRATR_LANGUAGE);
+                m_pWrtShell->SetDefault( aLang );
+                lcl_SetAllTextToDefaultLanguage( *m_pWrtShell, RES_CHRATR_LANGUAGE );
+            }
         }
         break;
         case  SID_ATTR_CHAR_CTL_LANGUAGE:
@@ -1248,23 +1334,38 @@ void SwView::Execute(SfxRequest &rReq)
             lcl_SetAllTextToDefaultLanguage( *m_pWrtShell, RES_CHRATR_CJK_LANGUAGE );
         }
         break;
+        case FN_OUTLINE_LEVELS_SHOWN:
+        {
+            SwWrtShell& rSh = GetWrtShell();
+            int nOutlineLevel = -1;
+            auto nOutlinePos = rSh.GetOutlinePos();
+            if (nOutlinePos != SwOutlineNodes::npos)
+                nOutlineLevel = rSh.getIDocumentOutlineNodesAccess()->getOutlineLevel(nOutlinePos);
+            SwNumberInputDlg aDlg(GetViewFrame()->GetFrameWeld(),
+                                  SwResId(STR_OUTLINE_LEVELS_SHOWN_TITLE),
+                                  SwResId(STR_OUTLINE_LEVELS_SHOWN_SPIN_LABEL),
+                                  nOutlineLevel + 1, 1, 10,
+                                  SwResId(STR_OUTLINE_LEVELS_SHOWN_HELP_LABEL));
+            if (aDlg.run() == RET_OK)
+                rSh.MakeOutlineLevelsVisible(aDlg.GetNumber());
+        }
+        break;
         case FN_TOGGLE_OUTLINE_CONTENT_VISIBILITY:
         {
-            m_pWrtShell->EnterStdMode();
-            size_t nPos(m_pWrtShell->GetOutlinePos());
-            if (nPos != SwOutlineNodes::npos)
-            {
-                SwNode* pNode = m_pWrtShell->GetNodes().GetOutLineNds()[nPos];
-                pNode->GetTextNode()->SetAttrOutlineContentVisible(
-                            !m_pWrtShell->GetAttrOutlineContentVisible(nPos));
-                m_pWrtShell->InvalidateOutlineContentVisibility();
-                m_pWrtShell->GotoOutline(nPos);
-            }
+        size_t nPos(m_pWrtShell->GetOutlinePos());
+        if (nPos != SwOutlineNodes::npos)
+            GetEditWin().ToggleOutlineContentVisibility(nPos, false);
         }
         break;
         case FN_NAV_ELEMENT:
         {
-            // nothing here on purpose - if removed only the listbox that changed is changed
+            pArgs->GetItemState(GetPool().GetWhich(FN_NAV_ELEMENT), false, &pItem);
+            if(pItem)
+            {
+                SvxSearchDialogWrapper::SetSearchLabel(SearchLabel::Empty);
+                sal_uInt32 nMoveType(static_cast<const SfxUInt32Item*>(pItem)->GetValue());
+                SwView::SetMoveType(nMoveType);
+            }
         }
         break;
         case FN_SCROLL_PREV:
@@ -1323,14 +1424,12 @@ void SwView::Execute(SfxRequest &rReq)
                     rSh.EnterStdMode(); // force change in text shell; necessary for mixing DB fields
                     AttrChangedNotify(nullptr);
 
-                    Sequence<PropertyValue> aProperties(3);
-                    PropertyValue* pValues = aProperties.getArray();
-                    pValues[0].Name = "DataSourceName";
-                    pValues[1].Name = "Command";
-                    pValues[2].Name = "CommandType";
-                    pValues[0].Value <<= aData.sDataSource;
-                    pValues[1].Value <<= aData.sCommand;
-                    pValues[2].Value <<= aData.nCommandType;
+                    Sequence<PropertyValue> aProperties
+                    {
+                        comphelper::makePropertyValue("DataSourceName", aData.sDataSource),
+                        comphelper::makePropertyValue("Command", aData.sCommand),
+                        comphelper::makePropertyValue("CommandType", aData.nCommandType)
+                    };
                     pDBManager->ExecuteFormLetter(rSh, aProperties);
                 }
             }
@@ -1553,28 +1652,131 @@ void SwView::StateStatusLine(SfxItemSet &rSet)
     {
         switch( nWhich )
         {
-            case FN_STAT_PAGE: {
-                // number of pages, log. page number
-                sal_uInt16 nPage, nLogPage;
-                OUString sDisplay;
-                rShell.GetPageNumber( -1, rShell.IsCursorVisible(), nPage, nLogPage, sDisplay );
-                bool bExtendedTooltip(!sDisplay.isEmpty() &&
-                                      std::u16string_view(OUString::number(nPage)) != sDisplay &&
-                                      nPage != nLogPage);
-                OUString aTooltip = bExtendedTooltip ? SwResId(STR_BOOKCTRL_HINT_EXTENDED)
-                                                     : SwResId(STR_BOOKCTRL_HINT);
+            case FN_STAT_PAGE:
+            {
+                OUString aTooltip;
+                OUString aPageStr;
+
+                SwVisiblePageNumbers aVisiblePageNumbers;
+                m_pWrtShell->GetFirstLastVisPageNumbers(aVisiblePageNumbers);
+
+                // convert to strings and define references
+                OUString sFirstPhy = OUString::number(aVisiblePageNumbers.nFirstPhy);
+                OUString sLastPhy = OUString::number(aVisiblePageNumbers.nLastPhy);
+                OUString sFirstVirt = OUString::number(aVisiblePageNumbers.nFirstVirt);
+                OUString sLastVirt = OUString::number(aVisiblePageNumbers.nLastVirt);
+                OUString& sFirstCustomPhy = aVisiblePageNumbers.sFirstCustomPhy;
+                OUString& sLastCustomPhy = aVisiblePageNumbers.sLastCustomPhy;
+                OUString& sFirstCustomVirt = aVisiblePageNumbers.sFirstCustomVirt;
+                OUString& sLastCustomVirt = aVisiblePageNumbers.sLastCustomVirt;
+                OUString sPageCount = OUString::number(m_pWrtShell->GetPageCount());
+
+                if (aVisiblePageNumbers.nFirstPhy == aVisiblePageNumbers.nFirstVirt)
+                {
+                    aTooltip = SwResId(STR_BOOKCTRL_HINT);
+                    if (aVisiblePageNumbers.nFirstPhy != aVisiblePageNumbers.nLastPhy)
+                    {
+                        if (sFirstPhy == sFirstCustomPhy && sLastPhy == sLastCustomPhy)
+                        {
+                            aPageStr = SwResId(STR_PAGES_COUNT);
+                            aPageStr = aPageStr.replaceFirst("%1", sFirstPhy);
+                            aPageStr = aPageStr.replaceFirst("%2", sLastPhy);
+                            aPageStr = aPageStr.replaceFirst("%3", sPageCount);
+                        }
+                        else
+                        {
+                            aPageStr = SwResId(STR_PAGES_COUNT_CUSTOM);
+                            aPageStr = aPageStr.replaceFirst("%1", sFirstPhy);
+                            aPageStr = aPageStr.replaceFirst("%2", sLastPhy);
+                            aPageStr = aPageStr.replaceFirst("%3", sFirstCustomPhy);
+                            aPageStr = aPageStr.replaceFirst("%4", sLastCustomPhy);
+                            aPageStr = aPageStr.replaceFirst("%5", sPageCount);
+                        }
+                    }
+                    else
+                    {
+                        if (sFirstPhy == sFirstCustomPhy && sLastPhy == sLastCustomPhy)
+                        {
+                            aPageStr = SwResId(STR_PAGE_COUNT);
+                            aPageStr = aPageStr.replaceFirst("%1", sFirstPhy);
+                            aPageStr = aPageStr.replaceFirst("%2", sPageCount);
+                        }
+                        else
+                        {
+                            aPageStr = SwResId(STR_PAGE_COUNT_CUSTOM);
+                            aPageStr = aPageStr.replaceFirst("%1", sFirstPhy);
+                            aPageStr = aPageStr.replaceFirst("%2", sFirstCustomPhy);
+                            aPageStr = aPageStr.replaceFirst("%3", sPageCount);
+                        }
+                    }
+                }
+                else
+                {
+                    aTooltip = SwResId(STR_BOOKCTRL_HINT_EXTENDED);
+                    if (aVisiblePageNumbers.nFirstPhy != aVisiblePageNumbers.nLastPhy)
+                    {
+                        if (sFirstPhy == sFirstCustomPhy && sLastPhy == sLastCustomPhy)
+                        {
+                            aPageStr = SwResId(STR_PAGES_COUNT_EXTENDED);
+                            aPageStr = aPageStr.replaceFirst("%1", sFirstPhy);
+                            aPageStr = aPageStr.replaceFirst("%2", sLastPhy);
+                            aPageStr = aPageStr.replaceFirst("%3", sPageCount);
+                            aPageStr = aPageStr.replaceFirst("%4", sFirstVirt);
+                            aPageStr = aPageStr.replaceFirst("%5", sLastVirt);
+                        }
+                        else
+                        {
+                            aPageStr = SwResId(STR_PAGES_COUNT_CUSTOM_EXTENDED);
+                            aPageStr = aPageStr.replaceFirst("%1", sFirstPhy);
+                            aPageStr = aPageStr.replaceFirst("%2", sLastPhy);
+                            aPageStr = aPageStr.replaceFirst("%3", sFirstCustomPhy);
+                            aPageStr = aPageStr.replaceFirst("%4", sLastCustomPhy);
+                            aPageStr = aPageStr.replaceFirst("%5", sPageCount);
+                            aPageStr = aPageStr.replaceFirst("%6", sFirstVirt);
+                            aPageStr = aPageStr.replaceFirst("%7", sLastVirt);
+                            aPageStr = aPageStr.replaceFirst("%8", sFirstCustomVirt);
+                            aPageStr = aPageStr.replaceFirst("%9", sLastCustomVirt);
+                        }
+                    }
+                    else
+                    {
+                        if (sFirstPhy == sFirstCustomPhy && sLastPhy == sLastCustomPhy)
+                        {
+                            aPageStr = SwResId(STR_PAGE_COUNT_EXTENDED);
+                            aPageStr = aPageStr.replaceFirst("%1", sFirstPhy);
+                            aPageStr = aPageStr.replaceFirst("%2", sPageCount);
+                            aPageStr = aPageStr.replaceFirst("%3", sFirstVirt);
+                        }
+                        else
+                        {
+                            aPageStr = SwResId(STR_PAGE_COUNT_CUSTOM_EXTENDED);
+                            aPageStr = aPageStr.replaceFirst("%1", sFirstPhy);
+                            aPageStr = aPageStr.replaceFirst("%2", sFirstCustomPhy);
+                            aPageStr = aPageStr.replaceFirst("%3", sPageCount);
+                            aPageStr = aPageStr.replaceFirst("%4", sFirstVirt);
+                            aPageStr = aPageStr.replaceFirst("%5", sFirstCustomVirt);
+                        }
+                    }
+                }
+
+                // replace range indicator with two pages conjunction if applicable
+                if ((aVisiblePageNumbers.nLastPhy - aVisiblePageNumbers.nFirstPhy) == 1)
+                    aPageStr = aPageStr.replaceAll("-", SwResId(STR_PAGES_TWO_CONJUNCTION));
+
+                // status bar bookmark control string and tooltip
                 std::vector<OUString> aStringList
                 {
-                    GetPageStr(nPage, nLogPage, sDisplay),
+                    aPageStr,
                     aTooltip
                 };
                 rSet.Put(SfxStringListItem(FN_STAT_PAGE, &aStringList));
+
                 //if existing page number is not equal to old page number, send out this event.
-                if (m_nOldPageNum != nLogPage )
+                if (m_nOldPageNum != aVisiblePageNumbers.nFirstPhy)
                 {
                     if (m_nOldPageNum != 0)
-                        SwCursorShell::FirePageChangeEvent(m_nOldPageNum, nLogPage);
-                    m_nOldPageNum = nLogPage;
+                        SwCursorShell::FirePageChangeEvent(m_nOldPageNum, aVisiblePageNumbers.nFirstPhy);
+                    m_nOldPageNum = aVisiblePageNumbers.nFirstPhy;
                 }
                 const sal_uInt16 nCnt = GetWrtShell().GetPageCnt();
                 if (m_nPageCnt != nCnt)   // notify Basic
@@ -1614,19 +1816,11 @@ void SwView::StateStatusLine(SfxItemSet &rSet)
             break;
             case FN_STAT_ACCESSIBILITY_CHECK:
             {
-                if (rShell.GetDoc()->getOnlineAccessibilityCheck())
+                std::unique_ptr<sw::OnlineAccessibilityCheck> const& rOnlineAccessibilityCheck = rShell.GetDoc()->getOnlineAccessibilityCheck();
+                if (rOnlineAccessibilityCheck)
                 {
-                    auto nIssues = rShell.GetDoc()->getOnlineAccessibilityCheck()->getNumberOfAccessibilityIssues();
-                    OUString aString;
-                    if (nIssues > 0)
-                    {
-                        aString = u"Issues: " + OUString::number(nIssues);
-                    }
-                    else
-                    {
-                        aString = u"No Issues";
-                    }
-                    rSet.Put(SfxStringItem(FN_STAT_ACCESSIBILITY_CHECK, aString));
+                    sal_Int32 nIssues = rOnlineAccessibilityCheck->getNumberOfAccessibilityIssues();
+                    rSet.Put(SfxInt32Item(FN_STAT_ACCESSIBILITY_CHECK, nIssues));
                 }
             }
             break;
@@ -1770,12 +1964,14 @@ void SwView::StateStatusLine(SfxItemSet &rSet)
             }
             else
             {
+                StatusCategory eCategory(StatusCategory::NONE);
                 OUString sStr;
                 if( rShell.IsCursorInTable() )
                 {
                     // table name + cell coordinate
                     sStr = rShell.GetTableFormat()->GetName() + ":";
                     sStr += rShell.GetBoxNms();
+                    eCategory = StatusCategory::TableCell;
                 }
                 else
                 {
@@ -1789,17 +1985,22 @@ void SwView::StateStatusLine(SfxItemSet &rSet)
                             {
                                 const SwTOXBase* pTOX = m_pWrtShell->GetCurTOX();
                                 if( pTOX )
+                                {
                                     sStr = pTOX->GetTOXName();
+                                    eCategory = StatusCategory::TableOfContents;
+                                }
                                 else
                                 {
                                     OSL_ENSURE( false,
                                         "Unknown kind of section" );
                                     sStr = pCurrSect->GetSectionName();
+                                    eCategory = StatusCategory::Section;
                                 }
                             }
                             break;
                         default:
                             sStr = pCurrSect->GetSectionName();
+                            eCategory = StatusCategory::Section;
                             break;
                         }
                     }
@@ -1826,6 +2027,8 @@ void SwView::StateStatusLine(SfxItemSet &rSet)
                                 {
                                     if(!sStr.isEmpty())
                                         sStr += sStatusDelim;
+                                    if (eCategory == StatusCategory::NONE)
+                                        eCategory = StatusCategory::ListStyle;
                                     sStr += rNumStyle;
                                 }
                             }
@@ -1833,7 +2036,8 @@ void SwView::StateStatusLine(SfxItemSet &rSet)
                         if (!sStr.isEmpty())
                             sStr += sStatusDelim;
                         sStr += SwResId(STR_NUM_LEVEL) + OUString::number( nNumLevel + 1 );
-
+                        if (eCategory == StatusCategory::NONE)
+                            eCategory = StatusCategory::Numbering;
                     }
                 }
                 const int nOutlineLevel = rShell.GetCurrentParaOutlineLevel();
@@ -1849,6 +2053,8 @@ void SwView::StateStatusLine(SfxItemSet &rSet)
                     else
                         sStr += SwResId(STR_NUM_OUTLINE);
                     sStr += OUString::number( nOutlineLevel);
+                    if (eCategory == StatusCategory::NONE)
+                        eCategory = StatusCategory::Numbering;
                 }
 
                 if( rShell.HasReadonlySel() )
@@ -1858,7 +2064,7 @@ void SwView::StateStatusLine(SfxItemSet &rSet)
                     sStr = SwResId(SW_STR_READONLY) + sStr;
                 }
                 if (!sStr.isEmpty())
-                    rSet.Put( SfxStringItem( SID_TABLE_CELL, sStr ));
+                    rSet.Put( SvxStatusItem( SID_TABLE_CELL, sStr, eCategory ));
             }
             break;
             case FN_STAT_SELMODE:
@@ -1935,8 +2141,15 @@ void SwView::ExecuteStatusLine(SfxRequest &rReq)
 
         case FN_STAT_TEMPLATE:
         {
+            weld::Window* pDialogParent = GetViewFrame()->GetFrameWeld();
+            css::uno::Any aAny(pDialogParent->GetXWindow());
+            SfxUnoAnyItem aDialogParent(SID_DIALOG_PARENT, aAny);
+            const SfxPoolItem* pInternalItems[ 2 ];
+            pInternalItems[ 0 ] = &aDialogParent;
+            pInternalItems[ 1 ] = nullptr;
             GetViewFrame()->GetDispatcher()->Execute(FN_FORMAT_PAGE_DLG,
-                                        SfxCallMode::SYNCHRON|SfxCallMode::RECORD );
+                                        SfxCallMode::SYNCHRON|SfxCallMode::RECORD,
+                                        nullptr, 0, pInternalItems);
         }
         break;
         case SID_ATTR_ZOOM:
@@ -1978,22 +2191,23 @@ void SwView::ExecuteStatusLine(SfxRequest &rReq)
                         pSet = pDlg->GetOutputItemSet();
                 }
 
-                const SfxPoolItem* pViewLayoutItem = nullptr;
-                if ( pSet && SfxItemState::SET == pSet->GetItemState(SID_ATTR_VIEWLAYOUT, true, &pViewLayoutItem))
+                const SvxViewLayoutItem* pViewLayoutItem = nullptr;
+                if ( pSet && (pViewLayoutItem = pSet->GetItemIfSet(SID_ATTR_VIEWLAYOUT)))
                 {
-                    const sal_uInt16 nColumns = static_cast<const SvxViewLayoutItem *>(pViewLayoutItem)->GetValue();
-                    const bool bBookMode  = static_cast<const SvxViewLayoutItem *>(pViewLayoutItem)->IsBookMode();
+                    const sal_uInt16 nColumns = pViewLayoutItem->GetValue();
+                    const bool bBookMode  = pViewLayoutItem->IsBookMode();
                     SetViewLayout( nColumns, bBookMode );
                 }
 
-                if ( pSet && SfxItemState::SET == pSet->GetItemState(SID_ATTR_ZOOM, true, &pItem))
+                const SvxZoomItem* pZoomItem = nullptr;
+                if ( pSet && (pZoomItem = pSet->GetItemIfSet(SID_ATTR_ZOOM)))
                 {
-                    SvxZoomType eType = static_cast<const SvxZoomItem *>(pItem)->GetType();
-                    SetZoom( eType, static_cast<const SvxZoomItem *>(pItem)->GetValue() );
+                    SvxZoomType eType = pZoomItem->GetType();
+                    SetZoom( eType, pZoomItem->GetValue() );
                 }
                 bUp = true;
-                if ( pItem )
-                    rReq.AppendItem( *pItem );
+                if ( pZoomItem )
+                    rReq.AppendItem( *pZoomItem );
                 rReq.Done();
             }
         }
@@ -2004,11 +2218,10 @@ void SwView::ExecuteStatusLine(SfxRequest &rReq)
             if ( pArgs && !rSh.getIDocumentSettingAccess().get(DocumentSettingId::BROWSE_MODE) &&
                 ( ( GetDocShell()->GetCreateMode() != SfxObjectCreateMode::EMBEDDED ) || !GetDocShell()->IsInPlaceActive() ) )
             {
-                if ( SfxItemState::SET == pArgs->GetItemState(SID_ATTR_VIEWLAYOUT, true, &pItem ))
+                if ( const SvxViewLayoutItem* pLayoutItem = pArgs->GetItemIfSet(SID_ATTR_VIEWLAYOUT ))
                 {
-                    const sal_uInt16 nColumns = static_cast<const SvxViewLayoutItem *>(pItem)->GetValue();
-                    const bool bBookMode  = (0 != nColumns && 0 == (nColumns % 2)) &&
-                                            static_cast<const SvxViewLayoutItem *>(pItem)->IsBookMode();
+                    const sal_uInt16 nColumns = pLayoutItem->GetValue();
+                    const bool bBookMode  = (0 != nColumns && 0 == (nColumns % 2)) && pLayoutItem->IsBookMode();
 
                     SetViewLayout( nColumns, bBookMode );
                 }
@@ -2025,9 +2238,9 @@ void SwView::ExecuteStatusLine(SfxRequest &rReq)
         {
             if ( pArgs && ( ( GetDocShell()->GetCreateMode() != SfxObjectCreateMode::EMBEDDED ) || !GetDocShell()->IsInPlaceActive() ) )
             {
-                if ( SfxItemState::SET == pArgs->GetItemState(SID_ATTR_ZOOMSLIDER, true, &pItem ))
+                if ( const SvxZoomSliderItem* pZoomItem = pArgs->GetItemIfSet(SID_ATTR_ZOOMSLIDER) )
                 {
-                    const sal_uInt16 nCurrentZoom = static_cast<const SvxZoomSliderItem *>(pItem)->GetValue();
+                    const sal_uInt16 nCurrentZoom = pZoomItem->GetValue();
                     SetZoom( SvxZoomType::PERCENT, nCurrentZoom );
                 }
 
@@ -2158,35 +2371,35 @@ void SwView::EditLinkDlg()
 
 namespace sw {
 
-auto PrepareJumpToTOXMark(SwDoc const& rDoc, OUString const& rName)
+auto PrepareJumpToTOXMark(SwDoc const& rDoc, std::u16string_view aName)
     -> std::optional<std::pair<SwTOXMark, sal_Int32>>
 {
-    sal_Int32 const first(rName.indexOf(toxMarkSeparator));
-    if (first == -1)
+    size_t const first(aName.find(toxMarkSeparator));
+    if (first == std::u16string_view::npos)
     {
         SAL_WARN("sw.ui", "JumpToTOXMark: missing separator");
         return std::optional<std::pair<SwTOXMark, sal_Int32>>();
     }
-    sal_Int32 const counter(rName.copy(0, first).toInt32());
+    sal_Int32 const counter(o3tl::toInt32(aName.substr(0, first)));
     if (counter <= 0)
     {
         SAL_WARN("sw.ui", "JumpToTOXMark: invalid counter");
         return std::optional<std::pair<SwTOXMark, sal_Int32>>();
     }
-    sal_Int32 const second(rName.indexOf(toxMarkSeparator, first + 1));
-    if (second == -1)
+    size_t const second(aName.find(toxMarkSeparator, first + 1));
+    if (second == std::u16string_view::npos)
     {
         SAL_WARN("sw.ui", "JumpToTOXMark: missing separator");
         return std::optional<std::pair<SwTOXMark, sal_Int32>>();
     }
-    OUString const entry(rName.copy(first + 1, second - (first + 1)));
-    if (rName.getLength() < second + 2)
+    std::u16string_view const entry(aName.substr(first + 1, second - (first + 1)));
+    if (aName.size() < second + 2)
     {
         SAL_WARN("sw.ui", "JumpToTOXMark: invalid tox");
         return std::optional<std::pair<SwTOXMark, sal_Int32>>();
     }
-    sal_uInt16 const indexType(rName[second + 1]);
-    OUString const indexName(rName.copy(second + 2));
+    sal_uInt16 const indexType(aName[second + 1]);
+    std::u16string_view const indexName(aName.substr(second + 2));
     SwTOXType const* pType(nullptr);
     switch (indexType)
     {
@@ -2218,16 +2431,16 @@ auto PrepareJumpToTOXMark(SwDoc const& rDoc, OUString const& rName)
     }
     // type and alt text are the search keys
     SwTOXMark tmp(pType);
-    tmp.SetAlternativeText(entry);
+    tmp.SetAlternativeText(OUString(entry));
     return std::optional<std::pair<SwTOXMark, sal_Int32>>(std::pair<SwTOXMark, sal_Int32>(tmp, counter));
 }
 
 } // namespace sw
 
-static auto JumpToTOXMark(SwWrtShell & rSh, OUString const& rName) -> bool
+static auto JumpToTOXMark(SwWrtShell & rSh, std::u16string_view aName) -> bool
 {
     std::optional<std::pair<SwTOXMark, sal_Int32>> const tmp(
-        sw::PrepareJumpToTOXMark(*rSh.GetDoc(), rName));
+        sw::PrepareJumpToTOXMark(*rSh.GetDoc(), aName));
     if (!tmp)
     {
         return false;
@@ -2314,7 +2527,7 @@ bool SwView::JumpToSwMark( std::u16string_view rMark )
                 sal_Int32 nNoPos = sName.indexOf( cSequenceMarkSeparator );
                 if ( nNoPos != -1 )
                 {
-                    sal_uInt16 nSeqNo = sName.copy( nNoPos + 1 ).toInt32();
+                    sal_uInt16 nSeqNo = o3tl::toInt32(sName.subView( nNoPos + 1 ));
                     sName = sName.copy( 0, nNoPos );
                     bRet = m_pWrtShell->GotoRefMark(sName, REF_SEQUENCEFLD, nSeqNo);
                 }
@@ -2405,11 +2618,10 @@ static size_t lcl_PageDescWithHeader( const SwDoc& rDoc )
     {
         const SwPageDesc& rPageDesc = rDoc.GetPageDesc( i );
         const SwFrameFormat& rMaster = rPageDesc.GetMaster();
-        const SfxPoolItem* pItem;
-        if( ( SfxItemState::SET == rMaster.GetAttrSet().GetItemState( RES_HEADER, false, &pItem ) &&
-              static_cast<const SwFormatHeader*>(pItem)->IsActive() ) ||
-            ( SfxItemState::SET == rMaster.GetAttrSet().GetItemState( RES_FOOTER, false, &pItem )  &&
-              static_cast<const SwFormatFooter*>(pItem)->IsActive()) )
+        const SwFormatHeader* pHeaderItem = rMaster.GetAttrSet().GetItemIfSet( RES_HEADER, false );
+        const SwFormatFooter* pFooterItem = rMaster.GetAttrSet().GetItemIfSet( RES_FOOTER, false );
+        if( (pHeaderItem && pHeaderItem->IsActive()) ||
+            (pFooterItem && pFooterItem->IsActive()) )
             ++nRet;
     }
     return nRet; // number of page styles with active header/footer
@@ -2550,7 +2762,7 @@ tools::Long SwView::InsertMedium( sal_uInt16 nSlotId, std::unique_ptr<SfxMedium>
                     else
                     {
                         ::sw::UndoGuard const ug(pDoc->GetIDocumentUndoRedo());
-                        uno::Reference<text::XTextRange> const xInsertPosition(
+                        rtl::Reference<SwXTextRange> const xInsertPosition(
                             SwXTextRange::CreateXTextRange(*pDoc,
                                 *m_pWrtShell->GetCursor()->GetPoint(), nullptr));
                         nErrno = pDocSh->ImportFrom(*pMedium, xInsertPosition)
@@ -2738,21 +2950,19 @@ void SwView::GenerateFormLetter(bool bUseCurrentDocument)
             sal_Int32 nIdx {0};
             aData.sDataSource = sDBName.getToken(0, DB_DELIM, nIdx);
             aData.sCommand = sDBName.getToken(0, DB_DELIM, nIdx);
-            aData.nCommandType = sDBName.getToken(0, DB_DELIM, nIdx).toInt32();
+            aData.nCommandType = o3tl::toInt32(o3tl::getToken(sDBName, 0, DB_DELIM, nIdx));
         }
         rSh.EnterStdMode(); // force change in text shell; necessary for mixing DB fields
         AttrChangedNotify(nullptr);
 
         if (pDBManager)
         {
-            Sequence<PropertyValue> aProperties(3);
-            PropertyValue* pValues = aProperties.getArray();
-            pValues[0].Name = "DataSourceName";
-            pValues[1].Name = "Command";
-            pValues[2].Name = "CommandType";
-            pValues[0].Value <<= aData.sDataSource;
-            pValues[1].Value <<= aData.sCommand;
-            pValues[2].Value <<= aData.nCommandType;
+            Sequence<PropertyValue> aProperties
+            {
+                comphelper::makePropertyValue("DataSourceName", aData.sDataSource),
+                comphelper::makePropertyValue("Command", aData.sCommand),
+                comphelper::makePropertyValue("CommandType", aData.nCommandType),
+            };
             pDBManager->ExecuteFormLetter(GetWrtShell(), aProperties);
         }
     }

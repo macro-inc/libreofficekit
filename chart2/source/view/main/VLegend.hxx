@@ -18,8 +18,11 @@
  */
 #pragma once
 
-#include <com/sun/star/uno/Reference.hxx>
+#include <Legend.hxx>
 
+#include <com/sun/star/uno/Reference.hxx>
+#include <rtl/ref.hxx>
+#include <svx/unoshape.hxx>
 #include <vector>
 
 namespace chart { class ChartModel; }
@@ -34,16 +37,16 @@ namespace com::sun::star::uno { class XComponentContext; }
 namespace chart
 {
 
+class Legend;
 class LegendEntryProvider;
 
 class VLegend
 {
 public:
-    VLegend( const css::uno::Reference< css::chart2::XLegend > & xLegend,
+    VLegend( rtl::Reference< ::chart::Legend > xLegend,
              const css::uno::Reference< css::uno::XComponentContext > & xContext,
              std::vector< LegendEntryProvider* >&& rLegendEntryProviderList,
-             const css::uno::Reference< css::drawing::XShapes >& xTargetPage,
-             const css::uno::Reference< css::lang::XMultiServiceFactory >& xFactory,
+             rtl::Reference<SvxShapeGroupAnyD> xTargetPage,
              ChartModel& rModel  );
 
     void setDefaultWritingMode( sal_Int16 nDefaultWritingMode );
@@ -67,13 +70,12 @@ public:
         const css::awt::Size & rDefaultLegendSize );
 
     static bool isVisible(
-        const css::uno::Reference< css::chart2::XLegend > & xLegend );
+        const rtl::Reference< ::chart::Legend > & xLegend );
 
 private:
-    css::uno::Reference< css::drawing::XShapes >            m_xTarget;
-    css::uno::Reference< css::lang::XMultiServiceFactory>   m_xShapeFactory;
-    css::uno::Reference< css::chart2::XLegend >             m_xLegend;
-    css::uno::Reference< css::drawing::XShape >             m_xShape;
+    rtl::Reference<SvxShapeGroupAnyD>            m_xTarget;
+    rtl::Reference<::chart::Legend>              m_xLegend;
+    rtl::Reference< SvxShapeGroup >                         m_xShape;
 
     ChartModel& mrModel;
 

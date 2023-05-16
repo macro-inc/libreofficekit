@@ -35,14 +35,11 @@
 
 namespace {
 
-bool lcl_GetTextWithBreaks( const EditTextObject& rData, ScDocument* pDoc, OUString& rVal )
+void lcl_GetTextWithBreaks( const EditTextObject& rData, ScDocument* pDoc, OUString& rVal )
 {
-    //  true = more than 1 paragraph
-
     EditEngine& rEngine = pDoc->GetEditEngine();
     rEngine.SetText(rData);
     rVal = rEngine.GetText();
-    return ( rEngine.GetParagraphCount() > 1 );
 }
 
 }
@@ -81,16 +78,15 @@ bool ScTable::SearchCell(const SvxSearchItem& rSearchItem, SCCOL nCol, sc::Colum
         pNote = nullptr;
     }
 
-    bool bMultiLine = false;
-    CellType eCellType = aCell.meType;
+    CellType eCellType = aCell.getType();
     switch (rSearchItem.GetCellType())
     {
         case SvxSearchCellType::FORMULA:
         {
             if ( eCellType == CELLTYPE_FORMULA )
-                aString = aCell.mpFormula->GetFormula(rDocument.GetGrammar());
+                aString = aCell.getFormula()->GetFormula(rDocument.GetGrammar());
             else if ( eCellType == CELLTYPE_EDIT )
-                bMultiLine = lcl_GetTextWithBreaks(*aCell.mpEditText, &rDocument, aString);
+                lcl_GetTextWithBreaks(*aCell.getEditText(), &rDocument, aString);
             else
             {
                 if( !bSearchFormatted )
@@ -102,7 +98,7 @@ bool ScTable::SearchCell(const SvxSearchItem& rSearchItem, SCCOL nCol, sc::Colum
         }
         case SvxSearchCellType::VALUE:
             if ( eCellType == CELLTYPE_EDIT )
-                bMultiLine = lcl_GetTextWithBreaks(*aCell.mpEditText, &rDocument, aString);
+                lcl_GetTextWithBreaks(*aCell.getEditText(), &rDocument, aString);
             else
             {
                 if( !bSearchFormatted )
@@ -114,10 +110,7 @@ bool ScTable::SearchCell(const SvxSearchItem& rSearchItem, SCCOL nCol, sc::Colum
         case SvxSearchCellType::NOTE:
         {
             if (pNote)
-            {
                 aString = pNote->GetText();
-                bMultiLine = pNote->HasMultiLineText();
-            }
             break;
         }
         default:
@@ -165,7 +158,7 @@ bool ScTable::SearchCell(const SvxSearchItem& rSearchItem, SCCOL nCol, sc::Colum
     // Don't split the matrix, only replace Matrix formulas
     if (eCellType == CELLTYPE_FORMULA)
     {
-        cMatrixFlag = aCell.mpFormula->GetMatrixFlag();
+        cMatrixFlag = aCell.getFormula()->GetMatrixFlag();
         if(cMatrixFlag == ScMatrixMode::Reference)
             return bFound;
     }
@@ -260,11 +253,11 @@ bool ScTable::SearchCell(const SvxSearchItem& rSearchItem, SCCOL nCol, sc::Colum
             aString, rDocument.GetGrammar(), cMatrixFlag );
         SCCOL nMatCols;
         SCROW nMatRows;
-        aCell.mpFormula->GetMatColsRows(nMatCols, nMatRows);
+        aCell.getFormula()->GetMatColsRows(nMatCols, nMatRows);
         pFCell->SetMatColsRows( nMatCols, nMatRows );
         aCol[nCol].SetFormulaCell(nRow, pFCell);
     }
-    else if ( bMultiLine && aString.indexOf('\n') != -1 )
+    else if (eCellType != CELLTYPE_FORMULA && aString.indexOf('\n') != -1)
     {
         ScFieldEditEngine& rEngine = rDocument.GetEditEngine();
         rEngine.SetTextCurrentDefaults(aString);
@@ -323,12 +316,14 @@ bool ScTable::Search(const SvxSearchItem& rSearchItem, SCCOL& rCol, SCROW& rRow,
         GetCellArea( nLastCol, nLastRow);
     else
         GetLastDataPos(nLastCol, nLastRow);
-    return Search(rSearchItem, rCol, rRow, nLastCol, nLastRow, rMark, rUndoStr, pUndoDoc);
+    std::vector< sc::ColumnBlockConstPosition > blockPos;
+    return Search(rSearchItem, rCol, rRow, nLastCol, nLastRow, rMark, rUndoStr, pUndoDoc, blockPos);
 }
 
 bool ScTable::Search(const SvxSearchItem& rSearchItem, SCCOL& rCol, SCROW& rRow,
                      SCCOL nLastCol, SCROW nLastRow,
-                     const ScMarkData& rMark, OUString& rUndoStr, ScDocument* pUndoDoc)
+                     const ScMarkData& rMark, OUString& rUndoStr, ScDocument* pUndoDoc,
+                     std::vector< sc::ColumnBlockConstPosition >& blockPos)
 {
     bool bFound = false;
     bool bAll =  (rSearchItem.GetCommand() == SvxSearchCmd::FIND_ALL)
@@ -339,9 +334,12 @@ bool ScTable::Search(const SvxSearchItem& rSearchItem, SCCOL& rCol, SCROW& rRow,
     bool bSkipFiltered = !rSearchItem.IsSearchFiltered();
     bool bSearchNotes = (rSearchItem.GetCellType() == SvxSearchCellType::NOTE);
     // We need to cache sc::ColumnBlockConstPosition per each column.
-    std::vector< sc::ColumnBlockConstPosition > blockPos( nLastCol + 1 );
-    for( SCCOL i = 0; i <= nLastCol; ++i )
-        aCol[ i ].InitBlockPosition( blockPos[ i ] );
+    if (static_cast<SCCOL>(blockPos.size()) != nLastCol + 1)
+    {
+        blockPos.resize( nLastCol + 1 );
+        for( SCCOL i = 0; i <= nLastCol; ++i )
+            aCol[ i ].InitBlockPosition( blockPos[ i ] );
+    }
     if (!bAll && rSearchItem.GetBackward())
     {
         SCROW nLastNonFilteredRow = rDocument.MaxRow() + 1;
@@ -477,6 +475,11 @@ bool ScTable::Search(const SvxSearchItem& rSearchItem, SCCOL& rCol, SCROW& rRow,
                     if (bSkipFiltered)
                         SkipFilteredRows(nRow, nLastNonFilteredRow, true);
 
+                    // GetSearchAndReplaceStart sets a nCol of -1 for
+                    // ColDirection() only if rSearchItem.GetPattern() is true,
+                    // so a negative column shouldn't be possible here.
+                    assert(nCol >= 0 && "negative nCol for ColDirection");
+
                     bFound = SearchCell(rSearchItem, nCol, blockPos[ nCol ],
                                         nRow, rMark, rUndoStr, pUndoDoc);
                     if (!bFound)
@@ -529,9 +532,10 @@ bool ScTable::SearchAll(const SvxSearchItem& rSearchItem, const ScMarkData& rMar
     else
         GetLastDataPos(nLastCol, nLastRow);
 
+    std::vector< sc::ColumnBlockConstPosition > blockPos;
     do
     {
-        bFound = Search(rSearchItem, nCol, nRow, nLastCol, nLastRow, rMark, rUndoStr, pUndoDoc);
+        bFound = Search(rSearchItem, nCol, nRow, nLastCol, nLastRow, rMark, rUndoStr, pUndoDoc, blockPos);
         if (bFound)
         {
             bEverFound = true;
@@ -595,10 +599,11 @@ bool ScTable::ReplaceAll(
     SvxSearchItem aCopyItem(rSearchItem);
     aCopyItem.SetRowDirection(false);
 
+    std::vector< sc::ColumnBlockConstPosition > blockPos;
     bool bEverFound = false;
     while (true)
     {
-        bool bFound = Search(aCopyItem, nCol, nRow, nLastCol, nLastRow, rMark, rUndoStr, pUndoDoc);
+        bool bFound = Search(aCopyItem, nCol, nRow, nLastCol, nLastRow, rMark, rUndoStr, pUndoDoc, blockPos);
 
         if (bFound)
         {
@@ -754,11 +759,7 @@ bool ScTable::SearchAllStyle(
             if (bFound)
             {
                 if (nEndRow<nRow)
-                {
-                    SCROW nTemp = nRow;
-                    nRow = nEndRow;
-                    nEndRow = nTemp;
-                }
+                    std::swap( nRow, nEndRow );
                 rMatchedRanges.Join(ScRange(i, nRow, nTab, i, nEndRow, nTab));
                 nRow = nEndRow + 1;
                 bEverFound = true;

@@ -35,9 +35,9 @@
 #include <svl/zformat.hxx>
 #include <unotools/collatorwrapper.hxx>
 
-bool ScQueryEvaluator::isPartialTextMatchOp(const ScQueryEntry& rEntry)
+bool ScQueryEvaluator::isPartialTextMatchOp(ScQueryOp eOp)
 {
-    switch (rEntry.eOp)
+    switch (eOp)
     {
         // these operators can only be used with textural comparisons.
         case SC_CONTAINS:
@@ -52,12 +52,12 @@ bool ScQueryEvaluator::isPartialTextMatchOp(const ScQueryEntry& rEntry)
     return false;
 }
 
-bool ScQueryEvaluator::isTextMatchOp(const ScQueryEntry& rEntry)
+bool ScQueryEvaluator::isTextMatchOp(ScQueryOp eOp)
 {
-    if (isPartialTextMatchOp(rEntry))
+    if (isPartialTextMatchOp(eOp))
         return true;
 
-    switch (rEntry.eOp)
+    switch (eOp)
     {
         // these operators can be used for either textural or value comparison.
         case SC_EQUAL:
@@ -66,6 +66,25 @@ bool ScQueryEvaluator::isTextMatchOp(const ScQueryEntry& rEntry)
         default:;
     }
     return false;
+}
+
+bool ScQueryEvaluator::isMatchWholeCellHelper(bool docMatchWholeCell, ScQueryOp eOp)
+{
+    bool bMatchWholeCell = docMatchWholeCell;
+    if (isPartialTextMatchOp(eOp))
+        // may have to do partial textural comparison.
+        bMatchWholeCell = false;
+    return bMatchWholeCell;
+}
+
+bool ScQueryEvaluator::isMatchWholeCell(ScQueryOp eOp) const
+{
+    return isMatchWholeCellHelper(mbMatchWholeCell, eOp);
+}
+
+bool ScQueryEvaluator::isMatchWholeCell(const ScDocument& rDoc, ScQueryOp eOp)
+{
+    return isMatchWholeCellHelper(rDoc.GetDocOptions().IsMatchWholeCell(), eOp);
 }
 
 void ScQueryEvaluator::setupTransliteratorIfNeeded()
@@ -114,7 +133,7 @@ bool ScQueryEvaluator::isRealWildOrRegExp(const ScQueryEntry& rEntry) const
     if (mrParam.eSearchType == utl::SearchParam::SearchType::Normal)
         return false;
 
-    return isTextMatchOp(rEntry);
+    return isTextMatchOp(rEntry.eOp);
 }
 
 bool ScQueryEvaluator::isTestWildOrRegExp(const ScQueryEntry& rEntry) const
@@ -128,10 +147,10 @@ bool ScQueryEvaluator::isTestWildOrRegExp(const ScQueryEntry& rEntry) const
     return (rEntry.eOp == SC_LESS_EQUAL || rEntry.eOp == SC_GREATER_EQUAL);
 }
 
-bool ScQueryEvaluator::isQueryByValue(const ScQueryEntry& rEntry, const ScQueryEntry::Item& rItem,
+bool ScQueryEvaluator::isQueryByValue(ScQueryOp eOp, ScQueryEntry::QueryType eType,
                                       const ScRefCellValue& rCell)
 {
-    if (rItem.meType == ScQueryEntry::ByString || isPartialTextMatchOp(rEntry))
+    if (eType == ScQueryEntry::ByString || isPartialTextMatchOp(eOp))
         return false;
 
     return isQueryByValueForCell(rCell);
@@ -139,20 +158,21 @@ bool ScQueryEvaluator::isQueryByValue(const ScQueryEntry& rEntry, const ScQueryE
 
 bool ScQueryEvaluator::isQueryByValueForCell(const ScRefCellValue& rCell)
 {
-    if (rCell.meType == CELLTYPE_FORMULA && rCell.mpFormula->GetErrCode() != FormulaError::NONE)
+    if (rCell.getType() == CELLTYPE_FORMULA
+        && rCell.getFormula()->GetErrCode() != FormulaError::NONE)
         // Error values are compared as string.
         return false;
 
     return rCell.hasNumeric();
 }
 
-bool ScQueryEvaluator::isQueryByString(const ScQueryEntry& rEntry, const ScQueryEntry::Item& rItem,
+bool ScQueryEvaluator::isQueryByString(ScQueryOp eOp, ScQueryEntry::QueryType eType,
                                        const ScRefCellValue& rCell)
 {
-    if (isTextMatchOp(rEntry))
+    if (isTextMatchOp(eOp))
         return true;
 
-    if (rItem.meType != ScQueryEntry::ByString)
+    if (eType != ScQueryEntry::ByString)
         return false;
 
     return rCell.hasString();
@@ -183,13 +203,13 @@ std::pair<bool, bool> ScQueryEvaluator::compareByValue(const ScRefCellValue& rCe
     // reason.
     sal_uInt32 nNumFmt = NUMBERFORMAT_ENTRY_NOT_FOUND;
 
-    switch (rCell.meType)
+    switch (rCell.getType())
     {
         case CELLTYPE_VALUE:
-            nCellVal = rCell.mfValue;
+            nCellVal = rCell.getDouble();
             break;
         case CELLTYPE_FORMULA:
-            nCellVal = rCell.mpFormula->GetValue();
+            nCellVal = rCell.getFormula()->GetValue();
             break;
         default:
             nCellVal = 0.0;
@@ -199,7 +219,7 @@ std::pair<bool, bool> ScQueryEvaluator::compareByValue(const ScRefCellValue& rCe
         nNumFmt = getNumFmt(nCol, nRow);
         if (nNumFmt)
         {
-            switch (rCell.meType)
+            switch (rCell.getType())
             {
                 case CELLTYPE_VALUE:
                 case CELLTYPE_FORMULA:
@@ -278,14 +298,14 @@ std::pair<bool, bool> ScQueryEvaluator::compareByValue(const ScRefCellValue& rCe
     return std::pair<bool, bool>(bOk, bTestEqual);
 }
 
-OUString ScQueryEvaluator::getCellString(const ScRefCellValue& rCell, SCROW nRow,
-                                         const ScQueryEntry& rEntry,
+OUString ScQueryEvaluator::getCellString(const ScRefCellValue& rCell, SCROW nRow, SCCOL nCol,
                                          const svl::SharedString** sharedString)
 {
-    if (rCell.meType == CELLTYPE_FORMULA && rCell.mpFormula->GetErrCode() != FormulaError::NONE)
+    if (rCell.getType() == CELLTYPE_FORMULA
+        && rCell.getFormula()->GetErrCode() != FormulaError::NONE)
     {
         // Error cell is evaluated as string (for now).
-        const FormulaError error = rCell.mpFormula->GetErrCode();
+        const FormulaError error = rCell.getFormula()->GetErrCode();
         auto it = mCachedSharedErrorStrings.find(error);
         if (it == mCachedSharedErrorStrings.end())
         {
@@ -297,22 +317,19 @@ OUString ScQueryEvaluator::getCellString(const ScRefCellValue& rCell, SCROW nRow
         *sharedString = &it->second;
         return OUString();
     }
-    else if (rCell.meType == CELLTYPE_STRING)
+    else if (rCell.getType() == CELLTYPE_STRING)
     {
-        *sharedString = rCell.mpString;
+        *sharedString = rCell.getSharedString();
         return OUString();
     }
     else
     {
         sal_uInt32 nFormat
-            = mpContext
-                  ? mrTab.GetNumberFormat(*mpContext, ScAddress(static_cast<SCCOL>(rEntry.nField),
-                                                                nRow, mrTab.GetTab()))
-                  : mrTab.GetNumberFormat(static_cast<SCCOL>(rEntry.nField), nRow);
+            = mpContext ? mrTab.GetNumberFormat(*mpContext, ScAddress(nCol, nRow, mrTab.GetTab()))
+                        : mrTab.GetNumberFormat(nCol, nRow);
         SvNumberFormatter* pFormatter
             = mpContext ? mpContext->GetFormatTable() : mrDoc.GetFormatTable();
-        return ScCellFormat::GetInputString(rCell, nFormat, *pFormatter, mrDoc, sharedString,
-                                            rEntry.bDoQuery);
+        return ScCellFormat::GetInputString(rCell, nFormat, *pFormatter, mrDoc, sharedString, true);
     }
 }
 
@@ -322,16 +339,11 @@ bool ScQueryEvaluator::isFastCompareByString(const ScQueryEntry& rEntry) const
     // can be selected using the template argument to get fast code
     // that will not check the same conditions every time. This makes a difference
     // in fast lookups that search for an exact value (case sensitive or not).
-    bool bMatchWholeCell = mbMatchWholeCell;
-    if (isPartialTextMatchOp(rEntry))
-        // may have to do partial textural comparison.
-        bMatchWholeCell = false;
-
     const bool bRealWildOrRegExp = isRealWildOrRegExp(rEntry);
     const bool bTestWildOrRegExp = isTestWildOrRegExp(rEntry);
-
     // SC_EQUAL is part of isTextMatchOp(rEntry)
-    return rEntry.eOp == SC_EQUAL && !bRealWildOrRegExp && !bTestWildOrRegExp && bMatchWholeCell;
+    return rEntry.eOp == SC_EQUAL && !bRealWildOrRegExp && !bTestWildOrRegExp
+           && isMatchWholeCell(rEntry.eOp);
 }
 
 // The value is placed inside one parameter: [pValueSource1] or [pValueSource2] but never in both.
@@ -348,13 +360,7 @@ std::pair<bool, bool> ScQueryEvaluator::compareByString(const ScQueryEntry& rEnt
     if (bFast)
         bMatchWholeCell = true;
     else
-    {
-        bMatchWholeCell = mbMatchWholeCell;
-        if (isPartialTextMatchOp(rEntry))
-            // may have to do partial textural comparison.
-            bMatchWholeCell = false;
-    }
-
+        bMatchWholeCell = isMatchWholeCell(rEntry.eOp);
     const bool bRealWildOrRegExp = !bFast && isRealWildOrRegExp(rEntry);
     const bool bTestWildOrRegExp = !bFast && isTestWildOrRegExp(rEntry);
 
@@ -422,7 +428,7 @@ std::pair<bool, bool> ScQueryEvaluator::compareByString(const ScQueryEntry& rEnt
     if (bFast || !bRealWildOrRegExp)
     {
         // Simple string matching i.e. no regexp match.
-        if (bFast || isTextMatchOp(rEntry))
+        if (bFast || isTextMatchOp(rEntry.eOp))
         {
             // Check this even with bFast.
             if (rItem.meType != ScQueryEntry::ByString && rItem.maString.isEmpty())
@@ -677,7 +683,8 @@ std::pair<bool, bool> ScQueryEvaluator::compareByRangeLookup(const ScRefCellValu
 
     if (rItem.meType == ScQueryEntry::ByString)
     {
-        if (rCell.meType == CELLTYPE_FORMULA && rCell.mpFormula->GetErrCode() != FormulaError::NONE)
+        if (rCell.getType() == CELLTYPE_FORMULA
+            && rCell.getFormula()->GetErrCode() != FormulaError::NONE)
             // Error values are compared as string.
             return std::pair<bool, bool>(false, bTestEqual);
 
@@ -713,13 +720,13 @@ std::pair<bool, bool> ScQueryEvaluator::processEntry(SCROW nRow, SCCOL nCol, ScR
         // For ScQueryEntry::ByValue check that the cell either is a value or is a formula
         // that has a value and is not an error (those are compared as strings). This
         // is basically simplified isQueryByValue().
-        if (aCell.meType == CELLTYPE_VALUE)
-            value = aCell.mfValue;
-        else if (aCell.meType == CELLTYPE_FORMULA
-                 && aCell.mpFormula->GetErrCode() != FormulaError::NONE
-                 && aCell.mpFormula->IsValue())
+        if (aCell.getType() == CELLTYPE_VALUE)
+            value = aCell.getDouble();
+        else if (aCell.getType() == CELLTYPE_FORMULA
+                 && aCell.getFormula()->GetErrCode() != FormulaError::NONE
+                 && aCell.getFormula()->IsValue())
         {
-            value = aCell.mpFormula->GetValue();
+            value = aCell.getFormula()->GetValue();
         }
         else
             valid = false;
@@ -759,19 +766,15 @@ std::pair<bool, bool> ScQueryEvaluator::processEntry(SCROW nRow, SCCOL nCol, ScR
         }
     }
     const svl::SharedString* cellSharedString = nullptr;
-    OUString cellString;
-    bool cellStringSet = false;
+    std::optional<OUString> oCellString;
     const bool bFastCompareByString = isFastCompareByString(rEntry);
     if (rEntry.eOp == SC_EQUAL && rItems.size() >= 10 && bFastCompareByString)
     {
         // The same as above but for strings. Try to optimize the case when
         // it's a svl::SharedString comparison. That happens when SC_EQUAL is used
         // and simple matching is used, see compareByString()
-        if (!cellStringSet)
-        {
-            cellString = getCellString(aCell, nRow, rEntry, &cellSharedString);
-            cellStringSet = true;
-        }
+        if (!oCellString)
+            oCellString = getCellString(aCell, nRow, rEntry.nField, &cellSharedString);
         // Allow also checking ScQueryEntry::ByValue if the cell is not numeric,
         // as in that case isQueryByNumeric() would be false and isQueryByString() would
         // be true because of SC_EQUAL making isTextMatchOp() true.
@@ -843,26 +846,23 @@ std::pair<bool, bool> ScQueryEvaluator::processEntry(SCROW nRow, SCCOL nCol, ScR
             aRes.first |= aThisRes.first;
             aRes.second |= aThisRes.second;
         }
-        else if (isQueryByValue(rEntry, rItem, aCell))
+        else if (isQueryByValue(rEntry.eOp, rItem.meType, aCell))
         {
             std::pair<bool, bool> aThisRes = compareByValue(aCell, nCol, nRow, rEntry, rItem);
             aRes.first |= aThisRes.first;
             aRes.second |= aThisRes.second;
         }
-        else if (isQueryByString(rEntry, rItem, aCell))
+        else if (isQueryByString(rEntry.eOp, rItem.meType, aCell))
         {
-            if (!cellStringSet)
-            {
-                cellString = getCellString(aCell, nRow, rEntry, &cellSharedString);
-                cellStringSet = true;
-            }
+            if (!oCellString)
+                oCellString = getCellString(aCell, nRow, rEntry.nField, &cellSharedString);
             std::pair<bool, bool> aThisRes;
             if (cellSharedString && bFastCompareByString) // fast
                 aThisRes = compareByString<true>(rEntry, rItem, cellSharedString, nullptr);
             else if (cellSharedString)
                 aThisRes = compareByString(rEntry, rItem, cellSharedString, nullptr);
             else
-                aThisRes = compareByString(rEntry, rItem, nullptr, &cellString);
+                aThisRes = compareByString(rEntry, rItem, nullptr, &*oCellString);
             aRes.first |= aThisRes.first;
             aRes.second |= aThisRes.second;
         }
@@ -887,9 +887,9 @@ bool ScQueryEvaluator::ValidQuery(SCROW nRow, const ScRefCellValue* pCell,
 
     tools::Long nPos = -1;
     ScQueryParam::const_iterator it, itBeg = mrParam.begin(), itEnd = mrParam.end();
-    for (it = itBeg; it != itEnd && (*it)->bDoQuery; ++it)
+    for (it = itBeg; it != itEnd && it->bDoQuery; ++it)
     {
-        const ScQueryEntry& rEntry = **it;
+        const ScQueryEntry& rEntry = *it;
 
         // Short-circuit the test at the end of the loop - if this is SC_AND
         // and the previous value is false, this value will not be needed.

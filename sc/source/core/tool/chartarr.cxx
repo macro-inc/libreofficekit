@@ -80,7 +80,7 @@ double getCellValue( ScDocument& rDoc, const ScAddress& rPos, double fDefault, b
     double fRet = fDefault;
 
     ScRefCellValue aCell(rDoc, rPos);
-    switch (aCell.meType)
+    switch (aCell.getType())
     {
         case CELLTYPE_VALUE:
         {
@@ -94,7 +94,7 @@ double getCellValue( ScDocument& rDoc, const ScAddress& rPos, double fDefault, b
         break;
         case CELLTYPE_FORMULA:
         {
-            ScFormulaCell* pFCell = aCell.mpFormula;
+            ScFormulaCell* pFCell = aCell.getFormula();
             if (pFCell && pFCell->GetErrCode() == FormulaError::NONE && pFCell->IsValue())
                 fRet = pFCell->GetValue();
         }

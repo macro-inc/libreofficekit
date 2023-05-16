@@ -43,7 +43,7 @@
 
 #include <comphelper/ofopxmlhelper.hxx>
 #include <comphelper/sequence.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
 
@@ -71,7 +71,7 @@ XMLSignatureHelper::~XMLSignatureHelper()
 
 void XMLSignatureHelper::SetStorage(
     const Reference < css::embed::XStorage >& rxStorage,
-    const OUString& sODFVersion)
+    std::u16string_view sODFVersion)
 {
     SAL_WARN_IF( mxUriBinding.is(), "xmlsecurity.helper", "SetStorage - UriBinding already set!" );
     mxUriBinding = new UriBindingHelper( rxStorage );
@@ -335,11 +335,10 @@ bool XMLSignatureHelper::ReadAndVerifySignatureStorage(const uno::Reference<embe
     for (sal_Int32 i = 0; i < aRelationsInfo.getLength(); ++i)
     {
         const uno::Sequence<beans::StringPair>& rRelation = aRelationsInfo[i];
-        auto aRelation = comphelper::sequenceToContainer< std::vector<beans::StringPair> >(rRelation);
-        if (std::any_of(aRelation.begin(), aRelation.end(), lcl_isSignatureType))
+        if (std::any_of(rRelation.begin(), rRelation.end(), lcl_isSignatureType))
         {
-            std::vector<beans::StringPair>::iterator it = std::find_if(aRelation.begin(), aRelation.end(), [](const beans::StringPair& rPair) { return rPair.First == "Target"; });
-            if (it != aRelation.end())
+            auto it = std::find_if(rRelation.begin(), rRelation.end(), [](const beans::StringPair& rPair) { return rPair.First == "Target"; });
+            if (it != rRelation.end())
             {
                 if (xStorage.is() && !xStorage->hasByName(it->Second))
                 {

@@ -21,6 +21,7 @@
 #include <memory>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <o3tl/string_view.hxx>
@@ -86,12 +87,12 @@ struct MigrationItem
     {
     }
 
-    MigrationItem(const OUString& sParentNodeName,
-        const OUString& sPrevSibling,
-        const OUString& sCommandURL,
-        const css::uno::Reference< css::container::XIndexContainer > & xPopupMenu)
-          : m_sParentNodeName(sParentNodeName), m_sPrevSibling(sPrevSibling),
-            m_sCommandURL(sCommandURL), m_xPopupMenu(xPopupMenu)
+    MigrationItem(OUString sParentNodeName,
+        OUString sPrevSibling,
+        OUString sCommandURL,
+        css::uno::Reference< css::container::XIndexContainer > xPopupMenu)
+          : m_sParentNodeName(std::move(sParentNodeName)), m_sPrevSibling(std::move(sPrevSibling)),
+            m_sCommandURL(std::move(sCommandURL)), m_xPopupMenu(std::move(xPopupMenu))
     {
     }
 
@@ -159,7 +160,7 @@ private:
 #if defined UNX && ! defined MACOSX
     static OUString preXDGConfigDir(const OUString& rConfigDir);
 #endif
-    static void   setInstallInfoIfExist(install_info& aInfo,  const OUString& rConfigDir, const OUString& rVersion);
+    static void   setInstallInfoIfExist(install_info& aInfo, std::u16string_view rConfigDir, const OUString& rVersion);
     static install_info  findInstallation(const strings_v& rVersions);
     strings_vr    compileFileList();
 

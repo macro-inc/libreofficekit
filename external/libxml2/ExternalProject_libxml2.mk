@@ -38,10 +38,13 @@ $(call gb_ExternalProject_get_state_target,libxml2,build):
 		$(gb_RUN_CONFIGURE) ./configure --disable-ipv6 --without-python --without-zlib --with-sax1 \
 			--without-lzma \
 			$(if $(debug),--with-run-debug) \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
+			$(if $(verbose),--disable-silent-rules,--enable-silent-rules) \
+			$(gb_CONFIGURE_PLATFORMS) \
 			$(if $(filter MACOSX,$(OS)),--prefix=/@.__________________________________________________URELIB) \
-			LDFLAGS="$(if $(SYSBASE),-L$(SYSBASE)/usr/lib)" \
-			CFLAGS="$(CFLAGS) $(if $(SYSBASE),-I$(SYSBASE)/usr/include) $(if $(debug),-g) $(if $(gb_Module_CURRENTMODULE_SYMBOLS_ENABLED),-g)" \
+			LDFLAGS="$(call gb_ExternalProject_get_link_flags,libxml2) $(if $(SYSBASE),-L$(SYSBASE)/usr/lib)" \
+			CFLAGS="$(CFLAGS) \
+				$(if $(SYSBASE),-I$(SYSBASE)/usr/include) \
+				$(call gb_ExternalProject_get_build_flags,libxml2)" \
 			$(if $(filter TRUE,$(DISABLE_DYNLOADING)),--disable-shared,--disable-static) \
 		&& $(MAKE) \
 	)

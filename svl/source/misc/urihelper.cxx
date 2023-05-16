@@ -282,10 +282,10 @@ OUString URIHelper::simpleNormalizedMakeRelative(
 
 namespace {
 
-sal_Int32 nextChar(OUString const & rStr, sal_Int32 nPos)
+sal_Int32 nextChar(std::u16string_view rStr, sal_Int32 nPos)
 {
     return rtl::isHighSurrogate(rStr[nPos])
-           && rStr.getLength() - nPos >= 2
+           && rStr.size() - nPos >= 2
            && rtl::isLowSurrogate(rStr[nPos + 1]) ?
         nPos + 2 : nPos + 1;
 }
@@ -347,7 +347,7 @@ bool isBoundary2(CharClass const & rCharClass, OUString const & rStr,
     }
 }
 
-// tdf#145381 Added MatchingBracketDepth counter o detect maching closing
+// tdf#145381 Added MatchingBracketDepth counter to detect matching closing
 // brackets that are part of the uri
 bool checkWChar(CharClass const & rCharClass, OUString const & rStr,
                 sal_Int32 * pPos, sal_Int32 * pEnd,
@@ -535,7 +535,7 @@ OUString URIHelper::FindFirstURLInText(OUString const & rText,
             if (rtl::isAsciiAlpha(c))
             {
                 sal_Int32 i = nPos;
-                INetProtocol eScheme = INetURLObject::CompareProtocolScheme(rText.copy(i, rEnd - i));
+                INetProtocol eScheme = INetURLObject::CompareProtocolScheme(rText.subView(i, rEnd - i));
                 if (eScheme == INetProtocol::File) // 2nd
                 {
                     while (rText[i++] != ':') ;
@@ -553,7 +553,7 @@ OUString URIHelper::FindFirstURLInText(OUString const & rText,
                     if (nUriEnd != nPrefixEnd
                         && isBoundary1(rCharClass, rText, nUriEnd, rEnd))
                     {
-                        INetURLObject aUri(rText.copy(nPos, nUriEnd - nPos),
+                        INetURLObject aUri(rText.subView(nPos, nUriEnd - nPos),
                                            INetProtocol::File, eMechanism, eCharset,
                                            FSysStyle::Detect);
                         if (!aUri.HasError())
@@ -584,7 +584,7 @@ OUString URIHelper::FindFirstURLInText(OUString const & rText,
                         && (isBoundary1(rCharClass, rText, nUriEnd, rEnd)
                             || rText[nUriEnd] == '\\'))
                     {
-                        INetURLObject aUri(rText.copy(nPos, nUriEnd - nPos),
+                        INetURLObject aUri(rText.subView(nPos, nUriEnd - nPos),
                                            INetProtocol::Http, eMechanism,
                                            eCharset);
                         if (!aUri.HasError())
@@ -633,7 +633,7 @@ OUString URIHelper::FindFirstURLInText(OUString const & rText,
                     if (isBoundary1(rCharClass, rText, nUriEnd, rEnd)
                         || rText[nUriEnd] == '\\')
                     {
-                        INetURLObject aUri(rText.copy(nPos, nUriEnd - nPos),
+                        INetURLObject aUri(rText.subView(nPos, nUriEnd - nPos),
                                            INetProtocol::Http, eMechanism,
                                            eCharset);
                         if (!aUri.HasError())
@@ -657,7 +657,7 @@ OUString URIHelper::FindFirstURLInText(OUString const & rText,
                            && checkWChar(rCharClass, rText, &i, &nUriEnd)) ;
                     if (isBoundary1(rCharClass, rText, nUriEnd, rEnd))
                     {
-                        INetURLObject aUri(rText.copy(nPos, nUriEnd - nPos),
+                        INetURLObject aUri(rText.subView(nPos, nUriEnd - nPos),
                                            INetProtocol::File,
                                            INetURLObject::EncodeMechanism::All,
                                            RTL_TEXTENCODING_UTF8,
@@ -686,7 +686,7 @@ OUString URIHelper::FindFirstURLInText(OUString const & rText,
                                          nullptr, true)) ;
                     if (isBoundary1(rCharClass, rText, nUriEnd, rEnd))
                     {
-                        INetURLObject aUri(rText.copy(nPos, nUriEnd - nPos),
+                        INetURLObject aUri(rText.subView(nPos, nUriEnd - nPos),
                                            INetProtocol::File,
                                            INetURLObject::EncodeMechanism::All,
                                            RTL_TEXTENCODING_UTF8,
@@ -723,7 +723,7 @@ OUString URIHelper::FindFirstURLInText(OUString const & rText,
                         if (nLabels >= 1
                             && isBoundary1(rCharClass, rText, i, rEnd))
                         {
-                            INetURLObject aUri(rText.copy(nPos, i - nPos),
+                            INetURLObject aUri(rText.subView(nPos, i - nPos),
                                                INetProtocol::Mailto,
                                                INetURLObject::EncodeMechanism::All);
                             if (!aUri.HasError())

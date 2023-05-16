@@ -57,7 +57,7 @@ private:
     SvMemoryStream  maHTMLStream;
 
 public:
-    explicit TETextDataObject( const OUString& rText );
+    explicit TETextDataObject( OUString aText );
 
     SvMemoryStream& GetHTMLStream() { return maHTMLStream; }
 
@@ -105,7 +105,7 @@ class VCL_DLLPUBLIC TextView final : public vcl::unohelper::DragAndDropClient
     void                ImpShowDDCursor();
 
     bool                ImplTruncateNewText( OUString& rNewText ) const;
-    bool                ImplCheckTextLen( const OUString& rNewText ) const;
+    bool                ImplCheckTextLen( std::u16string_view rNewText ) const;
 
     // DragAndDropClient
     virtual void        dragGestureRecognized( const css::datatransfer::dnd::DragGestureEvent& dge ) override;
@@ -196,6 +196,7 @@ public:
     TextPaM             CursorDown( const TextPaM& rPaM );
     TextPaM             CursorLeft( const TextPaM& rPaM, sal_uInt16 nCharacterIteratorMode );
     TextPaM             CursorRight( const TextPaM& rPaM, sal_uInt16 nCharacterIteratorMode );
+    TextPaM             CursorFirstWord( const TextPaM& rPaM );
     TextPaM             CursorWordLeft( const TextPaM& rPaM );
     TextPaM             CursorWordRight( const TextPaM& rPaM );
     TextPaM             CursorStartOfLine( const TextPaM& rPaM );

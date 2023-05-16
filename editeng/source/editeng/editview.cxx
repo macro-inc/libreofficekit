@@ -19,12 +19,10 @@
 
 
 #include <memory>
-#include <sal/macros.h>
 #include <vcl/image.hxx>
 
 #include <com/sun/star/i18n/WordType.hpp>
 #include <com/sun/star/i18n/ScriptType.hpp>
-#include <vcl/metric.hxx>
 
 #include <i18nlangtag/languagetag.hxx>
 #include <i18nlangtag/mslangid.hxx>
@@ -36,6 +34,7 @@
 #include <svl/srchitem.hxx>
 
 #include "impedit.hxx"
+#include <comphelper/propertyvalue.hxx>
 #include <editeng/editeng.hxx>
 #include <editeng/editview.hxx>
 #include <editeng/flditem.hxx>
@@ -50,7 +49,6 @@
 #include <vcl/window.hxx>
 #include <editeng/acorrcfg.hxx>
 #include <editeng/unolingu.hxx>
-#include <editeng/fontitem.hxx>
 #include <unotools/lingucfg.hxx>
 
 #include <com/sun/star/frame/XStorable.hpp>
@@ -64,7 +62,6 @@
 #include <sfx2/viewsh.hxx>
 #include <osl/diagnose.h>
 #include <boost/property_tree/json_parser.hpp>
-#include <sfx2/dispatch.hxx>
 
 #include <com/sun/star/lang/XServiceInfo.hpp>
 
@@ -711,7 +708,7 @@ void EditView::MoveParagraphs( tools::Long nDiff )
 {
     ESelection aSel = GetSelection();
     Range aRange( aSel.nStartPara, aSel.nEndPara );
-    aRange.Justify();
+    aRange.Normalize();
     tools::Long nDest = ( nDiff > 0  ? aRange.Max() : aRange.Min() ) + nDiff;
     if ( nDiff > 0 )
         nDest++;
@@ -981,7 +978,7 @@ static void LOKSendSpellPopupMenu(const weld::Menu& rMenu, LanguageType nGuessLa
     pViewShell->libreOfficeKitViewCallback(LOK_CALLBACK_CONTEXT_MENU, aStream.str().c_str());
 }
 
-void EditView::ExecuteSpellPopup(const Point& rPosPixel, const Link<SpellCallbackInfo&,void> &rCallBack)
+bool EditView::ExecuteSpellPopup(const Point& rPosPixel, const Link<SpellCallbackInfo&,void> &rCallBack)
 {
     OutputDevice& rDevice = pImpEditView->GetOutputDevice();
     Point aPos(rDevice.PixelToLogic(rPosPixel));
@@ -990,7 +987,7 @@ void EditView::ExecuteSpellPopup(const Point& rPosPixel, const Link<SpellCallbac
     Reference< linguistic2::XSpellChecker1 >  xSpeller( pImpEditView->pEditEngine->pImpEditEngine->GetSpeller() );
     ESelection aOldSel = GetSelection();
     if ( !(xSpeller.is() && pImpEditView->IsWrongSpelledWord( aPaM, true )) )
-        return;
+        return false;
 
     // PaMtoEditCursor returns Logical units
     tools::Rectangle aTempRect = pImpEditView->pEditEngine->pImpEditEngine->PaMtoEditCursor( aPaM, GetCursorFlags::TextOnly );
@@ -1021,14 +1018,11 @@ void EditView::ExecuteSpellPopup(const Point& rPosPixel, const Link<SpellCallbac
     // than returning e.g. 16 suggestions and using only the
     // first 7. Thus we hand down the value to use to that
     // implementation here by providing an additional parameter.
-    Sequence< PropertyValue > aPropVals(1);
-    PropertyValue &rVal = aPropVals.getArray()[0];
-    rVal.Name = UPN_MAX_NUMBER_OF_SUGGESTIONS;
-    rVal.Value <<= sal_Int16(7);
+    Sequence< PropertyValue > aPropVals { comphelper::makePropertyValue(UPN_MAX_NUMBER_OF_SUGGESTIONS, sal_Int16(7)) };
 
     // Are there any replace suggestions?
     Reference< linguistic2::XSpellAlternatives >  xSpellAlt =
-            xSpeller->spell( aSelected, static_cast<sal_uInt16>(pImpEditView->pEditEngine->pImpEditEngine->GetLanguage( aPaM2 )), aPropVals );
+            xSpeller->spell( aSelected, static_cast<sal_uInt16>(pImpEditView->pEditEngine->pImpEditEngine->GetLanguage( aPaM2 ).nLang), aPropVals );
 
     Reference< linguistic2::XLanguageGuessing >  xLangGuesser( EditDLL::Get().GetGlobalData()->GetLanguageGuesser() );
 
@@ -1108,7 +1102,7 @@ void EditView::ExecuteSpellPopup(const Point& rPosPixel, const Link<SpellCallbac
 
         aDics = xDicList->getDictionaries();
         pDic  = aDics.getConstArray();
-        LanguageType nCheckedLanguage = pImpEditView->pEditEngine->pImpEditEngine->GetLanguage( aPaM2 );
+        LanguageType nCheckedLanguage = pImpEditView->pEditEngine->pImpEditEngine->GetLanguage( aPaM2 ).nLang;
         sal_uInt16 nDicCount = static_cast<sal_uInt16>(aDics.getLength());
         for (sal_uInt16 i = 0; i < nDicCount; i++)
         {
@@ -1173,7 +1167,7 @@ void EditView::ExecuteSpellPopup(const Point& rPosPixel, const Link<SpellCallbac
         xPopupMenu->remove("autocorrectdlg");
 
         LOKSendSpellPopupMenu(*xPopupMenu, nGuessLangWord, nGuessLangPara, nWords);
-        return;
+        return true;
     }
 
     OString sId = xPopupMenu->popup_at_rect(pPopupParent, aTempRect);
@@ -1229,6 +1223,7 @@ void EditView::ExecuteSpellPopup(const Point& rPosPixel, const Link<SpellCallbac
         OUString aDicName;
         if (sId.toInt32() >= MN_DICTSTART)
         {
+            assert(xInsertMenu && "this case only occurs when xInsertMenu exists");
             // strip_mnemonic is necessary to retrieve the correct dictionary name
             aDicName = pPopupParent->strip_mnemonic(xInsertMenu->get_label(sId));
         }
@@ -1259,7 +1254,7 @@ void EditView::ExecuteSpellPopup(const Point& rPosPixel, const Link<SpellCallbac
         OUString aWord = pAlt[sId.toInt32() - MN_AUTOSTART];
         SvxAutoCorrect* pAutoCorrect = SvxAutoCorrCfg::Get().GetAutoCorrect();
         if ( pAutoCorrect )
-            pAutoCorrect->PutText( aSelected, aWord, pImpEditView->pEditEngine->pImpEditEngine->GetLanguage( aPaM2 ) );
+            pAutoCorrect->PutText( aSelected, aWord, pImpEditView->pEditEngine->pImpEditEngine->GetLanguage( aPaM2 ).nLang );
         InsertText( aWord );
     }
     else if ( sId.toInt32() >= MN_ALTSTART )  // Replace
@@ -1272,6 +1267,7 @@ void EditView::ExecuteSpellPopup(const Point& rPosPixel, const Link<SpellCallbac
     {
         SetSelection( aOldSel );
     }
+    return true;
 }
 
 OUString EditView::SpellIgnoreWord()
@@ -1396,6 +1392,53 @@ const SvxFieldData* EditView::GetFieldAtCursor() const
         pFieldItem = GetFieldAtSelection();
 
     return pFieldItem ? pFieldItem->GetField() : nullptr;
+}
+
+sal_Int32 EditView::countFieldsOffsetSum(sal_Int32 nPara, sal_Int32 nPos, bool bCanOverflow) const
+{
+    if (!pImpEditView || !pImpEditView->pEditEngine)
+        return 0;
+
+    int nOffset = 0;
+
+    for (int nCurrentPara = 0; nCurrentPara <= nPara; nCurrentPara++)
+    {
+        int nFields = pImpEditView->pEditEngine->GetFieldCount( nCurrentPara );
+        for (int nField = 0; nField < nFields; nField++)
+        {
+            EFieldInfo aFieldInfo
+                = pImpEditView->pEditEngine->GetFieldInfo( nCurrentPara, nField );
+
+            bool bLastPara = nCurrentPara == nPara;
+            sal_Int32 nFieldPos = aFieldInfo.aPosition.nIndex;
+
+            if (bLastPara && nFieldPos >= nPos)
+                break;
+
+            sal_Int32 nFieldLen = aFieldInfo.aCurrentText.getLength();
+
+            // position in the middle of a field
+            if (!bCanOverflow && bLastPara && nFieldPos + nFieldLen > nPos)
+                nFieldLen = nPos - nFieldPos;
+
+            nOffset += nFieldLen - 1;
+        }
+    }
+
+    return nOffset;
+}
+
+sal_Int32 EditView::GetPosNoField(sal_Int32 nPara, sal_Int32 nPos) const
+{
+    sal_Int32 nOffset = countFieldsOffsetSum(nPara, nPos, false);
+    assert(nPos >= nOffset);
+    return nPos - nOffset;
+}
+
+sal_Int32 EditView::GetPosWithField(sal_Int32 nPara, sal_Int32 nPos) const
+{
+    sal_Int32 nOffset = countFieldsOffsetSum(nPara, nPos, true);
+    return nPos + nOffset;
 }
 
 void EditView::SetInvalidateMore( sal_uInt16 nPixel )

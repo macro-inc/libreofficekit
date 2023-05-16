@@ -52,7 +52,7 @@
 #include <sfx2/linkmgr.hxx>
 #include <tools/debug.hxx>
 #include <tools/globname.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/classids.hxx>
 #include <comphelper/propertyvalue.hxx>
 
@@ -69,6 +69,7 @@
 #include <sdr/contact/viewcontactofsdrole2obj.hxx>
 #include <svx/svdograf.hxx>
 #include <sdr/properties/oleproperties.hxx>
+#include <svx/unoshape.hxx>
 #include <svx/xlineit0.hxx>
 #include <svx/xlnclit.hxx>
 #include <svx/xbtmpit.hxx>
@@ -593,12 +594,41 @@ void SdrEmbedObjectLink::Closed()
     SvBaseLink::Closed();
 }
 
+SdrIFrameLink::SdrIFrameLink(SdrOle2Obj* pObject)
+    : ::sfx2::SvBaseLink(::SfxLinkUpdateMode::ONCALL, SotClipboardFormatId::SVXB)
+    , m_pObject(pObject)
+{
+    SetSynchron( false );
+}
+
+::sfx2::SvBaseLink::UpdateResult SdrIFrameLink::DataChanged(
+    const OUString&, const uno::Any& )
+{
+    uno::Reference<embed::XEmbeddedObject> xObject = m_pObject->GetObjRef();
+    uno::Reference<embed::XCommonEmbedPersist> xPersObj(xObject, uno::UNO_QUERY);
+    if (xPersObj.is())
+    {
+        // let the IFrameObject reload the link
+        try
+        {
+            xPersObj->reload(uno::Sequence<beans::PropertyValue>(), uno::Sequence<beans::PropertyValue>());
+        }
+        catch (const uno::Exception&)
+        {
+        }
+
+        m_pObject->SetChanged();
+    }
+
+    return SUCCESS;
+}
+
 class SdrOle2ObjImpl
 {
 public:
     svt::EmbeddedObjectRef mxObjRef;
 
-    std::unique_ptr<Graphic> mxGraphic;
+    std::optional<Graphic> moGraphic;
     OUString        maProgName;
     OUString        aPersistName;       // name of object in persist
     rtl::Reference<SdrLightEmbeddedClient_Impl> mxLightClient; // must be registered as client only using AddOwnLightClient() call
@@ -610,7 +640,7 @@ public:
     bool mbLoadingOLEObjectFailed:1; // New local var to avoid repeated loading if load of OLE2 fails
     bool mbConnected:1;
 
-    SdrEmbedObjectLink* mpObjectLink;
+    sfx2::SvBaseLink* mpObjectLink;
     OUString maLinkURL;
 
     rtl::Reference<SvxUnoShapeModifyListener> mxModifyListener;
@@ -642,7 +672,7 @@ public:
 
     ~SdrOle2ObjImpl()
     {
-        mxGraphic.reset();
+        moGraphic.reset();
 
         if (mxModifyListener.is())
         {
@@ -723,9 +753,9 @@ SdrOle2Obj::SdrOle2Obj(SdrModel& rSdrModel, SdrOle2Obj const & rSource)
     mpImpl->maProgName = rSource.mpImpl->maProgName;
     mpImpl->mbFrame = rSource.mpImpl->mbFrame;
 
-    if (rSource.mpImpl->mxGraphic)
+    if (rSource.mpImpl->moGraphic)
     {
-        mpImpl->mxGraphic.reset(new Graphic(*rSource.mpImpl->mxGraphic));
+        mpImpl->moGraphic.emplace(*rSource.mpImpl->moGraphic);
     }
 
     if( IsEmptyPresObj() )
@@ -760,15 +790,19 @@ SdrOle2Obj::SdrOle2Obj(
 :   SdrRectObj(rSdrModel, rNewRect),
     mpImpl(new SdrOle2ObjImpl(false/*bFrame_*/, rNewObjRef))
 {
+    osl_atomic_increment(&m_refCount);
+
     mpImpl->aPersistName = rNewObjName;
 
     if (mpImpl->mxObjRef.is() && (mpImpl->mxObjRef->getStatus( GetAspect() ) & embed::EmbedMisc::EMBED_NEVERRESIZE ) )
-        SetResizeProtect(true);
+        m_bSizProt = true;
 
     // For math objects, set closed state to transparent
     SetClosedObj(!ImplIsMathObj( mpImpl->mxObjRef.GetObject() ));
 
     Init();
+
+    osl_atomic_decrement(&m_refCount);
 }
 
 OUString SdrOle2Obj::GetStyleString()
@@ -823,7 +857,7 @@ bool SdrOle2Obj::isUiActive() const
 void SdrOle2Obj::SetGraphic(const Graphic& rGrf)
 {
     // only for setting a preview graphic
-    mpImpl->mxGraphic.reset(new Graphic(rGrf));
+    mpImpl->moGraphic.emplace(rGrf);
 
     SetChanged();
     BroadcastObjectChange();
@@ -831,7 +865,7 @@ void SdrOle2Obj::SetGraphic(const Graphic& rGrf)
 
 void SdrOle2Obj::ClearGraphic()
 {
-    mpImpl->mxGraphic.reset();
+    mpImpl->moGraphic.reset();
 
     SetChanged();
     BroadcastObjectChange();
@@ -852,7 +886,7 @@ bool SdrOle2Obj::IsEmpty() const
     return !mpImpl->mxObjRef.is();
 }
 
-void SdrOle2Obj::Connect()
+void SdrOle2Obj::Connect(SvxOle2Shape* pCreator)
 {
     if( IsEmptyPresObj() )
         return;
@@ -865,7 +899,7 @@ void SdrOle2Obj::Connect()
         return;
     }
 
-    Connect_Impl();
+    Connect_Impl(pCreator);
     AddListeners_Impl();
 }
 
@@ -964,24 +998,51 @@ void SdrOle2Obj::CheckFileLink_Impl()
 
     try
     {
-        uno::Reference< embed::XLinkageSupport > xLinkSupport( mpImpl->mxObjRef.GetObject(), uno::UNO_QUERY );
+        uno::Reference<embed::XEmbeddedObject> xObject = mpImpl->mxObjRef.GetObject();
+        if (!xObject)
+            return;
 
-        if ( xLinkSupport.is() && xLinkSupport->isLink() )
+        bool bIFrame = false;
+
+        OUString aLinkURL;
+        uno::Reference<embed::XLinkageSupport> xLinkSupport(xObject, uno::UNO_QUERY);
+        if (xLinkSupport)
         {
-            OUString aLinkURL = xLinkSupport->getLinkURL();
-
-            if ( !aLinkURL.isEmpty() )
+            if (xLinkSupport->isLink())
+                aLinkURL = xLinkSupport->getLinkURL();
+        }
+        else
+        {
+            // get IFrame (Floating Frames) listed and updatable from the
+            // manage links dialog
+            SvGlobalName aClassId(xObject->getClassID());
+            if (aClassId == SvGlobalName(SO3_IFRAME_CLASSID))
             {
-                // this is a file link so the model link manager should handle it
-                sfx2::LinkManager* pLinkManager(getSdrModelFromSdrObject().GetLinkManager());
+                uno::Reference<beans::XPropertySet> xSet(xObject->getComponent(), uno::UNO_QUERY);
+                if (xSet.is())
+                    xSet->getPropertyValue("FrameURL") >>= aLinkURL;
+                bIFrame = true;
+            }
+        }
 
-                if ( pLinkManager )
+        if (!aLinkURL.isEmpty()) // this is a file link so the model link manager should handle it
+        {
+            sfx2::LinkManager* pLinkManager(getSdrModelFromSdrObject().GetLinkManager());
+
+            if ( pLinkManager )
+            {
+                SdrEmbedObjectLink* pEmbedObjectLink = nullptr;
+                if (!bIFrame)
                 {
-                    mpImpl->mpObjectLink = new SdrEmbedObjectLink( this );
-                    mpImpl->maLinkURL = aLinkURL;
-                    pLinkManager->InsertFileLink( *mpImpl->mpObjectLink, sfx2::SvBaseLinkObjectType::ClientOle, aLinkURL );
-                    mpImpl->mpObjectLink->Connect();
+                    pEmbedObjectLink = new SdrEmbedObjectLink(this);
+                    mpImpl->mpObjectLink = pEmbedObjectLink;
                 }
+                else
+                    mpImpl->mpObjectLink = new SdrIFrameLink(this);
+                mpImpl->maLinkURL = aLinkURL;
+                pLinkManager->InsertFileLink( *mpImpl->mpObjectLink, sfx2::SvBaseLinkObjectType::ClientOle, aLinkURL );
+                if (pEmbedObjectLink)
+                    pEmbedObjectLink->Connect();
             }
         }
     }
@@ -991,7 +1052,7 @@ void SdrOle2Obj::CheckFileLink_Impl()
     }
 }
 
-void SdrOle2Obj::Connect_Impl()
+void SdrOle2Obj::Connect_Impl(SvxOle2Shape* pCreator)
 {
     if(mpImpl->aPersistName.isEmpty() )
         return;
@@ -1029,6 +1090,17 @@ void SdrOle2Obj::Connect_Impl()
                 mpImpl->mxObjRef.AssignToContainer( &rContainer, mpImpl->aPersistName );
                 mpImpl->mbConnected = true;
                 mpImpl->mxObjRef.Lock();
+            }
+        }
+
+        if (pCreator)
+        {
+            OUString sFrameURL(pCreator->GetAndClearInitialFrameURL());
+            if (!sFrameURL.isEmpty() && svt::EmbeddedObjectRef::TryRunningState(mpImpl->mxObjRef.GetObject()))
+            {
+                uno::Reference<beans::XPropertySet> xSet(mpImpl->mxObjRef->getComponent(), uno::UNO_QUERY);
+                if (xSet.is())
+                    xSet->setPropertyValue("FrameURL", uno::Any(sFrameURL));
             }
         }
 
@@ -1200,14 +1272,14 @@ void SdrOle2Obj::Disconnect_Impl()
     mpImpl->mbConnected = false;
 }
 
-SdrObjectUniquePtr SdrOle2Obj::createSdrGrafObjReplacement(bool bAddText) const
+rtl::Reference<SdrObject> SdrOle2Obj::createSdrGrafObjReplacement(bool bAddText) const
 {
     const Graphic* pOLEGraphic = GetGraphic();
 
     if(pOLEGraphic)
     {
         // #i118485# allow creating a SdrGrafObj representation
-        SdrGrafObj* pClone = new SdrGrafObj(
+        rtl::Reference<SdrGrafObj> pClone = new SdrGrafObj(
             getSdrModelFromSdrObject(),
             *pOLEGraphic);
 
@@ -1233,13 +1305,13 @@ SdrObjectUniquePtr SdrOle2Obj::createSdrGrafObjReplacement(bool bAddText) const
             }
         }
 
-        return SdrObjectUniquePtr(pClone);
+        return rtl::Reference<SdrObject>(pClone);
     }
     else
     {
         // #i100710# pOLEGraphic may be zero (no visualisation available),
         // so we need to use the OLE replacement graphic
-        SdrRectObj* pClone = new SdrRectObj(
+        rtl::Reference<SdrRectObj> pClone = new SdrRectObj(
             getSdrModelFromSdrObject(),
             GetSnapRect());
 
@@ -1255,14 +1327,14 @@ SdrObjectUniquePtr SdrOle2Obj::createSdrGrafObjReplacement(bool bAddText) const
         pClone->SetMergedItem(XFillBmpTileItem(false));
         pClone->SetMergedItem(XFillBmpStretchItem(false));
 
-        return SdrObjectUniquePtr(pClone);
+        return rtl::Reference<SdrObject>(pClone);
     }
 }
 
-SdrObjectUniquePtr SdrOle2Obj::DoConvertToPolyObj(bool bBezier, bool bAddText) const
+rtl::Reference<SdrObject> SdrOle2Obj::DoConvertToPolyObj(bool bBezier, bool bAddText) const
 {
     // #i118485# missing converter added
-    SdrObjectUniquePtr pRetval = createSdrGrafObjReplacement(true);
+    rtl::Reference<SdrObject> pRetval = createSdrGrafObjReplacement(true);
 
     if(pRetval)
     {
@@ -1314,7 +1386,7 @@ void SdrOle2Obj::SetObjRef( const css::uno::Reference < css::embed::XEmbeddedObj
 
     if ( mpImpl->mxObjRef.is() )
     {
-        mpImpl->mxGraphic.reset();
+        mpImpl->moGraphic.reset();
 
         if ( mpImpl->mxObjRef->getStatus( GetAspect() ) & embed::EmbedMisc::EMBED_NEVERRESIZE )
             SetResizeProtect(true);
@@ -1336,20 +1408,20 @@ void SdrOle2Obj::SetClosedObj( bool bIsClosed )
     m_bClosedObj = bIsClosed;
 }
 
-SdrObjectUniquePtr SdrOle2Obj::getFullDragClone() const
+rtl::Reference<SdrObject> SdrOle2Obj::getFullDragClone() const
 {
     // #i118485# use central replacement generator
     return createSdrGrafObjReplacement(false);
 }
 
-void SdrOle2Obj::SetPersistName( const OUString& rPersistName )
+void SdrOle2Obj::SetPersistName( const OUString& rPersistName, SvxOle2Shape* pCreator )
 {
     DBG_ASSERT( mpImpl->aPersistName.isEmpty(), "Persist name changed!");
 
     mpImpl->aPersistName = rPersistName;
     mpImpl->mbLoadingOLEObjectFailed = false;
 
-    Connect();
+    Connect(pCreator);
     SetChanged();
 }
 
@@ -1386,7 +1458,7 @@ void SdrOle2Obj::TakeObjInfo(SdrObjTransformInfoRec& rInfo) const
 
 SdrObjKind SdrOle2Obj::GetObjIdentifier() const
 {
-    return mpImpl->mbFrame ? OBJ_FRAME : OBJ_OLE2;
+    return mpImpl->mbFrame ? SdrObjKind::OLEPluginFrame : SdrObjKind::OLE2;
 }
 
 OUString SdrOle2Obj::TakeObjNameSingul() const
@@ -1410,7 +1482,7 @@ OUString SdrOle2Obj::TakeObjNamePlural() const
     return SvxResId(mpImpl->mbFrame ? STR_ObjNamePluralFrame : STR_ObjNamePluralOLE2);
 }
 
-SdrOle2Obj* SdrOle2Obj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> SdrOle2Obj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new SdrOle2Obj(rTargetModel, *this);
 }
@@ -1634,7 +1706,7 @@ const Graphic* SdrOle2Obj::GetGraphic() const
 {
     if ( mpImpl->mxObjRef.is() )
         return mpImpl->mxObjRef.GetGraphic();
-    return mpImpl->mxGraphic.get();
+    return mpImpl->moGraphic ? &*mpImpl->moGraphic : nullptr;
 }
 
 void SdrOle2Obj::GetNewReplacement()
@@ -1821,7 +1893,7 @@ void SdrOle2Obj::SetGraphicToObj( const Graphic& aGraphic )
     // if the object isn't valid, e.g. link to something that doesn't exist, set the fallback
     // graphic as mxGraphic so SdrOle2Obj::GetGraphic will show the fallback
     if (const Graphic* pObjGraphic = mpImpl->mxObjRef.is() ? nullptr : mpImpl->mxObjRef.GetGraphic())
-        mpImpl->mxGraphic.reset(new Graphic(*pObjGraphic));
+        mpImpl->moGraphic.emplace(*pObjGraphic);
 }
 
 void SdrOle2Obj::SetGraphicToObj( const uno::Reference< io::XInputStream >& xGrStream, const OUString& aMediaType )
@@ -1830,7 +1902,7 @@ void SdrOle2Obj::SetGraphicToObj( const uno::Reference< io::XInputStream >& xGrS
     // if the object isn't valid, e.g. link to something that doesn't exist, set the fallback
     // graphic as mxGraphic so SdrOle2Obj::GetGraphic will show the fallback
     if (const Graphic* pObjGraphic = mpImpl->mxObjRef.is() ? nullptr : mpImpl->mxObjRef.GetGraphic())
-        mpImpl->mxGraphic.reset(new Graphic(*pObjGraphic));
+        mpImpl->moGraphic.emplace(*pObjGraphic);
 }
 
 bool SdrOle2Obj::IsCalc() const

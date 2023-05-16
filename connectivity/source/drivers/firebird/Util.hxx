@@ -14,6 +14,7 @@
 #include <rtl/ustring.hxx>
 
 #include <com/sun/star/uno/XInterface.hpp>
+#include <utility>
 
 namespace connectivity::firebird
     {
@@ -57,16 +58,16 @@ public:
              *
              */
             explicit ColumnTypeInfo( short aType, short aSubType = 0,
-                    short nScale = 0, const OUString& sCharset = OUString() )
+                    short nScale = 0, OUString sCharset = OUString() )
                 : m_aType(aType)
                 , m_aSubType(aSubType)
                 , m_nScale(nScale)
-                , m_sCharsetName(sCharset) {}
-            explicit ColumnTypeInfo( short aType, const OUString& sCharset )
+                , m_sCharsetName(std::move(sCharset)) {}
+            explicit ColumnTypeInfo( short aType, OUString sCharset )
                 : m_aType(aType)
                 , m_aSubType(0)
                 , m_nScale(0)
-                , m_sCharsetName(sCharset) {}
+                , m_sCharsetName(std::move(sCharset)) {}
             short getType() const { return m_aType; }
             short getSubType() const { return m_aSubType; }
             short getScale() const { return m_nScale; }
@@ -86,7 +87,7 @@ public:
          * for such shorter strings, however any trailing padding makes the gui
          * editing of such names harder, hence we remove all trailing whitespace.
          */
-        OUString sanitizeIdentifier(const OUString& rIdentifier);
+        OUString sanitizeIdentifier(std::u16string_view rIdentifier);
 
         inline bool IndicatesError(const ISC_STATUS_ARRAY& rStatusVector)
         {
@@ -118,7 +119,6 @@ public:
 
         void freeSQLVAR(XSQLDA* pSqlda);
 
-        OUString escapeWith( const OUString& sText, const char aKey, const char aEscapeChar);
         sal_Int64 pow10Integer( int nDecimalCount );
 
 }

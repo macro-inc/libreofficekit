@@ -32,6 +32,7 @@
 #include <i18nlangtag/mslangid.hxx>
 #include <unotools/syslocale.hxx>
 #include <unotools/syslocaleoptions.hxx>
+#include <utility>
 #include <vcl/QueueInfo.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/vclmain.hxx>
@@ -52,7 +53,7 @@
 #include <debugevent.hxx>
 #include <scrwnd.hxx>
 #include <windowdev.hxx>
-#include <saldatabasic.hxx>
+#include <svdata.hxx>
 
 #ifdef _WIN32
 #include <svsys.h>
@@ -69,7 +70,6 @@
 
 #include <impfontcache.hxx>
 #include <salinst.hxx>
-#include <svdata.hxx>
 #include <vcl/svmain.hxx>
 #include <dbggui.hxx>
 #include <accmgr.hxx>
@@ -100,11 +100,15 @@
 #include <watchdog.hxx>
 
 #include <basegfx/utils/systemdependentdata.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #if OSL_DEBUG_LEVEL > 0
 #include <typeinfo>
 #include <rtl/strbuf.hxx>
+#endif
+
+#ifdef LINUX
+#include <unx/gendata.hxx>
 #endif
 
 using namespace ::com::sun::star;
@@ -243,8 +247,8 @@ namespace {
 class DesktopEnvironmentContext: public cppu::WeakImplHelper< css::uno::XCurrentContext >
 {
 public:
-    explicit DesktopEnvironmentContext( const css::uno::Reference< css::uno::XCurrentContext > & ctx)
-        : m_xNextContext( ctx ) {}
+    explicit DesktopEnvironmentContext( css::uno::Reference< css::uno::XCurrentContext > ctx)
+        : m_xNextContext(std::move( ctx )) {}
 
     // XCurrentContext
     virtual css::uno::Any SAL_CALL getValueByName( const OUString& Name ) override;
@@ -317,6 +321,7 @@ bool InitVCL()
     pSVData->mpDefInst = CreateSalInstance();
     if ( !pSVData->mpDefInst )
         return false;
+    pSVData->mpDefInst->AcquireYieldMutex();
 
     // Desktop Environment context (to be able to get value of "system.desktop-environment" as soon as possible)
     css::uno::setCurrentContext(
@@ -583,6 +588,8 @@ void DeInitVCL()
 
     pSVData->maGDIData.mxScreenFontList.reset();
     pSVData->maGDIData.mxScreenFontCache.reset();
+    // we are iterating over a map and doing erase while inside a loop which is doing erase
+    // hence we can't use clear() here
     pSVData->maGDIData.maScaleCache.remove_if([](const lru_scale_cache::key_value_pair_t&)
                                                 { return true; });
 
@@ -592,6 +599,7 @@ void DeInitVCL()
     // Deinit Sal
     if (pSVData->mpDefInst)
     {
+        pSVData->mpDefInst->ReleaseYieldMutexAll();
         DestroySalInstance( pSVData->mpDefInst );
         pSVData->mpDefInst = nullptr;
     }
@@ -629,7 +637,7 @@ struct WorkerThreadData
 
 #ifdef _WIN32
 static HANDLE hThreadID = nullptr;
-static unsigned __stdcall threadmain( void *pArgs )
+static DWORD WINAPI threadmain( _In_ LPVOID pArgs )
 {
     OleInitialize( nullptr );
     static_cast<WorkerThreadData*>(pArgs)->pWorker( static_cast<WorkerThreadData*>(pArgs)->pThreadData );
@@ -656,14 +664,14 @@ void CreateMainLoopThread( oslWorkerFunction pWorker, void * pThreadData )
 #ifdef _WIN32
     // sal thread always call CoInitializeEx, so a system dependent implementation is necessary
 
-    unsigned uThreadID;
-    hThreadID = reinterpret_cast<HANDLE>(_beginthreadex(
+    DWORD uThreadID;
+    hThreadID = CreateThread(
         nullptr,       // no security handle
         0,          // stacksize 0 means default
         threadmain,    // thread worker function
         new WorkerThreadData( pWorker, pThreadData ),       // arguments for worker function
         0,          // 0 means: create immediately otherwise use CREATE_SUSPENDED
-        &uThreadID ));   // thread id to fill
+        &uThreadID );   // thread id to fill
 #else
     hThreadID = osl_createThread( MainWorkerFunction, new WorkerThreadData( pWorker, pThreadData ) );
 #endif

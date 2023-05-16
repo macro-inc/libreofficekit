@@ -76,7 +76,7 @@ namespace rptui
         // OPropertyChangeListener
         virtual void    _propertyChanged(const css::beans::PropertyChangeEvent& _rEvent) override;
     public:
-        OReportSection(OSectionWindow* _pParent,const css::uno::Reference< css::report::XSection >& _xSection);
+        OReportSection(OSectionWindow* _pParent,css::uno::Reference< css::report::XSection > _xSection);
         virtual ~OReportSection() override;
         virtual void dispose() override;
 
@@ -104,7 +104,7 @@ namespace rptui
 
         /** All objects will be marked.
         */
-        void SelectAll(const sal_uInt16 _nObjectType);
+        void SelectAll(const SdrObjKind _nObjectType);
 
         /** makes the grid visible
         *

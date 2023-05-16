@@ -21,7 +21,7 @@
 #include <memory>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/helpers.hxx>
 #include <tools/stream.hxx>
 #include <tools/vcompat.hxx>
@@ -459,7 +459,11 @@ void GDIMetaFile::Play(OutputDevice& rOut, const Point& rPos,
     MapMode aDrawMap( GetPrefMapMode() );
     Size    aDestSize(rOut.LogicToPixel(rSize));
 
-    if( !aDestSize.Width() || !aDestSize.Height() )
+    if (aDestSize.Width() <= 0 || aDestSize.Height() <= 0)
+        return;
+
+    if (aDestSize.Width() > std::numeric_limits<sal_Int32>::max() ||
+        aDestSize.Height() > std::numeric_limits<sal_Int32>::max())
         return;
 
     GDIMetaFile* pMtf = rOut.GetConnectMetaFile();
@@ -478,8 +482,23 @@ void GDIMetaFile::Play(OutputDevice& rOut, const Point& rPos,
     Fraction aScaleX( aDestSize.Width(), aTmpPrefSize.Width() );
     Fraction aScaleY( aDestSize.Height(), aTmpPrefSize.Height() );
 
-    aScaleX *= aDrawMap.GetScaleX(); aDrawMap.SetScaleX( aScaleX );
-    aScaleY *= aDrawMap.GetScaleY(); aDrawMap.SetScaleY( aScaleY );
+    aScaleX *= aDrawMap.GetScaleX();
+    aScaleY *= aDrawMap.GetScaleY();
+    // try reducing inaccurary first and abandon if the scaling
+    // still cannot be achieved
+    if (TooLargeScaleForMapMode(aScaleX, rOut.GetDPIX()))
+        aScaleX.ReduceInaccurate(10);
+    if (TooLargeScaleForMapMode(aScaleY, rOut.GetDPIY()))
+        aScaleY.ReduceInaccurate(10);
+    if (TooLargeScaleForMapMode(aScaleX, rOut.GetDPIX()) ||
+        TooLargeScaleForMapMode(aScaleY, rOut.GetDPIY()))
+    {
+        SAL_WARN("vcl", "GDIMetaFile Scaling is too high");
+        return;
+    }
+
+    aDrawMap.SetScaleX(aScaleX);
+    aDrawMap.SetScaleY(aScaleY);
 
     // #i47260# Convert logical output position to offset within
     // the metafile's mapmode. Therefore, disable pixel offset on
@@ -755,7 +774,7 @@ void GDIMetaFile::Clip( const tools::Rectangle& i_rClipRect )
             vcl::Region aNewReg( aCurRect );
             if( pOldAct->IsClipping() )
                 aNewReg.Intersect( pOldAct->GetRegion() );
-            MetaClipRegionAction* pNewAct = new MetaClipRegionAction( aNewReg, true );
+            MetaClipRegionAction* pNewAct = new MetaClipRegionAction( std::move(aNewReg), true );
             m_aList[ m_nCurrentActionElement ] = pNewAct;
         }
     }
@@ -959,7 +978,7 @@ void GDIMetaFile::Rotate( Degree10 nAngle10 )
             {
                 MetaTextArrayAction* pAct = static_cast<MetaTextArrayAction*>(pAction);
                 aMtf.AddAction( new MetaTextArrayAction( ImplGetRotatedPoint( pAct->GetPoint(), aRotAnchor, aRotOffset, fSin, fCos ),
-                                                                              pAct->GetText(), pAct->GetDXArray(), pAct->GetIndex(), pAct->GetLen() ) );
+                                                                              pAct->GetText(), pAct->GetDXArray(), pAct->GetKashidaArray(), pAct->GetIndex(), pAct->GetLen() ) );
             }
             break;
 
@@ -1233,7 +1252,7 @@ void GDIMetaFile::Rotate( Degree10 nAngle10 )
                 vcl::Font       aFont( pAct->GetFont() );
 
                 aFont.SetOrientation( aFont.GetOrientation() + nAngle10 );
-                aMtf.AddAction( new MetaFontAction( aFont ) );
+                aMtf.AddAction( new MetaFontAction( std::move(aFont) ) );
             }
             break;
 
@@ -1336,7 +1355,7 @@ tools::Rectangle GDIMetaFile::GetBoundRect( OutputDevice& i_rReference ) const
             MetaLineAction* pAct = static_cast<MetaLineAction*>(pAction);
             Point aP1( pAct->GetStartPoint() ), aP2( pAct->GetEndPoint() );
             tools::Rectangle aRect( aP1, aP2 );
-            aRect.Justify();
+            aRect.Normalize();
 
             ImplActionBounds( aBound, OutputDevice::LogicToLogic( aRect, aMapVDev->GetMapMode(), GetPrefMapMode() ), aClipStack );
         }
@@ -1433,7 +1452,7 @@ tools::Rectangle GDIMetaFile::GetBoundRect( OutputDevice& i_rReference ) const
             tools::Rectangle aRect;
             // hdu said base = index
             aMapVDev->GetTextBoundRect( aRect, pAct->GetText(), pAct->GetIndex(), pAct->GetIndex(), pAct->GetLen(),
-                                       0, pAct->GetDXArray() );
+                                       0, pAct->GetDXArray(), pAct->GetKashidaArray() );
             Point aPt( pAct->GetPoint() );
             aRect.Move( aPt.X(), aPt.Y() );
             ImplActionBounds( aBound, OutputDevice::LogicToLogic( aRect, aMapVDev->GetMapMode(), GetPrefMapMode() ), aClipStack );
@@ -1873,7 +1892,7 @@ void GDIMetaFile::ImplExchangeColors( ColorExchangeFnc pFncCol, const void* pCol
 
                 aFont.SetColor( pFncCol( aFont.GetColor(), pColParam ) );
                 aFont.SetFillColor( pFncCol( aFont.GetFillColor(), pColParam ) );
-                aMtf.push_back( new MetaFontAction( aFont ) );
+                aMtf.push_back( new MetaFontAction( std::move(aFont) ) );
             }
             break;
 
@@ -1897,7 +1916,7 @@ void GDIMetaFile::ImplExchangeColors( ColorExchangeFnc pFncCol, const void* pCol
                     aWall.SetGradient( aGradient );
                 }
 
-                aMtf.push_back( new MetaWallpaperAction( rRect, aWall ) );
+                aMtf.push_back( new MetaWallpaperAction( rRect, std::move(aWall) ) );
             }
             break;
 
@@ -1974,7 +1993,7 @@ void GDIMetaFile::ImplExchangeColors( ColorExchangeFnc pFncCol, const void* pCol
 
                 aGradient.SetStartColor( pFncCol( aGradient.GetStartColor(), pColParam ) );
                 aGradient.SetEndColor( pFncCol( aGradient.GetEndColor(), pColParam ) );
-                aMtf.push_back( new MetaGradientAction( pAct->GetRect(), aGradient ) );
+                aMtf.push_back( new MetaGradientAction( pAct->GetRect(), std::move(aGradient) ) );
             }
             break;
 
@@ -1985,7 +2004,7 @@ void GDIMetaFile::ImplExchangeColors( ColorExchangeFnc pFncCol, const void* pCol
 
                 aGradient.SetStartColor( pFncCol( aGradient.GetStartColor(), pColParam ) );
                 aGradient.SetEndColor( pFncCol( aGradient.GetEndColor(), pColParam ) );
-                aMtf.push_back( new MetaGradientExAction( pAct->GetPolyPolygon(), aGradient ) );
+                aMtf.push_back( new MetaGradientExAction( pAct->GetPolyPolygon(), std::move(aGradient) ) );
             }
             break;
 

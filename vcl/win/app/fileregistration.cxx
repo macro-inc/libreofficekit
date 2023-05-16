@@ -37,7 +37,7 @@ namespace vcl::fileregistration
 {
 static void LaunchModernSettingsDialogDefaultApps()
 {
-    auto pIf = sal::systools::COMReference<IApplicationActivationManager>().CoCreateInstance(
+    sal::systools::COMReference<IApplicationActivationManager> pIf(
         CLSID_ApplicationActivationManager, nullptr, CLSCTX_INPROC_SERVER);
 
     DWORD pid;
@@ -112,23 +112,17 @@ static bool IsDefaultAppInstalledInReg()
 
 void LaunchRegistrationUI()
 {
-    const bool bUninit = SUCCEEDED(CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED));
-    comphelper::ScopeGuard g([bUninit]() {
-        if (bUninit)
-            CoUninitialize();
-    });
-
     try
     {
+        sal::systools::CoInitializeGuard aGuard(COINIT_APARTMENTTHREADED);
         if (IsWindows10OrGreater())
         {
             LaunchModernSettingsDialogDefaultApps();
         }
         else
         {
-            auto pIf = sal::systools::COMReference<IApplicationAssociationRegistrationUI>()
-                           .CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI, nullptr,
-                                             CLSCTX_INPROC_SERVER);
+            sal::systools::COMReference<IApplicationAssociationRegistrationUI> pIf(
+                CLSID_ApplicationAssociationRegistrationUI, nullptr, CLSCTX_INPROC_SERVER);
 
             // LaunchAdvancedAssociationUI only works for applications registered under
             // Software\RegisteredApplications. See scp2/source/ooo/registryitem_ooo.scp
@@ -150,11 +144,8 @@ void CheckFileExtRegistration(weld::Window* pDialogParent)
     if (!IsDefaultAppInstalledInReg())
         return;
 
-    const bool bUninit = SUCCEEDED(CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED));
-    comphelper::ScopeGuard g([bUninit]() {
-        if (bUninit)
-            CoUninitialize();
-    });
+    sal::systools::CoInitializeGuard aGuard(COINIT_APARTMENTTHREADED, false,
+                                            sal::systools::CoInitializeGuard::WhenFailed::NoThrow);
     sal::systools::COMReference<IApplicationAssociationRegistration> pAAR;
     try
     {

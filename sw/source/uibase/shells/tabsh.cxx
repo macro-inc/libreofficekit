@@ -18,6 +18,7 @@
  */
 
 #include <hintids.hxx>
+#include <svl/imageitm.hxx>
 #include <svl/numformat.hxx>
 #include <svl/zforlist.hxx>
 #include <svl/stritem.hxx>
@@ -71,6 +72,7 @@
 #include <docsh.hxx>
 #include <tblsel.hxx>
 #include <viewopt.hxx>
+#include <tabfrm.hxx>
 
 #include <strings.hrc>
 #include <cmdid.h>
@@ -118,8 +120,7 @@ const WhichRangesContainer aUITableAttrRange(svl::Items<
     FN_TABLE_SET_VERT_ALIGN,        FN_TABLE_SET_VERT_ALIGN,
     FN_TABLE_BOX_TEXTORIENTATION,   FN_TABLE_BOX_TEXTORIENTATION,
     FN_PARAM_TABLE_NAME,            FN_PARAM_TABLE_NAME,
-    FN_PARAM_TABLE_HEADLINE,        FN_PARAM_TABLE_HEADLINE,
-    FN_PARAM_TABLE_SPACE,           FN_PARAM_TABLE_SPACE
+    FN_PARAM_TABLE_HEADLINE,        FN_PARAM_TABLE_HEADLINE
 >);
 
 const WhichRangesContainer& SwuiGetUITableAttrRange()
@@ -174,7 +175,7 @@ static std::shared_ptr<SwTableRep> lcl_TableParamToItemSet( SfxItemSet& rSet, Sw
         rSet.Put(*aBoxDirection);
     }
 
-    bool bSelectAll = rSh.StartsWithTable() && rSh.ExtendedSelectedAll();
+    bool bSelectAll = rSh.StartsWith_() == SwCursorShell::StartsWith::Table && rSh.ExtendedSelectedAll();
     bool bTableSel = rSh.IsTableMode() || bSelectAll;
     if(!bTableSel)
     {
@@ -273,25 +274,23 @@ void ItemSetToTableParam( const SfxItemSet& rSet,
 {
     rSh.StartAllAction();
     rSh.StartUndo( SwUndoId::TABLE_ATTR );
-    const SfxPoolItem* pItem = nullptr;
 
-    if(SfxItemState::SET == rSet.GetItemState(SID_BACKGRND_DESTINATION, false, &pItem))
+    if(const SfxUInt16Item* pDestItem = rSet.GetItemIfSet(SID_BACKGRND_DESTINATION, false))
     {
         SwViewOption aUsrPref( *rSh.GetViewOptions() );
-        aUsrPref.SetTableDest(static_cast<sal_uInt8>(static_cast<const SfxUInt16Item*>(pItem)->GetValue()));
+        aUsrPref.SetTableDest(static_cast<sal_uInt8>(pDestItem->GetValue()));
         SW_MOD()->ApplyUsrPref(aUsrPref, &rSh.GetView());
     }
     bool bBorder = ( SfxItemState::SET == rSet.GetItemState( RES_BOX ) ||
             SfxItemState::SET == rSet.GetItemState( SID_ATTR_BORDER_INNER ) );
-    pItem = nullptr;
-    bool bBackground = SfxItemState::SET == rSet.GetItemState( RES_BACKGROUND, false, &pItem );
-    const SfxPoolItem* pRowItem = nullptr, *pTableItem = nullptr;
-    bBackground |= SfxItemState::SET == rSet.GetItemState( SID_ATTR_BRUSH_ROW, false, &pRowItem );
-    bBackground |= SfxItemState::SET == rSet.GetItemState( SID_ATTR_BRUSH_TABLE, false, &pTableItem );
-    const SfxPoolItem* pSplit = nullptr;
-    bool bRowSplit = SfxItemState::SET == rSet.GetItemState( RES_ROW_SPLIT, false, &pSplit );
-    const SfxPoolItem* pBoxDirection = nullptr;
-    bool bBoxDirection = SfxItemState::SET == rSet.GetItemState( FN_TABLE_BOX_TEXTORIENTATION, false, &pBoxDirection );
+    const SvxBrushItem* pBackgroundItem = rSet.GetItemIfSet( RES_BACKGROUND, false );
+    const SvxBrushItem* pRowItem = rSet.GetItemIfSet( SID_ATTR_BRUSH_ROW, false );
+    const SvxBrushItem* pTableItem = rSet.GetItemIfSet( SID_ATTR_BRUSH_TABLE, false );
+    bool bBackground = pBackgroundItem || pRowItem || pTableItem;
+    const SwFormatRowSplit* pSplit = rSet.GetItemIfSet( RES_ROW_SPLIT, false );
+    bool bRowSplit = pSplit != nullptr;
+    const SvxFrameDirectionItem* pBoxDirection = rSet.GetItemIfSet( FN_TABLE_BOX_TEXTORIENTATION, false );
+    bool bBoxDirection = pBoxDirection != nullptr;
     if( bBackground || bBorder || bRowSplit || bBoxDirection)
     {
         // The border will be applied to the present selection.
@@ -302,17 +301,17 @@ void ItemSetToTableParam( const SfxItemSet& rSet,
 
         if(bBackground)
         {
-            if(pItem)
-                rSh.SetBoxBackground( *static_cast<const SvxBrushItem*>(pItem) );
+            if(pBackgroundItem)
+                rSh.SetBoxBackground( *pBackgroundItem );
             if(pRowItem)
             {
-                std::unique_ptr<SvxBrushItem> aBrush(static_cast<SvxBrushItem*>(pRowItem->Clone()));
+                std::unique_ptr<SvxBrushItem> aBrush(pRowItem->Clone());
                 aBrush->SetWhich(RES_BACKGROUND);
                 rSh.SetRowBackground(*aBrush);
             }
             if(pTableItem)
             {
-                std::unique_ptr<SvxBrushItem> aBrush(static_cast<SvxBrushItem*>(pTableItem->Clone()));
+                std::unique_ptr<SvxBrushItem> aBrush(pTableItem->Clone());
                 aBrush->SetWhich(RES_BACKGROUND);
                 rSh.SetTabBackground( *aBrush );
             }
@@ -321,7 +320,7 @@ void ItemSetToTableParam( const SfxItemSet& rSet,
         if(bBoxDirection)
         {
             SvxFrameDirectionItem aDirection( SvxFrameDirection::Environment, RES_FRAMEDIR );
-            aDirection.SetValue(static_cast< const SvxFrameDirectionItem* >(pBoxDirection)->GetValue());
+            aDirection.SetValue(pBoxDirection->GetValue());
             rSh.SetBoxDirection(aDirection);
         }
 
@@ -337,7 +336,7 @@ void ItemSetToTableParam( const SfxItemSet& rSet,
 
             if(bRowSplit)
             {
-                rSh.SetRowSplit(*static_cast<const SwFormatRowSplit*>(pSplit));
+                rSh.SetRowSplit(*pSplit);
             }
 
             if(!bTableSel)
@@ -355,9 +354,9 @@ void ItemSetToTableParam( const SfxItemSet& rSet,
     SwTableRep* pRep = nullptr;
     SwFrameFormat *pFormat = rSh.GetTableFormat();
     SfxItemSetFixed<RES_FRMATR_BEGIN, RES_FRMATR_END-1> aSet( rSh.GetAttrPool() );
-    if(SfxItemState::SET == rSet.GetItemState( FN_TABLE_REP, false, &pItem ))
+    if(const SwPtrItem* pRepItem = rSet.GetItemIfSet( FN_TABLE_REP, false ))
     {
-        pRep = static_cast<SwTableRep*>(static_cast<const SwPtrItem*>(pItem)->GetValue());
+        pRep = static_cast<SwTableRep*>(pRepItem->GetValue());
 
         const SwTwips nWidth = pRep->GetWidth();
         if ( text::HoriOrientation::FULL == pRep->GetAlign() )
@@ -395,14 +394,14 @@ void ItemSetToTableParam( const SfxItemSet& rSet,
         }
     }
 
-    if( SfxItemState::SET == rSet.GetItemState( FN_PARAM_TABLE_HEADLINE, false, &pItem))
-        rSh.SetRowsToRepeat( static_cast<const SfxUInt16Item*>(pItem)->GetValue() );
+    if( const SfxUInt16Item* pHeadlineItem = rSet.GetItemIfSet( FN_PARAM_TABLE_HEADLINE, false ))
+        rSh.SetRowsToRepeat( pHeadlineItem->GetValue() );
 
-    if( SfxItemState::SET == rSet.GetItemState( FN_TABLE_SET_VERT_ALIGN, false, &pItem))
-        rSh.SetBoxAlign(static_cast<const SfxUInt16Item*>(pItem)->GetValue());
+    if( const SfxUInt16Item* pAlignItem = rSet.GetItemIfSet( FN_TABLE_SET_VERT_ALIGN, false ))
+        rSh.SetBoxAlign(pAlignItem->GetValue());
 
-    if( SfxItemState::SET == rSet.GetItemState( FN_PARAM_TABLE_NAME, false, &pItem ))
-        rSh.SetTableName( *pFormat, static_cast<const SfxStringItem*>(pItem)->GetValue() );
+    if( const SfxStringItem* pNameItem = rSet.GetItemIfSet( FN_PARAM_TABLE_NAME, false ))
+        rSh.SetTableName( *pFormat, pNameItem->GetValue() );
 
     // Copy the chosen attributes in the ItemSet.
     static const sal_uInt16 aIds[] =
@@ -419,6 +418,7 @@ void ItemSetToTableParam( const SfxItemSet& rSet,
             // <-- collapsing borders
             0
         };
+    const SfxPoolItem* pItem = nullptr;
     for( const sal_uInt16* pIds = aIds; *pIds; ++pIds )
         if( SfxItemState::SET == rSet.GetItemState( *pIds, false, &pItem))
             aSet.Put( *pItem );
@@ -446,17 +446,13 @@ static void lcl_TabGetMaxLineWidth(const SvxBorderLine* pBorderLine, SvxBorderLi
     rBorderLine.SetColor(pBorderLine->GetColor());
 }
 
-static bool lcl_BoxesInDeletedRows(SwWrtShell &rSh, const SwSelBoxes& rBoxes)
+static bool lcl_BoxesInTrackedRows(SwWrtShell &rSh, const SwSelBoxes& rBoxes)
 {
-    // cursor and selection are there only in deleted rows in Show Changes mode
-    if ( rSh.GetLayout()->IsHideRedlines() )
-        return false;
-
-    // not selected or all selected rows are deleted
+    // cursor and selection are there only in tracked rows
     bool bRet = true;
     SwRedlineTable::size_type nRedlinePos = 0;
     if ( rBoxes.empty() )
-        bRet = rSh.GetCursor()->GetNode().GetTableBox()->GetUpper()->IsDeleted(nRedlinePos);
+        bRet = rSh.GetCursor()->GetPointNode().GetTableBox()->GetUpper()->IsTracked(nRedlinePos);
     else
     {
         tools::Long nBoxes = rBoxes.size();
@@ -465,7 +461,7 @@ static bool lcl_BoxesInDeletedRows(SwWrtShell &rSh, const SwSelBoxes& rBoxes)
         {
             SwTableLine* pLine = rBoxes[i]->GetUpper();
             if ( pLine != pPrevLine )
-                bRet &= pLine->IsDeleted(nRedlinePos);
+                bRet &= pLine->IsTracked(nRedlinePos);
             pPrevLine = pLine;
         }
     }
@@ -479,7 +475,7 @@ static bool lcl_CursorInDeletedTable(SwWrtShell &rSh)
     if ( rSh.GetLayout()->IsHideRedlines() )
         return false;
 
-    SwTableNode* pTableNd = rSh.GetCursor()->GetPoint()->nNode.GetNode().FindTableNode();
+    SwTableNode* pTableNd = rSh.GetCursor()->GetPoint()->GetNode().FindTableNode();
     return pTableNd && pTableNd->GetTable().IsDeleted();
 }
 
@@ -510,11 +506,11 @@ void SwTableShell::Execute(SfxRequest &rReq)
             aCoreSet.Put(aCoreInfo);
             rSh.GetTabBorders( aCoreSet );
             const SvxBoxItem& rCoreBox = aCoreSet.Get(RES_BOX);
-            const SfxPoolItem *pBoxItem = nullptr;
-            if ( pArgs->GetItemState(RES_BOX, true, &pBoxItem) == SfxItemState::SET )
+            const SvxBoxItem *pBoxItem = pArgs->GetItemIfSet(RES_BOX);
+            if ( pBoxItem )
             {
-                aBox.reset(static_cast<SvxBoxItem*>(pBoxItem->Clone()));
-                sal_uInt16 nDefValue = MIN_BORDER_DIST;
+                aBox.reset(pBoxItem->Clone());
+                sal_Int16 nDefValue = MIN_BORDER_DIST;
                 if ( !rReq.IsAPI() )
                     nDefValue = 55;
                 if (!rReq.IsAPI() || aBox->GetSmallestDistance() < MIN_BORDER_DIST)
@@ -528,13 +524,13 @@ void SwTableShell::Execute(SfxRequest &rReq)
 
             //since the drawing layer also supports borders the which id might be a different one
             std::shared_ptr<SvxBoxInfoItem> aInfo(std::make_shared<SvxBoxInfoItem>(SID_ATTR_BORDER_INNER));
-            if (pArgs->GetItemState(SID_ATTR_BORDER_INNER, true, &pBoxItem) == SfxItemState::SET)
+            if (const SvxBoxInfoItem* pBoxInfoItem = pArgs->GetItemIfSet(SID_ATTR_BORDER_INNER))
             {
-                aInfo.reset(static_cast<SvxBoxInfoItem*>(pBoxItem->Clone()));
+                aInfo.reset(pBoxInfoItem->Clone());
             }
-            else if( pArgs->GetItemState(SDRATTR_TABLE_BORDER_INNER, true, &pBoxItem) == SfxItemState::SET )
+            else if( const SvxBoxInfoItem* pBoxInfoInnerItem = pArgs->GetItemIfSet(SDRATTR_TABLE_BORDER_INNER))
             {
-                aInfo.reset(static_cast<SvxBoxInfoItem*>(pBoxItem->Clone()));
+                aInfo.reset(pBoxInfoInnerItem->Clone());
                 aInfo->SetWhich(SID_ATTR_BORDER_INNER);
             }
 
@@ -689,8 +685,7 @@ void SwTableShell::Execute(SfxRequest &rReq)
             break;
         case FN_NUM_FORMAT_TABLE_DLG:
         {
-            SwView* pView = GetActiveView();
-            if(pView)
+            if (SwView* pView = GetActiveView())
             {
                 FieldUnit eMetric = ::GetDfltMetric(dynamic_cast<SwWebView*>( pView) !=  nullptr );
                 SW_MOD()->PutItem(SfxUInt16Item(SID_ATTR_METRIC, static_cast< sal_uInt16 >(eMetric)));
@@ -735,9 +730,10 @@ void SwTableShell::Execute(SfxRequest &rReq)
                                 pNumberFormatItem->GetNumberFormatter()->DeleteEntry( key );
                         }
 
-                        const SfxPoolItem* pNumberFormatValueItem = nullptr;
-                        if( SfxItemState::SET == pDlg->GetOutputItemSet()->GetItemState(
-                            SID_ATTR_NUMBERFORMAT_VALUE, false, &pNumberFormatValueItem ))
+                        const SfxPoolItem* pNumberFormatValueItem =
+                            pDlg->GetOutputItemSet()->GetItemIfSet(
+                                SID_ATTR_NUMBERFORMAT_VALUE, false);
+                        if( pNumberFormatValueItem )
                         {
                             SfxItemSetFixed<RES_BOXATR_FORMAT, RES_BOXATR_FORMAT>
                                     aBoxFormatSet( *pCoreSet->GetPool() );
@@ -912,8 +908,8 @@ void SwTableShell::Execute(SfxRequest &rReq)
             if (pItem)
             {
                 nCount = static_cast<const SfxInt16Item* >(pItem)->GetValue();
-                if(SfxItemState::SET == pArgs->GetItemState(FN_PARAM_INSERT_AFTER, true, &pItem))
-                    bAfter = static_cast<const SfxBoolItem* >(pItem)->GetValue();
+                if(const SfxBoolItem* pAfterItem = pArgs->GetItemIfSet(FN_PARAM_INSERT_AFTER))
+                    bAfter = pAfterItem->GetValue();
             }
             else if( !rReq.IsAPI() )
             {
@@ -1373,6 +1369,24 @@ void SwTableShell::GetState(SfxItemSet &rSet)
                 }
                 break;
             }
+            case FN_TABLE_INSERT_COL_BEFORE:
+            case FN_TABLE_INSERT_COL_AFTER:
+            {
+                SfxImageItem aImageItem(nSlot);
+                if (pFormat->GetFrameDir().GetValue() == SvxFrameDirection::Environment)
+                {
+                    // Inherited from superordinate object (page or frame).
+                    // If the table spans multiple pages, direction is set by the first page.
+                    SwIterator<SwTabFrame, SwFrameFormat> aIterT(*pFormat);
+                    for (SwTabFrame* pFrame = aIterT.First(); pFrame;
+                        pFrame = static_cast<SwTabFrame*>(pFrame->GetPrecede()))
+                        aImageItem.SetMirrored(pFrame->IsRightToLeft());
+                }
+                else
+                    aImageItem.SetMirrored(pFormat->GetFrameDir().GetValue() == SvxFrameDirection::Horizontal_RL_TB);
+                rSet.Put(aImageItem);
+                break;
+            }
             case FN_TABLE_INSERT_ROW:
             case FN_TABLE_INSERT_ROW_AFTER:
             case FN_TABLE_INSERT_ROW_DLG:
@@ -1433,7 +1447,7 @@ void SwTableShell::GetState(SfxItemSet &rSet)
                 {
                     SwSelBoxes aBoxes;
                     ::GetTableSel( rSh, aBoxes, SwTableSearchType::Row );
-                    if( ::HasProtectedCells( aBoxes ) || lcl_BoxesInDeletedRows( rSh, aBoxes ) )
+                    if( ::HasProtectedCells( aBoxes ) || lcl_BoxesInTrackedRows( rSh, aBoxes ) )
                         rSet.DisableItem( nSlot );
                 }
                 break;

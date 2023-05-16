@@ -13,17 +13,20 @@
 #include <svl/svldllapi.h>
 #include <rtl/ustring.hxx>
 
+#include <utility>
+
 namespace svl {
 
 class SVL_DLLPUBLIC SharedString
 {
-    rtl_uString* mpData;
-    rtl_uString* mpDataIgnoreCase;
+    rtl_uString* mpData = nullptr;
+    rtl_uString* mpDataIgnoreCase = nullptr;
 public:
 
     static const SharedString & getEmptyString();
+    static const OUString EMPTY_STRING;
 
-    SharedString();
+    SharedString() = default;
     SharedString( rtl_uString* pData, rtl_uString* pDataIgnoreCase );
     explicit SharedString( const OUString& rStr );
     SharedString( const SharedString& r );
@@ -36,7 +39,8 @@ public:
     bool operator== ( const SharedString& r ) const;
     bool operator!= ( const SharedString& r ) const;
 
-    OUString getString() const;
+    const OUString & getString() const;
+    const OUString & getIgnoreCaseString() const;
 
     rtl_uString* getData();
     const rtl_uString* getData() const;
@@ -50,8 +54,6 @@ public:
     sal_Int32 getLength() const;
 };
 
-inline SharedString::SharedString() : mpData(nullptr), mpDataIgnoreCase(nullptr) {}
-
 inline SharedString::SharedString( rtl_uString* pData, rtl_uString* pDataIgnoreCase ) :
     mpData(pData), mpDataIgnoreCase(pDataIgnoreCase)
 {
@@ -61,7 +63,7 @@ inline SharedString::SharedString( rtl_uString* pData, rtl_uString* pDataIgnoreC
         rtl_uString_acquire(mpDataIgnoreCase);
 }
 
-inline SharedString::SharedString( const OUString& rStr ) : mpData(rStr.pData), mpDataIgnoreCase(nullptr)
+inline SharedString::SharedString( const OUString& rStr ) : mpData(rStr.pData)
 {
     rtl_uString_acquire(mpData);
 }
@@ -74,10 +76,10 @@ inline SharedString::SharedString( const SharedString& r ) : mpData(r.mpData), m
         rtl_uString_acquire(mpDataIgnoreCase);
 }
 
-inline SharedString::SharedString(SharedString&& r) noexcept : mpData(r.mpData), mpDataIgnoreCase(r.mpDataIgnoreCase)
+inline SharedString::SharedString(SharedString&& r) noexcept
+    : mpData(std::exchange(r.mpData, nullptr))
+    , mpDataIgnoreCase(std::exchange(r.mpDataIgnoreCase, nullptr))
 {
-    r.mpData = nullptr;
-    r.mpDataIgnoreCase = nullptr;
 }
 
 inline SharedString::~SharedString()
@@ -88,14 +90,34 @@ inline SharedString::~SharedString()
         rtl_uString_release(mpDataIgnoreCase);
 }
 
+inline SharedString& SharedString::operator=(SharedString&& r) noexcept
+{
+    // Having this inline helps Calc's mdds::multi_type_vector to do some operations
+    // much faster.
+    if (mpData)
+        rtl_uString_release(mpData);
+    if (mpDataIgnoreCase)
+        rtl_uString_release(mpDataIgnoreCase);
+
+    mpData = std::exchange(r.mpData, nullptr);
+    mpDataIgnoreCase = std::exchange(r.mpDataIgnoreCase, nullptr);
+
+    return *this;
+}
+
 inline bool SharedString::operator!= ( const SharedString& r ) const
 {
     return !operator== (r);
 }
 
-inline OUString SharedString::getString() const
+inline const OUString & SharedString::getString() const
 {
-    return mpData ? OUString(mpData) : OUString();
+    return mpData ? OUString::unacquired(&mpData) : EMPTY_STRING;
+}
+
+inline const OUString & SharedString::getIgnoreCaseString() const
+{
+    return mpDataIgnoreCase ? OUString::unacquired(&mpDataIgnoreCase) : EMPTY_STRING;
 }
 
 inline rtl_uString* SharedString::getData()

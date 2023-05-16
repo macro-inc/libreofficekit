@@ -67,11 +67,9 @@ static OUString GetCurrentApp()
 static OUString GetCurrentMode()
 {
     OUString sResult;
-    if (SfxViewFrame* pViewFrame = SfxViewFrame::Current())
+    if (SfxViewFrame::Current())
     {
-        const auto xCurrentFrame = pViewFrame->GetFrame().GetFrameInterface();
         const auto xContext = comphelper::getProcessComponentContext();
-        const auto xModuleManager = css::frame::ModuleManager::create(xContext);
         const utl::OConfigurationTreeRoot aAppNode(
             xContext, "org.openoffice.Office.UI.ToolbarMode/Applications/" + GetCurrentApp(), true);
         if (aAppNode.isValid())
@@ -96,12 +94,12 @@ ToolbarmodeDialog::ToolbarmodeDialog(weld::Window* pParent)
                        (m_xBuilder->weld_radio_button("rbButton9")) }
     , m_pInfoLabel(m_xBuilder->weld_label("lbInfo"))
 {
-    static_assert(SAL_N_ELEMENTS(m_pRadioButtons) == SAL_N_ELEMENTS(TOOLBARMODES_ARRAY));
+    static_assert(SAL_N_ELEMENTS(m_pRadioButtons) == std::size(TOOLBARMODES_ARRAY));
 
     Link<weld::Toggleable&, void> aLink = LINK(this, ToolbarmodeDialog, SelectToolbarmode);
 
     const OUString sCurrentMode = GetCurrentMode();
-    for (tools::ULong i = 0; i < SAL_N_ELEMENTS(m_pRadioButtons); i++)
+    for (std::size_t i = 0; i < std::size(m_pRadioButtons); ++i)
     {
         m_pRadioButtons[i]->connect_toggled(aLink);
         if (sCurrentMode == std::get<1>(TOOLBARMODES_ARRAY[i]))
@@ -112,7 +110,7 @@ ToolbarmodeDialog::ToolbarmodeDialog(weld::Window* pParent)
         }
     }
 
-    m_pApply->set_label(CuiResId(RID_SVXSTR_UI_APPLYALL).replaceFirst("%MODULE", GetCurrentApp()));
+    m_pApply->set_label(CuiResId(RID_CUISTR_UI_APPLYALL).replaceFirst("%MODULE", GetCurrentApp()));
     m_pApply->connect_clicked(LINK(this, ToolbarmodeDialog, OnApplyClick));
     m_pApplyAll->connect_clicked(LINK(this, ToolbarmodeDialog, OnApplyClick));
 
@@ -133,7 +131,7 @@ static bool file_exists(const OUString& fileName)
 
 int ToolbarmodeDialog::GetActiveRadioButton()
 {
-    for (tools::ULong i = 0; i < SAL_N_ELEMENTS(m_pRadioButtons); i++)
+    for (std::size_t i = 0; i < std::size(m_pRadioButtons); ++i)
     {
         if (m_pRadioButtons[i]->get_active())
             return i;
@@ -181,7 +179,7 @@ IMPL_LINK(ToolbarmodeDialog, OnApplyClick, weld::Button&, rButton, void)
     if (&rButton == m_pApplyAll.get())
     {
         std::shared_ptr<comphelper::ConfigurationChanges> aBatch(
-            comphelper::ConfigurationChanges::create(::comphelper::getProcessComponentContext()));
+            comphelper::ConfigurationChanges::create());
         officecfg::Office::UI::ToolbarMode::ActiveWriter::set(sCmd, aBatch);
         officecfg::Office::UI::ToolbarMode::ActiveCalc::set(sCmd, aBatch);
         officecfg::Office::UI::ToolbarMode::ActiveImpress::set(sCmd, aBatch);
@@ -189,21 +187,19 @@ IMPL_LINK(ToolbarmodeDialog, OnApplyClick, weld::Button&, rButton, void)
         aBatch->commit();
 
         OUString sCurrentApp = GetCurrentApp();
-        if (SfxViewFrame* pViewFrame = SfxViewFrame::Current())
+        if (SfxViewFrame::Current())
         {
-            const auto xCurrentFrame = pViewFrame->GetFrame().GetFrameInterface();
             const auto xContext = comphelper::getProcessComponentContext();
-            const auto xModuleManager = css::frame::ModuleManager::create(xContext);
             const utl::OConfigurationTreeRoot aAppNode(
                 xContext, "org.openoffice.Office.UI.ToolbarMode/Applications/", true);
             if (sCurrentApp != "Writer")
-                aAppNode.setNodeValue("Writer/Active", css::uno::makeAny(sCmd));
+                aAppNode.setNodeValue("Writer/Active", css::uno::Any(sCmd));
             if (sCurrentApp != "Calc")
-                aAppNode.setNodeValue("Calc/Active", css::uno::makeAny(sCmd));
+                aAppNode.setNodeValue("Calc/Active", css::uno::Any(sCmd));
             if (sCurrentApp != "Impress")
-                aAppNode.setNodeValue("Impress/Active", css::uno::makeAny(sCmd));
+                aAppNode.setNodeValue("Impress/Active", css::uno::Any(sCmd));
             if (sCurrentApp != "Draw")
-                aAppNode.setNodeValue("Draw/Active", css::uno::makeAny(sCmd));
+                aAppNode.setNodeValue("Draw/Active", css::uno::Any(sCmd));
             aAppNode.commit();
         };
     }

@@ -20,7 +20,6 @@
 #include <sal/config.h>
 
 #include <cstdlib>
-#include <limits>
 
 #include <oox/vml/vmlformatting.hxx>
 
@@ -46,6 +45,7 @@
 #include <oox/token/tokens.hxx>
 #include <svx/svdtrans.hxx>
 #include <comphelper/propertysequence.hxx>
+#include <o3tl/string_view.hxx>
 #include <vcl/virdev.hxx>
 
 namespace oox::vml {
@@ -65,30 +65,33 @@ using ::com::sun::star::drawing::PolygonFlags_CONTROL;
 
 namespace {
 
-bool lclExtractDouble( double& orfValue, sal_Int32& ornEndPos, const OUString& rValue )
+bool lclExtractDouble( double& orfValue, size_t& ornEndPos, std::u16string_view aValue )
 {
     // extract the double value and find start position of unit characters
     rtl_math_ConversionStatus eConvStatus = rtl_math_ConversionStatus_Ok;
-    orfValue = ::rtl::math::stringToDouble( rValue, '.', '\0', &eConvStatus, &ornEndPos );
+    sal_Int32 nEndPos;
+    orfValue = ::rtl::math::stringToDouble( aValue, '.', '\0', &eConvStatus, &nEndPos );
+    ornEndPos = nEndPos;
     return eConvStatus == rtl_math_ConversionStatus_Ok;
 }
 
 } // namespace
 
-bool ConversionHelper::separatePair( OUString& orValue1, OUString& orValue2,
-        const OUString& rValue, sal_Unicode cSep )
+bool ConversionHelper::separatePair( std::u16string_view& orValue1, std::u16string_view& orValue2,
+        std::u16string_view rValue, sal_Unicode cSep )
 {
-    sal_Int32 nSepPos = rValue.indexOf( cSep );
-    if( nSepPos >= 0 )
+    size_t nSepPos = rValue.find( cSep );
+    if( nSepPos != std::u16string_view::npos )
     {
-        orValue1 = rValue.copy( 0, nSepPos ).trim();
-        orValue2 = rValue.copy( nSepPos + 1 ).trim();
+        orValue1 = o3tl::trim(rValue.substr( 0, nSepPos ));
+        orValue2 = o3tl::trim(rValue.substr( nSepPos + 1 ));
     }
     else
     {
-        orValue1 = rValue.trim();
+        orValue1 = o3tl::trim(rValue);
+        orValue2 = std::u16string_view();
     }
-    return !orValue1.isEmpty() && !orValue2.isEmpty();
+    return !orValue1.empty() && !orValue2.empty();
 }
 
 bool ConversionHelper::decodeBool( std::u16string_view rValue )
@@ -98,43 +101,43 @@ bool ConversionHelper::decodeBool( std::u16string_view rValue )
     return (nToken == XML_t) || (nToken == XML_true);
 }
 
-double ConversionHelper::decodePercent( const OUString& rValue, double fDefValue )
+double ConversionHelper::decodePercent( std::u16string_view rValue, double fDefValue )
 {
-    if( rValue.isEmpty() )
+    if( rValue.empty() )
         return fDefValue;
 
     double fValue = 0.0;
-    sal_Int32 nEndPos = 0;
+    size_t nEndPos = 0;
     if( !lclExtractDouble( fValue, nEndPos, rValue ) )
         return fDefValue;
 
-    if( nEndPos == rValue.getLength() )
+    if( nEndPos == rValue.size() )
         return fValue;
 
-    if( (nEndPos + 1 == rValue.getLength()) && (rValue[ nEndPos ] == '%') )
+    if( (nEndPos + 1 == rValue.size()) && (rValue[ nEndPos ] == '%') )
         return fValue / 100.0;
 
-    if( (nEndPos + 1 == rValue.getLength()) && (rValue[ nEndPos ] == 'f') )
+    if( (nEndPos + 1 == rValue.size()) && (rValue[ nEndPos ] == 'f') )
         return fValue / 65536.0;
 
     OSL_FAIL( "ConversionHelper::decodePercent - unknown measure unit" );
     return fDefValue;
 }
 
-Degree100 ConversionHelper::decodeRotation( const OUString& rValue )
+Degree100 ConversionHelper::decodeRotation( std::u16string_view rValue )
 {
-    if( rValue.isEmpty() )
+    if( rValue.empty() )
         return 0_deg100;
 
     double fValue = 0.0;
     double fRotation = 0.0;
-    sal_Int32 nEndPos = 0;
+    size_t nEndPos = 0;
     if( !lclExtractDouble(fValue, nEndPos, rValue) )
         return 0_deg100;
 
-    if( nEndPos == rValue.getLength() )
+    if( nEndPos == rValue.size() )
         fRotation = fValue;
-    else if( (nEndPos + 2 == rValue.getLength()) && (rValue[nEndPos] == 'f') && (rValue[nEndPos+1] == 'd') )
+    else if( (nEndPos + 2 == rValue.size()) && (rValue[nEndPos] == 'f') && (rValue[nEndPos+1] == 'd') )
         fRotation = fValue / 65536.0;
     else
     {
@@ -146,14 +149,14 @@ Degree100 ConversionHelper::decodeRotation( const OUString& rValue )
 }
 
 sal_Int64 ConversionHelper::decodeMeasureToEmu( const GraphicHelper& rGraphicHelper,
-        const OUString& rValue, sal_Int32 nRefValue, bool bPixelX, bool bDefaultAsPixel )
+        std::u16string_view rValue, sal_Int32 nRefValue, bool bPixelX, bool bDefaultAsPixel )
 {
     // default for missing values is 0
-    if( rValue.isEmpty() )
+    if( rValue.empty() )
         return 0;
 
     // TODO: according to spec, value may contain "auto"
-    if ( rValue == "auto" )
+    if ( rValue == u"auto" )
     {
         OSL_FAIL( "ConversionHelper::decodeMeasureToEmu - special value 'auto' must be handled by caller" );
         return nRefValue;
@@ -161,19 +164,19 @@ sal_Int64 ConversionHelper::decodeMeasureToEmu( const GraphicHelper& rGraphicHel
 
     // extract the double value and find start position of unit characters
     double fValue = 0.0;
-    sal_Int32 nEndPos = 0;
+    size_t nEndPos = 0;
     if( !lclExtractDouble( fValue, nEndPos, rValue ) || (fValue == 0.0) )
         return 0;
 
     // process trailing unit, convert to EMU
-    OUString aUnit;
-    if( (0 < nEndPos) && (nEndPos < rValue.getLength()) )
-        aUnit = rValue.copy( nEndPos );
+    std::u16string_view aUnit;
+    if( (0 < nEndPos) && (nEndPos < rValue.size()) )
+        aUnit = rValue.substr( nEndPos );
     else if( bDefaultAsPixel )
-        aUnit = "px";
+        aUnit = u"px";
     // else default is EMU
 
-    if( aUnit.getLength() == 2 )
+    if( aUnit.size() == 2 )
     {
         sal_Unicode cChar1 = aUnit[ 0 ];
         sal_Unicode cChar2 = aUnit[ 1 ];
@@ -192,11 +195,11 @@ sal_Int64 ConversionHelper::decodeMeasureToEmu( const GraphicHelper& rGraphicHel
                                            : rGraphicHelper.convertScreenPixelYToHmm(fValue),
                                    o3tl::Length::mm100, o3tl::Length::emu);
     }
-    else if( (aUnit.getLength() == 1) && (aUnit[ 0 ] == '%') )
+    else if( (aUnit.size() == 1) && (aUnit[ 0 ] == '%') )
     {
         fValue *= nRefValue / 100.0;
     }
-    else if( bDefaultAsPixel || !aUnit.isEmpty() )   // default as EMU and no unit -> do nothing
+    else if( bDefaultAsPixel || !aUnit.empty() )   // default as EMU and no unit -> do nothing
     {
         OSL_FAIL( "ConversionHelper::decodeMeasureToEmu - unknown measure unit" );
         fValue = nRefValue;
@@ -205,13 +208,13 @@ sal_Int64 ConversionHelper::decodeMeasureToEmu( const GraphicHelper& rGraphicHel
 }
 
 sal_Int32 ConversionHelper::decodeMeasureToHmm( const GraphicHelper& rGraphicHelper,
-        const OUString& rValue, sal_Int32 nRefValue, bool bPixelX, bool bDefaultAsPixel )
+        std::u16string_view rValue, sal_Int32 nRefValue, bool bPixelX, bool bDefaultAsPixel )
 {
     return ::oox::drawingml::convertEmuToHmm( decodeMeasureToEmu( rGraphicHelper, rValue, nRefValue, bPixelX, bDefaultAsPixel ) );
 }
 
 sal_Int32 ConversionHelper::decodeMeasureToTwip(const GraphicHelper& rGraphicHelper,
-                                                const OUString& rValue, sal_Int32 nRefValue,
+                                                std::u16string_view rValue, sal_Int32 nRefValue,
                                                 bool bPixelX, bool bDefaultAsPixel)
 {
     return ::o3tl::convert(
@@ -220,42 +223,42 @@ sal_Int32 ConversionHelper::decodeMeasureToTwip(const GraphicHelper& rGraphicHel
 }
 
 Color ConversionHelper::decodeColor( const GraphicHelper& rGraphicHelper,
-        const OptValue< OUString >& roVmlColor, const OptValue< double >& roVmlOpacity,
+        const std::optional< OUString >& roVmlColor, const std::optional< double >& roVmlOpacity,
         ::Color nDefaultRgb, ::Color nPrimaryRgb )
 {
     Color aDmlColor;
 
     // convert opacity
     const sal_Int32 DML_FULL_OPAQUE = ::oox::drawingml::MAX_PERCENT;
-    double fOpacity = roVmlOpacity.get( 1.0 );
+    double fOpacity = roVmlOpacity.value_or( 1.0 );
     sal_Int32 nOpacity = getLimitedValue< sal_Int32, double >( fOpacity * DML_FULL_OPAQUE, 0, DML_FULL_OPAQUE );
     if( nOpacity < DML_FULL_OPAQUE )
         aDmlColor.addTransformation( XML_alpha, nOpacity );
 
     // color attribute not present - set passed default color
-    if( !roVmlColor.has() )
+    if( !roVmlColor.has_value() )
     {
         aDmlColor.setSrgbClr( nDefaultRgb );
         return aDmlColor;
     }
 
     // separate leading color name or RGB value from following palette index
-    OUString aColorName, aColorIndex;
-    separatePair( aColorName, aColorIndex, roVmlColor.get(), ' ' );
+    std::u16string_view aColorName, aColorIndex;
+    separatePair( aColorName, aColorIndex, roVmlColor.value(), ' ' );
 
     // RGB colors in the format '#RRGGBB'
-    if( (aColorName.getLength() == 7) && (aColorName[ 0 ] == '#') )
+    if( (aColorName.size() == 7) && (aColorName[ 0 ] == '#') )
     {
-        aDmlColor.setSrgbClr( aColorName.copy( 1 ).toUInt32( 16 ) );
+        aDmlColor.setSrgbClr( o3tl::toUInt32(aColorName.substr( 1 ), 16) );
         return aDmlColor;
     }
 
     // RGB colors in the format '#RGB'
-    if( (aColorName.getLength() == 4) && (aColorName[ 0 ] == '#') )
+    if( (aColorName.size() == 4) && (aColorName[ 0 ] == '#') )
     {
-        sal_Int32 nR = aColorName.copy( 1, 1 ).toUInt32( 16 ) * 0x11;
-        sal_Int32 nG = aColorName.copy( 2, 1 ).toUInt32( 16 ) * 0x11;
-        sal_Int32 nB = aColorName.copy( 3, 1 ).toUInt32( 16 ) * 0x11;
+        sal_Int32 nR = o3tl::toUInt32(aColorName.substr( 1, 1 ), 16 ) * 0x11;
+        sal_Int32 nG = o3tl::toUInt32(aColorName.substr( 2, 1 ), 16 ) * 0x11;
+        sal_Int32 nB = o3tl::toUInt32(aColorName.substr( 3, 1 ), 16 ) * 0x11;
         aDmlColor.setSrgbClr( (nR << 16) | (nG << 8) | nB );
         return aDmlColor;
     }
@@ -273,26 +276,27 @@ Color ConversionHelper::decodeColor( const GraphicHelper& rGraphicHelper,
     }
 
     // try palette colors enclosed in brackets
-    if( (aColorIndex.getLength() >= 3) && (aColorIndex[ 0 ] == '[') && (aColorIndex[ aColorIndex.getLength() - 1 ] == ']') )
+    if( (aColorIndex.size() >= 3) && (aColorIndex[ 0 ] == '[') && (aColorIndex[ aColorIndex.size() - 1 ] == ']') )
     {
-        aDmlColor.setPaletteClr( aColorIndex.copy( 1, aColorIndex.getLength() - 2 ).toInt32() );
+        aDmlColor.setPaletteClr( o3tl::toInt32(aColorIndex.substr( 1, aColorIndex.size() - 2 )) );
         return aDmlColor;
     }
 
     // try fill gradient modificator 'fill <modifier>(<amount>)'
     if( (nPrimaryRgb != API_RGB_TRANSPARENT) && (nColorToken == XML_fill) )
     {
-        sal_Int32 nOpenParen = aColorIndex.indexOf( '(' );
-        sal_Int32 nCloseParen = aColorIndex.indexOf( ')' );
-        if( (2 <= nOpenParen) && (nOpenParen + 1 < nCloseParen) && (nCloseParen + 1 == aColorIndex.getLength()) )
+        size_t nOpenParen = aColorIndex.find( '(' );
+        size_t nCloseParen = aColorIndex.find( ')' );
+        if( nOpenParen != std::u16string_view::npos && nCloseParen != std::u16string_view::npos &&
+            (2 <= nOpenParen) && (nOpenParen + 1 < nCloseParen) && (nCloseParen + 1 == aColorIndex.size()) )
         {
             sal_Int32 nModToken = XML_TOKEN_INVALID;
-            switch( AttributeConversion::decodeToken( aColorIndex.subView( 0, nOpenParen ) ) )
+            switch( AttributeConversion::decodeToken( aColorIndex.substr( 0, nOpenParen ) ) )
             {
                 case XML_darken:    nModToken = XML_shade;break;
                 case XML_lighten:   nModToken = XML_tint;
             }
-            sal_Int32 nValue = aColorIndex.copy( nOpenParen + 1, nCloseParen - nOpenParen - 1 ).toInt32();
+            sal_Int32 nValue = o3tl::toInt32(aColorIndex.substr( nOpenParen + 1, nCloseParen - nOpenParen - 1 ));
             if( (nModToken != XML_TOKEN_INVALID) && (0 <= nValue) && (nValue < 255) )
             {
                 /*  Simulate this modifier color by a color with related transformation.
@@ -306,12 +310,12 @@ Color ConversionHelper::decodeColor( const GraphicHelper& rGraphicHelper,
     }
 
     OSL_FAIL( OStringBuffer( "lclGetColor - invalid VML color name '" +
-            OUStringToOString( roVmlColor.get(), RTL_TEXTENCODING_ASCII_US ) + "'" ).getStr() );
+            OUStringToOString( roVmlColor.value(), RTL_TEXTENCODING_ASCII_US ) + "'" ).getStr() );
     aDmlColor.setSrgbClr( nDefaultRgb );
     return aDmlColor;
 }
 
-void ConversionHelper::decodeVmlPath( ::std::vector< ::std::vector< Point > >& rPointLists, ::std::vector< ::std::vector< PolygonFlags > >& rFlagLists, const OUString& rPath )
+void ConversionHelper::decodeVmlPath( ::std::vector< ::std::vector< Point > >& rPointLists, ::std::vector< ::std::vector< PolygonFlags > >& rFlagLists, std::u16string_view rPath )
 {
     ::std::vector< sal_Int32 > aCoordList;
     Point aCurrentPoint;
@@ -326,7 +330,7 @@ void ConversionHelper::decodeVmlPath( ::std::vector< ::std::vector< Point > >& r
     rPointLists.emplace_back( );
     rFlagLists.emplace_back( );
 
-    for ( sal_Int32 i = 0; i < rPath.getLength(); i++ )
+    for ( size_t i = 0; i < rPath.size(); i++ )
     {
         // Keep track of current integer token
         if ( ( rPath[ i ] >= '0' && rPath[ i ] <= '9' ) || rPath[ i ] == '-' )
@@ -337,7 +341,7 @@ void ConversionHelper::decodeVmlPath( ::std::vector< ::std::vector< Point > >& r
             if ( state != START && state != UNSUPPORTED )
             {
                 if ( nTokenLen > 0 )
-                    aCoordList.push_back( rPath.copy( nTokenStart, nTokenLen ).toInt32() );
+                    aCoordList.push_back( o3tl::toInt32(rPath.substr( nTokenStart, nTokenLen )) );
                 else
                     aCoordList.push_back( 0 );
                 nTokenLen = 0;
@@ -449,7 +453,7 @@ void ConversionHelper::decodeVmlPath( ::std::vector< ::std::vector< Point > >& r
 
             // Allow two-char commands to peek ahead to the next character
             sal_Unicode nextChar = '\0';
-            if (i+1 < rPath.getLength())
+            if (i+1 < rPath.size())
                 nextChar = rPath[i+1];
 
             // Move to relevant state upon finding a command
@@ -550,17 +554,17 @@ void ConversionHelper::decodeVmlPath( ::std::vector< ::std::vector< Point > >& r
 
 namespace {
 
-sal_Int64 lclGetEmu( const GraphicHelper& rGraphicHelper, const OptValue< OUString >& roValue, sal_Int64 nDefValue )
+sal_Int64 lclGetEmu( const GraphicHelper& rGraphicHelper, const std::optional< OUString >& roValue, sal_Int64 nDefValue )
 {
-    return roValue.has() ? ConversionHelper::decodeMeasureToEmu( rGraphicHelper, roValue.get(), 0, false, false ) : nDefValue;
+    return roValue.has_value() ? ConversionHelper::decodeMeasureToEmu( rGraphicHelper, roValue.value(), 0, false, false ) : nDefValue;
 }
 
-void lclGetDmlLineDash( OptValue< sal_Int32 >& oroPresetDash, LineProperties::DashStopVector& orCustomDash, const OptValue< OUString >& roDashStyle )
+void lclGetDmlLineDash( std::optional< sal_Int32 >& oroPresetDash, LineProperties::DashStopVector& orCustomDash, const std::optional< OUString >& roDashStyle )
 {
-    if( !roDashStyle.has() )
+    if( !roDashStyle.has_value() )
         return;
 
-    const OUString& rDashStyle = roDashStyle.get();
+    const OUString& rDashStyle = roDashStyle.value();
     switch( AttributeConversion::decodeToken( rDashStyle ) )
     {
         case XML_solid:             oroPresetDash = XML_solid;          return;
@@ -581,7 +585,7 @@ void lclGetDmlLineDash( OptValue< sal_Int32 >& oroPresetDash, LineProperties::Da
             ::std::vector< sal_Int32 > aValues;
             sal_Int32 nIndex = 0;
             while( nIndex >= 0 )
-                aValues.push_back( rDashStyle.getToken( 0, ' ', nIndex ).toInt32() );
+                aValues.push_back( o3tl::toInt32(o3tl::getToken(rDashStyle, 0, ' ', nIndex )) );
             size_t nPairs = aValues.size() / 2; // ignore last value if size is odd
             for( size_t nPairIdx = 0; nPairIdx < nPairs; ++nPairIdx )
                 orCustomDash.emplace_back( aValues[ 2 * nPairIdx ], aValues[ 2 * nPairIdx + 1 ] );
@@ -589,9 +593,9 @@ void lclGetDmlLineDash( OptValue< sal_Int32 >& oroPresetDash, LineProperties::Da
     }
 }
 
-sal_Int32 lclGetDmlArrowType( const OptValue< sal_Int32 >& roArrowType )
+sal_Int32 lclGetDmlArrowType( const std::optional< sal_Int32 >& roArrowType )
 {
-    if( roArrowType.has() ) switch( roArrowType.get() )
+    if( roArrowType.has_value() ) switch( roArrowType.value() )
     {
         case XML_none:      return XML_none;
         case XML_block:     return XML_triangle;
@@ -603,9 +607,9 @@ sal_Int32 lclGetDmlArrowType( const OptValue< sal_Int32 >& roArrowType )
     return XML_none;
 }
 
-sal_Int32 lclGetDmlArrowWidth( const OptValue< sal_Int32 >& roArrowWidth )
+sal_Int32 lclGetDmlArrowWidth( const std::optional< sal_Int32 >& roArrowWidth )
 {
-    if( roArrowWidth.has() ) switch( roArrowWidth.get() )
+    if( roArrowWidth.has_value() ) switch( roArrowWidth.value() )
     {
         case XML_narrow:    return XML_sm;
         case XML_medium:    return XML_med;
@@ -614,9 +618,9 @@ sal_Int32 lclGetDmlArrowWidth( const OptValue< sal_Int32 >& roArrowWidth )
     return XML_med;
 }
 
-sal_Int32 lclGetDmlArrowLength( const OptValue< sal_Int32 >& roArrowLength )
+sal_Int32 lclGetDmlArrowLength( const std::optional< sal_Int32 >& roArrowLength )
 {
-    if( roArrowLength.has() ) switch( roArrowLength.get() )
+    if( roArrowLength.has_value() ) switch( roArrowLength.value() )
     {
         case XML_short:     return XML_sm;
         case XML_medium:    return XML_med;
@@ -632,9 +636,9 @@ void lclConvertArrow( LineArrowProperties& orArrowProp, const StrokeArrowModel& 
     orArrowProp.moArrowLength = lclGetDmlArrowLength( rStrokeArrow.moArrowLength );
 }
 
-sal_Int32 lclGetDmlLineCompound( const OptValue< sal_Int32 >& roLineStyle )
+sal_Int32 lclGetDmlLineCompound( const std::optional< sal_Int32 >& roLineStyle )
 {
-    if( roLineStyle.has() ) switch( roLineStyle.get() )
+    if( roLineStyle.has_value() ) switch( roLineStyle.value() )
     {
         case XML_single:            return XML_sng;
         case XML_thinThin:          return XML_dbl;
@@ -645,9 +649,9 @@ sal_Int32 lclGetDmlLineCompound( const OptValue< sal_Int32 >& roLineStyle )
     return XML_sng;
 }
 
-sal_Int32 lclGetDmlLineCap( const OptValue< sal_Int32 >& roEndCap )
+sal_Int32 lclGetDmlLineCap( const std::optional< sal_Int32 >& roEndCap )
 {
-    if( roEndCap.has() ) switch( roEndCap.get() )
+    if( roEndCap.has_value() ) switch( roEndCap.value() )
     {
         case XML_flat:      return XML_flat;
         case XML_square:    return XML_sq;
@@ -656,9 +660,9 @@ sal_Int32 lclGetDmlLineCap( const OptValue< sal_Int32 >& roEndCap )
     return XML_flat;    // different defaults in VML (flat) and DrawingML (square)
 }
 
-sal_Int32 lclGetDmlLineJoint( const OptValue< sal_Int32 >& roJoinStyle )
+sal_Int32 lclGetDmlLineJoint( const std::optional< sal_Int32 >& roJoinStyle )
 {
-    if( roJoinStyle.has() ) switch( roJoinStyle.get() )
+    if( roJoinStyle.has_value() ) switch( roJoinStyle.value() )
     {
         case XML_round: return XML_round;
         case XML_bevel: return XML_bevel;
@@ -671,23 +675,23 @@ sal_Int32 lclGetDmlLineJoint( const OptValue< sal_Int32 >& roJoinStyle )
 
 void StrokeArrowModel::assignUsed( const StrokeArrowModel& rSource )
 {
-    moArrowType.assignIfUsed( rSource.moArrowType );
-    moArrowWidth.assignIfUsed( rSource.moArrowWidth );
-    moArrowLength.assignIfUsed( rSource.moArrowLength );
+    assignIfUsed( moArrowType, rSource.moArrowType );
+    assignIfUsed( moArrowWidth, rSource.moArrowWidth );
+    assignIfUsed( moArrowLength, rSource.moArrowLength );
 }
 
 void StrokeModel::assignUsed( const StrokeModel& rSource )
 {
-    moStroked.assignIfUsed( rSource.moStroked );
+    assignIfUsed( moStroked, rSource.moStroked );
     maStartArrow.assignUsed( rSource.maStartArrow );
     maEndArrow.assignUsed( rSource.maEndArrow );
-    moColor.assignIfUsed( rSource.moColor );
-    moOpacity.assignIfUsed( rSource.moOpacity );
-    moWeight.assignIfUsed( rSource.moWeight );
-    moDashStyle.assignIfUsed( rSource.moDashStyle );
-    moLineStyle.assignIfUsed( rSource.moLineStyle );
-    moEndCap.assignIfUsed( rSource.moEndCap );
-    moJoinStyle.assignIfUsed( rSource.moJoinStyle );
+    assignIfUsed( moColor, rSource.moColor );
+    assignIfUsed( moOpacity, rSource.moOpacity );
+    assignIfUsed( moWeight, rSource.moWeight );
+    assignIfUsed( moDashStyle, rSource.moDashStyle );
+    assignIfUsed( moLineStyle, rSource.moLineStyle );
+    assignIfUsed( moEndCap, rSource.moEndCap );
+    assignIfUsed( moJoinStyle, rSource.moJoinStyle );
 }
 
 void StrokeModel::pushToPropMap( ShapePropertyMap& rPropMap, const GraphicHelper& rGraphicHelper ) const
@@ -696,7 +700,7 @@ void StrokeModel::pushToPropMap( ShapePropertyMap& rPropMap, const GraphicHelper
         DrawingML code do the hard work. */
     LineProperties aLineProps;
 
-    if( moStroked.get( true ) )
+    if( moStroked.value_or( true ) )
     {
         aLineProps.maLineFill.moFillType = XML_solidFill;
         lclConvertArrow( aLineProps.maStartArrow, maStartArrow );
@@ -718,18 +722,18 @@ void StrokeModel::pushToPropMap( ShapePropertyMap& rPropMap, const GraphicHelper
 
 void FillModel::assignUsed( const FillModel& rSource )
 {
-    moFilled.assignIfUsed( rSource.moFilled );
-    moColor.assignIfUsed( rSource.moColor );
-    moOpacity.assignIfUsed( rSource.moOpacity );
-    moColor2.assignIfUsed( rSource.moColor2 );
-    moOpacity2.assignIfUsed( rSource.moOpacity2 );
-    moType.assignIfUsed( rSource.moType );
-    moAngle.assignIfUsed( rSource.moAngle );
-    moFocus.assignIfUsed( rSource.moFocus );
-    moFocusPos.assignIfUsed( rSource.moFocusPos );
-    moFocusSize.assignIfUsed( rSource.moFocusSize );
-    moBitmapPath.assignIfUsed( rSource.moBitmapPath );
-    moRotate.assignIfUsed( rSource.moRotate );
+    assignIfUsed( moFilled, rSource.moFilled );
+    assignIfUsed( moColor, rSource.moColor );
+    assignIfUsed( moOpacity, rSource.moOpacity );
+    assignIfUsed( moColor2, rSource.moColor2 );
+    assignIfUsed( moOpacity2, rSource.moOpacity2 );
+    assignIfUsed( moType, rSource.moType );
+    assignIfUsed( moAngle, rSource.moAngle );
+    assignIfUsed( moFocus, rSource.moFocus );
+    assignIfUsed( moFocusPos, rSource.moFocusPos );
+    assignIfUsed( moFocusSize, rSource.moFocusSize );
+    assignIfUsed( moBitmapPath, rSource.moBitmapPath );
+    assignIfUsed( moRotate, rSource.moRotate );
 }
 
 static void lcl_setGradientStop( std::multimap< double, Color >& rMap, const double fKey, const Color& rValue ) {
@@ -747,17 +751,17 @@ void FillModel::pushToPropMap( ShapePropertyMap& rPropMap, const GraphicHelper& 
         DrawingML code do the hard work. */
     FillProperties aFillProps;
 
-    if( moFilled.get( true ) )
+    if( moFilled.value_or( true ) )
     {
-        sal_Int32 nFillType = moType.get( XML_solid );
+        sal_Int32 nFillType = moType.value_or( XML_solid );
         switch( nFillType )
         {
             case XML_gradient:
             case XML_gradientRadial:
             {
                 aFillProps.moFillType = XML_gradFill;
-                aFillProps.maGradientProps.moRotateWithShape = moRotate.get( false );
-                double fFocus = moFocus.get( 0.0 );
+                aFillProps.maGradientProps.moRotateWithShape = moRotate.value_or( false );
+                double fFocus = moFocus.value_or( 0.0 );
 
                 // prepare colors
                 Color aColor1 = ConversionHelper::decodeColor( rGraphicHelper, moColor, moOpacity, API_RGB_WHITE );
@@ -767,7 +771,7 @@ void FillModel::pushToPropMap( ShapePropertyMap& rPropMap, const GraphicHelper& 
                 if( nFillType == XML_gradient )
                 {
                     // normalize angle to range [0;360) degrees
-                    sal_Int32 nVmlAngle = getIntervalValue< sal_Int32, sal_Int32 >( moAngle.get( 0 ), 0, 360 );
+                    sal_Int32 nVmlAngle = getIntervalValue< sal_Int32, sal_Int32 >( moAngle.value_or( 0 ), 0, 360 );
 
                     // focus of -50% or 50% is axial gradient
                     if( ((-0.75 <= fFocus) && (fFocus <= -0.25)) || ((0.25 <= fFocus) && (fFocus <= 0.75)) )
@@ -783,9 +787,10 @@ void FillModel::pushToPropMap( ShapePropertyMap& rPropMap, const GraphicHelper& 
                         const Color& rOuterColor = bOuterToInner ? aColor1 : aColor2;
                         const Color& rInnerColor = bOuterToInner ? aColor2 : aColor1;
 
+                        // add in order of offset
                         lcl_setGradientStop( aFillProps.maGradientProps.maGradientStops, 0.0, rOuterColor);
+                        lcl_setGradientStop( aFillProps.maGradientProps.maGradientStops, 0.5, rInnerColor);
                         lcl_setGradientStop( aFillProps.maGradientProps.maGradientStops, 1.0, rOuterColor);
-                        lcl_setGradientStop( aFillProps.maGradientProps.maGradientStops, 0.5, rInnerColor );
                     }
                     else    // focus of -100%, 0%, and 100% is linear gradient
                     {
@@ -809,8 +814,8 @@ void FillModel::pushToPropMap( ShapePropertyMap& rPropMap, const GraphicHelper& 
                 {
                     aFillProps.maGradientProps.moGradientPath = XML_rect;
                     // convert VML focus position and size to DrawingML fill-to-rect
-                    DoublePair aFocusPos = moFocusPos.get( DoublePair( 0.0, 0.0 ) );
-                    DoublePair aFocusSize = moFocusSize.get( DoublePair( 0.0, 0.0 ) );
+                    DoublePair aFocusPos = moFocusPos.value_or( DoublePair( 0.0, 0.0 ) );
+                    DoublePair aFocusSize = moFocusSize.value_or( DoublePair( 0.0, 0.0 ) );
                     double fLeft   = getLimitedValue< double, double >( aFocusPos.first, 0.0, 1.0 );
                     double fTop    = getLimitedValue< double, double >( aFocusPos.second, 0.0, 1.0 );
                     double fRight  = getLimitedValue< double, double >( fLeft + aFocusSize.first, fLeft, 1.0 );
@@ -833,9 +838,9 @@ void FillModel::pushToPropMap( ShapePropertyMap& rPropMap, const GraphicHelper& 
             case XML_tile:
             case XML_frame:
             {
-                if( moBitmapPath.has() && !moBitmapPath.get().isEmpty() )
+                if( moBitmapPath.has_value() && !moBitmapPath.value().isEmpty() )
                 {
-                    aFillProps.maBlipProps.mxFillGraphic = rGraphicHelper.importEmbeddedGraphic(moBitmapPath.get());
+                    aFillProps.maBlipProps.mxFillGraphic = rGraphicHelper.importEmbeddedGraphic(moBitmapPath.value());
                     if (aFillProps.maBlipProps.mxFillGraphic.is())
                     {
                         aFillProps.moFillType = XML_blipFill;
@@ -870,19 +875,19 @@ ShadowModel::ShadowModel()
 
 void ShadowModel::pushToPropMap(ShapePropertyMap& rPropMap, const GraphicHelper& rGraphicHelper) const
 {
-    if (!mbHasShadow || (moShadowOn.has() && !moShadowOn.get()))
+    if (!mbHasShadow || (moShadowOn.has_value() && !moShadowOn.value()))
         return;
 
     drawingml::Color aColor = ConversionHelper::decodeColor(rGraphicHelper, moColor, moOpacity, API_RGB_GRAY);
     // nOffset* is in mm100, default value is 35 twips, see DffPropertyReader::ApplyAttributes() in msfilter.
     sal_Int32 nOffsetX = 62, nOffsetY = 62;
-    if (moOffset.has())
+    if (moOffset.has_value())
     {
-        OUString aOffsetX, aOffsetY;
-        ConversionHelper::separatePair(aOffsetX, aOffsetY, moOffset.get(), ',');
-        if (!aOffsetX.isEmpty())
+        std::u16string_view aOffsetX, aOffsetY;
+        ConversionHelper::separatePair(aOffsetX, aOffsetY, moOffset.value(), ',');
+        if (!aOffsetX.empty())
             nOffsetX = ConversionHelper::decodeMeasureToHmm(rGraphicHelper, aOffsetX, 0, false, false );
-        if (!aOffsetY.isEmpty())
+        if (!aOffsetY.empty())
             nOffsetY = ConversionHelper::decodeMeasureToHmm(rGraphicHelper, aOffsetY, 0, false, false );
     }
 
@@ -919,10 +924,10 @@ void TextpathModel::pushToPropMap(ShapePropertyMap& rPropMap, const uno::Referen
 {
     OUString sFont = "";
 
-    if (moString.has())
+    if (moString.has_value())
     {
         uno::Reference<text::XTextRange> xTextRange(xShape, uno::UNO_QUERY);
-        xTextRange->setString(moString.get());
+        xTextRange->setString(moString.value());
 
         uno::Reference<beans::XPropertySet> xPropertySet(xShape, uno::UNO_QUERY);
         uno::Sequence<beans::PropertyValue> aGeomPropSeq = xPropertySet->getPropertyValue("CustomShapeGeometry").get< uno::Sequence<beans::PropertyValue> >();
@@ -941,43 +946,43 @@ void TextpathModel::pushToPropMap(ShapePropertyMap& rPropMap, const uno::Referen
             aGeomPropSeq.realloc(nSize+1);
             aGeomPropSeq.getArray()[nSize] = lcl_createTextpathProps();
         }
-        rPropMap.setAnyProperty(PROP_CustomShapeGeometry, uno::makeAny(aGeomPropSeq));
+        rPropMap.setAnyProperty(PROP_CustomShapeGeometry, uno::Any(aGeomPropSeq));
     }
-    if (moStyle.has())
+    if (moStyle.has_value())
     {
-        OUString aStyle = moStyle.get(OUString());
+        OUString aStyle = moStyle.value_or(OUString());
 
         sal_Int32 nIndex = 0;
         while( nIndex >= 0 )
         {
-            OUString aName, aValue;
-            if (ConversionHelper::separatePair(aName, aValue, aStyle.getToken(0, ';', nIndex), ':'))
+            std::u16string_view aName, aValue;
+            if (ConversionHelper::separatePair(aName, aValue, o3tl::getToken(aStyle, 0, ';', nIndex), ':'))
             {
-                if (aName == "font-family")
+                if (aName == u"font-family")
                 {
                     // remove " (first, and last character)
-                    if (aValue.getLength() > 2)
-                        aValue = aValue.copy(1, aValue.getLength() - 2);
+                    if (aValue.size() > 2)
+                        aValue = aValue.substr(1, aValue.size() - 2);
 
                     uno::Reference<beans::XPropertySet> xPropertySet(xShape, uno::UNO_QUERY);
-                    xPropertySet->setPropertyValue("CharFontName", uno::makeAny(aValue));
+                    xPropertySet->setPropertyValue("CharFontName", uno::Any(OUString(aValue)));
                     sFont = aValue;
                 }
-                else if (aName == "font-size")
+                else if (aName == u"font-size")
                 {
-                    oox::OptValue<OUString> aOptString(aValue);
+                    std::optional<OUString> aOptString {OUString(aValue)};
                     float nSize = drawingml::convertEmuToPoints(lclGetEmu(rGraphicHelper, aOptString, 1));
 
                     uno::Reference<beans::XPropertySet> xPropertySet(xShape, uno::UNO_QUERY);
-                    xPropertySet->setPropertyValue("CharHeight", uno::makeAny(nSize));
+                    xPropertySet->setPropertyValue("CharHeight", uno::Any(nSize));
                 }
             }
         }
     }
-    if (moTrim.has() && moTrim.get())
+    if (moTrim.has_value() && moTrim.value())
         return;
 
-    OUString sText = moString.get();
+    OUString sText = moString.value_or("");
     ScopedVclPtrInstance<VirtualDevice> pDevice;
     vcl::Font aFont = pDevice->GetFont();
     aFont.SetFamilyName(sFont);

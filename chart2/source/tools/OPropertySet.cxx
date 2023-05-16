@@ -24,7 +24,6 @@
 #include <com/sun/star/style/XStyle.hpp>
 
 #include <algorithm>
-#include <vector>
 #include <memory>
 
 using namespace ::com::sun::star;
@@ -41,23 +40,25 @@ using ::cppu::OPropertySetHelper;
 namespace property
 {
 
-OPropertySet::OPropertySet( ::osl::Mutex & par_rMutex ) :
-        OBroadcastHelper( par_rMutex ),
+OPropertySet::OPropertySet( ) :
+        OBroadcastHelper( m_aMutex ),
         // the following causes a warning; there seems to be no way to avoid it
         OPropertySetHelper( static_cast< OBroadcastHelper & >( *this )),
-        m_rMutex( par_rMutex ),
         m_bSetNewValuesExplicitlyEvenIfTheyEqualDefault(false)
 {
 }
 
-OPropertySet::OPropertySet( const OPropertySet & rOther, ::osl::Mutex & par_rMutex ) :
-        OBroadcastHelper( par_rMutex ),
+OPropertySet::OPropertySet( const OPropertySet & rOther ) :
+        OBroadcastHelper( m_aMutex ),
         // the following causes a warning; there seems to be no way to avoid it
         OPropertySetHelper( static_cast< OBroadcastHelper & >( *this )),
-        m_rMutex( par_rMutex ),
+        css::lang::XTypeProvider(),
+        css::beans::XPropertyState(),
+        css::beans::XMultiPropertyStates(),
+        css::style::XStyleSupplier(),
         m_bSetNewValuesExplicitlyEvenIfTheyEqualDefault(false)
 {
-    MutexGuard aGuard( m_rMutex );
+    MutexGuard aGuard( m_aMutex );
 
     m_aProperties = rOther.m_aProperties;
 
@@ -157,7 +158,9 @@ Any SAL_CALL
 {
     cppu::IPropertyArrayHelper & rPH = getInfoHelper();
 
-    return GetDefaultValue( rPH.getHandleByName( aPropertyName ) );
+    Any any;
+    GetDefaultValue( rPH.getHandleByName( aPropertyName ), any );
+    return any;
 }
 
 // ____ XMultiPropertyStates ____
@@ -198,8 +201,9 @@ Sequence< Any > SAL_CALL
 
     for( ; nI < nElements; ++nI )
     {
-        pResultArray[ nI ] = GetDefaultValue(
-            rPH.getHandleByName( aPropertyNames[ nI ] ));
+        GetDefaultValue(
+            rPH.getHandleByName( aPropertyNames[ nI ] ),
+            pResultArray[ nI ]);
     }
 
     return aResult;
@@ -256,7 +260,7 @@ void SAL_CALL OPropertySet::setFastPropertyValue_NoBroadcast
     Any aDefault;
     try
     {
-        aDefault = GetDefaultValue( nHandle );
+        GetDefaultValue( nHandle, aDefault );
     }
     catch( const beans::UnknownPropertyException& )
     {
@@ -337,7 +341,7 @@ void SAL_CALL OPropertySet::getFastPropertyValue
         // => take the default value
         try
         {
-            rValue = GetDefaultValue( nHandle );
+            GetDefaultValue( nHandle, rValue );
         }
         catch( const beans::UnknownPropertyException& )
         {

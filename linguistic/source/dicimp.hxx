@@ -24,9 +24,9 @@
 #include <com/sun/star/frame/XStorable.hpp>
 
 #include <cppuhelper/implbase.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <i18nlangtag/lang.h>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 
 #include "defs.hxx"
 
@@ -42,7 +42,7 @@ class DictionaryNeo :
     >
 {
 
-    ::comphelper::OInterfaceContainerHelper2                    aDicEvtListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::linguistic2::XDictionaryEventListener> aDicEvtListeners;
     std::vector< css::uno::Reference< css::linguistic2::XDictionaryEntry > >
                                                                 aEntries;
     OUString                                                    aDicName;
@@ -63,10 +63,10 @@ class DictionaryNeo :
 
     ErrCode                     loadEntries(const OUString &rMainURL);
     ErrCode                     saveEntries(const OUString &rMainURL);
-    static int                  cmpDicEntry(const OUString &rWord1,
-                                        const OUString &rWord2,
+    static int                  cmpDicEntry(std::u16string_view rWord1,
+                                        std::u16string_view rWord2,
                                         bool bSimilarOnly = false);
-    bool                        seekEntry(const OUString &rWord, sal_Int32 *pPos,
+    bool                        seekEntry(std::u16string_view rWord, sal_Int32 *pPos,
                                         bool bSimilarOnly = false);
     bool                        isSorted();
 
@@ -74,7 +74,7 @@ class DictionaryNeo :
                                           bool bIsLoadEntries = false);
 
 public:
-    DictionaryNeo(const OUString &rName, LanguageType nLang,
+    DictionaryNeo(OUString aName, LanguageType nLang,
                     css::linguistic2::DictionaryType eType,
                     const OUString &rMainURL,
                     bool bWriteable );
@@ -155,8 +155,8 @@ class DicEntry :
 
 public:
     DicEntry(const OUString &rDicFileWord, bool bIsNegativ);
-    DicEntry(const OUString &rDicWord, bool bIsNegativ,
-             const OUString &rRplcText);
+    DicEntry(OUString aDicWord, bool bIsNegativ,
+             OUString aRplcText);
     virtual ~DicEntry() override;
 
     // XDictionaryEntry

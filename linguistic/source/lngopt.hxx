@@ -21,8 +21,8 @@
 #define INCLUDED_LINGUISTIC_SOURCE_LNGOPT_HXX
 
 #include <cppuhelper/implbase.hxx>
-#include <cppuhelper/interfacecontainer.hxx>
-#include <comphelper/multiinterfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
+#include <comphelper/multiinterfacecontainer3.hxx>
 #include <com/sun/star/beans/XFastPropertySet.hpp>
 #include <com/sun/star/beans/XPropertyAccess.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
@@ -59,7 +59,7 @@ public:
             GetActiveDics() const   { return pData->aActiveDics; }
 };
 
-typedef comphelper::OMultiTypeInterfaceContainerHelperVar2<sal_Int32>
+typedef comphelper::OMultiTypeInterfaceContainerHelperVar3<css::beans::XPropertyChangeListener, sal_Int32>
     OPropertyListenerContainerHelper;
 
 class LinguProps :
@@ -72,7 +72,7 @@ class LinguProps :
         css::lang::XServiceInfo
     >
 {
-    ::comphelper::OInterfaceContainerHelper2           aEvtListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::lang::XEventListener> aEvtListeners;
     OPropertyListenerContainerHelper            aPropListeners;
 
     SfxItemPropertyMap                          aPropertyMap;

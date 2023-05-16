@@ -31,8 +31,9 @@
 #include <basegfx/matrix/b3dhommatrix.hxx>
 #include <com/sun/star/awt/Point.hpp>
 #include <com/sun/star/uno/Sequence.hxx>
+#include <rtl/ref.hxx>
+#include <svx/unoshape.hxx>
 
-namespace com::sun::star::chart2 { class XTransformation; }
 namespace com::sun::star::drawing { class XShapes; }
 namespace com::sun::star::drawing { struct HomogenMatrix; }
 namespace com::sun::star::drawing { struct PolyPolygonShape3D; }
@@ -41,6 +42,45 @@ namespace chart
 {
 
 class ShapeFactory;
+
+/** allows the transformation of numeric values from one
+     coordinate-system into another.  Values may be transformed using
+     any mapping.
+     This is a non-UNO variant of the css::chart2::XTransformation interface,
+     but using more efficient calling and returning types.
+  */
+class XTransformation2
+{
+public:
+    virtual ~XTransformation2();
+     /** transforms the given input data tuple, given in the source
+         coordinate system, according to the internal transformation
+         rules, into a tuple of transformed coordinates in the
+         destination coordinate system.
+
+         <p>Note that both coordinate systems may have different
+         dimensions, e.g., if a transformation does simply a projection
+         into a lower-dimensional space.</p>
+
+         @param aValues a source tuple of data that is to be
+                transformed.  The length of this sequence must be
+                equivalent to the dimension of the source coordinate
+                system.
+
+         @return the transformed data tuple.  The length of this
+                 sequence is equal to the dimension of the output
+                 coordinate system.
+
+         @throws ::com::sun::star::lang::IllegalArgumentException
+                if the dimension of the input vector is not equal to the
+                dimension given in getSourceDimension().
+      */
+    virtual css::drawing::Position3D transform(
+        const css::drawing::Position3D& rSourceValues ) const = 0;
+    virtual css::drawing::Position3D transform(
+        const css::uno::Sequence< double >& rSourceValues ) const = 0;
+};
+
 
 class PlottingPositionHelper
 {
@@ -72,7 +112,7 @@ public:
 
     inline void   doLogicScaling( css::drawing::Position3D& rPos ) const;
 
-    virtual css::uno::Reference< css::chart2::XTransformation >
+    virtual ::chart::XTransformation2*
                   getTransformationScaledLogicToScene() const;
 
     virtual css::drawing::Position3D
@@ -82,11 +122,12 @@ public:
             transformScaledLogicToScene( double fX, double fY, double fZ, bool bClip ) const;
 
     void    transformScaledLogicToScene( css::drawing::PolyPolygonShape3D& rPoly ) const;
+    void    transformScaledLogicToScene( std::vector<std::vector<css::drawing::Position3D>>& rPoly ) const;
 
     static css::awt::Point transformSceneToScreenPosition(
                   const css::drawing::Position3D& rScenePosition3D
-                , const css::uno::Reference< css::drawing::XShapes >& xSceneTarget
-                , ShapeFactory* pShapeFactory, sal_Int32 nDimensionCount );
+                , const rtl::Reference<SvxShapeGroupAnyD>& xSceneTarget
+                , sal_Int32 nDimensionCount );
 
     inline double getLogicMinX() const;
     inline double getLogicMinY() const;
@@ -120,7 +161,7 @@ protected: //member
     ::basegfx::B3DHomMatrix             m_aMatrixScreenToScene;
 
     //this is calculated based on m_aScales and m_aMatrixScreenToScene
-    mutable css::uno::Reference< css::chart2::XTransformation >  m_xTransformationLogicToScene;
+    mutable std::unique_ptr< ::chart::XTransformation2 >  m_xTransformationLogicToScene;
 
     bool    m_bSwapXAndY;//e.g. true for bar chart and false for column chart
 
@@ -153,7 +194,7 @@ public:
 
     const ::basegfx::B3DHomMatrix& getUnitCartesianToScene() const { return m_aUnitCartesianToScene;}
 
-    virtual css::uno::Reference< css::chart2::XTransformation >
+    virtual ::chart::XTransformation2*
                   getTransformationScaledLogicToScene() const override;
 
     //the resulting values provided by the following 3 methods should be used
@@ -359,11 +400,7 @@ inline bool PlottingPositionHelper::clipYRange( double& rMin, double& rMax ) con
 {
     //returns true if something remains
     if( rMin > rMax )
-    {
-        double fHelp = rMin;
-        rMin = rMax;
-        rMax = fHelp;
-    }
+        std::swap( rMin, rMax );
     if( rMin > getLogicMaxY() )
         return false;
     if( rMax < getLogicMinY() )

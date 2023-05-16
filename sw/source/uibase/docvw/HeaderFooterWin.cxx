@@ -29,11 +29,12 @@
 #include <basegfx/polygon/b2dpolygon.hxx>
 #include <basegfx/range/b2drectangle.hxx>
 #include <basegfx/vector/b2dsize.hxx>
+#include <basegfx/utils/gradienttools.hxx>
 #include <drawinglayer/attribute/fillgradientattribute.hxx>
 #include <drawinglayer/attribute/fontattribute.hxx>
 #include <drawinglayer/primitive2d/fillgradientprimitive2d.hxx>
 #include <drawinglayer/primitive2d/modifiedcolorprimitive2d.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/textlayoutdevice.hxx>
 #include <drawinglayer/primitive2d/textprimitive2d.hxx>
@@ -42,7 +43,7 @@
 #include <sfx2/bindings.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
-#include <drawinglayer/processor2d/processorfromoutputdevice.hxx>
+#include <drawinglayer/processor2d/processor2dtools.hxx>
 #include <vcl/canvastools.hxx>
 #include <vcl/metric.hxx>
 #include <vcl/svapp.hxx>
@@ -131,7 +132,7 @@ void SwFrameButtonPainter::PaintButton(drawinglayer::primitive2d::Primitive2DCon
     B2DPolygon aPolygon = lcl_GetPolygon(rRect, bOnTop);
 
     // Colors
-    basegfx::BColor aLineColor = SwViewOption::GetHeaderFooterMarkColor().getBColor();
+    basegfx::BColor aLineColor = SwViewOption::GetCurrentViewOptions().GetHeaderFooterMarkColor().getBColor();
     basegfx::BColor aFillColor = lcl_GetFillColor(aLineColor);
     basegfx::BColor aLighterColor = lcl_GetLighterGradientColor(aFillColor);
 
@@ -150,35 +151,100 @@ void SwFrameButtonPainter::PaintButton(drawinglayer::primitive2d::Primitive2DCon
         double nAngle = M_PI;
         if (bOnTop)
             nAngle = 0;
-        FillGradientAttribute aFillAttrs(drawinglayer::attribute::GradientStyle::Linear, 0.0, 0.0, 0.0, nAngle, aLighterColor, aFillColor);
+
+        FillGradientAttribute aFillAttrs(css::awt::GradientStyle_LINEAR, 0.0, 0.0, 0.0, nAngle,
+            basegfx::utils::createColorStopsFromStartEndColor(aLighterColor, aFillColor));
         rSeq.push_back(drawinglayer::primitive2d::Primitive2DReference(
-                            new drawinglayer::primitive2d::FillGradientPrimitive2D(aGradientRect, aFillAttrs)));
+                            new drawinglayer::primitive2d::FillGradientPrimitive2D(aGradientRect, std::move(aFillAttrs))));
     }
 
     // Create the border lines primitive
     rSeq.push_back(drawinglayer::primitive2d::Primitive2DReference(
-                new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(aPolygon, aLineColor)));
+                new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(std::move(aPolygon), aLineColor)));
 }
 
-SwHeaderFooterWin::SwHeaderFooterWin( SwEditWin* pEditWin, const SwFrame *pFrame, bool bHeader ) :
-    SwFrameMenuButtonBase(pEditWin, pFrame, "modules/swriter/ui/hfmenubutton.ui", "HFMenuButton"),
+SwHeaderFooterDashedLine::SwHeaderFooterDashedLine(SwEditWin* pEditWin, const SwFrame *pFrame, bool bHeader)
+    : SwDashedLine(pEditWin, &SwViewOption::GetHeaderFooterMarkColor)
+    , m_pEditWin(pEditWin)
+    , m_pFrame(pFrame)
+    , m_bIsHeader(bHeader)
+{
+}
+
+bool SwHeaderFooterDashedLine::IsOnScreen()
+{
+    tools::Rectangle aBounds(GetPosPixel(), GetSizePixel());
+    tools::Rectangle aVisArea = GetEditWin()->LogicToPixel(GetEditWin()->GetView().GetVisArea());
+    return aBounds.Overlaps(aVisArea);
+}
+
+void SwHeaderFooterDashedLine::EnsureWin()
+{
+    if (!m_pWin)
+    {
+        m_pWin = VclPtr<SwHeaderFooterWin>::Create(m_pEditWin, m_pFrame, m_bIsHeader);
+        m_pWin->SetZOrder(this, ZOrderFlags::Before);
+    }
+}
+
+void SwHeaderFooterDashedLine::ShowAll(bool bShow)
+{
+    Show(bShow);
+    if (!m_pWin && IsOnScreen())
+        EnsureWin();
+    if (m_pWin)
+        m_pWin->ShowAll(bShow);
+}
+
+void SwHeaderFooterDashedLine::SetReadonly(bool bReadonly)
+{
+    ShowAll(!bReadonly);
+}
+
+bool SwHeaderFooterDashedLine::Contains(const Point &rDocPt) const
+{
+    if (m_pWin && m_pWin->Contains(rDocPt))
+        return true;
+
+    ::tools::Rectangle aLineRect(GetPosPixel(), GetSizePixel());
+    return aLineRect.Contains(rDocPt);
+}
+
+void SwHeaderFooterDashedLine::SetOffset(Point aOffset, tools::Long nXLineStart, tools::Long nXLineEnd)
+{
+    Point aLinePos(nXLineStart, aOffset.Y());
+    Size aLineSize(nXLineEnd - nXLineStart, 1);
+    SetPosSizePixel(aLinePos, aLineSize);
+
+    bool bOnScreen = IsOnScreen();
+    if (!m_pWin && bOnScreen)
+    {
+        EnsureWin();
+        m_pWin->ShowAll(true);
+    }
+    else if (m_pWin && !bOnScreen)
+        m_pWin.disposeAndClear();
+
+    if (m_pWin)
+        m_pWin->SetOffset(aOffset);
+}
+
+SwHeaderFooterWin::SwHeaderFooterWin(SwEditWin* pEditWin, const SwFrame *pFrame, bool bHeader ) :
+    InterimItemWindow(pEditWin, "modules/swriter/ui/hfmenubutton.ui", "HFMenuButton"),
     m_xMenuButton(m_xBuilder->weld_menu_button("menubutton")),
     m_xPushButton(m_xBuilder->weld_button("button")),
+    m_pEditWin(pEditWin),
+    m_pFrame(pFrame),
     m_bIsHeader( bHeader ),
-    m_pLine( nullptr ),
     m_bIsAppearing( false ),
     m_nFadeRate( 100 ),
     m_aFadeTimer("SwHeaderFooterWin m_aFadeTimer")
 {
     m_xVirDev = m_xMenuButton->create_virtual_device();
-    SetVirDevFont();
+    SwFrameMenuButtonBase::SetVirDevFont(*m_xVirDev);
 
     m_xPushButton->connect_clicked(LINK(this, SwHeaderFooterWin, ClickHdl));
     m_xMenuButton->connect_selected(LINK(this, SwHeaderFooterWin, SelectHdl));
-
-    // Create the line control
-    m_pLine = VclPtr<SwDashedLine>::Create(GetEditWin(), &SwViewOption::GetHeaderFooterMarkColor);
-    m_pLine->SetZOrder(this, ZOrderFlags::Before);
 
     // set the PopupMenu
     // Rewrite the menu entries' text
@@ -204,20 +270,21 @@ SwHeaderFooterWin::~SwHeaderFooterWin( )
 
 void SwHeaderFooterWin::dispose()
 {
-    m_pLine.disposeAndClear();
     m_xPushButton.reset();
     m_xMenuButton.reset();
+    m_pEditWin.clear();
     m_xVirDev.disposeAndClear();
-    SwFrameMenuButtonBase::dispose();
+    InterimItemWindow::dispose();
 }
 
-void SwHeaderFooterWin::SetOffset(Point aOffset, tools::Long nXLineStart, tools::Long nXLineEnd)
+void SwHeaderFooterWin::SetOffset(Point aOffset)
 {
     // Compute the text to show
-    const SwPageDesc* pDesc = GetPageFrame()->GetPageDesc();
-    bool bIsFirst = !pDesc->IsFirstShared() && GetPageFrame()->OnFirstPage();
-    bool bIsLeft  = !pDesc->IsHeaderShared() && !GetPageFrame()->OnRightPage();
-    bool bIsRight = !pDesc->IsHeaderShared() && GetPageFrame()->OnRightPage();
+    const SwPageFrame* pPageFrame = SwFrameMenuButtonBase::GetPageFrame(m_pFrame);
+    const SwPageDesc* pDesc = pPageFrame->GetPageDesc();
+    bool bIsFirst = !pDesc->IsFirstShared() && pPageFrame->OnFirstPage();
+    bool bIsLeft  = !pDesc->IsHeaderShared() && !pPageFrame->OnRightPage();
+    bool bIsRight = !pDesc->IsHeaderShared() && pPageFrame->OnRightPage();
     m_sLabel = SwResId(STR_HEADER_TITLE);
     if (!m_bIsHeader)
         m_sLabel = bIsFirst ? SwResId(STR_FIRST_FOOTER_TITLE)
@@ -259,13 +326,6 @@ void SwHeaderFooterWin::SetOffset(Point aOffset, tools::Long nXLineStart, tools:
 
     m_xVirDev->SetOutputSizePixel(aBoxSize);
     PaintButton();
-
-    double nYLinePos = aBoxPos.Y();
-    if (!m_bIsHeader)
-        nYLinePos += aBoxSize.Height();
-    Point aLinePos(nXLineStart, nYLinePos);
-    Size aLineSize(nXLineEnd - nXLineStart, 1);
-    m_pLine->SetPosSizePixel(aLinePos, aLineSize);
 }
 
 void SwHeaderFooterWin::ShowAll(bool bShow)
@@ -284,11 +344,7 @@ void SwHeaderFooterWin::ShowAll(bool bShow)
 bool SwHeaderFooterWin::Contains( const Point &rDocPt ) const
 {
     ::tools::Rectangle aRect(GetPosPixel(), GetSizePixel());
-    if (aRect.Contains(rDocPt))
-        return true;
-
-    ::tools::Rectangle aLineRect(m_pLine->GetPosPixel(), m_pLine->GetSizePixel());
-    return aLineRect.Contains(rDocPt);
+    return aRect.Contains(rDocPt);
 }
 
 void SwHeaderFooterWin::PaintButton()
@@ -304,7 +360,7 @@ void SwHeaderFooterWin::PaintButton()
     SwFrameButtonPainter::PaintButton(aSeq, aRect, m_bIsHeader);
 
     // Create the text primitive
-    basegfx::BColor aLineColor = SwViewOption::GetHeaderFooterMarkColor().getBColor();
+    basegfx::BColor aLineColor = SwViewOption::GetCurrentViewOptions().GetHeaderFooterMarkColor().getBColor();
     B2DVector aFontSize;
     FontAttribute aFontAttr = drawinglayer::primitive2d::getFontAttributeFromVclFont(aFontSize, m_xVirDev->GetFont(), false, false);
 
@@ -319,11 +375,11 @@ void SwHeaderFooterWin::PaintButton()
     aSeq.push_back(drawinglayer::primitive2d::Primitive2DReference(
                     new drawinglayer::primitive2d::TextSimplePortionPrimitive2D(
                         aTextMatrix, m_sLabel, 0, m_sLabel.getLength(),
-                        std::vector<double>(), aFontAttr, css::lang::Locale(), aLineColor)));
+                        std::vector<double>(), {}, std::move(aFontAttr), css::lang::Locale(), aLineColor)));
 
     // Create the 'plus' or 'arrow' primitive
     B2DRectangle aSignArea(B2DPoint(aRect.Right() - BUTTON_WIDTH, 0.0),
-                           B2DSize(aRect.Right(), aRect.getHeight()));
+                           B2DVector(aRect.Right(), aRect.getOpenHeight()));
 
     B2DPolygon aSign;
     bool bIsEmptyHeaderFooter = IsEmptyHeaderFooter();
@@ -374,7 +430,7 @@ void SwHeaderFooterWin::PaintButton()
     // Create the processor and process the primitives
     const drawinglayer::geometry::ViewInformation2D aNewViewInfos;
     std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> pProcessor(
-        drawinglayer::processor2d::createBaseProcessor2DFromOutputDevice(*m_xVirDev, aNewViewInfos));
+        drawinglayer::processor2d::createProcessor2DFromOutputDevice(*m_xVirDev, aNewViewInfos));
 
     // TODO Ghost it all if needed
     drawinglayer::primitive2d::Primitive2DContainer aGhostedSeq(1);
@@ -399,16 +455,17 @@ bool SwHeaderFooterWin::IsEmptyHeaderFooter( ) const
 {
     bool bResult = true;
 
-    if (!GetPageFrame())
+    const SwPageFrame* pPageFrame = SwFrameMenuButtonBase::GetPageFrame(m_pFrame);
+    if (!pPageFrame)
     {
         return bResult;
     }
 
     // Actually check it
-    const SwPageDesc* pDesc = GetPageFrame()->GetPageDesc();
+    const SwPageDesc* pDesc = pPageFrame->GetPageDesc();
 
-    bool const bFirst(GetPageFrame()->OnFirstPage());
-    const SwFrameFormat *const pFormat = (GetPageFrame()->OnRightPage())
+    bool const bFirst(pPageFrame->OnFirstPage());
+    const SwFrameFormat *const pFormat = (pPageFrame->OnRightPage())
         ? pDesc->GetRightFormat(bFirst)
         : pDesc->GetLeftFormat(bFirst);
 
@@ -425,10 +482,11 @@ bool SwHeaderFooterWin::IsEmptyHeaderFooter( ) const
 
 void SwHeaderFooterWin::ExecuteCommand(std::string_view rIdent)
 {
-    SwView& rView = GetEditWin()->GetView();
+    SwView& rView = m_pEditWin->GetView();
     SwWrtShell& rSh = rView.GetWrtShell();
 
-    const OUString& rStyleName = GetPageFrame()->GetPageDesc()->GetName();
+    const SwPageFrame* pPageFrame = SwFrameMenuButtonBase::GetPageFrame(m_pFrame);
+    const OUString& rStyleName = pPageFrame->GetPageDesc()->GetName();
     if (rIdent == "edit")
     {
         OString sPageId = m_bIsHeader ? OString("header") : OString("footer");
@@ -436,7 +494,7 @@ void SwHeaderFooterWin::ExecuteCommand(std::string_view rIdent)
     }
     else if (rIdent == "borderback")
     {
-        const SwPageDesc* pDesc = GetPageFrame()->GetPageDesc();
+        const SwPageDesc* pDesc = pPageFrame->GetPageDesc();
         const SwFrameFormat& rMaster = pDesc->GetMaster();
         SwFrameFormat* pHFFormat = const_cast< SwFrameFormat* >( rMaster.GetFooter().GetFooterFormat() );
         if ( m_bIsHeader )
@@ -453,9 +511,8 @@ void SwHeaderFooterWin::ExecuteCommand(std::string_view rIdent)
         aSet.MergeRange(SID_ATTR_BORDER_INNER, SID_ATTR_BORDER_INNER);
         // Create a box info item... needed by the dialog
         std::shared_ptr<SvxBoxInfoItem> aBoxInfo(std::make_shared<SvxBoxInfoItem>(SID_ATTR_BORDER_INNER));
-        const SfxPoolItem *pBoxInfo;
-        if (SfxItemState::SET == pHFFormat->GetAttrSet().GetItemState(SID_ATTR_BORDER_INNER, true, &pBoxInfo))
-            aBoxInfo.reset(static_cast<SvxBoxInfoItem*>(pBoxInfo->Clone()));
+        if (const SvxBoxInfoItem *pBoxInfo = pHFFormat->GetAttrSet().GetItemIfSet(SID_ATTR_BORDER_INNER))
+            aBoxInfo.reset(pBoxInfo->Clone());
 
         aBoxInfo->SetTable(false);
         aBoxInfo->SetDist(true);
@@ -488,19 +545,20 @@ void SwHeaderFooterWin::ExecuteCommand(std::string_view rIdent)
     }
 }
 
-void SwHeaderFooterWin::SetReadonly( bool bReadonly )
-{
-    ShowAll( !bReadonly );
-}
-
 IMPL_LINK_NOARG(SwHeaderFooterWin, ClickHdl, weld::Button&, void)
 {
-    SwView& rView = GetEditWin()->GetView();
+    SwView& rView = m_pEditWin->GetView();
     SwWrtShell& rSh = rView.GetWrtShell();
 
-    const OUString& rStyleName = GetPageFrame()->GetPageDesc()->GetName();
-    rSh.ChangeHeaderOrFooter( rStyleName, m_bIsHeader, true, false );
-
+    const SwPageFrame* pPageFrame = SwFrameMenuButtonBase::GetPageFrame(m_pFrame);
+    const OUString& rStyleName = pPageFrame->GetPageDesc()->GetName();
+    {
+        VclPtr<SwHeaderFooterWin> xThis(this);
+        rSh.ChangeHeaderOrFooter( rStyleName, m_bIsHeader, true, false );
+        //tdf#153059 after ChangeHeaderOrFooter is it possible that "this" is disposed
+        if (xThis->isDisposed())
+            return;
+    }
     m_xPushButton->hide();
     m_xMenuButton->show();
     PaintButton();
@@ -521,12 +579,10 @@ IMPL_LINK_NOARG(SwHeaderFooterWin, FadeHandler, Timer *, void)
     if (m_nFadeRate != 100 && !IsVisible())
     {
         Show();
-        m_pLine->Show();
     }
     else if (m_nFadeRate == 100 && IsVisible())
     {
         Show(false);
-        m_pLine->Show(false);
     }
     else
         PaintButton();

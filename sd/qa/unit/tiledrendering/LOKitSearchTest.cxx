@@ -7,16 +7,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../sdmodeltestbase.hxx"
-
 #include "CallbackRecorder.hxx"
+#include <test/unoapi_test.hxx>
 
-#include <test/bootstrapfixture.hxx>
 #include <test/helper/transferable.hxx>
-#include <test/xmltesttools.hxx>
 
-#include <comphelper/dispatchcommand.hxx>
-#include <comphelper/processfactory.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <comphelper/lok.hxx>
 #include <svl/srchitem.hxx>
@@ -25,21 +20,21 @@
 #include <ViewShell.hxx>
 #include <unomodel.hxx>
 
+#include <DrawDocShell.hxx>
+#include <drawdoc.hxx>
 #include <sdpage.hxx>
 #include <svx/svdograf.hxx>
 #include <vcl/filter/PDFiumLibrary.hxx>
 
-#include <com/sun/star/frame/Desktop.hpp>
-
 using namespace css;
 
-class LOKitSearchTest : public SdModelTestBase, public XmlTestTools
+class LOKitSearchTest : public UnoApiTest
 {
-private:
-    static constexpr OUStringLiteral DATA_DIRECTORY = u"/sd/qa/unit/tiledrendering/data/";
-
 public:
-    LOKitSearchTest() = default;
+    LOKitSearchTest()
+        : UnoApiTest("/sd/qa/unit/tiledrendering/data/")
+    {
+    }
 
     virtual void setUp() override;
     virtual void tearDown() override;
@@ -84,83 +79,79 @@ private:
     SdXImpressDocument* createDoc(const char* pName,
                                   const uno::Sequence<beans::PropertyValue>& rArguments
                                   = uno::Sequence<beans::PropertyValue>());
+    void lcl_search(const OUString& rKey, bool bFindAll = false, bool bBackwards = false);
+    void lcl_replace(const OUString& rKey, const OUString& rReplace, bool bAll = false);
 
-    uno::Reference<lang::XComponent> mxComponent;
     std::unique_ptr<CallbackRecorder> mpCallbackRecorder;
 };
 
 void LOKitSearchTest::setUp()
 {
-    test::BootstrapFixture::setUp();
+    UnoApiTest::setUp();
 
     // prevent showing warning message box
     setenv("OOX_NO_SMARTART_WARNING", "1", 1);
     comphelper::LibreOfficeKit::setActive(true);
 
-    mxDesktop.set(
-        css::frame::Desktop::create(comphelper::getComponentContext(getMultiServiceFactory())));
     mpCallbackRecorder = std::make_unique<CallbackRecorder>();
 }
 
 void LOKitSearchTest::tearDown()
 {
     if (mxComponent.is())
+    {
         mxComponent->dispose();
+        mxComponent.clear();
+    }
 
     comphelper::LibreOfficeKit::setActive(false);
 
-    test::BootstrapFixture::tearDown();
+    UnoApiTest::tearDown();
 }
 
 SdXImpressDocument*
 LOKitSearchTest::createDoc(const char* pName, const uno::Sequence<beans::PropertyValue>& rArguments)
 {
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    mxComponent = loadFromDesktop(m_directories.getURLFromSrc(DATA_DIRECTORY)
-                                  + OUString::createFromAscii(pName));
-
-    CPPUNIT_ASSERT(mxComponent.is());
+    loadFromURL(OUString::createFromAscii(pName));
     SdXImpressDocument* pImpressDocument = dynamic_cast<SdXImpressDocument*>(mxComponent.get());
     CPPUNIT_ASSERT(pImpressDocument);
     pImpressDocument->initializeForTiledRendering(rArguments);
     return pImpressDocument;
 }
 
-namespace
-{
-void lcl_search(const OUString& rKey, bool bFindAll = false, bool bBackwards = false)
+void LOKitSearchTest::lcl_search(const OUString& rKey, bool bFindAll, bool bBackwards)
 {
     Scheduler::ProcessEventsToIdle();
     SvxSearchCmd eSearch = bFindAll ? SvxSearchCmd::FIND_ALL : SvxSearchCmd::FIND;
 
     uno::Sequence<beans::PropertyValue> aPropertyValues(comphelper::InitPropertySequence({
-        { "SearchItem.SearchString", uno::makeAny(rKey) },
-        { "SearchItem.Backward", uno::makeAny(bBackwards) },
-        { "SearchItem.Command", uno::makeAny(sal_uInt16(eSearch)) },
+        { "SearchItem.SearchString", uno::Any(rKey) },
+        { "SearchItem.Backward", uno::Any(bBackwards) },
+        { "SearchItem.Command", uno::Any(sal_uInt16(eSearch)) },
     }));
 
-    comphelper::dispatchCommand(".uno:ExecuteSearch", aPropertyValues);
+    dispatchCommand(mxComponent, ".uno:ExecuteSearch", aPropertyValues);
     Scheduler::ProcessEventsToIdle();
 }
 
-void lcl_replace(const OUString& rKey, const OUString& rReplace, bool bAll = false)
+void LOKitSearchTest::lcl_replace(const OUString& rKey, const OUString& rReplace, bool bAll)
 {
     Scheduler::ProcessEventsToIdle();
 
     SvxSearchCmd eSearch = bAll ? SvxSearchCmd::REPLACE_ALL : SvxSearchCmd::REPLACE;
 
     uno::Sequence<beans::PropertyValue> aPropertyValues(comphelper::InitPropertySequence({
-        { "SearchItem.SearchString", uno::makeAny(rKey) },
-        { "SearchItem.ReplaceString", uno::makeAny(rReplace) },
-        { "SearchItem.Command", uno::makeAny(sal_uInt16(eSearch)) },
+        { "SearchItem.SearchString", uno::Any(rKey) },
+        { "SearchItem.ReplaceString", uno::Any(rReplace) },
+        { "SearchItem.Command", uno::Any(sal_uInt16(eSearch)) },
     }));
 
-    comphelper::dispatchCommand(".uno:ExecuteSearch", aPropertyValues);
+    dispatchCommand(mxComponent, ".uno:ExecuteSearch", aPropertyValues);
     Scheduler::ProcessEventsToIdle();
 }
 
+namespace
+{
 SdrObject* lclGetSelectedObject(sd::ViewShell* pViewShell)
 {
     SdrView* pSdrView = pViewShell->GetView();
@@ -634,7 +625,7 @@ void LOKitSearchTest::testSearchIn2MixedObjects()
         SdrObject* pObject = pPage->GetObj(0);
         CPPUNIT_ASSERT(pObject);
 
-        CPPUNIT_ASSERT_EQUAL(OBJ_TEXT, pObject->GetObjIdentifier());
+        CPPUNIT_ASSERT_EQUAL(SdrObjKind::Text, pObject->GetObjIdentifier());
     }
 
     // Check Object 2
@@ -642,7 +633,7 @@ void LOKitSearchTest::testSearchIn2MixedObjects()
         SdrObject* pObject = pPage->GetObj(1);
         CPPUNIT_ASSERT(pObject);
 
-        CPPUNIT_ASSERT_EQUAL(OBJ_GRAF, pObject->GetObjIdentifier());
+        CPPUNIT_ASSERT_EQUAL(SdrObjKind::Graphic, pObject->GetObjIdentifier());
 
         SdrGrafObj* pGraphicObject = dynamic_cast<SdrGrafObj*>(pObject);
         CPPUNIT_ASSERT(pGraphicObject);
@@ -725,14 +716,14 @@ void LOKitSearchTest::testSearchIn6MixedObjects()
     {
         SdrObject* pObject = pPage->GetObj(0);
         CPPUNIT_ASSERT(pObject);
-        CPPUNIT_ASSERT_EQUAL(OBJ_TEXT, pObject->GetObjIdentifier());
+        CPPUNIT_ASSERT_EQUAL(SdrObjKind::Text, pObject->GetObjIdentifier());
     }
 
     // Check Object 2
     {
         SdrObject* pObject = pPage->GetObj(1);
         CPPUNIT_ASSERT(pObject);
-        CPPUNIT_ASSERT_EQUAL(OBJ_GRAF, pObject->GetObjIdentifier());
+        CPPUNIT_ASSERT_EQUAL(SdrObjKind::Graphic, pObject->GetObjIdentifier());
         SdrGrafObj* pGraphicObject = dynamic_cast<SdrGrafObj*>(pObject);
         CPPUNIT_ASSERT(pGraphicObject);
         auto const& pVectorGraphicData = pGraphicObject->GetGraphic().getVectorGraphicData();
@@ -744,21 +735,21 @@ void LOKitSearchTest::testSearchIn6MixedObjects()
     {
         SdrObject* pObject = pPage->GetObj(2);
         CPPUNIT_ASSERT(pObject);
-        CPPUNIT_ASSERT_EQUAL(OBJ_CUSTOMSHAPE, pObject->GetObjIdentifier());
+        CPPUNIT_ASSERT_EQUAL(SdrObjKind::CustomShape, pObject->GetObjIdentifier());
     }
 
     // Check Object 4
     {
         SdrObject* pObject = pPage->GetObj(3);
         CPPUNIT_ASSERT(pObject);
-        CPPUNIT_ASSERT_EQUAL(OBJ_CUSTOMSHAPE, pObject->GetObjIdentifier());
+        CPPUNIT_ASSERT_EQUAL(SdrObjKind::CustomShape, pObject->GetObjIdentifier());
     }
 
     // Check Object 5
     {
         SdrObject* pObject = pPage->GetObj(4);
         CPPUNIT_ASSERT(pObject);
-        CPPUNIT_ASSERT_EQUAL(OBJ_GRAF, pObject->GetObjIdentifier());
+        CPPUNIT_ASSERT_EQUAL(SdrObjKind::Graphic, pObject->GetObjIdentifier());
         SdrGrafObj* pGraphicObject = dynamic_cast<SdrGrafObj*>(pObject);
         CPPUNIT_ASSERT(pGraphicObject);
         auto const& pVectorGraphicData = pGraphicObject->GetGraphic().getVectorGraphicData();
@@ -770,7 +761,7 @@ void LOKitSearchTest::testSearchIn6MixedObjects()
     {
         SdrObject* pObject = pPage->GetObj(5);
         CPPUNIT_ASSERT(pObject);
-        CPPUNIT_ASSERT_EQUAL(OBJ_GRAF, pObject->GetObjIdentifier());
+        CPPUNIT_ASSERT_EQUAL(SdrObjKind::Graphic, pObject->GetObjIdentifier());
         SdrGrafObj* pGraphicObject = dynamic_cast<SdrGrafObj*>(pObject);
         CPPUNIT_ASSERT(pGraphicObject);
         auto const& pVectorGraphicData = pGraphicObject->GetGraphic().getVectorGraphicData();

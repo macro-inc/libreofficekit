@@ -16,15 +16,7 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef __com_sun_star_beans_XTolerantMultiPropertySet_idl__
-#define __com_sun_star_beans_XTolerantMultiPropertySet_idl__
 
-
-#include <com/sun/star/uno/XInterface.idl>
-#include <com/sun/star/beans/GetDirectPropertyTolerantResult.idl>
-#include <com/sun/star/beans/GetPropertyTolerantResult.idl>
-#include <com/sun/star/beans/SetPropertyTolerantFailed.idl>
-#include <com/sun/star/lang/IllegalArgumentException.idl>
 
 
 
@@ -121,7 +113,7 @@ published interface XTolerantMultiPropertySet : com::sun::star::uno::XInterface
         @returns
             a sequence of type
             com::sun::star::beans::GetDirectPropertyTolerantResult
-            but only for those properties supplied whoms state is
+            but only for those properties supplied whose state is
             com::sun::star::beans::PropertyState::DIRECT_VALUE.
      */
     sequence< com::sun::star::beans::GetDirectPropertyTolerantResult > getDirectPropertyValuesTolerant(
@@ -131,7 +123,5 @@ published interface XTolerantMultiPropertySet : com::sun::star::uno::XInterface
 
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

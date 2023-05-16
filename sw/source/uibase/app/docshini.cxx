@@ -31,11 +31,11 @@
 #include <sfx2/printer.hxx>
 #include <svl/asiancfg.hxx>
 #include <svl/intitem.hxx>
-#include <tools/UnitConversion.hxx>
 #include <editeng/adjustitem.hxx>
 #include <editeng/autokernitem.hxx>
 #include <com/sun/star/document/UpdateDocMode.hpp>
 #include <com/sun/star/i18n/ScriptType.hpp>
+#include <svx/compatflags.hxx>
 #include <svx/svxids.hrc>
 #include <editeng/fhgtitem.hxx>
 #include <editeng/fontitem.hxx>
@@ -74,7 +74,6 @@
 #include <swerror.h>
 #include <unochart.hxx>
 #include <drawdoc.hxx>
-#include <DocumentSettingManager.hxx>
 
 #include <svx/CommonStyleManager.hxx>
 
@@ -478,10 +477,14 @@ bool  SwDocShell::Load( SfxMedium& rMedium )
         // (if required, they will be overridden later when settings will be read)
         if (IsOwnStorageFormat(rMedium))
         {
-            // legacy processing for tdf#99729
-            if (m_xDoc->getIDocumentDrawModelAccess().GetDrawModel())
-                m_xDoc->getIDocumentDrawModelAccess().GetDrawModel()->SetAnchoredTextOverflowLegacy(
-                    true);
+            SwDrawModel* pDrawModel = m_xDoc->getIDocumentDrawModelAccess().GetDrawModel();
+            if (pDrawModel)
+            {
+                pDrawModel->SetCompatibilityFlag(SdrCompatibilityFlag::AnchoredTextOverflowLegacy,
+                                                 true); // legacy processing for tdf#99729
+                pDrawModel->SetCompatibilityFlag(SdrCompatibilityFlag::LegacySingleLineFontwork,
+                                                 true); // legacy processing for tdf#148000
+            }
         }
 
         // Loading
@@ -661,6 +664,7 @@ void SwDocShell::SubInitNew()
         SvxHyphenZoneItem aHyp( m_xDoc->GetDefault(RES_PARATR_HYPHENZONE)  );
         aHyp.GetMinLead()   = static_cast< sal_uInt8 >(aLinguOpt.nHyphMinLeading);
         aHyp.GetMinTrail()  = static_cast< sal_uInt8 >(aLinguOpt.nHyphMinTrailing);
+        aHyp.GetMinWordLength()  = static_cast< sal_uInt8 >(aLinguOpt.nHyphMinWordLength);
 
         aDfltSet.Put( aHyp );
 

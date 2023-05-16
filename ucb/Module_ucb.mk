@@ -31,17 +31,11 @@ $(eval $(call gb_Module_add_targets,ucb,\
 ))
 endif
 
-ifeq ($(WITH_WEBDAV),curl)
+ifneq ($(WITH_WEBDAV),)
 
 $(eval $(call gb_Module_add_check_targets,ucb,\
     CppunitTest_ucb_webdav_core \
 ))
-
-endif
-
-ifeq ($(WITH_WEBDAV),serf)
-
-## Placeholder for future serf local test implementation
 
 endif
 

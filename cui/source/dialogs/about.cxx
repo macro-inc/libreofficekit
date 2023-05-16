@@ -17,9 +17,14 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <sal/config.h>
+
+#include <cassert>
+
 #include <about.hxx>
 
 #include <osl/process.h>     //osl_getProcessLocale
+#include <rtl/bootstrap.hxx>
 #include <sal/log.hxx>       //SAL_WARN
 #include <vcl/settings.hxx>  //GetSettings
 #include <vcl/svapp.hxx>     //Application::
@@ -113,7 +118,7 @@ AboutDialog::AboutDialog(weld::Window *pParent)
   }
 
   // Links
-  m_pCreditsButton->set_uri(CuiResId(RID_SVXSTR_ABOUT_CREDITS_URL));
+  m_pCreditsButton->set_uri(officecfg::Office::Common::Menus::CreditsURL::get());
 
   OUString sURL(officecfg::Office::Common::Help::StartCenter::InfoURL::get());
   // localizeWebserviceURI(sURL);
@@ -132,8 +137,8 @@ AboutDialog::AboutDialog(weld::Window *pParent)
 
 AboutDialog::~AboutDialog() {}
 
-bool AboutDialog::IsStringValidGitHash(const OUString &hash) {
-  for (int i = 0; i < hash.getLength(); i++) {
+bool AboutDialog::IsStringValidGitHash(std::u16string_view hash) {
+  for (size_t i = 0; i < hash.size(); i++) {
     if (!std::isxdigit(hash[i])) {
       return false;
     }
@@ -142,13 +147,10 @@ bool AboutDialog::IsStringValidGitHash(const OUString &hash) {
 }
 
 OUString AboutDialog::GetVersionString() {
-  OUString sVersion = CuiResId(TranslateId(nullptr, "%ABOUTBOXPRODUCTVERSION%ABOUTBOXPRODUCTVERSIONSUFFIX"));
-
-#ifdef _WIN64
-  sVersion += " (x64)";
-#elif defined(_WIN32)
-  sVersion += " (x86)";
-#endif
+  OUString arch;
+  auto const ok = rtl::Bootstrap::get("_ARCH", arch);
+  assert(ok); (void) ok;
+  OUString sVersion = CuiResId(TranslateId(nullptr, "%ABOUTBOXPRODUCTVERSION%ABOUTBOXPRODUCTVERSIONSUFFIX")) + " (" + arch + ")";
 
 #if HAVE_FEATURE_COMMUNITY_FLAVOR
   sVersion += " / LibreOffice Community";
@@ -188,9 +190,9 @@ OUString AboutDialog::GetLocaleString(const bool bLocalized) {
       Application::GetSettings().GetUILanguageTag().getBcp47();
   OUString sUILocaleStr;
   if (bLocalized)
-     sUILocaleStr = CuiResId(RID_SVXSTR_ABOUT_UILOCALE);
+     sUILocaleStr = CuiResId(RID_CUISTR_ABOUT_UILOCALE);
   else
-     sUILocaleStr = Translate::get(RID_SVXSTR_ABOUT_UILOCALE, Translate::Create("cui", LanguageTag("en-US")));
+     sUILocaleStr = Translate::get(RID_CUISTR_ABOUT_UILOCALE, Translate::Create("cui", LanguageTag("en-US")));
 
   if (sUILocaleStr.indexOf("$LOCALE") == -1) {
     SAL_WARN("cui.dialogs", "translated uilocale string in translations "
@@ -212,14 +214,11 @@ OUString AboutDialog::GetMiscString() {
     sMisc = EXTRA_BUILDID "\n";
   }
 
-  OUString aCalcMode = "Calc: "; // Calc calculation mode
+  OUString aCalcMode; // Calc calculation mode
 
 #if HAVE_FEATURE_OPENCL
-  bool bOpenCL = openclwrapper::GPUEnv::isOpenCLEnabled();
-  if (bOpenCL)
-    aCalcMode += "CL";
-#else
-  const bool bOpenCL = false;
+  if (openclwrapper::GPUEnv::isOpenCLEnabled())
+    aCalcMode += " CL";
 #endif
 
   static const bool bThreadingProhibited =
@@ -227,32 +226,31 @@ OUString AboutDialog::GetMiscString() {
   bool bThreadedCalc = officecfg::Office::Calc::Formula::Calculation::
       UseThreadedCalculationForFormulaGroups::get();
 
-  if (!bThreadingProhibited && !bOpenCL && bThreadedCalc) {
-    if (!aCalcMode.endsWith(" "))
-      aCalcMode += " ";
-    aCalcMode += "threaded";
+  if (!bThreadingProhibited && bThreadedCalc) {
+    aCalcMode += " threaded";
   }
 
   if (officecfg::Office::Calc::Defaults::Sheet::JumboSheets::get())
   {
-    if (!aCalcMode.endsWith(" "))
-      aCalcMode += " ";
-    aCalcMode += "Jumbo";
+    aCalcMode += " Jumbo";
   }
-  sMisc += aCalcMode;
+
+  if (aCalcMode.isEmpty())
+      aCalcMode = " default";
+  sMisc += "Calc:" + aCalcMode;
 
   return sMisc;
 }
 
 OUString AboutDialog::GetCopyrightString() {
-  OUString sVendorTextStr(CuiResId(RID_SVXSTR_ABOUT_VENDOR));
+  OUString sVendorTextStr(CuiResId(RID_CUISTR_ABOUT_VENDOR));
   OUString aCopyrightString =
-      sVendorTextStr + "\n" + CuiResId(RID_SVXSTR_ABOUT_COPYRIGHT) + "\n";
+      sVendorTextStr + "\n" + CuiResId(RID_CUISTR_ABOUT_COPYRIGHT) + "\n";
 
   if (utl::ConfigManager::getProductName() == "LibreOffice")
-    aCopyrightString += CuiResId(RID_SVXSTR_ABOUT_BASED_ON);
+    aCopyrightString += CuiResId(RID_CUISTR_ABOUT_BASED_ON);
   else
-    aCopyrightString += CuiResId(RID_SVXSTR_ABOUT_DERIVED);
+    aCopyrightString += CuiResId(RID_CUISTR_ABOUT_DERIVED);
 
   return aCopyrightString;
 }

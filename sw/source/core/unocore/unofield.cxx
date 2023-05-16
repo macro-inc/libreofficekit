@@ -43,6 +43,7 @@
 #include <sfx2/linkmgr.hxx>
 #include <editsh.hxx>
 #include <viewsh.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <comphelper/string.hxx>
 #include <cppuhelper/supportsservice.hxx>
@@ -80,7 +81,7 @@
 #include <svx/dataaccessdescriptor.hxx>
 #include <o3tl/any.hxx>
 #include <o3tl/safeint.hxx>
-#include <osl/mutex.hxx>
+#include <mutex>
 #include <vcl/svapp.hxx>
 #include <textapi.hxx>
 #include <fmtmeta.hxx>
@@ -291,16 +292,16 @@ static sal_uInt16 lcl_GetPropMapIdForFieldType( SwFieldIds nWhich )
 
 static sal_Int32 lcl_PropName2TokenPos(std::u16string_view rPropertyName)
 {
-    if (rPropertyName == u"" UNO_NAME_DDE_COMMAND_TYPE)
+    if (rPropertyName == UNO_NAME_DDE_COMMAND_TYPE)
         return 0;
 
-    if (rPropertyName == u"" UNO_NAME_DDE_COMMAND_FILE)
+    if (rPropertyName == UNO_NAME_DDE_COMMAND_FILE)
         return 1;
 
-    if (rPropertyName == u"" UNO_NAME_DDE_COMMAND_ELEMENT)
+    if (rPropertyName == UNO_NAME_DDE_COMMAND_ELEMENT)
         return 2;
 
-    if (rPropertyName == u"" UNO_NAME_IS_AUTOMATIC_UPDATE)
+    if (rPropertyName == UNO_NAME_IS_AUTOMATIC_UPDATE)
         return 3;
 
     return SAL_MAX_INT32;
@@ -403,12 +404,11 @@ static sal_uInt16 lcl_GetPropertyMapOfService( SwServiceType nServiceId )
 class SwXFieldMaster::Impl
     : public SvtListener
 {
-private:
-    ::osl::Mutex m_Mutex; // just for OInterfaceContainerHelper2
-
 public:
-    uno::WeakReference<uno::XInterface> m_wThis;
-    ::comphelper::OInterfaceContainerHelper2 m_EventListeners;
+    std::mutex m_Mutex; // just for OInterfaceContainerHelper4
+
+    unotools::WeakReference<SwXFieldMaster> m_wThis;
+    ::comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_EventListeners;
 
     SwDoc*          m_pDoc;
     SwFieldType* m_pType;
@@ -425,8 +425,7 @@ public:
     sal_Int32       m_nParam2;
 
     Impl(SwPageDesc* const pPageDesc, SwDoc* pDoc, SwFieldIds nResId)
-        : m_EventListeners(m_Mutex)
-        , m_pDoc(pDoc)
+        : m_pDoc(pDoc)
         , m_pType(nullptr)
         , m_nResTypeId(nResId)
         , m_fParam1(0.0)
@@ -438,8 +437,7 @@ public:
     }
 
     Impl(SwFieldType* const pType, SwDoc* pDoc, SwFieldIds nResId)
-        : m_EventListeners(m_Mutex)
-        , m_pDoc(pDoc)
+        : m_pDoc(pDoc)
         , m_pType(pType)
         , m_nResTypeId(nResId)
         , m_fParam1(0.0)
@@ -534,15 +532,15 @@ SwXFieldMaster::~SwXFieldMaster()
 {
 }
 
-uno::Reference<beans::XPropertySet>
+rtl::Reference<SwXFieldMaster>
 SwXFieldMaster::CreateXFieldMaster(SwDoc * pDoc, SwFieldType *const pType,
         SwFieldIds nResId)
 {
     // re-use existing SwXFieldMaster
-    uno::Reference<beans::XPropertySet> xFM;
+    rtl::Reference<SwXFieldMaster> xFM;
     if (pType)
     {
-        xFM = pType->GetXObject();
+        xFM = dynamic_cast<SwXFieldMaster*>(pType->GetXObject().get().get());
     }
     if (!xFM.is())
     {
@@ -555,7 +553,7 @@ SwXFieldMaster::CreateXFieldMaster(SwDoc * pDoc, SwFieldType *const pType,
             pType->SetXObject(xFM);
         }
         // need a permanent Reference to initialize m_wThis
-        pFM->m_pImpl->m_wThis = xFM;
+        pFM->m_pImpl->m_wThis = xFM.get();
     }
     return xFM;
 }
@@ -793,7 +791,7 @@ SwFieldType* SwXFieldMaster::GetFieldType(bool const bDontCreate) const
         aData.sCommand = m_pImpl->m_sParam2;
         aData.nCommandType = m_pImpl->m_nParam2;
 
-        SwDBFieldType aType(m_pImpl->m_pDoc, m_pImpl->m_sParam3, aData);
+        SwDBFieldType aType(m_pImpl->m_pDoc, m_pImpl->m_sParam3, std::move(aData));
         SwFieldType *const pType = m_pImpl->m_pDoc->getIDocumentFieldsAccess().InsertFieldType(aType);
         m_pImpl->SetFieldType(pType);
     }
@@ -826,7 +824,7 @@ SwXFieldMaster::getPropertyValue(const OUString& rPropertyName)
             pType->GatherFields(vpFields);
             uno::Sequence<uno::Reference <text::XDependentTextField> > aSeq(vpFields.size());
             std::transform(vpFields.begin(), vpFields.end(), aSeq.getArray(),
-                    [this](SwFormatField* pF) { return uno::Reference<text::XDependentTextField>(SwXTextField::CreateXTextField(m_pImpl->m_pDoc, pF), uno::UNO_QUERY); });
+                    [this](SwFormatField* pF) { return uno::Reference<text::XDependentTextField>(SwXTextField::CreateXTextField(m_pImpl->m_pDoc, pF)); });
             aRet <<= aSeq;
         }
         else
@@ -971,15 +969,15 @@ void SAL_CALL SwXFieldMaster::dispose()
 void SAL_CALL SwXFieldMaster::addEventListener(
         const uno::Reference<lang::XEventListener> & xListener)
 {
-    // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.addInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.addInterface(aGuard, xListener);
 }
 
 void SAL_CALL SwXFieldMaster::removeEventListener(
         const uno::Reference<lang::XEventListener> & xListener)
 {
-    // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.removeInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.removeInterface(aGuard, xListener);
 }
 
 void SwXFieldMaster::Impl::Notify(const SfxHint& rHint)
@@ -994,7 +992,8 @@ void SwXFieldMaster::Impl::Notify(const SfxHint& rHint)
             return;
         }
         lang::EventObject const ev(xThis);
-        m_EventListeners.disposeAndClear(ev);
+        std::unique_lock aGuard(m_Mutex);
+        m_EventListeners.disposeAndClear(aGuard, ev);
     }
 }
 
@@ -1043,6 +1042,8 @@ struct SwFieldProperties_Impl
     OUString    sPar2;
     OUString    sPar3;
     OUString    sPar4;
+    OUString    sPar5;
+    OUString    sPar6;
     Date            aDate;
     double          fDouble;
     uno::Sequence<beans::PropertyValue> aPropSeq;
@@ -1083,14 +1084,13 @@ struct SwFieldProperties_Impl
 class SwXTextField::Impl
     : public SvtListener
 {
-private:
-    ::osl::Mutex m_Mutex; // just for OInterfaceContainerHelper2
+public:
+    std::mutex m_Mutex; // just for OInterfaceContainerHelper4
     SwFieldType* m_pFieldType;
     SwFormatField* m_pFormatField;
 
-public:
-    uno::WeakReference<uno::XInterface> m_wThis;
-    ::comphelper::OInterfaceContainerHelper2 m_EventListeners;
+    unotools::WeakReference<SwXTextField> m_wThis;
+    ::comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_EventListeners;
 
     SwDoc* m_pDoc;
     rtl::Reference<SwTextAPIObject> m_xTextObject;
@@ -1103,7 +1103,6 @@ public:
     Impl(SwDoc *const pDoc, SwFormatField *const pFormat, SwServiceType nServiceId)
         : m_pFieldType(nullptr)
         , m_pFormatField(pFormat)
-        , m_EventListeners(m_Mutex)
         , m_pDoc(pDoc)
         , m_bIsDescriptor(pFormat == nullptr)
         , m_bCallUpdate(false)
@@ -1215,14 +1214,14 @@ SwXTextField::~SwXTextField()
 {
 }
 
-uno::Reference<text::XTextField>
+rtl::Reference<SwXTextField>
 SwXTextField::CreateXTextField(SwDoc *const pDoc, SwFormatField const* pFormat,
         SwServiceType nServiceId)
 {
     assert(!pFormat || pDoc);
     assert(pFormat || nServiceId != SwServiceType::Invalid);
     // re-use existing SwXTextField
-    uno::Reference<text::XTextField> xField;
+    rtl::Reference<SwXTextField> xField;
     if (pFormat)
     {
         xField = pFormat->GetXTextField();
@@ -1238,7 +1237,7 @@ SwXTextField::CreateXTextField(SwDoc *const pDoc, SwFormatField const* pFormat,
             const_cast<SwFormatField *>(pFormat)->SetXTextField(xField);
         }
         // need a permanent Reference to initialize m_wThis
-        pField->m_pImpl->m_wThis = xField;
+        pField->m_pImpl->m_wThis = xField.get();
     }
     return xField;
 }
@@ -1263,10 +1262,10 @@ SwServiceType SwXTextField::GetServiceId() const
 void SwXTextField::TransmuteLeadToInputField(SwSetExpField & rField)
 {
     assert(rField.GetFormatField()->Which() == (rField.GetInputFlag() ? RES_TXTATR_INPUTFIELD : RES_TXTATR_FIELD));
-    uno::Reference<text::XTextField> const xField(
+    rtl::Reference<SwXTextField> const xField(
         rField.GetFormatField()->GetXTextField());
     SwXTextField *const pXField = xField.is()
-        ? comphelper::getFromUnoTunnel<SwXTextField>(uno::Reference<lang::XUnoTunnel>(xField, uno::UNO_QUERY_THROW))
+        ? comphelper::getFromUnoTunnel<SwXTextField>(uno::Reference<lang::XUnoTunnel>(xField))
         : nullptr;
     if (pXField)
         pXField->m_pImpl->SetFormatField(nullptr, nullptr);
@@ -1282,13 +1281,13 @@ void SwXTextField::TransmuteLeadToInputField(SwSetExpField & rField)
     IDocumentContentOperations & rIDCO(rNode.GetDoc().getIDocumentContentOperations());
     SwTextField::GetPamForTextField(*pOldAttr, pPamForTextField);
     assert(pPamForTextField);
-    sal_Int32 const nStart(pPamForTextField->Start()->nContent.GetIndex());
+    sal_Int32 const nStart(pPamForTextField->Start()->GetContentIndex());
     rIDCO.DeleteAndJoin(*pPamForTextField);
     // ATTENTION: rField is dead now! hope nobody accesses it...
     bool bSuccess = rIDCO.InsertPoolItem(*pPamForTextField, tempFormat);
     assert(bSuccess);
     (void) bSuccess;
-    SwTextField const* pNewAttr(rNode.GetFieldTextAttrAt(nStart, true));
+    SwTextField const* pNewAttr(rNode.GetFieldTextAttrAt(nStart, ::sw::GetTextAttrMode::Default));
     assert(pNewAttr);
     SwFormatField const& rNewFormat(pNewAttr->GetFormatField());
     assert(rNewFormat.Which() == (static_cast<SwSetExpField const*>(rNewFormat.GetField())->GetInputFlag() ? RES_TXTATR_INPUTFIELD : RES_TXTATR_FIELD));
@@ -1328,6 +1327,8 @@ SwXTextField::getTextFieldMaster()
     SolarMutexGuard aGuard;
 
     SwFieldType* pType = m_pImpl->GetFieldType();
+    if (!pType && !m_pImpl->m_pDoc) // tdf#152619
+        return nullptr;
     uno::Reference<beans::XPropertySet> const xRet(
             SwXFieldMaster::CreateXFieldMaster(m_pImpl->m_pDoc, pType));
     return xRet;
@@ -1376,6 +1377,14 @@ void SAL_CALL SwXTextField::attach(
                     {
                         aDateTime = *(m_pImpl->m_pProps->pDateTime);
                     }
+
+                    sal_uInt32 nImportedId = 0;
+                    if (!m_pImpl->m_pProps->sPar6.isEmpty())
+                        nImportedId = m_pImpl->m_pProps->sPar6.toInt32(16);
+                    sal_uInt32 nParentId = 0;
+                    if (!m_pImpl->m_pProps->sPar5.isEmpty())
+                        nParentId = m_pImpl->m_pProps->sPar5.toInt32(16);
+
                     SwPostItField* pPostItField = new SwPostItField(
                         static_cast<SwPostItFieldType*>(pFieldType),
                         m_pImpl->m_pProps->sPar1, // author
@@ -1383,7 +1392,10 @@ void SAL_CALL SwXTextField::attach(
                         m_pImpl->m_pProps->sPar3, // author's initials
                         m_pImpl->m_pProps->sPar4, // name
                         aDateTime,
-                        m_pImpl->m_pProps->bBool1 // resolvedflag
+                        m_pImpl->m_pProps->bBool1, // resolvedflag
+                        0, // id
+                        nParentId, // parent id
+                        nImportedId // imported para id
                     );
                     if ( m_pImpl->m_xTextObject.is() )
                     {
@@ -1881,7 +1893,7 @@ void SAL_CALL SwXTextField::attach(
                 SwAuthorityFieldType const type(pDoc);
                 xField.reset(new SwAuthorityField(static_cast<SwAuthorityFieldType*>(
                             pDoc->getIDocumentFieldsAccess().InsertFieldType(type)),
-                        OUString()));
+                        u""));
                 if (m_pImpl->m_pProps->aPropSeq.hasElements())
                 {
                     uno::Any aVal;
@@ -1964,12 +1976,13 @@ void SAL_CALL SwXTextField::attach(
         else
             pDoc->getIDocumentContentOperations().InsertPoolItem(aPam, aFormat, nInsertFlags);
 
-        SwTextAttr* pTextAttr = aPam.GetNode().GetTextNode()->GetFieldTextAttrAt( aPam.GetPoint()->nContent.GetIndex()-1, true );
+        SwTextAttr* pTextAttr = aPam.GetPointNode().GetTextNode()->GetFieldTextAttrAt(aPam.GetPoint()->GetContentIndex()-1, ::sw::GetTextAttrMode::Default);
 
         // What about updating the fields? (see fldmgr.cxx)
         if (!pTextAttr)
             throw uno::RuntimeException("no SwTextAttr inserted?");  // could theoretically happen, if paragraph is full
 
+        m_pImpl->ClearFieldType();
         const SwFormatField& rField = pTextAttr->GetFormatField();
         m_pImpl->SetFormatField(const_cast<SwFormatField*>(&rField), pDoc);
 
@@ -1991,9 +2004,8 @@ void SAL_CALL SwXTextField::attach(
         assert(m_pImpl->GetFormatField());
         m_pImpl->m_pDoc = pDoc;
         m_pImpl->GetFormatField()->SetXTextField(this);
-        m_pImpl->m_wThis = *this;
+        m_pImpl->m_wThis = this;
         m_pImpl->m_bIsDescriptor = false;
-        m_pImpl->ClearFieldType();
         m_pImpl->m_pProps.reset();
         if (m_pImpl->m_bCallUpdate)
             update();
@@ -2002,7 +2014,8 @@ void SAL_CALL SwXTextField::attach(
               && m_pImpl->m_pDoc != nullptr
               && m_pImpl->m_nServiceId == SwServiceType::FieldTypeAnnotation )
     {
-        SwUnoInternalPaM aIntPam( *m_pImpl->m_pDoc );
+        SwDoc* pDoc = m_pImpl->m_pDoc;
+        SwUnoInternalPaM aIntPam( *pDoc );
         if ( !::sw::XTextRangeToSwPaM( aIntPam, xTextRange ) )
             throw lang::IllegalArgumentException();
 
@@ -2010,13 +2023,13 @@ void SAL_CALL SwXTextField::attach(
         // value.
         if (!aIntPam.HasMark() || *aIntPam.Start() != *aIntPam.End())
         {
-            UnoActionContext aCont( m_pImpl->m_pDoc );
+            UnoActionContext aCont( pDoc );
             // insert copy of annotation at new text range
             std::unique_ptr<SwPostItField> pPostItField(static_cast< SwPostItField* >(m_pImpl->GetFormatField()->GetField()->CopyField().release()));
             SwFormatField aFormatField( *pPostItField );
             pPostItField.reset();
             SwPaM aEnd( *aIntPam.End(), *aIntPam.End() );
-            m_pImpl->m_pDoc->getIDocumentContentOperations().InsertPoolItem( aEnd, aFormatField );
+            pDoc->getIDocumentContentOperations().InsertPoolItem( aEnd, aFormatField );
             // delete former annotation
             {
                 const SwTextField* pTextField = m_pImpl->GetFormatField()->GetTextField();
@@ -2024,14 +2037,14 @@ void SAL_CALL SwXTextField::attach(
                 SwPaM aPam( rTextNode, pTextField->GetStart() );
                 aPam.SetMark();
                 aPam.Move();
-                m_pImpl->m_pDoc->getIDocumentContentOperations().DeleteAndJoin(aPam);
+                pDoc->getIDocumentContentOperations().DeleteAndJoin(aPam);
             }
             // keep inserted annotation
             {
-                SwTextField* pTextAttr = aEnd.GetNode().GetTextNode()->GetFieldTextAttrAt( aEnd.End()->nContent.GetIndex()-1, true );
+                SwTextField *const pTextAttr = aEnd.GetPointNode().GetTextNode()->GetFieldTextAttrAt(aEnd.End()->GetContentIndex()-1, ::sw::GetTextAttrMode::Default);
                 if ( pTextAttr != nullptr )
                 {
-                    m_pImpl->SetFormatField(const_cast<SwFormatField*>(&pTextAttr->GetFormatField()), m_pImpl->m_pDoc);
+                    m_pImpl->SetFormatField(const_cast<SwFormatField*>(&pTextAttr->GetFormatField()), pDoc);
 
                     if ( *aIntPam.GetPoint() != *aIntPam.GetMark() )
                     {
@@ -2086,7 +2099,7 @@ SwXTextField::getAnchor()
         }
     }
 
-    uno::Reference<text::XTextRange> xRange = SwXTextRange::CreateXTextRange(
+    rtl::Reference<SwXTextRange> xRange = SwXTextRange::CreateXTextRange(
             *m_pImpl->m_pDoc, *(pPamForTextField->GetPoint()), pPamForTextField->GetMark());
     return xRange;
 }
@@ -2113,15 +2126,15 @@ void SAL_CALL SwXTextField::dispose()
 void SAL_CALL SwXTextField::addEventListener(
         const uno::Reference<lang::XEventListener> & xListener)
 {
-    // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.addInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.addInterface(aGuard, xListener);
 }
 
 void SAL_CALL SwXTextField::removeEventListener(
         const uno::Reference<lang::XEventListener> & xListener)
 {
-    // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.removeInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.removeInterface(aGuard, xListener);
 }
 
 uno::Reference< beans::XPropertySetInfo > SAL_CALL
@@ -2181,8 +2194,7 @@ SwXTextField::setPropertyValue(
             const SwTextField* pTextField = m_pImpl->GetFormatField()->GetTextField();
             if(!pTextField)
                 throw uno::RuntimeException();
-            SwPosition aPosition( pTextField->GetTextNode() );
-            aPosition.nContent = pTextField->GetStart();
+            SwPosition aPosition( pTextField->GetTextNode(), pTextField->GetStart() );
             pDoc->getIDocumentFieldsAccess().PutValueToField( aPosition, rValue, pEntry->nWID);
         }
 
@@ -2222,6 +2234,12 @@ SwXTextField::setPropertyValue(
             break;
         case FIELD_PROP_PAR4:
             rValue >>= m_pImpl->m_pProps->sPar4;
+            break;
+        case FIELD_PROP_PAR5:
+            rValue >>= m_pImpl->m_pProps->sPar5;
+            break;
+        case FIELD_PROP_PAR6:
+            rValue >>= m_pImpl->m_pProps->sPar6;
             break;
         case FIELD_PROP_FORMAT:
             rValue >>= m_pImpl->m_pProps->nFormat;
@@ -2423,6 +2441,12 @@ uno::Any SAL_CALL SwXTextField::getPropertyValue(const OUString& rPropertyName)
             case FIELD_PROP_PAR4:
                 aRet <<= m_pImpl->m_pProps->sPar4;
                 break;
+            case FIELD_PROP_PAR5:
+                aRet <<= m_pImpl->m_pProps->sPar5;
+                break;
+            case FIELD_PROP_PAR6:
+                aRet <<= m_pImpl->m_pProps->sPar6;
+                break;
             case FIELD_PROP_FORMAT:
                 aRet <<= m_pImpl->m_pProps->nFormat;
                 break;
@@ -2610,7 +2634,8 @@ void SwXTextField::Impl::Invalidate()
         return;
     }
     lang::EventObject const ev(xThis);
-    m_EventListeners.disposeAndClear(ev);
+    std::unique_lock aGuard(m_Mutex);
+    m_EventListeners.disposeAndClear(aGuard, ev);
 }
 
 void SwXTextField::Impl::Notify(const SfxHint& rHint)
@@ -2732,7 +2757,7 @@ uno::Any SwXTextFieldMasters::getByName(const OUString& rName)
 
     uno::Reference<beans::XPropertySet> const xRet(
             SwXFieldMaster::CreateXFieldMaster(GetDoc(), pType));
-    return uno::makeAny(xRet);
+    return uno::Any(xRet);
 }
 
 bool SwXTextFieldMasters::getInstanceName(
@@ -2826,13 +2851,9 @@ sal_Bool SwXTextFieldMasters::hasElements()
 
 class SwXTextFieldTypes::Impl
 {
-private:
-    ::osl::Mutex m_Mutex; // just for OInterfaceContainerHelper2
-
 public:
-    ::comphelper::OInterfaceContainerHelper2 m_RefreshListeners;
-
-    Impl() : m_RefreshListeners(m_Mutex) { }
+    std::mutex m_Mutex; // just for OInterfaceContainerHelper3
+    ::comphelper::OInterfaceContainerHelper4<util::XRefreshListener> m_RefreshListeners;
 };
 
 OUString SwXTextFieldTypes::getImplementationName()
@@ -2865,7 +2886,8 @@ void SwXTextFieldTypes::Invalidate()
 {
     SwUnoCollection::Invalidate();
     lang::EventObject const ev(static_cast< ::cppu::OWeakObject&>(*this));
-    m_pImpl->m_RefreshListeners.disposeAndClear(ev);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_RefreshListeners.disposeAndClear(aGuard, ev);
 }
 
 uno::Reference< container::XEnumeration >  SwXTextFieldTypes::createEnumeration()
@@ -2901,22 +2923,23 @@ void SAL_CALL SwXTextFieldTypes::refresh()
     }
     // call refresh listeners (without SolarMutex locked)
     lang::EventObject const event(static_cast< ::cppu::OWeakObject*>(this));
-    m_pImpl->m_RefreshListeners.notifyEach(
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_RefreshListeners.notifyEach(aGuard,
             & util::XRefreshListener::refreshed, event);
 }
 
 void SAL_CALL SwXTextFieldTypes::addRefreshListener(
         const uno::Reference<util::XRefreshListener> & xListener)
 {
-    // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_RefreshListeners.addInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_RefreshListeners.addInterface(aGuard, xListener);
 }
 
 void SAL_CALL SwXTextFieldTypes::removeRefreshListener(
         const uno::Reference<util::XRefreshListener> & xListener)
 {
-    // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_RefreshListeners.removeInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_RefreshListeners.removeInterface(aGuard, xListener);
 }
 
 class SwXFieldEnumeration::Impl
@@ -2985,7 +3008,7 @@ SwXFieldEnumeration::SwXFieldEnumeration(SwDoc & rDoc)
     IDocumentMarkAccess& rMarksAccess(*rDoc.getIDocumentMarkAccess());
     for (auto iter = rMarksAccess.getFieldmarksBegin(); iter != rMarksAccess.getFieldmarksEnd(); ++iter)
     {
-        m_pImpl->m_Items.emplace_back(SwXFieldmark::CreateXFieldmark(rDoc, *iter), uno::UNO_QUERY);
+        m_pImpl->m_Items.emplace_back(static_cast<cppu::OWeakObject*>(SwXFieldmark::CreateXFieldmark(rDoc, *iter).get()), uno::UNO_QUERY);
     }
 }
 

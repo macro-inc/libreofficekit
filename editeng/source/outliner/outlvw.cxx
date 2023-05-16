@@ -30,7 +30,7 @@
 #include <i18nlangtag/languagetag.hxx>
 
 #include <editeng/outliner.hxx>
-#include "outleeng.hxx"
+#include <outleeng.hxx>
 #include "paralist.hxx"
 #include "outlundo.hxx"
 #include <editeng/outlobj.hxx>
@@ -1045,17 +1045,15 @@ void OutlinerView::ApplyBulletsNumbering(
 
                     // Get old bullet space.
                     {
-                        const SfxPoolItem* pPoolItem=nullptr;
-                        SfxItemState eState = rAttrs.GetItemState(EE_PARA_NUMBULLET, false, &pPoolItem);
-                        if (eState != SfxItemState::SET)
+                        const SvxNumBulletItem* pNumBulletItem = rAttrs.GetItemIfSet(EE_PARA_NUMBULLET, false);
+                        if (pNumBulletItem)
                         {
                             // Use default value when has not contain bullet item.
                             ESelection aSelection(nPara, 0);
                             SfxItemSet aTmpSet(pOwner->pEditEngine->GetAttribs(aSelection));
-                            pPoolItem = aTmpSet.GetItem(EE_PARA_NUMBULLET);
+                            pNumBulletItem = aTmpSet.GetItem(EE_PARA_NUMBULLET);
                         }
 
-                        const SvxNumBulletItem* pNumBulletItem = dynamic_cast< const SvxNumBulletItem* >(pPoolItem);
                         if (pNumBulletItem)
                         {
                             const sal_uInt16 nLevelCnt = std::min(pNumBulletItem->GetNumRule().GetLevelCount(), aNewRule.GetLevelCount());
@@ -1473,7 +1471,7 @@ bool GetStatusValueForThesaurusFromContext(
     if (!isSingleScriptType(pEditEngine->GetScriptType(aTextSel)))
         return false;
 
-    LanguageType nLang = pEditEngine->GetLanguage( aTextSel.nStartPara, aTextSel.nStartPos );
+    LanguageType nLang = pEditEngine->GetLanguage( aTextSel.nStartPara, aTextSel.nStartPos ).nLang;
     OUString aLangText( LanguageTag::convertToBcp47( nLang ) );
 
     // set word and locale to look up as status value

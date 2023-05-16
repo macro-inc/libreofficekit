@@ -8,6 +8,7 @@
  */
 
 #include <swmodeltestbase.hxx>
+#include <o3tl/string_view.hxx>
 
 class Test : public SwModelTestBase
 {
@@ -15,12 +16,6 @@ public:
     Test()
         : SwModelTestBase("/sw/qa/extras/ooxmlexport/data/", "Office Open XML Text")
     {
-    }
-
-protected:
-    bool mustTestImportOf(const char* filename) const override
-    {
-        return OString(filename).endsWith(".docx");
     }
 };
 

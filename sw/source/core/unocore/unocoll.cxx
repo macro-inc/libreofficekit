@@ -33,6 +33,7 @@
 #include <txtftn.hxx>
 #include <com/sun/star/text/XTextTable.hpp>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <svtools/unoimap.hxx>
 #include <svtools/unoevent.hxx>
 #include <svx/SvxXTextColumns.hxx>
@@ -182,7 +183,7 @@ public:
     {
         if ( !hasByName( aName ) )
             throw container::NoSuchElementException();
-        return uno::makeAny( mTemplateToProject.find( aName )->second );
+        return uno::Any( mTemplateToProject.find( aName )->second );
     }
     virtual css::uno::Sequence< OUString > SAL_CALL getElementNames(  ) override
     {
@@ -251,7 +252,7 @@ public:
         uno::Reference< uno::XInterface > xDocObj = ooo::vba::createVBAUnoAPIServiceWithArgs( mpDocShell, "ooo.vba.word.Document" , aArgs );
         SAL_INFO("sw.uno",
             "Creating Object ( ooo.vba.word.Document ) 0x" << xDocObj.get());
-        return  uno::makeAny( xDocObj );
+        return  uno::Any( xDocObj );
     }
     virtual css::uno::Sequence< OUString > SAL_CALL getElementNames(  ) override
     {
@@ -502,11 +503,11 @@ uno::Sequence<OUString>     SwXServiceProvider::GetAllServiceNames()
 
 }
 
-SwServiceType  SwXServiceProvider::GetProviderType(const OUString& rServiceName)
+SwServiceType  SwXServiceProvider::GetProviderType(std::u16string_view rServiceName)
 {
     for(const ProvNamesId_Type & i : aProvNamesId)
     {
-        if (rServiceName.equalsAscii(i.pName))
+        if (o3tl::equalsAscii(rServiceName, i.pName))
             return i.nType;
     }
     return SwServiceType::Invalid;
@@ -521,39 +522,39 @@ SwXServiceProvider::MakeInstance(SwServiceType nObjectType, SwDoc & rDoc)
     {
         case  SwServiceType::TypeTextTable:
         {
-            xRet = SwXTextTable::CreateXTextTable(nullptr);
+            xRet = static_cast<cppu::OWeakObject*>(SwXTextTable::CreateXTextTable(nullptr).get());
         }
         break;
         case  SwServiceType::TypeTextFrame:
         {
-            xRet = SwXTextFrame::CreateXTextFrame(rDoc, nullptr);
+            xRet = static_cast<cppu::OWeakObject*>(SwXTextFrame::CreateXTextFrame(rDoc, nullptr).get());
         }
         break;
         case  SwServiceType::TypeGraphic  :
         case  SwServiceType::TypeTextGraphic /* #i47503# */ :
         {
-            xRet = SwXTextGraphicObject::CreateXTextGraphicObject(rDoc, nullptr);
+            xRet = static_cast<cppu::OWeakObject*>(SwXTextGraphicObject::CreateXTextGraphicObject(rDoc, nullptr).get());
 
         }
         break;
         case  SwServiceType::TypeOLE      :
         {
-            xRet = SwXTextEmbeddedObject::CreateXTextEmbeddedObject(rDoc, nullptr);
+            xRet = static_cast<cppu::OWeakObject*>(SwXTextEmbeddedObject::CreateXTextEmbeddedObject(rDoc, nullptr).get());
         }
         break;
         case  SwServiceType::TypeBookmark :
         {
-            xRet = SwXBookmark::CreateXBookmark(rDoc, nullptr);
+            xRet = static_cast<cppu::OWeakObject*>(SwXBookmark::CreateXBookmark(rDoc, nullptr).get());
         }
         break;
         case  SwServiceType::TypeFieldMark :
         {
-            xRet = SwXFieldmark::CreateXFieldmark(rDoc, nullptr);
+            xRet = static_cast<cppu::OWeakObject*>(SwXFieldmark::CreateXFieldmark(rDoc, nullptr).get());
         }
         break;
         case  SwServiceType::TypeFormFieldMark :
         {
-            xRet = SwXFieldmark::CreateXFieldmark(rDoc, nullptr, true);
+            xRet = static_cast<cppu::OWeakObject*>(SwXFieldmark::CreateXFieldmark(rDoc, nullptr, true).get());
         }
         break;
         case  SwServiceType::VbaObjectProvider :
@@ -604,10 +605,10 @@ SwXServiceProvider::MakeInstance(SwServiceType nObjectType, SwDoc & rDoc)
         break;
 
         case  SwServiceType::TypeFootnote :
-            xRet = SwXFootnote::CreateXFootnote(rDoc, nullptr);
+            xRet = static_cast<cppu::OWeakObject*>(SwXFootnote::CreateXFootnote(rDoc, nullptr).get());
         break;
         case  SwServiceType::TypeEndnote  :
-            xRet = SwXFootnote::CreateXFootnote(rDoc, nullptr, true);
+            xRet = static_cast<cppu::OWeakObject*>(SwXFootnote::CreateXFootnote(rDoc, nullptr, true).get());
         break;
         case  SwServiceType::ContentIndexMark :
         case  SwServiceType::UserIndexMark    :
@@ -618,7 +619,7 @@ SwXServiceProvider::MakeInstance(SwServiceType nObjectType, SwDoc & rDoc)
                 eType = TOX_CONTENT;
             else if(SwServiceType::UserIndexMark == nObjectType)
                 eType = TOX_USER;
-            xRet = SwXDocumentIndexMark::CreateXDocumentIndexMark(rDoc, nullptr, eType);
+            xRet = static_cast<cppu::OWeakObject*>(SwXDocumentIndexMark::CreateXDocumentIndexMark(rDoc, nullptr, eType).get());
         }
         break;
         case  SwServiceType::ContentIndex      :
@@ -650,17 +651,17 @@ SwXServiceProvider::MakeInstance(SwServiceType nObjectType, SwDoc & rDoc)
             {
                 eType = TOX_TABLES;
             }
-            xRet = SwXDocumentIndex::CreateXDocumentIndex(rDoc, nullptr, eType);
+            xRet = static_cast<cppu::OWeakObject*>(SwXDocumentIndex::CreateXDocumentIndex(rDoc, nullptr, eType).get());
         }
         break;
         case SwServiceType::IndexHeaderSection :
         case SwServiceType::TextSection :
-            xRet = SwXTextSection::CreateXTextSection(nullptr,
-                    (SwServiceType::IndexHeaderSection == nObjectType));
+            xRet = static_cast<cppu::OWeakObject*>(SwXTextSection::CreateXTextSection(nullptr,
+                    (SwServiceType::IndexHeaderSection == nObjectType)).get());
 
         break;
         case SwServiceType::ReferenceMark :
-            xRet = SwXReferenceMark::CreateXReferenceMark(rDoc, nullptr);
+            xRet = static_cast<cppu::OWeakObject*>(SwXReferenceMark::CreateXReferenceMark(rDoc, nullptr).get());
         break;
         case SwServiceType::StyleCharacter:
         case SwServiceType::StyleParagraph:
@@ -755,10 +756,10 @@ SwXServiceProvider::MakeInstance(SwServiceType nObjectType, SwDoc & rDoc)
         case SwServiceType::FieldTypeDropdown:
         case SwServiceType::FieldTypeTableFormula:
             // NOTE: the sw.SwXAutoTextEntry unoapi test depends on pDoc = 0
-            xRet = SwXTextField::CreateXTextField(nullptr, nullptr, nObjectType);
+            xRet = static_cast<cppu::OWeakObject*>(SwXTextField::CreateXTextField(nullptr, nullptr, nObjectType).get());
             break;
         case SwServiceType::FieldTypeAnnotation:
-            xRet = SwXTextField::CreateXTextField(&rDoc, nullptr, nObjectType);
+            xRet = static_cast<cppu::OWeakObject*>(SwXTextField::CreateXTextField(&rDoc, nullptr, nObjectType).get());
             break;
         case SwServiceType::FieldMasterUser:
         case SwServiceType::FieldMasterDDE:
@@ -774,7 +775,7 @@ SwXServiceProvider::MakeInstance(SwServiceType nObjectType, SwDoc & rDoc)
                 case SwServiceType::FieldMasterDatabase: nResId = SwFieldIds::Database; break;
                 default: break;
             }
-            xRet = SwXFieldMaster::CreateXFieldMaster(&rDoc, nullptr, nResId);
+            xRet = static_cast<cppu::OWeakObject*>(SwXFieldMaster::CreateXFieldMaster(&rDoc, nullptr, nResId).get());
         }
         break;
         case SwServiceType::FieldMasterBibliography:
@@ -785,11 +786,11 @@ SwXServiceProvider::MakeInstance(SwServiceType nObjectType, SwDoc & rDoc)
                 SwAuthorityFieldType aType(&rDoc);
                 pType = rDoc.getIDocumentFieldsAccess().InsertFieldType(aType);
             }
-            xRet = SwXFieldMaster::CreateXFieldMaster(&rDoc, pType);
+            xRet = static_cast<cppu::OWeakObject*>(SwXFieldMaster::CreateXFieldMaster(&rDoc, pType).get());
         }
         break;
         case SwServiceType::Paragraph:
-            xRet = SwXParagraph::CreateXParagraph(rDoc, nullptr);
+            xRet = static_cast<cppu::OWeakObject*>(SwXParagraph::CreateXParagraph(rDoc, nullptr).get());
         break;
         case SwServiceType::NumberingRules:
             xRet = static_cast<cppu::OWeakObject*>(new SwXNumberingRules(rDoc));
@@ -822,16 +823,16 @@ SwXServiceProvider::MakeInstance(SwServiceType nObjectType, SwDoc & rDoc)
 
         break;
         case SwServiceType::TypeMeta:
-            xRet = SwXMeta::CreateXMeta(rDoc, false);
+            xRet = static_cast<cppu::OWeakObject*>(SwXMeta::CreateXMeta(rDoc, false).get());
         break;
         case SwServiceType::FieldTypeMetafield:
-            xRet = SwXMeta::CreateXMeta(rDoc, true);
+            xRet = static_cast<cppu::OWeakObject*>(SwXMeta::CreateXMeta(rDoc, true).get());
         break;
         case SwServiceType::LineBreak:
-            xRet = SwXLineBreak::CreateXLineBreak(nullptr);
+            xRet = static_cast<cppu::OWeakObject*>(SwXLineBreak::CreateXLineBreak(nullptr).get());
             break;
         case SwServiceType::ContentControl:
-            xRet = SwXContentControl::CreateXContentControl(rDoc);
+            xRet = static_cast<cppu::OWeakObject*>(SwXContentControl::CreateXContentControl(rDoc).get());
         break;
         default:
             throw uno::RuntimeException();
@@ -1001,7 +1002,7 @@ namespace
         {
             uno::Reference<text::XTextFrame> const xRet(
                 SwXTextFrame::CreateXTextFrame(*rFrameFormat.GetDoc(), &rFrameFormat));
-            return uno::makeAny(xRet);
+            return uno::Any(xRet);
         }
         static bool filter(const SwNode* const pNode) { return !pNode->IsNoTextNode(); };
     };
@@ -1013,7 +1014,7 @@ namespace
         {
             uno::Reference<text::XTextContent> const xRet(
                 SwXTextGraphicObject::CreateXTextGraphicObject(*rFrameFormat.GetDoc(), &rFrameFormat));
-            return uno::makeAny(xRet);
+            return uno::Any(xRet);
         }
         static bool filter(const SwNode* const pNode) { return pNode->IsGrfNode(); };
     };
@@ -1025,7 +1026,7 @@ namespace
         {
             uno::Reference<text::XTextContent> const xRet(
                 SwXTextEmbeddedObject::CreateXTextEmbeddedObject(*rFrameFormat.GetDoc(), &rFrameFormat));
-            return uno::makeAny(xRet);
+            return uno::Any(xRet);
         }
         static bool filter(const SwNode* const pNode) { return pNode->IsOLENode(); };
     };
@@ -1423,7 +1424,7 @@ uno::Any SwXTextSections::getByIndex(sal_Int32 nIndex)
     SwSectionFormat* pFormat = rFormats[nIndex];
     xRet = GetObject(*pFormat);
 
-    return makeAny(xRet);
+    return Any(xRet);
 }
 
 uno::Any SwXTextSections::getByName(const OUString& rName)

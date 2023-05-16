@@ -34,7 +34,7 @@ namespace sw {
     class RepeatContext;
 }
 
-class IDocumentUndoRedo
+class SAL_LOPLUGIN_ANNOTATE("crosscast") IDocumentUndoRedo
 {
 public:
 
@@ -246,6 +246,7 @@ private:
     bool const m_bUndoWasEnabled;
 };
 
+/// Blocks grouping undo actions together into an SfxListUndoAction.
 class GroupUndoGuard
 {
 public:

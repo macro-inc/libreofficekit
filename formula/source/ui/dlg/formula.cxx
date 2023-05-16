@@ -25,7 +25,7 @@
 #include <sal/log.hxx>
 
 #include <unotools/charclass.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include "funcpage.hxx"
 #include <formula/formula.hxx>
@@ -281,9 +281,9 @@ FormulaDlg_Impl::FormulaDlg_Impl(weld::Dialog& rDialog,
     m_xParaWin->SetArgModifiedHdl( LINK( this, FormulaDlg_Impl, ModifyHdl ) );
     m_xParaWin->SetFxHdl( LINK( this, FormulaDlg_Impl, FxHdl ) );
 
-    m_xFuncPage.reset(new FuncPage(m_xTabCtrl->get_page("function"), _pFunctionMgr));
-    m_xStructPage.reset(new StructPage(m_xTabCtrl->get_page("struct")));
-    m_xTabCtrl->set_current_page("function");
+    m_xFuncPage.reset(new FuncPage(m_xTabCtrl->get_page("functiontab"), _pFunctionMgr));
+    m_xStructPage.reset(new StructPage(m_xTabCtrl->get_page("structtab")));
+    m_xTabCtrl->set_current_page("functiontab");
 
     m_aOldHelp = m_rDialog.get_help_id();                // HelpId from resource always for "Page 1"
 
@@ -318,8 +318,8 @@ FormulaDlg_Impl::FormulaDlg_Impl(weld::Dialog& rDialog,
 
 FormulaDlg_Impl::~FormulaDlg_Impl()
 {
-    m_xTabCtrl->remove_page("function");
-    m_xTabCtrl->remove_page("struct");
+    m_xTabCtrl->remove_page("functiontab");
+    m_xTabCtrl->remove_page("structtab");
 
     DeleteArgs();
 }
@@ -337,7 +337,7 @@ void FormulaDlg_Impl::StoreFormEditData(FormEditData* pData)
     pData->SetFStart(nStartPos);
     pData->SetSelection(Selection(nStartPos, nEndPos));
 
-    if (m_xTabCtrl->get_current_page_ident() == "function")
+    if (m_xTabCtrl->get_current_page_ident() == "functiontab")
         pData->SetMode( FormulaDlgMode::Formula );
     else
         pData->SetMode( FormulaDlgMode::Edit );
@@ -1254,7 +1254,7 @@ IMPL_LINK( FormulaDlg_Impl, FxHdl, ParaWin&, rPtr, void )
         return;
 
     m_xBtnForward->set_sensitive(true); //@ In order to be able to input another function.
-    m_xTabCtrl->set_current_page("function");
+    m_xTabCtrl->set_current_page("functiontab");
 
     OUString aUndoStr = m_pHelper->getCurrentFormula();       // it will be added before a ";"
     FormEditData* pData = m_pHelper->getFormEditData();
@@ -1456,14 +1456,22 @@ IMPL_LINK_NOARG( FormulaDlg_Impl, FormulaCursorHdl, weld::TextView&, void)
 void FormulaDlg_Impl::UpdateSelection()
 {
     m_pHelper->setSelection( m_aFuncSel.Min(), m_aFuncSel.Max());
-    m_pHelper->setCurrentFormula( m_pFuncDesc->getFormula( m_aArguments ) );
+    if (m_pFuncDesc)
+    {
+        m_pHelper->setCurrentFormula( m_pFuncDesc->getFormula( m_aArguments ) );
+        m_nArgs = m_pFuncDesc->getSuppressedArgumentCount();
+    }
+    else
+    {
+        m_pHelper->setCurrentFormula("");
+        m_nArgs = 0;
+    }
+
     m_xMEdit->set_text(m_pHelper->getCurrentFormula());
     sal_Int32 PrivStart, PrivEnd;
     m_pHelper->getSelection( PrivStart, PrivEnd);
     m_aFuncSel.Min() = PrivStart;
     m_aFuncSel.Max() = PrivEnd;
-
-    m_nArgs = m_pFuncDesc->getSuppressedArgumentCount();
 
     OUString aFormula = m_xMEdit->get_text();
     sal_Int32 nArgPos = m_aFormulaHelper.GetArgStart( aFormula, PrivStart, 0);
@@ -1580,9 +1588,9 @@ void FormulaDlg_Impl::Update()
     FormulaCursor();
     CalcStruct(sExpression);
     if (pData->GetMode() == FormulaDlgMode::Formula)
-        m_xTabCtrl->set_current_page("function");
+        m_xTabCtrl->set_current_page("functiontab");
     else
-        m_xTabCtrl->set_current_page("struct");
+        m_xTabCtrl->set_current_page("structtab");
     m_xBtnMatrix->set_active(pData->GetMatrixFlag());
 }
 
@@ -1640,7 +1648,7 @@ bool FormulaDlg_Impl::CheckMatrix(OUString& aFormula)
         m_xBtnMatrix->set_sensitive(false);
     } // if ( bMatrix )
 
-    m_xTabCtrl->set_current_page("struct");
+    m_xTabCtrl->set_current_page("structtab");
     return bMatrix;
 }
 
@@ -1712,7 +1720,7 @@ bool FormulaDlg_Impl::UpdateParaWin(Selection& _rSelection)
     if (pEd && !m_pTheRefEdit)
     {
         _rSelection = pEd->GetSelection();
-        _rSelection.Justify();
+        _rSelection.Normalize();
         aStrEd = pEd->GetText();
         m_xEdRef->SetRefString(aStrEd);
         m_xEdRef->SetSelection( _rSelection );
@@ -1720,7 +1728,7 @@ bool FormulaDlg_Impl::UpdateParaWin(Selection& _rSelection)
     else
     {
         _rSelection = m_xEdRef->GetSelection();
-        _rSelection.Justify();
+        _rSelection.Normalize();
         aStrEd = m_xEdRef->GetText();
     }
     return m_pTheRefEdit == nullptr;

@@ -103,7 +103,7 @@ void SwHTMLParser::NewDivision( HtmlTokenId nToken )
     }
 
     bool bAppended = false;
-    if( m_pPam->GetPoint()->nContent.GetIndex() )
+    if( m_pPam->GetPoint()->GetContentIndex() )
     {
         AppendTextNode( bHeader||bFooter||!aId.isEmpty()|| !aHRef.isEmpty() ? AM_NORMAL
                                                                 : AM_NOSPACE );
@@ -185,18 +185,16 @@ void SwHTMLParser::NewDivision( HtmlTokenId nToken )
 
         const SwFormatContent& rFlyContent = pHdFtFormat->GetContent();
         const SwNodeIndex& rContentStIdx = *rFlyContent.GetContentIdx();
-        SwContentNode *pCNd;
 
-        if( bNew )
+        if( !bNew )
         {
-            pCNd = m_xDoc->GetNodes()[rContentStIdx.GetIndex()+1]
-                       ->GetContentNode();
-        }
-        else
-        {
-            // Create a new node at the beginning of the section
+            // Our own html export only exports one "header" at most (and one "footer")
+
+            // Create a new node at the beginning of the section if a duplicate arises
+            // and hide the original header/footers content by putting it into a hidden
+            // document-level section
             SwNodeIndex aSttIdx( rContentStIdx, 1 );
-            pCNd = m_xDoc->GetNodes().MakeTextNode( aSttIdx,
+            m_xDoc->GetNodes().MakeTextNode( aSttIdx.GetNode(),
                             m_pCSS1Parser->GetTextCollFromPool(RES_POOLCOLL_TEXT));
 
             // delete the current content of the section
@@ -205,13 +203,11 @@ void SwHTMLParser::NewDivision( HtmlTokenId nToken )
 
             const SwStartNode *pStNd =
                 static_cast<const SwStartNode *>( &rContentStIdx.GetNode() );
-            aDelPam.GetPoint()->nNode = pStNd->EndOfSectionIndex() - 1;
+            aDelPam.GetPoint()->Assign( pStNd->EndOfSectionIndex() );
 
-            if (!PendingTableInPaM(aDelPam))
-            {
-                m_xDoc->getIDocumentContentOperations().DeleteRange(aDelPam);
-                m_xDoc->getIDocumentContentOperations().DelFullPara(aDelPam);
-            }
+            SwSectionData aSection(SectionType::Content, m_xDoc->GetUniqueSectionName());
+            if (SwSection* pOldContent = m_xDoc->InsertSwSection(aDelPam, aSection, nullptr, nullptr, false))
+                pOldContent->SetHidden(true);
 
             // update page style
             for( size_t i=0; i < m_xDoc->GetPageDescCnt(); i++ )
@@ -224,7 +220,7 @@ void SwHTMLParser::NewDivision( HtmlTokenId nToken )
             }
         }
 
-        SwPosition aNewPos( SwNodeIndex( rContentStIdx, 1 ), SwIndex( pCNd, 0 ) );
+        SwPosition aNewPos( rContentStIdx, SwNodeOffset(1) );
         SaveDocContext(xCntxt.get(), nFlags, &aNewPos);
     }
     else if( !bPositioned && aId.getLength() > 9 &&
@@ -244,7 +240,7 @@ void SwHTMLParser::NewDivision( HtmlTokenId nToken )
                 SwContentNode *pCNd =
                     m_xDoc->GetNodes()[pStartNdIdx->GetIndex()+1]->GetContentNode();
                 SwNodeIndex aTmpSwNodeIndex(*pCNd);
-                SwPosition aNewPos( aTmpSwNodeIndex, SwIndex( pCNd, 0 ) );
+                SwPosition aNewPos( aTmpSwNodeIndex, pCNd, 0 );
                 SaveDocContext(xCntxt.get(), HtmlContextFlags::MultiColMask, &aNewPos);
                 aId.clear();
                 aPropInfo.m_aId.clear();
@@ -263,7 +259,7 @@ void SwHTMLParser::NewDivision( HtmlTokenId nToken )
         // Therefore we have to add a node and delete it again!
         if( !bAppended )
         {
-            SwNodeIndex aPrvNdIdx( m_pPam->GetPoint()->nNode, -1 );
+            SwNodeIndex aPrvNdIdx( m_pPam->GetPoint()->GetNode(), -1 );
             if (aPrvNdIdx.GetNode().IsSectionNode())
             {
                 AppendTextNode();
@@ -285,11 +281,7 @@ void SwHTMLParser::NewDivision( HtmlTokenId nToken )
             {
                 nPos2 = aHRef.lastIndexOf( cDelim, nPos );
                 if( nPos2 != -1 )
-                {
-                    sal_Int32 nTmp = nPos;
-                    nPos = nPos2;
-                    nPos2 = nTmp;
-                }
+                    std::swap( nPos, nPos2 );
             }
             OUString aURL;
             if( nPos == -1 )
@@ -328,15 +320,12 @@ void SwHTMLParser::NewDivision( HtmlTokenId nToken )
         if( !IsNewDoc() )
             Reader::ResetFrameFormatAttrs(aFrameItemSet );
 
-        const SfxPoolItem *pItem;
-        if( SfxItemState::SET == aItemSet.GetItemState( RES_BACKGROUND, false,
-                                                   &pItem ) )
+        if( const SvxBrushItem* pItem = aItemSet.GetItemIfSet( RES_BACKGROUND, false ) )
         {
             aFrameItemSet.Put( *pItem );
             aItemSet.ClearItem( RES_BACKGROUND );
         }
-        if( SfxItemState::SET == aItemSet.GetItemState( RES_FRAMEDIR, false,
-                                                   &pItem ) )
+        if( const SvxFrameDirectionItem* pItem = aItemSet.GetItemIfSet( RES_FRAMEDIR, false ) )
         {
             aFrameItemSet.Put( *pItem );
             aItemSet.ClearItem( RES_FRAMEDIR );
@@ -352,14 +341,14 @@ void SwHTMLParser::NewDivision( HtmlTokenId nToken )
         }
 
         SwTextNode* pOldTextNd =
-            bAppended ? nullptr : m_pPam->GetPoint()->nNode.GetNode().GetTextNode();
+            bAppended ? nullptr : m_pPam->GetPoint()->GetNode().GetTextNode();
 
         m_pPam->Move( fnMoveBackward );
 
         // move PageDesc and SwFormatBreak attribute from current node into
         // (first) node of the section
         if( pOldTextNd )
-            MovePageDescAttrs( pOldTextNd, m_pPam->GetPoint()->nNode.GetIndex(),
+            MovePageDescAttrs( pOldTextNd, m_pPam->GetPoint()->GetNodeIndex(),
                                true  );
 
         if( pPostIts )
@@ -443,7 +432,7 @@ void SwHTMLParser::FixHeaderFooterDistance( bool bHeader,
     }
     else
     {
-        nPrvNxtIdx = pOldPos->nNode.GetIndex() - 1;
+        nPrvNxtIdx = pOldPos->GetNodeIndex() - 1;
     }
 
     sal_uInt16 nSpace = 0;
@@ -451,8 +440,7 @@ void SwHTMLParser::FixHeaderFooterDistance( bool bHeader,
     if( pTextNode )
     {
         const SvxULSpaceItem& rULSpace =
-            static_cast<const SvxULSpaceItem&>(pTextNode
-                ->SwContentNode::GetAttr( RES_UL_SPACE ));
+            pTextNode->SwContentNode::GetAttr( RES_UL_SPACE );
 
         // The bottom paragraph padding becomes the padding
         // to header or footer
@@ -471,7 +459,7 @@ void SwHTMLParser::FixHeaderFooterDistance( bool bHeader,
 
     if( bHeader )
     {
-        nPrvNxtIdx = pOldPos->nNode.GetIndex();
+        nPrvNxtIdx = pOldPos->GetNodeIndex();
     }
     else
     {
@@ -483,8 +471,7 @@ void SwHTMLParser::FixHeaderFooterDistance( bool bHeader,
     if( pTextNode )
     {
         const SvxULSpaceItem& rULSpace =
-            static_cast<const SvxULSpaceItem&>(pTextNode
-                ->SwContentNode::GetAttr( RES_UL_SPACE ));
+            pTextNode->SwContentNode::GetAttr( RES_UL_SPACE );
 
         // The top paragraph padding becomes the padding
         // to headline or footer if it is greater than the
@@ -514,7 +501,7 @@ void SwHTMLParser::FixHeaderFooterDistance( bool bHeader,
 
 bool SwHTMLParser::EndSection( bool bLFStripped )
 {
-    SwEndNode *pEndNd = m_xDoc->GetNodes()[m_pPam->GetPoint()->nNode.GetIndex()+1]
+    SwEndNode *pEndNd = m_xDoc->GetNodes()[m_pPam->GetPoint()->GetNodeIndex()+1]
                             ->GetEndNode();
     if( pEndNd && pEndNd->StartOfSectionNode()->IsSectionNode() )
     {
@@ -665,7 +652,7 @@ void SwHTMLParser::NewMultiCol( sal_uInt16 columnsFromCss )
     bool bAppended = false;
     if( !bPositioned )
     {
-        if( m_pPam->GetPoint()->nContent.GetIndex() )
+        if( m_pPam->GetPoint()->GetContentIndex() )
         {
             AppendTextNode( AM_SPACE );
             bAppended = true;
@@ -684,7 +671,7 @@ void SwHTMLParser::NewMultiCol( sal_uInt16 columnsFromCss )
             // If the pam is at the start of a section, an additional text
             // node must be inserted. Otherwise, the new section will be
             // inserted in front of the old one.
-            SwNodeIndex aPrvNdIdx( m_pPam->GetPoint()->nNode, -1 );
+            SwNodeIndex aPrvNdIdx( m_pPam->GetPoint()->GetNode(), -1 );
             if (aPrvNdIdx.GetNode().IsSectionNode())
             {
                 AppendTextNode();
@@ -714,15 +701,12 @@ void SwHTMLParser::NewMultiCol( sal_uInt16 columnsFromCss )
         aFormatCol.Init( nCols, nGutter, USHRT_MAX );
         aFrameItemSet.Put( aFormatCol );
 
-        const SfxPoolItem *pItem;
-        if( SfxItemState::SET == aItemSet.GetItemState( RES_BACKGROUND, false,
-                                                   &pItem ) )
+        if( const SvxBrushItem* pItem = aItemSet.GetItemIfSet( RES_BACKGROUND, false) )
         {
             aFrameItemSet.Put( *pItem );
             aItemSet.ClearItem( RES_BACKGROUND );
         }
-        if( SfxItemState::SET == aItemSet.GetItemState( RES_FRAMEDIR, false,
-                                                   &pItem ) )
+        if( const SvxFrameDirectionItem* pItem = aItemSet.GetItemIfSet( RES_FRAMEDIR, false ) )
         {
             aFrameItemSet.Put( *pItem );
             aItemSet.ClearItem( RES_FRAMEDIR );
@@ -737,14 +721,14 @@ void SwHTMLParser::NewMultiCol( sal_uInt16 columnsFromCss )
         }
 
         SwTextNode* pOldTextNd =
-            bAppended ? nullptr : m_pPam->GetPoint()->nNode.GetNode().GetTextNode();
+            bAppended ? nullptr : m_pPam->GetPoint()->GetNode().GetTextNode();
 
         m_pPam->Move( fnMoveBackward );
 
         // Move PageDesc and SwFormatBreak attributes of the current node
         // to the section's first node.
         if( pOldTextNd )
-            MovePageDescAttrs( pOldTextNd, m_pPam->GetPoint()->nNode.GetIndex(),
+            MovePageDescAttrs( pOldTextNd, m_pPam->GetPoint()->GetNodeIndex(),
                                true  );
 
         if( pPostIts )
@@ -779,16 +763,14 @@ void SwHTMLParser::InsertFlyFrame( const SfxItemSet& rItemSet,
     SwFlyFrameFormat* pFlyFormat = m_xDoc->MakeFlySection( eAnchorId, m_pPam->GetPoint(),
                                                     &rItemSet );
     if( !rName.isEmpty() )
-        pFlyFormat->SetName( rName );
+        pFlyFormat->SetFormatName( rName );
 
     RegisterFlyFrame( pFlyFormat );
 
     const SwFormatContent& rFlyContent = pFlyFormat->GetContent();
     const SwNodeIndex& rFlyCntIdx = *rFlyContent.GetContentIdx();
-    SwContentNode *pCNd = m_xDoc->GetNodes()[rFlyCntIdx.GetIndex()+1]
-                            ->GetContentNode();
 
-    SwPosition aNewPos( SwNodeIndex( rFlyCntIdx, 1 ), SwIndex( pCNd, 0 ) );
+    SwPosition aNewPos( rFlyCntIdx, SwNodeOffset(1) );
     const HtmlContextFlags nFlags = HtmlContextFlags::ProtectStack|HtmlContextFlags::StripPara;
     SaveDocContext( pCntxt, nFlags, &aNewPos );
 }
@@ -806,18 +788,17 @@ void SwHTMLParser::MovePageDescAttrs( SwNode *pSrcNd,
     {
         SwContentNode* pSrcContentNd = pSrcNd->GetContentNode();
 
-        const SfxPoolItem* pItem;
-        if( SfxItemState::SET == pSrcContentNd->GetSwAttrSet()
-                .GetItemState( RES_PAGEDESC, false, &pItem ) &&
-            static_cast<const SwFormatPageDesc *>(pItem)->GetPageDesc() )
+        const SwFormatPageDesc* pFormatPageDesc =
+            pSrcContentNd->GetSwAttrSet().GetItemIfSet( RES_PAGEDESC, false );
+        if( pFormatPageDesc && pFormatPageDesc->GetPageDesc() )
         {
-            pDestContentNd->SetAttr( *pItem );
+            pDestContentNd->SetAttr( *pFormatPageDesc );
             pSrcContentNd->ResetAttr( RES_PAGEDESC );
         }
-        if( SfxItemState::SET == pSrcContentNd->GetSwAttrSet()
-                .GetItemState( RES_BREAK, false, &pItem ) )
+        if( const SvxFormatBreakItem* pItem = pSrcContentNd->GetSwAttrSet()
+                .GetItemIfSet( RES_BREAK, false ) )
         {
-            switch( static_cast<const SvxFormatBreakItem *>(pItem)->GetBreak() )
+            switch( pItem->GetBreak() )
             {
             case SvxBreak::PageBefore:
             case SvxBreak::PageAfter:
@@ -835,9 +816,8 @@ void SwHTMLParser::MovePageDescAttrs( SwNode *pSrcNd,
     {
         SwFrameFormat *pFrameFormat = pSrcNd->GetTableNode()->GetTable().GetFrameFormat();
 
-        const SfxPoolItem* pItem;
-        if( SfxItemState::SET == pFrameFormat->GetAttrSet().
-                GetItemState( RES_PAGEDESC, false, &pItem ) )
+        if( const SwFormatPageDesc* pItem = pFrameFormat->GetAttrSet().
+                GetItemIfSet( RES_PAGEDESC, false ) )
         {
             if (pDestContentNd)
                 pDestContentNd->SetAttr(*pItem);

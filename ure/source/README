@@ -25,7 +25,6 @@ ELF platforms (Linux, Solaris, *BSD):
 /opt/libreoffice/ure/THIRDPARTYLICENSEREADME.html
 /opt/libreoffice/ure/README
 /opt/libreoffice/ure/bin/uno
-/opt/libreoffice/ure/bin/regmerge
 /opt/libreoffice/ure/bin/regview
 /opt/libreoffice/ure/bin/javaldx
 /opt/libreoffice/ure/lib/libuno_cppu.so.3
@@ -60,21 +59,18 @@ ELF platforms (Linux, Solaris, *BSD):
 /opt/libreoffice/ure/lib/libjuh.so  [private]
 /opt/libreoffice/ure/lib/libjuhx.so  [private]
 /opt/libreoffice/ure/lib/libsal_textenclo.so  [private]
-/opt/libreoffice/ure/lib/libacceptorlo.so  [private]
 /opt/libreoffice/ure/lib/libbinaryurplo.so  [private]
 /opt/libreoffice/ure/lib/libbootstraplo.so  [private]
-/opt/libreoffice/ure/lib/libconnectorlo.so  [private]
+/opt/libreoffice/ure/lib/libi18nlangtag.so  [private]
 /opt/libreoffice/ure/lib/libintrospectionlo.so  [private]
 /opt/libreoffice/ure/lib/libinvocadaptlo.so  [private]
 /opt/libreoffice/ure/lib/libinvocationlo.so  [private]
+/opt/libreoffice/ure/lib/libiolo.so  [private]
 /opt/libreoffice/ure/lib/libjavaloaderlo.so  [private]
 /opt/libreoffice/ure/lib/libjavavmlo.so  [private]
 /opt/libreoffice/ure/lib/libnamingservicelo.so  [private]
 /opt/libreoffice/ure/lib/libproxyfaclo.so  [private]
 /opt/libreoffice/ure/lib/libreflectionlo.so  [private]
-/opt/libreoffice/ure/lib/libstreamslo.so  [private]
-/opt/libreoffice/ure/lib/libtextinstreamlo.so  [private]
-/opt/libreoffice/ure/lib/libtextoutstreamlo.so  [private]
 /opt/libreoffice/ure/lib/libstocserviceslo.so  [private]
 /opt/libreoffice/ure/lib/libuuresolverlo.so  [private]
 /opt/libreoffice/ure/share/java/java_uno.jar  [private]
@@ -86,7 +82,6 @@ Program Files\URE\LICENSE
 Program Files\URE\THIRDPARTYLICENSEREADME.html
 Program Files\URE\README
 Program Files\URE\bin\uno.exe
-Program Files\URE\bin\regmerge.exe
 Program Files\URE\bin\regview.exe
 Program Files\URE\bin\cppu3.dll
 Program Files\URE\bin\cppuhelper3MSC.dll
@@ -121,21 +116,18 @@ Program Files\URE\bin\jpipx.dll  [private]
 Program Files\URE\bin\juh.dll  [private]
 Program Files\URE\bin\juhx.dll  [private]
 Program Files\URE\bin\sal_textenclo.dll  [private]
-Program Files\URE\bin\acceptorlo.dll  [private]
 Program Files\URE\bin\binaryurplo.dll  [private]
 Program Files\URE\bin\bootstraplo.dll  [private]
-Program Files\URE\bin\connectorlo.dll  [private]
+Program Files\URE\bin\i18nlangtag.dll  [private]
 Program Files\URE\bin\introspectionlo.dll  [private]
 Program Files\URE\bin\invocadaptlo.dll  [private]
 Program Files\URE\bin\invocationlo.dll  [private]
+Program Files\URE\bin\iolo.dll  [private]
 Program Files\URE\bin\javaloaderlo.dll  [private]
 Program Files\URE\bin\javavmlo.dll  [private]
 Program Files\URE\bin\namingservicelo.dll  [private]
 Program Files\URE\bin\proxyfaclo.dll  [private]
 Program Files\URE\bin\reflectionlo.dll  [private]
-Program Files\URE\bin\streamslo.dll  [private]
-Program Files\URE\bin\textinstreamlo.dll  [private]
-Program Files\URE\bin\textoutstreamlo.dll  [private]
 Program Files\URE\bin\stocserviceslo.dll  [private]
 Program Files\URE\bin\uuresolverlo.dll  [private]
 Program Files\URE\bin\uwinapi.dll  [private]
@@ -174,7 +166,7 @@ A URE installation contains the following public files:
 - uno is the executable file that runs UNO components.  For more details, see
 the SDK Developer's Guide.
 
-- regmerge and regview are tools that work with binary registries that contain
+- regview is a tool that works with old-format binary registries that contain
 UNO type or UNO service information.  For more details, see the SDK Developer's
 Guide.
 

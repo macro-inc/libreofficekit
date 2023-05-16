@@ -27,7 +27,9 @@
 #include <basegfx/polygon/b3dpolygontools.hxx>
 #include <basegfx/polygon/b3dpolypolygontools.hxx>
 #include <drawinglayer/attribute/sdrlightingattribute3d.hxx>
+#include <o3tl/safeint.hxx>
 #include <svtools/optionsdrawinglayer.hxx>
+#include <utility>
 
 using namespace com::sun::star;
 
@@ -269,7 +271,7 @@ void ZBufferRasterConverter3D::processLineSpan(const basegfx::RasterConversionLi
     if(nSpanCount & 0x0001)
         return;
 
-    if(nLine < 0 || nLine >= static_cast<sal_Int32>(mrBuffer.getHeight()))
+    if(nLine < 0 || o3tl::make_unsigned(nLine) >= mrBuffer.getHeight())
         return;
 
     sal_uInt32 nXA(std::min(mrBuffer.getWidth(), static_cast<sal_uInt32>(std::max(sal_Int32(0), basegfx::fround(rA.getX().getVal())))));
@@ -374,16 +376,16 @@ private:
 
 public:
     RasterPrimitive3D(
-        const std::shared_ptr< drawinglayer::texture::GeoTexSvx >& pGeoTexSvx,
-        const std::shared_ptr< drawinglayer::texture::GeoTexSvx >& pTransparenceGeoTexSvx,
+        std::shared_ptr< drawinglayer::texture::GeoTexSvx > pGeoTexSvx,
+        std::shared_ptr< drawinglayer::texture::GeoTexSvx > pTransparenceGeoTexSvx,
         const drawinglayer::attribute::MaterialAttribute3D& rMaterial,
         const basegfx::B3DPolyPolygon& rPolyPolygon,
         bool bModulate,
         bool bFilter,
         bool bSimpleTextureActive,
         bool bIsLine)
-    :   mpGeoTexSvx(pGeoTexSvx),
-        mpTransparenceGeoTexSvx(pTransparenceGeoTexSvx),
+    :   mpGeoTexSvx(std::move(pGeoTexSvx)),
+        mpTransparenceGeoTexSvx(std::move(pTransparenceGeoTexSvx)),
         maMaterial(rMaterial),
         maPolyPolygon(rPolyPolygon),
         mfCenterZ(basegfx::utils::getRange(rPolyPolygon).getCenter().getZ()),

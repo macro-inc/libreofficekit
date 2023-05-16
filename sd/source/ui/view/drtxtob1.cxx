@@ -112,7 +112,6 @@ namespace sd {
 void TextObjectBar::Execute( SfxRequest &rReq )
 {
     const SfxItemSet* pArgs = rReq.GetArgs();
-    const SfxPoolItem* pPoolItem = nullptr;
     sal_uInt16 nSlot = rReq.GetSlot();
     OutlinerView* pOLV = mpView->GetTextEditOutlinerView();
 
@@ -198,8 +197,7 @@ void TextObjectBar::Execute( SfxRequest &rReq )
                         pNewItem->SetLeftValue( static_cast<sal_uInt16>(nLeft) );
 
                         SfxItemSet aNewAttrs( aAttr );
-                        aNewAttrs.Put( *pNewItem );
-                        pNewItem.reset();
+                        aNewAttrs.Put( std::move(pNewItem) );
                         pOLV->GetOutliner()->SetParaAttribs( nPara, aNewAttrs );
                     }
                 }
@@ -265,8 +263,7 @@ void TextObjectBar::Execute( SfxRequest &rReq )
                         pNewItem->SetLower( static_cast<sal_uInt16>(nLower) );
 
                         SfxItemSet aNewAttrs( aAttr );
-                        aNewAttrs.Put( *pNewItem );
-                        pNewItem.reset();
+                        aNewAttrs.Put( std::move(pNewItem) );
                         pOLV->GetOutliner()->SetParaAttribs( nPara, aNewAttrs );
                     }
                 }
@@ -307,8 +304,7 @@ void TextObjectBar::Execute( SfxRequest &rReq )
                     }
                     pNewItem->SetLower( static_cast<sal_uInt16>(nLower) );
 
-                    aNewAttrs.Put( *pNewItem );
-                    pNewItem.reset();
+                    aNewAttrs.Put( std::move(pNewItem) );
 
                     mpView->SetAttributes( aNewAttrs );
                 }
@@ -355,7 +351,7 @@ void TextObjectBar::Execute( SfxRequest &rReq )
         case SID_ATTR_PARA_LRSPACE:
         {
             SvxLRSpaceItem aLRSpace = static_cast<const SvxLRSpaceItem&>(pArgs->Get(
-                GetPool().GetWhich(SID_ATTR_PARA_LRSPACE)));
+                SID_ATTR_PARA_LRSPACE));
 
             SfxItemSetFixed<EE_PARA_LRSPACE, EE_PARA_LRSPACE> aEditAttr( GetPool() );
             aLRSpace.SetWhich( EE_PARA_LRSPACE );
@@ -459,7 +455,7 @@ void TextObjectBar::Execute( SfxRequest &rReq )
                         OUString sStyleName(SdResId(STR_PSEUDOSHEET_OUTLINE) + " 1");
                         SfxStyleSheetBase* pFirstStyleSheet = pSSPool->Find(sStyleName, SfxStyleFamily::Pseudo);
                         if( pFirstStyleSheet )
-                            pFirstStyleSheet->GetItemSet().GetItemState(EE_PARA_NUMBULLET, false, reinterpret_cast<const SfxPoolItem**>(&pItem));
+                            pItem = pFirstStyleSheet->GetItemSet().GetItemIfSet(EE_PARA_NUMBULLET, false);
 
                         if (pItem )
                         {
@@ -516,7 +512,7 @@ void TextObjectBar::Execute( SfxRequest &rReq )
         case SID_THES:
         {
             OUString aReplaceText;
-            const SfxStringItem* pItem2 = rReq.GetArg<SfxStringItem>(SID_THES);
+            const SfxStringItem* pItem2 = rReq.GetArg(FN_PARAM_THES_WORD_REPLACE);
             if (pItem2)
                 aReplaceText = pItem2->GetValue();
             if (!aReplaceText.isEmpty())
@@ -712,8 +708,8 @@ void TextObjectBar::Execute( SfxRequest &rReq )
                 bool bLeftToRight = nSlot == SID_ATTR_PARA_LEFT_TO_RIGHT;
 
                 SvxAdjust nAdjust = SvxAdjust::Left;
-                if( SfxItemState::SET == aEditAttr.GetItemState(EE_PARA_JUST, true, &pPoolItem ) )
-                    nAdjust = static_cast<const SvxAdjustItem*>(pPoolItem)->GetAdjust();
+                if( const SvxAdjustItem* pAdjustItem = aEditAttr.GetItemIfSet(EE_PARA_JUST) )
+                    nAdjust = pAdjustItem->GetAdjust();
 
                 if( bLeftToRight )
                 {
@@ -822,26 +818,21 @@ void TextObjectBar::Execute( SfxRequest &rReq )
             if (nSlot == SID_ATTR_CHAR_COLOR)
             {
                 pColorItem = std::make_unique<SvxColorItem>(pNewArgs->Get(EE_CHAR_COLOR));
-            }
-            const SfxPoolItem* pItem = nullptr;
-            if (pArgs->GetItemState(SID_ATTR_COLOR_THEME_INDEX, false, &pItem) == SfxItemState::SET)
-            {
-                auto pIntItem = static_cast<const SfxInt16Item*>(pItem);
-                pColorItem->GetThemeColor().SetThemeIndex(pIntItem->GetValue());
-            }
-            if (pArgs->GetItemState(SID_ATTR_COLOR_LUM_MOD, false, &pItem) == SfxItemState::SET)
-            {
-                auto pIntItem = static_cast<const SfxInt16Item*>(pItem);
-                pColorItem->GetThemeColor().SetLumMod(pIntItem->GetValue());
-            }
-            if (pArgs->GetItemState(SID_ATTR_COLOR_LUM_OFF, false, &pItem) == SfxItemState::SET)
-            {
-                auto pIntItem = static_cast<const SfxInt16Item*>(pItem);
-                pColorItem->GetThemeColor().SetLumOff(pIntItem->GetValue());
-            }
-            if (pColorItem)
-            {
-                pNewArgs->Put(*pColorItem);
+                pColorItem->GetThemeColor().clearTransformations();
+
+                if (const SfxInt16Item* pIntItem = pArgs->GetItemIfSet(SID_ATTR_COLOR_THEME_INDEX, false))
+                {
+                    pColorItem->GetThemeColor().setType(model::convertToThemeColorType(pIntItem->GetValue()));
+                }
+                if (const SfxInt16Item* pIntItem = pArgs->GetItemIfSet(SID_ATTR_COLOR_LUM_MOD, false))
+                {
+                    pColorItem->GetThemeColor().addTransformation({model::TransformationType::LumMod, pIntItem->GetValue()});
+                }
+                if (const SfxInt16Item* pIntItem = pArgs->GetItemIfSet(SID_ATTR_COLOR_LUM_OFF, false))
+                {
+                    pColorItem->GetThemeColor().addTransformation({model::TransformationType::LumOff, pIntItem->GetValue()});
+                }
+                pNewArgs->Put(std::move(pColorItem));
             }
 
             mpView->SetAttributes(*pNewArgs);

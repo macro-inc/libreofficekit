@@ -30,6 +30,7 @@
 #include <ndtxt.hxx>
 #include <textcontentcontrol.hxx>
 #include <doc.hxx>
+#include <unocontentcontrol.hxx>
 #include <wrtsh.hxx>
 
 using namespace com::sun::star;
@@ -182,9 +183,50 @@ SwContentControl::SwContentControl(SwFormatContentControl* pFormat)
     , m_pFormat(pFormat)
     , m_pTextNode(nullptr)
 {
+    if (!pFormat)
+    {
+        return;
+    }
+
+    const std::shared_ptr<SwContentControl>& pOther = pFormat->GetContentControl();
+    if (!pOther)
+    {
+        return;
+    }
+
+    SetShowingPlaceHolder(pOther->m_bShowingPlaceHolder);
+    SetCheckbox(pOther->m_bCheckbox);
+    SetChecked(pOther->m_bChecked);
+    SetCheckedState(pOther->m_aCheckedState);
+    SetUncheckedState(pOther->m_aUncheckedState);
+    SetListItems(pOther->m_aListItems);
+    SetPicture(pOther->m_bPicture);
+    SetDate(pOther->m_bDate);
+    SetDateFormat(pOther->m_aDateFormat);
+    SetDateLanguage(pOther->m_aDateLanguage);
+    SetCurrentDate(pOther->m_aCurrentDate);
+    SetPlainText(pOther->m_bPlainText);
+    SetComboBox(pOther->m_bComboBox);
+    SetDropDown(pOther->m_bDropDown);
+    SetPlaceholderDocPart(pOther->m_aPlaceholderDocPart);
+    SetDataBindingPrefixMappings(pOther->m_aDataBindingPrefixMappings);
+    SetDataBindingXpath(pOther->m_aDataBindingXpath);
+    SetDataBindingStoreItemID(pOther->m_aDataBindingStoreItemID);
+    SetColor(pOther->m_aColor);
+    SetAppearance(pOther->m_aAppearance);
+    SetAlias(pOther->m_aAlias);
+    SetTag(pOther->m_aTag);
+    SetId(pOther->m_nId);
+    SetTabIndex(pOther->m_nTabIndex);
+    SetLock(pOther->m_aLock);
 }
 
 SwContentControl::~SwContentControl() {}
+
+void SwContentControl::SetXContentControl(const rtl::Reference<SwXContentControl>& xContentCnotrol)
+{
+    m_wXContentControl = xContentCnotrol.get();
+}
 
 SwTextContentControl* SwContentControl::GetTextAttr() const
 {
@@ -221,7 +263,7 @@ void SwContentControl::SwClientNotify(const SwModify&, const SfxHint& rHint)
     if (pLegacy->GetWhich() == RES_REMOVE_UNO_OBJECT)
     {
         // Invalidate cached uno object.
-        SetXContentControl(uno::Reference<text::XTextContent>());
+        SetXContentControl(nullptr);
         GetNotifier().Broadcast(SfxHint(SfxHintId::Deinitializing));
     }
 }
@@ -402,7 +444,7 @@ double SwContentControl::GetCurrentDateValue() const
 
     double dCurrentDate = 0;
     OUString aCurrentDate = m_aCurrentDate.replaceAll("T00:00:00Z", "");
-    pNumberFormatter->IsNumberFormat(aCurrentDate, nFormat, dCurrentDate);
+    (void)pNumberFormatter->IsNumberFormat(aCurrentDate, nFormat, dCurrentDate);
     return dCurrentDate;
 }
 
@@ -437,6 +479,42 @@ bool SwContentControl::ShouldOpenPopup(const vcl::KeyCode& rKeyCode)
     }
 
     return false;
+}
+
+// NOTE: call SetReadWrite separately to implement true (un)locking.
+// This is mostly a theoretical function; the lock state is mainly kept for round-tripping purposes.
+// It is implemented here primarily for pointless VBA control, but with the intention that it
+// could be made functionally useful as well for checkboxes/dropdowns/pictures.
+// Returns whether the content (bControl=false) cannot be modified,
+// or if the control cannot be deleted.
+std::optional<bool> SwContentControl::GetLock(bool bControl) const
+{
+    std::optional<bool> oLock;
+    if (m_aLock.isEmpty())
+        return oLock;
+    else if (m_aLock.equalsIgnoreAsciiCase("sdtContentLocked"))
+        oLock = true;
+    else if (m_aLock.equalsIgnoreAsciiCase("unlocked"))
+        oLock = false;
+    else if (m_aLock.equalsIgnoreAsciiCase("sdtLocked"))
+        oLock = bControl;
+    else if (m_aLock.equalsIgnoreAsciiCase("contentLocked"))
+        oLock = !bControl;
+
+    assert(oLock && "invalid or unknown lock state");
+    return oLock;
+}
+
+void SwContentControl::SetLock(bool bLockContent, bool bLockControl)
+{
+    if (!bLockContent && !bLockControl)
+        m_aLock = "unlocked";
+    else if (bLockContent && bLockControl)
+        m_aLock = "sdtContentLocked";
+    else if (bLockContent)
+        m_aLock = "contentLocked";
+    else
+        m_aLock = "sdtLocked";
 }
 
 SwContentControlType SwContentControl::GetType() const
@@ -515,11 +593,17 @@ void SwContentControl::dumpAsXml(xmlTextWriterPtr pWriter) const
                                       BAD_CAST(m_aDataBindingStoreItemID.toUtf8().getStr()));
     (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("color"),
                                       BAD_CAST(m_aColor.toUtf8().getStr()));
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("appearance"),
+                                      BAD_CAST(m_aAppearance.toUtf8().getStr()));
     (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("alias"),
                                       BAD_CAST(m_aAlias.toUtf8().getStr()));
     (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("tag"), BAD_CAST(m_aTag.toUtf8().getStr()));
     (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("id"),
                                       BAD_CAST(OString::number(m_nId).getStr()));
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("tab-index"),
+                                      BAD_CAST(OString::number(m_nTabIndex).getStr()));
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("lock"),
+                                      BAD_CAST(m_aLock.toUtf8().getStr()));
 
     if (!m_aListItems.empty())
     {
@@ -544,7 +628,7 @@ void SwContentControlListItem::dumpAsXml(xmlTextWriterPtr pWriter) const
     (void)xmlTextWriterEndElement(pWriter);
 }
 
-OUString SwContentControlListItem::ToString() const
+const OUString& SwContentControlListItem::ToString() const
 {
     if (!m_aDisplayText.isEmpty())
     {
@@ -674,16 +758,11 @@ void SwTextContentControl::Delete(bool bSaveContents)
     if (!GetTextNode())
         return;
 
+    SwPaM aPaM(*GetTextNode(), GetStart(), *GetTextNode(), *End());
     if (bSaveContents)
-    {
-        SwIndex aStart(GetTextNode(), GetStart());
-        GetTextNode()->RstTextAttr(aStart, *End() - GetStart(), RES_TXTATR_CONTENTCONTROL);
-    }
+        GetTextNode()->GetDoc().ResetAttrs(aPaM, /*bTextAttr=*/true, { RES_TXTATR_CONTENTCONTROL });
     else
-    {
-        SwPaM aPaM(*GetTextNode(), GetStart(), *GetTextNode(), *End());
         GetTextNode()->GetDoc().getIDocumentContentOperations().DeleteAndJoin(aPaM);
-    }
 }
 
 SwTextNode* SwTextContentControl::GetTextNode() const
@@ -717,7 +796,6 @@ void SwTextContentControl::Invalidate()
     pDocShell->GetWrtShell()->Push();
 
     // visit the control in the text (which makes any necessary visual changes)
-    // NOTE: simply going to a control indicates cancelling ShowingPlaceHolder, unless bOnlyRefresh
     // NOTE: simply going to a checkbox causes a toggle, unless bOnlyRefresh
     auto& rFormatContentControl = static_cast<SwFormatContentControl&>(GetAttr());
     pDocShell->GetWrtShell()->GotoContentControl(rFormatContentControl, /*bOnlyRefresh=*/true);
@@ -764,6 +842,12 @@ SwTextContentControl* SwContentControlManager::Get(size_t nIndex)
                   return nIdxLHS < nIdxRHS;
               });
 
+    return m_aContentControls[nIndex];
+}
+
+SwTextContentControl* SwContentControlManager::UnsortedGet(size_t nIndex)
+{
+    assert(nIndex < m_aContentControls.size());
     return m_aContentControls[nIndex];
 }
 

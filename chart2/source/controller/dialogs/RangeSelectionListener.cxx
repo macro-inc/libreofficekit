@@ -18,6 +18,8 @@
  */
 
 #include <RangeSelectionListener.hxx>
+#include <ChartModel.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -28,10 +30,10 @@ namespace chart
 
 RangeSelectionListener::RangeSelectionListener(
     RangeSelectionListenerParent & rParent,
-    const OUString & rInitialRange,
-    const Reference< frame::XModel >& xModelToLockController ) :
+    OUString aInitialRange,
+    const rtl::Reference<::chart::ChartModel>& xModelToLockController ) :
         m_rParent( rParent ),
-        m_aRange( rInitialRange ),
+        m_aRange(std::move( aInitialRange )),
         m_aControllerLockGuard( xModelToLockController )
 {}
 

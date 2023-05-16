@@ -24,7 +24,6 @@
 #include <o3tl/any.hxx>
 
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <unotools/charclass.hxx>
 
 #include <calc.hxx>
@@ -69,6 +68,7 @@ std::unique_ptr<SwField> SwUserField::Copy() const
 {
     std::unique_ptr<SwField> pTmp(new SwUserField(static_cast<SwUserFieldType*>(GetTyp()), m_nSubType, GetFormat()));
     pTmp->SetAutomaticLanguage(IsAutomaticLanguage());
+    pTmp->SetTitle(GetTitle());
     return pTmp;
 }
 
@@ -307,7 +307,7 @@ void SwUserFieldType::SetContent( const OUString& rStr, sal_uInt32 nFormat )
             SetValue(fValue);
             LanguageTag aContentLanguage(GetFieldTypeLanguage());
             m_aContentLang = aContentLanguage.getBcp47();
-            m_aContent = DoubleToString(fValue, nFormat);
+            m_aContent = DoubleToString(fValue, aContentLanguage.getLanguageType());
         }
     }
 
@@ -348,7 +348,7 @@ void SwUserFieldType::PutValue( const uno::Any& rAny, sal_uInt16 nWhichId )
             m_nValue = fVal;
             LanguageTag aContentLanguage(GetFieldTypeLanguage());
             m_aContentLang = aContentLanguage.getBcp47();
-            m_aContent = DoubleToString(m_nValue, static_cast<sal_uInt16>(GetFieldTypeLanguage()));
+            m_aContent = DoubleToString(m_nValue, aContentLanguage.getLanguageType());
         }
         break;
     case FIELD_PROP_PAR2:

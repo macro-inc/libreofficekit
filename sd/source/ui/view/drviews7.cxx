@@ -38,7 +38,6 @@
 #include <svx/clipfmtitem.hxx>
 #include <svl/eitem.hxx>
 #include <svl/intitem.hxx>
-#include <svl/itempool.hxx>
 #include <svl/itemset.hxx>
 #include <svl/stritem.hxx>
 #include <svl/visitem.hxx>
@@ -56,7 +55,6 @@
 // #UndoRedo#
 #include <svtools/insdlg.hxx>
 #include <unotools/moduleoptions.hxx>
-#include <svl/languageoptions.hxx>
 #include <svl/cjkoptions.hxx>
 #include <comphelper/processfactory.hxx>
 #include <sfx2/request.hxx>
@@ -416,7 +414,7 @@ void DrawViewShell::GetMenuState( SfxItemSet &rSet )
                     else
                     {
                         // check if the object is in edit, then if it's temporarily not empty
-                        SdrTextObj* pTextObj = dynamic_cast< SdrTextObj* >( pObj );
+                        SdrTextObj* pTextObj = DynCastSdrTextObj( pObj );
                         if( pTextObj )
                         {
                             if( pTextObj->CanCreateEditOutlinerParaObject() )
@@ -932,7 +930,7 @@ void DrawViewShell::GetMenuState( SfxItemSet &rSet )
             SdrObject* pObj = rMarkList.GetMark(nNum)->GetMarkedSdrObj();
             if( pObj->GetObjInventor() == SdrInventor::Default )
             {
-                if( pObj->GetObjIdentifier() == OBJ_OUTLINETEXT )
+                if( pObj->GetObjIdentifier() == SdrObjKind::OutlineText )
                 {
                     bHasOutliner = true;
                     if(bHasOther)
@@ -1009,11 +1007,8 @@ void DrawViewShell::GetMenuState( SfxItemSet &rSet )
 #ifndef ENABLE_SDREMOTE
         bDisableSdremoteForGood = true;
 #endif
-        uno::Reference< uno::XComponentContext > xContext = comphelper::getProcessComponentContext();
-        if ( xContext.is() )
-            bDisableSdremoteForGood |= ! ( /*officecfg::Office::Common::Misc::ExperimentalMode::get( xContext ) &&*/
-
-                                           officecfg::Office::Impress::Misc::Start::EnableSdremote::get( xContext ) );
+        bDisableSdremoteForGood |= ! ( /*officecfg::Office::Common::Misc::ExperimentalMode::get() &&*/
+                                       officecfg::Office::Impress::Misc::Start::EnableSdremote::get() );
 
         // This dialog is only useful for TCP/IP remote control
         // which is unusual, under-tested and a security issue.
@@ -1381,7 +1376,7 @@ void DrawViewShell::GetMenuState( SfxItemSet &rSet )
         for (size_t i=0; i < nMarkCount && !bFoundAny; ++i)
         {
             SdrObject*  pObj = aMarkList.GetMark(i)->GetMarkedSdrObj();
-            sal_uInt16  nId  = pObj->GetObjIdentifier();
+            SdrObjKind  nId  = pObj->GetObjIdentifier();
             SdrInventor nInv = pObj->GetObjInventor();
 
             if(nInv == SdrInventor::Default)
@@ -1389,22 +1384,22 @@ void DrawViewShell::GetMenuState( SfxItemSet &rSet )
                 // 2D objects
                 switch( nId )
                 {
-                    case OBJ_PATHLINE :
-                    case OBJ_PLIN :
-                    case OBJ_LINE:
-                    case OBJ_FREELINE :
-                    case OBJ_EDGE:
-                    case OBJ_CARC :
+                    case SdrObjKind::PathLine :
+                    case SdrObjKind::PolyLine :
+                    case SdrObjKind::Line:
+                    case SdrObjKind::FreehandLine :
+                    case SdrObjKind::Edge:
+                    case SdrObjKind::CircleArc :
                         bFoundObjNoArea      = true;
                         bFoundNoGraphicObj = true;
                         break;
-                    case OBJ_OLE2 :
+                    case SdrObjKind::OLE2 :
                         // #i118485# #i118525# Allow Line, Area and Graphic (Metafile, Bitmap)
                         bSingleGraphicSelected = nMarkCount == 1;
                         bFoundBitmap = true;
                         bFoundMetafile = true;
                         break;
-                    case OBJ_GRAF :
+                    case SdrObjKind::Graphic :
                     {
                         bSingleGraphicSelected = nMarkCount == 1;
                         const SdrGrafObj* pSdrGrafObj = static_cast< const SdrGrafObj* >(pObj);
@@ -1436,7 +1431,7 @@ void DrawViewShell::GetMenuState( SfxItemSet &rSet )
                         }
                         break;
                     }
-                    case OBJ_TABLE:
+                    case SdrObjKind::Table:
                         bFoundTable = true;
                         break;
                     default :
@@ -1782,7 +1777,7 @@ void DrawViewShell::SetPageProperties (SfxRequest& rReq)
     {
         SdrPageProperties& rPageProperties = pPage->getSdrPageProperties();
         const SfxItemSet &aPageItemSet = rPageProperties.GetItemSet();
-        std::unique_ptr<SfxItemSet> pTempSet = aPageItemSet.Clone(false, &mpDrawView->GetModel()->GetItemPool());
+        SfxItemSet aTempSet = aPageItemSet.CloneAsValue(false, &mpDrawView->GetModel()->GetItemPool());
         const SfxPoolItem* pItem = nullptr;
 
         rPageProperties.ClearItem(XATTR_FILLSTYLE);
@@ -1839,10 +1834,10 @@ void DrawViewShell::SetPageProperties (SfxRequest& rReq)
                     // MigrateItemSet guarantees unique gradient names
                     SfxItemSetFixed<XATTR_FILLGRADIENT, XATTR_FILLGRADIENT> aMigrateSet( mpDrawView->GetModel()->GetItemPool() );
                     aMigrateSet.Put( aGradientItem );
-                    SdrModel::MigrateItemSet( &aMigrateSet, pTempSet.get(), mpDrawView->GetModel() );
+                    SdrModel::MigrateItemSet( &aMigrateSet, &aTempSet, mpDrawView->GetModel() );
 
                     rPageProperties.PutItem( XFillStyleItem( drawing::FillStyle_GRADIENT ) );
-                    rPageProperties.PutItemSet( *pTempSet );
+                    rPageProperties.PutItemSet( aTempSet );
                 }
                 else
                 {
@@ -1851,10 +1846,10 @@ void DrawViewShell::SetPageProperties (SfxRequest& rReq)
                     // MigrateItemSet guarantees unique gradient names
                     SfxItemSetFixed<XATTR_FILLGRADIENT, XATTR_FILLGRADIENT> aMigrateSet( mpDrawView->GetModel()->GetItemPool() );
                     aMigrateSet.Put( aGradientItem );
-                    SdrModel::MigrateItemSet( &aMigrateSet, pTempSet.get(), mpDrawView->GetModel() );
+                    SdrModel::MigrateItemSet( &aMigrateSet, &aTempSet, mpDrawView->GetModel() );
 
                     rPageProperties.PutItem( XFillStyleItem( drawing::FillStyle_GRADIENT ) );
-                    rPageProperties.PutItemSet( *pTempSet );
+                    rPageProperties.PutItemSet( aTempSet );
                 }
             }
             break;
@@ -1896,7 +1891,7 @@ void DrawViewShell::SetPageProperties (SfxRequest& rReq)
         switch (nSlotId)
         {
             case SID_ATTR_PAGE_LRSPACE:
-                if( pArgs->GetItemState(GetPool().GetWhich(SID_ATTR_PAGE_LRSPACE),
+                if( pArgs->GetItemState(SID_ATTR_PAGE_LRSPACE,
                                         true,&pPoolItem) == SfxItemState::SET )
                 {
                     nLeft = static_cast<const SvxLongLRSpaceItem*>(pPoolItem)->GetLeft();

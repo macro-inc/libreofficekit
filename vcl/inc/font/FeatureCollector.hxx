@@ -15,29 +15,29 @@
 #include <hb.h>
 #include <i18nlangtag/lang.h>
 
+#include <font/PhysicalFontFace.hxx>
+
 namespace vcl::font
 {
 class FeatureCollector
 {
 private:
+    const PhysicalFontFace* m_pFace;
     hb_face_t* m_pHbFace;
     std::vector<vcl::font::Feature>& m_rFontFeatures;
-    LanguageType m_eLanguageType;
+    const LanguageTag& m_rLanguageTag;
 
 public:
-    FeatureCollector(hb_face_t* pHbFace, std::vector<vcl::font::Feature>& rFontFeatures,
-                     LanguageType eLanguageType)
-        : m_pHbFace(pHbFace)
+    FeatureCollector(const PhysicalFontFace* pFace, std::vector<vcl::font::Feature>& rFontFeatures,
+                     const LanguageTag& rLanguageTag)
+        : m_pFace(pFace)
+        , m_pHbFace(pFace->GetHbFace())
         , m_rFontFeatures(rFontFeatures)
-        , m_eLanguageType(eLanguageType)
+        , m_rLanguageTag(rLanguageTag)
     {
     }
 
 private:
-    void collectForLanguage(hb_tag_t aTableTag, sal_uInt32 nScript, hb_tag_t aScriptTag,
-                            sal_uInt32 nLanguage, hb_tag_t aLanguageTag);
-
-    void collectForScript(hb_tag_t aTableTag, sal_uInt32 nScript, hb_tag_t aScriptTag);
     void collectForTable(hb_tag_t aTableTag);
     bool collectGraphite();
 

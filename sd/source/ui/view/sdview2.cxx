@@ -408,8 +408,8 @@ void View::DragFinished( sal_Int8 nDropAction )
             if( pObj && pObj->getSdrPageFromSdrObject() )
             {
                 const size_t nOrdNum = pObj->GetOrdNumDirect();
-                SdrObject* pChkObj = pObj->getSdrPageFromSdrObject()->RemoveObject(nOrdNum);
-                DBG_ASSERT(pChkObj==pObj,"pChkObj!=pObj in RemoveObject()");
+                rtl::Reference<SdrObject> pChkObj = pObj->getSdrPageFromSdrObject()->RemoveObject(nOrdNum);
+                DBG_ASSERT(pChkObj.get()==pObj,"pChkObj!=pObj in RemoveObject()");
             }
         }
 
@@ -437,7 +437,9 @@ sal_Int8 View::AcceptDrop( const AcceptDropEvent& rEvt, DropTargetHelper& rTarge
     if( nLayer != SDRLAYER_NOTFOUND )
     {
         SdrLayerAdmin& rLayerAdmin = mrDoc.GetLayerAdmin();
-        aLayerName = rLayerAdmin.GetLayerPerID(nLayer)->GetName();
+        SdrLayer* pLayer = rLayerAdmin.GetLayerPerID(nLayer);
+        assert(pLayer && "layer missing");
+        aLayerName = pLayer->GetName();
     }
 
     if( mbIsDropAllowed && !pPV->IsLayerLocked( aLayerName ) && pPV->IsLayerVisible( aLayerName ) )
@@ -731,7 +733,7 @@ sal_Int8 View::ExecuteDrop( const ExecuteDropEvent& rEvt,
                                 sal_Int32 nIndex = aBookmark.indexOf( '#' );
                                 if( nIndex != -1 )
                                 {
-                                    const OUString aDocName( aBookmark.copy( 0, nIndex ) );
+                                    const std::u16string_view aDocName( aBookmark.subView( 0, nIndex ) );
 
                                     if (mpDocSh->GetMedium()->GetName() == aDocName || aDocName == mpDocSh->GetName())
                                     {

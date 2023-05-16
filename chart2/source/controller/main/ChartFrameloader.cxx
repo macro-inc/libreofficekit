@@ -20,11 +20,14 @@
 #include "ChartFrameloader.hxx"
 #include <servicenames.hxx>
 #include <MediaDescriptorHelper.hxx>
+#include <ChartController.hxx>
+#include <ChartModel.hxx>
+#include <unotools/fcm.hxx>
 #include <unotools/mediadescriptor.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <com/sun/star/frame/XLoadable.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace chart
 {
@@ -93,90 +96,71 @@ sal_Bool SAL_CALL ChartFrameLoader::load( const uno::Sequence< beans::PropertyVa
     if( ! xModel.is())
     {
         //@todo?? load mechanism to cancel during loading of document
-        xModel.set(
-                m_xCC->getServiceManager()->createInstanceWithContext(
-                CHART_MODEL_SERVICE_IMPLEMENTATION_NAME, m_xCC )
-                , uno::UNO_QUERY );
+        xModel = new ChartModel(m_xCC);
 
         if( impl_checkCancel() )
             return false;
     }
 
     //create the controller(+XWindow)
-    uno::Reference< frame::XController >    xController;
-    uno::Reference< awt::XWindow >          xComponentWindow;
-    {
-        xController.set(
-            m_xCC->getServiceManager()->createInstanceWithContext(
-            CHART_CONTROLLER_SERVICE_IMPLEMENTATION_NAME,m_xCC )
-            , uno::UNO_QUERY );
+    rtl::Reference< ChartController > xController = new ChartController(m_xCC);
 
-        //!!!it is a special characteristic of the example application
-        //that the controller simultaneously provides the XWindow controller functionality
-        xComponentWindow =
-                      uno::Reference< awt::XWindow >( xController, uno::UNO_QUERY );
-
-        if( impl_checkCancel() )
-            return false;
-    }
+    if( impl_checkCancel() )
+        return false;
 
     //connect frame, controller and model one to each other:
-    if(xController.is()&&xModel.is())
+    if(xModel.is())
     {
-        xModel->connectController(xController);
-        xModel->setCurrentController(xController);
-        xController->attachModel(xModel);
-        if(xFrame.is())
-            xFrame->setComponent(xComponentWindow,xController);
-        //creates the view and menu
-        //for correct menu creation the initialized component must be already set into the frame
-        xController->attachFrame(xFrame);
+        utl::ConnectFrameControllerModel(xFrame, xController, xModel);
     }
 
     // call initNew() or load() at XLoadable
-    if(!bHaveLoadedModel)
-        try
+    if(bHaveLoadedModel)
+        return true;
+
+    try
+    {
+        utl::MediaDescriptor::const_iterator aIt( aMediaDescriptor.find( utl::MediaDescriptor::PROP_URL));
+        if( aIt != aMediaDescriptor.end())
         {
-            utl::MediaDescriptor::const_iterator aIt( aMediaDescriptor.find( utl::MediaDescriptor::PROP_URL));
-            if( aIt != aMediaDescriptor.end())
+            OUString aURL( (*aIt).second.get< OUString >());
+            if( aURL.startsWith( "private:factory/schart" ) )
             {
-                OUString aURL( (*aIt).second.get< OUString >());
-                if( aURL.startsWith( "private:factory/schart" ) )
+                // create new file
+                uno::Reference< frame::XLoadable > xLoadable( xModel, uno::UNO_QUERY_THROW );
+                xLoadable->initNew();
+            }
+            else
+            {
+                // use the URL as BaseURL, similar to what SfxBaseModel effectively does
+                if (!aURL.isEmpty())
                 {
-                    // create new file
-                    uno::Reference< frame::XLoadable > xLoadable( xModel, uno::UNO_QUERY_THROW );
-                    xLoadable->initNew();
+                    aMediaDescriptor[utl::MediaDescriptor::PROP_DOCUMENTBASEURL] <<= aURL;
                 }
-                else
+                aMediaDescriptor.addInputStream();
+                uno::Sequence< beans::PropertyValue > aCompleteMediaDescriptor;
+                aMediaDescriptor >> aCompleteMediaDescriptor;
+                apphelper::MediaDescriptorHelper aMDHelper( aCompleteMediaDescriptor );
+
+                // load file
+                // @todo: replace: aMediaDescriptorHelper.getReducedForModel()
+                uno::Reference< frame::XLoadable > xLoadable( xModel, uno::UNO_QUERY_THROW );
+                xLoadable->load( aCompleteMediaDescriptor );
+
+                //resize standalone files to get correct size:
+                if( aMDHelper.ISSET_FilterName && aMDHelper.FilterName == "StarChart 5.0" )
                 {
-                    // use the URL as BaseURL, similar to what SfxBaseModel effectively does
-                    if (!aURL.isEmpty())
-                    {
-                        aMediaDescriptor[utl::MediaDescriptor::PROP_DOCUMENTBASEURL] <<= aURL;
-                    }
-                    aMediaDescriptor.addInputStream();
-                    uno::Sequence< beans::PropertyValue > aCompleteMediaDescriptor;
-                    aMediaDescriptor >> aCompleteMediaDescriptor;
-                    apphelper::MediaDescriptorHelper aMDHelper( aCompleteMediaDescriptor );
-
-                    // load file
-                    // @todo: replace: aMediaDescriptorHelper.getReducedForModel()
-                    uno::Reference< frame::XLoadable > xLoadable( xModel, uno::UNO_QUERY_THROW );
-                    xLoadable->load( aCompleteMediaDescriptor );
-
-                    //resize standalone files to get correct size:
-                    if( xComponentWindow.is() && aMDHelper.ISSET_FilterName && aMDHelper.FilterName == "StarChart 5.0" )
-                    {
-                        awt::Rectangle aRect( xComponentWindow->getPosSize() );
-                        xComponentWindow->setPosSize( aRect.X, aRect.Y, aRect.Width, aRect.Height, 0 );
-                    }
+                    uno::Reference<awt::XWindow> xComponentWindow = xController->getComponentWindow();
+                    awt::Rectangle aRect( xComponentWindow->getPosSize() );
+                    xComponentWindow->setPosSize( aRect.X, aRect.Y, aRect.Width, aRect.Height, 0 );
                 }
             }
         }
-        catch( const uno::Exception & )
-        {
-            DBG_UNHANDLED_EXCEPTION("chart2");
-        }
+    }
+    catch( const uno::Exception & )
+    {
+        DBG_UNHANDLED_EXCEPTION("chart2");
+    }
 
     return true;
 }

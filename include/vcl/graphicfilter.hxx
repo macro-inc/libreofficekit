@@ -23,11 +23,12 @@
 #include <tools/gen.hxx>
 #include <vcl/dllapi.h>
 #include <vcl/graph.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <o3tl/typed_flags_set.hxx>
+#include <vcl/BinaryDataContainer.hxx>
+#include <vcl/graphic/GraphicMetadata.hxx>
 
 #include <memory>
-#include <optional>
 
 namespace com::sun::star::beans { struct PropertyValue; }
 namespace com::sun::star::uno { template <class E> class Sequence; }
@@ -70,13 +71,16 @@ namespace o3tl
 #define IMP_MOV                 "SVMOV"
 #define IMP_SVMETAFILE          "SVMETAFILE"
 #define IMP_WMF                 "SVWMF"
+#define IMP_WMZ                 "SVWMZ"
 #define IMP_EMF                 "SVEMF"
+#define IMP_EMZ                 "SVEMZ"
 #define IMP_GIF                 "SVIGIF"
 #define IMP_PNG                 "SVIPNG"
 #define IMP_JPEG                "SVIJPEG"
 #define IMP_XBM                 "SVIXBM"
 #define IMP_XPM                 "SVIXPM"
 #define IMP_SVG                 "SVISVG"
+#define IMP_SVGZ                "SVISVGZ"
 #define IMP_PDF                 "SVIPDF"
 #define IMP_TIFF                "SVTIFF"
 #define IMP_TGA                 "SVTGA"
@@ -94,9 +98,12 @@ namespace o3tl
 #define EXP_BMP                 "SVBMP"
 #define EXP_SVMETAFILE          "SVMETAFILE"
 #define EXP_WMF                 "SVWMF"
+#define EXP_WMZ                 "SVWMZ"
 #define EXP_EMF                 "SVEMF"
+#define EXP_EMZ                 "SVEMZ"
 #define EXP_JPEG                "SVEJPEG"
 #define EXP_SVG                 "SVESVG"
+#define EXP_SVGZ                "SVESVGZ"
 #define EXP_PDF                 "SVEPDF"
 #define EXP_PNG                 "SVEPNG"
 #define EXP_TIFF                "SVTIFF"
@@ -119,56 +126,12 @@ inline constexpr OUStringLiteral SVG_SHORTNAME = u"SVG";
 inline constexpr OUStringLiteral PDF_SHORTNAME = u"PDF";
 inline constexpr OUStringLiteral WEBP_SHORTNAME = u"WEBP";
 
-//  Info class for all supported file formats
-
-enum class GraphicFileFormat
-{
-    NOT = 0x0000,
-    BMP = 0x0001,
-    GIF = 0x0002,
-    JPG = 0x0003,
-    PCD = 0x0004,
-    PCX = 0x0005,
-    PNG = 0x0006,
-    TIF = 0x0007,
-    XBM = 0x0008,
-    XPM = 0x0009,
-    PBM = 0x000a,
-    PGM = 0x000b,
-    PPM = 0x000c,
-    RAS = 0x000d,
-    TGA = 0x000e,
-    PSD = 0x000f,
-    EPS = 0x0010,
-    WEBP = 0x0011,
-    DXF = 0x00f1,
-    MET = 0x00f2,
-    PCT = 0x00f3,
-    // retired SGF = 0x00f4,
-    SVM = 0x00f5,
-    WMF = 0x00f6,
-    // retired SGV = 0x00f7,
-    EMF = 0x00f8,
-    SVG = 0x00f9
-};
-
-
 class VCL_DLLPUBLIC GraphicDescriptor final
 {
-    SvStream*           pFileStm;
-
-    OUString            aPathExt;
-    Size                aPixSize;
-    Size                aLogSize;
-    std::optional<Size> maPreferredLogSize;
-    std::optional<MapMode> maPreferredMapMode;
-    sal_uInt16          nBitsPerPixel;
-    sal_uInt16          nPlanes;
-    GraphicFileFormat   nFormat;
-    bool                bOwnStream;
-    sal_uInt8 mnNumberOfImageComponents;
-    bool                bIsTransparent;
-    bool                bIsAlpha;
+    SvStream*            pFileStm;
+    OUString             aPathExt;
+    GraphicMetadata      aMetadata;
+    bool                 bOwnStream;
 
     void                ImpConstruct();
 
@@ -225,37 +188,37 @@ public:
     bool    Detect( bool bExtendedInfo = false );
 
     /** @return the file format, GraphicFileFormat::NOT if no format was recognized */
-    GraphicFileFormat  GetFileFormat() const { return nFormat; }
+    GraphicFileFormat  GetFileFormat() const { return aMetadata.mnFormat; }
 
     /** @return graphic size in pixels or 0 size */
-    const Size&     GetSizePixel() const { return aPixSize; }
+    const Size&     GetSizePixel() const { return aMetadata.maPixSize; }
 
     /** @return the logical graphic size in 1/100mm or 0 size */
-    const Size&     GetSize_100TH_MM() const { return aLogSize; }
+    const Size&     GetSize_100TH_MM() const { return aMetadata.maLogSize; }
 
     /**
      * Returns the logic size, according to the map mode available via GetPreferredMapMode(). Prefer
      * this size over GetSize_100TH_MM().
      */
-    const std::optional<Size>& GetPreferredLogSize() const { return maPreferredLogSize; }
+    const std::optional<Size>& GetPreferredLogSize() const { return aMetadata.maPreferredLogSize; }
 
     /**
      * If available, this returns the map mode the graphic prefers, which may be other than pixel or
      * 100th mm. Prefer this map mode over just assuming MapUnit::Map100thMM.
      */
-    const std::optional<MapMode>& GetPreferredMapMode() const { return maPreferredMapMode; }
+    const std::optional<MapMode>& GetPreferredMapMode() const { return aMetadata.maPreferredMapMode; }
 
     /** @return bits/pixel or 0 **/
-    sal_uInt16          GetBitsPerPixel() const { return nBitsPerPixel; }
+    sal_uInt16          GetBitsPerPixel() const { return aMetadata.mnBitsPerPixel; }
 
     /** @return number of color channels */
-    sal_uInt8 GetNumberOfImageComponents() const { return mnNumberOfImageComponents; }
+    sal_uInt8 GetNumberOfImageComponents() const { return aMetadata.mnNumberOfImageComponents; }
 
     /** @return whether image supports transparency */
-    bool IsTransparent() const { return bIsTransparent; }
+    bool IsTransparent() const { return aMetadata.mbIsTransparent; }
 
     /** @return whether image supports alpha values for translucent colours */
-    bool IsAlpha() const { return bIsAlpha; }
+    bool IsAlpha() const { return aMetadata.mbIsAlpha; }
 
     /** @return filter number that is needed by the GraphFilter to read this format */
     static OUString GetImportFormatShortName( GraphicFileFormat nFormat );
@@ -295,7 +258,7 @@ public:
     ErrCode             ExportGraphic( const Graphic& rGraphic, const INetURLObject& rPath,
                                        sal_uInt16 nFormat,
                                        const css::uno::Sequence< css::beans::PropertyValue >* pFilterData = nullptr );
-    ErrCode             ExportGraphic( const Graphic& rGraphic, const OUString& rPath,
+    ErrCode             ExportGraphic( const Graphic& rGraphic, std::u16string_view rPath,
                                        SvStream& rOStm, sal_uInt16 nFormat,
                                        const css::uno::Sequence< css::beans::PropertyValue >* pFilterData = nullptr );
 
@@ -307,15 +270,14 @@ public:
                                    sal_uInt16 nFormat = GRFILTER_FORMAT_DONTKNOW,
                                    sal_uInt16 * pDeterminedFormat = nullptr, GraphicFilterImportFlags nImportFlags = GraphicFilterImportFlags::NONE );
 
-    ErrCode             CanImportGraphic( const OUString& rPath, SvStream& rStream,
+    ErrCode             CanImportGraphic( std::u16string_view rPath, SvStream& rStream,
                                       sal_uInt16 nFormat,
                                       sal_uInt16 * pDeterminedFormat);
 
-    ErrCode             ImportGraphic( Graphic& rGraphic, const OUString& rPath,
+    ErrCode             ImportGraphic( Graphic& rGraphic, std::u16string_view rPath,
                                    SvStream& rStream,
                                    sal_uInt16 nFormat = GRFILTER_FORMAT_DONTKNOW,
-                                   sal_uInt16 * pDeterminedFormat = nullptr, GraphicFilterImportFlags nImportFlags = GraphicFilterImportFlags::NONE,
-                                   WmfExternal const *pExtHeader = nullptr );
+                                   sal_uInt16 * pDeterminedFormat = nullptr, GraphicFilterImportFlags nImportFlags = GraphicFilterImportFlags::NONE );
 
     /// Imports multiple graphics.
     ///
@@ -327,13 +289,6 @@ public:
      not process all items.
     */
     void MakeGraphicsAvailableThreaded(std::vector< Graphic* >& rGraphics);
-
-    ErrCode             ImportGraphic( Graphic& rGraphic, const OUString& rPath,
-                                   SvStream& rStream,
-                                   sal_uInt16 nFormat,
-                                   sal_uInt16 * pDeterminedFormat, GraphicFilterImportFlags nImportFlags,
-                                   const css::uno::Sequence< css::beans::PropertyValue >* pFilterData,
-                                   WmfExternal const *pExtHeader = nullptr );
 
     // Setting sizeLimit limits how much will be read from the stream.
     Graphic ImportUnloadedGraphic(SvStream& rIStream, sal_uInt64 sizeLimit = 0, const Size* pSizeHint = nullptr);
@@ -352,22 +307,21 @@ public:
 
     static ErrCode readGIF(SvStream& rStream, Graphic& rGraphic, GfxLinkType& rLinkType);
     static ErrCode readPNG(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType,
-                    std::unique_ptr<sal_uInt8[]> & rpGraphicContent, sal_Int32& rGraphicContentSize);
+                    BinaryDataContainer & rpGraphicContent);
     static ErrCode readJPEG(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType,
                     GraphicFilterImportFlags nImportFlags);
     static ErrCode readSVG(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType,
-                    std::unique_ptr<sal_uInt8[]> & rpGraphicContent, sal_Int32& rGraphicContentSize);
+                    BinaryDataContainer & rpGraphicContent);
     static ErrCode readXBM(SvStream & rStream, Graphic & rGraphic);
     static ErrCode readXPM(SvStream & rStream, Graphic & rGraphic);
 
-    static ErrCode readWMF_EMF(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType,
-                        WmfExternal const* pExtHeader, VectorGraphicDataType eType);
-    static ErrCode readWMF(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType, WmfExternal const* pExtHeader);
-    static ErrCode readEMF(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType, WmfExternal const* pExtHeader);
+    static ErrCode readWMF_EMF(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType, VectorGraphicDataType eType);
+    static ErrCode readWMF(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType);
+    static ErrCode readEMF(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType);
 
     static ErrCode readPDF(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType);
     static ErrCode readTIFF(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType);
-    static ErrCode readWithTypeSerializer(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType, OUString aFilterName);
+    static ErrCode readWithTypeSerializer(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType, std::u16string_view aFilterName);
     static ErrCode readBMP(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType);
     static ErrCode readTGA(SvStream & rStream, Graphic & rGraphic);
     static ErrCode readPICT(SvStream & rStream, Graphic & rGraphic, GfxLinkType & rLinkType);
@@ -387,7 +341,7 @@ private:
 
     void            ImplInit();
     ErrCode         ImplSetError( ErrCode nError, const SvStream* pStm = nullptr );
-    ErrCode         ImpTestOrFindFormat( const OUString& rPath, SvStream& rStream, sal_uInt16& rFormat );
+    ErrCode         ImpTestOrFindFormat( std::u16string_view rPath, SvStream& rStream, sal_uInt16& rFormat );
 
                     DECL_DLLPRIVATE_LINK( FilterCallback, ConvertData&, bool );
 

@@ -34,6 +34,7 @@
 #include <dialmgr.hxx>
 #include <svx/dialmgr.hxx>
 #include <svx/strings.hrc>
+#include <basegfx/utils/gradienttools.hxx>
 #include <sal/log.hxx>
 
 #define DEFAULT_GRADIENTSTEP 64
@@ -83,7 +84,8 @@ SvxGradientTabPage::SvxGradientTabPage(weld::Container* pPage, weld::DialogContr
 
     // setting the output device
     m_rXFSet.Put( XFillStyleItem(drawing::FillStyle_GRADIENT) );
-    m_rXFSet.Put( XFillGradientItem(OUString(), XGradient( COL_BLACK, COL_WHITE )) );
+    // XGradient() default already creates [COL_BLACK, COL_WHITE] as defaults
+    m_rXFSet.Put( XFillGradientItem(OUString(), XGradient()));
     m_aCtlPreview.SetAttributes(m_aXFillAttr.GetItemSet());
 
     // set handler
@@ -149,7 +151,7 @@ void SvxGradientTabPage::ActivatePage( const SfxItemSet& rSet )
 
     // determining (and possibly cutting) the name and
     // displaying it in the GroupBox
-    OUString        aString = CuiResId( RID_SVXSTR_TABLE ) + ": ";
+    OUString        aString = CuiResId( RID_CUISTR_TABLE ) + ": ";
     INetURLObject   aURL( m_pGradientList->GetPath() );
 
     aURL.Append( m_pGradientList->GetName() );
@@ -194,8 +196,8 @@ bool SvxGradientTabPage::FillItemSet( SfxItemSet* rSet )
     else
     // gradient was passed (unidentified)
     {
-        pXGradient.reset(new XGradient( m_xLbColorFrom->GetSelectEntryColor(),
-                    m_xLbColorTo->GetSelectEntryColor(),
+        pXGradient.reset(new XGradient(
+                    createColorStops(),
                     static_cast<css::awt::GradientStyle>(m_xLbGradientType->get_active()),
                     Degree10(static_cast<sal_Int16>(m_xMtrAngle->get_value(FieldUnit::NONE) * 10)), // should be changed in resource
                     static_cast<sal_uInt16>(m_xMtrCenterX->get_value(FieldUnit::NONE)),
@@ -292,8 +294,8 @@ void SvxGradientTabPage::ModifiedHdl_Impl( void const * pControl )
 
     css::awt::GradientStyle eXGS = static_cast<css::awt::GradientStyle>(m_xLbGradientType->get_active());
 
-    XGradient aXGradient( m_xLbColorFrom->GetSelectEntryColor(),
-                          m_xLbColorTo->GetSelectEntryColor(),
+    XGradient aXGradient(
+                          createColorStops(),
                           eXGS,
                           Degree10(static_cast<sal_Int16>(m_xMtrAngle->get_value(FieldUnit::NONE) * 10)), // should be changed in resource
                           static_cast<sal_uInt16>(m_xMtrCenterX->get_value(FieldUnit::NONE)),
@@ -321,7 +323,7 @@ void SvxGradientTabPage::ModifiedHdl_Impl( void const * pControl )
 IMPL_LINK_NOARG(SvxGradientTabPage, ClickAddHdl_Impl, weld::Button&, void)
 {
     OUString aNewName( SvxResId( RID_SVXSTR_GRADIENT ) );
-    OUString aDesc( CuiResId( RID_SVXSTR_DESC_GRADIENT ) );
+    OUString aDesc( CuiResId( RID_CUISTR_DESC_GRADIENT ) );
     OUString aName;
 
     tools::Long nCount = m_pGradientList->Count();
@@ -359,8 +361,8 @@ IMPL_LINK_NOARG(SvxGradientTabPage, ClickAddHdl_Impl, weld::Button&, void)
 
     if( !nError )
     {
-        XGradient aXGradient( m_xLbColorFrom->GetSelectEntryColor(),
-                              m_xLbColorTo->GetSelectEntryColor(),
+        XGradient aXGradient(
+                              createColorStops(),
                               static_cast<css::awt::GradientStyle>(m_xLbGradientType->get_active()),
                               Degree10(static_cast<sal_Int16>(m_xMtrAngle->get_value(FieldUnit::NONE) * 10)), // should be changed in resource
                               static_cast<sal_uInt16>(m_xMtrCenterX->get_value(FieldUnit::NONE)),
@@ -399,8 +401,8 @@ IMPL_LINK_NOARG(SvxGradientTabPage, ClickModifyHdl_Impl, weld::Button&, void)
 
     OUString aName( m_pGradientList->GetGradient( static_cast<sal_uInt16>(nPos) )->GetName() );
 
-    XGradient aXGradient( m_xLbColorFrom->GetSelectEntryColor(),
-                          m_xLbColorTo->GetSelectEntryColor(),
+    XGradient aXGradient(
+                          createColorStops(),
                           static_cast<css::awt::GradientStyle>(m_xLbGradientType->get_active()),
                           Degree10(static_cast<sal_Int16>(m_xMtrAngle->get_value(FieldUnit::NONE) * 10)), // should be changed in resource
                           static_cast<sal_uInt16>(m_xMtrCenterX->get_value(FieldUnit::NONE)),
@@ -457,7 +459,7 @@ IMPL_LINK_NOARG(SvxGradientTabPage, ClickRenameHdl_Impl, SvxPresetListBox*, void
     if ( nPos == VALUESET_ITEM_NOTFOUND )
         return;
 
-    OUString aDesc( CuiResId( RID_SVXSTR_DESC_GRADIENT ) );
+    OUString aDesc( CuiResId( RID_CUISTR_DESC_GRADIENT ) );
     OUString aName( m_pGradientList->GetGradient( nPos )->GetName() );
 
     SvxAbstractDialogFactory* pFact = SvxAbstractDialogFactory::Create();
@@ -503,13 +505,13 @@ void SvxGradientTabPage::ChangeGradientHdl_Impl()
         pGradient.reset(new XGradient( m_pGradientList->GetGradient( static_cast<sal_uInt16>( nPos ) )->GetGradient() ));
     else
     {
-        const SfxPoolItem* pPoolItem = nullptr;
-        if( SfxItemState::SET == m_rOutAttrs.GetItemState( GetWhich( XATTR_FILLSTYLE ), true, &pPoolItem ) )
+        if( const XFillStyleItem* pFillStyleItem = m_rOutAttrs.GetItemIfSet( GetWhich( XATTR_FILLSTYLE ) ) )
         {
-            if( ( drawing::FillStyle_GRADIENT == static_cast<const XFillStyleItem*>( pPoolItem )->GetValue() ) &&
-                ( SfxItemState::SET == m_rOutAttrs.GetItemState( GetWhich( XATTR_FILLGRADIENT ), true, &pPoolItem ) ) )
+            const XFillGradientItem* pGradientItem;
+            if( ( drawing::FillStyle_GRADIENT == pFillStyleItem->GetValue() ) &&
+                ( pGradientItem = m_rOutAttrs.GetItemIfSet( GetWhich( XATTR_FILLGRADIENT ) ) ) )
             {
-                pGradient.reset(new XGradient( static_cast<const XFillGradientItem*>( pPoolItem )->GetGradientValue() ));
+                pGradient.reset(new XGradient( pGradientItem->GetGradientValue() ));
             }
         }
         if( !pGradient )
@@ -542,10 +544,16 @@ void SvxGradientTabPage::ChangeGradientHdl_Impl()
     // if the entry is not in the listbox,
     // colors are added temporarily
     m_xLbColorFrom->SetNoSelection();
-    m_xLbColorFrom->SelectEntry( pGradient->GetStartColor() );
+    m_xLbColorFrom->SelectEntry(Color(pGradient->GetColorStops().front().getStopColor()));
 
     m_xLbColorTo->SetNoSelection();
-    m_xLbColorTo->SelectEntry( pGradient->GetEndColor() );
+    m_xLbColorTo->SelectEntry(Color(pGradient->GetColorStops().back().getStopColor()));
+
+    // MCGR: preserve in-between ColorStops if given
+    if (pGradient->GetColorStops().size() > 2)
+        m_aColorStops = basegfx::ColorStops(pGradient->GetColorStops().begin() + 1, pGradient->GetColorStops().end() - 1);
+    else
+        m_aColorStops.clear();
 
     m_xMtrAngle->set_value(pGradient->GetAngle().get() / 10, FieldUnit::NONE); // should be changed in resource
     m_xSliderAngle->set_value(pGradient->GetAngle().get() / 10);
@@ -628,6 +636,22 @@ sal_Int32 SvxGradientTabPage::SearchGradientList(std::u16string_view rGradientNa
         }
     }
     return nPos;
+}
+
+basegfx::ColorStops SvxGradientTabPage::createColorStops()
+{
+    basegfx::ColorStops aColorStops;
+
+    aColorStops.emplace_back(0.0, m_xLbColorFrom->GetSelectEntryColor().getBColor());
+
+    if(!m_aColorStops.empty())
+    {
+        aColorStops.insert(aColorStops.begin(), m_aColorStops.begin(), m_aColorStops.end());
+    }
+
+    aColorStops.emplace_back(1.0, m_xLbColorTo->GetSelectEntryColor().getBColor());
+
+    return aColorStops;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -35,11 +35,12 @@
 
 
 #include <framework/ContextChangeEventMultiplexerTunnel.hxx>
+#include <vcl/EnumContext.hxx>
 #include <vcl/uitest/logger.hxx>
 #include <vcl/uitest/eventdescription.hxx>
 #include <vcl/svapp.hxx>
 #include <splitwin.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/json_writer.hxx>
 #include <tools/link.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
@@ -49,8 +50,6 @@
 #include <sal/log.hxx>
 #include <officecfg/Office/UI/Sidebar.hxx>
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 
 #include <com/sun/star/awt/XWindowPeer.hpp>
 #include <com/sun/star/frame/XDispatch.hpp>
@@ -111,8 +110,7 @@ namespace {
 SidebarController::SidebarController (
     SidebarDockingWindow* pParentWindow,
     const SfxViewFrame* pViewFrame)
-    : SidebarControllerInterfaceBase(m_aMutex),
-      mpParentWindow(pParentWindow),
+    : mpParentWindow(pParentWindow),
       mpViewFrame(pViewFrame),
       mxFrame(pViewFrame->GetFrame().GetFrameInterface()),
       mpTabBar(VclPtr<TabBar>::Create(
@@ -275,7 +273,7 @@ namespace
     };
 }
 
-void SAL_CALL SidebarController::disposing()
+void SidebarController::disposing(std::unique_lock<std::mutex>&)
 {
     SolarMutexGuard aSolarMutexGuard;
 
@@ -361,8 +359,6 @@ void SAL_CALL SidebarController::notifyContextChangeEvent (const css::ui::Contex
 
 void SAL_CALL SidebarController::disposing (const css::lang::EventObject& )
 {
-    SolarMutexGuard aSolarMutexGuard;
-
     dispose();
 }
 
@@ -480,6 +476,7 @@ void SidebarController::NotifyResize()
                 mpCurrentDeck->setPosSizePixel(nDeckX, 0, nWidth - nTabBarDefaultWidth, nHeight);
             mpCurrentDeck->Show();
             mpCurrentDeck->RequestLayout();
+            mpTabBar->HighlightDeck(mpCurrentDeck->GetId());
         }
         else
             mpCurrentDeck->Hide();
@@ -512,6 +509,8 @@ void SidebarController::ProcessNewWidth (const sal_Int32 nNewWidth)
     {
         // Deck became large enough to be shown.  Show it.
         mnSavedSidebarWidth = nNewWidth;
+        // Store nNewWidth to mnWidthOnSplitterButtonDown when dragging sidebar Splitter
+        mnWidthOnSplitterButtonDown = nNewWidth;
         if (!*mbIsDeckOpen)
             RequestOpenDeck();
     }
@@ -601,10 +600,6 @@ void SidebarController::UpdateConfigurations()
         return;
     }
 
-    // Tell the tab bar to highlight the button associated
-    // with the deck.
-    mpTabBar->HighlightDeck(sNewDeckId);
-
     std::shared_ptr<DeckDescriptor> xDescriptor = mpResourceManager->GetDeckDescriptor(sNewDeckId);
 
     if (xDescriptor)
@@ -659,8 +654,12 @@ void SidebarController::OpenThenToggleDeck (
     if (mpCurrentDeck && mpTabBar)
     {
         sal_Int32 nRequestedWidth = mpCurrentDeck->GetMinimalWidth() + TabBar::GetDefaultWidth();
-        if (mnSavedSidebarWidth < nRequestedWidth)
+        // if sidebar was dragged
+        if(mnWidthOnSplitterButtonDown > 0 && mnWidthOnSplitterButtonDown > nRequestedWidth){
+            SetChildWindowWidth(mnWidthOnSplitterButtonDown);
+        }else{
             SetChildWindowWidth(nRequestedWidth);
+        }
     }
 }
 
@@ -828,8 +827,6 @@ void SidebarController::SwitchToDeck (
         msCurrentDeckId = rDeckDescriptor.msId;
     }
 
-    mpTabBar->HighlightDeck(msCurrentDeckId);
-
     // Determine the panels to display in the deck.
     ResourceManager::PanelContextDescriptorContainer aPanelContextDescriptors;
 
@@ -981,17 +978,17 @@ Reference<ui::XUIElement> SidebarController::CreateUIElement (
 
        // Create the XUIElement.
         ::comphelper::NamedValueCollection aCreationArguments;
-        aCreationArguments.put("Frame", makeAny(mxFrame));
-        aCreationArguments.put("ParentWindow", makeAny(rxWindow));
+        aCreationArguments.put("Frame", Any(mxFrame));
+        aCreationArguments.put("ParentWindow", Any(rxWindow));
         SidebarDockingWindow* pSfxDockingWindow = mpParentWindow.get();
         if (pSfxDockingWindow != nullptr)
-            aCreationArguments.put("SfxBindings", makeAny(reinterpret_cast<sal_uInt64>(&pSfxDockingWindow->GetBindings())));
+            aCreationArguments.put("SfxBindings", Any(reinterpret_cast<sal_uInt64>(&pSfxDockingWindow->GetBindings())));
         aCreationArguments.put("Theme", Theme::GetPropertySet());
-        aCreationArguments.put("Sidebar", makeAny(Reference<ui::XSidebar>(static_cast<ui::XSidebar*>(this))));
+        aCreationArguments.put("Sidebar", Any(Reference<ui::XSidebar>(static_cast<ui::XSidebar*>(this))));
         if (bWantsCanvas)
         {
             Reference<rendering::XSpriteCanvas> xCanvas (VCLUnoHelper::GetWindow(rxWindow)->GetOutDev()->GetSpriteCanvas());
-            aCreationArguments.put("Canvas", makeAny(xCanvas));
+            aCreationArguments.put("Canvas", Any(xCanvas));
         }
 
         if (mxCurrentController.is())
@@ -999,13 +996,13 @@ Reference<ui::XUIElement> SidebarController::CreateUIElement (
             OUString aModule = Tools::GetModuleName(mxCurrentController);
             if (!aModule.isEmpty())
             {
-                aCreationArguments.put("Module", makeAny(aModule));
+                aCreationArguments.put("Module", Any(aModule));
             }
-            aCreationArguments.put("Controller", makeAny(mxCurrentController));
+            aCreationArguments.put("Controller", Any(mxCurrentController));
         }
 
-        aCreationArguments.put("ApplicationName", makeAny(rContext.msApplication));
-        aCreationArguments.put("ContextName", makeAny(rContext.msContext));
+        aCreationArguments.put("ApplicationName", Any(rContext.msApplication));
+        aCreationArguments.put("ContextName", Any(rContext.msContext));
 
         Reference<ui::XUIElement> xUIElement(
             xUIElementFactory->createUIElement(
@@ -1066,7 +1063,6 @@ IMPL_LINK(SidebarController, WindowEventHandler, VclWindowEvent&, rEvent, void)
             case VclEventId::WindowMouseButtonUp:
             {
                 ProcessNewWidth(mpParentWindow->GetSizePixel().Width());
-                mnWidthOnSplitterButtonDown = 0;
                 break;
             }
 
@@ -1254,8 +1250,7 @@ void SidebarController::RequestCloseDeck()
     mbIsDeckRequestedOpen = false;
     UpdateDeckOpenState();
 
-    if (!mpCurrentDeck)
-        mpTabBar->RemoveDeckHighlight();
+    mpTabBar->RemoveDeckHighlight();
 }
 
 void SidebarController::RequestOpenDeck()
@@ -1375,9 +1370,6 @@ void SidebarController::UpdateDeckOpenState()
         mpParentWindow->SetStyle(mpParentWindow->GetStyle() & ~WB_SIZEABLE);
     }
 
-    mbIsDeckOpen = *mbIsDeckRequestedOpen;
-    if (*mbIsDeckOpen && mpCurrentDeck)
-        mpCurrentDeck->Show();
     NotifyResize();
 }
 

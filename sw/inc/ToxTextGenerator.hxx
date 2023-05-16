@@ -58,7 +58,7 @@ class ToxWhitespaceStripper;
 class ToxTextGenerator
 {
 public:
-    ToxTextGenerator(const SwForm& toxForm, std::shared_ptr<ToxTabStopTokenHandler> const & tabStopHandler);
+    ToxTextGenerator(const SwForm& toxForm, std::shared_ptr<ToxTabStopTokenHandler> tabStopHandler);
 
     virtual ~ToxTextGenerator();
 
@@ -143,7 +143,7 @@ private:
      */
     static OUString
     GetNumStringOfFirstNode(const SwTOXSortTabBase& rBase, bool bUsePrefix,
-            sal_uInt8 nLevel, SwRootFrame const* pLayout);
+            sal_uInt8 nLevel, SwRootFrame const* pLayout, bool bAddSpace = true);
 
     /** Handle a chapter token.
      */

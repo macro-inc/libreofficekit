@@ -21,7 +21,6 @@
 
 #include <sfx2/lnkbase.hxx>
 #include <svl/hint.hxx>
-#include <tools/solar.h>
 #include "swdllapi.h"
 #include "fldbas.hxx"
 
@@ -63,7 +62,7 @@ class SW_DLLPUBLIC SwDDEFieldType final : public SwFieldType
     SAL_DLLPRIVATE void RefCntChgd();
 
 public:
-    SwDDEFieldType( const OUString& rName, const OUString& rCmd,
+    SwDDEFieldType( OUString aName, const OUString& rCmd,
                     SfxLinkUpdateMode );
     virtual ~SwDDEFieldType() override;
 

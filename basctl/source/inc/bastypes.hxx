@@ -21,6 +21,7 @@
 #include "scriptdocument.hxx"
 
 #include "sbxitem.hxx"
+#include <svtools/scrolladaptor.hxx>
 #include <svtools/tabbar.hxx>
 #include <basic/sbdef.hxx>
 #include <vcl/dockwin.hxx>
@@ -49,11 +50,11 @@ class Layout;
 class ModulWindow;
 class DialogWindow;
 
-#define LINE_SEP_CR     0x0D
-#define LINE_SEP        0x0A
+constexpr auto LINE_SEP_CR = 0x0D;
+constexpr auto LINE_SEP = 0x0A;
 
 // Implementation: baside2b.cxx
-sal_Int32 searchEOL( const OUString& rStr, sal_Int32 fromIndex );
+sal_Int32 searchEOL( std::u16string_view rStr, sal_Int32 fromIndex );
 
 // Meaning of bToBeKilled:
 // While being in a reschedule-loop, I may not destroy the window.
@@ -155,10 +156,11 @@ class EntryDescriptor;
 class BaseWindow : public vcl::Window
 {
 private:
-    VclPtr<ScrollBar>      pShellHScrollBar;
-    VclPtr<ScrollBar>      pShellVScrollBar;
+    VclPtr<ScrollAdaptor>  pShellHScrollBar;
+    VclPtr<ScrollAdaptor>  pShellVScrollBar;
 
-    DECL_LINK( ScrollHdl, ScrollBar*, void );
+    DECL_LINK( VertScrollHdl, weld::Scrollbar&, void );
+    DECL_LINK( HorzScrollHdl, weld::Scrollbar&, void );
     int nStatus;
 
     ScriptDocument      m_aDocument;
@@ -169,10 +171,10 @@ private:
     friend class DialogWindow;
 
 protected:
-    virtual void    DoScroll( ScrollBar* pCurScrollBar );
+    virtual void    DoScroll(Scrollable* pCurScrollBar);
 
 public:
-    BaseWindow( vcl::Window* pParent, const ScriptDocument& rDocument, const OUString& aLibName, const OUString& aName );
+    BaseWindow( vcl::Window* pParent, ScriptDocument aDocument, OUString aLibName, OUString aName );
     virtual         ~BaseWindow() override;
     virtual void    dispose() override;
 
@@ -180,10 +182,11 @@ public:
     virtual void    DoInit();
     virtual void    Activating () = 0;
     virtual void    Deactivating () = 0;
-    void            GrabScrollBars( ScrollBar* pHScroll, ScrollBar* pVScroll );
+    void            GrabScrollBars(ScrollAdaptor* pHScroll, ScrollAdaptor* pVScroll);
 
-    ScrollBar*      GetHScrollBar() const { return pShellHScrollBar; }
-    ScrollBar*      GetVScrollBar() const { return pShellVScrollBar; }
+    ScrollAdaptor*  GetHScrollBar() const { return pShellHScrollBar.get(); }
+    ScrollAdaptor*  GetVScrollBar() const { return pShellVScrollBar.get(); }
+    void            ShowShellScrollBars(bool bVisible = true);
 
     virtual void    ExecuteCommand (SfxRequest&);
     virtual void    ExecuteGlobal (SfxRequest&);
@@ -260,7 +263,7 @@ private:
         OUString        m_aLibName;
 
     public:
-        Key (ScriptDocument const&, OUString const& rLibName);
+        Key (ScriptDocument , OUString aLibName);
     public:
         bool operator == (Key const&) const;
         struct Hash
@@ -278,7 +281,7 @@ public:
         ItemType        m_eCurrentType;
 
     public:
-        Item (OUString const& rCurrentName, ItemType eCurrentType);
+        Item (OUString aCurrentName, ItemType eCurrentType);
         const OUString& GetCurrentName()        const { return m_aCurrentName; }
         ItemType        GetCurrentType()        const { return m_eCurrentType; }
     };

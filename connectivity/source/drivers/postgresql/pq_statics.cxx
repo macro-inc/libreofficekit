@@ -35,9 +35,9 @@
  ************************************************************************/
 
 #include "pq_statics.hxx"
-#include "pq_updateableresultset.hxx"
 #include <com/sun/star/sdbc/DataType.hpp>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
+#include <utility>
 
 using com::sun::star::uno::Sequence;
 using com::sun::star::uno::Any;
@@ -69,8 +69,8 @@ struct BaseTypeDef { const char * typeName; sal_Int32 value; };
 
 struct PropertyDef
 {
-    PropertyDef( const OUString &str, const Type &t )
-        : name( str ) , type( t ) {}
+    PropertyDef( OUString str, const Type &t )
+        : name(std::move( str )) , type( t ) {}
     OUString name;
     css::uno::Type type;
 };
@@ -197,7 +197,7 @@ Statics & getStatics()
                     PropertyDef( statics.TYPE , tString )
                 };
             ist.pProps = createPropertyArrayHelper(
-                tableDef, SAL_N_ELEMENTS(tableDef), READONLY );
+                tableDef, std::size(tableDef), READONLY );
 
             statics.refl.tableDescriptor.implName =
                 "org.openoffice.comp.pq.sdbcx.TableDescriptor";
@@ -211,7 +211,7 @@ Statics & getStatics()
                     PropertyDef( statics.SCHEMA_NAME , tString )
                 };
             statics.refl.tableDescriptor.pProps = createPropertyArrayHelper(
-                tableDescDef, SAL_N_ELEMENTS(tableDescDef), 0 );
+                tableDescDef, std::size(tableDescDef), 0 );
 
             // Column props set
             statics.refl.column.implName = "org.openoffice.comp.pq.sdbcx.Column";
@@ -233,7 +233,7 @@ Statics & getStatics()
                     PropertyDefEx( statics.TYPE_NAME , tString ,READONLY)
                 };
             statics.refl.column.pProps = createPropertyArrayHelper(
-                columnDef, SAL_N_ELEMENTS(columnDef) );
+                columnDef, std::size(columnDef) );
 
             statics.refl.columnDescriptor.implName =
                 "org.openoffice.comp.pq.sdbcx.ColumnDescriptor";
@@ -256,7 +256,7 @@ Statics & getStatics()
                 };
 
             statics.refl.columnDescriptor.pProps = createPropertyArrayHelper(
-                columnDescDef, SAL_N_ELEMENTS(columnDescDef), 0 );
+                columnDescDef, std::size(columnDescDef), 0 );
 
             // Key properties
             statics.refl.key.implName = "org.openoffice.comp.pq.sdbcx.Key";
@@ -272,7 +272,7 @@ Statics & getStatics()
                     PropertyDef( statics.UPDATE_RULE, tInt )
                 };
             statics.refl.key.pProps = createPropertyArrayHelper(
-                keyDef, SAL_N_ELEMENTS(keyDef), READONLY );
+                keyDef, std::size(keyDef), READONLY );
 
 
             // Key properties
@@ -288,7 +288,7 @@ Statics & getStatics()
                     PropertyDef( statics.UPDATE_RULE, tInt )
                 };
             statics.refl.keyDescriptor.pProps = createPropertyArrayHelper(
-                keyDescDef, SAL_N_ELEMENTS(keyDescDef), 0 );
+                keyDescDef, std::size(keyDescDef), 0 );
 
 
             // KeyColumn props set
@@ -311,7 +311,7 @@ Statics & getStatics()
                     PropertyDef( statics.TYPE_NAME , tString )
                 };
             statics.refl.keycolumn.pProps = createPropertyArrayHelper(
-                keycolumnDef, SAL_N_ELEMENTS(keycolumnDef), READONLY );
+                keycolumnDef, std::size(keycolumnDef), READONLY );
 
             // KeyColumn props set
             statics.refl.keycolumnDescriptor.implName =
@@ -324,7 +324,7 @@ Statics & getStatics()
                     PropertyDef( statics.RELATED_COLUMN, tString )
                 };
             statics.refl.keycolumnDescriptor.pProps = createPropertyArrayHelper(
-                keycolumnDescDef, SAL_N_ELEMENTS(keycolumnDescDef), 0 );
+                keycolumnDescDef, std::size(keycolumnDescDef), 0 );
 
             // view props set
             statics.refl.view.implName = "org.openoffice.comp.pq.sdbcx.View";
@@ -338,13 +338,13 @@ Statics & getStatics()
                     PropertyDef( statics.SCHEMA_NAME , tString )
                 };
             statics.refl.view.pProps = createPropertyArrayHelper(
-                viewDef, SAL_N_ELEMENTS(viewDef), READONLY );
+                viewDef, std::size(viewDef), READONLY );
 
             // view props set
             statics.refl.viewDescriptor.implName = "org.openoffice.comp.pq.sdbcx.ViewDescriptor";
             statics.refl.viewDescriptor.serviceNames = { "com.sun.star.sdbcx.ViewDescriptor" };
             statics.refl.viewDescriptor.pProps = createPropertyArrayHelper(
-                viewDef, SAL_N_ELEMENTS(viewDef), 0 ); // reuse view, as it is identical
+                viewDef, std::size(viewDef), 0 ); // reuse view, as it is identical
             // user props set
             statics.refl.user.implName = "org.openoffice.comp.pq.sdbcx.User";
             statics.refl.user.serviceNames = { "com.sun.star.sdbcx.User" };
@@ -353,7 +353,7 @@ Statics & getStatics()
                     PropertyDef( statics.NAME , tString )
                 };
             statics.refl.user.pProps = createPropertyArrayHelper(
-                userDefRO, SAL_N_ELEMENTS(userDefRO), READONLY );
+                userDefRO, std::size(userDefRO), READONLY );
 
             // user props set
             statics.refl.userDescriptor.implName =
@@ -365,7 +365,7 @@ Statics & getStatics()
                     PropertyDef( statics.PASSWORD , tString )
                 };
             statics.refl.userDescriptor.pProps = createPropertyArrayHelper(
-                userDefWR, SAL_N_ELEMENTS(userDefWR), 0 );
+                userDefWR, std::size(userDefWR), 0 );
 
             // index props set
             statics.refl.index.implName = "org.openoffice.comp.pq.sdbcx.Index";
@@ -380,14 +380,14 @@ Statics & getStatics()
                     PropertyDef( statics.PRIVATE_COLUMN_INDEXES, tStringSequence )
                 };
             statics.refl.index.pProps = createPropertyArrayHelper(
-                indexDef, SAL_N_ELEMENTS(indexDef), READONLY );
+                indexDef, std::size(indexDef), READONLY );
 
             // index props set
             statics.refl.indexDescriptor.implName =
                 "org.openoffice.comp.pq.sdbcx.IndexDescriptor";
             statics.refl.indexDescriptor.serviceNames = { "com.sun.star.sdbcx.IndexDescriptor" };
             statics.refl.indexDescriptor.pProps = createPropertyArrayHelper(
-                indexDef, SAL_N_ELEMENTS(indexDef), 0 );
+                indexDef, std::size(indexDef), 0 );
 
             // indexColumn props set
             statics.refl.indexColumn.implName = "org.openoffice.comp.pq.sdbcx.IndexColumn";
@@ -409,7 +409,7 @@ Statics & getStatics()
                     PropertyDef( statics.TYPE_NAME , tString )
                 };
             statics.refl.indexColumn.pProps = createPropertyArrayHelper(
-                indexColumnDef, SAL_N_ELEMENTS(indexColumnDef), READONLY );
+                indexColumnDef, std::size(indexColumnDef), READONLY );
 
             // indexColumn props set
             statics.refl.indexColumnDescriptor.implName =
@@ -422,31 +422,7 @@ Statics & getStatics()
                     PropertyDef( statics.NAME , tString )
                 };
             statics.refl.indexColumnDescriptor.pProps = createPropertyArrayHelper(
-                indexColumnDescDef, SAL_N_ELEMENTS(indexColumnDescDef), 0 );
-
-            // resultset
-            statics.refl.resultSet.implName = "org.openoffice.comp.pq.ResultSet";
-            statics.refl.resultSet.serviceNames = { "com.sun.star.sdbc.ResultSet" };
-            statics.refl.resultSet.types = UpdateableResultSet::getStaticTypes( false /* updateable */ );
-            PropertyDef resultSet[] =
-                {
-                    PropertyDef( statics.CURSOR_NAME , tString ),
-                    PropertyDef( statics.ESCAPE_PROCESSING , tBool ),
-                    PropertyDef( statics.FETCH_DIRECTION , tInt ),
-                    PropertyDef( statics.FETCH_SIZE , tInt ),
-                    PropertyDef( statics.IS_BOOKMARKABLE , tBool ),
-                    PropertyDef( statics.RESULT_SET_CONCURRENCY , tInt ),
-                    PropertyDef( statics.RESULT_SET_TYPE , tInt )
-                };
-            statics.refl.resultSet.pProps = createPropertyArrayHelper(
-                resultSet, SAL_N_ELEMENTS(resultSet), 0 );
-
-            // updateableResultset
-            statics.refl.updateableResultSet.implName = "org.openoffice.comp.pq.UpdateableResultSet";
-            statics.refl.updateableResultSet.serviceNames = { "com.sun.star.sdbc.ResultSet" };
-            statics.refl.updateableResultSet.types = UpdateableResultSet::getStaticTypes( true /* updateable */ );
-            statics.refl.updateableResultSet.pProps = createPropertyArrayHelper(
-                resultSet, SAL_N_ELEMENTS(resultSet), 0 );
+                indexColumnDescDef, std::size(indexColumnDescDef), 0 );
 
             // databasemetadata
             statics.tablesRowNames = std::vector< OUString > ( 5 );

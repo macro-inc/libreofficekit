@@ -27,6 +27,7 @@
 #include <token.hxx>
 #include <tokenarray.hxx>
 #include <rangenam.hxx>
+#include <rangeutl.hxx>
 #include <global.hxx>
 #include <compiler.hxx>
 #include <refupdat.hxx>
@@ -258,8 +259,8 @@ OUString ScRangeData::GetSymbol( const ScAddress& rPos, const FormulaGrammar::Gr
 
 void ScRangeData::UpdateSymbol( OUStringBuffer& rBuffer, const ScAddress& rPos )
 {
-    std::unique_ptr<ScTokenArray> pTemp( pCode->Clone() );
-    ScCompiler aComp(rDoc, rPos, *pTemp, formula::FormulaGrammar::GRAM_DEFAULT);
+    ScTokenArray aTemp( pCode->CloneValue() );
+    ScCompiler aComp(rDoc, rPos, aTemp, formula::FormulaGrammar::GRAM_DEFAULT);
     aComp.MoveRelWrap();
     aComp.CreateStringFromTokenArray( rBuffer );
 }
@@ -407,8 +408,7 @@ void ScRangeData::UpdateDeleteTab( sc::RefUpdateDeleteTabContext& rCxt, SCTAB nL
     if (aRes.mbReferenceModified)
         rCxt.maUpdatedNames.setUpdatedName(nLocalTab, nIndex);
 
-    if (rCxt.mnDeletePos <= aPos.Tab())
-        aPos.IncTab(-rCxt.mnSheets);
+    ScRangeUpdater::UpdateDeleteTab( aPos, rCxt);
 }
 
 void ScRangeData::UpdateMoveTab( sc::RefUpdateMoveTabContext& rCxt, SCTAB nLocalTab )
@@ -666,7 +666,11 @@ public:
 
 }
 
-ScRangeName::ScRangeName() {}
+ScRangeName::ScRangeName()
+    : mHasPossibleAddressConflict(false)
+    , mHasPossibleAddressConflictDirty(false)
+{
+}
 
 ScRangeName::ScRangeName(const ScRangeName& r)
     : mHasPossibleAddressConflict( r.mHasPossibleAddressConflict )

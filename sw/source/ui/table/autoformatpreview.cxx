@@ -36,6 +36,8 @@
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
 #include <drawinglayer/processor2d/processor2dtools.hxx>
 #include <strings.hrc>
+#include <svtools/colorcfg.hxx>
+#include <swmodule.hxx>
 
 #include <autoformatpreview.hxx>
 
@@ -234,7 +236,7 @@ void AutoFormatPreview::DrawString(vcl::RenderContext& rRenderContext, size_t nC
     SvtScriptedTextHelper aScriptedText(rRenderContext);
     Size aStrSize;
     sal_uInt8 nFormatIndex = GetFormatIndex(nCol, nRow);
-    const basegfx::B2DRange aCellRange(maArray.GetCellRange(nCol, nRow, true));
+    const basegfx::B2DRange aCellRange(maArray.GetCellRange(nCol, nRow));
     const tools::Rectangle cellRect(
         basegfx::fround(aCellRange.getMinX()), basegfx::fround(aCellRange.getMinY()),
         basegfx::fround(aCellRange.getMaxX()), basegfx::fround(aCellRange.getMaxY()));
@@ -324,7 +326,7 @@ void AutoFormatPreview::DrawBackground(vcl::RenderContext& rRenderContext)
             rRenderContext.Push(vcl::PushFlags::LINECOLOR | vcl::PushFlags::FILLCOLOR);
             rRenderContext.SetLineColor();
             rRenderContext.SetFillColor(aBrushItem.GetColor());
-            const basegfx::B2DRange aCellRange(maArray.GetCellRange(nCol, nRow, true));
+            const basegfx::B2DRange aCellRange(maArray.GetCellRange(nCol, nRow));
             rRenderContext.DrawRect(tools::Rectangle(
                 basegfx::fround(aCellRange.getMinX()), basegfx::fround(aCellRange.getMinY()),
                 basegfx::fround(aCellRange.getMaxX()), basegfx::fround(aCellRange.getMaxY())));
@@ -430,6 +432,10 @@ void AutoFormatPreview::Paint(vcl::RenderContext& rRenderContext, const tools::R
 {
     rRenderContext.Push(vcl::PushFlags::ALL);
 
+    const Color& rWinColor = SW_MOD()->GetColorConfig().GetColorValue(::svtools::DOCCOLOR).nColor;
+    rRenderContext.SetBackground(Wallpaper(rWinColor));
+    rRenderContext.Erase();
+
     DrawModeFlags nOldDrawMode = rRenderContext.GetDrawMode();
     if (rRenderContext.GetSettings().GetStyleSettings().GetHighContrastMode())
         rRenderContext.SetDrawMode(DrawModeFlags::SettingsLine | DrawModeFlags::SettingsFill
@@ -439,12 +445,7 @@ void AutoFormatPreview::Paint(vcl::RenderContext& rRenderContext, const tools::R
 
     vcl::Font aFont(rRenderContext.GetFont());
     aFont.SetTransparent(true);
-
     rRenderContext.SetFont(aFont);
-    rRenderContext.SetLineColor();
-    const Color& rWinColor = rRenderContext.GetSettings().GetStyleSettings().GetWindowColor();
-    rRenderContext.SetBackground(Wallpaper(rWinColor));
-    rRenderContext.SetFillColor(rWinColor);
 
     // Draw the Frame
     Color oldColor = rRenderContext.GetLineColor();

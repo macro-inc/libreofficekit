@@ -9,9 +9,8 @@
 
 #include <swmodeltestbase.hxx>
 
+#include <com/sun/star/awt/FontWeight.hpp>
 #include <com/sun/star/drawing/FillStyle.hpp>
-#include <tools/color.hxx>
-#include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/text/RelOrientation.hpp>
 #include <com/sun/star/text/XTextViewCursorSupplier.hpp>
 #include <com/sun/star/text/XPageCursor.hpp>
@@ -20,22 +19,12 @@
 #include <com/sun/star/text/XTextTablesSupplier.hpp>
 #include <com/sun/star/text/XTextFieldsSupplier.hpp>
 #include <com/sun/star/text/XTextField.hpp>
-
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/extras/ooxmlexport/data/";
+#include <o3tl/string_view.hxx>
 
 class Test : public SwModelTestBase
 {
 public:
-    Test() : SwModelTestBase(DATA_DIRECTORY, "Office Open XML Text") {}
-
-protected:
-    /**
-     * Denylist handling
-     */
-    bool mustTestImportOf(const char* filename) const override {
-        // If the testcase is stored in some other format, it's pointless to test.
-        return OString(filename).endsWith(".docx");
-    }
+    Test() : SwModelTestBase("/sw/qa/extras/ooxmlexport/data/", "Office Open XML Text") {}
 };
 
 CPPUNIT_TEST_FIXTURE(Test, testTdf123621)
@@ -47,8 +36,9 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf123621)
         "/wp:positionV/wp:posOffset", "1080135");
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf131540, "tdf131540.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf131540)
 {
+    loadAndReload("tdf131540.odt");
     CPPUNIT_ASSERT_EQUAL(2, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // There are 2 OLEs test if one of them moved on save:
@@ -64,33 +54,33 @@ DECLARE_OOXMLEXPORT_TEST(testTdf131801, "tdf131801.docx")
 
     xmlDocUniquePtr pDump = parseLayoutDump();
     // "1." is red
-    CPPUNIT_ASSERT_EQUAL(OUString("1."), getXPath(pDump, "//page[1]/body/txt[1]/Special", "rText"));
-    CPPUNIT_ASSERT_EQUAL(OUString("00ff0000"), getXPath(pDump, "//page[1]/body/txt[1]/Special/SwFont", "color"));
+    CPPUNIT_ASSERT_EQUAL(OUString("1."), getXPath(pDump, "//page[1]/body/txt[1]/SwParaPortion/SwLineLayout/SwFieldPortion", "expand"));
+    CPPUNIT_ASSERT_EQUAL(OUString("00ff0000"), getXPath(pDump, "//page[1]/body/txt[1]/SwParaPortion/SwLineLayout/SwFieldPortion", "font-color"));
     // "2." is red
-    CPPUNIT_ASSERT_EQUAL(OUString("2."), getXPath(pDump, "//page[1]/body/txt[2]/Special", "rText"));
-    CPPUNIT_ASSERT_EQUAL(OUString("00ff0000"), getXPath(pDump, "//page[1]/body/txt[2]/Special/SwFont", "color"));
+    CPPUNIT_ASSERT_EQUAL(OUString("2."), getXPath(pDump, "//page[1]/body/txt[2]/SwParaPortion/SwLineLayout/SwFieldPortion", "expand"));
+    CPPUNIT_ASSERT_EQUAL(OUString("00ff0000"), getXPath(pDump, "//page[1]/body/txt[2]/SwParaPortion/SwLineLayout/SwFieldPortion", "font-color"));
     // "3." is black
-    CPPUNIT_ASSERT_EQUAL(OUString("3."), getXPath(pDump, "//page[1]/body/txt[3]/Special", "rText"));
-    CPPUNIT_ASSERT_EQUAL(OUString("ffffffff"), getXPath(pDump, "//page[1]/body/txt[3]/Special/SwFont", "color"));
+    CPPUNIT_ASSERT_EQUAL(OUString("3."), getXPath(pDump, "//page[1]/body/txt[3]/SwParaPortion/SwLineLayout/SwFieldPortion", "expand"));
+    CPPUNIT_ASSERT_EQUAL(OUString("ffffffff"), getXPath(pDump, "//page[1]/body/txt[3]/SwParaPortion/SwLineLayout/SwFieldPortion", "font-color"));
     // "4." is black
-    CPPUNIT_ASSERT_EQUAL(OUString("4."), getXPath(pDump, "//page[1]/body/txt[4]/Special", "rText"));
-    CPPUNIT_ASSERT_EQUAL(OUString("ffffffff"), getXPath(pDump, "//page[1]/body/txt[4]/Special/SwFont", "color"));
+    CPPUNIT_ASSERT_EQUAL(OUString("4."), getXPath(pDump, "//page[1]/body/txt[4]/SwParaPortion/SwLineLayout/SwFieldPortion", "expand"));
+    CPPUNIT_ASSERT_EQUAL(OUString("ffffffff"), getXPath(pDump, "//page[1]/body/txt[4]/SwParaPortion/SwLineLayout/SwFieldPortion", "font-color"));
     // "5." is red
-    CPPUNIT_ASSERT_EQUAL(OUString("5."), getXPath(pDump, "//page[1]/body/txt[5]/Special", "rText"));
-    CPPUNIT_ASSERT_EQUAL(OUString("00ff0000"), getXPath(pDump, "//page[1]/body/txt[5]/Special/SwFont", "color"));
+    CPPUNIT_ASSERT_EQUAL(OUString("5."), getXPath(pDump, "//page[1]/body/txt[5]/SwParaPortion/SwLineLayout/SwFieldPortion", "expand"));
+    CPPUNIT_ASSERT_EQUAL(OUString("00ff0000"), getXPath(pDump, "//page[1]/body/txt[5]/SwParaPortion/SwLineLayout/SwFieldPortion", "font-color"));
     // "6." is red
-    CPPUNIT_ASSERT_EQUAL(OUString("6."), getXPath(pDump, "//page[1]/body/txt[6]/Special", "rText"));
-    CPPUNIT_ASSERT_EQUAL(OUString("00ff0000"), getXPath(pDump, "//page[1]/body/txt[6]/Special/SwFont", "color"));
+    CPPUNIT_ASSERT_EQUAL(OUString("6."), getXPath(pDump, "//page[1]/body/txt[6]/SwParaPortion/SwLineLayout/SwFieldPortion", "expand"));
+    CPPUNIT_ASSERT_EQUAL(OUString("00ff0000"), getXPath(pDump, "//page[1]/body/txt[6]/SwParaPortion/SwLineLayout/SwFieldPortion", "font-color"));
     // "7." is black
-    CPPUNIT_ASSERT_EQUAL(OUString("7."), getXPath(pDump, "//page[1]/body/txt[7]/Special", "rText"));
-    CPPUNIT_ASSERT_EQUAL(OUString("ffffffff"), getXPath(pDump, "//page[1]/body/txt[7]/Special/SwFont", "color"));
+    CPPUNIT_ASSERT_EQUAL(OUString("7."), getXPath(pDump, "//page[1]/body/txt[7]/SwParaPortion/SwLineLayout/SwFieldPortion", "expand"));
+    CPPUNIT_ASSERT_EQUAL(OUString("ffffffff"), getXPath(pDump, "//page[1]/body/txt[7]/SwParaPortion/SwLineLayout/SwFieldPortion", "font-color"));
     // "8." is black
-    CPPUNIT_ASSERT_EQUAL(OUString("8."), getXPath(pDump, "//page[1]/body/txt[8]/Special[1]", "rText"));
-    CPPUNIT_ASSERT_EQUAL(OUString("ffffffff"), getXPath(pDump, "//page[1]/body/txt[8]/Special[1]/SwFont", "color"));
+    CPPUNIT_ASSERT_EQUAL(OUString("8."), getXPath(pDump, "//page[1]/body/txt[8]/SwParaPortion/SwLineLayout/SwFieldPortion[1]", "expand"));
+    CPPUNIT_ASSERT_EQUAL(OUString("ffffffff"), getXPath(pDump, "//page[1]/body/txt[8]/SwParaPortion/SwLineLayout/SwFieldPortion[1]", "font-color"));
 
-    xmlDocUniquePtr pXmlDocument = parseExport("word/document.xml");
-    if (!pXmlDocument)
+    if (!isExported())
         return;
+    xmlDocUniquePtr pXmlDocument = parseExport("word/document.xml");
 
     assertXPath(pXmlDocument, "/w:document/w:body/w:p[1]/w:pPr/w:rPr/w:rStyle",
         "val", "Emphasis");
@@ -110,8 +100,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf131801, "tdf131801.docx")
     assertXPath(pXmlDocument, "/w:document/w:body/w:p[8]/w:pPr/w:rPr/w:rStyle", 0);
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf133334_followPgStyle, "tdf133334_followPgStyle.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf133334_followPgStyle)
 {
+    loadAndReload("tdf133334_followPgStyle.odt");
     CPPUNIT_ASSERT_EQUAL(2, getPages());
 }
 
@@ -139,7 +130,7 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf118701)
     // This was 6, related to moving inline images after the page breaks
     CPPUNIT_ASSERT_EQUAL(4, getPages());
 
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     assertXPath(pXmlDoc, "/w:document/w:body/w:p[1]/w:pPr[1]/w:numPr", 0);
     assertXPath(pXmlDoc, "/w:document/w:body/w:p[2]/w:pPr[1]/w:numPr", 0);
@@ -165,8 +156,24 @@ DECLARE_OOXMLEXPORT_TEST(testTdf123388, "tdf123388.docx")
     CPPUNIT_ASSERT_EQUAL(OUString("640"), xEnumerationAccess1->getPresentation(false).trim());
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf123401, "tdf123401.fodt")
+DECLARE_OOXMLEXPORT_TEST(testTdf123381, "tdf123381.docx")
 {
+    uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<container::XEnumerationAccess> xFieldsAccess(xTextFieldsSupplier->getTextFields());
+    uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
+
+    uno::Reference<text::XTextField> xEnumerationAccess1(xFields->nextElement(), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(OUString("INT(5.65)"), xEnumerationAccess1->getPresentation(true).trim());
+    CPPUNIT_ASSERT_EQUAL(OUString("5"), xEnumerationAccess1->getPresentation(false).trim());
+
+    uno::Reference<text::XTextField> xEnumerationAccess2(xFields->nextElement(), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(OUString("INT(<A1>)"), xEnumerationAccess2->getPresentation(true).trim());
+    CPPUNIT_ASSERT_EQUAL(OUString("6"), xEnumerationAccess2->getPresentation(false).trim());
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf123401)
+{
+    loadAndReload("tdf123401.fodt");
     uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xFieldsAccess(xTextFieldsSupplier->getTextFields());
     uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
@@ -180,7 +187,7 @@ DECLARE_OOXMLEXPORT_TEST(testTdf123401, "tdf123401.fodt")
     CPPUNIT_ASSERT_EQUAL(OUString("AVERAGE(<A1:A3>)"), xEnumerationAccess2->getPresentation(true).trim());
     CPPUNIT_ASSERT_EQUAL(OUString("3"), xEnumerationAccess2->getPresentation(false).trim());
 
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     // MEAN converted to AVERAGE
     assertXPathContent(pXmlDoc, "/w:document/w:body/w:tbl/w:tr[3]/w:tc/w:p/w:r[2]/w:instrText", " =AVERAGE(A1:A2)");
@@ -200,14 +207,15 @@ DECLARE_OOXMLEXPORT_TEST(testTdf116394, "tdf116394.docx")
     // - Actual  : abcd..
     CPPUNIT_ASSERT_EQUAL(OUString("ab=cd.."), xEnumerationAccess->getPresentation(true).trim());
 
-    xmlDocUniquePtr pXmlDoc = parseExport();
-    if (!pXmlDoc)
+    if (!isExported())
         return;
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     assertXPathContent(pXmlDoc, "/w:document/w:body/w:p/w:r[2]/w:instrText", " MERGEFIELD ab=cd ");
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf123356, "tdf123356.fodt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf123356)
 {
+    loadAndReload("tdf123356.fodt");
     uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xFieldsAccess(xTextFieldsSupplier->getTextFields());
     uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
@@ -222,8 +230,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf123356, "tdf123356.fodt")
     CPPUNIT_ASSERT_EQUAL(OUString("4"), xEnumerationAccess2->getPresentation(false).trim());
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf136404, "tdf136404.fodt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf136404)
 {
+    loadAndReload("tdf136404.fodt");
     uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xFieldsAccess(xTextFieldsSupplier->getTextFields());
     uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
@@ -269,10 +278,14 @@ DECLARE_OOXMLEXPORT_TEST(testTdf138739, "tdf138739.docx")
     uno::Reference<beans::XPropertySet> xParaProps(getParagraph(1), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Font type name does not match!", OUString("Comic Sans MS"),
                                  xParaProps->getPropertyValue("CharFontName").get<OUString>());
+
+    // tdf#148565: text at anchor point should be bold, Comic Sans MS font
+    CPPUNIT_ASSERT_EQUAL(awt::FontWeight::BOLD, getProperty<float>(getRun(getParagraph(5), 3), "CharWeight"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf123390, "tdf123390.fodt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf123390)
 {
+    loadAndReload("tdf123390.fodt");
     uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xFieldsAccess(xTextFieldsSupplier->getTextFields());
     uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
@@ -291,8 +304,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf123390, "tdf123390.fodt")
     CPPUNIT_ASSERT_EQUAL(OUString("0"), xEnumerationAccess3->getPresentation(false).trim());
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf123354, "tdf123354.fodt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf123354)
 {
+    loadAndReload("tdf123354.fodt");
     uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xFieldsAccess(xTextFieldsSupplier->getTextFields());
     uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
@@ -345,9 +359,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf123355, "tdf123355.docx")
     CPPUNIT_ASSERT_EQUAL(OUString("AVERAGE(<A2:A2>)"), xEnumerationAccess5->getPresentation(true).trim());
     CPPUNIT_ASSERT_EQUAL(OUString("4"), xEnumerationAccess5->getPresentation(false).trim());
 
-    xmlDocUniquePtr pXmlDoc = parseExport();
-    if (!pXmlDoc)
+    if (!isExported())
         return;
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     // keep original formula IDs
     assertXPathContent(pXmlDoc, "/w:document/w:body/w:tbl/w:tr[1]/w:tc[2]/w:p/w:r[2]/w:instrText", " =average( below )");
@@ -396,9 +410,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf123382, "tdf123382.docx")
     CPPUNIT_ASSERT_EQUAL(OUString("MAX(<B2:B4>)"), xEnumerationAccess7->getPresentation(true).trim());
     CPPUNIT_ASSERT_EQUAL(OUString("10"), xEnumerationAccess7->getPresentation(false).trim());
 
-    xmlDocUniquePtr pXmlDoc = parseExport();
-    if (!pXmlDoc)
+    if (!isExported())
         return;
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     // keep original formula IDs
     assertXPathContent(pXmlDoc, "/w:document/w:body/w:tbl/w:tr[1]/w:tc[1]/w:p/w:r[2]/w:instrText", " =MAX(RIGHT)");
@@ -434,9 +448,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf122648, "tdf122648.docx")
     CPPUNIT_ASSERT_EQUAL(OUString("SUM(<A1:B1>)"), xEnumerationAccess4->getPresentation(true).trim());
     CPPUNIT_ASSERT_EQUAL(OUString("2"), xEnumerationAccess4->getPresentation(false).trim());
 
-    xmlDocUniquePtr pXmlDoc = parseExport();
-    if (!pXmlDoc)
+    if (!isExported())
         return;
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     assertXPathContent(pXmlDoc, "/w:document/w:body/w:tbl[1]/w:tr[1]/w:tc[2]/w:p/w:r[2]/w:instrText", " =A1");
     assertXPathContent(pXmlDoc, "/w:document/w:body/w:tbl[1]/w:tr[2]/w:tc[2]/w:p/w:r[2]/w:instrText", " =SUM(A1:B1)");
@@ -445,8 +459,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf122648, "tdf122648.docx")
     assertXPathContent(pXmlDoc, "/w:document/w:body/w:tbl[2]/w:tr[2]/w:tc[2]/w:p/w:r[2]/w:instrText", " =SUM(A1:B1)");
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf98000_changePageStyle, "tdf98000_changePageStyle.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf98000_changePageStyle)
 {
+    loadAndReload("tdf98000_changePageStyle.odt");
     uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextViewCursorSupplier> xTextViewCursorSupplier(xModel->getCurrentController(), uno::UNO_QUERY);
 
@@ -458,8 +473,54 @@ DECLARE_OOXMLEXPORT_TEST(testTdf98000_changePageStyle, "tdf98000_changePageStyle
     CPPUNIT_ASSERT_MESSAGE("Different page1/page2 styles", sPageOneStyle != sPageTwoStyle);
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf135216_evenOddFooter, "tdf135216_evenOddFooter.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf145998_unnecessaryPageStyles)
 {
+    loadAndReload("tdf145998_unnecessaryPageStyles.odt");
+
+    // Sanity check - always good to test when dealing with page styles and breaks.
+    CPPUNIT_ASSERT_EQUAL(5, getPages());
+
+    // Page Style should be explicitly mentioned - otherwise it would be a "follow" style
+    uno::Reference<beans::XPropertySet> xPara(getParagraph(2, "2"), uno::UNO_QUERY_THROW);
+    CPPUNIT_ASSERT(uno::Any() != xPara->getPropertyValue("PageDescName"));
+    // CPPUNIT_ASSERT_EQUAL(OUString("First Page header"),
+    //                      parseDump("/root/page[2]/header/txt"));
+
+    // Page Style is converted into a page break instead. Still shows "first" header.
+    xPara.set(getParagraph(3, "3"), uno::UNO_QUERY_THROW);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(), xPara->getPropertyValue("PageDescName"));
+    // CPPUNIT_ASSERT_EQUAL(OUString("Default page style - first page style"),
+    //                      parseDump("/root/page[3]/header/txt"));
+    CPPUNIT_ASSERT_EQUAL(OUString(), parseDump("/root/page[3]/footer/txt"));
+
+    // Page Style is converted into a page break instead. Shows the "normal" header.
+    xPara.set(getParagraph(5, "4"), uno::UNO_QUERY_THROW);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(), xPara->getPropertyValue("PageDescName"));
+    CPPUNIT_ASSERT_EQUAL(OUString("Default page style"),
+                         parseDump("/root/page[4]/header/txt"));
+
+    // Page Style is retained (with wrong header) in order to preserve page re-numbering.
+    xPara.set(getParagraph(7, "1"), uno::UNO_QUERY_THROW);
+    CPPUNIT_ASSERT(uno::Any() != xPara->getPropertyValue("PageDescName"));
+    CPPUNIT_ASSERT_EQUAL(OUString(), parseDump("/root/page[5]/footer/txt"));
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf145998_firstHeader)
+{
+    loadAndReload("tdf145998_firstHeader.odt");
+
+    // Sanity check - always good to test when dealing with page styles and breaks.
+    CPPUNIT_ASSERT_EQUAL(2, getPages());
+
+    CPPUNIT_ASSERT_EQUAL(OUString("Very first header"), parseDump("/root/page[1]/header/txt"));
+
+    // Page Style is already used in prior section - this can't be the first-header
+    CPPUNIT_ASSERT_EQUAL(OUString("Normal Header"), parseDump("/root/page[2]/header/txt"));
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf135216_evenOddFooter)
+{
+    loadAndReload("tdf135216_evenOddFooter.odt");
     uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextViewCursorSupplier> xTextViewCursorSupplier(xModel->getCurrentController(), uno::UNO_QUERY);
     uno::Reference<text::XPageCursor> xCursor(xTextViewCursorSupplier->getViewCursor(), uno::UNO_QUERY);
@@ -489,8 +550,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf135216_evenOddFooter, "tdf135216_evenOddFooter.o
     getParagraph(2, "2");
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf136929_framesOfParagraph, "tdf136929_framesOfParagraph.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf136929_framesOfParagraph)
 {
+    loadAndReload("tdf136929_framesOfParagraph.odt");
     // Before this fix, the image was placed in the footer instead of in the text body - messing everything up.
     CPPUNIT_ASSERT_EQUAL_MESSAGE( "Number of Pages", 5, getPages() );
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Header2 text", OUString("* | *"), parseDump("/root/page[4]/footer/txt"));
@@ -506,14 +568,16 @@ DECLARE_OOXMLEXPORT_TEST(testTdf136589_paraHadField, "tdf136589_paraHadField.doc
     CPPUNIT_ASSERT_EQUAL(uno::Any(), xPara->getPropertyValue("PageDescName"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf133370_columnBreak, "tdf133370_columnBreak.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf133370_columnBreak)
 {
+    loadAndReload("tdf133370_columnBreak.odt");
     // Since non-DOCX formats ignores column breaks in non-column situations, don't export to docx.
     CPPUNIT_ASSERT_EQUAL(1, getPages());
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf134649_pageBreak, "tdf134649_pageBreak.fodt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf134649_pageBreak)
 {
+    loadAndReload("tdf134649_pageBreak.fodt");
     // This was 1 (missing page break between tables).
     CPPUNIT_ASSERT_EQUAL(2, getPages());
 }
@@ -531,8 +595,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf135343_columnSectionBreak_c14, "tdf135343_column
     //CPPUNIT_ASSERT_EQUAL(1, getPages());
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf135973, "tdf135973.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf135973)
 {
+    loadAndReload("tdf135973.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     {
         uno::Reference<beans::XPropertySet> xPara(getParagraph(2), uno::UNO_QUERY);
@@ -593,8 +658,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf121669_equalColumns, "tdf121669_equalColumns.doc
     CPPUNIT_ASSERT(getProperty<bool>(xTextColumns, "IsAutomatic"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf132149_pgBreak, "tdf132149_pgBreak.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf132149_pgBreak)
 {
+    loadAndReload("tdf132149_pgBreak.odt");
     // This 5 page document is designed to visually exaggerate the problems
     // of emulating LO's followed-by-page-style into MSWord's sections.
     // While much has been improved, there are extra pages present, which still need fixing.
@@ -608,9 +674,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf132149_pgBreak, "tdf132149_pgBreak.odt")
     assertXPath(pDump, "//page[2]/infos/prtBounds", "left", "2268");  //Left page style
 
     assertXPath(pDump, "//page[1]/infos/bounds", "width", "8391");  //landscape
-    assertXPath(pDump, "//page[2]/infos/bounds", "width", "5953");  //portrait
+    assertXPath(pDump, "//page[2]/infos/bounds", "width", "5940");  //portrait
     // This two-line 3rd page ought not to exist. DID YOU FIX ME? The real page 3 should be "8391" landscape.
-    assertXPath(pDump, "//page[3]/infos/bounds", "width", "5953");
+    assertXPath(pDump, "//page[3]/infos/bounds", "width", "5940");
     // This really ought to be on odd page 3, but now it is on odd page 5.
     assertXPath(pDump, "//page[5]/infos/bounds", "width", "8391");
     assertXPath(pDump, "//page[5]/infos/prtBounds", "right", "6122");  //Left page style
@@ -618,23 +684,25 @@ DECLARE_OOXMLEXPORT_TEST(testTdf132149_pgBreak, "tdf132149_pgBreak.odt")
 
     //Page style change here must not be lost. This SHOULD be on page 4, but sadly it is not.
     assertXPathContent(pDump, "//page[6]/header/txt", "First Page Style");
-    CPPUNIT_ASSERT(getXPath(pDump, "//page[6]/body/txt[1]/Text[1]", "Portion").startsWith("Lorem ipsum"));
+    CPPUNIT_ASSERT(getXPathContent(pDump, "//page[6]/body/txt[1]").startsWith("Lorem ipsum"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf132149_pgBreakB, "tdf132149_pgBreakB.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf132149_pgBreakB)
 {
+    loadAndReload("tdf132149_pgBreakB.odt");
     // This 5 page document is designed to visually exaggerate the problems
     // of emulating LO's followed-by-page-style into MSWord's sections.
     xmlDocUniquePtr pDump = parseLayoutDump();
 
     //Sanity check to ensure the correct page is being tested. This SHOULD be on page 3, but sadly it is not.
-    CPPUNIT_ASSERT(getXPath(pDump, "//page[5]/body/txt[1]/Text[1]", "Portion").startsWith("Lorem ipsum"));
+    CPPUNIT_ASSERT(getXPathContent(pDump, "//page[5]/body/txt[1]").startsWith("Lorem ipsum"));
     //Prior to this fix, the original alternation between portrait and landscape was completely lost.
     assertXPath(pDump, "//page[5]/infos/bounds", "width", "8391");  //landscape
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf132149_pgBreak2, "tdf132149_pgBreak2.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf132149_pgBreak2)
 {
+    loadAndReload("tdf132149_pgBreak2.odt");
     // This 3 page document is designed to visually exaggerate the problems
     // of emulating LO's followed-by-page-style into MSWord's sections.
 
@@ -647,15 +715,16 @@ DECLARE_OOXMLEXPORT_TEST(testTdf132149_pgBreak2, "tdf132149_pgBreak2.odt")
     CPPUNIT_ASSERT_LESSEQUAL( 3, getParagraphs() );
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf136952_pgBreak3B, "tdf136952_pgBreak3B.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf136952_pgBreak3B)
 {
+    loadAndReload("tdf136952_pgBreak3B.odt");
     // This 4 page document is designed to visually exaggerate the problems
     // of emulating LO's followed-by-page-style into MSWord's sections.
     xmlDocUniquePtr pDump = parseLayoutDump();
 
     //page::breakAfter must not be lost.
     //Prior to this bug fix, the Lorem ipsum paragraph was in the middle of a portrait page, with no switch to landscape occurring.
-    CPPUNIT_ASSERT(getXPath(pDump, "//page[3]/body/txt[1]/Text[1]", "Portion").startsWith("Lorem ipsum"));
+    CPPUNIT_ASSERT(getXPathContent(pDump, "//page[3]/body/txt[1]").startsWith("Lorem ipsum"));
     assertXPath(pDump, "//page[3]/infos/bounds", "width", "8391");  //landscape
 }
 
@@ -726,7 +795,7 @@ DECLARE_OOXMLEXPORT_TEST(testTdf131561_necessaryBorder, "tdf131561_necessaryBord
 CPPUNIT_TEST_FIXTURE(Test, testTdf135655)
 {
     loadAndSave("tdf135655.odt");
-    const xmlDocUniquePtr pExpDoc = parseExport();
+    const xmlDocUniquePtr pExpDoc = parseExport("word/document.xml");
     const OUString sXFillColVal = getXPath(pExpDoc, "/w:document/w:body/w:p/w:r/w:object/v:shape", "fillcolor");
     CPPUNIT_ASSERT_EQUAL(OUString("#00A933"), sXFillColVal);
 }
@@ -737,7 +806,8 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf138374)
     xmlDocUniquePtr pXmlDocument = parseExport("word/document.xml");
     assertXPath(pXmlDocument, "/w:document/w:body/w:p[2]/w:r/w:pict/v:shape", "fillcolor", "#ffd320");
     assertXPath(pXmlDocument, "/w:document/w:body/w:p[2]/w:r/w:pict/v:shape", "coordsize", "1315,6116");
-    assertXPath(pXmlDocument, "/w:document/w:body/w:p[2]/w:r/w:pict/v:shape", "path",
+    if (IsDefaultDPI())
+        assertXPath(pXmlDocument, "/w:document/w:body/w:p[2]/w:r/w:pict/v:shape", "path",
             "m0,0l1314,0l1314,5914l416,5914l416,6115l106,5715l416,5415l416,5715l1014,5715l1014,224l0,224l0,16l0,0e");
     assertXPath(pXmlDocument, "/w:document/w:body/w:p[2]/w:r/w:pict/v:shape", "style",
             "position:absolute;margin-left:394.3pt;margin-top:204pt;width:37.2pt;height:173.3pt;mso-wrap-style:none;v-text-anchor:middle");
@@ -762,8 +832,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf134609_gridAfter, "tdf134609_gridAfter.docx")
     CPPUNIT_ASSERT_MESSAGE("Top border is not an edge border", aBorder.LineWidth < 100);
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf135329_lostImage, "tdf135329_lostImage.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf135329_lostImage)
 {
+    loadAndReload("tdf135329_lostImage.odt");
     // the character-anchored image was being skipped, since searchNext didn't notice it.
     uno::Reference<beans::XPropertySet> xImageProps(getShape(2), uno::UNO_QUERY_THROW);
 }
@@ -778,9 +849,11 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf136441_commentInFootnote)
 DECLARE_OOXMLEXPORT_TEST(testTdf137683_charHighlightTests, "tdf137683_charHighlightTests.docx")
 {
     // Don't export unnecessary w:highlight="none" (Unnecessary one intentionally hand-added to original .docx)
-    xmlDocUniquePtr pXmlStyles = parseExport("word/styles.xml");
-    if (pXmlStyles)
+    if (isExported())
+    {
+        xmlDocUniquePtr pXmlStyles = parseExport("word/styles.xml");
         assertXPath(pXmlStyles, "/w:styles/w:style[@w:styleId='Normal']/w:rPr/w:highlight", 0);
+    }
 
     uno::Reference<beans::XPropertySet> xRun(getRun(getParagraph(10), 2, "no highlight"), uno::UNO_QUERY_THROW);
     // This test was failing with a cyan charHighlight of 65535 (0x00FFFF), instead of COL_TRANSPARENT (0xFFFFFFFF)
@@ -796,8 +869,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf138345_charStyleHighlight, "tdf138345_charStyleH
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(COL_TRANSPARENT), getProperty<sal_Int32>(xRun,"CharBackColor"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf125268, "tdf125268.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf125268)
 {
+    loadAndReload("tdf125268.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     const uno::Reference<beans::XPropertySet> xRun(getRun(getParagraph(1), 1, "Hello"), uno::UNO_QUERY);
     // Without the fix in place, this test would have failed with
@@ -823,9 +897,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf134063, "tdf134063.docx")
     xmlDocUniquePtr pDump = parseLayoutDump();
 
     // There are three tabs with default width
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(720), getXPath(pDump, "//page[1]/body/txt[1]/Text[1]", "nWidth").toInt32());
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(720), getXPath(pDump, "//page[1]/body/txt[1]/Text[2]", "nWidth").toInt32());
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(720), getXPath(pDump, "//page[1]/body/txt[1]/Text[3]", "nWidth").toInt32());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(720), getXPath(pDump, "//page[1]/body/txt[1]/SwParaPortion/SwLineLayout/SwFixPortion[1]", "width").toInt32());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(720), getXPath(pDump, "//page[1]/body/txt[1]/SwParaPortion/SwLineLayout/SwFixPortion[2]", "width").toInt32());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(720), getXPath(pDump, "//page[1]/body/txt[1]/SwParaPortion/SwLineLayout/SwFixPortion[3]", "width").toInt32());
 }
 
 DECLARE_OOXMLEXPORT_TEST(TestTdf135653, "tdf135653.docx")
@@ -935,7 +1009,7 @@ CPPUNIT_TEST_FIXTURE(Test, TestTdf143028)
     loadAndSave("fail_bracePair.odt");
     CPPUNIT_ASSERT_EQUAL(1, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
-    auto pExportXml = parseExport();
+    auto pExportXml = parseExport("word/document.xml");
 
     CPPUNIT_ASSERT_EQUAL(1, getXPathNode(
         pExportXml, "/w:document/w:body/w:p/w:r/mc:AlternateContent/mc:Choice/w:drawing/wp:anchor/"
@@ -983,15 +1057,16 @@ CPPUNIT_TEST_FIXTURE(Test, testImageSpaceSettings)
 {
     loadAndSave("tdf135047_ImageSpaceSettings.fodt");
     // tdf#135047 The spaces of image were not saved.
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     assertXPath(pXmlDoc, "/w:document/w:body/w:p[1]/w:r[1]/w:drawing/wp:anchor", "distT", "90170");
     assertXPath(pXmlDoc, "/w:document/w:body/w:p[1]/w:r[1]/w:drawing/wp:anchor", "distB", "90170");
     assertXPath(pXmlDoc, "/w:document/w:body/w:p[1]/w:r[1]/w:drawing/wp:anchor", "distL", "90170");
     assertXPath(pXmlDoc, "/w:document/w:body/w:p[1]/w:r[1]/w:drawing/wp:anchor", "distR", "90170");
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf137295, "tdf137295.doc")
+CPPUNIT_TEST_FIXTURE(Test, testTdf137295)
 {
+    loadAndReload("tdf137295.doc");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
 
     // Without the fix in place, the test would have failed with

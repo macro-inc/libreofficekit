@@ -33,7 +33,7 @@ using namespace ::com::sun::star::xml::sax;
 
 namespace oox::ppt {
 
-SlideTransitionContext::SlideTransitionContext( FragmentHandler2 const & rParent, const AttributeList& rAttribs, PropertyMap & aProperties ) noexcept
+SlideTransitionContext::SlideTransitionContext( FragmentHandler2 const & rParent, const AttributeList& rAttribs, PropertyMap & aProperties )
 : FragmentHandler2( rParent )
 , maSlideProperties( aProperties )
 , mbHasTransition( false )
@@ -164,7 +164,7 @@ SlideTransitionContext::~SlideTransitionContext() noexcept
         if (!mbHasTransition)
         {
             mbHasTransition = true;
-            maTransition.setPresetTransition(rAttribs.getString(XML_prst, ""));
+            maTransition.setPresetTransition(rAttribs.getStringDefaulted(XML_prst));
         }
         return this;
     case PPT_TOKEN( strips ):

@@ -25,9 +25,9 @@
 #include <svtools/PlaceEditDialog.hxx>
 #include "OfficeControlAccess.hxx"
 #include "PlacesListBox.hxx"
-#include <fpsofficeResMgr.hxx>
+#include <fpicker/fpsofficeResMgr.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/stream.hxx>
 #include <tools/urlobj.hxx>
 #include <vcl/errinf.hxx>
@@ -70,6 +70,7 @@
 #include <com/sun/star/ucb/InteractiveAugmentedIOException.hpp>
 #include "fpinteraction.hxx"
 #include <osl/process.h>
+#include <o3tl/string_view.hxx>
 
 #include <officecfg/Office/Common.hxx>
 
@@ -126,18 +127,18 @@ namespace
     }
 
 
-    OUString GetFsysExtension_Impl( const OUString& rFile, const OUString& rLastFilterExt )
+    OUString GetFsysExtension_Impl( std::u16string_view rFile, const OUString& rLastFilterExt )
     {
-        sal_Int32 nDotPos = rFile.lastIndexOf( '.' );
-        if ( nDotPos != -1 )
+        size_t nDotPos = rFile.rfind( '.' );
+        if ( nDotPos != std::u16string_view::npos )
         {
             if ( !rLastFilterExt.isEmpty() )
             {
-                if ( rFile.copy( nDotPos + 1 ).equalsIgnoreAsciiCase( rLastFilterExt ) )
+                if ( o3tl::equalsIgnoreAsciiCase(rFile.substr( nDotPos + 1 ), rLastFilterExt ) )
                     return rLastFilterExt;
             }
             else
-                return rFile.copy( nDotPos );
+                return OUString(rFile.substr( nDotPos ));
         }
         return OUString();
     }
@@ -252,7 +253,7 @@ namespace
     }
 #endif
 
-    OUString lcl_ensureFinalSlash( const OUString& _rDir )
+    OUString lcl_ensureFinalSlash( std::u16string_view _rDir )
     {
         INetURLObject aWorkPathObj( _rDir, INetProtocol::File );
         aWorkPathObj.setFinalSlash();
@@ -288,7 +289,6 @@ SvtFileDialog::SvtFileDialog(weld::Window* pParent, PickerFlags nStyle)
     , m_bIsInExecute(false)
     , m_bInExecuteAsync(false)
     , m_bHasFilename(false)
-    , m_xContext(comphelper::getProcessComponentContext())
 {
     m_xImpl->m_xCbOptions = m_xBuilder->weld_check_button("options");
     m_xImpl->m_xFtFileName = m_xBuilder->weld_label("file_name_label");
@@ -467,10 +467,10 @@ SvtFileDialog::~SvtFileDialog()
     {
         // save window state
         SvtViewOptions aDlgOpt( EViewType::Dialog, m_xImpl->m_aIniKey );
-        aDlgOpt.SetWindowState(OStringToOUString(m_xDialog->get_window_state(WindowStateMask::All), RTL_TEXTENCODING_UTF8));
+        aDlgOpt.SetWindowState(OStringToOUString(m_xDialog->get_window_state(vcl::WindowDataMask::All), RTL_TEXTENCODING_UTF8));
         OUString sUserData = m_xFileView->GetConfigString();
         aDlgOpt.SetUserItem( "UserData",
-                             makeAny( sUserData ) );
+                             Any( sUserData ) );
     }
 
     m_xFileView->SetSelectHdl(Link<SvtFileView*,void>());
@@ -494,7 +494,7 @@ SvtFileDialog::~SvtFileDialog()
         }
     }
 
-    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create(m_xContext));
+    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
     officecfg::Office::Common::Misc::FilePickerPlacesUrls::set(placesUrlsList, batch);
     officecfg::Office::Common::Misc::FilePickerPlacesNames::set(placesNamesList, batch);
     batch->commit();
@@ -1270,7 +1270,7 @@ bool implIsInvalid( const OUString & rURL )
 }
 
 
-OUString SvtFileDialog::implGetInitialURL( const OUString& _rPath, const OUString& _rFallback )
+OUString SvtFileDialog::implGetInitialURL( const OUString& _rPath, std::u16string_view _rFallback )
 {
     // a URL parser for the fallback
     INetURLObject aURLParser;
@@ -1403,7 +1403,7 @@ void SvtFileDialog::displayIOException( const OUString& _rURL, IOErrorCode _eCod
 
         // let and interaction handler handle this exception
         rtl::Reference<::comphelper::OInteractionRequest> pRequest =
-            new ::comphelper::OInteractionRequest( makeAny( aException ) );
+            new ::comphelper::OInteractionRequest( Any( aException ) );
         pRequest->addContinuation( new ::comphelper::OInteractionAbort( ) );
 
         Reference< XInteractionHandler2 > xHandler(
@@ -1831,51 +1831,51 @@ bool SvtFileDialog::IsolateFilterFromPath_Impl( OUString& rPath, OUString& rFilt
 
     rFilter.clear();
 
-    if ( nWildCardPos != -1 )
-    {
-        sal_Int32 nPathTokenPos = aReversePath.indexOf( '/' );
+    if ( nWildCardPos == -1 )
+        return true;
 
+    sal_Int32 nPathTokenPos = aReversePath.indexOf( '/' );
+
+    if ( nPathTokenPos == -1 )
+    {
+        OUString aDelim(
+#if defined(_WIN32)
+                '\\'
+#else
+                '/'
+#endif
+        );
+
+        nPathTokenPos = aReversePath.indexOf( aDelim );
+#if !defined( UNX )
         if ( nPathTokenPos == -1 )
         {
-            OUString aDelim(
-#if defined(_WIN32)
-                    '\\'
-#else
-                    '/'
+            nPathTokenPos = aReversePath.indexOf( ':' );
+        }
 #endif
-            );
+    }
 
-            nPathTokenPos = aReversePath.indexOf( aDelim );
-#if !defined( UNX )
-            if ( nPathTokenPos == -1 )
-            {
-                nPathTokenPos = aReversePath.indexOf( ':' );
-            }
-#endif
-        }
-
-        // check syntax
-        if ( nPathTokenPos != -1 )
+    // check syntax
+    if ( nPathTokenPos != -1 )
+    {
+        if ( nPathTokenPos < (rPath.getLength() - nWildCardPos - 1) )
         {
-            if ( nPathTokenPos < (rPath.getLength() - nWildCardPos - 1) )
-            {
-                ErrorHandler::HandleError( ERRCODE_SFX_INVALIDSYNTAX );
-                return false;
-            }
-
-            // cut off filter
-            rFilter = aReversePath.copy( 0, nPathTokenPos );
-            rFilter = comphelper::string::reverseString(rFilter);
-
-            // determine folder
-            rPath = aReversePath.copy( nPathTokenPos );
-            rPath = comphelper::string::reverseString(rPath);
+            ErrorHandler::HandleError( ERRCODE_SFX_INVALIDSYNTAX );
+            return false;
         }
-        else
-        {
-            rFilter = rPath;
-            rPath.clear();
-        }
+
+        // cut off filter
+        rFilter = aReversePath.copy( 0, nPathTokenPos );
+        rFilter = comphelper::string::reverseString(rFilter);
+
+        // determine folder
+        rPath = aReversePath.copy( nPathTokenPos );
+        rPath = comphelper::string::reverseString(rPath);
+    }
+    else
+    {
+        rFilter = rPath;
+        rPath.clear();
     }
 
     return true;
@@ -2267,10 +2267,10 @@ void SvtFileDialog::appendDefaultExtension(OUString& rFileName,
     {
         if (nPos+1<aType.getLength() && aType[nPos]=='*') // take care of a leading *
             ++nPos;
-        const OUString aExt(aType.getToken( 0, FILEDIALOG_DEF_EXTSEP, nPos ));
-        if (aExt.isEmpty())
+        const std::u16string_view aExt(o3tl::getToken(aType, 0, FILEDIALOG_DEF_EXTSEP, nPos ));
+        if (aExt.empty())
             continue;
-        if (aTemp.endsWith(aExt))
+        if (o3tl::ends_with(aTemp, aExt))
             return;
     }
     while (nPos>=0);
@@ -2284,8 +2284,8 @@ void SvtFileDialog::initDefaultPlaces( )
     m_xImpl->m_xPlaces->AppendPlace( pRootPlace );
 
     // Load from user settings
-    Sequence< OUString > placesUrlsList(officecfg::Office::Common::Misc::FilePickerPlacesUrls::get(m_xContext));
-    Sequence< OUString > placesNamesList(officecfg::Office::Common::Misc::FilePickerPlacesNames::get(m_xContext));
+    Sequence< OUString > placesUrlsList(officecfg::Office::Common::Misc::FilePickerPlacesUrls::get());
+    Sequence< OUString > placesNamesList(officecfg::Office::Common::Misc::FilePickerPlacesNames::get());
 
     for(sal_Int32 nPlace = 0; nPlace < placesUrlsList.getLength() && nPlace < placesNamesList.getLength(); ++nPlace)
     {

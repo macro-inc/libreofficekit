@@ -25,9 +25,9 @@
 #include "HelperCollections.hxx"
 #include <core_resource.hxx>
 #include <strings.hrc>
+#include <strings.hxx>
 
-#include <cppuhelper/interfacecontainer.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 
 #include <com/sun/star/sdbc/XConnection.hpp>
@@ -40,6 +40,7 @@
 #include <definitioncolumn.hxx>
 
 #include <com/sun/star/beans/PropertyAttribute.hpp>
+#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <ContainerMediator.hxx>
 
 using namespace dbaccess;

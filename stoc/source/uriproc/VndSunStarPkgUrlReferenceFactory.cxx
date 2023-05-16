@@ -30,8 +30,8 @@
 #include <rtl/textenc.h>
 #include <rtl/uri.h>
 #include <rtl/uri.hxx>
-#include <rtl/ustrbuf.hxx>
 #include <rtl/ustring.hxx>
+#include <utility>
 #include <sal/types.h>
 
 namespace com::sun::star::uno { class XComponentContext; }
@@ -45,8 +45,8 @@ class Factory:
 {
 public:
     explicit Factory(
-        css::uno::Reference< css::uno::XComponentContext > const & context):
-        m_context(context) {}
+        css::uno::Reference< css::uno::XComponentContext > context):
+        m_context(std::move(context)) {}
 
     Factory(const Factory&) = delete;
     Factory& operator=(const Factory&) = delete;

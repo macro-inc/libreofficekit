@@ -18,7 +18,6 @@
  */
 
 #include "system.h"
-#include <psapi.h>
 
 #include "file_url.hxx"
 #include "path_helper.hxx"
@@ -27,6 +26,7 @@
 #include <osl/diagnose.h>
 #include <osl/thread.h>
 #include <osl/file.h>
+#include <rtl/ustring.hxx>
 #include <sal/log.hxx>
 #include <o3tl/char16_t2wchar_t.hxx>
 #include <vector>
@@ -137,14 +137,7 @@ void* SAL_CALL osl_getSymbol(oslModule Module, rtl_uString *strSymbolName)
        be in this case unavoidable because the API has to stay
        compatible. We need to keep this function which returns a
        void* by definition */
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4054)
-#endif
     return reinterpret_cast<void*>(osl_getFunctionSymbol(Module, strSymbolName));
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 }
 
 oslGenericFunction SAL_CALL osl_getFunctionSymbol( oslModule Module, rtl_uString *strSymbolName )
@@ -182,44 +175,19 @@ osl_getAsciiFunctionSymbol( oslModule Module, const char *pSymbol )
 
 sal_Bool SAL_CALL osl_getModuleURLFromAddress( void *pv, rtl_uString **pustrURL )
 {
-    bool bSuccess    = false;    /* Assume failure */
-    DWORD cbNeeded = 0;
-    HMODULE* lpModules = nullptr;
-    DWORD nModules = 0;
-    UINT iModule = 0;
-    MODULEINFO modinfo;
+    HMODULE hModule{};
+    GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS
+                           | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                       static_cast<LPCWSTR>(pv), &hModule);
+    if (!hModule)
+        return false;
 
-    EnumProcessModules(GetCurrentProcess(), nullptr, 0, &cbNeeded);
+    ::osl::LongPathBuffer<sal_Unicode> aBuffer(MAX_LONG_PATH);
 
-    lpModules = static_cast<HMODULE*>(_alloca(cbNeeded));
-    EnumProcessModules(GetCurrentProcess(), lpModules, cbNeeded, &cbNeeded);
+    DWORD nch = GetModuleFileNameW(hModule, o3tl::toW(aBuffer), aBuffer.getBufSizeInSymbols());
 
-    nModules = cbNeeded / sizeof(HMODULE);
-
-    for (iModule = 0; !bSuccess && iModule < nModules; iModule++)
-    {
-        GetModuleInformation(GetCurrentProcess(), lpModules[iModule], &modinfo,
-                                 sizeof(modinfo));
-
-        if (static_cast<BYTE*>(pv) >= static_cast<BYTE*>(modinfo.lpBaseOfDll)
-            && static_cast<BYTE*>(pv)
-                   < static_cast<BYTE*>(modinfo.lpBaseOfDll) + modinfo.SizeOfImage)
-        {
-            ::osl::LongPathBuffer<sal_Unicode> aBuffer(MAX_LONG_PATH);
-            rtl_uString* ustrSysPath = nullptr;
-
-            GetModuleFileNameW(lpModules[iModule], o3tl::toW(aBuffer),
-                               aBuffer.getBufSizeInSymbols());
-
-            rtl_uString_newFromStr(&ustrSysPath, aBuffer);
-            osl_getFileURLFromSystemPath(ustrSysPath, pustrURL);
-            rtl_uString_release(ustrSysPath);
-
-            bSuccess = true;
-        }
-    }
-
-    return bSuccess;
+    OUString ustrSysPath(aBuffer, nch);
+    return osl_getFileURLFromSystemPath(ustrSysPath.pData, pustrURL) == osl_File_E_None;
 }
 
 sal_Bool SAL_CALL osl_getModuleURLFromFunctionAddress( oslGenericFunction addr, rtl_uString ** ppLibraryUrl )
@@ -228,14 +196,7 @@ sal_Bool SAL_CALL osl_getModuleURLFromFunctionAddress( oslGenericFunction addr, 
        not allowed according to the C/C++ standards. In this case
        it is unavoidable because we have to stay compatible we
        cannot remove any function. */
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4054)
-#endif
     return osl_getModuleURLFromAddress(reinterpret_cast<void*>(addr), ppLibraryUrl);
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -85,13 +85,13 @@ OlePicture::OlePicture(int tsize)
         return;
 };
 
+#ifdef _WIN32
 OlePicture::~OlePicture()
 {
-#ifdef _WIN32
      if( pis )
           pis->Release();
-#endif
 };
+#endif
 
 #define FILESTG_SIGNATURE_NORMAL 0xF8995568
 
@@ -112,7 +112,7 @@ void OlePicture::Read(HWPFile & hwpf)
           return;
     }
 
-    utl::TempFile aTempFile;
+    utl::TempFileNamed aTempFile;
     aTempFile.EnableKillingFile();
 
     SvFileStream aOutputStream(aTempFile.GetURL(), StreamMode::WRITE);

@@ -23,6 +23,8 @@
 
 #include <tools/debug.hxx>
 #include <unotools/viewoptions.hxx>
+#include <o3tl/string_view.hxx>
+#include <utility>
 
 using namespace ::com::sun::star::uno;
 
@@ -35,9 +37,9 @@ namespace sfx2 {
 // SearchDialog
 
 
-SearchDialog::SearchDialog(weld::Window* pWindow, const OUString& rConfigName)
+SearchDialog::SearchDialog(weld::Window* pWindow, OUString aConfigName)
     : GenericDialogController(pWindow, "sfx/ui/searchdialog.ui", "SearchDialog")
-    , m_sConfigName(rConfigName)
+    , m_sConfigName(std::move(aConfigName))
     , m_xSearchEdit(m_xBuilder->weld_combo_box("searchterm"))
     , m_xWholeWordsBox(m_xBuilder->weld_check_button("wholewords"))
     , m_xMatchCaseBox(m_xBuilder->weld_check_button("matchcase"))
@@ -70,10 +72,10 @@ void SearchDialog::LoadConfig()
             DBG_ASSERT( comphelper::string::getTokenCount(sUserData, ';') == 5, "invalid config data" );
             sal_Int32 nIdx = 0;
             OUString sSearchText = sUserData.getToken( 0, ';', nIdx );
-            m_xWholeWordsBox->set_active( sUserData.getToken( 0, ';', nIdx ).toInt32() == 1 );
-            m_xMatchCaseBox->set_active( sUserData.getToken( 0, ';', nIdx ).toInt32() == 1 );
-            m_xWrapAroundBox->set_active( sUserData.getToken( 0, ';', nIdx ).toInt32() == 1 );
-            m_xBackwardsBox->set_active( sUserData.getToken( 0, ';', nIdx ).toInt32() == 1 );
+            m_xWholeWordsBox->set_active( o3tl::toInt32(o3tl::getToken(sUserData, 0, ';', nIdx )) == 1 );
+            m_xMatchCaseBox->set_active( o3tl::toInt32(o3tl::getToken(sUserData, 0, ';', nIdx )) == 1 );
+            m_xWrapAroundBox->set_active( o3tl::toInt32(o3tl::getToken(sUserData, 0, ';', nIdx )) == 1 );
+            m_xBackwardsBox->set_active( o3tl::toInt32(o3tl::getToken(sUserData, 0, ';', nIdx )) == 1 );
 
             nIdx = 0;
             while ( nIdx != -1 )
@@ -100,7 +102,7 @@ void SearchDialog::SaveConfig()
         OUString::number( m_xWrapAroundBox->get_active() ? 1 : 0 ) + ";" +
         OUString::number( m_xBackwardsBox->get_active() ? 1 : 0 );
 
-    Any aUserItem = makeAny( sUserData );
+    Any aUserItem( sUserData );
     aViewOpt.SetUserItem( "UserItem", aUserItem );
 }
 

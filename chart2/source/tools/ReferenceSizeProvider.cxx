@@ -20,13 +20,13 @@
 #include <ReferenceSizeProvider.hxx>
 #include <RelativeSizeHelper.hxx>
 #include <ChartModelHelper.hxx>
+#include <ChartModel.hxx>
+#include <DataSeries.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
-#include <com/sun/star/chart2/XChartDocument.hpp>
-#include <com/sun/star/chart2/XTitled.hpp>
-#include <com/sun/star/chart2/XTitle.hpp>
-#include <com/sun/star/chart2/XDataSeries.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <vector>
 
@@ -41,7 +41,7 @@ namespace chart
 
 ReferenceSizeProvider::ReferenceSizeProvider(
     awt::Size aPageSize,
-    const Reference< XChartDocument > & xChartDoc ) :
+    const rtl::Reference<::chart::ChartModel> & xChartDoc ) :
         m_aPageSize( aPageSize ),
         m_xChartDoc( xChartDoc ),
         m_bUseAutoScale( getAutoResizeState( xChartDoc ) == AUTO_RESIZE_YES )
@@ -91,36 +91,32 @@ void ReferenceSizeProvider::setValuesAtTitle(
 
 void ReferenceSizeProvider::setValuesAtAllDataSeries()
 {
-    Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( m_xChartDoc ));
+    rtl::Reference< Diagram > xDiagram( ChartModelHelper::findDiagram( m_xChartDoc ));
 
     // DataSeries/Points
-    std::vector< Reference< XDataSeries > > aSeries(
-        DiagramHelper::getDataSeriesFromDiagram( xDiagram ));
+    std::vector< rtl::Reference< DataSeries > > aSeries =
+        DiagramHelper::getDataSeriesFromDiagram( xDiagram );
 
     for (auto const& elem : aSeries)
     {
-        Reference< beans::XPropertySet > xSeriesProp(elem, uno::UNO_QUERY );
-        if( xSeriesProp.is())
+        // data points
+        Sequence< sal_Int32 > aPointIndexes;
+        try
         {
-            // data points
-            Sequence< sal_Int32 > aPointIndexes;
-            try
+            if( elem->getPropertyValue( "AttributedDataPoints") >>= aPointIndexes )
             {
-                if( xSeriesProp->getPropertyValue( "AttributedDataPoints") >>= aPointIndexes )
-                {
-                    for( sal_Int32 idx : std::as_const(aPointIndexes) )
-                        setValuesAtPropertySet(
-                            elem->getDataPointByIndex( idx ) );
-                }
+                for( sal_Int32 idx : std::as_const(aPointIndexes) )
+                    setValuesAtPropertySet(
+                        elem->getDataPointByIndex( idx ) );
             }
-            catch (const uno::Exception&)
-            {
-                DBG_UNHANDLED_EXCEPTION("chart2");
-            }
-
-            //it is important to correct the datapoint properties first as they do reference the series properties
-            setValuesAtPropertySet( xSeriesProp );
         }
+        catch (const uno::Exception&)
+        {
+            DBG_UNHANDLED_EXCEPTION("chart2");
+        }
+
+        //it is important to correct the datapoint properties first as they do reference the series properties
+        setValuesAtPropertySet( elem );
     }
 }
 
@@ -217,26 +213,24 @@ void ReferenceSizeProvider::impl_getAutoResizeFromTitled(
     with state NO, AUTO_RESIZE_AMBIGUOUS is returned.
 */
 ReferenceSizeProvider::AutoResizeState ReferenceSizeProvider::getAutoResizeState(
-    const Reference< XChartDocument > & xChartDoc )
+    const rtl::Reference<::chart::ChartModel> & xChartDoc )
 {
     AutoResizeState eResult = AUTO_RESIZE_UNKNOWN;
 
     // Main Title
-    Reference< XTitled > xDocTitled( xChartDoc, uno::UNO_QUERY );
-    if( xDocTitled.is())
-        impl_getAutoResizeFromTitled( xDocTitled, eResult );
+    if( xChartDoc.is())
+        impl_getAutoResizeFromTitled( xChartDoc, eResult );
     if( eResult == AUTO_RESIZE_AMBIGUOUS )
         return eResult;
 
     // diagram is needed by the rest of the objects
-    Reference< XDiagram > xDiagram = ChartModelHelper::findDiagram( xChartDoc );
+    rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram( xChartDoc );
     if( ! xDiagram.is())
         return eResult;
 
     // Sub Title
-    Reference< XTitled > xDiaTitled( xDiagram, uno::UNO_QUERY );
-    if( xDiaTitled.is())
-        impl_getAutoResizeFromTitled( xDiaTitled, eResult );
+    if( xDiagram.is())
+        impl_getAutoResizeFromTitled( xDiagram, eResult );
     if( eResult == AUTO_RESIZE_AMBIGUOUS )
         return eResult;
 
@@ -248,53 +242,43 @@ ReferenceSizeProvider::AutoResizeState ReferenceSizeProvider::getAutoResizeState
         return eResult;
 
     // Axes (incl. Axis Titles)
-    const Sequence< Reference< XAxis > > aAxes( AxisHelper::getAllAxesOfDiagram( xDiagram ) );
-    for( Reference< XAxis > const & axis : aAxes )
+    const std::vector< rtl::Reference< Axis > > aAxes = AxisHelper::getAllAxesOfDiagram( xDiagram );
+    for( rtl::Reference< Axis > const & axis : aAxes )
     {
-        Reference< beans::XPropertySet > xProp( axis, uno::UNO_QUERY );
-        if( xProp.is())
-            getAutoResizeFromPropSet( xProp, eResult );
-        Reference< XTitled > xTitled( axis, uno::UNO_QUERY );
-        if( xTitled.is())
-        {
-            impl_getAutoResizeFromTitled( xTitled, eResult );
-            if( eResult == AUTO_RESIZE_AMBIGUOUS )
-                return eResult;
-        }
+        getAutoResizeFromPropSet( axis, eResult );
+        impl_getAutoResizeFromTitled( axis, eResult );
+        if( eResult == AUTO_RESIZE_AMBIGUOUS )
+            return eResult;
     }
 
     // DataSeries/Points
-    std::vector< Reference< XDataSeries > > aSeries(
-        DiagramHelper::getDataSeriesFromDiagram( xDiagram ));
+    std::vector< rtl::Reference< DataSeries > > aSeries =
+        DiagramHelper::getDataSeriesFromDiagram( xDiagram );
 
     for (auto const& elem : aSeries)
     {
-        Reference< beans::XPropertySet > xSeriesProp(elem, uno::UNO_QUERY);
-        if( xSeriesProp.is())
-        {
-            getAutoResizeFromPropSet( xSeriesProp, eResult );
-            if( eResult == AUTO_RESIZE_AMBIGUOUS )
-                return eResult;
+        getAutoResizeFromPropSet( elem, eResult );
+        if( eResult == AUTO_RESIZE_AMBIGUOUS )
+            return eResult;
 
-            // data points
-            Sequence< sal_Int32 > aPointIndexes;
-            try
+        // data points
+        Sequence< sal_Int32 > aPointIndexes;
+        try
+        {
+            if( elem->getPropertyValue( "AttributedDataPoints") >>= aPointIndexes )
             {
-                if( xSeriesProp->getPropertyValue( "AttributedDataPoints") >>= aPointIndexes )
+                for( sal_Int32 idx : std::as_const(aPointIndexes) )
                 {
-                    for( sal_Int32 idx : std::as_const(aPointIndexes) )
-                    {
-                        getAutoResizeFromPropSet(
-                            elem->getDataPointByIndex( idx ), eResult );
-                        if( eResult == AUTO_RESIZE_AMBIGUOUS )
-                            return eResult;
-                    }
+                    getAutoResizeFromPropSet(
+                        elem->getDataPointByIndex( idx ), eResult );
+                    if( eResult == AUTO_RESIZE_AMBIGUOUS )
+                        return eResult;
                 }
             }
-            catch (const uno::Exception&)
-            {
-                DBG_UNHANDLED_EXCEPTION("chart2");
-            }
+        }
+        catch (const uno::Exception&)
+        {
+            DBG_UNHANDLED_EXCEPTION("chart2");
         }
     }
 
@@ -314,15 +298,15 @@ void ReferenceSizeProvider::setAutoResizeState( ReferenceSizeProvider::AutoResiz
     m_bUseAutoScale = (eNewState == AUTO_RESIZE_YES);
 
     // Main Title
-    impl_setValuesAtTitled( Reference< XTitled >( m_xChartDoc, uno::UNO_QUERY ));
+    impl_setValuesAtTitled( m_xChartDoc );
 
     // diagram is needed by the rest of the objects
-    Reference< XDiagram > xDiagram = ChartModelHelper::findDiagram( m_xChartDoc );
+    rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram( m_xChartDoc );
     if( ! xDiagram.is())
         return;
 
     // Sub Title
-    impl_setValuesAtTitled( Reference< XTitled >( xDiagram, uno::UNO_QUERY ));
+    impl_setValuesAtTitled( xDiagram );
 
     // Legend
     Reference< beans::XPropertySet > xLegendProp( xDiagram->getLegend(), uno::UNO_QUERY );
@@ -330,13 +314,11 @@ void ReferenceSizeProvider::setAutoResizeState( ReferenceSizeProvider::AutoResiz
         setValuesAtPropertySet( xLegendProp );
 
     // Axes (incl. Axis Titles)
-    const Sequence< Reference< XAxis > > aAxes( AxisHelper::getAllAxesOfDiagram( xDiagram ) );
-    for( Reference< XAxis > const & axis : aAxes )
+    const std::vector< rtl::Reference< Axis > > aAxes = AxisHelper::getAllAxesOfDiagram( xDiagram );
+    for( rtl::Reference< Axis > const & axis : aAxes )
     {
-        Reference< beans::XPropertySet > xProp( axis, uno::UNO_QUERY );
-        if( xProp.is())
-            setValuesAtPropertySet( xProp );
-        impl_setValuesAtTitled( Reference< XTitled >( axis, uno::UNO_QUERY ));
+        setValuesAtPropertySet( axis );
+        impl_setValuesAtTitled( axis );
     }
 
     // DataSeries/Points

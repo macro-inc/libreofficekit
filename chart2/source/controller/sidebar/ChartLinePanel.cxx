@@ -10,6 +10,7 @@
 #include "ChartLinePanel.hxx"
 
 #include <ChartController.hxx>
+#include <ChartModel.hxx>
 
 #include <svx/xlnwtit.hxx>
 #include <svx/xlinjoit.hxx>
@@ -21,7 +22,6 @@
 #include <vcl/svapp.hxx>
 
 #include <com/sun/star/view/XSelectionSupplier.hpp>
-#include <com/sun/star/util/XModifyBroadcaster.hpp>
 #include <com/sun/star/chart2/XDiagram.hpp>
 
 #include <comphelper/lok.hxx>
@@ -46,7 +46,7 @@ SvxColorToolBoxControl* getColorToolBoxControl(const ToolbarUnoDispatcher& rTool
     return pToolBoxColorControl;
 }
 
-OUString getCID(const css::uno::Reference<css::frame::XModel>& xModel)
+OUString getCID(const rtl::Reference<::chart::ChartModel>& xModel)
 {
     css::uno::Reference<css::frame::XController> xController(xModel->getCurrentController());
     css::uno::Reference<css::view::XSelectionSupplier> xSelectionSupplier(xController, css::uno::UNO_QUERY);
@@ -56,7 +56,7 @@ OUString getCID(const css::uno::Reference<css::frame::XModel>& xModel)
     css::uno::Any aAny = xSelectionSupplier->getSelection();
     if (!aAny.hasValue())
     {
-        xSelectionSupplier->select(css::uno::makeAny(OUString("CID/Page=")));
+        xSelectionSupplier->select(css::uno::Any(OUString("CID/Page=")));
         aAny = xSelectionSupplier->getSelection();
     }
 
@@ -67,7 +67,7 @@ OUString getCID(const css::uno::Reference<css::frame::XModel>& xModel)
 }
 
 css::uno::Reference<css::beans::XPropertySet> getPropSet(
-        const css::uno::Reference<css::frame::XModel>& xModel)
+        const rtl::Reference<::chart::ChartModel>& xModel)
 {
     OUString aCID = getCID(xModel);
     css::uno::Reference<css::beans::XPropertySet> xPropSet =
@@ -124,7 +124,7 @@ ChartLinePanel::ChartLinePanel(weld::Widget* pParent,
         const css::uno::Reference<css::frame::XFrame>& rxFrame,
         ChartController* pController):
     svx::sidebar::LinePropertyPanelBase(pParent, rxFrame),
-    mxModel(pController->getModel()),
+    mxModel(pController->getChartModel()),
     mxListener(new ChartSidebarModifyListener(this)),
     mxSelectionListener(new ChartSidebarSelectionListener(this)),
     mbUpdate(true),
@@ -148,8 +148,7 @@ ChartLinePanel::~ChartLinePanel()
 
 void ChartLinePanel::Initialize()
 {
-    css::uno::Reference<css::util::XModifyBroadcaster> xBroadcaster(mxModel, css::uno::UNO_QUERY_THROW);
-    xBroadcaster->addModifyListener(mxListener);
+    mxModel->addModifyListener(mxListener);
 
     css::uno::Reference<css::view::XSelectionSupplier> xSelectionSupplier(mxModel->getCurrentController(), css::uno::UNO_QUERY);
     if (xSelectionSupplier.is())
@@ -200,12 +199,11 @@ void ChartLinePanel::selectionChanged(bool bCorrectType)
         updateData();
 }
 
-void ChartLinePanel::doUpdateModel(css::uno::Reference<css::frame::XModel> xModel)
+void ChartLinePanel::doUpdateModel(rtl::Reference<::chart::ChartModel> xModel)
 {
     if (mbModelValid)
     {
-        css::uno::Reference<css::util::XModifyBroadcaster> xBroadcaster(mxModel, css::uno::UNO_QUERY_THROW);
-        xBroadcaster->removeModifyListener(mxListener);
+        mxModel->removeModifyListener(mxListener);
 
         css::uno::Reference<css::view::XSelectionSupplier> oldSelectionSupplier(
             mxModel->getCurrentController(), css::uno::UNO_QUERY);
@@ -223,8 +221,7 @@ void ChartLinePanel::doUpdateModel(css::uno::Reference<css::frame::XModel> xMode
     maLineStyleWrapper.updateModel(mxModel);
     maLineColorWrapper.updateModel(mxModel);
 
-    css::uno::Reference<css::util::XModifyBroadcaster> xBroadcasterNew(mxModel, css::uno::UNO_QUERY_THROW);
-    xBroadcasterNew->addModifyListener(mxListener);
+    mxModel->addModifyListener(mxListener);
 
     css::uno::Reference<css::view::XSelectionSupplier> xSelectionSupplier(mxModel->getCurrentController(), css::uno::UNO_QUERY);
     if (xSelectionSupplier.is())
@@ -233,7 +230,9 @@ void ChartLinePanel::doUpdateModel(css::uno::Reference<css::frame::XModel> xMode
 
 void ChartLinePanel::updateModel(css::uno::Reference<css::frame::XModel> xModel)
 {
-    doUpdateModel(xModel);
+    ::chart::ChartModel* pModel = dynamic_cast<::chart::ChartModel*>(xModel.get());
+    assert(!xModel || pModel);
+    doUpdateModel(pModel);
 }
 
 void ChartLinePanel::setLineJoint(const XLineJointItem* pItem)

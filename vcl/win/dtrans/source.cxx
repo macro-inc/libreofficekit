@@ -23,12 +23,12 @@
 #include <com/sun/star/awt/MouseEvent.hpp>
 #include <cppuhelper/supportsservice.hxx>
 #include <o3tl/any.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <process.h>
 #include <memory>
 
-#include "source.hxx"
+#include <win/dnd_source.hxx>
 #include "globals.hxx"
 #include "sourcecontext.hxx"
 #include "DtObjFactory.hxx"
@@ -48,7 +48,7 @@ using namespace com::sun::star::awt::MouseButton;
 using namespace com::sun::star::awt;
 using namespace com::sun::star::lang;
 
-static unsigned __stdcall DndOleSTAFunc(LPVOID pParams);
+static DWORD WINAPI DndOleSTAFunc(_In_ LPVOID pParams);
 
 DragSource::DragSource( const Reference<XComponentContext>& rxContext):
     WeakComponentImplHelper< XDragSource, XInitialization, XServiceInfo >(m_aMutex),
@@ -120,9 +120,8 @@ void DragSource::StartDragImpl(
 
     // The thread accesses members of this instance but does not call acquire.
     // Hopefully this instance is not destroyed before the thread has terminated.
-    unsigned threadId;
-    HANDLE hThread= reinterpret_cast<HANDLE>(_beginthreadex(
-        nullptr, 0, DndOleSTAFunc, this, 0, &threadId));
+    DWORD threadId;
+    HANDLE hThread = CreateThread(nullptr, 0, DndOleSTAFunc, this, 0, &threadId);
 
     // detach from thread
     CloseHandle(hThread);
@@ -305,7 +304,7 @@ dtrans_DragSource_get_implementation(
     carries out a drag and drop operation by calling
     DoDragDrop. The thread also notifies all
     XSourceListener. */
-unsigned __stdcall DndOleSTAFunc(LPVOID pParams)
+DWORD WINAPI DndOleSTAFunc(_In_ LPVOID pParams)
 {
     osl_setThreadName("DragSource DndOleSTAFunc");
 

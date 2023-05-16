@@ -20,13 +20,13 @@
 #include <sidebar/DeckLayouter.hxx>
 #include <sidebar/DeckTitleBar.hxx>
 #include <sidebar/PanelTitleBar.hxx>
-#include <sfx2/sidebar/Deck.hxx>
 #include <sfx2/sidebar/Panel.hxx>
 #include <sfx2/sidebar/Theme.hxx>
 #include <sfx2/sidebar/SidebarDockingWindow.hxx>
 #include <sfx2/sidebar/SidebarController.hxx>
 #include <sfx2/viewsh.hxx>
 #include <comphelper/lok.hxx>
+#include <osl/diagnose.h>
 
 #include <comphelper/processfactory.hxx>
 
@@ -36,6 +36,7 @@
 #include <com/sun/star/frame/XFrame.hpp>
 #include <com/sun/star/ui/XSidebarPanel.hpp>
 
+#include <utility>
 #include <vcl/jsdialog/executor.hxx>
 
 using namespace css;
@@ -61,8 +62,8 @@ namespace {
         sal_Int32 mnWeight;
         bool mbShowTitleBar;
 
-        LayoutItem(const std::shared_ptr<Panel>& pPanel)
-            : mpPanel(pPanel)
+        LayoutItem(std::shared_ptr<Panel> pPanel)
+            : mpPanel(std::move(pPanel))
             , maLayoutSize(0, 0, 0)
             , mnDistributedHeight(0)
             , mnWeight(0)

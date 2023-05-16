@@ -19,8 +19,6 @@
 
 #include <sal/config.h>
 
-#include <string_view>
-
 #include "selectlabeldialog.hxx"
 #include <strings.hrc>
 #include <bitmaps.hlst>
@@ -37,7 +35,6 @@
 #include <comphelper/types.hxx>
 #include <sal/log.hxx>
 #include <tools/debug.hxx>
-#include <rtl/ustrbuf.hxx>
 
 
 namespace pcr
@@ -73,7 +70,7 @@ namespace pcr
             nClassID = ::comphelper::getINT16(m_xControlModel->getPropertyValue(PROPERTY_CLASSID));
 
         sDescription = sDescription.replaceAll("$controlclass$",
-            GetUIHeadlineName(nClassID, makeAny(m_xControlModel)));
+            GetUIHeadlineName(nClassID, Any(m_xControlModel)));
         OUString sName = ::comphelper::getString(m_xControlModel->getPropertyValue(PROPERTY_NAME));
         sDescription = sDescription.replaceAll("$controlname$", sName);
         m_xMainDesc->set_label(sDescription);
@@ -211,7 +208,7 @@ namespace pcr
 
             // all requirements met -> insert
             m_xUserData.emplace_back(new Reference<XPropertySet>(xAsSet));
-            OUString sId(OUString::number(reinterpret_cast<sal_Int64>(m_xUserData.back().get())));
+            OUString sId(weld::toId(m_xUserData.back().get()));
             m_xControlTree->insert(&rContainerEntry, -1, &sDisplayName, &sId, nullptr, nullptr, false, m_xScratchIter.get());
             m_xControlTree->set_image(*m_xScratchIter, m_aRequiredControlImage);
 
@@ -235,7 +232,7 @@ namespace pcr
         bool bSelected = m_xControlTree->get_selected(xIter.get());
         OUString sData = bSelected ? m_xControlTree->get_id(*xIter) : OUString();
         if (!sData.isEmpty())
-            m_xSelectedControl.set(*reinterpret_cast<Reference<XPropertySet>*>(sData.toInt64()));
+            m_xSelectedControl.set(*weld::fromId<Reference<XPropertySet>*>(sData));
         m_xNoAssignment->set_active(sData.isEmpty());
     }
 

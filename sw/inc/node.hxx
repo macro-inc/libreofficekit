@@ -26,7 +26,7 @@
 #include "BorderCacheOwner.hxx"
 #include "ndarr.hxx"
 #include "ndtyp.hxx"
-#include "index.hxx"
+#include "contentindex.hxx"
 #include "fmtcol.hxx"
 #include "nodeoffset.hxx"
 
@@ -73,10 +73,23 @@ class IDocumentListItems;
 class Point;
 enum class SvxFrameDirection;
 typedef std::vector<SwOLENode*> SwOLENodes; // docary.hxx
+enum class SwCursorSkipMode;
 
 namespace drawinglayer::attribute {
     class SdrAllFillAttributesHelper;
     typedef std::shared_ptr< SdrAllFillAttributesHelper > SdrAllFillAttributesHelperPtr;
+}
+
+// Accessibility check
+
+namespace sw
+{
+struct AccessibilityCheckStatus
+{
+    std::unique_ptr<sfx::AccessibilityIssueCollection> pCollection;
+    void reset();
+};
+
 }
 
 /// Base class of the Writer document model elements.
@@ -90,6 +103,8 @@ class SW_DLLPUBLIC SwNode
     /// For text nodes: level of auto format. Was put here because we had still free bits.
     sal_uInt8 m_nAFormatNumLvl : 3;
     bool m_bIgnoreDontExpand : 1;     ///< for Text Attributes - ignore the flag
+
+    mutable sw::AccessibilityCheckStatus m_aAccessibilityCheckStatus;
 
 public:
     /// sw_redlinehide: redline node merge state
@@ -115,7 +130,10 @@ private:
 protected:
     SwStartNode* m_pStartOfSection;
 
-    SwNode( const SwNodeIndex &rWhere, const SwNodeType nNodeId );
+    /// only used by SwContentNodeTmp in SwTextNode::Update
+    SwNode();
+
+    SwNode( const SwNode& rWhere, const SwNodeType nNodeId );
 
     /// for the initial StartNode
     SwNode( SwNodes& rNodes, SwNodeOffset nPos, const SwNodeType nNodeId );
@@ -306,6 +324,20 @@ public:
      */
     virtual void dumpAsXml(xmlTextWriterPtr pWriter) const;
 
+    bool operator==(const SwNode& rOther) const { return this == &rOther; }
+    bool operator!=(const SwNode& rOther) const { return this != &rOther; }
+    bool operator<(const SwNode& rOther) const { assert(&GetNodes() == &rOther.GetNodes()); return GetIndex() < rOther.GetIndex(); }
+    bool operator<=(const SwNode& rOther) const { assert(&GetNodes() == &rOther.GetNodes()); return GetIndex() <= rOther.GetIndex(); }
+    bool operator>(const SwNode& rOther) const { assert(&GetNodes() == &rOther.GetNodes()); return GetIndex() > rOther.GetIndex(); }
+    bool operator>=(const SwNode& rOther) const { assert(&GetNodes() == &rOther.GetNodes()); return GetIndex() >= rOther.GetIndex(); }
+
+    sw::AccessibilityCheckStatus& getAccessibilityCheckStatus()
+    {
+        return m_aAccessibilityCheckStatus;
+    }
+
+    void resetAndQueueAccessibilityCheck();
+
 private:
     SwNode( const SwNode & rNodes ) = delete;
     SwNode & operator= ( const SwNode & rNodes ) = delete;
@@ -325,7 +357,7 @@ class SAL_DLLPUBLIC_RTTI SwStartNode: public SwNode
     SwStartNode( SwNodes& rNodes, SwNodeOffset nPos );
 
 protected:
-    SwStartNode( const SwNodeIndex &rWhere,
+    SwStartNode( const SwNode& rWhere,
                  const SwNodeType nNodeType = SwNodeType::Start,
                  SwStartNodeType = SwNormalStartNode );
 public:
@@ -351,37 +383,26 @@ class SwEndNode final : public SwNode
     /// for the initial StartNode
     SwEndNode( SwNodes& rNodes, SwNodeOffset nPos, SwStartNode& rSttNd );
 
-    SwEndNode( const SwNodeIndex &rWhere, SwStartNode& rSttNd );
+    SwEndNode( const SwNode& rWhere, SwStartNode& rSttNd );
 
     SwEndNode( const SwEndNode & rNode ) = delete;
     SwEndNode & operator= ( const SwEndNode & rNode ) = delete;
 };
 
-// Accessibiity check
-
-namespace sw
-{
-struct AccessibilityCheckStatus
-{
-    std::unique_ptr<sfx::AccessibilityIssueCollection> pCollection;
-    bool bDirty = true;
-};
-
-}
-
 // SwContentNode
 
-class SW_DLLPUBLIC SwContentNode: public sw::BroadcastingModify, public SwNode, public SwIndexReg
+class SW_DLLPUBLIC SwContentNode: public sw::BroadcastingModify, public SwNode, public SwContentIndexReg
 {
 
     sw::WriterMultiListener m_aCondCollListener;
     SwFormatColl* m_pCondColl;
     mutable bool mbSetModifyAtAttr;
 
-    mutable sw::AccessibilityCheckStatus m_aAccessibilityCheckStatus;
-
 protected:
-    SwContentNode( const SwNodeIndex &rWhere, const SwNodeType nNodeType,
+    /// only used by SwContentNodeTmp in SwTextNode::Update
+    SwContentNode();
+
+    SwContentNode( const SwNode& rWhere, const SwNodeType nNodeType,
                 SwFormatColl *pFormatColl );
     /** the = 0 forces the class to be an abstract base class, but the dtor can be still called
        from subclasses */
@@ -409,14 +430,13 @@ public:
     virtual SwContentNode *JoinNext();
     /** Is it possible to join two nodes?
        In pIdx the second position can be returned. */
-    bool CanJoinNext( SwNodeIndex* pIdx =nullptr ) const;
+    bool CanJoinNext( SwNodeIndex* pIdx = nullptr ) const;
+    bool CanJoinNext( SwPosition* pIdx ) const;
     bool CanJoinPrev( SwNodeIndex* pIdx =nullptr ) const;
 
-    void MakeStartIndex( SwIndex * pIdx )   { pIdx->Assign( this, 0 ); }
-    void MakeEndIndex( SwIndex * pIdx )     { pIdx->Assign( this, Len() ); }
-
-    bool GoNext(SwIndex *, sal_uInt16 nMode ) const;
-    bool GoPrevious(SwIndex *, sal_uInt16 nMode ) const;
+    bool GoNext(SwContentIndex *, SwCursorSkipMode nMode ) const;
+    bool GoNext(SwPosition*, SwCursorSkipMode nMode ) const;
+    bool GoPrevious(SwContentIndex *, SwCursorSkipMode nMode ) const;
 
     /// @see GetFrameOfModify
     SwContentFrame *getLayoutFrame( const SwRootFrame*,
@@ -441,7 +461,7 @@ public:
        There are differences between text node and formula node. */
     virtual sal_Int32 Len() const;
 
-    virtual SwContentNode* MakeCopy(SwDoc&, const SwNodeIndex&, bool bNewFrames) const = 0;
+    virtual SwContentNode* MakeCopy(SwDoc&, SwNode& rWhere, bool bNewFrames) const = 0;
 
     /// Get information from Client.
     virtual bool GetInfo( SfxPoolItem& ) const override;
@@ -450,6 +470,9 @@ public:
 
     /// If bInParent is FALSE search for attribute only in this node.
     const SfxPoolItem& GetAttr( sal_uInt16 nWhich, bool bInParent=true ) const;
+    template<class T>
+    const T& GetAttr( TypedWhichId<T> nWhich, bool bInParent=true ) const
+    { return static_cast<const T&>(GetAttr(sal_uInt16(nWhich), bInParent)); }
     bool GetAttr( SfxItemSet& rSet ) const;
     /// made virtual
     virtual bool SetAttr( const SfxPoolItem& );
@@ -460,6 +483,9 @@ public:
 
     /// Obtains attribute that is not delivered via conditional style!
     const SfxPoolItem* GetNoCondAttr( sal_uInt16 nWhich, bool bInParents ) const;
+    template<class T>
+    const T* GetNoCondAttr( TypedWhichId<T> nWhich, bool bInParents ) const
+    { return static_cast<const T*>(GetNoCondAttr(sal_uInt16(nWhich), bInParents)); }
 
     /** Does node has already its own auto-attributes?
      Access to SwAttrSet. */
@@ -496,11 +522,6 @@ public:
 
     void UpdateAttr(const SwUpdateAttr&);
 
-    sw::AccessibilityCheckStatus& getAccessibilityCheckStatus()
-    {
-        return m_aAccessibilityCheckStatus;
-    }
-
 private:
     SwContentNode( const SwContentNode & rNode ) = delete;
     SwContentNode & operator= ( const SwContentNode & rNode ) = delete;
@@ -516,14 +537,15 @@ class SW_DLLPUBLIC SwTableNode final : public SwStartNode, public sw::Broadcasti
     virtual ~SwTableNode() override;
 
 public:
-    SwTableNode( const SwNodeIndex & );
+    SwTableNode( const SwNode& );
 
     const SwTable& GetTable() const { return *m_pTable; }
     SwTable& GetTable() { return *m_pTable; }
     SwTabFrame *MakeFrame( SwFrame* );
 
     /// Creates the frms for the table node (i.e. the TabFrames).
-    void MakeOwnFrames(SwNodeIndex* pIdxBehind);
+    /// pIdxBehind is optional parameter.
+    void MakeOwnFrames(SwPosition* pIdxBehind = nullptr);
 
     /** Method deletes all views of document for the node.
        The content frames are removed from the respective layout. */
@@ -538,6 +560,8 @@ public:
 
     // Removes redline objects that relate to this table from the 'Extra Redlines' table
     void RemoveRedlines();
+
+    void dumpAsXml(xmlTextWriterPtr pWriter) const override;
 
 private:
     SwTableNode( const SwTableNode & rNode ) = delete;
@@ -558,7 +582,7 @@ private:
     virtual ~SwSectionNode() override;
 
 public:
-    SwSectionNode(SwNodeIndex const&,
+    SwSectionNode(const SwNode& rWhere,
         SwSectionFormat & rFormat, SwTOXBase const*const pTOXBase);
 
     const SwSection& GetSection() const { return *m_pSection; }
@@ -589,6 +613,8 @@ public:
        a hidden sub-area. */
     bool IsContentHidden() const;
 
+    void dumpAsXml(xmlTextWriterPtr pWriter) const override;
+
 };
 
 /** This class is internal, used only during DocumentContentOperationsManager::CopyWithFlyInFly(), and for undo.
@@ -600,7 +626,7 @@ class SwPlaceholderNode final : private SwNode
 {
 private:
     friend class SwNodes;
-    SwPlaceholderNode(const SwNodeIndex &rWhere);
+    SwPlaceholderNode(const SwNode& rWhere);
 };
 
 inline       SwEndNode   *SwNode::GetEndNode()
@@ -739,15 +765,13 @@ inline const SwAttrSet& SwContentNode::GetSwAttrSet() const
     return mpAttrSet ? *GetpSwAttrSet() : GetAnyFormatColl().GetAttrSet();
 }
 
-//FEATURE::CONDCOLL
-
 inline const SfxPoolItem& SwContentNode::GetAttr( sal_uInt16 nWhich,
                                                 bool bInParents ) const
 {
     return GetSwAttrSet().Get( nWhich, bInParents );
 }
 
-inline SwPlaceholderNode::SwPlaceholderNode(const SwNodeIndex &rWhere)
+inline SwPlaceholderNode::SwPlaceholderNode(const SwNode& rWhere)
     : SwNode(rWhere, SwNodeType::PlaceHolder)
 {
 }

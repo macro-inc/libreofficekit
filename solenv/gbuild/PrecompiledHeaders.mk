@@ -21,7 +21,7 @@
 # PrecompiledHeader class
 
 # Use different PCH file depending on whether we use debugging symbols.
-gb_PrecompiledHeader__get_debugdir = $(if $(call gb_LinkTarget__symbols_enabled,$(1)),debug,nodebug)
+gb_PrecompiledHeader__get_debugdir = $(if $(call gb_target_symbols_enabled,$(1)),debug,nodebug)
 
 # $(call gb_PrecompiledHeader_generate_timestamp_rule,linktargetmakefilename)
 define gb_PrecompiledHeader_generate_timestamp_rule
@@ -70,8 +70,8 @@ $(call gb_PrecompiledHeader_get_target,$(1),$(3)) :
 	$$(call gb_PrecompiledHeader__sum_command,$$@,$(1),$$<,$(gb_PrecompiledHeader_cxxflags_includes),$$(INCLUDE),$(3),$(5))
 ifeq ($(gb_FULLDEPS),$(true))
 	$$(call gb_Helper_abbreviate_dirs,\
-		RESPONSEFILE=$$(call gb_var2file,$$(shell $$(gb_MKTEMP)),200,$$(call gb_PrecompiledHeader_get_dep_target_tmp,$(1),$(3))) && \
-		$$(call gb_Executable_get_command,concat-deps) $$$${RESPONSEFILE} \
+		RESPONSEFILE=$$(call gb_var2file,$$(shell $$(gb_MKTEMP)),$$(call gb_PrecompiledHeader_get_dep_target_tmp,$(1),$(3))) && \
+		SYSTEM_BOOST="$(SYSTEM_BOOST)" $$(call gb_Executable_get_command,concat-deps) $$$${RESPONSEFILE} \
 			> $$(call gb_PrecompiledHeader_get_dep_target,$(1),$(3)) && \
 		rm -f $$$${RESPONSEFILE} $$(call gb_PrecompiledHeader_get_dep_target_tmp,$(1),$(3)))
 endif
@@ -159,7 +159,8 @@ gb_PrecompiledHeader_ignore_flags_system := \
 -DGLM_FORCE_CTOR_INIT \
 -DVCL_INTERNALS \
 -DZLIB_CONST \
--include $(SRCDIR)/pch/inc/clangfix.hxx \
+$(gb_CXXFLAGS_include)$(SRCDIR)/pch/inc/clangfix.hxx \
+$(gb_CXXFLAGS_no_pch_warnings) \
 $(gb_PrecompiledHeader_ignore_flags_for_flags_file) \
 
 # Probably also update pch/inc/clangfix.hxx if you extend the list.

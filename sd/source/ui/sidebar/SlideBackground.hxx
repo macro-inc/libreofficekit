@@ -26,6 +26,8 @@
 #include <sfx2/sidebar/IContextChangeReceiver.hxx>
 #include <vcl/EnumContext.hxx>
 
+#include <com/sun/star/frame/XFrame.hpp>
+
 namespace sd { class ViewShellBase; }
 namespace sd::tools { class EventMultiplexerEvent; }
 
@@ -50,7 +52,7 @@ public:
     SlideBackground(
         weld::Widget* pParent,
         ViewShellBase& rBase,
-        const css::uno::Reference<css::frame::XFrame>& rxFrame,
+        css::uno::Reference<css::frame::XFrame> xFrame,
         SfxBindings* pBindings );
     virtual ~SlideBackground() override;
     SfxBindings* GetBindings() { return mpBindings; }
@@ -137,6 +139,9 @@ private:
 
     MapUnit meUnit;
 
+    // MCGR: Preserve in-between ColorStops until we have an UI to edit these
+    basegfx::ColorStops maColorStops;
+
     DECL_LINK(FillBackgroundHdl, weld::ComboBox&, void);
     DECL_LINK(FillStyleModifyHdl, weld::ComboBox&, void);
     DECL_LINK(PaperSizeModifyHdl, weld::ComboBox&, void);
@@ -171,6 +176,9 @@ private:
     void updateMasterSlideSelection();
 
     static FieldUnit GetCurrentUnit(SfxItemState eState, const SfxPoolItem* pState);
+
+    // MCGR: Preserve in-between ColorStops until we have an UI to edit these
+    basegfx::ColorStops createColorStops();
 };
 
 }

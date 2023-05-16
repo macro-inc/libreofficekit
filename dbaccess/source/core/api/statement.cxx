@@ -20,6 +20,8 @@
 #include <statement.hxx>
 #include "resultset.hxx"
 #include <stringconstants.hxx>
+#include <strings.hxx>
+#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/sdbc/XDatabaseMetaData.hpp>
 #include <com/sun/star/sdbc/SQLException.hpp>
 #include <cppuhelper/queryinterface.hxx>
@@ -27,7 +29,7 @@
 #include <cppuhelper/typeprovider.hxx>
 #include <comphelper/property.hxx>
 #include <comphelper/types.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <connectivity/dbexception.hxx>
 
 using namespace ::com::sun::star::sdb;
@@ -122,7 +124,7 @@ void OStatementBase::disposeResultSet()
     Reference< XComponent > xComp(m_aResultSet.get(), UNO_QUERY);
     if (xComp.is())
         xComp->dispose();
-    m_aResultSet = nullptr;
+    m_aResultSet.clear();
 }
 
 // OComponentHelper
@@ -176,21 +178,21 @@ Reference< XPropertySetInfo > OStatementBase::getPropertySetInfo()
 // comphelper::OPropertyArrayUsageHelper
 ::cppu::IPropertyArrayHelper* OStatementBase::createArrayHelper( ) const
 {
-    css::uno::Sequence< css::beans::Property> aDescriptor(10);
-    css::beans::Property* pDesc = aDescriptor.getArray();
-    sal_Int32 nPos = 0;
-    pDesc[nPos++] = css::beans::Property(PROPERTY_CURSORNAME, PROPERTY_ID_CURSORNAME, cppu::UnoType<OUString>::get(), 0);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_ESCAPE_PROCESSING, PROPERTY_ID_ESCAPE_PROCESSING, cppu::UnoType<bool>::get(), 0);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_FETCHDIRECTION, PROPERTY_ID_FETCHDIRECTION, cppu::UnoType<sal_Int32>::get(), 0);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_FETCHSIZE, PROPERTY_ID_FETCHSIZE, cppu::UnoType<sal_Int32>::get(), 0);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_MAXFIELDSIZE, PROPERTY_ID_MAXFIELDSIZE, cppu::UnoType<sal_Int32>::get(), 0);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_MAXROWS, PROPERTY_ID_MAXROWS, cppu::UnoType<sal_Int32>::get(), 0);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_QUERYTIMEOUT, PROPERTY_ID_QUERYTIMEOUT, cppu::UnoType<sal_Int32>::get(), 0);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_RESULTSETCONCURRENCY, PROPERTY_ID_RESULTSETCONCURRENCY, cppu::UnoType<sal_Int32>::get(), 0);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_RESULTSETTYPE, PROPERTY_ID_RESULTSETTYPE, cppu::UnoType<sal_Int32>::get(), 0);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_USEBOOKMARKS, PROPERTY_ID_USEBOOKMARKS, cppu::UnoType<bool>::get(), 0);
-    OSL_ENSURE(nPos == aDescriptor.getLength(), "forgot to adjust the count ?");
-    return new ::cppu::OPropertyArrayHelper(aDescriptor);
+    return new ::cppu::OPropertyArrayHelper
+    {
+        {
+            { PROPERTY_CURSORNAME, PROPERTY_ID_CURSORNAME, cppu::UnoType<OUString>::get(), 0 },
+            { PROPERTY_ESCAPE_PROCESSING, PROPERTY_ID_ESCAPE_PROCESSING, cppu::UnoType<bool>::get(), 0 },
+            { PROPERTY_FETCHDIRECTION, PROPERTY_ID_FETCHDIRECTION, cppu::UnoType<sal_Int32>::get(), 0 },
+            { PROPERTY_FETCHSIZE, PROPERTY_ID_FETCHSIZE, cppu::UnoType<sal_Int32>::get(), 0 },
+            { PROPERTY_MAXFIELDSIZE, PROPERTY_ID_MAXFIELDSIZE, cppu::UnoType<sal_Int32>::get(), 0 },
+            { PROPERTY_MAXROWS, PROPERTY_ID_MAXROWS, cppu::UnoType<sal_Int32>::get(), 0 },
+            { PROPERTY_QUERYTIMEOUT, PROPERTY_ID_QUERYTIMEOUT, cppu::UnoType<sal_Int32>::get(), 0 },
+            { PROPERTY_RESULTSETCONCURRENCY, PROPERTY_ID_RESULTSETCONCURRENCY, cppu::UnoType<sal_Int32>::get(), 0 },
+            { PROPERTY_RESULTSETTYPE, PROPERTY_ID_RESULTSETTYPE, cppu::UnoType<sal_Int32>::get(), 0 },
+            { PROPERTY_USEBOOKMARKS, PROPERTY_ID_USEBOOKMARKS, cppu::UnoType<bool>::get(), 0 }
+        }
+    };
 }
 
 // cppu::OPropertySetHelper

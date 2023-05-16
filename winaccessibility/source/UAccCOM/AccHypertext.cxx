@@ -18,18 +18,10 @@
  */
 
 #include "stdafx.h"
+#include  <UAccCOM.h>
 #include "AccHypertext.h"
 #include "AccHyperLink.h"
 #include "acccommon.h"
-
-#if defined __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-#include  <UAccCOM.h>
-#if defined __clang__
-#pragma clang diagnostic pop
-#endif
 
 #include <vcl/svapp.hxx>
 
@@ -276,7 +268,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHypertext::get_nHyperlinks(long *hyperlink
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(hyperlinkCount == nullptr)
@@ -290,7 +282,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHypertext::get_nHyperlinks(long *hyperlink
     *hyperlinkCount = pHyperText->getHyperLinkCount();
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -303,7 +295,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHypertext::get_hyperlink(long index,IAcces
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(hyperlink == nullptr)
@@ -338,7 +330,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHypertext::get_hyperlink(long index,IAcces
 
     return E_FAIL;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -351,7 +343,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHypertext::get_hyperlinkIndex(long charInd
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(hyperlinkIndex == nullptr)
@@ -365,7 +357,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHypertext::get_hyperlinkIndex(long charInd
     *hyperlinkIndex = pHyperText->getHyperLinkIndex(charIndex);
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -377,7 +369,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHypertext::put_XInterface(hyper pXInterfac
 {
     // internal IUNOXWrapper - no mutex meeded
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     CAccTextBase::put_XInterface(pXInterface);
     //special query.
@@ -395,7 +387,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHypertext::put_XInterface(hyper pXInterfac
         pHyperText = pRXI.get();
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -27,12 +27,13 @@
 
 #include <com/sun/star/rendering/XCanvas.hpp>
 #include <com/sun/star/presentation/XSlideShowView.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include "pointersymbol.hxx"
 #include <eventmultiplexer.hxx>
 
 #include <algorithm>
+#include <utility>
 
 
 using namespace com::sun::star;
@@ -54,10 +55,10 @@ PointerSymbolSharedPtr PointerSymbol::create( const uno::Reference<rendering::XB
     return pRet;
 }
 
-PointerSymbol::PointerSymbol( uno::Reference<rendering::XBitmap> const &   xBitmap,
+PointerSymbol::PointerSymbol( uno::Reference<rendering::XBitmap>           xBitmap,
                               ScreenUpdater&                               rScreenUpdater,
                               const UnoViewContainer&                      rViewContainer ) :
-    mxBitmap(xBitmap),
+    mxBitmap(std::move(xBitmap)),
     maViews(),
     mrScreenUpdater( rScreenUpdater ),
     maPos(),
@@ -95,8 +96,8 @@ basegfx::B2DPoint PointerSymbol::calcSpritePos(UnoViewSharedPtr const & rView) c
     const geometry::IntegerSize2D realTranslationOffset ( rView->getTranslationOffset() );
 
     return basegfx::B2DPoint(
-        realTranslationOffset.Width + ((aViewArea.Width - aViewArea.X) - 2 * realTranslationOffset.Width) * maPos.X,
-        realTranslationOffset.Height + ((aViewArea.Height - aViewArea.Y) - 2 * realTranslationOffset.Height) * maPos.Y);
+        realTranslationOffset.Width + (aViewArea.Width * maPos.X),
+        realTranslationOffset.Height + (aViewArea.Height * maPos.Y));
 }
 
 void PointerSymbol::viewAdded( const UnoViewSharedPtr& rView )
@@ -106,7 +107,7 @@ void PointerSymbol::viewAdded( const UnoViewSharedPtr& rView )
     try
     {
         const geometry::IntegerSize2D spriteSize( mxBitmap->getSize() );
-        sprite = rView->createSprite( basegfx::B2DVector( spriteSize.Width,
+        sprite = rView->createSprite( basegfx::B2DSize( spriteSize.Width,
                                                           spriteSize.Height ),
                                       1000.0 ); // sprite should be in front of all
                                                 // other sprites

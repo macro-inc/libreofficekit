@@ -22,12 +22,13 @@
 
 #include <cassert>
 #include <map>
+#include <utility>
 
-QtClipboard::QtClipboard(const OUString& aModeString, const QClipboard::Mode aMode)
+QtClipboard::QtClipboard(OUString aModeString, const QClipboard::Mode aMode)
     : cppu::WeakComponentImplHelper<css::datatransfer::clipboard::XSystemClipboard,
                                     css::datatransfer::clipboard::XFlushableClipboard,
                                     XServiceInfo>(m_aMutex)
-    , m_aClipboardName(aModeString)
+    , m_aClipboardName(std::move(aModeString))
     , m_aClipboardMode(aMode)
     , m_bOwnClipboardChange(false)
     , m_bDoClear(false)
@@ -58,7 +59,7 @@ css::uno::Reference<css::uno::XInterface> QtClipboard::create(const OUString& aM
 
 void QtClipboard::flushClipboard()
 {
-    auto* pSalInst(static_cast<QtInstance*>(GetSalData()->m_pInstance));
+    auto* pSalInst(GetQtInstance());
     SolarMutexGuard g;
     pSalInst->RunInMainThread([this]() {
         if (!isOwner(m_aClipboardMode))
@@ -81,6 +82,9 @@ void QtClipboard::flushClipboard()
 
 css::uno::Reference<css::datatransfer::XTransferable> QtClipboard::getContents()
 {
+#if defined(EMSCRIPTEN)
+    static QMimeData aMimeData;
+#endif
     osl::MutexGuard aGuard(m_aMutex);
 
     // if we're the owner, we might have the XTransferable from setContents. but
@@ -91,6 +95,10 @@ css::uno::Reference<css::datatransfer::XTransferable> QtClipboard::getContents()
 
     // check if we can still use the shared QtClipboardTransferable
     const QMimeData* pMimeData = QApplication::clipboard()->mimeData(m_aClipboardMode);
+#if defined(EMSCRIPTEN)
+    if (!pMimeData)
+        pMimeData = &aMimeData;
+#endif
     if (m_aContents.is())
     {
         const auto* pTrans = dynamic_cast<QtClipboardTransferable*>(m_aContents.get());

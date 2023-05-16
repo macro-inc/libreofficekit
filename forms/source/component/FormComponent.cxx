@@ -25,6 +25,7 @@
 
 #include <com/sun/star/awt/XTextComponent.hpp>
 #include <com/sun/star/awt/XWindow.hpp>
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/form/FormComponentType.hpp>
 #include <com/sun/star/form/XForm.hpp>
 #include <com/sun/star/form/XLoadable.hpp>
@@ -43,13 +44,12 @@
 
 #include <comphelper/basicio.hxx>
 #include <comphelper/guarding.hxx>
-#include <comphelper/interfacecontainer2.hxx>
 #include <comphelper/property.hxx>
 #include <connectivity/dbtools.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 
 #include <algorithm>
@@ -103,7 +103,7 @@ public:
     {
         Reference< XPropertySet > xNewField( m_rModel.getField() );
         if ( m_xOldField != xNewField )
-            m_rLock.addPropertyNotification( PROPERTY_ID_BOUNDFIELD, makeAny( m_xOldField ), makeAny( xNewField ) );
+            m_rLock.addPropertyNotification( PROPERTY_ID_BOUNDFIELD, Any( m_xOldField ), Any( xNewField ) );
     }
 
 private:
@@ -459,7 +459,7 @@ void OControlModel::readHelpTextCompatibly(const css::uno::Reference< css::io::X
     try
     {
         if (m_xAggregateSet.is())
-            m_xAggregateSet->setPropertyValue(PROPERTY_HELPTEXT, makeAny(sHelpText));
+            m_xAggregateSet->setPropertyValue(PROPERTY_HELPTEXT, Any(sHelpText));
     }
     catch(const Exception&)
     {
@@ -496,6 +496,7 @@ OControlModel::OControlModel(
     ,m_nTabIndex(FRM_DEFAULT_TABINDEX)
     ,m_nClassId(FormComponentType::CONTROL)
     ,m_bNativeLook( false )
+    ,m_bStandardTheme( false )
     ,m_bGenerateVbEvents( false )
     ,m_nControlTypeinMSO(0) // 0 : default value is create from AOO
     ,m_nObjIDinMSO(INVALID_OBJ_ID_IN_MSO)
@@ -516,7 +517,7 @@ OControlModel::OControlModel(
             try
             {
                 if ( !rDefault.isEmpty() )
-                    m_xAggregateSet->setPropertyValue( PROPERTY_DEFAULTCONTROL, makeAny( rDefault ) );
+                    m_xAggregateSet->setPropertyValue( PROPERTY_DEFAULTCONTROL, Any( rDefault ) );
             }
             catch( const Exception& )
             {
@@ -548,6 +549,7 @@ OControlModel::OControlModel( const OControlModel* _pOriginal, const Reference< 
     m_nTabIndex = _pOriginal->m_nTabIndex;
     m_nClassId = _pOriginal->m_nClassId;
     m_bNativeLook = _pOriginal->m_bNativeLook;
+    m_bStandardTheme = _pOriginal->m_bStandardTheme;
     m_bGenerateVbEvents = _pOriginal->m_bGenerateVbEvents;
     m_nControlTypeinMSO = _pOriginal->m_nControlTypeinMSO;
     m_nObjIDinMSO = _pOriginal->m_nObjIDinMSO;
@@ -645,7 +647,7 @@ void SAL_CALL OControlModel::setName(const OUString& _rName)
 {
     try
     {
-        setFastPropertyValue(PROPERTY_ID_NAME, makeAny(_rName));
+        setFastPropertyValue(PROPERTY_ID_NAME, Any(_rName));
     }
     catch (const css::beans::UnknownPropertyException&)
     {
@@ -871,6 +873,9 @@ Any OControlModel::getPropertyDefaultByHandle( sal_Int32 _nHandle ) const
         case PROPERTY_ID_NATIVE_LOOK:
             aReturn <<= true;
             break;
+        case PROPERTY_ID_STANDARD_THEME:
+            aReturn <<= false;
+            break;
         case PROPERTY_ID_GENERATEVBAEVENTS:
             aReturn <<= false;
             break;
@@ -909,6 +914,9 @@ void OControlModel::getFastPropertyValue( Any& _rValue, sal_Int32 _nHandle ) con
         case PROPERTY_ID_NATIVE_LOOK:
             _rValue <<= m_bNativeLook;
             break;
+        case PROPERTY_ID_STANDARD_THEME:
+            _rValue <<= m_bStandardTheme;
+            break;
         case PROPERTY_ID_GENERATEVBAEVENTS:
             _rValue <<= m_bGenerateVbEvents;
             break;
@@ -945,6 +953,9 @@ sal_Bool OControlModel::convertFastPropertyValue(
             break;
         case PROPERTY_ID_NATIVE_LOOK:
             bModified = tryPropertyValue(_rConvertedValue, _rOldValue, _rValue, m_bNativeLook);
+            break;
+        case PROPERTY_ID_STANDARD_THEME:
+            bModified = tryPropertyValue(_rConvertedValue, _rOldValue, _rValue, m_bStandardTheme);
             break;
         case PROPERTY_ID_GENERATEVBAEVENTS:
             bModified = tryPropertyValue(_rConvertedValue, _rOldValue, _rValue, m_bGenerateVbEvents);
@@ -988,6 +999,9 @@ void OControlModel::setFastPropertyValue_NoBroadcast(sal_Int32 _nHandle, const A
         case PROPERTY_ID_NATIVE_LOOK:
             OSL_VERIFY( _rValue >>= m_bNativeLook );
             break;
+        case PROPERTY_ID_STANDARD_THEME:
+            OSL_VERIFY( _rValue >>= m_bStandardTheme );
+            break;
         case PROPERTY_ID_GENERATEVBAEVENTS:
             OSL_VERIFY( _rValue >>= m_bGenerateVbEvents );
             break;
@@ -1009,11 +1023,13 @@ void OControlModel::setFastPropertyValue_NoBroadcast(sal_Int32 _nHandle, const A
 
 void OControlModel::describeFixedProperties( Sequence< Property >& _rProps ) const
 {
-    _rProps.realloc(7);
+    _rProps.realloc(8);
     css::beans::Property* pProperties = _rProps.getArray();
     *pProperties++ = css::beans::Property(PROPERTY_CLASSID, PROPERTY_ID_CLASSID, cppu::UnoType<sal_Int16>::get(), css::beans::PropertyAttribute::READONLY | css::beans::PropertyAttribute::TRANSIENT);
     *pProperties++ = css::beans::Property(PROPERTY_NAME, PROPERTY_ID_NAME, cppu::UnoType<OUString>::get(), css::beans::PropertyAttribute::BOUND);
     *pProperties++ = css::beans::Property(PROPERTY_NATIVE_LOOK, PROPERTY_ID_NATIVE_LOOK, cppu::UnoType<bool>::get(),
+                                          css::beans::PropertyAttribute::BOUND | css::beans::PropertyAttribute::TRANSIENT);
+    *pProperties++ = css::beans::Property(PROPERTY_STANDARD_THEME, PROPERTY_ID_STANDARD_THEME, cppu::UnoType<bool>::get(),
                                           css::beans::PropertyAttribute::BOUND | css::beans::PropertyAttribute::TRANSIENT);
     *pProperties++ = css::beans::Property(PROPERTY_TAG, PROPERTY_ID_TAG, cppu::UnoType<OUString>::get(), css::beans::PropertyAttribute::BOUND);
     *pProperties++ = css::beans::Property(PROPERTY_GENERATEVBAEVENTS, PROPERTY_ID_GENERATEVBAEVENTS, cppu::UnoType<sal_Bool>::get(), css::beans::PropertyAttribute::TRANSIENT);
@@ -1045,7 +1061,7 @@ void OControlModel::describeFixedAndAggregateProperties( Sequence< Property >& _
 
 Reference< XMultiPropertySet > OControlModel::getPropertiesInterface()
 {
-    return Reference< XMultiPropertySet >( *this, UNO_QUERY );
+    return this;
 }
 
 Reference< XPropertySetInfo> SAL_CALL OControlModel::getPropertySetInfo()
@@ -1477,7 +1493,7 @@ void SAL_CALL OBoundControlModel::disposing(const css::lang::EventObject& _rEven
         Reference<XPropertySet> xOldValue = m_xLabelControl;
         m_xLabelControl = nullptr;
         // fire a propertyChanged (when we leave aLock's scope)
-        aLock.addPropertyNotification( PROPERTY_ID_CONTROLLABEL, makeAny( xOldValue ), makeAny( m_xLabelControl ) );
+        aLock.addPropertyNotification( PROPERTY_ID_CONTROLLABEL, Any( xOldValue ), Any( m_xLabelControl ) );
     }
 
     else if ( _rEvent.Source == m_xExternalBinding )
@@ -1854,14 +1870,14 @@ sal_Bool SAL_CALL OBoundControlModel::commit()
         // we reach this only if we're not working with an external binding
     if ( !hasField() )
         return true;
-    ::comphelper::OInterfaceIteratorHelper2 aIter( m_aUpdateListeners );
+    ::comphelper::OInterfaceIteratorHelper3 aIter( m_aUpdateListeners );
     EventObject aEvent;
     aEvent.Source = static_cast< XWeak* >( this );
     bool bSuccess = true;
     aLock.release();
     // UNSAFE >
     while (aIter.hasMoreElements() && bSuccess)
-        bSuccess = static_cast< XUpdateListener* >( aIter.next() )->approveUpdate( aEvent );
+        bSuccess = aIter.next()->approveUpdate( aEvent );
     // < UNSAFE
     aLock.acquire();
     if ( bSuccess )
@@ -1944,7 +1960,8 @@ void OBoundControlModel::connectToField(const Reference<XRowSet>& rForm)
                 m_xColumn.set( m_xField, UNO_QUERY );
                 sal_Int32 nNullableFlag = ColumnValue::NO_NULLS;
                 m_xField->getPropertyValue(PROPERTY_ISNULLABLE) >>= nNullableFlag;
-                m_bRequired = (ColumnValue::NO_NULLS == nNullableFlag);
+                // tdf#122319 - don't allow nullable form components if input is required
+                m_bRequired = (ColumnValue::NO_NULLS == nNullableFlag || m_bInputRequired);
                 // we're optimistic: in case of ColumnValue_NULLABLE_UNKNOWN we assume nullability...
             }
             else
@@ -2151,7 +2168,7 @@ void OBoundControlModel::onConnectedValidator( )
         if ( m_xAggregateSet.is() )
             xAggregatePropertyInfo = m_xAggregateSet->getPropertySetInfo();
         if ( xAggregatePropertyInfo.is() && xAggregatePropertyInfo->hasPropertyByName( PROPERTY_ENFORCE_FORMAT ) )
-            m_xAggregateSet->setPropertyValue( PROPERTY_ENFORCE_FORMAT, makeAny( false ) );
+            m_xAggregateSet->setPropertyValue( PROPERTY_ENFORCE_FORMAT, Any( false ) );
     }
 
     catch( const Exception& )
@@ -2170,7 +2187,7 @@ void OBoundControlModel::onDisconnectedValidator( )
         if ( m_xAggregateSet.is() )
             xAggregatePropertyInfo = m_xAggregateSet->getPropertySetInfo();
         if ( xAggregatePropertyInfo.is() && xAggregatePropertyInfo->hasPropertyByName( PROPERTY_ENFORCE_FORMAT ) )
-            m_xAggregateSet->setPropertyValue( PROPERTY_ENFORCE_FORMAT, makeAny( true ) );
+            m_xAggregateSet->setPropertyValue( PROPERTY_ENFORCE_FORMAT, Any( true ) );
     }
 
     catch( const Exception& )

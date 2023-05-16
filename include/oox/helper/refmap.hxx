@@ -24,6 +24,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <utility>
 
 namespace oox {
 
@@ -117,7 +118,7 @@ private:
     struct ForEachFunctor
     {
         FunctorType         maFunctor;
-        explicit     ForEachFunctor( const FunctorType& rFunctor ) : maFunctor( rFunctor ) {}
+        explicit     ForEachFunctor( FunctorType aFunctor ) : maFunctor(std::move( aFunctor )) {}
         void         operator()( const value_type& rValue ) { if( rValue.second.get() ) maFunctor( *rValue.second ); }
     };
 
@@ -125,14 +126,14 @@ private:
     struct ForEachFunctorWithKey
     {
         FunctorType         maFunctor;
-        explicit     ForEachFunctorWithKey( const FunctorType& rFunctor ) : maFunctor( rFunctor ) {}
+        explicit     ForEachFunctorWithKey( FunctorType aFunctor ) : maFunctor(std::move( aFunctor )) {}
         void         operator()( const value_type& rValue ) { if( rValue.second.get() ) maFunctor( rValue.first, *rValue.second ); }
     };
 
     const mapped_type* getRef( key_type nKey ) const
     {
         typename container_type::const_iterator aIt = this->find( nKey );
-        return (aIt == this->end()) ? 0 : &aIt->second;
+        return (aIt == this->end()) ? nullptr : &aIt->second;
     }
 };
 

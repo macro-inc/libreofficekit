@@ -45,13 +45,13 @@ bool SwServerObject::GetData( uno::Any & rData,
     switch( SotExchange::GetFormatIdFromMimeType( rMimeType ) )
     {
     case SotClipboardFormatId::STRING:
-        ::GetASCWriter( OUString(), OUString(), xWrt );
+        ::GetASCWriter( std::u16string_view(), OUString(), xWrt );
         break;
 
     case SotClipboardFormatId::RTF:
     case SotClipboardFormatId::RICHTEXT:
         // mba: no BaseURL for data exchange
-        ::GetRTFWriter( OUString(), OUString(), xWrt );
+        ::GetRTFWriter( std::u16string_view(), OUString(), xWrt );
         break;
     default: break;
     }
@@ -79,7 +79,7 @@ bool SwServerObject::GetData( uno::Any & rData,
             pPam = new SwPaM( SwPosition( *m_CNTNT_TYPE.pSectNd ) );
             pPam->Move( fnMoveForward );
             pPam->SetMark();
-            pPam->GetPoint()->nNode = *m_CNTNT_TYPE.pSectNd->EndOfSectionNode();
+            pPam->GetPoint()->Assign( *m_CNTNT_TYPE.pSectNd->EndOfSectionNode() );
             pPam->Move( fnMoveBackward );
             break;
         case NONE_SERVER: break;
@@ -128,7 +128,7 @@ void SwServerObject::SendDataChanged( const SwPosition& rPos )
     }
     if( pNd )
     {
-        SwNodeOffset nNd = rPos.nNode.GetIndex();
+        SwNodeOffset nNd = rPos.GetNodeIndex();
         bCall = pNd->GetIndex() < nNd && nNd < pNd->EndOfSectionIndex();
     }
 
@@ -148,7 +148,7 @@ void SwServerObject::SendDataChanged( const SwPaM& rRange )
 
     bool bCall = false;
     const SwStartNode* pNd = nullptr;
-    const SwPosition* pStt = rRange.Start(), *pEnd = rRange.End();
+    auto [pStt, pEnd] = rRange.StartEnd(); // SwPosition*
     switch( m_eType )
     {
     case BOOKMARK_SERVER:
@@ -166,8 +166,8 @@ void SwServerObject::SendDataChanged( const SwPaM& rRange )
     if( pNd )
     {
         // Is the start area within the node area?
-        bCall = pStt->nNode.GetIndex() <  pNd->EndOfSectionIndex() &&
-                pEnd->nNode.GetIndex() >= pNd->GetIndex();
+        bCall = pStt->GetNodeIndex() <  pNd->EndOfSectionIndex() &&
+                pEnd->GetNodeIndex() >= pNd->GetIndex();
     }
 
     if( bCall )
@@ -192,9 +192,9 @@ bool SwServerObject::IsLinkInServer( const SwBaseLink* pChkLnk ) const
             const SwPosition* pStt = &m_CNTNT_TYPE.pBkmk->GetMarkStart(),
                             * pEnd = &m_CNTNT_TYPE.pBkmk->GetMarkEnd();
 
-            nSttNd = pStt->nNode.GetIndex();
-            nEndNd = pEnd->nNode.GetIndex();
-            pNds = &pStt->nNode.GetNodes();
+            nSttNd = pStt->GetNodeIndex();
+            nEndNd = pEnd->GetNodeIndex();
+            pNds = &pStt->GetNodes();
         }
         break;
 
@@ -277,13 +277,13 @@ void SwServerObject::SetDdeBookmark( ::sw::mark::IMark& rBookmark)
 SwDataChanged::SwDataChanged( const SwPaM& rPam )
     : m_pPam( &rPam ), m_pPos( nullptr ), m_rDoc( rPam.GetDoc() )
 {
-    m_nContent = rPam.GetPoint()->nContent.GetIndex();
+    m_nContent = rPam.GetPoint()->GetContentIndex();
 }
 
 SwDataChanged::SwDataChanged( SwDoc& rDc, const SwPosition& rPos )
     : m_pPam( nullptr ), m_pPos( &rPos ), m_rDoc( rDc )
 {
-    m_nContent = rPos.nContent.GetIndex();
+    m_nContent = rPos.GetContentIndex();
 }
 
 SwDataChanged::~SwDataChanged()

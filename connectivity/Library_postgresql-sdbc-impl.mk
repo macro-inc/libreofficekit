@@ -45,13 +45,15 @@ endif
 $(eval $(call gb_Library_use_externals,postgresql-sdbc-impl,\
 	boost_headers \
 	postgresql \
-	$(if $(filter-out MSC,$(COM)), \
-		openssl \
-		$(if $(ENABLE_LDAP),openldap) \
-		nss3 \
-		plc4 \
-		ssl3 \
-	) \
+    $(if $(filter-out MSC,$(COM)), \
+        $(if $(ENABLE_OPENSSL),openssl) \
+        $(if $(ENABLE_LDAP), \
+            openldap \
+            nss3 \
+            plc4 \
+            ssl3 \
+        ) \
+    ) \
 ))
 
 ifeq ($(SYSTEM_POSTGRESQL),)
@@ -66,7 +68,7 @@ $(eval $(call gb_Library_add_libs,postgresql-sdbc-impl,\
 endif
 endif
 
-$(eval $(call gb_Library_set_componentfile,postgresql-sdbc-impl,connectivity/source/drivers/postgresql/postgresql-sdbc-impl))
+$(eval $(call gb_Library_set_componentfile,postgresql-sdbc-impl,connectivity/source/drivers/postgresql/postgresql-sdbc-impl,postgresql-sdbc))
 
 $(eval $(call gb_Library_add_exception_objects,postgresql-sdbc-impl,\
 	connectivity/source/drivers/postgresql/pq_array \

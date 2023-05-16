@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 #include "vbaautotextentry.hxx"
+#include <utility>
 #include <vbahelper/vbahelper.hxx>
 #include <com/sun/star/text/XParagraphCursor.hpp>
 #include "wordvbahelper.hxx"
@@ -25,8 +26,8 @@
 using namespace ::ooo::vba;
 using namespace ::com::sun::star;
 
-SwVbaAutoTextEntry::SwVbaAutoTextEntry( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, const uno::Reference< text::XAutoTextEntry >& xEntry ) :
-    SwVbaAutoTextEntry_BASE( rParent, rContext ), mxEntry( xEntry )
+SwVbaAutoTextEntry::SwVbaAutoTextEntry( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, uno::Reference< text::XAutoTextEntry >  xEntry ) :
+    SwVbaAutoTextEntry_BASE( rParent, rContext ), mxEntry(std::move( xEntry ))
 {
 }
 
@@ -109,7 +110,7 @@ uno::Any
 SwVbaAutoTextEntries::createCollectionObject( const css::uno::Any& aSource )
 {
     uno::Reference< text::XAutoTextEntry > xEntry( aSource, uno::UNO_QUERY_THROW );
-    return uno::makeAny( uno::Reference< word::XAutoTextEntry >( new SwVbaAutoTextEntry( this, mxContext, xEntry ) ) );
+    return uno::Any( uno::Reference< word::XAutoTextEntry >( new SwVbaAutoTextEntry( this, mxContext, xEntry ) ) );
 }
 
 OUString

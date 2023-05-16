@@ -25,9 +25,9 @@
 #include <srchdlg.hxx>
 #include <sfx2/sfxhelp.hxx>
 #include <sal/log.hxx>
-#include <osl/diagnose.h>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <sfx2/strings.hrc>
 #include <helpids.h>
@@ -74,6 +74,7 @@
 #include <tools/urlobj.hxx>
 #include <svtools/imagemgr.hxx>
 #include <svtools/miscopt.hxx>
+#include <utility>
 #include <vcl/commandevent.hxx>
 #include <vcl/event.hxx>
 #include <vcl/i18nhelp.hxx>
@@ -194,8 +195,8 @@ struct IndexEntry_Impl
     bool            m_bSubEntry;
     OUString        m_aURL;
 
-    IndexEntry_Impl( const OUString& rURL, bool bSubEntry ) :
-        m_bSubEntry( bSubEntry ), m_aURL( rURL ) {}
+    IndexEntry_Impl( OUString aURL, bool bSubEntry ) :
+        m_bSubEntry( bSubEntry ), m_aURL(std::move( aURL )) {}
 };
 
 // struct ContentEntry_Impl ----------------------------------------------
@@ -205,8 +206,8 @@ struct ContentEntry_Impl
     OUString    aURL;
     bool        bIsFolder;
 
-    ContentEntry_Impl( const OUString& rURL, bool bFolder ) :
-        aURL( rURL ), bIsFolder( bFolder ) {}
+    ContentEntry_Impl( OUString _aURL, bool bFolder ) :
+        aURL(std::move( _aURL )), bIsFolder( bFolder ) {}
 };
 
 }
@@ -221,11 +222,11 @@ void ContentTabPage_Impl::InitRoot()
         sal_Int32 nIdx = 0;
         OUString aTitle = aRow.getToken( 0, '\t', nIdx );
         OUString aURL = aRow.getToken( 0, '\t', nIdx );
-        sal_Unicode cFolder = aRow.getToken( 0, '\t', nIdx )[0];
+        sal_Unicode cFolder = o3tl::getToken(aRow, 0, '\t', nIdx )[0];
         bool bIsFolder = ( '1' == cFolder );
         OUString sId;
         if (bIsFolder)
-            sId = OUString::number(reinterpret_cast<sal_Int64>(new ContentEntry_Impl(aURL, true)));
+            sId = weld::toId(new ContentEntry_Impl(aURL, true));
         m_xContentBox->insert(nullptr, -1, &aTitle, &sId, nullptr, nullptr, true, m_xScratchIter.get());
         m_xContentBox->set_image(*m_xScratchIter, aClosedBookImage);
     }
@@ -238,7 +239,7 @@ void ContentTabPage_Impl::ClearChildren(const weld::TreeIter* pParent)
     while (bEntry)
     {
         ClearChildren(xEntry.get());
-        delete reinterpret_cast<ContentEntry_Impl*>(m_xContentBox->get_id(*xEntry).toInt64());
+        delete weld::fromId<ContentEntry_Impl*>(m_xContentBox->get_id(*xEntry));
         bEntry = m_xContentBox->iter_next_sibling(*xEntry);
     }
 
@@ -246,7 +247,7 @@ void ContentTabPage_Impl::ClearChildren(const weld::TreeIter* pParent)
 
 IMPL_LINK(ContentTabPage_Impl, ExpandingHdl, const weld::TreeIter&, rIter, bool)
 {
-    ContentEntry_Impl* pContentEntry = reinterpret_cast<ContentEntry_Impl*>(m_xContentBox->get_id(rIter).toInt64());
+    ContentEntry_Impl* pContentEntry = weld::fromId<ContentEntry_Impl*>(m_xContentBox->get_id(rIter));
     if (!m_xContentBox->iter_has_child(rIter))
     {
         try
@@ -260,11 +261,11 @@ IMPL_LINK(ContentTabPage_Impl, ExpandingHdl, const weld::TreeIter&, rIter, bool)
                     sal_Int32 nIdx = 0;
                     OUString aTitle = aRow.getToken( 0, '\t', nIdx );
                     OUString aURL = aRow.getToken( 0, '\t', nIdx );
-                    sal_Unicode cFolder = aRow.getToken( 0, '\t', nIdx )[0];
+                    sal_Unicode cFolder = o3tl::getToken(aRow, 0, '\t', nIdx )[0];
                     bool bIsFolder = ( '1' == cFolder );
                     if ( bIsFolder )
                     {
-                        OUString sId = OUString::number(reinterpret_cast<sal_Int64>(new ContentEntry_Impl(aURL, true)));
+                        OUString sId = weld::toId(new ContentEntry_Impl(aURL, true));
                         m_xContentBox->insert(&rIter, -1, &aTitle, &sId, nullptr, nullptr, true, m_xScratchIter.get());
                         m_xContentBox->set_image(*m_xScratchIter, aClosedBookImage);
                     }
@@ -274,7 +275,7 @@ IMPL_LINK(ContentTabPage_Impl, ExpandingHdl, const weld::TreeIter&, rIter, bool)
                         OUString sId;
                         OUString aTargetURL;
                         if ( aAny >>= aTargetURL )
-                            sId = OUString::number(reinterpret_cast<sal_Int64>(new ContentEntry_Impl(aTargetURL, false)));
+                            sId = weld::toId(new ContentEntry_Impl(aTargetURL, false));
                         m_xContentBox->insert(&rIter, -1, &aTitle, &sId, nullptr, nullptr, false, m_xScratchIter.get());
                         m_xContentBox->set_image(*m_xScratchIter, aDocumentImage);
                     }
@@ -295,7 +296,7 @@ IMPL_LINK(ContentTabPage_Impl, ExpandingHdl, const weld::TreeIter&, rIter, bool)
 
 IMPL_LINK(ContentTabPage_Impl, CollapsingHdl, const weld::TreeIter&, rIter, bool)
 {
-    ContentEntry_Impl* pContentEntry = reinterpret_cast<ContentEntry_Impl*>(m_xContentBox->get_id(rIter).toInt64());
+    ContentEntry_Impl* pContentEntry = weld::fromId<ContentEntry_Impl*>(m_xContentBox->get_id(rIter));
     if (!pContentEntry || pContentEntry->bIsFolder)
         m_xContentBox->set_image(rIter, aClosedBookImage);
 
@@ -305,7 +306,7 @@ IMPL_LINK(ContentTabPage_Impl, CollapsingHdl, const weld::TreeIter&, rIter, bool
 OUString ContentTabPage_Impl::GetSelectedEntry() const
 {
     OUString aRet;
-    ContentEntry_Impl* pEntry = reinterpret_cast<ContentEntry_Impl*>(m_xContentBox->get_selected_id().toInt64());
+    ContentEntry_Impl* pEntry = weld::fromId<ContentEntry_Impl*>(m_xContentBox->get_selected_id());
     if (pEntry && !pEntry->bIsFolder)
         aRet = pEntry->aURL;
     return aRet;
@@ -360,7 +361,7 @@ ContentTabPage_Impl::~ContentTabPage_Impl()
     while (bEntry)
     {
         ClearChildren(xEntry.get());
-        delete reinterpret_cast<ContentEntry_Impl*>(m_xContentBox->get_id(*xEntry).toInt64());
+        delete weld::fromId<ContentEntry_Impl*>(m_xContentBox->get_id(*xEntry));
         bEntry = m_xContentBox->iter_next_sibling(*xEntry);
     }
 }
@@ -373,11 +374,11 @@ void IndexTabPage_Impl::SelectExecutableEntry()
 
     sal_Int32 nOldPos = nPos;
     OUString aEntryText;
-    IndexEntry_Impl* pEntry = reinterpret_cast<IndexEntry_Impl*>(m_xIndexList->get_id(nPos).toInt64());
+    IndexEntry_Impl* pEntry = weld::fromId<IndexEntry_Impl*>(m_xIndexList->get_id(nPos));
     sal_Int32 nCount = m_xIndexList->n_children();
     while ( nPos < nCount && ( !pEntry || pEntry->m_aURL.isEmpty() ) )
     {
-        pEntry = reinterpret_cast<IndexEntry_Impl*>(m_xIndexList->get_id(++nPos).toInt64());
+        pEntry = weld::fromId<IndexEntry_Impl*>(m_xIndexList->get_id(++nPos));
         aEntryText = m_xIndexList->get_text(nPos);
     }
 
@@ -446,7 +447,7 @@ IMPL_LINK(IndexTabPage_Impl, CustomRenderHdl, weld::TreeView::render_args, aPayl
     int nIndex = m_xIndexList->find_id(rId);
     OUString aEntry(m_xIndexList->get_text(nIndex));
 
-    IndexEntry_Impl* pEntry = reinterpret_cast<IndexEntry_Impl*>(rId.toInt64());
+    IndexEntry_Impl* pEntry = weld::fromId<IndexEntry_Impl*>(rId);
     if (pEntry && pEntry->m_bSubEntry)
     {
         // indent sub entries
@@ -625,7 +626,7 @@ void IndexTabPage_Impl::InitializeIndex()
                         {
                             aIndex = aTempString;
                             it = aInfo.emplace(aTempString, 0).first;
-                            sId = OUString::number(reinterpret_cast<sal_Int64>(new IndexEntry_Impl(OUString(), false)));
+                            sId = weld::toId(new IndexEntry_Impl(OUString(), false));
                             if ( (tmp = it->second++) != 0)
                                 m_xIndexList->append(
                                     sId, aTempString + std::u16string_view(append, tmp));
@@ -646,10 +647,10 @@ void IndexTabPage_Impl::InitializeIndex()
                         if ( aAnchorList[0].getLength() > 0 )
                         {
                             aData.append( aRefList[0] ).append( '#' ).append( aAnchorList[0] );
-                            sId = OUString::number(reinterpret_cast<sal_Int64>(new IndexEntry_Impl(aData.makeStringAndClear(), insert)));
+                            sId = weld::toId(new IndexEntry_Impl(aData.makeStringAndClear(), insert));
                         }
                         else
-                            sId = OUString::number(reinterpret_cast<sal_Int64>(new IndexEntry_Impl(aRefList[0], insert)));
+                            sId = weld::toId(new IndexEntry_Impl(aRefList[0], insert));
                     }
 
                     // Assume the token is trimmed
@@ -673,10 +674,10 @@ void IndexTabPage_Impl::InitializeIndex()
                         if ( aAnchorList[j].getLength() > 0 )
                         {
                             aData.append( aRefList[j] ).append( '#' ).append( aAnchorList[j] );
-                            sId = OUString::number(reinterpret_cast<sal_Int64>(new IndexEntry_Impl(aData.makeStringAndClear(), insert)));
+                            sId = weld::toId(new IndexEntry_Impl(aData.makeStringAndClear(), insert));
                         }
                         else
-                            sId = OUString::number(reinterpret_cast<sal_Int64>(new IndexEntry_Impl(aRefList[j], insert)));
+                            sId = weld::toId(new IndexEntry_Impl(aRefList[j], insert));
 
                         it = aInfo.emplace(aTempString, 0).first;
                         if ( (tmp = it->second++) != 0 )
@@ -704,7 +705,7 @@ void IndexTabPage_Impl::ClearIndex()
 {
     const sal_Int32 nCount = m_xIndexList->n_children();
     for ( sal_Int32 i = 0; i < nCount; ++i )
-        delete reinterpret_cast<IndexEntry_Impl*>(m_xIndexList->get_id(i).toInt64());
+        delete weld::fromId<IndexEntry_Impl*>(m_xIndexList->get_id(i));
     m_xIndexList->clear();
 }
 
@@ -837,7 +838,7 @@ void IndexTabPage_Impl::SetFactory( const OUString& rFactory )
 OUString IndexTabPage_Impl::GetSelectedEntry() const
 {
     OUString aRet;
-    IndexEntry_Impl* pEntry = reinterpret_cast<IndexEntry_Impl*>(m_xIndexList->get_id(m_xIndexList->find_text(m_xIndexEntry->get_text())).toInt64());
+    IndexEntry_Impl* pEntry = weld::fromId<IndexEntry_Impl*>(m_xIndexList->get_id(m_xIndexList->find_text(m_xIndexEntry->get_text())));
     if (pEntry)
         aRet = pEntry->m_aURL;
     return aRet;
@@ -934,15 +935,15 @@ SearchTabPage_Impl::SearchTabPage_Impl(weld::Widget* pParent, SfxHelpIndexWindow
         if ( aUserItem >>= aUserData )
         {
             sal_Int32 nIdx {0};
-            bool bChecked = aUserData.getToken(0, ';', nIdx).toInt32() == 1;
+            bool bChecked = o3tl::toInt32(o3tl::getToken(aUserData, 0, ';', nIdx)) == 1;
             m_xFullWordsCB->set_active(bChecked);
-            bChecked = aUserData.getToken(0, ';', nIdx).toInt32() == 1;
+            bChecked = o3tl::toInt32(o3tl::getToken(aUserData, 0, ';', nIdx)) == 1;
             m_xScopeCB->set_active(bChecked);
 
             while ( nIdx > 0 )
             {
                 m_xSearchED->append_text( INetURLObject::decode(
-                    aUserData.getToken(0, ';', nIdx),
+                    o3tl::getToken(aUserData, 0, ';', nIdx),
                     INetURLObject::DecodeMechanism::WithCharset ) );
             }
         }
@@ -969,7 +970,7 @@ SearchTabPage_Impl::~SearchTabPage_Impl()
                 INetURLObject::EncodeMechanism::All ));
     }
 
-    Any aUserItem = makeAny( aUserData.makeStringAndClear() );
+    Any aUserItem( aUserData.makeStringAndClear() );
     aViewOpt.SetUserItem( USERITEM_NAME, aUserItem );
 
     m_xSearchED.reset();
@@ -1109,7 +1110,8 @@ void BookmarksTabPage_Impl::DoAction(std::string_view rAction)
             {
                 OUString sURL = m_xBookmarksBox->get_id(nPos);
                 m_xBookmarksBox->remove(nPos);
-                m_xBookmarksBox->append(sURL, aDlg.GetTitle(), SvFileInformationManager::GetImageId(INetURLObject(IMAGE_URL+INetURLObject(sURL).GetHost())));
+                m_xBookmarksBox->append(sURL, aDlg.GetTitle(),
+                    SvFileInformationManager::GetImageId(INetURLObject(rtl::Concat2View(IMAGE_URL+INetURLObject(sURL).GetHost()))));
                 m_xBookmarksBox->select(m_xBookmarksBox->n_children() - 1);
             }
         }
@@ -1186,7 +1188,9 @@ BookmarksTabPage_Impl::~BookmarksTabPage_Impl()
     SvtHistoryOptions::Clear( EHistoryType::HelpBookmarks );
     const sal_Int32 nCount = m_xBookmarksBox->n_children();
     for (sal_Int32 i = 0; i < nCount; ++i)
-        SvtHistoryOptions::AppendItem(EHistoryType::HelpBookmarks, m_xBookmarksBox->get_id(i), "", m_xBookmarksBox->get_text(i), std::nullopt);
+    {
+        SvtHistoryOptions::AppendItem(EHistoryType::HelpBookmarks, m_xBookmarksBox->get_id(i), "", m_xBookmarksBox->get_text(i), std::nullopt, std::nullopt);
+    }
 
     m_xBookmarksBox.reset();
     m_xBookmarksPB.reset();
@@ -1342,7 +1346,7 @@ void SfxHelpIndexWindow_Impl::Initialize()
     {
         sal_Int32 nIdx = 0;
         OUString aTitle = rRow.getToken( 0, '\t', nIdx ); // token 0
-        OUString aURL = rRow.getToken( 1, '\t', nIdx ); // token 2
+        std::u16string_view aURL = o3tl::getToken(rRow, 1, '\t', nIdx ); // token 2
         OUString aFactory(INetURLObject(aURL).GetHost());
         m_xActiveLB->append(aFactory, aTitle);
     }
@@ -1592,7 +1596,7 @@ TextWin_Impl::TextWin_Impl( vcl::Window* p ) : DockingWindow( p, 0 )
 
 bool TextWin_Impl::EventNotify( NotifyEvent& rNEvt )
 {
-    if( ( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT ) && rNEvt.GetKeyEvent()->GetKeyCode().GetCode() == KEY_TAB )
+    if( ( rNEvt.GetType() == NotifyEventType::KEYINPUT ) && rNEvt.GetKeyEvent()->GetKeyCode().GetCode() == KEY_TAB )
         return GetParent()->EventNotify( rNEvt );
     else
         return DockingWindow::EventNotify( rNEvt );
@@ -1832,9 +1836,9 @@ IMPL_LINK_NOARG(SfxHelpTextWindow_Impl, SelectHdl, Timer *, void)
             {
                 // create descriptor, set string and find all words
                 Reference < XSearchDescriptor > xSrchDesc = xSearchable->createSearchDescriptor();
-                xSrchDesc->setPropertyValue( "SearchRegularExpression", makeAny( true ) );
+                xSrchDesc->setPropertyValue( "SearchRegularExpression", Any( true ) );
                 if ( bIsFullWordSearch )
-                    xSrchDesc->setPropertyValue( "SearchWords", makeAny( true ) );
+                    xSrchDesc->setPropertyValue( "SearchWords", Any( true ) );
 
                 xSrchDesc->setSearchString( sfx2::PrepareSearchString( aSearchText, GetBreakIterator(), false ) );
                 Reference< XIndexAccess > xSelection = xSearchable->findAll( xSrchDesc );
@@ -1883,9 +1887,9 @@ void SfxHelpTextWindow_Impl::FindHdl(sfx2::SearchDialog* pDlg)
             {
                 // create descriptor, set string and find all words
                 Reference < XSearchDescriptor > xSrchDesc = xSearchable->createSearchDescriptor();
-                xSrchDesc->setPropertyValue( "SearchWords", makeAny(pDlg->IsOnlyWholeWords()) );
-                xSrchDesc->setPropertyValue( "SearchCaseSensitive", makeAny(pDlg->IsMarchCase()) );
-                xSrchDesc->setPropertyValue( "SearchBackwards", makeAny(pDlg->IsSearchBackwards()) );
+                xSrchDesc->setPropertyValue( "SearchWords", Any(pDlg->IsOnlyWholeWords()) );
+                xSrchDesc->setPropertyValue( "SearchCaseSensitive", Any(pDlg->IsMarchCase()) );
+                xSrchDesc->setPropertyValue( "SearchBackwards", Any(pDlg->IsSearchBackwards()) );
                 xSrchDesc->setSearchString( pDlg->GetSearchText() );
                 Reference< XInterface > xSelection;
                 Reference< XTextRange > xCursor = getCursor();
@@ -1957,7 +1961,7 @@ IMPL_LINK_NOARG(SfxHelpTextWindow_Impl, CheckHdl, weld::Toggleable&, void)
     try
     {
         ConfigurationHelper::writeRelativeKey(
-            xConfiguration, PATH_OFFICE_FACTORIES + sCurrentFactory, KEY_HELP_ON_OPEN, makeAny( bChecked ) );
+            xConfiguration, PATH_OFFICE_FACTORIES + sCurrentFactory, KEY_HELP_ON_OPEN, Any( bChecked ) );
         ConfigurationHelper::flush( xConfiguration );
     }
     catch( Exception const & )
@@ -1975,8 +1979,8 @@ void SfxHelpTextWindow_Impl::Resize()
 bool SfxHelpTextWindow_Impl::PreNotify( NotifyEvent& rNEvt )
 {
     bool bDone = false;
-    MouseNotifyEvent nType = rNEvt.GetType();
-    if ( MouseNotifyEvent::COMMAND == nType && rNEvt.GetCommandEvent() )
+    NotifyEventType nType = rNEvt.GetType();
+    if ( NotifyEventType::COMMAND == nType && rNEvt.GetCommandEvent() )
     {
         const CommandEvent* pCmdEvt = rNEvt.GetCommandEvent();
         vcl::Window* pCmdWin = rNEvt.GetWindow();
@@ -2042,7 +2046,7 @@ bool SfxHelpTextWindow_Impl::PreNotify( NotifyEvent& rNEvt )
             bDone = true;
         }
     }
-    else if ( MouseNotifyEvent::KEYINPUT == nType && rNEvt.GetKeyEvent() )
+    else if ( NotifyEventType::KEYINPUT == nType && rNEvt.GetKeyEvent() )
     {
         const KeyEvent* pKEvt = rNEvt.GetKeyEvent();
         const vcl::KeyCode& rKeyCode = pKEvt->GetKeyCode();
@@ -2157,7 +2161,7 @@ void SfxHelpTextWindow_Impl::SetPageStyleHeaderOff() const
                             if ( xContainer->getByName( sStyleName ) >>= xStyle )
                             {
                                 Reference < XPropertySet > xPropSet( xStyle, UNO_QUERY );
-                                xPropSet->setPropertyValue( "HeaderIsOn",  makeAny( false ) );
+                                xPropSet->setPropertyValue( "HeaderIsOn",  Any( false ) );
 
                                 Reference< XModifiable > xReset(xStyles, UNO_QUERY);
                                 xReset->setModified(false);
@@ -2262,13 +2266,13 @@ void SfxHelpWindow_Impl::LoadConfig()
     {
         DBG_ASSERT( comphelper::string::getTokenCount(aUserData, ';') == 6, "invalid user data" );
         sal_Int32 nIdx = 0;
-        nIndexSize = aUserData.getToken( 0, ';', nIdx ).toInt32();
-        aUserData.getToken(0, ';', nIdx); // ignore nTextSize
-        sal_Int32 nOldWidth = aUserData.getToken( 0, ';', nIdx ).toInt32();
-        sal_Int32 nOldHeight = aUserData.getToken( 0, ';', nIdx ).toInt32();
+        nIndexSize = o3tl::toInt32(o3tl::getToken(aUserData, 0, ';', nIdx ));
+        o3tl::getToken(aUserData, 0, ';', nIdx); // ignore nTextSize
+        sal_Int32 nOldWidth = o3tl::toInt32(o3tl::getToken(aUserData, 0, ';', nIdx ));
+        sal_Int32 nOldHeight = o3tl::toInt32(o3tl::getToken(aUserData, 0, ';', nIdx ));
         aWinSize = Size(nOldWidth, nOldHeight);
-        aWinPos.setX( aUserData.getToken( 0, ';', nIdx ).toInt32() );
-        aWinPos.setY( aUserData.getToken( 0, ';', nIdx ).toInt32() );
+        aWinPos.setX( o3tl::toInt32(o3tl::getToken(aUserData, 0, ';', nIdx )) );
+        aWinPos.setY( o3tl::toInt32(o3tl::getToken(aUserData, 0, ';', nIdx )) );
     }
 
     pTextWin->ToggleIndex( bIndex );
@@ -2298,7 +2302,7 @@ void SfxHelpWindow_Impl::SaveConfig()
         + ";" + OUString::number( aWinPos.X() )
         + ";" + OUString::number( aWinPos.Y() );
 
-    aViewOpt.SetUserItem( USERITEM_NAME, makeAny( aUserData ) );
+    aViewOpt.SetUserItem( USERITEM_NAME, Any( aUserData ) );
 }
 
 void SfxHelpWindow_Impl::ShowStartPage()
@@ -2328,18 +2332,18 @@ IMPL_LINK_NOARG(SfxHelpWindow_Impl, OpenHdl, LinkParamNone*, void)
         sHelpURL = aEntry;
     else
     {
-        OUString aId;
+        std::u16string_view aId;
         OUString aAnchor('#');
         if ( comphelper::string::getTokenCount(aEntry, '#') == 2 )
         {
             sal_Int32 nIdx{ 0 };
-            aId = aEntry.getToken( 0, '#', nIdx );
-            aAnchor += aEntry.getToken( 0, '#', nIdx );
+            aId = o3tl::getToken(aEntry, 0, '#', nIdx );
+            aAnchor += o3tl::getToken(aEntry, 0, '#', nIdx );
         }
         else
             aId = aEntry;
 
-        sHelpURL = SfxHelpWindow_Impl::buildHelpURL(xIndexWin->GetFactory(), OUStringConcatenation("/" + aId), aAnchor);
+        sHelpURL = SfxHelpWindow_Impl::buildHelpURL(xIndexWin->GetFactory(), Concat2View(OUString::Concat("/") + aId), aAnchor);
     }
 
     loadHelpContent(sHelpURL);
@@ -2366,7 +2370,7 @@ IMPL_LINK( SfxHelpWindow_Impl, ChangeHdl, HelpListener_Impl&, rListener, void )
 }
 
 
-void SfxHelpWindow_Impl::openDone(const OUString& sURL    ,
+void SfxHelpWindow_Impl::openDone(std::u16string_view sURL    ,
                                         bool         bSuccess)
 {
     INetURLObject aObj( sURL );
@@ -2393,13 +2397,13 @@ void SfxHelpWindow_Impl::openDone(const OUString& sURL    ,
             Reference < XViewSettingsSupplier > xSettings( xController, UNO_QUERY );
             Reference < XPropertySet > xViewProps = xSettings->getViewSettings();
             Reference< XPropertySetInfo > xInfo = xViewProps->getPropertySetInfo();
-            xViewProps->setPropertyValue( "ShowContentTips", makeAny( false ) );
-            xViewProps->setPropertyValue( "ShowGraphics", makeAny( true ) );
-            xViewProps->setPropertyValue( "ShowTables", makeAny( true ) );
-            xViewProps->setPropertyValue( "HelpURL", makeAny( OUString("HID:SFX2_HID_HELP_ONHELP") ) );
+            xViewProps->setPropertyValue( "ShowContentTips", Any( false ) );
+            xViewProps->setPropertyValue( "ShowGraphics", Any( true ) );
+            xViewProps->setPropertyValue( "ShowTables", Any( true ) );
+            xViewProps->setPropertyValue( "HelpURL", Any( OUString("HID:SFX2_HID_HELP_ONHELP") ) );
             OUString sProperty( "IsExecuteHyperlinks" );
             if ( xInfo->hasPropertyByName( sProperty ) )
-                xViewProps->setPropertyValue( sProperty, makeAny( true ) );
+                xViewProps->setPropertyValue( sProperty, Any( true ) );
             xController->restoreViewData(Any());
         }
     }
@@ -2488,7 +2492,7 @@ void SfxHelpWindow_Impl::dispose()
 bool SfxHelpWindow_Impl::PreNotify( NotifyEvent& rNEvt )
 {
     bool bHandled = false;
-    if ( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT )
+    if ( rNEvt.GetType() == NotifyEventType::KEYINPUT )
     {
         // Backward == <ALT><LEFT> or <BACKSPACE> Forward == <ALT><RIGHT>
         const vcl::KeyCode& rKeyCode = rNEvt.GetKeyEvent()->GetKeyCode();
@@ -2528,7 +2532,7 @@ void SfxHelpWindow_Impl::SetFactory( const OUString& rFactory )
     xIndexWin->SetFactory( rFactory, true );
 }
 
-void SfxHelpWindow_Impl::SetHelpURL( const OUString& rURL )
+void SfxHelpWindow_Impl::SetHelpURL( std::u16string_view rURL )
 {
     INetURLObject aObj( rURL );
     if ( aObj.GetProtocol() == INetProtocol::VndSunStarHelp )

@@ -397,7 +397,8 @@ bool ScFuncDesc::compareByName(const ScFuncDesc* a, const ScFuncDesc* b)
 
 #define ENTRY(CODE) CODE, SAL_N_ELEMENTS(CODE)
 
-ScFunctionList::ScFunctionList()
+ScFunctionList::ScFunctionList( bool bEnglishFunctionNames )
+    : mbEnglishFunctionNames( bEnglishFunctionNames )
 {
     sal_Int32  nMaxFuncNameLen = 0; // Length of longest function name
 
@@ -601,7 +602,7 @@ ScFunctionList::ScFunctionList()
         { SC_OPCODE_AREAS, ENTRY(SC_OPCODE_AREAS_ARY), 0, ID_FUNCTION_GRP_TABLE, HID_FUNC_BEREICHE, 1, { 0 }, 0 },
         { SC_OPCODE_CURRENCY, ENTRY(SC_OPCODE_CURRENCY_ARY), 0, ID_FUNCTION_GRP_TEXT, HID_FUNC_DM, 2, { 0, 1 }, 0 },
         { SC_OPCODE_REPLACE, ENTRY(SC_OPCODE_REPLACE_ARY), 0, ID_FUNCTION_GRP_TEXT, HID_FUNC_ERSETZEN, 4, { 0, 0, 0, 0 }, 0 },
-        { SC_OPCODE_FIXED, ENTRY(SC_OPCODE_FIXED_ARY), 0, ID_FUNCTION_GRP_TEXT, HID_FUNC_FEST, 3, { 0, 0, 1 }, 0 },
+        { SC_OPCODE_FIXED, ENTRY(SC_OPCODE_FIXED_ARY), 0, ID_FUNCTION_GRP_TEXT, HID_FUNC_FEST, 3, { 0, 1, 1 }, 0 },
         { SC_OPCODE_FIND, ENTRY(SC_OPCODE_FIND_ARY), 0, ID_FUNCTION_GRP_TEXT, HID_FUNC_FINDEN, 3, { 0, 0, 1 }, 0 },
         { SC_OPCODE_EXACT, ENTRY(SC_OPCODE_EXACT_ARY), 0, ID_FUNCTION_GRP_TEXT, HID_FUNC_IDENTISCH, 2, { 0, 0 }, 0 },
         { SC_OPCODE_LEFT, ENTRY(SC_OPCODE_LEFT_ARY), 0, ID_FUNCTION_GRP_TEXT, HID_FUNC_LINKS, 2, { 0, 1 }, 0 },
@@ -738,7 +739,7 @@ ScFunctionList::ScFunctionList()
         { SC_OPCODE_F_TEST_MS, ENTRY(SC_OPCODE_F_TEST_MS_ARY), 0, ID_FUNCTION_GRP_STATISTIC, HID_FUNC_F_TEST_MS, 2, { 0, 0 }, 0 },
         { SC_OPCODE_EXP_DIST_MS, ENTRY(SC_OPCODE_EXP_DIST_MS_ARY), 0, ID_FUNCTION_GRP_STATISTIC, HID_FUNC_EXP_DIST_MS, 3, { 0, 0, 0 }, 0 },
         { SC_OPCODE_HYP_GEOM_DIST_MS, ENTRY(SC_OPCODE_HYP_GEOM_DIST_MS_ARY), 0, ID_FUNCTION_GRP_STATISTIC, HID_FUNC_HYP_GEOM_DIST_MS, 5, { 0, 0, 0, 0, 0 }, 0 },
-        { SC_OPCODE_POISSON_DIST_MS, ENTRY(SC_OPCODE_POISSON_DIST_MS_ARY), 0, ID_FUNCTION_GRP_STATISTIC, HID_FUNC_POISSON_DIST_MS, 3, { 0, 0, 1 }, 0 },
+        { SC_OPCODE_POISSON_DIST_MS, ENTRY(SC_OPCODE_POISSON_DIST_MS_ARY), 0, ID_FUNCTION_GRP_STATISTIC, HID_FUNC_POISSON_DIST_MS, 3, { 0, 0, 0 }, 0 },
         { SC_OPCODE_WEIBULL_MS, ENTRY(SC_OPCODE_WEIBULL_MS_ARY), 0, ID_FUNCTION_GRP_STATISTIC, HID_FUNC_WEIBULL_DIST_MS, 4, { 0, 0, 0, 0 }, 0 },
         { SC_OPCODE_GAMMA_DIST_MS, ENTRY(SC_OPCODE_GAMMA_DIST_MS_ARY), 0, ID_FUNCTION_GRP_STATISTIC, HID_FUNC_GAMMADIST_MS, 4, { 0, 0, 0, 0 }, 0 },
         { SC_OPCODE_GAMMA_INV_MS, ENTRY(SC_OPCODE_GAMMA_INV_MS_ARY), 0, ID_FUNCTION_GRP_STATISTIC, HID_FUNC_GAMMAINV_MS, 3, { 0, 0, 0 }, 0 },
@@ -958,7 +959,7 @@ ScFunctionList::ScFunctionList()
         pDesc = new ScFuncDesc;
         pDesc->nFIndex = nNextId++;
 
-        if ( pUnoAddIns->FillFunctionDesc( nFunc, *pDesc ) )
+        if ( pUnoAddIns->FillFunctionDesc( nFunc, *pDesc, mbEnglishFunctionNames ) )
         {
             tmpFuncVector.push_back(pDesc);
             nStrLen = pDesc->mxFuncName->getLength();

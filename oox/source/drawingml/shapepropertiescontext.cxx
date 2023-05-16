@@ -62,15 +62,9 @@ ContextHandlerRef ShapePropertiesContext::onCreateContext( sal_Int32 aElementTok
         {
             sal_Int32 nToken = rAttribs.getToken( XML_prst, 0 );
             // TODO: Move the following checks to a separate place or as a separate function
-            if ( nToken == XML_line )
+            if (nToken == XML_line && !mrShape.isConnectorShape())
             {
                 mrShape.getServiceName() = "com.sun.star.drawing.LineShape";
-            }
-            if( ( nToken >= XML_bentConnector2 && nToken <= XML_bentConnector5 ) ||
-                ( nToken >= XML_curvedConnector2 && nToken <= XML_curvedConnector5 ) ||
-                  nToken == XML_straightConnector1 )
-            {
-                mrShape.getServiceName() = "com.sun.star.drawing.CustomShape";
             }
 
             // We got a preset geometry, forget the geometry inherited from the placeholder shape.
@@ -101,7 +95,7 @@ ContextHandlerRef ShapePropertiesContext::onCreateContext( sal_Int32 aElementTok
         return new Shape3DPropertiesContext( *this, rAttribs, mrShape.get3DProperties() );
     }
 
-    return FillPropertiesContext::createFillContext( *this, aElementToken, rAttribs, mrShape.getFillProperties() );
+    return FillPropertiesContext::createFillContext(*this, aElementToken, rAttribs, mrShape.getFillProperties(), nullptr);
 }
 
 }

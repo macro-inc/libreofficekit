@@ -56,12 +56,12 @@
 #include <o3tl/safeint.hxx>
 #include <svl/numformat.hxx>
 #include <svl/numuno.hxx>
-#include <svl/zforlist.hxx>
 #include <svx/dialmgr.hxx>
+#include <toolkit/helper/listenermultiplexer.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <tools/debug.hxx>
 #include <tools/fract.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
 #include <connectivity/dbtools.hxx>
@@ -245,7 +245,7 @@ void DbGridColumn::impl_toggleScriptManager_nothrow( bool _bAttach )
 
         Reference< XInterface > xCellInterface( *m_pCell, UNO_QUERY );
         if ( _bAttach )
-            xManager->attach( nIndexInParent, xCellInterface, makeAny( xCellInterface ) );
+            xManager->attach( nIndexInParent, xCellInterface, Any( xCellInterface ) );
         else
             xManager->detach( nIndexInParent, xCellInterface );
     }
@@ -1199,7 +1199,7 @@ bool DbTextField::commitControl()
         if ( sOldValue.getLength() > nMaxTextLen && sOldValue.compareTo(aText,nMaxTextLen) == 0 )
             aText = sOldValue;
     }
-    m_rColumn.getModel()->setPropertyValue( FM_PROP_TEXT, makeAny( aText ) );
+    m_rColumn.getModel()->setPropertyValue( FM_PROP_TEXT, Any( aText ) );
     return true;
 }
 
@@ -1805,7 +1805,7 @@ void DbCheckBox::updateFromModel( Reference< XPropertySet > _rxModel )
 bool DbCheckBox::commitControl()
 {
     m_rColumn.getModel()->setPropertyValue( FM_PROP_STATE,
-                    makeAny( static_cast<sal_Int16>( static_cast< CheckBoxControl* >( m_pWindow.get() )->GetState() ) ) );
+                    Any( static_cast<sal_Int16>( static_cast< CheckBoxControl* >( m_pWindow.get() )->GetState() ) ) );
     return true;
 }
 
@@ -1919,7 +1919,7 @@ void DbPatternField::updateFromModel( Reference< XPropertySet > _rxModel )
 bool DbPatternField::commitControl()
 {
     weld::Entry& rEntry = static_cast<PatternControl*>(m_pWindow.get())->get_widget();
-    m_rColumn.getModel()->setPropertyValue(FM_PROP_TEXT, makeAny(rEntry.get_text()));
+    m_rColumn.getModel()->setPropertyValue(FM_PROP_TEXT, Any(rEntry.get_text()));
     return true;
 }
 
@@ -2560,7 +2560,7 @@ bool DbComboBox::commitControl()
     ComboBoxControl* pControl = static_cast<ComboBoxControl*>(m_pWindow.get());
     weld::ComboBox& rComboBox = pControl->get_widget();
     OUString aText(rComboBox.get_active_text());
-    m_rColumn.getModel()->setPropertyValue(FM_PROP_TEXT, makeAny(aText));
+    m_rColumn.getModel()->setPropertyValue(FM_PROP_TEXT, Any(aText));
     return true;
 }
 
@@ -3107,7 +3107,7 @@ void DbFilterField::Update()
 
         xStatement = xConnection->createStatement();
         Reference< css::beans::XPropertySet >  xStatementProps(xStatement, UNO_QUERY);
-        xStatementProps->setPropertyValue(FM_PROP_ESCAPE_PROCESSING, makeAny(true));
+        xStatementProps->setPropertyValue(FM_PROP_ESCAPE_PROCESSING, Any(true));
 
         xListCursor = xStatement->executeQuery(aStatement.makeStringAndClear());
 
@@ -3204,12 +3204,13 @@ void FmXGridCell::init()
     svt::ControlBase* pEventWindow( getEventWindow() );
     if ( pEventWindow )
     {
-        pEventWindow->AddEventListener( LINK( this, FmXGridCell, OnWindowEvent ) );
         pEventWindow->SetFocusInHdl(LINK( this, FmXGridCell, OnFocusGained));
         pEventWindow->SetFocusOutHdl(LINK( this, FmXGridCell, OnFocusLost));
         pEventWindow->SetMousePressHdl(LINK( this, FmXGridCell, OnMousePress));
         pEventWindow->SetMouseReleaseHdl(LINK( this, FmXGridCell, OnMouseRelease));
         pEventWindow->SetMouseMoveHdl(LINK( this, FmXGridCell, OnMouseMove));
+        pEventWindow->SetKeyInputHdl( LINK( this, FmXGridCell, OnKeyInput) );
+        pEventWindow->SetKeyReleaseHdl( LINK( this, FmXGridCell, OnKeyRelease) );
     }
 }
 
@@ -3441,12 +3442,6 @@ void SAL_CALL FmXGridCell::removePaintListener( const Reference< awt::XPaintList
     OSL_FAIL( "FmXGridCell::removePaintListener: not implemented" );
 }
 
-IMPL_LINK( FmXGridCell, OnWindowEvent, VclWindowEvent&, _rEvent, void )
-{
-    ENSURE_OR_THROW( _rEvent.GetWindow(), "illegal window" );
-    onWindowEvent(_rEvent.GetId(), _rEvent.GetData());
-}
-
 void FmXGridCell::onFocusGained( const awt::FocusEvent& _rEvent )
 {
     checkDisposed(OComponentHelper::rBHelper.bDisposed);
@@ -3523,25 +3518,23 @@ IMPL_LINK(FmXGridCell, OnMouseMove, const MouseEvent&, rMouseEvent, void)
     }
 }
 
-void FmXGridCell::onWindowEvent(const VclEventId _nEventId, const void* _pEventData)
+IMPL_LINK(FmXGridCell, OnKeyInput, const KeyEvent&, rEventData, void)
 {
-    switch ( _nEventId )
-    {
-    case VclEventId::WindowKeyInput:
-    case VclEventId::WindowKeyUp:
-    {
-        if ( !m_aKeyListeners.getLength() )
-            break;
+    if (!m_aKeyListeners.getLength())
+        return;
 
-        const bool bKeyPressed = ( _nEventId == VclEventId::WindowKeyInput );
-        awt::KeyEvent aEvent( VCLUnoHelper::createKeyEvent( *static_cast< const ::KeyEvent* >( _pEventData ), *this ) );
-        m_aKeyListeners.notifyEach( bKeyPressed ? &awt::XKeyListener::keyPressed: &awt::XKeyListener::keyReleased, aEvent );
-    }
-    break;
-    default: break;
-    }
+    awt::KeyEvent aEvent(VCLUnoHelper::createKeyEvent(rEventData, *this));
+    m_aKeyListeners.notifyEach(&awt::XKeyListener::keyPressed, aEvent);
 }
 
+IMPL_LINK(FmXGridCell, OnKeyRelease, const KeyEvent&, rEventData, void)
+{
+    if (!m_aKeyListeners.getLength())
+        return;
+
+    awt::KeyEvent aEvent(VCLUnoHelper::createKeyEvent(rEventData, *this));
+    m_aKeyListeners.notifyEach(&awt::XKeyListener::keyReleased, aEvent);
+}
 
 void FmXDataCell::PaintFieldToCell(OutputDevice& rDev, const tools::Rectangle& rRect,
                         const Reference< css::sdb::XColumn >& _rxField,
@@ -3550,7 +3543,6 @@ void FmXDataCell::PaintFieldToCell(OutputDevice& rDev, const tools::Rectangle& r
     m_pCellControl->PaintFieldToCell( rDev, rRect, _rxField, xFormatter );
 }
 
-
 void FmXDataCell::UpdateFromColumn()
 {
     Reference< css::sdb::XColumn >  xField(m_pColumn->GetCurrentFieldValue());
@@ -3558,13 +3550,11 @@ void FmXDataCell::UpdateFromColumn()
         m_pCellControl->UpdateFromField(xField, m_pColumn->GetParent().getNumberFormatter());
 }
 
-
 FmXTextCell::FmXTextCell( DbGridColumn* pColumn, std::unique_ptr<DbCellControl> pControl )
     :FmXDataCell( pColumn, std::move(pControl) )
     ,m_bIsMultiLineText(false)
 {
 }
-
 
 void FmXTextCell::PaintFieldToCell(OutputDevice& rDev,
                         const tools::Rectangle& rRect,
@@ -4301,15 +4291,12 @@ IMPL_LINK(FmXListBoxCell, ChangedHdl, bool, bInteractive, void)
 
 void FmXListBoxCell::OnDoubleClick()
 {
-    ::comphelper::OInterfaceIteratorHelper2 aIt( m_aActionListeners );
-
     css::awt::ActionEvent aEvent;
     aEvent.Source = *this;
     weld::ComboBox& rBox = m_pBox->get_widget();
     aEvent.ActionCommand = rBox.get_active_text();
 
-    while( aIt.hasMoreElements() )
-        static_cast< css::awt::XActionListener *>(aIt.next())->actionPerformed( aEvent );
+    m_aActionListeners.notifyEach( &css::awt::XActionListener::actionPerformed, aEvent );
 }
 
 FmXComboBoxCell::FmXComboBoxCell( DbGridColumn* pColumn, std::unique_ptr<DbCellControl> pControl )
@@ -4620,11 +4607,9 @@ void SAL_CALL FmXFilterCell::setMaxTextLen( sal_Int16 /*nLen*/ )
 
 IMPL_LINK_NOARG(FmXFilterCell, OnCommit, DbFilterField&, void)
 {
-    ::comphelper::OInterfaceIteratorHelper2 aIt( m_aTextListeners );
     css::awt::TextEvent aEvt;
     aEvt.Source = *this;
-    while( aIt.hasMoreElements() )
-        static_cast< css::awt::XTextListener *>(aIt.next())->textChanged( aEvt );
+    m_aTextListeners.notifyEach( &css::awt::XTextListener::textChanged, aEvt );
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

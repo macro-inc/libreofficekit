@@ -70,6 +70,7 @@
 #include <vcl/virdev.hxx>
 #include <sal/log.hxx>
 #include <tools/svborder.hxx>
+#include <o3tl/string_view.hxx>
 #include <o3tl/temporary.hxx>
 
 #include <unotools/streamwrap.hxx>
@@ -106,6 +107,8 @@ using namespace css::uno;
 
 SmGraphicWindow::SmGraphicWindow(SmViewShell& rShell)
     : InterimItemWindow(&rShell.GetViewFrame()->GetWindow(), "modules/smath/ui/mathwindow.ui", "MathWindow")
+    , nLinePixH(GetSettings().GetStyleSettings().GetScrollBarSize())
+    , nColumnPixW(nLinePixH)
     , nZoom(100)
     // continue to use user-scrolling to make this work equivalent to how it 'always' worked
     , mxScrolledWindow(m_xBuilder->weld_scrolled_window("scrolledwindow", true))
@@ -113,8 +116,6 @@ SmGraphicWindow::SmGraphicWindow(SmViewShell& rShell)
     , mxGraphicWin(new weld::CustomWeld(*m_xBuilder, "mathview", *mxGraphic))
 {
     InitControlBase(mxGraphic->GetDrawingArea());
-
-    nColumnPixW = nLinePixH = GetSettings().GetStyleSettings().GetScrollBarSize();
 
     mxScrolledWindow->connect_hadjustment_changed(LINK(this, SmGraphicWindow, ScrollHdl));
     mxScrolledWindow->connect_vadjustment_changed(LINK(this, SmGraphicWindow, ScrollHdl));
@@ -382,7 +383,6 @@ bool SmGraphicWidget::MouseButtonDown(const MouseEvent& rMEvt)
     SmEditWindow* pEdit = GetView().GetEditWindow();
     if (!pEdit)
         return true;
-    const SmToken  aToken (pNode->GetToken());
 
     // set selection to the beginning of the token
     pEdit->SetSelection(pNode->GetSelection());
@@ -795,8 +795,35 @@ bool SmGraphicWidget::Command(const CommandEvent& rCEvt)
                     mrGraphicWindow.SetZoom(nTmpZoom);
                     bCallBase = false;
                 }
+                break;
             }
-            break;
+            case CommandEventId::GestureZoom:
+            {
+                const CommandGestureZoomData* pData = rCEvt.GetGestureZoomData();
+                if (pData)
+                {
+                    if (pData->meEventType == GestureEventZoomType::Begin)
+                    {
+                        mfLastZoomScale = pData->mfScaleDelta;
+                    }
+                    else if (pData->meEventType == GestureEventZoomType::Update)
+                    {
+                        double deltaBetweenEvents = (pData->mfScaleDelta - mfLastZoomScale) / mfLastZoomScale;
+                        mfLastZoomScale = pData->mfScaleDelta;
+
+                        // Accumulate fractional zoom to avoid small zoom changes from being ignored
+                        mfAccumulatedZoom += deltaBetweenEvents;
+                        int nZoomChangePercent = mfAccumulatedZoom * 100;
+                        mfAccumulatedZoom -= nZoomChangePercent / 100.0;
+
+                        sal_uInt16 nZoom = mrGraphicWindow.GetZoom();
+                        nZoom += nZoomChangePercent;
+                        mrGraphicWindow.SetZoom(nZoom);
+                    }
+                    bCallBase = false;
+                }
+                break;
+            }
 
             default: break;
         }
@@ -1188,17 +1215,17 @@ Size SmViewShell::GetTextLineSize(OutputDevice const & rDevice, const OUString& 
     return aSize;
 }
 
-Size SmViewShell::GetTextSize(OutputDevice const & rDevice, const OUString& rText, tools::Long MaxWidth)
+Size SmViewShell::GetTextSize(OutputDevice const & rDevice, std::u16string_view rText, tools::Long MaxWidth)
 {
     Size aSize;
     Size aTextSize;
-    if (rText.isEmpty())
+    if (rText.empty())
         return aTextSize;
 
     sal_Int32 nPos = 0;
     do
     {
-        OUString aLine = rText.getToken(0, '\n', nPos);
+        OUString aLine( o3tl::getToken(rText, 0, '\n', nPos) );
         aLine = aLine.replaceAll("\r", "");
 
         aSize = GetTextLineSize(rDevice, aLine);
@@ -1270,9 +1297,9 @@ void SmViewShell::DrawTextLine(OutputDevice& rDevice, const Point& rPosition, co
         rDevice.DrawText(aPoint, rLine);
 }
 
-void SmViewShell::DrawText(OutputDevice& rDevice, const Point& rPosition, const OUString& rText, sal_uInt16 MaxWidth)
+void SmViewShell::DrawText(OutputDevice& rDevice, const Point& rPosition, std::u16string_view rText, sal_uInt16 MaxWidth)
 {
-    if (rText.isEmpty())
+    if (rText.empty())
         return;
 
     Point aPoint(rPosition);
@@ -1281,7 +1308,7 @@ void SmViewShell::DrawText(OutputDevice& rDevice, const Point& rPosition, const 
     sal_Int32 nPos = 0;
     do
     {
-        OUString aLine = rText.getToken(0, '\n', nPos);
+        OUString aLine( o3tl::getToken(rText, 0, '\n', nPos) );
         aLine = aLine.replaceAll("\r", "");
         aSize = GetTextLineSize(rDevice, aLine);
         if (aSize.Width() > MaxWidth)
@@ -2124,24 +2151,6 @@ void SmViewShell::GetState(SfxItemSet &rSet)
 
 namespace
 {
-css::uno::Reference<css::ui::XSidebar>
-getSidebarFromModel(const css::uno::Reference<css::frame::XModel>& xModel)
-{
-    css::uno::Reference<css::container::XChild> xChild(xModel, css::uno::UNO_QUERY);
-    if (!xChild.is())
-        return nullptr;
-    css::uno::Reference<css::frame::XModel> xParent(xChild->getParent(), css::uno::UNO_QUERY);
-    if (!xParent.is())
-        return nullptr;
-    css::uno::Reference<css::frame::XController2> xController(xParent->getCurrentController(),
-                                                              css::uno::UNO_QUERY);
-    if (!xController.is())
-        return nullptr;
-    css::uno::Reference<css::ui::XSidebarProvider> xSidebarProvider = xController->getSidebar();
-    if (!xSidebarProvider.is())
-        return nullptr;
-    return xSidebarProvider->getSidebar();
-}
 class SmController : public SfxBaseController
 {
 public:
@@ -2161,19 +2170,7 @@ public:
         SfxBaseController::attachFrame(xFrame);
 
         if (comphelper::LibreOfficeKit::isActive())
-        {
             CopyLokViewCallbackFromFrameCreator();
-            // In lok mode, DocumentHolder::ShowUI is not called on OLE in-place activation,
-            // because respective code is skipped in OCommonEmbeddedObject::SwitchStateTo_Impl,
-            // so sidebar controller does not get registered properly; do it here
-            if (auto xSidebar = getSidebarFromModel(getModel()))
-            {
-                auto pSidebar = dynamic_cast<sfx2::sidebar::SidebarController*>(xSidebar.get());
-                assert(pSidebar);
-                pSidebar->registerSidebarForFrame(this);
-                pSidebar->updateModel(getModel());
-            }
-        }
 
         // No need to call mpSelectionChangeHandler->Connect() unless SmController implements XSelectionSupplier
         mpSelectionChangeHandler->selectionChanged({}); // Installs the correct context

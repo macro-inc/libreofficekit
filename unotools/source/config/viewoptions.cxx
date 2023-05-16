@@ -24,12 +24,11 @@
 #include <com/sun/star/container/XNameContainer.hpp>
 #include <com/sun/star/container/XNameAccess.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <osl/diagnose.h>
-#include <sal/log.hxx>
 #include <unotools/configmgr.hxx>
 #include <comphelper/configurationhelper.hxx>
 #include <comphelper/processfactory.hxx>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 constexpr OUStringLiteral PACKAGE_VIEWS = u"org.openoffice.Office.Views";
 constexpr OUStringLiteral PROPERTY_WINDOWSTATE = u"WindowState";
@@ -38,9 +37,9 @@ constexpr OUStringLiteral PROPERTY_VISIBLE = u"Visible";
 constexpr OUStringLiteral PROPERTY_USERDATA = u"UserData";
 
 
-SvtViewOptions::SvtViewOptions( EViewType eType, const OUString& sViewName )
+SvtViewOptions::SvtViewOptions( EViewType eType, OUString sViewName )
     :   m_eViewType ( eType     )
-    ,   m_sViewName ( sViewName )
+    ,   m_sViewName (std::move( sViewName ))
 {
     (void)m_eViewType; // so the release build does not complain, since we only use it in assert
     // we must know, which view type we must support
@@ -177,7 +176,7 @@ void SvtViewOptions::SetWindowState( const OUString& sState )
         css::uno::Reference< css::beans::XPropertySet > xNode(
             impl_getSetNode(m_sViewName, true),
             css::uno::UNO_QUERY_THROW);
-        xNode->setPropertyValue(PROPERTY_WINDOWSTATE, css::uno::makeAny(sState));
+        xNode->setPropertyValue(PROPERTY_WINDOWSTATE, css::uno::Any(sState));
         ::comphelper::ConfigurationHelper::flush(m_xRoot);
     }
     catch(const css::uno::Exception&)
@@ -225,7 +224,7 @@ void SvtViewOptions::SetPageID(std::string_view rID)
         css::uno::Reference< css::beans::XPropertySet > xNode(
             impl_getSetNode(m_sViewName, true),
             css::uno::UNO_QUERY_THROW);
-        xNode->setPropertyValue(PROPERTY_PAGEID, css::uno::makeAny(OUString::fromUtf8(rID)));
+        xNode->setPropertyValue(PROPERTY_PAGEID, css::uno::Any(OUString::fromUtf8(rID)));
         ::comphelper::ConfigurationHelper::flush(m_xRoot);
     }
     catch(const css::uno::Exception&)
@@ -283,7 +282,7 @@ void SvtViewOptions::SetVisible( bool bVisible )
         css::uno::Reference< css::beans::XPropertySet > xNode(
             impl_getSetNode(m_sViewName, true),
             css::uno::UNO_QUERY_THROW);
-        xNode->setPropertyValue(PROPERTY_VISIBLE, css::uno::makeAny(bVisible));
+        xNode->setPropertyValue(PROPERTY_VISIBLE, css::uno::Any(bVisible));
         ::comphelper::ConfigurationHelper::flush(m_xRoot);
     }
     catch(const css::uno::Exception&)

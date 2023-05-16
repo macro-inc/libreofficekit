@@ -29,8 +29,8 @@
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/processor2d/processor2dtools.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 
 #define CELL_WIDTH      1600L
@@ -352,8 +352,9 @@ void SvxPageWindow::drawFillAttributes(vcl::RenderContext& rRenderContext,
     if (aSequence.empty())
         return;
 
-    const drawinglayer::geometry::ViewInformation2D aViewInformation2D(
-                    basegfx::B2DHomMatrix(), rRenderContext.GetViewTransformation(), aPaintRange, nullptr, 0.0);
+    drawinglayer::geometry::ViewInformation2D aViewInformation2D;
+    aViewInformation2D.setViewTransformation(rRenderContext.GetViewTransformation());
+    aViewInformation2D.setViewport(aPaintRange);
 
     std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> pProcessor(
         drawinglayer::processor2d::createProcessor2DFromOutputDevice(rRenderContext, aViewInformation2D));

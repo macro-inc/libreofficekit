@@ -31,6 +31,7 @@
 #include <basic/basmgr.hxx>
 #include <com/sun/star/script/XLibraryContainerPassword.hpp>
 #include <com/sun/star/script/XLibraryContainer2.hpp>
+#include <com/sun/star/frame/XController.hpp>
 #include <comphelper/processfactory.hxx>
 #include <sfx2/app.hxx>
 #include <sfx2/dispatch.hxx>
@@ -42,7 +43,7 @@
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <xmlscript/xmldlg_imexp.hxx>
 #include <com/sun/star/uno/XComponentContext.hpp>
 
@@ -182,8 +183,24 @@ void Shell::CopyDialogResources(
     io_xISP = ::xmlscript::exportDialogModel( xDialogModel, xContext, rDestDoc.isDocument() ? rDestDoc.getDocument() : Reference< frame::XModel >() );
 }
 
+void OrganizeDialog::SetCurrentEntry(const css::uno::Reference<css::frame::XFrame>& xDocFrame)
+{
+    if (!xDocFrame)
+        return;
+    Reference<css::frame::XController> xController(xDocFrame->getController());
+    if (!xController)
+        return;
+    Reference<css::frame::XModel> xModel(xController->getModel());
+    if (!xModel)
+        return;
+    ScriptDocument aScriptDocument(xModel);
+    EntryDescriptor aDesc(aScriptDocument, LIBRARY_LOCATION_DOCUMENT, OUString(), OUString(), OUString(), OBJ_TYPE_DOCUMENT);
+    m_xModulePage->SetCurrentEntry(aDesc);
+    m_xDialogPage->SetCurrentEntry(aDesc);
+}
+
 // OrganizeDialog
-OrganizeDialog::OrganizeDialog(weld::Window* pParent, sal_Int16 tabId )
+OrganizeDialog::OrganizeDialog(weld::Window* pParent, const css::uno::Reference<css::frame::XFrame>& xDocFrame, sal_Int16 tabId)
     : GenericDialogController(pParent, "modules/BasicIDE/ui/organizedialog.ui", "OrganizeDialog")
     , m_xTabCtrl(m_xBuilder->weld_notebook("tabcontrol"))
     , m_xModulePage(new ObjectPage(m_xTabCtrl->get_page("modules"), "ModulePage", BrowseMode::Modules, this))
@@ -191,6 +208,8 @@ OrganizeDialog::OrganizeDialog(weld::Window* pParent, sal_Int16 tabId )
     , m_xLibPage(new LibPage(m_xTabCtrl->get_page("libraries"), this))
 {
     m_xTabCtrl->connect_enter_page(LINK(this, OrganizeDialog, ActivatePageHdl));
+
+    SetCurrentEntry(xDocFrame);
 
     OString sPage;
     if (tabId == 0)
@@ -397,7 +416,7 @@ private:
         // get source shell, library name and module/dialog name
         std::unique_ptr<weld::TreeIter> xSelected(m_rTreeView.make_iterator());
         if (!m_rTreeView.get_selected(xSelected.get()))
-            xSelected.reset();
+            return;
         EntryDescriptor aSourceDesc = m_rTreeView.GetEntryDescriptor(xSelected.get());
         const ScriptDocument& rSourceDoc( aSourceDesc.GetDocument() );
         const OUString& aSourceLibName( aSourceDesc.GetLibName() );
@@ -504,11 +523,11 @@ private:
         OUString sText(m_rTreeView.get_text(*xSelected));
         OUString sId(m_rTreeView.get_id(*xSelected));
         /// if copying then clone the userdata
-        if (Entry* pEntry = bMove ? nullptr : reinterpret_cast<Entry*>(sId.toUInt64()))
+        if (Entry* pEntry = bMove ? nullptr : weld::fromId<Entry*>(sId))
         {
             assert(pEntry->GetType() != OBJ_TYPE_DOCUMENT);
             std::unique_ptr<Entry> xNewUserData(std::make_unique<Entry>(*pEntry));
-            sId = OUString::number(reinterpret_cast<sal_uInt64>(xNewUserData.release()));
+            sId = weld::toId(xNewUserData.release());
         }
         std::unique_ptr<weld::TreeIter> xRet(m_rTreeView.make_iterator());
         m_rTreeView.get_widget().insert(xNewParent.get(), nNewChildPos, &sText, &sId, nullptr, nullptr, false, xRet.get());
@@ -702,7 +721,7 @@ IMPL_LINK(ObjectPage, ButtonHdl, weld::Button&, rButton, void)
             std::unique_ptr<weld::TreeIter> xParentEntry(m_xBasicBox->make_iterator(xCurEntry.get()));
             if (m_xBasicBox->iter_parent(*xParentEntry))
             {
-                DocumentEntry* pDocumentEntry = reinterpret_cast<DocumentEntry*>(m_xBasicBox->get_id(*xParentEntry).toInt64());
+                DocumentEntry* pDocumentEntry = weld::fromId<DocumentEntry*>(m_xBasicBox->get_id(*xParentEntry));
                 if (pDocumentEntry)
                     aDocument = pDocumentEntry->GetDocument();
             }
@@ -860,6 +879,8 @@ void ObjectPage::DeleteCurrent()
     if (!m_xBasicBox->get_cursor(xCurEntry.get()))
         xCurEntry.reset();
     DBG_ASSERT( xCurEntry, "No current entry!" );
+    if (!xCurEntry)
+        return;
     EntryDescriptor aDesc( m_xBasicBox->GetEntryDescriptor( xCurEntry.get() ) );
     const ScriptDocument& aDocument( aDesc.GetDocument() );
     DBG_ASSERT( aDocument.isAlive(), "ObjectPage::DeleteCurrent: no document!" );

@@ -20,7 +20,7 @@ $(eval $(call gb_Library_add_defs,drawinglayer,\
 
 $(eval $(call gb_Library_set_precompiled_header,drawinglayer,drawinglayer/inc/pch/precompiled_drawinglayer))
 
-$(eval $(call gb_Library_set_componentfile,drawinglayer,drawinglayer/drawinglayer))
+$(eval $(call gb_Library_set_componentfile,drawinglayer,drawinglayer/drawinglayer,services))
 
 $(eval $(call gb_Library_use_sdk_api,drawinglayer))
 
@@ -29,13 +29,19 @@ $(eval $(call gb_Library_use_externals,drawinglayer,\
 	libxml2 \
 ))
 
+ifneq ($(ENABLE_WASM_STRIP_CANVAS),TRUE)
+$(eval $(call gb_Library_use_libraries,drawinglayer,\
+    canvastools \
+    cppcanvas \
+))
+endif
+
 $(eval $(call gb_Library_use_libraries,drawinglayer,\
     basegfx \
-    canvastools \
     comphelper \
-    cppcanvas \
     cppu \
     cppuhelper \
+    drawinglayercore \
     i18nlangtag \
     sal \
     salhelper \
@@ -67,14 +73,12 @@ $(eval $(call gb_Library_add_exception_objects,drawinglayer,\
     drawinglayer/source/attribute/sdrsceneattribute3d \
     drawinglayer/source/attribute/sdrshadowattribute \
     drawinglayer/source/attribute/strokeattribute \
-    drawinglayer/source/geometry/viewinformation2d \
     drawinglayer/source/geometry/viewinformation3d \
     drawinglayer/source/primitive2d/animatedprimitive2d \
     drawinglayer/source/primitive2d/backgroundcolorprimitive2d \
-    drawinglayer/source/primitive2d/baseprimitive2d \
     drawinglayer/source/primitive2d/bitmapprimitive2d \
     drawinglayer/source/primitive2d/borderlineprimitive2d \
-    drawinglayer/source/primitive2d/BufferedDecompositionPrimitive2D \
+    drawinglayer/source/primitive2d/BufferedDecompositionGroupPrimitive2D \
     drawinglayer/source/primitive2d/controlprimitive2d \
     drawinglayer/source/primitive2d/cropprimitive2d \
     drawinglayer/source/primitive2d/discretebitmapprimitive2d \
@@ -85,6 +89,7 @@ $(eval $(call gb_Library_add_exception_objects,drawinglayer,\
     drawinglayer/source/primitive2d/fillgradientprimitive2d \
     drawinglayer/source/primitive2d/fillhatchprimitive2d \
     drawinglayer/source/primitive2d/glowprimitive2d \
+    drawinglayer/source/primitive2d/GlowSoftEgdeShadowTools \
     drawinglayer/source/primitive2d/graphicprimitivehelper2d \
     drawinglayer/source/primitive2d/graphicprimitive2d \
     drawinglayer/source/primitive2d/gridprimitive2d \
@@ -112,7 +117,6 @@ $(eval $(call gb_Library_add_exception_objects,drawinglayer,\
     drawinglayer/source/primitive2d/PolyPolygonGraphicPrimitive2D \
     drawinglayer/source/primitive2d/PolyPolygonSelectionPrimitive2D \
     drawinglayer/source/primitive2d/primitivetools2d \
-    drawinglayer/source/primitive2d/Primitive2DContainer \
     drawinglayer/source/primitive2d/sceneprimitive2d \
     drawinglayer/source/primitive2d/sdrdecompositiontools2d \
     drawinglayer/source/primitive2d/shadowprimitive2d \
@@ -128,7 +132,6 @@ $(eval $(call gb_Library_add_exception_objects,drawinglayer,\
     drawinglayer/source/primitive2d/textlineprimitive2d \
     drawinglayer/source/primitive2d/textprimitive2d \
     drawinglayer/source/primitive2d/textstrikeoutprimitive2d \
-    drawinglayer/source/primitive2d/Tools \
     drawinglayer/source/primitive2d/transformprimitive2d \
     drawinglayer/source/primitive2d/transparenceprimitive2d \
     drawinglayer/source/primitive2d/unifiedtransparenceprimitive2d \
@@ -162,7 +165,6 @@ $(eval $(call gb_Library_add_exception_objects,drawinglayer,\
     drawinglayer/source/processor2d/hittestprocessor2d \
     drawinglayer/source/processor2d/linegeometryextractor2d \
     drawinglayer/source/processor2d/objectinfoextractor2d \
-    drawinglayer/source/processor2d/processorfromoutputdevice \
     drawinglayer/source/processor2d/textaspolygonextractor2d \
     drawinglayer/source/processor2d/vclhelperbufferdevice \
     drawinglayer/source/processor2d/vclmetafileprocessor2d \

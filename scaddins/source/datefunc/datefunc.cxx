@@ -120,7 +120,7 @@ const lang::Locale& ScaDateAddIn::GetLocale( sal_uInt32 nIndex )
     if( !pDefLocales )
         InitDefLocales();
 
-    return (nIndex < sizeof( pLang )) ? pDefLocales[ nIndex ] : aFuncLoc;
+    return (nIndex < nNumOfLoc) ? pDefLocales[ nIndex ] : aFuncLoc;
 }
 
 void ScaDateAddIn::InitData()
@@ -450,12 +450,13 @@ sal_Int32 GetNullDate( const uno::Reference< beans::XPropertySet >& xOptions )
  * mode 1 calculates the difference by week adhering to ISO8601.
  *
  * The International Standard IS-8601 states that Monday is the first
- * day of the week. The Gregorian Calender is used for all dates,
+ * day of the week. The Gregorian Calendar is used for all dates,
  * proleptic in case of dates before 1582-10-15.
  *
  * The (consecutive) week number of a date is
  * std::floor( (date + NullDate - 1), 7.0 ),
- * with weeks starting on Monday.
+ * with weeks starting on Monday, and week 0
+ * starting on Monday, 0001-01-01 Gregorian.
  *
  * Weeks(d2,d1,m) is defined as -Weeks(d1,d2,m).
  *
@@ -466,14 +467,11 @@ sal_Int32 SAL_CALL ScaDateAddIn::getDiffWeeks(
         sal_Int32 nStartDate, sal_Int32 nEndDate,
         sal_Int32 nMode )
 {
-    if (nMode != 0 && nMode != 1)
-        throw lang::IllegalArgumentException();
-
     if ( nMode  == 0 )
     {
         return ( nEndDate - nStartDate ) / 7;
     }
-    else
+    else if ( nMode == 1 )
     {
         sal_Int32 nNullDate = GetNullDate( xOptions );
         sal_Int32 nDays1 = nStartDate + nNullDate - 1;
@@ -481,6 +479,8 @@ sal_Int32 SAL_CALL ScaDateAddIn::getDiffWeeks(
 
         return ( std::floor( nDays2 / 7.0 ) - std::floor( nDays1 / 7.0 ) );
     }
+    else
+        throw lang::IllegalArgumentException();
 }
 
 /**

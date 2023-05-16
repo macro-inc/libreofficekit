@@ -18,6 +18,8 @@
  */
 
 #include <Diagram.hxx>
+#include <ChartTypeManager.hxx>
+#include <ChartTypeTemplate.hxx>
 #include <PropertyHelper.hxx>
 #include "Wall.hxx"
 #include <ModifyListenerHelper.hxx>
@@ -28,6 +30,8 @@
 #include <CloneHelper.hxx>
 #include <SceneProperties.hxx>
 #include <unonames.hxx>
+#include <BaseCoordinateSystem.hxx>
+#include <Legend.hxx>
 #include <DataTable.hxx>
 
 #include <basegfx/numeric/ftools.hxx>
@@ -36,12 +40,12 @@
 #include <com/sun/star/chart2/RelativeSize.hpp>
 #include <com/sun/star/container/NoSuchElementException.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
+#include <utility>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::beans::PropertyAttribute;
@@ -207,27 +211,16 @@ const uno::Reference< beans::XPropertySetInfo >& StaticDiagramInfo()
     return xPropertySetInfo;
 };
 
-/// clones a UNO-sequence of UNO-References
-typedef Reference< chart2::XCoordinateSystem > lcl_tCooSysRef;
-typedef std::vector< lcl_tCooSysRef >          lcl_tCooSysVector;
-
 void lcl_CloneCoordinateSystems(
-        const lcl_tCooSysVector & rSource,
-        lcl_tCooSysVector & rDestination )
+        const ::chart::Diagram::tCoordinateSystemContainerType & rSource,
+        ::chart::Diagram::tCoordinateSystemContainerType & rDestination )
 {
-    for( auto const & i : rSource )
+    for( rtl::Reference< ::chart::BaseCoordinateSystem > const & i : rSource )
     {
-        lcl_tCooSysRef xClone;
-        css::uno::Reference< css::util::XCloneable > xCloneable( i, css::uno::UNO_QUERY );
-        if( xCloneable.is())
-            xClone.set( xCloneable->createClone(), css::uno::UNO_QUERY );
-
-        if( xClone.is())
-        {
-            rDestination.push_back( xClone );
-        }
-        else
-            rDestination.push_back( i );
+        auto xClone = i->createClone();
+        ::chart::BaseCoordinateSystem* pClone = dynamic_cast<::chart::BaseCoordinateSystem*>(xClone.get());
+        assert(pClone);
+        rDestination.push_back( pClone );
     }
 }
 
@@ -236,10 +229,9 @@ void lcl_CloneCoordinateSystems(
 namespace chart
 {
 
-Diagram::Diagram( uno::Reference< uno::XComponentContext > const & xContext ) :
-        ::property::OPropertySet( m_aMutex ),
-        m_xContext( xContext ),
-        m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+Diagram::Diagram( uno::Reference< uno::XComponentContext > xContext ) :
+        m_xContext(std::move( xContext )),
+        m_xModifyEventForwarder( new ModifyEventForwarder() )
 {
     // Set camera position to a default position (that should be set hard, so
     // that it will be exported.  The property default is a camera looking
@@ -252,39 +244,45 @@ Diagram::Diagram( uno::Reference< uno::XComponentContext > const & xContext ) :
 
 Diagram::Diagram( const Diagram & rOther ) :
         impl::Diagram_Base(rOther),
-        ::property::OPropertySet( rOther, m_aMutex ),
+        ::property::OPropertySet( rOther ),
     m_xContext( rOther.m_xContext ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {
     lcl_CloneCoordinateSystems( rOther.m_aCoordSystems, m_aCoordSystems );
-    ModifyListenerHelper::addListenerToAllElements( m_aCoordSystems, m_xModifyEventForwarder );
+    for (auto & xSystem : m_aCoordSystems)
+        xSystem->addModifyListener(m_xModifyEventForwarder);
 
-    m_xWall.set( CloneHelper::CreateRefClone< beans::XPropertySet >()( rOther.m_xWall ));
-    m_xFloor.set( CloneHelper::CreateRefClone< beans::XPropertySet >()( rOther.m_xFloor ));
+    if ( rOther.m_xWall )
+        m_xWall = new Wall( *rOther.m_xWall );
+    if ( rOther.m_xFloor )
+        m_xFloor = new Wall( *rOther.m_xFloor );
     m_xTitle.set( CloneHelper::CreateRefClone< chart2::XTitle >()( rOther.m_xTitle ));
-    m_xLegend.set( CloneHelper::CreateRefClone< chart2::XLegend >()( rOther.m_xLegend ));
+    if (rOther.m_xLegend)
+        m_xLegend = new Legend(*rOther.m_xLegend);
+    if (rOther.m_xDataTable)
+        m_xDataTable = new DataTable(*rOther.m_xDataTable);
 
-    if (rOther.m_xDataTable.is())
-        m_xDataTable.set(new DataTable(*rOther.m_xDataTable));
-
-    ModifyListenerHelper::addListener( m_xWall, m_xModifyEventForwarder );
-    ModifyListenerHelper::addListener( m_xFloor, m_xModifyEventForwarder );
+    if ( m_xWall )
+        m_xWall->addModifyListener( m_xModifyEventForwarder );
+    if ( m_xFloor )
+        m_xFloor->addModifyListener( m_xModifyEventForwarder );
     ModifyListenerHelper::addListener( m_xTitle, m_xModifyEventForwarder );
     ModifyListenerHelper::addListener( m_xLegend, m_xModifyEventForwarder );
-    ModifyListenerHelper::addListener(uno::Reference<chart2::XDataTable>(m_xDataTable), m_xModifyEventForwarder );
 }
 
 Diagram::~Diagram()
 {
     try
     {
-        ModifyListenerHelper::removeListenerFromAllElements( m_aCoordSystems, m_xModifyEventForwarder );
+        for (auto & xSystem : m_aCoordSystems)
+            xSystem->removeModifyListener(m_xModifyEventForwarder);
 
-        ModifyListenerHelper::removeListener( m_xWall, m_xModifyEventForwarder );
-        ModifyListenerHelper::removeListener( m_xFloor, m_xModifyEventForwarder );
+        if ( m_xWall )
+            m_xWall->removeModifyListener( m_xModifyEventForwarder );
+        if ( m_xFloor )
+            m_xFloor->removeModifyListener( m_xModifyEventForwarder );
         ModifyListenerHelper::removeListener( m_xTitle, m_xModifyEventForwarder );
         ModifyListenerHelper::removeListener( m_xLegend, m_xModifyEventForwarder );
-        ModifyListenerHelper::removeListener( uno::Reference<chart2::XDataTable>(m_xDataTable), m_xModifyEventForwarder );
     }
     catch( const uno::Exception & )
     {
@@ -295,7 +293,7 @@ Diagram::~Diagram()
 // ____ XDiagram ____
 uno::Reference< beans::XPropertySet > SAL_CALL Diagram::getWall()
 {
-    uno::Reference< beans::XPropertySet > xRet;
+    rtl::Reference< Wall > xRet;
     bool bAddListener = false;
     {
         MutexGuard aGuard( m_aMutex );
@@ -307,13 +305,13 @@ uno::Reference< beans::XPropertySet > SAL_CALL Diagram::getWall()
         xRet =  m_xWall;
     }
     if(bAddListener)
-        ModifyListenerHelper::addListener( xRet, m_xModifyEventForwarder );
+        xRet->addModifyListener( m_xModifyEventForwarder );
     return xRet;
 }
 
 uno::Reference< beans::XPropertySet > SAL_CALL Diagram::getFloor()
 {
-    uno::Reference< beans::XPropertySet > xRet;
+    rtl::Reference< Wall > xRet;
     bool bAddListener = false;
     {
         MutexGuard aGuard( m_aMutex );
@@ -325,7 +323,7 @@ uno::Reference< beans::XPropertySet > SAL_CALL Diagram::getFloor()
         xRet = m_xFloor;
     }
     if(bAddListener)
-        ModifyListenerHelper::addListener( xRet, m_xModifyEventForwarder );
+        xRet->addModifyListener( m_xModifyEventForwarder );
     return xRet;
 }
 
@@ -337,7 +335,14 @@ uno::Reference< chart2::XLegend > SAL_CALL Diagram::getLegend()
 
 void SAL_CALL Diagram::setLegend( const uno::Reference< chart2::XLegend >& xNewLegend )
 {
-    Reference< chart2::XLegend > xOldLegend;
+    auto pLegend = dynamic_cast<Legend*>(xNewLegend.get());
+    assert(!xNewLegend || pLegend);
+    setLegend(rtl::Reference< Legend >(pLegend));
+}
+
+void Diagram::setLegend( const rtl::Reference< Legend >& xNewLegend )
+{
+    rtl::Reference< Legend > xOldLegend;
     {
         MutexGuard aGuard( m_aMutex );
         if( m_xLegend == xNewLegend )
@@ -382,15 +387,14 @@ void SAL_CALL Diagram::setDiagramData(
     const Reference< chart2::data::XDataSource >& xDataSource,
     const Sequence< beans::PropertyValue >& aArguments )
 {
-    uno::Reference< lang::XMultiServiceFactory > xChartTypeManager( m_xContext->getServiceManager()->createInstanceWithContext(
-            "com.sun.star.chart2.ChartTypeManager", m_xContext ), uno::UNO_QUERY );
+    rtl::Reference< ::chart::ChartTypeManager > xChartTypeManager = new ::chart::ChartTypeManager( m_xContext );
     DiagramHelper::tTemplateWithServiceName aTemplateAndService = DiagramHelper::getTemplateForDiagram( this, xChartTypeManager );
-    uno::Reference< chart2::XChartTypeTemplate > xTemplate( aTemplateAndService.first );
+    rtl::Reference< ::chart::ChartTypeTemplate > xTemplate( aTemplateAndService.xChartTypeTemplate );
     if( !xTemplate.is() )
-        xTemplate.set( xChartTypeManager->createInstance( "com.sun.star.chart2.template.Column" ), uno::UNO_QUERY );
+        xTemplate = xChartTypeManager->createTemplate( "com.sun.star.chart2.template.Column" );
     if(!xTemplate.is())
         return;
-    xTemplate->changeDiagramData( this, xDataSource, aArguments );
+    xTemplate->changeDiagramData( rtl::Reference< ::chart::Diagram >(this), xDataSource, aArguments );
 }
 
 // ____ XTitled ____
@@ -437,9 +441,11 @@ void SAL_CALL Diagram::setDefaultIllumination()
 void SAL_CALL Diagram::addCoordinateSystem(
     const uno::Reference< chart2::XCoordinateSystem >& aCoordSys )
 {
+    ::chart::BaseCoordinateSystem* pCoordSys = dynamic_cast<::chart::BaseCoordinateSystem*>(aCoordSys.get());
+    assert(pCoordSys);
     {
         MutexGuard aGuard( m_aMutex );
-        if( std::find( m_aCoordSystems.begin(), m_aCoordSystems.end(), aCoordSys )
+        if( std::find( m_aCoordSystems.begin(), m_aCoordSystems.end(), pCoordSys )
             != m_aCoordSystems.end())
             throw lang::IllegalArgumentException("coordsys not found", static_cast<cppu::OWeakObject*>(this), 1);
 
@@ -448,7 +454,7 @@ void SAL_CALL Diagram::addCoordinateSystem(
             OSL_FAIL( "more than one coordinatesystem is not supported yet by the fileformat" );
             return;
         }
-        m_aCoordSystems.push_back( aCoordSys );
+        m_aCoordSystems.push_back( pCoordSys );
     }
     ModifyListenerHelper::addListener( aCoordSys, m_xModifyEventForwarder );
     fireModifyEvent();
@@ -457,10 +463,11 @@ void SAL_CALL Diagram::addCoordinateSystem(
 void SAL_CALL Diagram::removeCoordinateSystem(
     const uno::Reference< chart2::XCoordinateSystem >& aCoordSys )
 {
+    ::chart::BaseCoordinateSystem* pCoordSys = dynamic_cast<::chart::BaseCoordinateSystem*>(aCoordSys.get());
+    assert(pCoordSys);
     {
         MutexGuard aGuard( m_aMutex );
-        std::vector< uno::Reference< chart2::XCoordinateSystem > >::iterator
-              aIt( std::find( m_aCoordSystems.begin(), m_aCoordSystems.end(), aCoordSys ));
+        auto aIt =  std::find( m_aCoordSystems.begin(), m_aCoordSystems.end(), pCoordSys );
         if( aIt == m_aCoordSystems.end())
             throw container::NoSuchElementException(
                 "The given coordinate-system is no element of the container",
@@ -474,7 +481,7 @@ void SAL_CALL Diagram::removeCoordinateSystem(
 uno::Sequence< uno::Reference< chart2::XCoordinateSystem > > SAL_CALL Diagram::getCoordinateSystems()
 {
     MutexGuard aGuard( m_aMutex );
-    return comphelper::containerToSequence( m_aCoordSystems );
+    return comphelper::containerToSequence<uno::Reference< chart2::XCoordinateSystem >>( m_aCoordSystems );
 }
 
 void SAL_CALL Diagram::setCoordinateSystems(
@@ -485,6 +492,30 @@ void SAL_CALL Diagram::setCoordinateSystems(
     if( aCoordinateSystems.hasElements() )
     {
         OSL_ENSURE( aCoordinateSystems.getLength()<=1, "more than one coordinatesystem is not supported yet by the fileformat" );
+        ::chart::BaseCoordinateSystem* pCoordSys = dynamic_cast<::chart::BaseCoordinateSystem*>(aCoordinateSystems[0].get());
+        assert(pCoordSys);
+        aNew.push_back( pCoordSys );
+    }
+    {
+        MutexGuard aGuard( m_aMutex );
+        std::swap( aOld, m_aCoordSystems );
+        m_aCoordSystems = aNew;
+    }
+    for (auto & xSystem : aOld)
+        xSystem->removeModifyListener(m_xModifyEventForwarder);
+    for (auto & xSystem : aNew)
+        xSystem->addModifyListener(m_xModifyEventForwarder);
+    fireModifyEvent();
+}
+
+void Diagram::setCoordinateSystems(
+    const std::vector< rtl::Reference< BaseCoordinateSystem > >& aCoordinateSystems )
+{
+    tCoordinateSystemContainerType aNew;
+    tCoordinateSystemContainerType aOld;
+    if( !aCoordinateSystems.empty() )
+    {
+        OSL_ENSURE( aCoordinateSystems.size()<=1, "more than one coordinatesystem is not supported yet by the fileformat" );
         aNew.push_back( aCoordinateSystems[0] );
     }
     {
@@ -492,8 +523,10 @@ void SAL_CALL Diagram::setCoordinateSystems(
         std::swap( aOld, m_aCoordSystems );
         m_aCoordSystems = aNew;
     }
-    ModifyListenerHelper::removeListenerFromAllElements( aOld, m_xModifyEventForwarder );
-    ModifyListenerHelper::addListenerToAllElements( aNew, m_xModifyEventForwarder );
+    for (auto & xSystem : aOld)
+        xSystem->removeModifyListener(m_xModifyEventForwarder);
+    for (auto & xSystem : aNew)
+        xSystem->addModifyListener(m_xModifyEventForwarder);
     fireModifyEvent();
 }
 
@@ -507,28 +540,12 @@ Reference< util::XCloneable > SAL_CALL Diagram::createClone()
 // ____ XModifyBroadcaster ____
 void SAL_CALL Diagram::addModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL Diagram::removeModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 // ____ XModifyListener ____
@@ -555,13 +572,14 @@ void Diagram::fireModifyEvent()
 }
 
 // ____ OPropertySet ____
-uno::Any Diagram::GetDefaultValue( sal_Int32 nHandle ) const
+void Diagram::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = StaticDiagramDefaults();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 // ____ OPropertySet ____
@@ -654,15 +672,9 @@ void Diagram::setDataTable(const rtl::Reference<DataTable>& xNewDataTable)
         m_xDataTable = xNewDataTable;
     }
     if (xOldDataTable.is())
-    {
-        uno::Reference<chart2::XDataTable> xDataTable(xOldDataTable);
-        ModifyListenerHelper::removeListener(xDataTable, m_xModifyEventForwarder);
-    }
+        ModifyListenerHelper::removeListener(xOldDataTable, m_xModifyEventForwarder);
     if (xNewDataTable.is())
-    {
-        uno::Reference<chart2::XDataTable> xDataTable(xNewDataTable);
-        ModifyListenerHelper::addListener(xDataTable, m_xModifyEventForwarder);
-    }
+        ModifyListenerHelper::addListener(xNewDataTable, m_xModifyEventForwarder);
     fireModifyEvent();
 }
 

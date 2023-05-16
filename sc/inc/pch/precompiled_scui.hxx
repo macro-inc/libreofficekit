@@ -95,7 +95,7 @@
 #include <svx/pageitem.hxx>
 #include <svx/txencbox.hxx>
 #include <tools/color.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/fldunit.hxx>
 #include <tools/lineend.hxx>
 #include <unicode/ucsdet.h>
@@ -141,6 +141,7 @@
 #include <formulaopt.hxx>
 #include <global.hxx>
 #include <globalnames.hxx>
+#include <gototabdlg.hxx>
 #include <groupdlg.hxx>
 #include <helpids.h>
 #include <hfedtdlg.hxx>

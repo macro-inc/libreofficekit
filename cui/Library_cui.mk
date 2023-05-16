@@ -9,7 +9,9 @@
 
 $(eval $(call gb_Library_Library,cui))
 
-$(eval $(call gb_Library_set_componentfile,cui,cui/util/cui))
+$(eval $(call gb_Library_set_plugin_for,cui,vcl))
+
+$(eval $(call gb_Library_set_componentfile,cui,cui/util/cui,services))
 
 $(eval $(call gb_Library_set_include,cui,\
     $$(INCLUDE) \
@@ -25,6 +27,7 @@ $(eval $(call gb_Library_add_defs,cui,\
 
 $(eval $(call gb_Library_use_custom_headers,cui,\
 	officecfg/registry \
+	oox/generated \
 ))
 
 $(eval $(call gb_Library_use_sdk_api,cui))
@@ -35,6 +38,7 @@ $(eval $(call gb_Library_use_libraries,cui,\
     comphelper \
     cppu \
     cppuhelper \
+    docmodel \
     drawinglayer \
     editeng \
     i18nlangtag \
@@ -58,7 +62,6 @@ $(eval $(call gb_Library_use_libraries,cui,\
     tl \
     ucbhelper \
     utl \
-    vcl \
     $(if $(ENABLE_BREAKPAD), \
         crashreport \
     ) \
@@ -68,6 +71,7 @@ $(eval $(call gb_Library_use_externals,cui,\
 	boost_headers \
 	$(call gb_Helper_optional,OPENCL,\
 		clew) \
+    epoxy \
     icuuc \
     icu_headers \
     libxml2 \
@@ -75,11 +79,6 @@ $(eval $(call gb_Library_use_externals,cui,\
     orcus \
     zxing \
 ))
-ifeq ($(DISABLE_GUI),)
-$(eval $(call gb_Library_use_externals,cui,\
-     epoxy \
- ))
-endif
 
 ifeq ($(OS),WNT)
 $(eval $(call gb_Library_use_system_win32_libs,cui,\
@@ -89,6 +88,18 @@ $(eval $(call gb_Library_use_system_win32_libs,cui,\
 
 $(eval $(call gb_Library_add_exception_objects,cui,\
     cui/source/dialogs/fileextcheckdlg \
+))
+endif
+
+ifneq ($(ENABLE_WASM_STRIP_PINGUSER),TRUE)
+$(eval $(call gb_Library_add_exception_objects,cui,\
+    cui/source/dialogs/tipofthedaydlg \
+))
+endif
+
+ifneq ($(ENABLE_WASM_STRIP_HUNSPELL),TRUE)
+$(eval $(call gb_Library_add_exception_objects,cui,\
+    cui/source/dialogs/hyphen \
 ))
 endif
 
@@ -125,9 +136,7 @@ $(eval $(call gb_Library_add_exception_objects,cui,\
     cui/source/dialogs/hlmailtp \
     cui/source/dialogs/hlmarkwn \
     cui/source/dialogs/hltpbase \
-    cui/source/dialogs/hyphen \
     cui/source/dialogs/iconcdlg \
-    cui/source/dialogs/tipofthedaydlg \
     cui/source/dialogs/insdlg \
     cui/source/dialogs/insrc \
     cui/source/dialogs/linkdlg \

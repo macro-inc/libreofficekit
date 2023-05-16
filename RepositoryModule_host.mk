@@ -20,33 +20,61 @@ $(eval $(call gb_Module_add_targets,libreoffice,\
 ))
 endif
 
+# WASM_CHART change
+ifneq ($(ENABLE_WASM_STRIP_CHART),TRUE)
+$(eval $(call gb_Module_add_moduledirs,libreoffice,\
+	chart2 \
+))
+endif
+
+# WASM_CANVAS change
+ifneq ($(ENABLE_WASM_STRIP_CANVAS),TRUE)
+$(eval $(call gb_Module_add_moduledirs,libreoffice,\
+	canvas \
+	cppcanvas \
+))
+endif
+
+ifneq ($(ENABLE_WASM_STRIP_DBACCESS),TRUE)
+$(eval $(call gb_Module_add_moduledirs,libreoffice,\
+	dbaccess \
+))
+endif
+
+ifneq ($(ENABLE_WASM_STRIP_ACCESSIBILITY),TRUE)
 $(eval $(call gb_Module_add_moduledirs,libreoffice,\
 	accessibility \
+	winaccessibility \
+))
+endif
+
+$(eval $(call gb_Module_add_moduledirs,libreoffice,\
 	android \
+    $(if $(ENABLE_WASM_STRIP_BASIC_DRAW_MATH_IMPRESS),, \
 	animations \
+    ) \
 	apple_remote \
-	$(call gb_Helper_optional,AVMEDIA,avmedia) \
+	avmedia \
+	$(if $(ENABLE_WASM_STRIP_CALC),, \
 	basctl \
+	) \
 	basegfx \
 	basic \
 	bean \
 	binaryurp \
 	bridges \
-	canvas \
-	chart2 \
 	cli_ure \
-	$(call gb_Helper_optional,DESKTOP,codemaker) \
+    codemaker \
 	comphelper \
 	configmgr \
 	connectivity \
-	cppcanvas \
 	cppu \
 	cppuhelper \
 	cpputools \
 	cui \
-	dbaccess \
 	desktop \
 	$(call gb_Helper_optional,DICTIONARIES,dictionaries) \
+	docmodel\
 	drawinglayer \
 	editeng \
 	embeddedobj \
@@ -67,7 +95,6 @@ $(eval $(call gb_Module_add_moduledirs,libreoffice,\
 	i18npool \
 	i18nutil \
 	idl \
-	$(call gb_Helper_optional,DESKTOP,idlc) \
 	instsetoo_native \
 	io \
 	javaunohelper \
@@ -103,22 +130,31 @@ $(eval $(call gb_Module_add_moduledirs,libreoffice,\
 	sal \
 	salhelper \
 	sax \
+	$(if $(ENABLE_WASM_STRIP_CALC),, \
 	sc \
 	scaddins \
 	sccomp \
+	) \
 	$(call gb_Helper_optional,DESKTOP,scp2) \
 	scripting \
+    $(if $(ENABLE_WASM_STRIP_BASIC_DRAW_MATH_IMPRESS),, \
 	sd \
 	sdext \
+    ) \
 	$(call gb_Helper_optional,DESKTOP,setup_native) \
 	sfx2 \
 	shell \
+    $(if $(ENABLE_WASM_STRIP_BASIC_DRAW_MATH_IMPRESS),, \
 	slideshow \
+    ) \
 	smoketest \
 	solenv \
 	soltools \
 	sot \
+    $(if $(ENABLE_WASM_STRIP_BASIC_DRAW_MATH_IMPRESS),, \
 	starmath \
+    ) \
+    $(if $(ENABLE_CUSTOMTARGET_COMPONENTS),static) \
 	stoc \
 	store \
 	svl \
@@ -126,8 +162,10 @@ $(eval $(call gb_Module_add_moduledirs,libreoffice,\
 	svgio \
 	emfio \
 	svx \
+	$(if $(ENABLE_WASM_STRIP_WRITER),, \
 	sw \
 	swext \
+	) \
 	sysui \
 	test \
 	testtools \
@@ -148,7 +186,6 @@ $(eval $(call gb_Module_add_moduledirs,libreoffice,\
 	uui \
 	vbahelper \
 	vcl \
-	winaccessibility \
 	wizards \
 	writerfilter \
 	writerperfect \
@@ -160,14 +197,21 @@ $(eval $(call gb_Module_add_moduledirs,libreoffice,\
 	xmlsecurity \
 ))
 
+ifeq (,$(DISABLE_DYNLOADING))
 # Especially when building everything with symbols, the linking of the largest
 # libraries takes enormous amounts of RAM.	To prevent annoying OOM situations
 # etc., try to prevent linking these in parallel by adding artificial build
 # order dependencies here.
+# Do this only if a linker is not explicitly set, as this should only apply
+# to the BFD linker and any decently modern linker presumably performs better.
+ifeq (,$(USE_LD))
 define repositorymodule_serialize1
-$(call gb_LinkTarget_get_target,$(call gb_Library_get_linktarget,$(1))) \
-	:| $(foreach lib,$(2),$(call gb_Library_get_target,$(lib)))
+$(call gb_Library_get_linktarget_target,$(1)) :| $(foreach lib,$(2),$(call gb_Library_get_target,$(lib)))
 endef
+else
+define repositorymodule_serialize1
+endef
+endif
 
 define repositorymodule_serialize
 $(if $(filter-out 0 1,$(words $(1))),\
@@ -180,7 +224,7 @@ endef
 # otherwise cyclic dependencies ruin everything.
 # do not serialize on a partial build as that may fail due to missing deps.
 # the default goal is build (see Module.mk)
-ifeq (,$(filter-out build check unitcheck slowcheck screenshot subsequentcheck uicheck,$(MAKECMDGOALS)))
+ifeq (,$(filter-out build check unitcheck slowcheck screenshot subsequentcheck uicheck coverage,$(MAKECMDGOALS)))
 $(eval $(call repositorymodule_serialize,\
 	scfilt \
 	$(call gb_Helper_optional,SCRIPTING,vbaobj) \
@@ -193,5 +237,6 @@ $(eval $(call repositorymodule_serialize,\
 		svx svxcore xo sfx fwk svt vcl) \
 ))
 endif
+endif # !$(DISABLE_DYNLOADING)
 
 # vim: set noet sw=4 ts=4:

@@ -26,6 +26,7 @@
 #include <com/sun/star/frame/XDispatch.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
+#include <com/sun/star/util/XCacheInfo.hpp>
 #include <rtl/ref.hxx>
 
 namespace sdext::presenter {
@@ -33,6 +34,7 @@ namespace sdext::presenter {
 typedef ::cppu::WeakComponentImplHelper <
     css::lang::XInitialization,
     css::lang::XServiceInfo,
+    css::util::XCacheInfo,
     css::frame::XDispatchProvider
 > PresenterProtocolHandlerInterfaceBase;
 
@@ -70,6 +72,9 @@ public:
     virtual css::uno::Sequence<css::uno::Reference<css::frame::XDispatch> > SAL_CALL
         queryDispatches(
             const css::uno::Sequence< css::frame::DispatchDescriptor>& rDescriptors) override;
+
+    /// See XCacheInfo::IsCachingAllowed().
+    sal_Bool SAL_CALL isCachingAllowed() override { return false; }
 
 private:
     class Dispatch;

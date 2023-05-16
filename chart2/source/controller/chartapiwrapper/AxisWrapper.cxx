@@ -18,6 +18,7 @@
  */
 
 #include "AxisWrapper.hxx"
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <TitleHelper.hxx>
 #include "Chart2ModelContact.hxx"
@@ -35,8 +36,6 @@
 #include <com/sun/star/chart/ChartAxisLabelPosition.hpp>
 #include <com/sun/star/chart/ChartAxisMarkPosition.hpp>
 #include <com/sun/star/chart2/XAxis.hpp>
-#include <com/sun/star/chart2/XDiagram.hpp>
-#include <com/sun/star/frame/XModel.hpp>
 
 #include <CharacterProperties.hxx>
 #include <LinePropertiesHelper.hxx>
@@ -49,7 +48,8 @@
 #include "WrappedScaleTextProperties.hxx"
 
 #include <algorithm>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
@@ -370,8 +370,8 @@ namespace chart::wrapper
 {
 
 AxisWrapper::AxisWrapper(
-    tAxisType eType, const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact) :
-        m_spChart2ModelContact( spChart2ModelContact ),
+    tAxisType eType, std::shared_ptr<Chart2ModelContact> spChart2ModelContact) :
+        m_spChart2ModelContact(std::move( spChart2ModelContact )),
         m_aEventListenerContainer( m_aMutex ),
         m_eType( eType )
 {
@@ -490,18 +490,18 @@ OUString SAL_CALL AxisWrapper::getShapeType()
 // ____ XNumberFormatsSupplier ____
 uno::Reference< beans::XPropertySet > SAL_CALL AxisWrapper::getNumberFormatSettings()
 {
-    Reference< util::XNumberFormatsSupplier > xNumSuppl( m_spChart2ModelContact->getChartModel(), uno::UNO_QUERY );
-    if( xNumSuppl.is() )
-        return xNumSuppl->getNumberFormatSettings();
+    rtl::Reference<ChartModel> xChartModel( m_spChart2ModelContact->getDocumentModel() );
+    if( xChartModel )
+        return xChartModel->getNumberFormatSettings();
 
     return uno::Reference< beans::XPropertySet >();
 }
 
 uno::Reference< util::XNumberFormats > SAL_CALL AxisWrapper::getNumberFormats()
 {
-    Reference< util::XNumberFormatsSupplier > xNumSuppl( m_spChart2ModelContact->getChartModel(), uno::UNO_QUERY );
-    if( xNumSuppl.is() )
-        return xNumSuppl->getNumberFormats();
+    rtl::Reference<ChartModel> xChartModel( m_spChart2ModelContact->getDocumentModel() );
+    if( xChartModel )
+        return xChartModel->getNumberFormats();
 
     return uno::Reference< util::XNumberFormats >();
 }
@@ -574,21 +574,20 @@ awt::Size AxisWrapper::getCurrentSizeForReference()
 
 Reference< chart2::XAxis > AxisWrapper::getAxis()
 {
-    Reference< chart2::XAxis > xAxis;
+    rtl::Reference< Axis > xAxis;
     try
     {
         sal_Int32 nDimensionIndex = 0;
         bool  bMainAxis = true;
         AxisWrapper::getDimensionAndMainAxisBool( m_eType, nDimensionIndex, bMainAxis );
 
-        Reference< XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
+        rtl::Reference< Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
         xAxis = AxisHelper::getAxis( nDimensionIndex, bMainAxis, xDiagram );
         if( !xAxis.is() )
         {
             xAxis = AxisHelper::createAxis( nDimensionIndex, bMainAxis, xDiagram, m_spChart2ModelContact->m_xContext );
-            Reference< beans::XPropertySet > xProp( xAxis, uno::UNO_QUERY );
-            if( xProp.is() )
-                xProp->setPropertyValue("Show", uno::Any( false ) );
+            if( xAxis.is() )
+                xAxis->setPropertyValue("Show", uno::Any( false ) );
         }
     }
     catch( const uno::Exception & )

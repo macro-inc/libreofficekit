@@ -19,12 +19,12 @@
 
 #include <sal/config.h>
 
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <svl/listener.hxx>
-#include <osl/mutex.hxx>
+#include <mutex>
 
 #include <unofootnote.hxx>
 #include <unotextrange.hxx>
@@ -61,15 +61,13 @@ GetSupportedServiceNamesImpl(
 class SwXFootnote::Impl
     : public SvtListener
 {
-private:
-    ::osl::Mutex m_Mutex; // just for OInterfaceContainerHelper2
-
 public:
 
     SwXFootnote& m_rThis;
-    uno::WeakReference<uno::XInterface> m_wThis;
+    unotools::WeakReference<SwXFootnote> m_wThis;
     const bool m_bIsEndnote;
-    ::comphelper::OInterfaceContainerHelper2 m_EventListeners;
+    std::mutex m_Mutex; // just for OInterfaceContainerHelper4
+    ::comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_EventListeners;
     bool m_bIsDescriptor;
     SwFormatFootnote* m_pFormatFootnote;
     OUString m_sLabel;
@@ -79,7 +77,6 @@ public:
             const bool bIsEndnote)
         : m_rThis(rThis)
         , m_bIsEndnote(bIsEndnote)
-        , m_EventListeners(m_Mutex)
         , m_bIsDescriptor(nullptr == pFootnote)
         , m_pFormatFootnote(pFootnote)
     {
@@ -115,7 +112,8 @@ void SwXFootnote::Impl::Invalidate()
         return;
     }
     lang::EventObject const ev(xThis);
-    m_EventListeners.disposeAndClear(ev);
+    std::unique_lock aGuard(m_Mutex);
+    m_EventListeners.disposeAndClear(aGuard, ev);
 }
 
 void SwXFootnote::Impl::Notify(const SfxHint& rHint)
@@ -140,28 +138,27 @@ SwXFootnote::~SwXFootnote()
 {
 }
 
-uno::Reference<text::XFootnote>
+rtl::Reference<SwXFootnote>
 SwXFootnote::CreateXFootnote(SwDoc & rDoc, SwFormatFootnote *const pFootnoteFormat,
         bool const isEndnote)
 {
     // i#105557: do not iterate over the registered clients: race condition
-    uno::Reference<text::XFootnote> xNote;
+    rtl::Reference<SwXFootnote> xNote;
     if (pFootnoteFormat)
     {
         xNote = pFootnoteFormat->GetXFootnote();
     }
     if (!xNote.is())
     {
-        SwXFootnote *const pNote(pFootnoteFormat
+        xNote = pFootnoteFormat
                 ? new SwXFootnote(rDoc, *pFootnoteFormat)
-                : new SwXFootnote(isEndnote));
-        xNote.set(pNote);
+                : new SwXFootnote(isEndnote);
         if (pFootnoteFormat)
         {
             pFootnoteFormat->SetXFootnote(xNote);
         }
         // need a permanent Reference to initialize m_wThis
-        pNote->m_pImpl->m_wThis = xNote;
+        xNote->m_pImpl->m_wThis = xNote.get();
     }
     return xNote;
 }
@@ -330,8 +327,8 @@ SwXFootnote::attach(const uno::Reference< text::XTextRange > & xTextRange)
     pNewDoc->getIDocumentContentOperations().InsertPoolItem(aPam, aFootNote, nInsertFlags);
 
     SwTextFootnote *const pTextAttr = static_cast<SwTextFootnote*>(
-        aPam.GetNode().GetTextNode()->GetTextAttrForCharAt(
-                aPam.GetPoint()->nContent.GetIndex()-1, RES_TXTATR_FTN ));
+        aPam.GetPointNode().GetTextNode()->GetTextAttrForCharAt(
+                aPam.GetPoint()->GetContentIndex()-1, RES_TXTATR_FTN ));
 
     if (pTextAttr)
     {
@@ -379,7 +376,8 @@ SwXFootnote::addEventListener(
     const uno::Reference< lang::XEventListener > & xListener)
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.addInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.addInterface(aGuard, xListener);
 }
 
 void SAL_CALL
@@ -387,7 +385,8 @@ SwXFootnote::removeEventListener(
     const uno::Reference< lang::XEventListener > & xListener)
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.removeInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.removeInterface(aGuard, xListener);
 }
 
 const SwStartNode *SwXFootnote::GetStartNode() const
@@ -443,7 +442,7 @@ SwXFootnote::createTextCursorByRange(
     SwTextFootnote const*const pTextFootnote = rFormat.GetTextFootnote();
     SwNode const*const pFootnoteStartNode = &pTextFootnote->GetStartNode()->GetNode();
 
-    const SwNode* pStart = aPam.GetNode().FindFootnoteStartNode();
+    const SwNode* pStart = aPam.GetPointNode().FindFootnoteStartNode();
     if (pStart != pFootnoteStartNode)
     {
         throw uno::RuntimeException();

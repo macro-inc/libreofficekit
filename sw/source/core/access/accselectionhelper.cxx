@@ -31,7 +31,6 @@
 
 #include <com/sun/star/uno/Reference.hxx>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
-#include <com/sun/star/accessibility/XAccessibleStateSet.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <fmtanchr.hxx>
 
@@ -48,10 +47,6 @@ using namespace ::sw::access;
 SwAccessibleSelectionHelper::SwAccessibleSelectionHelper(
     SwAccessibleContext& rContext ) :
         m_rContext( rContext )
-{
-}
-
-SwAccessibleSelectionHelper::~SwAccessibleSelectionHelper()
 {
 }
 
@@ -79,9 +74,12 @@ void SwAccessibleSelectionHelper::throwIndexOutOfBoundsException()
 
 // XAccessibleSelection
 void SwAccessibleSelectionHelper::selectAccessibleChild(
-    sal_Int32 nChildIndex )
+    sal_Int64 nChildIndex )
 {
     SolarMutexGuard aGuard;
+
+    if (nChildIndex < 0 || nChildIndex >= m_rContext.GetChildCount(*(m_rContext.GetMap())))
+        throwIndexOutOfBoundsException();
 
     // Get the respective child as SwFrame (also do index checking), ...
     const SwAccessibleChild aChild = m_rContext.GetChild( *(m_rContext.GetMap()),
@@ -91,8 +89,7 @@ void SwAccessibleSelectionHelper::selectAccessibleChild(
 
     // we can only select fly frames, so we ignore (should: return
     // false) all other attempts at child selection
-    SwFEShell* pFEShell = GetFEShell();
-    if( pFEShell != nullptr )
+    if (GetFEShell())
     {
         const SdrObject *pObj = aChild.GetDrawObject();
         if( pObj )
@@ -121,21 +118,20 @@ static bool lcl_getSelectedState(const SwAccessibleChild& aChild,
         Reference< XAccessibleContext > pRContext = xAcc->getAccessibleContext();
         if(!pRContext.is())
             return false;
-        Reference<XAccessibleStateSet> pRStateSet = pRContext->getAccessibleStateSet();
-        if( pRStateSet.is() )
-        {
-            const Sequence<short> aStates = pRStateSet->getStates();
-            if (std::find(aStates.begin(), aStates.end(), AccessibleStateType::SELECTED) != aStates.end())
-                return true;
-        }
+        sal_Int64 nRStateSet = pRContext->getAccessibleStateSet();
+        if(nRStateSet & AccessibleStateType::SELECTED)
+            return true;
     }
     return false;
 }
 
 bool SwAccessibleSelectionHelper::isAccessibleChildSelected(
-    sal_Int32 nChildIndex )
+    sal_Int64 nChildIndex )
 {
     SolarMutexGuard aGuard;
+
+    if (nChildIndex < 0 || nChildIndex >= m_rContext.GetChildCount(*(m_rContext.GetMap())))
+        throwIndexOutOfBoundsException();
 
     // Get the respective child as SwFrame (also do index checking), ...
     const SwAccessibleChild aChild = m_rContext.GetChild( *(m_rContext.GetMap()),
@@ -145,8 +141,7 @@ bool SwAccessibleSelectionHelper::isAccessibleChildSelected(
 
     // ... and compare to the currently selected frame
     bool bRet = false;
-    const SwFEShell* pFEShell = GetFEShell();
-    if( pFEShell )
+    if (const SwFEShell* pFEShell = GetFEShell())
     {
         if ( aChild.GetSwFrame() != nullptr )
         {
@@ -175,7 +170,7 @@ void SwAccessibleSelectionHelper::selectAllAccessibleChildren(  )
     // the first we can select, and select it.
 
     SwFEShell* pFEShell = GetFEShell();
-    if( !pFEShell )
+    if (!pFEShell)
         return;
 
     std::list< SwAccessibleChild > aChildren;
@@ -194,15 +189,14 @@ void SwAccessibleSelectionHelper::selectAllAccessibleChildren(  )
     }
 }
 
-sal_Int32 SwAccessibleSelectionHelper::getSelectedAccessibleChildCount(  )
+sal_Int64 SwAccessibleSelectionHelper::getSelectedAccessibleChildCount(  )
 {
     SolarMutexGuard aGuard;
 
-    sal_Int32 nCount = 0;
+    sal_Int64 nCount = 0;
     // Only one frame can be selected at a time, and we only frames
     // for selectable children.
-    const SwFEShell* pFEShell = GetFEShell();
-    if( pFEShell != nullptr )
+    if (const SwFEShell* pFEShell = GetFEShell())
     {
         const SwFlyFrame* pFlyFrame = pFEShell->GetSelectedFlyFrame();
         if( pFlyFrame )
@@ -245,7 +239,7 @@ sal_Int32 SwAccessibleSelectionHelper::getSelectedAccessibleChildCount(  )
 }
 
 Reference<XAccessible> SwAccessibleSelectionHelper::getSelectedAccessibleChild(
-    sal_Int32 nSelectedChildIndex )
+    sal_Int64 nSelectedChildIndex )
 {
     SolarMutexGuard aGuard;
 
@@ -254,7 +248,7 @@ Reference<XAccessible> SwAccessibleSelectionHelper::getSelectedAccessibleChild(
     // be 0, and a selection must exist, otherwise we have to throw an
     // lang::IndexOutOfBoundsException
     SwFEShell* pFEShell = GetFEShell();
-    if( nullptr == pFEShell )
+    if (!pFEShell)
         throwIndexOutOfBoundsException();
 
     SwAccessibleChild aChild;
@@ -336,7 +330,7 @@ Reference<XAccessible> SwAccessibleSelectionHelper::getSelectedAccessibleChild(
 
 // index has to be treated as global child index.
 void SwAccessibleSelectionHelper::deselectAccessibleChild(
-    sal_Int32 nChildIndex )
+    sal_Int64 nChildIndex )
 {
     SolarMutexGuard g;
 

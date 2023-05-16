@@ -9,7 +9,7 @@
 
 $(eval $(call gb_Library_Library,stringresource))
 
-$(eval $(call gb_Library_set_componentfile,stringresource,scripting/source/stringresource/stringresource))
+$(eval $(call gb_Library_set_componentfile,stringresource,scripting/source/stringresource/stringresource,services))
 
 $(eval $(call gb_Library_set_include,stringresource,\
 	$$(INCLUDE) \
@@ -25,6 +25,7 @@ $(eval $(call gb_Library_use_libraries,stringresource,\
 	cppu \
 	cppuhelper \
 	sal \
+	utl \
 	tl \
 	i18nlangtag \
 ))

@@ -48,7 +48,8 @@
 #include <i18nlangtag/languagetag.hxx>
 #include <vcl/commandevent.hxx>
 #include <vcl/svapp.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace ::svt;
 using namespace ::dbaui;
@@ -74,8 +75,8 @@ namespace
         if ( !bAsterisk )
         {
             sal_Int32 nTokenCount = comphelper::string::getTokenCount(_sFieldName, '.');
-            if (    (nTokenCount == 2 && _sFieldName.getToken(1,'.')[0] == '*' )
-                ||  (nTokenCount == 3 && _sFieldName.getToken(2,'.')[0] == '*' ) )
+            if (    (nTokenCount == 2 && o3tl::getToken(_sFieldName,1,'.')[0] == '*' )
+                ||  (nTokenCount == 3 && o3tl::getToken(_sFieldName,2,'.')[0] == '*' ) )
             {
                 bAsterisk = true;
             }
@@ -146,7 +147,7 @@ OSelectionBrowseBox::OSelectionBrowseBox( vcl::Window* pParent )
 
     const OUString aTxt(DBA_RES(STR_QUERY_SORTTEXT));
     for (sal_Int32 nIdx {0}; nIdx>=0;)
-        rOrderBox.append_text(aTxt.getToken(0, ';', nIdx));
+        rOrderBox.append_text(OUString(o3tl::getToken(aTxt, 0, ';', nIdx)));
 
     m_bVisibleRow.insert(m_bVisibleRow.end(), BROW_ROW_CNT, true);
 
@@ -492,7 +493,7 @@ void OSelectionBrowseBox::InitController(CellControllerRef& /*rController*/, sal
             getDesignView()->fillValidFields(aTable, rComboBox);
 
             // replace with alias.*
-            if (aField.trim() == "*")
+            if (o3tl::trim(aField) == u"*")
             {
                 aField = aTable + ".*";
             }
@@ -1053,7 +1054,7 @@ bool OSelectionBrowseBox::SaveModified()
                     sal_Int32 nPos = rComboBox.get_active();
                     // these functions are only available in CORE
                     OUString sFunctionName        = rComboBox.get_text(nPos);
-                    OUString sGroupFunctionName   = m_aFunctionStrings.copy(m_aFunctionStrings.lastIndexOf(';')+1);
+                    std::u16string_view sGroupFunctionName = m_aFunctionStrings.subView(m_aFunctionStrings.lastIndexOf(';')+1);
                     bool bGroupBy = false;
                     if ( sGroupFunctionName == sFunctionName ) // check if the function name is GROUP
                     {
@@ -1556,7 +1557,7 @@ OTableFieldDescRef OSelectionBrowseBox::InsertField(const OJoinExchangeData& jxd
     weld::TreeView& rTreeView = jxdSource.pListBox->get_widget();
     OUString aFieldName = rTreeView.get_text(jxdSource.nEntry);
     sal_uInt32 nFieldIndex = jxdSource.nEntry;
-    OTableFieldInfo* pInf = reinterpret_cast<OTableFieldInfo*>(rTreeView.get_id(jxdSource.nEntry).toUInt64());
+    OTableFieldInfo* pInf = weld::fromId<OTableFieldInfo*>(rTreeView.get_id(jxdSource.nEntry));
 
     // construct DragInfo, such that I use the other InsertField
     OTableFieldDescRef aInfo = new OTableFieldDesc(pSourceWin->GetTableName(),aFieldName);
@@ -2087,8 +2088,8 @@ sal_Int32 OSelectionBrowseBox::GetNoneVisibleRows() const
 {
     sal_Int32 nErg(0);
     // only the first 11 rows are interesting
-    sal_Int32 const nSize = SAL_N_ELEMENTS(nVisibleRowMask);
-    for(sal_Int32 i=0;i<nSize;i++)
+    std::size_t const nSize = std::size(nVisibleRowMask);
+    for(std::size_t i=0;i<nSize;i++)
     {
         if(!m_bVisibleRow[i])
             nErg |= nVisibleRowMask[i];
@@ -2099,8 +2100,8 @@ sal_Int32 OSelectionBrowseBox::GetNoneVisibleRows() const
 void OSelectionBrowseBox::SetNoneVisibleRow(sal_Int32 nRows)
 {
     // only the first 11 rows are interesting
-    sal_Int32 const nSize = SAL_N_ELEMENTS(nVisibleRowMask);
-    for(sal_Int32 i=0;i< nSize;i++)
+    std::size_t const nSize = std::size(nVisibleRowMask);
+    for(std::size_t i=0;i< nSize;i++)
         m_bVisibleRow[i] = !(nRows & nVisibleRowMask[i]);
 }
 
@@ -2281,16 +2282,16 @@ void OSelectionBrowseBox::SetCellContents(sal_Int32 nRow, sal_uInt16 nColId, con
             break;
         case BROW_FUNCTION_ROW:
         {
-            OUString sGroupFunctionName = m_aFunctionStrings.copy(m_aFunctionStrings.lastIndexOf(';')+1);
+            std::u16string_view sGroupFunctionName = m_aFunctionStrings.subView(m_aFunctionStrings.lastIndexOf(';')+1);
             pEntry->SetFunction(strNewText);
             // first reset this two member
             sal_Int32 nFunctionType = pEntry->GetFunctionType();
             nFunctionType &= ~FKT_AGGREGATE;
             pEntry->SetFunctionType(nFunctionType);
-            if ( pEntry->IsGroupBy() && !sGroupFunctionName.equalsIgnoreAsciiCase(strNewText) )
+            if ( pEntry->IsGroupBy() && !o3tl::equalsIgnoreAsciiCase(sGroupFunctionName, strNewText) )
                 pEntry->SetGroupBy(false);
 
-            if ( sGroupFunctionName.equalsIgnoreAsciiCase(strNewText) )
+            if ( o3tl::equalsIgnoreAsciiCase(sGroupFunctionName, strNewText) )
                 pEntry->SetGroupBy(true);
             else if ( !strNewText.isEmpty() )
             {

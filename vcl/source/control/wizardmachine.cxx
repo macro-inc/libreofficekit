@@ -21,7 +21,7 @@
 #include <officecfg/Office/Common.hxx>
 #include <vcl/event.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <strings.hrc>
 #include <svdata.hxx>
 #include <wizdlg.hxx>
@@ -429,7 +429,7 @@ namespace vcl
 
     bool RoadmapWizard::EventNotify( NotifyEvent& rNEvt )
     {
-        if ( (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) && mpPrevBtn && mpNextBtn )
+        if ( (rNEvt.GetType() == NotifyEventType::KEYINPUT) && mpPrevBtn && mpNextBtn )
         {
             const KeyEvent* pKEvt = rNEvt.GetKeyEvent();
             vcl::KeyCode aKeyCode = pKEvt->GetKeyCode();
@@ -531,6 +531,7 @@ namespace vcl
             mpFirstPage = pNewPageData;
         else
         {
+            pPage->Hide();
             ImplWizPageData* pPageData = mpFirstPage;
             while ( pPageData->mpNext )
                 pPageData = pPageData->mpNext;
@@ -893,6 +894,16 @@ namespace vcl
         implUpdateTitle();
     }
 
+    OString WizardMachine::getPageIdentForState(WizardTypes::WizardState nState) const
+    {
+        return OString::number(nState);
+    }
+
+    WizardTypes::WizardState WizardMachine::getStateFromPageIdent(const OString& rIdent) const
+    {
+        return rIdent.toInt32();
+    }
+
     BuilderPage* WizardMachine::GetOrCreatePage( const WizardTypes::WizardState i_nState )
     {
         if ( nullptr == GetPage( i_nState ) )
@@ -949,21 +960,15 @@ namespace vcl
         if (_nWizardButtonFlags & WizardButtonFlags::CANCEL)
             pNewDefButton = m_xCancel.get();
 
-        if ( pNewDefButton )
-            defaultButton( pNewDefButton );
-        else
-            m_xAssistant->recursively_unset_default_buttons();
+        defaultButton(pNewDefButton);
     }
 
     void WizardMachine::defaultButton(weld::Button* _pNewDefButton)
     {
         // loop through all (direct and indirect) descendants which participate in our tabbing order, and
-        // reset the WB_DEFBUTTON for every window which is a button
-        m_xAssistant->recursively_unset_default_buttons();
-
-        // set its new style
-        if (_pNewDefButton)
-            _pNewDefButton->set_has_default(true);
+        // reset the WB_DEFBUTTON for every window which is a button and set _pNewDefButton as the new
+        // WB_DEFBUTTON
+        m_xAssistant->change_default_widget(nullptr, _pNewDefButton);
     }
 
     void WizardMachine::enableButtons(WizardButtonFlags _nWizardButtonFlags, bool _bEnable)
@@ -1180,7 +1185,7 @@ namespace vcl
             if (pOldTabPage)
                 pOldTabPage->Deactivate();
 
-            m_xAssistant->set_current_page(OString::number(nState));
+            m_xAssistant->set_current_page(getPageIdentForState(nState));
 
             m_pCurTabPage = GetPage(m_nCurState);
             m_pCurTabPage->Activate();

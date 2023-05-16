@@ -162,7 +162,7 @@ private:
     std::unique_ptr<SfxBroadcaster> pAccessibilityBroadcaster;
 
     // ugly hack for Add button in ScNameDlg
-    std::map<OUString, std::unique_ptr<ScRangeName>> m_RangeMap;
+    std::map<OUString, ScRangeName> m_RangeMap;
     bool    mbInSwitch;
     OUString   maName;
     OUString   maScope;
@@ -173,7 +173,7 @@ private:
 
     SfxShell*       GetMySubShell() const;
 
-    void            DoReadUserData( const OUString& rData );
+    void            DoReadUserData( std::u16string_view rData );
     void            DoReadUserDataSequence( const css::uno::Sequence< css::beans::PropertyValue >& rSettings );
     bool            IsSignatureLineSelected();
     bool            IsSignatureLineSigned();
@@ -201,7 +201,7 @@ protected:
 
     virtual void    QueryObjAreaPixel( tools::Rectangle& rRect ) const override;
 
-    virtual OUString GetSelectionText( bool bWholeWord = false ) override;
+    virtual OUString GetSelectionText( bool bWholeWord = false, bool bOnlyASample = false ) override;
     virtual bool     HasSelection( bool bText = true ) const override;
 
     virtual void    WriteUserData(OUString &, bool bBrowse = false) override;

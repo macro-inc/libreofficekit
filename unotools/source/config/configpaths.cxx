@@ -19,12 +19,14 @@
 
 #include <sal/config.h>
 
+#include <cassert>
 #include <string_view>
 
 #include <unotools/configpaths.hxx>
 #include <rtl/ustring.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 
 namespace utl
 {
@@ -71,72 +73,93 @@ void lcl_resolveCharEntities(OUString & aLocalString)
     aLocalString = aResult.makeStringAndClear();
 }
 
-bool splitLastFromConfigurationPath(OUString const& _sInPath,
+bool splitLastFromConfigurationPath(std::u16string_view _sInPath,
                                         OUString& _rsOutPath,
                                         OUString& _rsLocalName)
 {
-    sal_Int32 nStart,nEnd;
+    size_t nStart,nEnd;
 
-    sal_Int32 nPos = _sInPath.getLength()-1;
+    size_t nPos = _sInPath.size();
 
-    // strip trailing slash
-    if (nPos > 0 && _sInPath[ nPos ] == '/')
+    // for backwards compatibility, strip trailing slash
+    if (nPos > 1 && _sInPath[ nPos - 1 ] == '/')
     {
-        OSL_FAIL("Invalid config path: trailing '/' is not allowed");
         --nPos;
     }
 
-    // check for predicate ['xxx'] or ["yyy"]
-    if (nPos  > 0 && _sInPath[ nPos ] == ']')
+    // check for set element ['xxx'] or ["yyy"]
+    bool decode;
+    if (nPos > 0 && _sInPath[ nPos - 1 ] == ']')
     {
-        sal_Unicode chQuote = _sInPath[--nPos];
+        decode = true;
+        if (nPos < 3) { // expect at least chQuote + chQuote + ']' at _sInPath[nPos-3..nPos-1]
+            goto invalid;
+        }
+        nPos -= 2;
+        sal_Unicode chQuote = _sInPath[nPos];
 
         if (chQuote == '\'' || chQuote == '\"')
         {
             nEnd = nPos;
-            nPos = _sInPath.lastIndexOf(chQuote,nEnd);
+            nPos = _sInPath.rfind(chQuote,nEnd - 1);
+            if (nPos == std::u16string_view::npos) {
+                goto invalid;
+            }
             nStart = nPos + 1;
-            --nPos; // nPos = rInPath.lastIndexOf('[',nPos);
         }
-        else // allow [xxx]
+        else
         {
-            nEnd = nPos + 1;
-            nPos = _sInPath.lastIndexOf('[',nEnd);
-            nStart = nPos + 1;
+            goto invalid;
         }
 
-        OSL_ENSURE(nPos >= 0 && _sInPath[nPos] == '[', "Invalid config path: unmatched quotes or brackets");
-        if (nPos >= 0 && _sInPath[nPos] == '[')
+        OSL_ENSURE(nPos > 0 && _sInPath[nPos - 1] == '[', "Invalid config path: unmatched quotes or brackets");
+        if (nPos > 1 && _sInPath[nPos - 1] == '[')
+            // expect at least '/' + '[' at _sInPath[nPos-2..nPos-1]
         {
-            nPos =  _sInPath.lastIndexOf('/',nPos);
+            nPos =  _sInPath.rfind('/',nPos - 2);
+            if (nPos == std::u16string_view::npos) {
+                goto invalid;
+            }
         }
-        else // defined behavior for invalid paths
+        else
         {
-            nStart = 0;
-            nEnd = _sInPath.getLength();
-            nPos = -1;
+            goto invalid;
         }
 
     }
     else
     {
-        nEnd = nPos+1;
-        nPos = _sInPath.lastIndexOf('/',nEnd);
+        decode = false;
+        nEnd = nPos;
+        if (nEnd == 0) {
+            goto invalid;
+        }
+        nPos = _sInPath.rfind('/',nEnd - 1);
+        if (nPos == std::u16string_view::npos) {
+            goto invalid;
+        }
         nStart = nPos + 1;
     }
-    OSL_ASSERT( -1 <= nPos &&
-                nPos < nStart &&
-                nStart < nEnd &&
-                nEnd <= _sInPath.getLength() );
+    assert( nPos != std::u16string_view::npos &&
+            nPos < nStart &&
+            nStart <= nEnd &&
+            nEnd <= _sInPath.size() );
 
-    OSL_ASSERT(nPos == -1 || _sInPath[nPos] == '/');
+    assert(_sInPath[nPos] == '/');
     OSL_ENSURE(nPos != 0 , "Invalid config child path: immediate child of root");
 
-    _rsLocalName = _sInPath.copy(nStart, nEnd-nStart);
-    _rsOutPath = (nPos > 0) ? _sInPath.copy(0,nPos) : OUString();
-    lcl_resolveCharEntities(_rsLocalName);
+    _rsLocalName = _sInPath.substr(nStart, nEnd-nStart);
+    _rsOutPath = (nPos > 0) ? OUString(_sInPath.substr(0,nPos)) : OUString();
+    if (decode) {
+        lcl_resolveCharEntities(_rsLocalName);
+    }
 
-    return nPos >= 0;
+    return true;
+
+invalid:
+    _rsOutPath.clear();
+    _rsLocalName = _sInPath;
+    return false;
 }
 
 OUString extractFirstFromConfigurationPath(OUString const& _sInPath, OUString* _sOutPath)
@@ -182,22 +205,22 @@ OUString extractFirstFromConfigurationPath(OUString const& _sInPath, OUString* _
 }
 
 // find the position after the prefix in the nested path
-static sal_Int32 lcl_findPrefixEnd(OUString const& _sNestedPath, OUString const& _sPrefixPath)
+static sal_Int32 lcl_findPrefixEnd(std::u16string_view _sNestedPath, std::u16string_view _sPrefixPath)
 {
     // TODO: currently handles only exact prefix matches
-    sal_Int32 nPrefixLength = _sPrefixPath.getLength();
+    size_t nPrefixLength = _sPrefixPath.size();
 
     OSL_ENSURE(nPrefixLength == 0 || _sPrefixPath[nPrefixLength-1] != '/',
                 "Cannot handle slash-terminated prefix paths");
 
     bool bIsPrefix;
-    if (_sNestedPath.getLength() > nPrefixLength)
+    if (_sNestedPath.size() > nPrefixLength)
     {
         bIsPrefix = _sNestedPath[nPrefixLength] == '/' &&
-                    _sNestedPath.startsWith(_sPrefixPath);
+                    o3tl::starts_with(_sNestedPath, _sPrefixPath);
         ++nPrefixLength;
     }
-    else if (_sNestedPath.getLength() == nPrefixLength)
+    else if (_sNestedPath.size() == nPrefixLength)
     {
         bIsPrefix = _sNestedPath == _sPrefixPath;
     }
@@ -209,14 +232,14 @@ static sal_Int32 lcl_findPrefixEnd(OUString const& _sNestedPath, OUString const&
     return bIsPrefix ? nPrefixLength : 0;
 }
 
-bool isPrefixOfConfigurationPath(OUString const& _sNestedPath,
-                                     OUString const& _sPrefixPath)
+bool isPrefixOfConfigurationPath(std::u16string_view _sNestedPath,
+                                     std::u16string_view _sPrefixPath)
 {
-    return _sPrefixPath.isEmpty() || lcl_findPrefixEnd(_sNestedPath,_sPrefixPath) != 0;
+    return _sPrefixPath.empty() || lcl_findPrefixEnd(_sNestedPath,_sPrefixPath) != 0;
 }
 
 OUString dropPrefixFromConfigurationPath(OUString const& _sNestedPath,
-                                         OUString const& _sPrefixPath)
+                                         std::u16string_view _sPrefixPath)
 {
     if ( sal_Int32 nPrefixEnd = lcl_findPrefixEnd(_sNestedPath,_sPrefixPath) )
     {
@@ -224,17 +247,17 @@ OUString dropPrefixFromConfigurationPath(OUString const& _sNestedPath,
     }
     else
     {
-        OSL_ENSURE(_sPrefixPath.isEmpty(),  "Path does not start with expected prefix");
+        OSL_ENSURE(_sPrefixPath.empty(),  "Path does not start with expected prefix");
 
         return _sNestedPath;
     }
 }
 
 static
-OUString lcl_wrapName(const OUString& _sContent, const OUString& _sType)
+OUString lcl_wrapName(std::u16string_view _sContent, const OUString& _sType)
 {
-    const sal_Unicode * const pBeginContent = _sContent.getStr();
-    const sal_Unicode * const pEndContent   = pBeginContent + _sContent.getLength();
+    const sal_Unicode * const pBeginContent = _sContent.data();
+    const sal_Unicode * const pEndContent   = pBeginContent + _sContent.size();
 
     OSL_PRECOND(!_sType.isEmpty(), "Unexpected config type name: empty");
     OSL_PRECOND(pBeginContent <= pEndContent, "Invalid config name: empty");
@@ -242,7 +265,7 @@ OUString lcl_wrapName(const OUString& _sContent, const OUString& _sType)
     if (pBeginContent == pEndContent)
         return _sType;
 
-    OUStringBuffer aNormalized(_sType.getLength() + _sContent.getLength() + 4); // reserve approximate size initially
+    OUStringBuffer aNormalized(_sType.getLength() + _sContent.size() + 4); // reserve approximate size initially
 
     // prefix: type, opening bracket and quote
     aNormalized.append( _sType + "['" );
@@ -267,12 +290,12 @@ OUString lcl_wrapName(const OUString& _sContent, const OUString& _sType)
     return aNormalized.makeStringAndClear();
 }
 
-OUString wrapConfigurationElementName(OUString const& _sElementName)
+OUString wrapConfigurationElementName(std::u16string_view _sElementName)
 {
     return lcl_wrapName(_sElementName, "*" );
 }
 
-OUString wrapConfigurationElementName(OUString const& _sElementName,
+OUString wrapConfigurationElementName(std::u16string_view _sElementName,
                                       OUString const& _sTypeName)
 {
     // todo: check that _sTypeName is valid

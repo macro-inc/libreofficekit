@@ -20,7 +20,8 @@
 #pragma once
 
 #include <tools/gen.hxx>
-#include <vcl/errcode.hxx>
+#include <utility>
+#include <comphelper/errcode.hxx>
 #include <vcl/graph.hxx>
 #include <svl/itemset.hxx>
 #include <svl/itempool.hxx>
@@ -40,8 +41,8 @@ struct ScHTMLImage
     Size                aSize;
     Point               aSpace;
     OUString            aFilterName;
-    std::unique_ptr<Graphic>
-                        pGraphic;       // is taken over by WriteToDocument
+    std::optional<Graphic>
+                        oGraphic;       // is taken over by WriteToDocument
     char                nDir;           // 1==hori, 2==verti, 3==both
 
     ScHTMLImage() :
@@ -79,8 +80,8 @@ struct ScEEParseEntry
         nOffset(0), nWidth(0), bHasGraphic(false), bEntirePara(true)
         {}
 
-    ScEEParseEntry( const SfxItemSet& rItemSet ) :
-        aItemSet( rItemSet ),
+    ScEEParseEntry( SfxItemSet _aItemSet ) :
+        aItemSet(std::move( _aItemSet )),
         nCol(SCCOL_MAX), nRow(SCROW_MAX), nTab(0),
         nTwips(0), nColOverlap(1), nRowOverlap(1),
         nOffset(0), nWidth(0), bHasGraphic(false), bEntirePara(true)

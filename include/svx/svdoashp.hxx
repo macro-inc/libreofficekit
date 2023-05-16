@@ -80,7 +80,7 @@ private:
 
 protected:
     virtual std::unique_ptr<sdr::contact::ViewContact> CreateObjectSpecificViewContact() override;
-    virtual void impl_setUnoShape(const css::uno::Reference<css::drawing::XShape>& rxUnoShape) override;
+    virtual void setUnoShape(const css::uno::Reference<css::drawing::XShape>& rxUnoShape) override;
 
 public:
     virtual std::unique_ptr<sdr::properties::BaseProperties> CreateObjectSpecificProperties() override;
@@ -93,7 +93,7 @@ public:
     mutable css::uno::Reference< css::drawing::XCustomShapeEngine > mxCustomShapeEngine;
 
     // #i37011# render geometry shadow
-    SdrObject* mpLastShadowGeometry;
+    rtl::Reference<SdrObject> mpLastShadowGeometry;
 
     css::uno::Reference< css::drawing::XCustomShapeEngine > const & GetCustomShapeEngine() const;
 
@@ -128,8 +128,7 @@ protected:
 
     Size m_aSuggestedTextFrameSize;
 
-    // protected destructor
-    virtual ~SdrObjCustomShape() override;
+    virtual void InternalSetStyleSheet( SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr, bool bBroadcast ) override;
 
 public:
     bool UseNoFillStyle() const;
@@ -144,6 +143,7 @@ public:
 
     SdrObjCustomShape(SdrModel& rSdrModel);
     SdrObjCustomShape(SdrModel& rSdrModel, SdrObjCustomShape const & rSource);
+    virtual ~SdrObjCustomShape() override;
 
     /* is merging default attributes from type-shape into the SdrCustomShapeGeometryItem. If pType
     is NULL then the type is being taken from the "Type" property of the SdrCustomShapeGeometryItem.
@@ -183,8 +183,6 @@ public:
 
     virtual SdrGluePoint GetVertexGluePoint(sal_uInt16 nNum) const override;
 
-    virtual void NbcSetStyleSheet( SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr ) override;
-
     // special drag methods
     virtual bool hasSpecialDrag() const override;
     virtual bool beginSpecialDrag(SdrDragStat& rDrag) const override;
@@ -210,7 +208,7 @@ public:
     virtual void TakeTextAnchorRect( tools::Rectangle& rAnchorRect ) const override;
     virtual void TakeTextRect( SdrOutliner& rOutliner, tools::Rectangle& rTextRect, bool bNoEditText,
         tools::Rectangle* pAnchorRect, bool bLineWidth = true ) const override;
-    virtual SdrObjCustomShape* CloneSdrObject(SdrModel& rTargetModel) const override;
+    virtual rtl::Reference<SdrObject> CloneSdrObject(SdrModel& rTargetModel) const override;
 
     virtual OUString TakeObjNameSingul() const override;
     virtual OUString TakeObjNamePlural() const override;
@@ -222,7 +220,7 @@ public:
 
     virtual void NbcSetOutlinerParaObject(std::optional<OutlinerParaObject> pTextObject) override;
 
-    virtual SdrObjectUniquePtr DoConvertToPolyObj(bool bBezier, bool bAddText) const override;
+    virtual rtl::Reference<SdrObject> DoConvertToPolyObj(bool bBezier, bool bAddText) const override;
 
     // react on model/page change
     virtual void handlePageChange(SdrPage* pOldPage, SdrPage* pNewPage) override;
@@ -243,7 +241,7 @@ public:
     virtual void AddToHdlList(SdrHdlList& rHdlList) const override;
 
     // #i33136#
-    static bool doConstructOrthogonal(const OUString& rName);
+    static bool doConstructOrthogonal(std::u16string_view rName);
 
     using SdrTextObj::NbcSetOutlinerParaObject;
 

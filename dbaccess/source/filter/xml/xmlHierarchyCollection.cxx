@@ -21,15 +21,14 @@
 #include "xmlComponent.hxx"
 #include "xmlColumn.hxx"
 #include "xmlfilter.hxx"
+#include <utility>
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/ProgressBarHelper.hxx>
 #include "xmlEnums.hxx"
 #include <com/sun/star/container/XNameContainer.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <comphelper/propertysequence.hxx>
-#include <osl/diagnose.h>
-#include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace dbaxml
 {
@@ -42,10 +41,10 @@ OXMLHierarchyCollection::OXMLHierarchyCollection( ODBFilter& rImport
                 ,const Reference< XFastAttributeList > & _xAttrList
                 ,const Reference< XNameAccess >& _xParentContainer
                 ,const OUString& _sCollectionServiceName
-                ,const OUString& _sComponentServiceName) :
+                ,OUString _sComponentServiceName) :
     SvXMLImportContext( rImport )
     ,m_sCollectionServiceName(_sCollectionServiceName)
-    ,m_sComponentServiceName(_sComponentServiceName)
+    ,m_sComponentServiceName(std::move(_sComponentServiceName))
 {
     OUString sName;
     for (auto &aIter : sax_fastparser::castToFastAttributeList( _xAttrList ))
@@ -75,7 +74,7 @@ OXMLHierarchyCollection::OXMLHierarchyCollection( ODBFilter& rImport
             m_xContainer.set(xORB->createInstanceWithArguments(_sCollectionServiceName,aArguments),UNO_QUERY);
             Reference<XNameContainer> xNameContainer(_xParentContainer,UNO_QUERY);
             if ( xNameContainer.is() && !xNameContainer->hasByName(sName) )
-                xNameContainer->insertByName(sName,makeAny(m_xContainer));
+                xNameContainer->insertByName(sName,Any(m_xContainer));
         }
     }
     catch(Exception&)

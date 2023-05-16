@@ -57,6 +57,7 @@
 #include <sfx2/sidebar/Panel.hxx>
 #include <EventMultiplexer.hxx>
 #include <unotools/localedatawrapper.hxx>
+#include <utility>
 #include <vcl/EnumContext.hxx>
 #include <vcl/svapp.hxx>
 
@@ -88,7 +89,7 @@ enum eFillStyle
 SlideBackground::SlideBackground(
     weld::Widget* pParent,
     ViewShellBase& rBase,
-    const css::uno::Reference<css::frame::XFrame>& rxFrame,
+    css::uno::Reference<css::frame::XFrame> xFrame,
     SfxBindings* pBindings) :
     PanelLayout( pParent, "SlideBackgroundPanel", "modules/simpress/ui/sidebarslidebackground.ui" ),
     mrBase( rBase ),
@@ -127,7 +128,7 @@ SlideBackground::SlideBackground(
     mpPageItem( new SvxPageItem(SID_ATTR_PAGE) ),
     mbSwitchModeToNormal(false),
     mbSwitchModeToMaster(false),
-    mxFrame(rxFrame),
+    mxFrame(std::move(xFrame)),
     maDrawOtherContext(vcl::EnumContext::Application::Draw, vcl::EnumContext::Context::DrawPage),
     maDrawMasterContext(vcl::EnumContext::Application::Draw, vcl::EnumContext::Context::MasterPage),
     maImpressOtherContext(vcl::EnumContext::Application::Impress, vcl::EnumContext::Context::DrawPage),
@@ -398,10 +399,16 @@ void SlideBackground::Update()
             mxFillGrad2->show();
 
             const XGradient xGradient = GetGradientSetOrDefault();
-            const Color aStartColor = xGradient.GetStartColor();
+            const Color aStartColor(xGradient.GetColorStops().front().getStopColor());
             mxFillGrad1->SelectEntry(aStartColor);
-            const Color aEndColor = xGradient.GetEndColor();
+            const Color aEndColor(xGradient.GetColorStops().back().getStopColor());
             mxFillGrad2->SelectEntry(aEndColor);
+
+            // MCGR: preserve in-between ColorStops if given
+            if (xGradient.GetColorStops().size() > 2)
+                maColorStops = basegfx::ColorStops(xGradient.GetColorStops().begin() + 1, xGradient.GetColorStops().end() - 1);
+            else
+                maColorStops.clear();
         }
         break;
 
@@ -753,11 +760,14 @@ XGradient const & SlideBackground::GetGradientSetOrDefault()
 {
     if( !mpGradientItem )
     {
-        SfxObjectShell* pSh = SfxObjectShell::Current();
-        const SvxGradientListItem * pGradListItem = pSh->GetItem(SID_GRADIENT_LIST);
-        const XGradient aGradient = pGradListItem->GetGradientList()->GetGradient(0)->GetGradient();
-        const OUString aGradientName = pGradListItem->GetGradientList()->GetGradient(0)->GetName();
-
+        XGradient aGradient;
+        OUString aGradientName;
+        if (SfxObjectShell* pSh = SfxObjectShell::Current())
+        {
+            const SvxGradientListItem * pGradListItem = pSh->GetItem(SID_GRADIENT_LIST);
+            aGradient = pGradListItem->GetGradientList()->GetGradient(0)->GetGradient();
+            aGradientName = pGradListItem->GetGradientList()->GetGradient(0)->GetName();
+        }
         mpGradientItem.reset( new XFillGradientItem( aGradientName, aGradient ) );
     }
 
@@ -768,11 +778,14 @@ OUString const & SlideBackground::GetHatchingSetOrDefault()
 {
     if( !mpHatchItem )
     {
-        SfxObjectShell* pSh = SfxObjectShell::Current();
-        const SvxHatchListItem * pHatchListItem = pSh->GetItem(SID_HATCH_LIST);
-        const XHatch aHatch = pHatchListItem->GetHatchList()->GetHatch(0)->GetHatch();
-        const OUString aHatchName = pHatchListItem->GetHatchList()->GetHatch(0)->GetName();
-
+        XHatch aHatch;
+        OUString aHatchName;
+        if (SfxObjectShell* pSh = SfxObjectShell::Current())
+        {
+            const SvxHatchListItem * pHatchListItem = pSh->GetItem(SID_HATCH_LIST);
+            aHatch = pHatchListItem->GetHatchList()->GetHatch(0)->GetHatch();
+            aHatchName = pHatchListItem->GetHatchList()->GetHatch(0)->GetName();
+        }
         mpHatchItem.reset( new XFillHatchItem( aHatchName, aHatch ) );
     }
 
@@ -783,11 +796,14 @@ OUString const & SlideBackground::GetBitmapSetOrDefault()
 {
     if( !mpBitmapItem || mpBitmapItem->isPattern())
     {
-        SfxObjectShell* pSh = SfxObjectShell::Current();
-        const SvxBitmapListItem * pBmpListItem = pSh->GetItem(SID_BITMAP_LIST);
-        const GraphicObject aGraphObj = pBmpListItem->GetBitmapList()->GetBitmap(0)->GetGraphicObject();
-        const OUString aBmpName = pBmpListItem->GetBitmapList()->GetBitmap(0)->GetName();
-
+        GraphicObject aGraphObj;
+        OUString aBmpName;
+        if (SfxObjectShell* pSh = SfxObjectShell::Current())
+        {
+            const SvxBitmapListItem * pBmpListItem = pSh->GetItem(SID_BITMAP_LIST);
+            aGraphObj = pBmpListItem->GetBitmapList()->GetBitmap(0)->GetGraphicObject();
+            aBmpName = pBmpListItem->GetBitmapList()->GetBitmap(0)->GetName();
+        }
         mpBitmapItem.reset( new XFillBitmapItem( aBmpName, aGraphObj ) );
     }
 
@@ -798,11 +814,14 @@ OUString const & SlideBackground::GetPatternSetOrDefault()
 {
     if( !mpBitmapItem || !(mpBitmapItem->isPattern()))
     {
-        SfxObjectShell* pSh = SfxObjectShell::Current();
-        const SvxPatternListItem * pPtrnListItem = pSh->GetItem(SID_PATTERN_LIST);
-        const GraphicObject aGraphObj = pPtrnListItem->GetPatternList()->GetBitmap(0)->GetGraphicObject();
-        const OUString aPtrnName = pPtrnListItem->GetPatternList()->GetBitmap(0)->GetName();
-
+        GraphicObject aGraphObj;
+        OUString aPtrnName;
+        if (SfxObjectShell* pSh = SfxObjectShell::Current())
+        {
+            const SvxPatternListItem * pPtrnListItem = pSh->GetItem(SID_PATTERN_LIST);
+            aGraphObj = pPtrnListItem->GetPatternList()->GetBitmap(0)->GetGraphicObject();
+            aPtrnName = pPtrnListItem->GetPatternList()->GetBitmap(0)->GetName();
+        }
         mpBitmapItem.reset( new XFillBitmapItem( aPtrnName, aGraphObj ) );
     }
 
@@ -1022,30 +1041,42 @@ IMPL_LINK_NOARG(SlideBackground, FillStyleModifyHdl, weld::ComboBox&, void)
 
         case SOLID:
         {
-            const XFillColorItem aItem( OUString(), mpColorItem->GetColorValue() );
-            GetBindings()->GetDispatcher()->ExecuteList(SID_ATTR_PAGE_COLOR, SfxCallMode::RECORD, { &aItem });
+            if (mpColorItem)
+            {
+                const XFillColorItem aItem( OUString(), mpColorItem->GetColorValue() );
+                GetBindings()->GetDispatcher()->ExecuteList(SID_ATTR_PAGE_COLOR, SfxCallMode::RECORD, { &aItem });
+            }
         }
         break;
 
         case GRADIENT:
         {
-            const XFillGradientItem aItem( mpGradientItem->GetName(), mpGradientItem->GetGradientValue() );
-            GetBindings()->GetDispatcher()->ExecuteList(SID_ATTR_PAGE_GRADIENT, SfxCallMode::RECORD, { &aItem });
+            if (mpGradientItem)
+            {
+                const XFillGradientItem aItem( mpGradientItem->GetName(), mpGradientItem->GetGradientValue() );
+                GetBindings()->GetDispatcher()->ExecuteList(SID_ATTR_PAGE_GRADIENT, SfxCallMode::RECORD, { &aItem });
+            }
         }
         break;
 
         case HATCH:
         {
-            const XFillHatchItem aItem( mpHatchItem->GetName(), mpHatchItem->GetHatchValue() );
-            GetBindings()->GetDispatcher()->ExecuteList(SID_ATTR_PAGE_HATCH, SfxCallMode::RECORD, { &aItem });
+            if (mpHatchItem)
+            {
+                const XFillHatchItem aItem( mpHatchItem->GetName(), mpHatchItem->GetHatchValue() );
+                GetBindings()->GetDispatcher()->ExecuteList(SID_ATTR_PAGE_HATCH, SfxCallMode::RECORD, { &aItem });
+            }
         }
         break;
 
         case BITMAP:
         case PATTERN:
         {
-            const XFillBitmapItem aItem( mpBitmapItem->GetName(), mpBitmapItem->GetGraphicObject() );
-            GetBindings()->GetDispatcher()->ExecuteList(SID_ATTR_PAGE_BITMAP, SfxCallMode::RECORD, { &aItem });
+            if (mpBitmapItem)
+            {
+                const XFillBitmapItem aItem( mpBitmapItem->GetName(), mpBitmapItem->GetGraphicObject() );
+                GetBindings()->GetDispatcher()->ExecuteList(SID_ATTR_PAGE_BITMAP, SfxCallMode::RECORD, { &aItem });
+            }
         }
         break;
 
@@ -1102,9 +1133,7 @@ IMPL_LINK_NOARG(SlideBackground, FillColorHdl, ColorListBox&, void)
         break;
         case drawing::FillStyle_GRADIENT:
         {
-            XGradient aGradient;
-            aGradient.SetStartColor(mxFillGrad1->GetSelectEntryColor());
-            aGradient.SetEndColor(mxFillGrad2->GetSelectEntryColor());
+            XGradient aGradient(createColorStops());
 
             // the name doesn't really matter, it'll be converted to unique one eventually,
             // but it has to be non-empty
@@ -1121,6 +1150,8 @@ IMPL_LINK_NOARG(SlideBackground, FillBackgroundHdl, weld::ComboBox&, void)
 {
     const eFillStyle nFillPos = static_cast<eFillStyle>(mxFillStyle->get_active());
     SfxObjectShell* pSh = SfxObjectShell::Current();
+    if (!pSh)
+        return;
     switch(nFillPos)
     {
 
@@ -1255,6 +1286,23 @@ IMPL_LINK_NOARG( SlideBackground, ModifyMarginHdl, weld::ComboBox&, void )
     }
 }
 
+basegfx::ColorStops SlideBackground::createColorStops()
+{
+    basegfx::ColorStops aColorStops;
+
+    aColorStops.emplace_back(0.0, mxFillGrad1->GetSelectEntryColor().getBColor());
+
+    if(!maColorStops.empty())
+    {
+        aColorStops.insert(aColorStops.begin(), maColorStops.begin(), maColorStops.end());
+    }
+
+    aColorStops.emplace_back(1.0, mxFillGrad2->GetSelectEntryColor().getBColor());
+
+    return aColorStops;
 }
+
+}
+
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

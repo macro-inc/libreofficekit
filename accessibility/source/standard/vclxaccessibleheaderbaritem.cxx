@@ -25,7 +25,6 @@
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <cppuhelper/supportsservice.hxx>
 
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
@@ -52,19 +51,19 @@ VCLXAccessibleHeaderBarItem::~VCLXAccessibleHeaderBarItem()
 {
 }
 
-void VCLXAccessibleHeaderBarItem::FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet )
+void VCLXAccessibleHeaderBarItem::FillAccessibleStateSet( sal_Int64& rStateSet )
 {
     if ( m_pHeadBar )
     {
         if ( m_pHeadBar->IsEnabled() )
-            rStateSet.AddState( AccessibleStateType::ENABLED );
+            rStateSet |= AccessibleStateType::ENABLED;
 
         if ( m_pHeadBar->IsVisible() )
         {
-            rStateSet.AddState( AccessibleStateType::VISIBLE );
+            rStateSet |= AccessibleStateType::VISIBLE;
         }
-        rStateSet.AddState( AccessibleStateType::SELECTABLE );
-        rStateSet.AddState( AccessibleStateType::RESIZABLE );
+        rStateSet |= AccessibleStateType::SELECTABLE;
+        rStateSet |= AccessibleStateType::RESIZABLE;
     }
 }
 
@@ -119,13 +118,13 @@ Reference< XAccessibleContext > VCLXAccessibleHeaderBarItem::getAccessibleContex
 // XAccessibleContext
 
 
-sal_Int32 VCLXAccessibleHeaderBarItem::getAccessibleChildCount()
+sal_Int64 VCLXAccessibleHeaderBarItem::getAccessibleChildCount()
 {
     return 0;
 }
 
 
-Reference< XAccessible > VCLXAccessibleHeaderBarItem::getAccessibleChild( sal_Int32 i )
+Reference< XAccessible > VCLXAccessibleHeaderBarItem::getAccessibleChild( sal_Int64 i )
 {
     OExternalLockGuard aGuard( this );
 
@@ -150,7 +149,7 @@ Reference< XAccessible > VCLXAccessibleHeaderBarItem::getAccessibleParent()
 }
 
 
-sal_Int32 VCLXAccessibleHeaderBarItem::getAccessibleIndexInParent()
+sal_Int64 VCLXAccessibleHeaderBarItem::getAccessibleIndexInParent()
 {
     OExternalLockGuard aGuard( this );
     return m_nIndexInParent - 1;
@@ -188,22 +187,22 @@ Reference< XAccessibleRelationSet > VCLXAccessibleHeaderBarItem::getAccessibleRe
 }
 
 
-Reference< XAccessibleStateSet > VCLXAccessibleHeaderBarItem::getAccessibleStateSet(  )
+sal_Int64 VCLXAccessibleHeaderBarItem::getAccessibleStateSet(  )
 {
     OExternalLockGuard aGuard( this );
 
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSetHelper = new utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if ( !rBHelper.bDisposed && !rBHelper.bInDispose )
     {
-        FillAccessibleStateSet( *pStateSetHelper );
+        FillAccessibleStateSet( nStateSet );
     }
     else
     {
-        pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+        nStateSet |= AccessibleStateType::DEFUNC;
     }
 
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 

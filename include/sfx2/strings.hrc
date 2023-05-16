@@ -58,7 +58,6 @@
 #define STR_QRYTEMPL_MESSAGE                    NC_("STR_QRYTEMPL_MESSAGE", "The template '$(ARG1)' on which this document is based, has been modified. Do you want to update the styles of the current document, using the modified template?")
 #define STR_QRYTEMPL_UPDATE_BTN                 NC_("STR_QRYTEMPL_UPDATE_BTN", "~Update Styles")
 #define STR_QRYTEMPL_KEEP_BTN                   NC_("STR_QRYTEMPL_KEEP_BTN", "~Keep Old Styles")
-#define STR_ACTION_REFRESH                      NC_("STR_ACTION_REFRESH", "~Refresh")
 #define STR_CATEGORY_NEW                        NC_("STR_CATEGORY_NEW", "~New Category")
 #define STR_CATEGORY_DELETE                     NC_("STR_CATEGORY_DELETE", "~Delete Category")
 #define STR_MSG_EXPORT_SUCCESS                  NC_("STR_MSG_EXPORT_SUCCESS", "$1 templates successfully exported.")
@@ -98,7 +97,7 @@
 #define STR_NONAME                              NC_("STR_NONAME", "Untitled")
 #define STR_STANDARD_SHORTCUT                   NC_("STR_STANDARD_SHORTCUT", "Standard")
 #define STR_BYTES                               NC_("STR_BYTES", "Bytes")
-#define STR_KB                                  NC_("STR_KB", "KB")
+#define STR_KB                                  NC_("STR_KB", "kB")
 #define STR_MB                                  NC_("STR_MB", "MB")
 #define STR_GB                                  NC_("STR_GB", "GB")
 #define STR_QUERY_LASTVERSION                   NC_("STR_QUERY_LASTVERSION", "Cancel all changes?")
@@ -146,7 +145,7 @@
 #define STR_QUERY_UPDATE_LINKS                  NC_("STR_QUERY_UPDATE_LINKS", "The document %{filename} contains one or more links to external data.\n\nWould you like to change the document, and update all links\nto get the most recent data?")
 #define STR_DDE_ERROR                           NC_("STR_DDE_ERROR", "DDE link to %1 for %2 area %3 are not available.")
 #define STR_SECURITY_WARNING_NO_HYPERLINKS      NC_("STR_SECURITY_WARNING_NO_HYPERLINKS", "For security reasons, the hyperlink cannot be executed.\nThe stated address will not be opened.")
-#define RID_SECURITY_WARNING_TITLE                  NC_("RID_SECURITY_WARNING_TITLE", "Security Warning")
+#define RID_SECURITY_WARNING_TITLE              NC_("RID_SECURITY_WARNING_TITLE", "Security Warning")
 #define RID_SVXSTR_XMLSEC_QUERY_LOSINGSIGNATURE NC_("RID_SVXSTR_XMLSEC_QUERY_LOSINGSIGNATURE", "Saving will remove all existing signatures.\nDo you want to continue saving the document?")
 #define RID_SVXSTR_XMLSEC_QUERY_SAVEBEFORESIGN  NC_("RID_SVXSTR_XMLSEC_QUERY_SAVEBEFORESIGN", "The document has to be saved before it can be signed.\nDo you want to save the document?")
 #define STR_QUERY_CANCELCHECKOUT                NC_("STR_QUERY_CANCELCHECKOUT", "This will discard all changes on the server since check-out.\nDo you want to proceed?")
@@ -213,7 +212,7 @@
 #define STR_SFX_EXPLORERFILE_BUTTONINSERT       NC_("STR_SFX_EXPLORERFILE_BUTTONINSERT", "~Insert")
 #define STR_SFX_IMPORT_ALL_IMAGES               NC_("STR_SFX_IMPORT_ALL_IMAGES", "<All images>")
 #define STR_PB_SAVEACOPY                        NC_("STR_PB_SAVEACOPY", "Save a Copy")
-#define STR_PB_COMPAREDOC                       NC_("STR_PB_COMPAREDOC", "Compare to")
+#define STR_PB_COMPAREDOC                       NC_("STR_PB_COMPAREDOC", "Compare to Original Document")
 #define STR_PB_MERGEDOC                         NC_("STR_PB_MERGEDOC", "Merge with")
 
 #define STR_SFX_NEWOFFICEDOC                    NC_("STR_SFX_NEWOFFICEDOC", "%PRODUCTNAME document")
@@ -293,8 +292,9 @@
 #define STR_HYPHENATION_BUTTON                  NC_("STR_HYPHENATION_BUTTON", "Learn more")
 #define STR_REFRESH_MASTER_PASSWORD             NC_("STR_REFRESH_MASTER_PASSWORD", "The master password is stored in an outdated format, you should refresh it")
 #define STR_REFRESH_PASSWORD                    NC_("STR_REFRESH_PASSWORD", "Refresh Password")
-
-#define STR_CLOSE_PANE                          NC_("STR_CLOSE_PANE", "Close Pane")
+#define STR_CONTAINS_MACROS                     NC_("STR_CONTAINS_MACROS", "The document contains macros.")
+#define STR_MACROS                              NC_("STR_MACROS", "Macros")
+#define STR_EVENTS                              NC_("STR_EVENTS", "Events")
 
 // Translators: default Impress template names
 #define STR_TEMPLATE_NAME1                      NC_("STR_TEMPLATE_NAME1", "Grey Elegant")
@@ -330,6 +330,7 @@
 #define STR_TEMPLATE_NAME30                     NC_("STR_TEMPLATE_NAME30", "Businesscard with logo")
 #define STR_TEMPLATE_NAME31                     NC_("STR_TEMPLATE_NAME31", "Simple")
 #define STR_TEMPLATE_NAME32                     NC_("STR_TEMPLATE_NAME32", "BPMN")
+#define STR_TEMPLATE_NAME33                     NC_("STR_TEMPLATE_NAME33", "Simplified Chinese Normal")
 
 #define STR_CLEAR_CHAR                          NC_("STR_CLEAR_CHAR", "Remove")
 #define STR_CLEAR_ALL_CHAR                      NC_("STR_CLEAR_ALL_CHAR", "Clear All")
@@ -359,6 +360,8 @@
 #define STR_WINDOW_TITLE_RENAME_TEMPLATE        NC_("STR_WINDOW_TITLE_RENAME_TEMPLATE","Rename")
 #define STR_WINDOW_TITLE_RENAME_CATEGORY        NC_("STR_WINDOW_TITLE_RENAME_CATEGORY","Rename Category")
 #define STR_WINDOW_TITLE_RENAME_NEW_CATEGORY    NC_("STR_WINDOW_TITLE_RENAME_NEW_CATEGORY","New Category")
+
+#define STR_OBJECT_INSPECTOR                    NC_("STR_OBJECT_INSPECTOR", "UNO Object Inspector")
 #endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

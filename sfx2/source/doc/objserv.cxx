@@ -39,7 +39,7 @@
 
 #include <com/sun/star/security/DocumentSignatureInformation.hpp>
 #include <com/sun/star/security/DocumentDigitalSignatures.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <svl/whiter.hxx>
 #include <svl/intitem.hxx>
@@ -105,6 +105,7 @@
 #include <unotools/ucbstreamhelper.hxx>
 #include <unotools/streamwrap.hxx>
 #include <comphelper/sequenceashashmap.hxx>
+#include <editeng/unoprnms.hxx>
 
 #include <autoredactdialog.hxx>
 
@@ -270,7 +271,7 @@ void SfxObjectShell::PrintState_Impl(SfxItemSet &rSet)
     rSet.Put( SfxBoolItem( SID_PRINTOUT, bPrinting ) );
 }
 
-bool SfxObjectShell::APISaveAs_Impl(const OUString& aFileName, SfxItemSet& rItemSet,
+bool SfxObjectShell::APISaveAs_Impl(std::u16string_view aFileName, SfxItemSet& rItemSet,
                                     const css::uno::Sequence<css::beans::PropertyValue>& rArgs)
 {
     bool bOk = false;
@@ -665,7 +666,7 @@ void SfxObjectShell::ExecFile_Impl(SfxRequest &rReq)
                 {
                     if (RET_OK == nResult)
                     {
-                        const SfxDocumentInfoItem* pDocInfoItem = SfxItemSet::GetItem<SfxDocumentInfoItem>(xDlg->GetOutputItemSet(), SID_DOCINFO, false);
+                        const SfxDocumentInfoItem* pDocInfoItem = SfxItemSet::GetItem(xDlg->GetOutputItemSet(), SID_DOCINFO, false);
                         if ( pDocInfoItem )
                         {
                             // user has done some changes to DocumentInfo
@@ -853,32 +854,32 @@ void SfxObjectShell::ExecFile_Impl(SfxRequest &rReq)
                         if (sShapeName == "RectangleRedactionShape"
                                 && xInfo->hasPropertyByName("FillTransparence") && xInfo->hasPropertyByName("FillColor"))
                         {
-                            xPropSet->setPropertyValue("FillTransparence", css::uno::makeAny(static_cast<sal_Int16>(0)));
+                            xPropSet->setPropertyValue("FillTransparence", css::uno::Any(static_cast<sal_Int16>(0)));
                             if (sRedactionStyle == "White")
                             {
-                                xPropSet->setPropertyValue("FillColor", css::uno::makeAny(COL_WHITE));
-                                xPropSet->setPropertyValue("LineStyle", css::uno::makeAny(css::drawing::LineStyle::LineStyle_SOLID));
-                                xPropSet->setPropertyValue("LineColor", css::uno::makeAny(COL_BLACK));
+                                xPropSet->setPropertyValue("FillColor", css::uno::Any(COL_WHITE));
+                                xPropSet->setPropertyValue("LineStyle", css::uno::Any(css::drawing::LineStyle::LineStyle_SOLID));
+                                xPropSet->setPropertyValue("LineColor", css::uno::Any(COL_BLACK));
                             }
                             else
                             {
-                                xPropSet->setPropertyValue("FillColor", css::uno::makeAny(COL_BLACK));
-                                xPropSet->setPropertyValue("LineStyle", css::uno::makeAny(css::drawing::LineStyle::LineStyle_NONE));
+                                xPropSet->setPropertyValue("FillColor", css::uno::Any(COL_BLACK));
+                                xPropSet->setPropertyValue("LineStyle", css::uno::Any(css::drawing::LineStyle::LineStyle_NONE));
                             }
                         }
                         // Freeform redaction
                         else if (sShapeName == "FreeformRedactionShape"
                                  && xInfo->hasPropertyByName("LineTransparence") && xInfo->hasPropertyByName("LineColor"))
                         {
-                            xPropSet->setPropertyValue("LineTransparence", css::uno::makeAny(static_cast<sal_Int16>(0)));
+                            xPropSet->setPropertyValue("LineTransparence", css::uno::Any(static_cast<sal_Int16>(0)));
 
                             if (sRedactionStyle == "White")
                             {
-                                xPropSet->setPropertyValue("LineColor", css::uno::makeAny(COL_WHITE));
+                                xPropSet->setPropertyValue("LineColor", css::uno::Any(COL_WHITE));
                             }
                             else
                             {
-                                xPropSet->setPropertyValue("LineColor", css::uno::makeAny(COL_BLACK));
+                                xPropSet->setPropertyValue("LineColor", css::uno::Any(COL_BLACK));
                             }
                         }
                     }
@@ -953,7 +954,7 @@ void SfxObjectShell::ExecFile_Impl(SfxRequest &rReq)
 
                     if ( xStatusIndicator.is() )
                     {
-                        SfxUnoAnyItem aStatIndItem( SID_PROGRESS_STATUSBAR_CONTROL, uno::makeAny( xStatusIndicator ) );
+                        SfxUnoAnyItem aStatIndItem( SID_PROGRESS_STATUSBAR_CONTROL, uno::Any( xStatusIndicator ) );
 
                         if ( nId == SID_SAVEDOC )
                         {
@@ -986,7 +987,7 @@ void SfxObjectShell::ExecFile_Impl(SfxRequest &rReq)
                     uno::Reference< task::XInteractionHandler2 > xInteract(
                         task::InteractionHandler::createWithParent(xContext, xParentWindow) );
 
-                    SfxUnoAnyItem aInteractionItem( SID_INTERACTIONHANDLER, uno::makeAny( xInteract ) );
+                    SfxUnoAnyItem aInteractionItem( SID_INTERACTIONHANDLER, uno::Any( xInteract ) );
                     if ( nId == SID_SAVEDOC )
                     {
                         // in case of saving it is not possible to transport the parameters from here
@@ -1031,6 +1032,18 @@ void SfxObjectShell::ExecFile_Impl(SfxRequest &rReq)
                         uno::Reference< uno::XInterface >(), sal_uInt32(ERRCODE_IO_ABORT));
                 }
 
+                const SfxBoolItem *pItem = nId != SID_DIRECTEXPORTDOCASPDF ? nullptr :
+                    dynamic_cast<const SfxBoolItem*>( GetSlotState(SID_MAIL_PREPAREEXPORT) );
+                // Fetch value from the pool item early, because GUIStoreModel() can free the pool
+                // item as part of spinning the main loop if a dialog is opened.
+                bool bMailPrepareExport = pItem && pItem->GetValue();
+                if (bMailPrepareExport)
+                {
+                    SfxRequest aRequest(SID_MAIL_PREPAREEXPORT, SfxCallMode::SYNCHRON, GetPool());
+                    aRequest.AppendItem(SfxBoolItem(FN_NOUPDATE, true));
+                    ExecuteSlot(aRequest);
+                }
+
                 xHelper->GUIStoreModel( GetModel(),
                                        OUString::createFromAscii( pSlot->GetUnoName() ),
                                        aDispatchArgs,
@@ -1038,6 +1051,11 @@ void SfxObjectShell::ExecFile_Impl(SfxRequest &rReq)
                                        GetDocumentSignatureState(),
                                        bIsAsync );
 
+                if (bMailPrepareExport)
+                {
+                    SfxRequest aRequest(SID_MAIL_EXPORT_FINISHED, SfxCallMode::SYNCHRON, GetPool());
+                    ExecuteSlot(aRequest);
+                }
 
                 // merge aDispatchArgs to the request
                 SfxAllItemSet aResultParams( GetPool() );
@@ -1057,7 +1075,7 @@ void SfxObjectShell::ExecFile_Impl(SfxRequest &rReq)
             }
             catch( const task::ErrorCodeIOException& aErrorEx )
             {
-                TOOLS_WARN_EXCEPTION( "sfx.doc", "Fatal IO error during save");
+                TOOLS_WARN_EXCEPTION_IF(ErrCode(aErrorEx.ErrCode) != ERRCODE_IO_ABORT, "sfx.doc", "Fatal IO error during save");
                 nErrorCode = ErrCode(aErrorEx.ErrCode);
             }
             catch( Exception& )
@@ -1085,7 +1103,7 @@ void SfxObjectShell::ExecFile_Impl(SfxRequest &rReq)
             {
                 if (comphelper::LibreOfficeKit::isActive())
                     sendErrorToLOK(lErr);
-                else
+                else if (!(lErr == ERRCODE_IO_GENERAL && bIsPDFExport))
                 {
                     SfxErrorContext aEc(ERRCTX_SFX_SAVEASDOC,GetTitle());
                     ErrorHandler::HandleError(lErr, pDialogParent);
@@ -1151,16 +1169,16 @@ void SfxObjectShell::ExecFile_Impl(SfxRequest &rReq)
                             if (sShapeName == "RectangleRedactionShape"
                                     && xInfo->hasPropertyByName("FillTransparence") && xInfo->hasPropertyByName("FillColor"))
                             {
-                                xPropSet->setPropertyValue("FillTransparence", css::uno::makeAny(static_cast<sal_Int16>(50)));
-                                xPropSet->setPropertyValue("FillColor", css::uno::makeAny(COL_GRAY7));
-                                xPropSet->setPropertyValue("LineStyle", css::uno::makeAny(css::drawing::LineStyle::LineStyle_NONE));
+                                xPropSet->setPropertyValue("FillTransparence", css::uno::Any(static_cast<sal_Int16>(50)));
+                                xPropSet->setPropertyValue("FillColor", css::uno::Any(COL_GRAY7));
+                                xPropSet->setPropertyValue("LineStyle", css::uno::Any(css::drawing::LineStyle::LineStyle_NONE));
 
                             }
                             // Freeform redaction
                             else if (sShapeName == "FreeformRedactionShape")
                             {
-                                xPropSet->setPropertyValue("LineTransparence", css::uno::makeAny(static_cast<sal_Int16>(50)));
-                                xPropSet->setPropertyValue("LineColor", css::uno::makeAny(COL_GRAY7));
+                                xPropSet->setPropertyValue("LineTransparence", css::uno::Any(static_cast<sal_Int16>(50)));
+                                xPropSet->setPropertyValue("LineColor", css::uno::Any(COL_GRAY7));
                             }
                         }
                     }
@@ -2161,6 +2179,36 @@ const uno::Sequence<sal_Int8>& SfxObjectShell::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit theSfxObjectShellUnoTunnelId;
     return theSfxObjectShellUnoTunnelId.getSeq();
+}
+
+uno::Sequence< beans::PropertyValue > SfxObjectShell::GetDocumentProtectionFromGrabBag() const
+{
+    uno::Reference<frame::XModel> xModel = GetBaseModel();
+
+    if (!xModel.is())
+    {
+        return uno::Sequence< beans::PropertyValue>();
+    }
+
+    uno::Reference< beans::XPropertySet > xPropSet( xModel, uno::UNO_QUERY_THROW );
+    uno::Reference< beans::XPropertySetInfo > xPropSetInfo = xPropSet->getPropertySetInfo();
+    const OUString aGrabBagName = UNO_NAME_MISC_OBJ_INTEROPGRABBAG;
+    if ( xPropSetInfo->hasPropertyByName( aGrabBagName ) )
+    {
+        uno::Sequence< beans::PropertyValue > propList;
+        xPropSet->getPropertyValue( aGrabBagName ) >>= propList;
+        for( const auto& rProp : std::as_const(propList) )
+        {
+            if (rProp.Name == "DocumentProtection")
+            {
+                uno::Sequence< beans::PropertyValue > rAttributeList;
+                rProp.Value >>= rAttributeList;
+                return rAttributeList;
+            }
+        }
+    }
+
+    return uno::Sequence< beans::PropertyValue>();
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

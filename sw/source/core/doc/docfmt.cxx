@@ -230,12 +230,12 @@ void SwDoc::RstTextAttrs(const SwPaM &rRg, bool bInclRefToxMark,
         pHst = &pUndo->GetHistory();
         GetIDocumentUndoRedo().AppendUndo(std::move(pUndo));
     }
-    const SwPosition *pStt = rRg.Start(), *pEnd = rRg.End();
+    auto [pStt, pEnd] = rRg.StartEnd(); // SwPosition*
     sw::DocumentContentOperationsManager::ParaRstFormat aPara(
             pStt, pEnd, pHst, nullptr, pLayout );
     aPara.bInclRefToxMark = bInclRefToxMark;
     aPara.bExactRange = bExactRange;
-    GetNodes().ForEach( pStt->nNode.GetIndex(), pEnd->nNode.GetIndex()+1,
+    GetNodes().ForEach( pStt->GetNodeIndex(), pEnd->GetNodeIndex()+1,
                         sw::DocumentContentOperationsManager::lcl_RstTextAttr, &aPara );
     getIDocumentState().SetModified();
 }
@@ -247,23 +247,25 @@ void SwDoc::ResetAttrs( const SwPaM &rRg,
                         SwRootFrame const*const pLayout)
 {
     SwPaM* pPam = const_cast<SwPaM*>(&rRg);
+    std::optional<SwPaM> oExtraPaM;
     if( !bTextAttr && !rAttrs.empty() && RES_TXTATR_END > *(rAttrs.begin()) )
         bTextAttr = true;
 
     if( !rRg.HasMark() )
     {
-        SwTextNode* pTextNd = rRg.GetPoint()->nNode.GetNode().GetTextNode();
+        SwTextNode* pTextNd = rRg.GetPoint()->GetNode().GetTextNode();
         if( !pTextNd )
             return ;
 
-        pPam = new SwPaM( *rRg.GetPoint() );
+        oExtraPaM.emplace( *rRg.GetPoint() );
+        pPam = &*oExtraPaM;
 
-        SwIndex& rSt = pPam->GetPoint()->nContent;
-        sal_Int32 nMkPos, nPtPos = rSt.GetIndex();
+        SwPosition& rSt = *pPam->GetPoint();
+        sal_Int32 nMkPos, nPtPos = rSt.GetContentIndex();
 
         // Special case: if the Cursor is located within a URL attribute, we take over it's area
         SwTextAttr const*const pURLAttr(
-            pTextNd->GetTextAttrAt(rSt.GetIndex(), RES_TXTATR_INETFMT));
+            pTextNd->GetTextAttrAt(rSt.GetContentIndex(), RES_TXTATR_INETFMT));
         if (pURLAttr && !pURLAttr->GetINetFormat().GetValue().isEmpty())
         {
             nMkPos = pURLAttr->GetStart();
@@ -285,22 +287,22 @@ void SwDoc::ResetAttrs( const SwPaM &rRg,
             }
             else
             {
-                nPtPos = nMkPos = rSt.GetIndex();
+                nPtPos = nMkPos = rSt.GetContentIndex();
                 if( bTextAttr )
-                    pTextNd->DontExpandFormat( rSt );
+                    pTextNd->DontExpandFormat( nPtPos );
             }
         }
 
-        rSt = nMkPos;
+        rSt.SetContent(nMkPos);
         pPam->SetMark();
-        pPam->GetPoint()->nContent = nPtPos;
+        pPam->GetPoint()->SetContent(nPtPos);
     }
 
     // #i96644#
-    std::unique_ptr< SwDataChanged > xDataChanged;
+    std::optional< SwDataChanged > oDataChanged;
     if ( bSendDataChangedEvents )
     {
-        xDataChanged.reset( new SwDataChanged( *pPam ) );
+        oDataChanged.emplace( *pPam );
     }
     SwHistory* pHst = nullptr;
     if (GetIDocumentUndoRedo().DoesUndo())
@@ -315,7 +317,7 @@ void SwDoc::ResetAttrs( const SwPaM &rRg,
         GetIDocumentUndoRedo().AppendUndo(std::move(pUndo));
     }
 
-    const SwPosition *pStt = pPam->Start(), *pEnd = pPam->End();
+    auto [pStt, pEnd] = pPam->StartEnd(); // SwPosition*
     sw::DocumentContentOperationsManager::ParaRstFormat aPara(
             pStt, pEnd, pHst, nullptr, pLayout);
 
@@ -334,9 +336,9 @@ void SwDoc::ResetAttrs( const SwPaM &rRg,
         aPara.pDelSet = &aDelSet;
 
     bool bAdd = true;
-    SwNodeIndex aTmpStt( pStt->nNode );
-    SwNodeIndex aTmpEnd( pEnd->nNode );
-    if( pStt->nContent.GetIndex() )     // just one part
+    SwNodeIndex aTmpStt( pStt->GetNode() );
+    SwNodeIndex aTmpEnd( pEnd->GetNode() );
+    if( pStt->GetContentIndex() )     // just one part
     {
         // set up a later, and all CharFormatAttr -> TextFormatAttr
         SwTextNode* pTNd = aTmpStt.GetNode().GetTextNode();
@@ -355,13 +357,13 @@ void SwDoc::ResetAttrs( const SwPaM &rRg,
 
         ++aTmpStt;
     }
-    if( pEnd->nContent.GetIndex() == pEnd->nNode.GetNode().GetContentNode()->Len() )
+    if( pEnd->GetContentIndex() == pEnd->GetNode().GetContentNode()->Len() )
     {
          // set up a later, and all CharFormatAttr -> TextFormatAttr
         ++aTmpEnd;
         bAdd = false;
     }
-    else if( pStt->nNode != pEnd->nNode || !pStt->nContent.GetIndex() )
+    else if( pStt->GetNode() != pEnd->GetNode() || !pStt->GetContentIndex() )
     {
         SwTextNode* pTNd = aTmpEnd.GetNode().GetTextNode();
         if( pTNd && pTNd->HasSwAttrSet() && pTNd->GetpSwAttrSet()->Count() )
@@ -379,11 +381,11 @@ void SwDoc::ResetAttrs( const SwPaM &rRg,
     }
 
     if( aTmpStt < aTmpEnd )
-        GetNodes().ForEach( pStt->nNode, aTmpEnd, lcl_RstAttr, &aPara );
+        GetNodes().ForEach( pStt->GetNode(), aTmpEnd.GetNode(), lcl_RstAttr, &aPara );
     else if( !rRg.HasMark() )
     {
         aPara.bResetAll = false ;
-        ::lcl_RstAttr( &pStt->nNode.GetNode(), &aPara );
+        ::lcl_RstAttr( &pStt->GetNode(), &aPara );
         aPara.bResetAll = true ;
     }
 
@@ -391,15 +393,12 @@ void SwDoc::ResetAttrs( const SwPaM &rRg,
     {
         if( bAdd )
             ++aTmpEnd;
-        GetNodes().ForEach( pStt->nNode, aTmpEnd, sw::DocumentContentOperationsManager::lcl_RstTextAttr, &aPara );
+        GetNodes().ForEach( pStt->GetNode(), aTmpEnd.GetNode(), sw::DocumentContentOperationsManager::lcl_RstTextAttr, &aPara );
     }
 
     getIDocumentState().SetModified();
 
-    xDataChanged.reset(); //before delete pPam
-
-    if( pPam != &rRg )
-        delete pPam;
+    oDataChanged.reset(); //before delete pPam
 }
 
 /// Set the rsid of the next nLen symbols of rRg to the current session number
@@ -408,18 +407,18 @@ void SwDoc::UpdateRsid( const SwPaM &rRg, const sal_Int32 nLen )
     if (!SW_MOD()->GetModuleConfig()->IsStoreRsid())
         return;
 
-    SwTextNode *pTextNode = rRg.GetPoint()->nNode.GetNode().GetTextNode();
+    SwTextNode *pTextNode = rRg.GetPoint()->GetNode().GetTextNode();
     if (!pTextNode)
     {
         return;
     }
-    const sal_Int32 nStart(rRg.GetPoint()->nContent.GetIndex() - nLen);
+    const sal_Int32 nStart(rRg.GetPoint()->GetContentIndex() - nLen);
     SvxRsidItem aRsid( mnRsid, RES_CHRATR_RSID );
 
     SfxItemSetFixed<RES_CHRATR_RSID, RES_CHRATR_RSID> aSet(GetAttrPool());
     aSet.Put(aRsid);
     bool const bRet(pTextNode->SetAttr(aSet, nStart,
-        rRg.GetPoint()->nContent.GetIndex()));
+        rRg.GetPoint()->GetContentIndex()));
 
     if (bRet && GetIDocumentUndoRedo().DoesUndo())
     {
@@ -617,16 +616,14 @@ void SwDoc::SetDefault( const SfxItemSet& rSet )
             GetIDocumentUndoRedo().AppendUndo( std::make_unique<SwUndoDefaultAttr>( aOld, *this ) );
         }
 
-        const SfxPoolItem* pTmpItem;
-        if( ( SfxItemState::SET ==
-                aNew.GetItemState( RES_PARATR_TABSTOP, false, &pTmpItem ) ) &&
-            pTmpItem->StaticWhichCast(RES_PARATR_TABSTOP).Count() )
+        const SvxTabStopItem* pTmpItem = aNew.GetItemIfSet( RES_PARATR_TABSTOP, false );
+        if( pTmpItem && pTmpItem->Count() )
         {
             // Set the default values of all TabStops to the new value.
             // Attention: we always work with the PoolAttribute here, so that
             // we don't calculate the same value on the same TabStop (pooled!) for all sets.
             // We send a FormatChg to modify.
-            SwTwips nNewWidth = pTmpItem->StaticWhichCast(RES_PARATR_TABSTOP)[ 0 ].GetTabPos(),
+            SwTwips nNewWidth = (*pTmpItem)[ 0 ].GetTabPos(),
                     nOldWidth = aOld.Get(RES_PARATR_TABSTOP)[ 0 ].GetTabPos();
 
             bool bChg = false;
@@ -921,7 +918,6 @@ SwFormat *SwDoc::MakeTextFormatColl_(const OUString &rFormatName,
     return pTextFormatColl;
 }
 
-//FEATURE::CONDCOLL
 SwConditionTextFormatColl* SwDoc::MakeCondTextFormatColl( const OUString &rFormatName,
                                                   SwTextFormatColl *pDerivedFrom,
                                                   bool bBroadcast)
@@ -945,7 +941,6 @@ SwConditionTextFormatColl* SwDoc::MakeCondTextFormatColl( const OUString &rForma
 
     return pFormatColl;
 }
-//FEATURE::CONDCOLL
 
 // GRF
 SwGrfFormatColl* SwDoc::MakeGrfFormatColl( const OUString &rFormatName,
@@ -1020,7 +1015,7 @@ static bool lcl_SetTextFormatColl( SwNode* pNode, void* pArgs )
         }
         if (pCNd->IsTextNode())
         {
-            pCNd = sw::GetParaPropsNode(*pPara->pLayout, SwNodeIndex(*pCNd));
+            pCNd = sw::GetParaPropsNode(*pPara->pLayout, *pCNd);
         }
     }
 
@@ -1036,7 +1031,7 @@ static bool lcl_SetTextFormatColl( SwNode* pNode, void* pArgs )
         {
             // Check, if the list style of the paragraph will change.
             bool bChangeOfListStyleAtParagraph( true );
-            SwTextNode& rTNd(dynamic_cast<SwTextNode&>(*pCNd));
+            SwTextNode& rTNd(*pCNd->GetTextNode());
             {
                 SwNumRule* pNumRuleAtParagraph(rTNd.GetNumRule());
                 if ( pNumRuleAtParagraph )
@@ -1090,7 +1085,7 @@ bool SwDoc::SetTextFormatColl(const SwPaM &rRg,
                           SwRootFrame const*const pLayout)
 {
     SwDataChanged aTmp( rRg );
-    const SwPosition *pStt = rRg.Start(), *pEnd = rRg.End();
+    auto [pStt, pEnd] = rRg.StartEnd(); // SwPosition*
     SwHistory* pHst = nullptr;
     bool bRet = true;
 
@@ -1110,7 +1105,7 @@ bool SwDoc::SetTextFormatColl(const SwPaM &rRg,
     // #i62675#
     aPara.bResetListAttrs = bResetListAttrs;
 
-    GetNodes().ForEach( pStt->nNode.GetIndex(), pEnd->nNode.GetIndex()+1,
+    GetNodes().ForEach( pStt->GetNodeIndex(), pEnd->GetNodeIndex()+1,
                         lcl_SetTextFormatColl, &aPara );
     if( !aPara.nWhich )
         bRet = false;           // didn't find a valid Node
@@ -1186,7 +1181,6 @@ SwTextFormatColl* SwDoc::CopyTextColl( const SwTextFormatColl& rColl )
     if( pParent != rColl.DerivedFrom() )
         pParent = CopyTextColl( *static_cast<SwTextFormatColl*>(rColl.DerivedFrom()) );
 
-//FEATURE::CONDCOLL
     if( RES_CONDTXTFMTCOLL == rColl.Which() )
     {
         pNewColl = new SwConditionTextFormatColl( GetAttrPool(), rColl.GetName(),
@@ -1200,7 +1194,6 @@ SwTextFormatColl* SwDoc::CopyTextColl( const SwTextFormatColl& rColl )
                             static_cast<const SwConditionTextFormatColl&>(rColl).GetCondColls() );
     }
     else
-//FEATURE::CONDCOLL
         pNewColl = MakeTextFormatColl( rColl.GetName(), pParent );
 
     // copy the auto formats or the attributes
@@ -1220,11 +1213,11 @@ SwTextFormatColl* SwDoc::CopyTextColl( const SwTextFormatColl& rColl )
     // create the NumRule if necessary
     if( this != rColl.GetDoc() )
     {
-        const SfxPoolItem* pItem;
-        if( SfxItemState::SET == pNewColl->GetItemState( RES_PARATR_NUMRULE,
-            false, &pItem ))
+        const SwNumRuleItem* pItem = pNewColl->GetItemIfSet( RES_PARATR_NUMRULE,
+            false );
+        if( pItem )
         {
-            const OUString& rName = pItem->StaticWhichCast(RES_PARATR_NUMRULE).GetValue();
+            const OUString& rName = pItem->GetValue();
             if( !rName.isEmpty() )
             {
                 const SwNumRule* pRule = rColl.GetDoc()->FindNumRulePtr( rName );
@@ -1305,12 +1298,12 @@ void SwDoc::CopyFormatArr( const SwFormatsBase& rSourceArr,
         pDest->DelDiffs( *pSrc );
 
         // #i94285#: existing <SwFormatPageDesc> instance, before copying attributes
-        const SfxPoolItem* pItem;
+        const SwFormatPageDesc* pItem;
         if( &GetAttrPool() != pSrc->GetAttrSet().GetPool()
-                && SfxItemState::SET == pSrc->GetAttrSet().GetItemState( RES_PAGEDESC, false, &pItem )
-                && pItem->StaticWhichCast(RES_PAGEDESC).GetPageDesc() )
+                && (pItem = pSrc->GetAttrSet().GetItemIfSet( RES_PAGEDESC, false ))
+                && pItem->GetPageDesc() )
         {
-            SwFormatPageDesc aPageDesc( pItem->StaticWhichCast(RES_PAGEDESC) );
+            SwFormatPageDesc aPageDesc( *pItem );
             const OUString& rNm = aPageDesc.GetPageDesc()->GetName();
             SwPageDesc* pPageDesc = FindPageDesc( rNm );
             if( !pPageDesc )
@@ -1348,7 +1341,6 @@ void SwDoc::CopyFormatArr( const SwFormatsBase& rSourceArr,
             if(pSrcColl->IsAssignedToListLevelOfOutlineStyle())
                 pDstColl->AssignToListLevelOfOutlineStyle(pSrcColl->GetAssignedOutlineStyleLevel());
 
-//FEATURE::CONDCOLL
             if( RES_CONDTXTFMTCOLL == pSrc->Which() )
             {
                 if (pDstColl->Which() != RES_CONDTXTFMTCOLL)
@@ -1362,7 +1354,6 @@ void SwDoc::CopyFormatArr( const SwFormatsBase& rSourceArr,
                 static_cast<SwConditionTextFormatColl*>(pDstColl)->SetConditions(
                             static_cast<SwConditionTextFormatColl*>(pSrc)->GetCondColls() );
             }
-//FEATURE::CONDCOLL
         }
     }
 }
@@ -1393,27 +1384,23 @@ void SwDoc::CopyPageDescHeaderFooterImpl( bool bCpyHeader,
                                         GetDfltFrameFormat() );
     pNewFormat->CopyAttrs( *pOldFormat );
 
-    if( SfxItemState::SET == pNewFormat->GetAttrSet().GetItemState(
-        RES_CNTNT, false, &pItem ))
+    if( const SwFormatContent* pContent = pNewFormat->GetAttrSet().GetItemIfSet(
+        RES_CNTNT, false ) )
     {
-        const SwFormatContent* pContent = &pItem->StaticWhichCast(RES_CNTNT);
         if( pContent->GetContentIdx() )
         {
-            SwNodeIndex aTmpIdx( GetNodes().GetEndOfAutotext() );
             const SwNodes& rSrcNds = rSrcFormat.GetDoc()->GetNodes();
-            SwStartNode* pSttNd = SwNodes::MakeEmptySection( aTmpIdx,
+            SwStartNode* pSttNd = SwNodes::MakeEmptySection( GetNodes().GetEndOfAutotext(),
                                             bCpyHeader
                                                 ? SwHeaderStartNode
                                                 : SwFooterStartNode );
             const SwNode& rCSttNd = pContent->GetContentIdx()->GetNode();
             SwNodeRange aRg( rCSttNd, SwNodeOffset(0), *rCSttNd.EndOfSectionNode() );
-            aTmpIdx = *pSttNd->EndOfSectionNode();
-            rSrcNds.Copy_( aRg, aTmpIdx );
-            aTmpIdx = *pSttNd;
-            rSrcFormat.GetDoc()->GetDocumentContentOperationsManager().CopyFlyInFlyImpl(aRg, nullptr, aTmpIdx);
+            rSrcNds.Copy_( aRg, *pSttNd->EndOfSectionNode() );
+            rSrcFormat.GetDoc()->GetDocumentContentOperationsManager().CopyFlyInFlyImpl(aRg, nullptr, *pSttNd);
             // TODO: investigate calling CopyWithFlyInFly?
             SwPaM const source(aRg.aStart, aRg.aEnd);
-            SwPosition dest(aTmpIdx);
+            SwPosition dest(*pSttNd);
             sw::CopyBookmarks(source, dest);
             pNewFormat->SetFormatAttr( SwFormatContent( pSttNd ));
         }
@@ -1655,14 +1642,14 @@ void SwDoc::MoveLeftMargin(const SwPaM& rPam, bool bRight, bool bModulus,
     const SvxTabStopItem& rTabItem = GetDefault( RES_PARATR_TABSTOP );
     const sal_Int32 nDefDist = rTabItem.Count() ? rTabItem[0].GetTabPos() : 1134;
     const SwPosition &rStt = *rPam.Start(), &rEnd = *rPam.End();
-    SwNodeIndex aIdx( rStt.nNode );
-    while( aIdx <= rEnd.nNode )
+    SwNodeIndex aIdx( rStt.GetNode() );
+    while( aIdx <= rEnd.GetNode() )
     {
         SwTextNode* pTNd = aIdx.GetNode().GetTextNode();
         if( pTNd )
         {
-            pTNd = sw::GetParaPropsNode(*pLayout, aIdx);
-            SvxLRSpaceItem aLS(pTNd->SwContentNode::GetAttr(RES_LR_SPACE).StaticWhichCast(RES_LR_SPACE));
+            pTNd = sw::GetParaPropsNode(*pLayout, aIdx.GetNode());
+            SvxLRSpaceItem aLS(pTNd->SwContentNode::GetAttr(RES_LR_SPACE));
 
             // #i93873# See also lcl_MergeListLevelIndentAsLRSpaceItem in thints.cxx
             if ( pTNd->AreListLevelIndentsApplicable() )
@@ -1697,7 +1684,7 @@ void SwDoc::MoveLeftMargin(const SwPaM& rPam, bool bRight, bool bModulus,
 
             SwRegHistory aRegH( pTNd, *pTNd, pHistory );
             pTNd->SetAttr( aLS );
-            aIdx = *sw::GetFirstAndLastNode(*pLayout, aIdx).second;
+            aIdx = *sw::GetFirstAndLastNode(*pLayout, aIdx.GetNode()).second;
         }
         ++aIdx;
     }
@@ -1707,10 +1694,10 @@ void SwDoc::MoveLeftMargin(const SwPaM& rPam, bool bRight, bool bModulus,
 bool SwDoc::DontExpandFormat( const SwPosition& rPos, bool bFlag )
 {
     bool bRet = false;
-    SwTextNode* pTextNd = rPos.nNode.GetNode().GetTextNode();
+    SwTextNode* pTextNd = rPos.GetNode().GetTextNode();
     if( pTextNd )
     {
-        bRet = pTextNd->DontExpandFormat( rPos.nContent, bFlag );
+        bRet = pTextNd->DontExpandFormat( rPos.GetContentIndex(), bFlag );
         if( bRet && GetIDocumentUndoRedo().DoesUndo() )
         {
             GetIDocumentUndoRedo().AppendUndo( std::make_unique<SwUndoDontExpandFormat>(rPos) );
@@ -1722,7 +1709,7 @@ bool SwDoc::DontExpandFormat( const SwPosition& rPos, bool bFlag )
 SwTableBoxFormat* SwDoc::MakeTableBoxFormat()
 {
     SwTableBoxFormat* pFormat = new SwTableBoxFormat( GetAttrPool(), mpDfltFrameFormat.get() );
-    pFormat->SetName("TableBox" + OUString::number(reinterpret_cast<sal_IntPtr>(pFormat)));
+    pFormat->SetFormatName("TableBox" + OUString::number(reinterpret_cast<sal_IntPtr>(pFormat)));
     getIDocumentState().SetModified();
     return pFormat;
 }
@@ -1730,7 +1717,7 @@ SwTableBoxFormat* SwDoc::MakeTableBoxFormat()
 SwTableLineFormat* SwDoc::MakeTableLineFormat()
 {
     SwTableLineFormat* pFormat = new SwTableLineFormat( GetAttrPool(), mpDfltFrameFormat.get() );
-    pFormat->SetName("TableLine" + OUString::number(reinterpret_cast<sal_IntPtr>(pFormat)));
+    pFormat->SetFormatName("TableLine" + OUString::number(reinterpret_cast<sal_IntPtr>(pFormat)));
     getIDocumentState().SetModified();
     return pFormat;
 }
@@ -1777,7 +1764,7 @@ void SwDoc::SetTextFormatCollByAutoFormat( const SwPosition& rPos, sal_uInt16 nP
                                     const SfxItemSet* pSet )
 {
     SwPaM aPam( rPos );
-    SwTextNode* pTNd = rPos.nNode.GetNode().GetTextNode();
+    SwTextNode* pTNd = rPos.GetNode().GetTextNode();
     assert(pTNd);
 
     if (mbIsAutoFormatRedline)
@@ -1813,7 +1800,7 @@ void SwDoc::SetTextFormatCollByAutoFormat( const SwPosition& rPos, sal_uInt16 nP
     if (pSet && pSet->Count())
     {
         aPam.SetMark();
-        aPam.GetMark()->nContent.Assign(pTNd, pTNd->GetText().getLength());
+        aPam.GetMark()->SetContent(pTNd->GetText().getLength());
         // sw_redlinehide: don't need layout currently because the only caller
         // passes in the properties node
         assert(static_cast<SwTextFrame const*>(pTNd->getLayoutFrame(nullptr))->GetTextNodeForParaProps() == pTNd);
@@ -1823,7 +1810,7 @@ void SwDoc::SetTextFormatCollByAutoFormat( const SwPosition& rPos, sal_uInt16 nP
 
 void SwDoc::SetFormatItemByAutoFormat( const SwPaM& rPam, const SfxItemSet& rSet )
 {
-    SwTextNode* pTNd = rPam.GetPoint()->nNode.GetNode().GetTextNode();
+    SwTextNode* pTNd = rPam.GetPoint()->GetNode().GetTextNode();
     assert(pTNd);
 
     RedlineFlags eOld = getIDocumentRedlineAccess().GetRedlineFlags();
@@ -1847,7 +1834,7 @@ void SwDoc::SetFormatItemByAutoFormat( const SwPaM& rPam, const SfxItemSet& rSet
         getIDocumentRedlineAccess().SetRedlineFlags_intern( eOld | RedlineFlags::Ignore );
     }
 
-    const sal_Int32 nEnd(rPam.End()->nContent.GetIndex());
+    const sal_Int32 nEnd(rPam.End()->GetContentIndex());
     std::vector<WhichPair> whichIds;
     SfxItemIter iter(rSet);
     for (SfxPoolItem const* pItem = iter.GetCurItem(); pItem; pItem = iter.NextItem())
@@ -1942,7 +1929,7 @@ void SwDoc::RenameFormat(SwFormat & rFormat, const OUString & sNewName,
     if (rFormat.Which() == RES_CHRFMT)
         mpCharFormatTable->SetFormatNameAndReindex(static_cast<SwCharFormat*>(&rFormat), sNewName);
     else
-        rFormat.SetName(sNewName);
+        rFormat.SetFormatName(sNewName);
 
     if (bBroadcast)
         BroadcastStyleOperation(sNewName, eFamily, SfxHintId::StyleSheetModified);

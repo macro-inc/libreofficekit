@@ -538,7 +538,7 @@ bool GalleryTheme::InsertTransferable(const uno::Reference< datatransfer::XTrans
     if( rxTransferable.is() )
     {
         TransferableDataHelper  aDataHelper( rxTransferable );
-        std::unique_ptr<Graphic> pGraphic;
+        std::optional<Graphic> oGraphic;
 
         if( aDataHelper.HasFormat( SotClipboardFormatId::DRAWING ) )
         {
@@ -591,10 +591,10 @@ bool GalleryTheme::InsertTransferable(const uno::Reference< datatransfer::XTrans
                 nFormat = SotClipboardFormatId::BITMAP;
 
             if( nFormat != SotClipboardFormatId::NONE && aDataHelper.GetGraphic( nFormat, aGraphic ) )
-                pGraphic.reset(new Graphic( aGraphic ));
+                oGraphic.emplace( aGraphic );
         }
 
-        if( pGraphic )
+        if( oGraphic )
         {
             bRet = false;
 
@@ -611,17 +611,17 @@ bool GalleryTheme::InsertTransferable(const uno::Reference< datatransfer::XTrans
                     if( aModel.GetModel() )
                     {
                         SdrPage*    pPage = aModel.GetModel()->GetPage(0);
-                        SdrGrafObj* pGrafObj = new SdrGrafObj(*aModel.GetModel(), *pGraphic );
+                        rtl::Reference<SdrGrafObj> pGrafObj = new SdrGrafObj(*aModel.GetModel(), *oGraphic );
 
                         pGrafObj->AppendUserData( std::unique_ptr<SdrObjUserData>(new SgaIMapInfo( aImageMap )) );
-                        pPage->InsertObject( pGrafObj );
+                        pPage->InsertObject( pGrafObj.get() );
                         bRet = InsertModel( *aModel.GetModel(), nInsertPos );
                     }
                 }
             }
 
             if( !bRet )
-                bRet = InsertGraphic( *pGraphic, nInsertPos );
+                bRet = InsertGraphic( *oGraphic, nInsertPos );
         }
     }
 

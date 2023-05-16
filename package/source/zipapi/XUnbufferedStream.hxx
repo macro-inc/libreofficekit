@@ -19,10 +19,8 @@
 #ifndef INCLUDED_PACKAGE_SOURCE_ZIPAPI_XUNBUFFEREDSTREAM_HXX
 #define INCLUDED_PACKAGE_SOURCE_ZIPAPI_XUNBUFFEREDSTREAM_HXX
 
-#include <com/sun/star/lang/IllegalArgumentException.hpp>
 #include <com/sun/star/io/XSeekable.hpp>
 #include <com/sun/star/io/XInputStream.hpp>
-#include <com/sun/star/io/XOutputStream.hpp>
 #include <com/sun/star/xml/crypto/XCipherContext.hpp>
 
 #include <comphelper/refcountedmutex.hxx>
@@ -64,7 +62,7 @@ class XUnbufferedStream final : public cppu::WeakImplHelper
 public:
     XUnbufferedStream(
                  const css::uno::Reference< css::uno::XComponentContext >& xContext,
-                 const rtl::Reference<comphelper::RefCountedMutex>& aMutexHolder,
+                 rtl::Reference<comphelper::RefCountedMutex> aMutexHolder,
                  ZipEntry const & rEntry,
                  css::uno::Reference < css::io::XInputStream > const & xNewZipStream,
                  const ::rtl::Reference< EncryptionData >& rData,
@@ -75,7 +73,7 @@ public:
 
     // allows to read package raw stream
     XUnbufferedStream(
-                 const rtl::Reference<comphelper::RefCountedMutex>& aMutexHolder,
+                 rtl::Reference<comphelper::RefCountedMutex> aMutexHolder,
                  const css::uno::Reference < css::io::XInputStream >& xRawStream,
                  const ::rtl::Reference< EncryptionData >& rData );
 

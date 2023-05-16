@@ -72,6 +72,7 @@ enum class SelectionType : sal_Int32;
 namespace com::sun::star::view { class XSelectionSupplier; }
 namespace sfx2 { class FileDialogHelper; }
 namespace sw::mark { class IFieldmark; }
+namespace weld { class Scrollbar; }
 
 const tools::Long nLeftOfst = -370;
 const tools::Long nScrollX  =   30;
@@ -163,8 +164,8 @@ class SW_DLLPUBLIC SwView: public SfxViewShell
     // search & replace
     static SvxSearchItem           *s_pSrchItem;
 
-    static sal_uInt16       m_nMoveType; // for buttons below the scrollbar (viewmdi)
-    static sal_Int32        m_nActMark; // current jump mark for unknown mark
+    static sal_uInt16       s_nMoveType; // for buttons below the scrollbar (viewmdi)
+    static sal_Int32        s_nActMark; // current jump mark for unknown mark
 
     static bool             s_bExtra;
     static bool             s_bFound;
@@ -204,9 +205,6 @@ class SW_DLLPUBLIC SwView: public SfxViewShell
     bool                m_bHScrollbarEnabled;
     bool                m_bVScrollbarEnabled;
 
-    VclPtr<vcl::Window> m_pScrollFill;   // dummy window for filling the lower right edge
-                                        // when both scrollbars are active
-
     VclPtr<SvxRuler>    m_pHRuler,
                         m_pVRuler;
 
@@ -214,6 +212,7 @@ class SW_DLLPUBLIC SwView: public SfxViewShell
     std::unique_ptr<SwDrawBase>    m_pDrawActual;
 
     const SwFrameFormat      *m_pLastTableFormat;
+    const SwFrameFormat* m_pLastFlyFormat;
 
     std::unique_ptr<SwFormatClipboard> m_pFormatClipboard; //holds data for format paintbrush
 
@@ -236,6 +235,8 @@ class SW_DLLPUBLIC SwView: public SfxViewShell
     SvxSearchCmd        m_eLastSearchCommand;
 
     bool m_bWheelScrollInProgress;
+    double          m_fLastZoomScale = 0;
+    double          m_fAccumulatedZoom = 0;
 
     bool            m_bCenterCursor : 1,
                     m_bTopCursor : 1,
@@ -266,10 +267,16 @@ class SW_DLLPUBLIC SwView: public SfxViewShell
     SwTwips         m_nLOKPageUpDownOffset;
 
     SelectCycle m_aSelectCycle;
+
+    int m_nMaxOutlineLevelShown = 10;
+
+    static constexpr sal_uInt16 MAX_ZOOM_PERCENT = 600;
+    static constexpr sal_uInt16 MIN_ZOOM_PERCENT = 20;
+
     // methods for searching
     // set search context
     SAL_DLLPRIVATE bool          SearchAndWrap(bool bApi);
-    SAL_DLLPRIVATE bool          SearchAll();
+    SAL_DLLPRIVATE sal_uInt16 SearchAll();
     SAL_DLLPRIVATE sal_uLong     FUNC_Search( const SwSearchOptions& rOptions );
     SAL_DLLPRIVATE void          Replace();
 
@@ -298,8 +305,9 @@ class SW_DLLPUBLIC SwView: public SfxViewShell
     SAL_DLLPRIVATE void          PhyPageDown();
 
     SAL_DLLPRIVATE void           CreateScrollbar( bool bHori );
-    DECL_DLLPRIVATE_LINK(  ScrollHdl, ScrollBar*, void );
-    DECL_DLLPRIVATE_LINK(  EndScrollHdl, ScrollBar*, void );
+    DECL_DLLPRIVATE_LINK(HoriScrollHdl, weld::Scrollbar&, void);
+    DECL_DLLPRIVATE_LINK(VertScrollHdl, weld::Scrollbar&, void);
+    SAL_DLLPRIVATE void EndScrollHdl(weld::Scrollbar& rScrollbar, bool bHorizontal);
     SAL_DLLPRIVATE bool          UpdateScrollbars();
     DECL_DLLPRIVATE_LINK( WindowChildEventListener, VclWindowEvent&, void );
     SAL_DLLPRIVATE void          CalcVisArea( const Size &rPixelSz );
@@ -397,7 +405,7 @@ public:
     OUString                GetSelectionTextParam( bool bCompleteWords,
                                                    bool bEraseTrail );
     virtual bool            HasSelection( bool bText = true ) const override;
-    virtual OUString        GetSelectionText( bool bCompleteWords = false ) override;
+    virtual OUString        GetSelectionText( bool bCompleteWords = false, bool bOnlyASample = false ) override;
     virtual bool            PrepareClose( bool bUI = true ) override;
     virtual void            MarginChanged() override;
 
@@ -464,6 +472,7 @@ public:
     static void     SetActMark(sal_Int32 nSet);
 
     bool            HandleWheelCommands( const CommandEvent& );
+    bool            HandleGestureZoomCommand(const CommandEvent&);
 
     // insert frames
     void            InsFrameMode(sal_uInt16 nCols);
@@ -535,7 +544,7 @@ public:
     bool            EnterDrawTextMode(const Point& aDocPos);
     /// Same as EnterDrawTextMode(), but takes an SdrObject instead of guessing it by document position.
     bool EnterShapeDrawTextMode(SdrObject* pObject);
-    void            LeaveDrawCreate()   { m_nDrawSfxId = m_nFormSfxId = USHRT_MAX; m_sDrawCustom.clear(); m_eFormObjKind = OBJ_NONE; }
+    void            LeaveDrawCreate()   { m_nDrawSfxId = m_nFormSfxId = USHRT_MAX; m_sDrawCustom.clear(); m_eFormObjKind = SdrObjKind::NONE; }
     bool            IsDrawMode() const  { return (m_nDrawSfxId != USHRT_MAX || m_nFormSfxId != USHRT_MAX); }
     bool            IsFormMode() const;
     bool            IsBezierEditMode() const;
@@ -643,6 +652,9 @@ public:
     void SelectShellForDrop();
 
     void UpdateDocStats();
+
+    void SetMaxOutlineLevelShown(int nLevel) {m_nMaxOutlineLevelShown = nLevel;}
+    int GetMaxOutlineLevelShown() const {return m_nMaxOutlineLevelShown;}
 
     // methods for printing
     SAL_DLLPRIVATE virtual   SfxPrinter*     GetPrinter( bool bCreate = false ) override;

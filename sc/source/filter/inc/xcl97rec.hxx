@@ -168,7 +168,7 @@ class XclObjComment : public XclObj
 {
     ScAddress                   maScPos;
 
-    // no need to use std::unique_ptr< SdrCaptionObj, SdrObjectFreeOp >
+    // no need to use std::unique_ptr< SdrCaptionObj >
     SdrCaptionObj*              mpCaption;
 
     bool                        mbVisible;
@@ -320,7 +320,7 @@ private:
 
 public:
                                 ExcBundlesheet8( const RootData& rRootData, SCTAB nTab );
-                                ExcBundlesheet8( const OUString& rString );
+                                ExcBundlesheet8( OUString aString );
 
     virtual std::size_t         GetLen() const override;
 
@@ -440,7 +440,7 @@ private:
 class XclExpSheetEnhancedProtection : public XclExpRecord
 {
 public:
-    explicit            XclExpSheetEnhancedProtection( const XclExpRoot& rRoot, const ScEnhancedProtection& rProt );
+    explicit            XclExpSheetEnhancedProtection( const XclExpRoot& rRoot, ScEnhancedProtection aProt );
 
 private:
     virtual void        WriteBody( XclExpStream& rStrm ) override;

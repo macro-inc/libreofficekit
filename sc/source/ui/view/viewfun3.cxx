@@ -111,7 +111,7 @@ void ScViewFunc::CutToClip()
         if ( !rMark.IsMarked() && !rMark.IsMultiMarked() )          // mark the range if not marked yet
         {
             DoneBlockMode();
-            InitOwnBlockMode();
+            InitOwnBlockMode( aRange );
             rMark.SetMarkArea( aRange );
             MarkDataChanged();
         }
@@ -226,10 +226,12 @@ bool ScViewFunc::CopyToClipSingleRange( ScDocument* pClipDoc, const ScRangeList&
         return false;
 
     bool bSysClip = false;
+    std::shared_ptr<ScDocument> pSysClipDoc;
     if ( !pClipDoc )                                    // no clip doc specified
     {
         // Create one (deleted by ScTransferObj).
-        pClipDoc = new ScDocument( SCDOCMODE_CLIP );
+        pSysClipDoc = std::make_shared<ScDocument>( SCDOCMODE_CLIP );
+        pClipDoc = pSysClipDoc.get();
         bSysClip = true;                                // and copy into system
     }
     if ( !bCut )
@@ -243,7 +245,7 @@ bool ScViewFunc::CopyToClipSingleRange( ScDocument* pClipDoc, const ScRangeList&
     {
         bool bAnyOle = rDoc.HasOLEObjectsInArea( aRange );
         // Update ScGlobal::xDrawClipDocShellRef.
-        ScDrawLayer::SetGlobalDrawPersist( ScTransferObj::SetDrawClipDoc( bAnyOle ) );
+        ScDrawLayer::SetGlobalDrawPersist( ScTransferObj::SetDrawClipDoc( bAnyOle, pSysClipDoc ) );
     }
 
     // is this necessary?, will setting the doc id upset the
@@ -254,8 +256,7 @@ bool ScViewFunc::CopyToClipSingleRange( ScDocument* pClipDoc, const ScRangeList&
     if (SfxObjectShell* pObjectShell = rDoc.GetDocumentShell())
     {
         // Copy document properties from pObjectShell to pClipDoc (to its clip options, as it has no object shell).
-        uno::Reference<document::XDocumentPropertiesSupplier> xDocumentPropertiesSupplier(pObjectShell->GetModel(), uno::UNO_QUERY);
-        uno::Reference<util::XCloneable> xCloneable(xDocumentPropertiesSupplier->getDocumentProperties(), uno::UNO_QUERY);
+        uno::Reference<util::XCloneable> xCloneable(pObjectShell->getDocProperties(), uno::UNO_QUERY_THROW);
         std::unique_ptr<ScClipOptions> pOptions(new ScClipOptions);
         pOptions->m_xDocumentProperties.set(xCloneable->createClone(), uno::UNO_QUERY);
         pClipDoc->SetClipOptions(std::move(pOptions));
@@ -292,7 +293,7 @@ bool ScViewFunc::CopyToClipSingleRange( ScDocument* pClipDoc, const ScRangeList&
         aObjDesc.maDisplayName = pDocSh->GetMedium()->GetURLObject().GetURLNoPass();
         // maSize is set in ScTransferObj ctor
 
-        rtl::Reference<ScTransferObj> pTransferObj(new ScTransferObj( ScDocumentUniquePtr(pClipDoc), aObjDesc ));
+        rtl::Reference<ScTransferObj> pTransferObj(new ScTransferObj( pSysClipDoc, std::move(aObjDesc) ));
         if ( ScGlobal::xDrawClipDocShellRef.is() )
         {
             SfxObjectShellRef aPersistRef( ScGlobal::xDrawClipDocShellRef.get() );
@@ -408,7 +409,7 @@ bool ScViewFunc::CopyToClipMultiRange( const ScDocument* pInputClipDoc, const Sc
         aObjDesc.maDisplayName = pDocSh->GetMedium()->GetURLObject().GetURLNoPass();
         // maSize is set in ScTransferObj ctor
 
-        rtl::Reference<ScTransferObj> pTransferObj(new ScTransferObj( std::move(pDocClip), aObjDesc ));
+        rtl::Reference<ScTransferObj> pTransferObj(new ScTransferObj( std::move(pDocClip), std::move(aObjDesc) ));
         if ( ScGlobal::xDrawClipDocShellRef.is() )
         {
             SfxObjectShellRef aPersistRef( ScGlobal::xDrawClipDocShellRef.get() );
@@ -455,7 +456,7 @@ rtl::Reference<ScTransferObj> ScViewFunc::CopyToTransferable()
             TransferableObjectDescriptor aObjDesc;
             pDocSh->FillTransferableObjectDescriptor( aObjDesc );
             aObjDesc.maDisplayName = pDocSh->GetMedium()->GetURLObject().GetURLNoPass();
-            return new ScTransferObj( std::move(pClipDoc), aObjDesc );
+            return new ScTransferObj( std::move(pClipDoc), std::move(aObjDesc) );
         }
     }
 
@@ -847,8 +848,8 @@ bool checkDestRangeForOverwrite(const ScRangeList& rDestRanges, const ScDocument
         {
             const ScRange& rRange = rDestRanges[i];
             bIsEmpty = rDoc.IsBlockEmpty(
-                rTab, rRange.aStart.Col(), rRange.aStart.Row(),
-                rRange.aEnd.Col(), rRange.aEnd.Row());
+                rRange.aStart.Col(), rRange.aStart.Row(),
+                rRange.aEnd.Col(), rRange.aEnd.Row(), rTab );
         }
         if (!bIsEmpty)
             break;
@@ -900,7 +901,7 @@ bool ScViewFunc::PasteFromClip( InsertDeleteFlags nFlags, ScDocument* pClipDoc,
     if (rClipParam.isMultiRange())
     {
         // Source data is multi-range.
-        return PasteMultiRangesFromClip(nFlags, pClipDoc, nFunction, bSkipEmptyCells, false, bTranspose,
+        return PasteMultiRangesFromClip(nFlags, pClipDoc, nFunction, bSkipEmptyCells, bTranspose,
                                         bAsLink, bAllowDialogs, eMoveMode, nUndoFlags);
     }
 
@@ -1269,7 +1270,7 @@ bool ScViewFunc::PasteFromClip( InsertDeleteFlags nFlags, ScDocument* pClipDoc,
     if (GetViewData().IsActive())
     {
         DoneBlockMode();
-        InitOwnBlockMode();
+        InitOwnBlockMode( aUserRange );
     }
     rMark.SetMarkArea( aUserRange );
     MarkDataChanged();
@@ -1464,7 +1465,7 @@ bool ScViewFunc::PasteFromClip( InsertDeleteFlags nFlags, ScDocument* pClipDoc,
 
 bool ScViewFunc::PasteMultiRangesFromClip(InsertDeleteFlags nFlags, ScDocument* pClipDoc,
                                           ScPasteFunc nFunction, bool bSkipEmptyCells,
-                                          bool bIncludeFiltered, bool bTranspose, bool bAsLink,
+                                          bool bTranspose, bool bAsLink,
                                           bool bAllowDialogs, InsCellCmd eMoveMode,
                                           InsertDeleteFlags nUndoFlags)
 {
@@ -1475,7 +1476,7 @@ bool ScViewFunc::PasteMultiRangesFromClip(InsertDeleteFlags nFlags, ScDocument* 
     const ScAddress& rCurPos = rViewData.GetCurPos();
     ScClipParam& rClipParam = pClipDoc->GetClipParam();
     SCCOL nColSize = rClipParam.getPasteColSize();
-    SCROW nRowSize = rClipParam.getPasteRowSize(*pClipDoc, bIncludeFiltered);
+    SCROW nRowSize = rClipParam.getPasteRowSize(*pClipDoc, /*bIncludeFiltered*/false);
 
     if (bTranspose)
     {
@@ -1486,7 +1487,7 @@ bool ScViewFunc::PasteMultiRangesFromClip(InsertDeleteFlags nFlags, ScDocument* 
         }
 
         ScDocumentUniquePtr pTransClip(new ScDocument(SCDOCMODE_CLIP));
-        pClipDoc->TransposeClip(pTransClip.get(), nFlags, bAsLink, bIncludeFiltered);
+        pClipDoc->TransposeClip(pTransClip.get(), nFlags, bAsLink, /*bIncludeFiltered*/false);
         pClipDoc = pTransClip.release();
         SCCOL nTempColSize = nColSize;
         nColSize = static_cast<SCCOL>(nRowSize);
@@ -1577,7 +1578,7 @@ bool ScViewFunc::PasteMultiRangesFromClip(InsertDeleteFlags nFlags, ScDocument* 
     if (bAsLink && bTranspose)
         nCopyFlags |= InsertDeleteFlags::FORMULA;
     rDoc.CopyMultiRangeFromClip(rCurPos, aMark, nCopyFlags, pClipDoc, true, bAsLink && !bTranspose,
-                                bIncludeFiltered, bSkipEmptyCells);
+                                /*bIncludeFiltered*/false, bSkipEmptyCells);
 
     if (pMixDoc)
         rDoc.MixDocument(aMarkedRange, nFunction, bSkipEmptyCells, *pMixDoc);
@@ -1588,7 +1589,7 @@ bool ScViewFunc::PasteMultiRangesFromClip(InsertDeleteFlags nFlags, ScDocument* 
     {
         //  Paste the drawing objects after the row heights have been updated.
         rDoc.CopyMultiRangeFromClip(rCurPos, aMark, InsertDeleteFlags::OBJECTS, pClipDoc, true,
-                                    false, bIncludeFiltered, true);
+                                    false, /*bIncludeFiltered*/false, true);
     }
 
     if (bRowInfo)

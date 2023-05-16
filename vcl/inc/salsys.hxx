@@ -30,7 +30,6 @@ const int SALSYSTEM_SHOWNATIVEMSGBOX_BTN_OK = 1;
 class VCL_PLUGIN_PUBLIC SalSystem
 {
 public:
-    SalSystem() {}
     virtual ~SalSystem();
 
     // get info about the display
@@ -82,6 +81,9 @@ public:
 };
 
 VCL_DLLPUBLIC SalSystem* ImplGetSalSystem();
+
+#define VIRTUAL_DESKTOP_WIDTH 1024
+#define VIRTUAL_DESKTOP_HEIGHT 768
 
 #endif // INCLUDED_VCL_INC_SALSYS_HXX
 

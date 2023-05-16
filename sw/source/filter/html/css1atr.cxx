@@ -94,6 +94,7 @@
 #include <o3tl/unit_conversion.hxx>
 
 #include <rtl/strbuf.hxx>
+#include <rtl/xmlencode.hxx>
 #include <osl/diagnose.h>
 
 using namespace css;
@@ -314,7 +315,8 @@ void SwHTMLWriter::OutCSS1_Property( const char *pProp,
                     "p." sCSS2_P_CLASS_leaders " span+span{float:right;padding-left:0.33em;"
                     "background:white;position:relative;z-index:1}");
         }
-        Strm().WriteOString( sOut.makeStringAndClear() );
+        Strm().WriteOString( sOut );
+        sOut.setLength(0);
 
         IncIndentLevel();
     }
@@ -332,7 +334,7 @@ void SwHTMLWriter::OutCSS1_Property( const char *pProp,
             }
             else
             {
-                HTMLOutFuncs::Out_AsciiTag( Strm(), OStringConcatenation(GetNamespace() + OOO_STRING_SVTOOLS_HTML_span), false );
+                HTMLOutFuncs::Out_AsciiTag( Strm(), Concat2View(GetNamespace() + OOO_STRING_SVTOOLS_HTML_span), false );
                 return;
             }
             break;
@@ -340,7 +342,7 @@ void SwHTMLWriter::OutCSS1_Property( const char *pProp,
         case CSS1_OUTMODE_RULE_ON:
             {
                 OutNewLine();
-                sOut.append(OUStringToOString(m_aCSS1Selector, m_eDestEnc) + " { ");
+                sOut.append(OUStringToOString(m_aCSS1Selector, RTL_TEXTENCODING_UTF8) + " { ");
             }
             break;
 
@@ -359,12 +361,12 @@ void SwHTMLWriter::OutCSS1_Property( const char *pProp,
     if( m_nCSS1OutMode & CSS1_OUTMODE_ENCODE )
     {
         // for STYLE-Option encode string
-        Strm().WriteOString( sOut.makeStringAndClear() );
+        Strm().WriteOString( sOut );
+        sOut.setLength(0);
         if( !sVal.empty() )
-            HTMLOutFuncs::Out_String( Strm(), OUString::createFromAscii(sVal),
-                                      m_eDestEnc, &m_aNonConvertableCharacters );
+            HTMLOutFuncs::Out_String( Strm(), OUString::createFromAscii(sVal) );
         else if( pSVal )
-            HTMLOutFuncs::Out_String( Strm(), *pSVal, m_eDestEnc, &m_aNonConvertableCharacters );
+            HTMLOutFuncs::Out_String( Strm(), *pSVal );
     }
     else
     {
@@ -372,11 +374,11 @@ void SwHTMLWriter::OutCSS1_Property( const char *pProp,
         if( !sVal.empty() )
             sOut.append(sVal);
         else if( pSVal )
-            sOut.append(OUStringToOString(*pSVal, m_eDestEnc));
+            sOut.append(OUStringToOString(*pSVal, RTL_TEXTENCODING_UTF8));
     }
 
     if (!sOut.isEmpty())
-        Strm().WriteOString( sOut.makeStringAndClear() );
+        Strm().WriteOString( sOut );
 }
 
 static void AddUnitPropertyValue(OStringBuffer &rOut, tools::Long nVal,
@@ -461,7 +463,7 @@ void SwHTMLWriter::OutCSS1_UnitProperty( const char *pProp, tools::Long nVal )
 {
     OStringBuffer sOut;
     AddUnitPropertyValue(sOut, nVal, m_eCSS1Unit);
-    OutCSS1_PropertyAscii(pProp, sOut.makeStringAndClear());
+    OutCSS1_PropertyAscii(pProp, sOut);
 }
 
 void SwHTMLWriter::OutCSS1_PixelProperty( const char *pProp, tools::Long nVal,
@@ -582,7 +584,7 @@ void SwHTMLWriter::OutStyleSheet( const SwPageDesc& rPageDesc )
         DecIndentLevel();
 
         OutNewLine();
-        HTMLOutFuncs::Out_AsciiTag( Strm(), OStringConcatenation(GetNamespace() + OOO_STRING_SVTOOLS_HTML_style), false );
+        HTMLOutFuncs::Out_AsciiTag( Strm(), Concat2View(GetNamespace() + OOO_STRING_SVTOOLS_HTML_style), false );
     }
     else
     {
@@ -997,7 +999,7 @@ void SwHTMLWriter::SubtractItemSet( SfxItemSet& rItemSet,
     {
         const SfxPoolItem *pRefItem, *pItem;
         bool bItemSet = ( SfxItemState::SET ==
-                rItemSet.GetItemState( nWhich, false, &pItem) );
+                aIter.GetItemState( false, &pItem) );
         bool bRefItemSet;
 
         if( pRefScriptItemSet )
@@ -1075,7 +1077,7 @@ void SwHTMLWriter::PrepareFontList( const SvxFontItem& rFontItem,
         while( nStrPos != -1 )
         {
             OUString aName = rName.getToken( 0, ';', nStrPos );
-            aName = comphelper::string::strip(aName, ' ');
+            aName = rtl::encodeForXml(comphelper::string::strip(aName, ' '));
             if( aName.isEmpty() )
                 continue;
 
@@ -1203,12 +1205,10 @@ bool SwHTMLWriter::HasScriptDependentItems( const SfxItemSet& rItemSet,
         }
     }
 
-    const SfxPoolItem *pItem;
+    const SwFormatDrop *pDrop;
     if( bCheckDropCap &&
-        SfxItemState::SET == rItemSet.GetItemState( RES_PARATR_DROP, true,
-                &pItem ) )
+        (pDrop = rItemSet.GetItemIfSet( RES_PARATR_DROP )) )
     {
-        const SwFormatDrop *pDrop = static_cast<const SwFormatDrop *>(pItem);
         const SwCharFormat *pDCCharFormat = pDrop->GetCharFormat();
         if( pDCCharFormat )
         {
@@ -1238,16 +1238,16 @@ static bool OutCSS1Rule( SwHTMLWriter& rHTMLWrt, const OUString& rSelector,
     if( SwHTMLWriter::HasScriptDependentItems( rItemSet, bHasClass ) )
     {
         bScriptDependent = true;
-        OUString aSelector( rSelector );
+        std::u16string_view aSelector( rSelector );
 
-        OUString aPseudo;
+        std::u16string_view aPseudo;
         if( bCheckForPseudo )
         {
-            sal_Int32 nPos = aSelector.lastIndexOf( ':' );
-            if( nPos >= 0 )
+            size_t nPos = aSelector.rfind( ':' );
+            if( nPos != std::u16string_view::npos )
             {
-                aPseudo = aSelector.copy( nPos );
-                aSelector =aSelector.copy( 0, nPos );
+                aPseudo = aSelector.substr( nPos );
+                aSelector =aSelector.substr( 0, nPos );
             }
         }
 
@@ -1271,21 +1271,21 @@ static bool OutCSS1Rule( SwHTMLWriter& rHTMLWrt, const OUString& rSelector,
                 aScriptItemSet( *rItemSet.GetPool() );
             aScriptItemSet.Put( rItemSet );
 
-            OUString aNewSelector = aSelector + ".western" + aPseudo;
+            OUString aNewSelector = OUString::Concat(aSelector) + ".western" + aPseudo;
             {
                 SwCSS1OutMode aMode( rHTMLWrt, CSS1_OUTMODE_WESTERN|CSS1_OUTMODE_RULE|CSS1_OUTMODE_TEMPLATE,
                                      &aNewSelector );
                 rHTMLWrt.OutCSS1_SfxItemSet( aScriptItemSet, false );
             }
 
-            aNewSelector = aSelector + ".cjk" + aPseudo;
+            aNewSelector = OUString::Concat(aSelector) + ".cjk" + aPseudo;
             {
                 SwCSS1OutMode aMode( rHTMLWrt, CSS1_OUTMODE_CJK|CSS1_OUTMODE_RULE|CSS1_OUTMODE_TEMPLATE,
                                      &aNewSelector );
                 rHTMLWrt.OutCSS1_SfxItemSet( aScriptItemSet, false );
             }
 
-            aNewSelector = aSelector + ".ctl" + aPseudo;
+            aNewSelector = OUString::Concat(aSelector) + ".ctl" + aPseudo;
             {
                 SwCSS1OutMode aMode( rHTMLWrt, CSS1_OUTMODE_CTL|CSS1_OUTMODE_RULE|CSS1_OUTMODE_TEMPLATE,
                                      &aNewSelector );
@@ -1297,21 +1297,21 @@ static bool OutCSS1Rule( SwHTMLWriter& rHTMLWrt, const OUString& rSelector,
             // If there are script dependencies and we are derived from a tag,
             // when we have to export a style dependent class for all
             // scripts
-            OUString aNewSelector = aSelector + "-western" + aPseudo;
+            OUString aNewSelector = OUString::Concat(aSelector) + "-western" + aPseudo;
             {
                 SwCSS1OutMode aMode( rHTMLWrt, CSS1_OUTMODE_WESTERN|CSS1_OUTMODE_RULE|CSS1_OUTMODE_TEMPLATE,
                                      &aNewSelector );
                 rHTMLWrt.OutCSS1_SfxItemSet( rItemSet, false );
             }
 
-            aNewSelector = aSelector + "-cjk" + aPseudo;
+            aNewSelector = OUString::Concat(aSelector) + "-cjk" + aPseudo;
             {
                 SwCSS1OutMode aMode( rHTMLWrt, CSS1_OUTMODE_CJK|CSS1_OUTMODE_RULE|CSS1_OUTMODE_TEMPLATE,
                                      &aNewSelector );
                 rHTMLWrt.OutCSS1_SfxItemSet( rItemSet, false );
             }
 
-            aNewSelector = aSelector + "-ctl" + aPseudo;
+            aNewSelector = OUString::Concat(aSelector) + "-ctl" + aPseudo;
             {
                 SwCSS1OutMode aMode( rHTMLWrt, CSS1_OUTMODE_CTL|CSS1_OUTMODE_RULE|CSS1_OUTMODE_TEMPLATE,
                                      &aNewSelector );
@@ -1343,14 +1343,14 @@ static void OutCSS1DropCapRule(
     if( (bHasScriptDependencies && bHasClass) ||
          (pDCCharFormat && SwHTMLWriter::HasScriptDependentItems( pDCCharFormat->GetAttrSet(), false ) ) )
     {
-        OUString aSelector( rSelector );
+        std::u16string_view aSelector( rSelector );
 
-        OUString aPseudo;
-        sal_Int32 nPos = aSelector.lastIndexOf( ':' );
-        if( nPos >= 0 )
+        std::u16string_view aPseudo;
+        size_t nPos = aSelector.rfind( ':' );
+        if( nPos != std::u16string_view::npos )
         {
-            aPseudo = aSelector.copy( nPos );
-            aSelector = aSelector.copy( 0, nPos );
+            aPseudo = aSelector.substr( nPos );
+            aSelector = aSelector.substr( 0, nPos );
         }
 
         if( !bHasClass )
@@ -1372,21 +1372,21 @@ static void OutCSS1DropCapRule(
             if( pDCCharFormat )
                 aScriptItemSet.Set( pDCCharFormat->GetAttrSet() );
 
-            OUString aNewSelector = aSelector + ".western" + aPseudo;
+            OUString aNewSelector = OUString::Concat(aSelector) + ".western" + aPseudo;
             {
                 SwCSS1OutMode aMode( rHTMLWrt, CSS1_OUTMODE_WESTERN|CSS1_OUTMODE_RULE|CSS1_OUTMODE_DROPCAP,
                                      &aNewSelector );
                 OutCSS1_SwFormatDropAttrs(  rHTMLWrt, rDrop, &aScriptItemSet );
             }
 
-            aNewSelector = aSelector + ".cjk" + aPseudo;
+            aNewSelector = OUString::Concat(aSelector) + ".cjk" + aPseudo;
             {
                 SwCSS1OutMode aMode( rHTMLWrt, CSS1_OUTMODE_CJK|CSS1_OUTMODE_RULE|CSS1_OUTMODE_DROPCAP,
                                      &aNewSelector );
                 OutCSS1_SwFormatDropAttrs(  rHTMLWrt, rDrop, &aScriptItemSet );
             }
 
-            aNewSelector = aSelector + ".ctl" + aPseudo;
+            aNewSelector = OUString::Concat(aSelector) + ".ctl" + aPseudo;
             {
                 SwCSS1OutMode aMode( rHTMLWrt, CSS1_OUTMODE_CTL|CSS1_OUTMODE_RULE|CSS1_OUTMODE_DROPCAP,
                                      &aNewSelector );
@@ -1398,21 +1398,21 @@ static void OutCSS1DropCapRule(
             // If there are script dependencies and we are derived from a tag,
             // when we have to export a style dependent class for all
             // scripts
-            OUString aNewSelector = aSelector + "-western" + aPseudo;
+            OUString aNewSelector = OUString::Concat(aSelector) + "-western" + aPseudo;
             {
                 SwCSS1OutMode aMode( rHTMLWrt, CSS1_OUTMODE_WESTERN|CSS1_OUTMODE_RULE|CSS1_OUTMODE_DROPCAP,
                                      &aNewSelector );
                 OutCSS1_SwFormatDropAttrs(  rHTMLWrt, rDrop );
             }
 
-            aNewSelector = aSelector + "-cjk" + aPseudo;
+            aNewSelector = OUString::Concat(aSelector) + "-cjk" + aPseudo;
             {
                 SwCSS1OutMode aMode( rHTMLWrt, CSS1_OUTMODE_CJK|CSS1_OUTMODE_RULE|CSS1_OUTMODE_DROPCAP,
                                      &aNewSelector );
                 OutCSS1_SwFormatDropAttrs(  rHTMLWrt, rDrop );
             }
 
-            aNewSelector = aSelector + "-ctl" + aPseudo;
+            aNewSelector = OUString::Concat(aSelector) + "-ctl" + aPseudo;
             {
                 SwCSS1OutMode aMode( rHTMLWrt, CSS1_OUTMODE_CTL|CSS1_OUTMODE_RULE|CSS1_OUTMODE_DROPCAP,
                                      &aNewSelector );
@@ -1591,12 +1591,10 @@ static Writer& OutCSS1_SwFormat( Writer& rWrt, const SwFormat& rFormat,
     }
 
     // export Drop-Caps
-    const SfxPoolItem *pItem;
-    if( SfxItemState::SET==aItemSet.GetItemState( RES_PARATR_DROP, false, &pItem ))
+    if( const SwFormatDrop *pDrop = aItemSet.GetItemIfSet( RES_PARATR_DROP, false ) )
     {
         OUString sOut = aSelector +
             ":" + OStringToOUString( sCSS1_first_letter, RTL_TEXTENCODING_ASCII_US );
-        const SwFormatDrop *pDrop = static_cast<const SwFormatDrop *>(pItem);
         OutCSS1DropCapRule( rHTMLWrt, sOut, *pDrop, CSS1_FMT_ISTAG != nDeep, bHasScriptDependencies );
     }
 
@@ -1672,7 +1670,7 @@ static Writer& OutCSS1_SwPageDesc( Writer& rWrt, const SwPageDesc& rPageDesc,
         AddUnitPropertyValue(sVal, rSz.Width(), rHTMLWrt.GetCSS1Unit());
         sVal.append(' ');
         AddUnitPropertyValue(sVal, rSz.Height(), rHTMLWrt.GetCSS1Unit());
-        rHTMLWrt.OutCSS1_PropertyAscii(sCSS1_P_size, sVal.makeStringAndClear());
+        rHTMLWrt.OutCSS1_PropertyAscii(sCSS1_P_size, sVal);
     }
 
     // Export the distance-Attributes as normally
@@ -1695,7 +1693,7 @@ static Writer& OutCSS1_SwPageDesc( Writer& rWrt, const SwPageDesc& rPageDesc,
     if( rHTMLWrt.m_bFirstCSS1Property && bPseudo )
     {
         rHTMLWrt.OutNewLine();
-        OString sTmp(OUStringToOString(aSelector, rHTMLWrt.m_eDestEnc));
+        OString sTmp(OUStringToOString(aSelector, RTL_TEXTENCODING_UTF8));
         rWrt.Strm().WriteOString( sTmp ).WriteCharPtr( " {" );
         rHTMLWrt.m_bFirstCSS1Property = false;
     }
@@ -2067,6 +2065,17 @@ void SwHTMLWriter::OutCSS1_TableFrameFormatOptions( const SwFrameFormat& rFrameF
     if( SfxItemState::SET==rItemSet.GetItemState( RES_LAYOUT_SPLIT, false, &pItem ) )
         OutCSS1_SwFormatLayoutSplit( *this, *pItem );
 
+    if (mbXHTML)
+    {
+        sal_Int16 eTabHoriOri = rFrameFormat.GetHoriOrient().GetHoriOrient();
+        if (eTabHoriOri == text::HoriOrientation::CENTER)
+        {
+            // Emit XHTML's center using inline CSS.
+            OutCSS1_Property(sCSS1_P_margin_left, "auto", nullptr, sw::Css1Background::Table);
+            OutCSS1_Property(sCSS1_P_margin_right, "auto", nullptr, sw::Css1Background::Table);
+        }
+    }
+
     if( !m_bFirstCSS1Property )
         Strm().WriteChar( '\"' );
 }
@@ -2092,6 +2101,17 @@ void SwHTMLWriter::OutCSS1_SectionFormatOptions( const SwFrameFormat& rFrameForm
     const SfxItemSet& rItemSet = rFrameFormat.GetAttrSet();
     if( SfxItemState::SET==rItemSet.GetItemState( RES_BACKGROUND, false, &pItem ) )
         OutCSS1_SvxBrush( *this, *pItem, sw::Css1Background::Section, nullptr );
+
+    if (mbXHTML)
+    {
+        SvxFrameDirection nDir = GetHTMLDirection(rFrameFormat.GetAttrSet());
+        OString sConvertedDirection = convertDirection(nDir);
+        if (!sConvertedDirection.isEmpty())
+        {
+            OutCSS1_Property(sCSS1_P_dir, sConvertedDirection, nullptr,
+                             sw::Css1Background::Section);
+        }
+    }
 
     if (pCol)
     {
@@ -2128,23 +2148,22 @@ void SwHTMLWriter::OutCSS1_FrameFormatBackground( const SwFrameFormat& rFrameFor
     // If the frame is not linked to a page, we use the background of the anchor.
     const SwFormatAnchor& rAnchor = rFrameFormat.GetAnchor();
     RndStdIds eAnchorId = rAnchor.GetAnchorId();
-    const SwPosition *pAnchorPos = rAnchor.GetContentAnchor();
-    if (RndStdIds::FLY_AT_PAGE != eAnchorId && pAnchorPos)
+    const SwNode *pAnchorNode = rAnchor.GetAnchorNode();
+    if (RndStdIds::FLY_AT_PAGE != eAnchorId && pAnchorNode)
     {
-        const SwNode& rNode = pAnchorPos->nNode.GetNode();
-        if( rNode.IsContentNode() )
+        if( pAnchorNode->IsContentNode() )
         {
             // If the frame is linked to a content-node,
             // we take the background of the content-node, if it has one.
             if( OutCSS1_FrameFormatBrush( *this,
-                    rNode.GetContentNode()->GetSwAttrSet().GetBackground()) )
+                    pAnchorNode->GetContentNode()->GetSwAttrSet().GetBackground()) )
                 return;
 
             // Otherwise we also could be in a table
-            const SwTableNode *pTableNd = rNode.FindTableNode();
+            const SwTableNode *pTableNd = pAnchorNode->FindTableNode();
             if( pTableNd )
             {
-                const SwStartNode *pBoxSttNd = rNode.FindTableBoxStartNode();
+                const SwStartNode *pBoxSttNd = pAnchorNode->FindTableBoxStartNode();
                 const SwTableBox *pBox =
                     pTableNd->GetTable().GetTableBox( pBoxSttNd->GetIndex() );
 
@@ -2173,7 +2192,7 @@ void SwHTMLWriter::OutCSS1_FrameFormatBackground( const SwFrameFormat& rFrameFor
         }
 
         // If the anchor is again in a Fly-Frame, use the background of the Fly-Frame.
-        const SwFrameFormat *pFrameFormat = rNode.GetFlyFormat();
+        const SwFrameFormat *pFrameFormat = pAnchorNode->GetFlyFormat();
         if( pFrameFormat )
         {
             OutCSS1_FrameFormatBackground( *pFrameFormat );
@@ -2326,7 +2345,7 @@ static Writer& OutCSS1_SvxTextLn_SvxCrOut_SvxBlink( Writer& rWrt,
     }
 
     if (!sOut.isEmpty())
-        rHTMLWrt.OutCSS1_PropertyAscii( sCSS1_P_text_decoration, sOut.makeStringAndClear() );
+        rHTMLWrt.OutCSS1_PropertyAscii( sCSS1_P_text_decoration, sOut );
     else if( bNone )
         rHTMLWrt.OutCSS1_PropertyAscii( sCSS1_P_text_decoration, sCSS1_PV_none );
 
@@ -2508,8 +2527,8 @@ static Writer& OutCSS1_SvxKerning( Writer& rWrt, const SfxPoolItem& rHt )
         sOut.append(OString::number(nValue  / 10) + "." + OString::number(nValue % 10) +
                     sCSS1_UNIT_pt);
 
-        rHTMLWrt.OutCSS1_PropertyAscii(sCSS1_P_letter_spacing,
-            sOut.makeStringAndClear());
+        rHTMLWrt.OutCSS1_PropertyAscii(sCSS1_P_letter_spacing, sOut);
+        sOut.setLength(0);
     }
     else
     {
@@ -2808,7 +2827,7 @@ static Writer& OutCSS1_SwFormatDrop( Writer& rWrt, const SfxPoolItem& rHt )
     }
     else
     {
-        HTMLOutFuncs::Out_AsciiTag( rWrt.Strm(), OStringConcatenation(rHTMLWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_span), false );
+        HTMLOutFuncs::Out_AsciiTag( rWrt.Strm(), Concat2View(rHTMLWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_span), false );
     }
 
     return rWrt;
@@ -2934,14 +2953,8 @@ static Writer& OutCSS1_SvxULSpace_SvxLRSpace( Writer& rWrt,
 static Writer& OutCSS1_SvxULSpace_SvxLRSpace( Writer& rWrt,
                                         const SfxItemSet& rItemSet )
 {
-    const SvxULSpaceItem *pULSpace = nullptr;
-    const SvxLRSpaceItem *pLRSpace = nullptr;
-    const SfxPoolItem *pItem;
-    if( SfxItemState::SET == rItemSet.GetItemState( RES_LR_SPACE, false/*bDeep*/, &pItem ) )
-        pLRSpace = static_cast<const SvxLRSpaceItem *>(pItem);
-
-    if( SfxItemState::SET == rItemSet.GetItemState( RES_UL_SPACE, false/*bDeep*/, &pItem ) )
-        pULSpace = static_cast<const SvxULSpaceItem *>(pItem);
+    const SvxLRSpaceItem *pLRSpace = rItemSet.GetItemIfSet( RES_LR_SPACE, false/*bDeep*/ );
+    const SvxULSpaceItem *pULSpace = rItemSet.GetItemIfSet( RES_UL_SPACE, false/*bDeep*/ );
 
     if( pLRSpace || pULSpace )
         OutCSS1_SvxULSpace_SvxLRSpace( rWrt, pULSpace, pLRSpace );
@@ -3025,22 +3038,16 @@ static Writer& OutCSS1_SvxFormatBreak_SwFormatPDesc_SvxFormatKeep( Writer& rWrt,
                                         bool bDeep )
 {
     SwHTMLWriter& rHTMLWrt = static_cast<SwHTMLWriter&>(rWrt);
-    const SfxPoolItem *pItem;
-    const SvxFormatBreakItem *pBreakItem = nullptr;
-    if( SfxItemState::SET==rItemSet.GetItemState( RES_BREAK, bDeep, &pItem ))
-        pBreakItem = static_cast<const SvxFormatBreakItem *>(pItem);
+    const SvxFormatBreakItem *pBreakItem = rItemSet.GetItemIfSet( RES_BREAK, bDeep );
 
     const SwFormatPageDesc *pPDescItem = nullptr;
-    if( ( !rHTMLWrt.IsCSS1Source( CSS1_OUTMODE_PARA ) ||
-          !rHTMLWrt.m_bCSS1IgnoreFirstPageDesc ||
-          rHTMLWrt.m_pStartNdIdx->GetIndex() !=
-                      rHTMLWrt.m_pCurrentPam->GetPoint()->nNode.GetIndex() ) &&
-        SfxItemState::SET==rItemSet.GetItemState( RES_PAGEDESC, bDeep, &pItem ))
-        pPDescItem = static_cast<const SwFormatPageDesc*>(pItem);
+    if( !rHTMLWrt.IsCSS1Source( CSS1_OUTMODE_PARA ) ||
+        !rHTMLWrt.m_bCSS1IgnoreFirstPageDesc ||
+        rHTMLWrt.m_pStartNdIdx->GetIndex() !=
+                    rHTMLWrt.m_pCurrentPam->GetPoint()->GetNodeIndex() )
+        pPDescItem = rItemSet.GetItemIfSet( RES_PAGEDESC, bDeep );
 
-    const SvxFormatKeepItem *pKeepItem = nullptr;
-    if( SfxItemState::SET==rItemSet.GetItemState( RES_KEEP, bDeep, &pItem ))
-        pKeepItem = static_cast<const SvxFormatKeepItem *>(pItem);
+    const SvxFormatKeepItem *pKeepItem = rItemSet.GetItemIfSet( RES_KEEP, bDeep );
 
     if( pBreakItem || pPDescItem || pKeepItem )
         OutCSS1_SvxFormatBreak_SwFormatPDesc_SvxFormatKeep( rWrt, pBreakItem,
@@ -3314,7 +3321,7 @@ static void OutCSS1_SvxBorderLine( SwHTMLWriter& rHTMLWrt,
     // and also the color
     sOut.append(GetCSS1_Color(pLine->GetColor()));
 
-    rHTMLWrt.OutCSS1_PropertyAscii(pProperty, sOut.makeStringAndClear());
+    rHTMLWrt.OutCSS1_PropertyAscii(pProperty, sOut);
 }
 
 Writer& OutCSS1_SvxBox( Writer& rWrt, const SfxPoolItem& rHt )
@@ -3335,7 +3342,7 @@ Writer& OutCSS1_SvxBox( Writer& rWrt, const SfxPoolItem& rHt )
         }
         else
         {
-            HTMLOutFuncs::Out_AsciiTag( rWrt.Strm(), OStringConcatenation(rHTMLWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_span), false );
+            HTMLOutFuncs::Out_AsciiTag( rWrt.Strm(), Concat2View(rHTMLWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_span), false );
             return rWrt;
         }
     }
@@ -3377,7 +3384,7 @@ Writer& OutCSS1_SvxBox( Writer& rWrt, const SfxPoolItem& rHt )
             sVal.append(' ');
             AddUnitPropertyValue(sVal, nLeftDist, rHTMLWrt.GetCSS1Unit());
         }
-        rHTMLWrt.OutCSS1_PropertyAscii(sCSS1_P_padding, sVal.makeStringAndClear());
+        rHTMLWrt.OutCSS1_PropertyAscii(sCSS1_P_padding, sVal);
     }
     else
     {
@@ -3598,27 +3605,22 @@ void SwHTMLWriter::OutCSS1_SfxItemSet( const SfxItemSet& rItemSet,
     Out_SfxItemSet( aCSS1AttrFnTab, *this, rItemSet, bDeep );
 
     // some Attributes require special treatment
-    const SfxPoolItem *pItem = nullptr;
 
     // Underline, Overline, CrossedOut and Blink form together a CSS1-Property
     // (doesn't work of course for Hints)
     if( !IsCSS1Source(CSS1_OUTMODE_HINT) )
     {
-        const SvxUnderlineItem *pUnderlineItem = nullptr;
-        if( SfxItemState::SET==rItemSet.GetItemState( RES_CHRATR_UNDERLINE, bDeep, &pItem ))
-            pUnderlineItem = static_cast<const SvxUnderlineItem *>(pItem);
+        const SvxUnderlineItem *pUnderlineItem =
+            rItemSet.GetItemIfSet( RES_CHRATR_UNDERLINE, bDeep );
 
-        const SvxOverlineItem *pOverlineItem = nullptr;
-        if( SfxItemState::SET==rItemSet.GetItemState( RES_CHRATR_OVERLINE, bDeep, &pItem ))
-            pOverlineItem = static_cast<const SvxOverlineItem *>(pItem);
+        const SvxOverlineItem *pOverlineItem =
+            rItemSet.GetItemIfSet( RES_CHRATR_OVERLINE, bDeep );
 
-        const SvxCrossedOutItem *pCrossedOutItem = nullptr;
-        if( SfxItemState::SET==rItemSet.GetItemState( RES_CHRATR_CROSSEDOUT, bDeep, &pItem ))
-            pCrossedOutItem = static_cast<const SvxCrossedOutItem *>(pItem);
+        const SvxCrossedOutItem *pCrossedOutItem =
+            rItemSet.GetItemIfSet( RES_CHRATR_CROSSEDOUT, bDeep );
 
-        const SvxBlinkItem *pBlinkItem = nullptr;
-        if( SfxItemState::SET==rItemSet.GetItemState( RES_CHRATR_BLINK, bDeep, &pItem ))
-            pBlinkItem = static_cast<const SvxBlinkItem *>(pItem);
+        const SvxBlinkItem *pBlinkItem =
+            rItemSet.GetItemIfSet( RES_CHRATR_BLINK, bDeep );
 
         if( pUnderlineItem || pOverlineItem || pCrossedOutItem || pBlinkItem )
             OutCSS1_SvxTextLn_SvxCrOut_SvxBlink( *this, pUnderlineItem,
@@ -3650,7 +3652,7 @@ void SwHTMLWriter::OutCSS1_SfxItemSet( const SfxItemSet& rItemSet,
         break;
     }
     if (!sOut.isEmpty())
-        Strm().WriteOString( sOut.makeStringAndClear() );
+        Strm().WriteOString( sOut );
 }
 
 Writer& OutCSS1_HintSpanTag( Writer& rWrt, const SfxPoolItem& rHt )

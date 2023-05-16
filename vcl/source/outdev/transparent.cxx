@@ -213,7 +213,7 @@ bool OutputDevice::DrawTransparentNatively ( const tools::PolyPolygon& rPolyPoly
             InitClipRegion();
 
         if( mbOutputClipped )
-            return false;
+            return true;
 
         if( mbInitLineColor )
             InitLineColor();
@@ -327,7 +327,7 @@ void OutputDevice::EmulateDrawTransparent ( const tools::PolyPolygon& rPolyPoly,
                     // This is because the source is a polygon which when painted would not paint
                     // the rightmost and lowest pixel line(s), so use one pixel less for the
                     // rectangle, too.
-                                                    aPixelRect.getWidth(), aPixelRect.getHeight(),
+                                                    aPixelRect.getOpenWidth(), aPixelRect.getOpenHeight(),
                                                     sal::static_int_cast<sal_uInt8>(nTransparencePercent),
                                                     *this );
             }
@@ -1016,7 +1016,7 @@ tools::Rectangle ImplCalcActionBounds( const MetaAction& rAct, const OutputDevic
         {
             const MetaLineAction& rMetaLineAction = static_cast<const MetaLineAction&>(rAct);
             aActionBounds = tools::Rectangle( rMetaLineAction.GetStartPoint(),  rMetaLineAction.GetEndPoint() );
-            aActionBounds.Justify();
+            aActionBounds.Normalize();
             const tools::Long nLineWidth(rMetaLineAction.GetLineInfo().GetWidth());
             if(nLineWidth)
             {
@@ -1193,7 +1193,7 @@ tools::Rectangle ImplCalcActionBounds( const MetaAction& rAct, const OutputDevic
                 // #105987# ImplLayout takes everything in logical coordinates
                 std::unique_ptr<SalLayout> pSalLayout = rOut.ImplLayout( rTextAct.GetText(), rTextAct.GetIndex(),
                                                          rTextAct.GetLen(), rTextAct.GetPoint(),
-                                                         0, rTextAct.GetDXArray());
+                                                         0, rTextAct.GetDXArray(), rTextAct.GetKashidaArray() );
                 if( pSalLayout )
                 {
                     tools::Rectangle aBoundRect( rOut.ImplGetTextBoundRect( *pSalLayout ) );

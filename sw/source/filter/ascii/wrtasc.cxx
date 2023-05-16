@@ -29,20 +29,23 @@
 #include <frameformats.hxx>
 #include <sfx2/docfile.hxx>
 #include <sfx2/sfxsids.hrc>
+#include <o3tl/string_view.hxx>
 
 #include <strings.hrc>
 
-SwASCWriter::SwASCWriter( const OUString& rFltNm )
+SwASCWriter::SwASCWriter( std::u16string_view rFltNm )
 {
     SwAsciiOptions aNewOpts;
 
-    switch( 5 <= rFltNm.getLength() ? rFltNm[4] : 0 )
+    switch( 5 <= rFltNm.size() ? rFltNm[4] : 0 )
     {
     case 'D':
                 aNewOpts.SetCharSet( RTL_TEXTENCODING_IBM_850 );
                 aNewOpts.SetParaFlags( LINEEND_CRLF );
-                if( 5 < rFltNm.getLength() )
-                    switch( rFltNm.copy( 5 ).toInt32() )
+                if( 5 < rFltNm.size() )
+                {
+                    std::u16string_view aFilterNum = rFltNm.substr( 5 );
+                    switch( o3tl::toInt32(aFilterNum) )
                     {
                     case 437: aNewOpts.SetCharSet( RTL_TEXTENCODING_IBM_437 );  break;
                     case 850: aNewOpts.SetCharSet( RTL_TEXTENCODING_IBM_850 );  break;
@@ -51,6 +54,7 @@ SwASCWriter::SwASCWriter( const OUString& rFltNm )
                     case 863: aNewOpts.SetCharSet( RTL_TEXTENCODING_IBM_863 );  break;
                     case 865: aNewOpts.SetCharSet( RTL_TEXTENCODING_IBM_865 );  break;
                     }
+                }
                 break;
 
     case 'A':
@@ -73,7 +77,7 @@ SwASCWriter::SwASCWriter( const OUString& rFltNm )
                 break;
 
     default:
-        if( rFltNm.getLength() >= 4 && rFltNm.subView( 4 )==u"_DLG" )
+        if( rFltNm.size() >= 4 && rFltNm.substr( 4 )==u"_DLG" )
         {
             // use the options
             aNewOpts = GetAsciiOptions();
@@ -118,11 +122,11 @@ ErrCode SwASCWriter::WriteStream()
     // Output all areas of the pam into the ASC file
     do {
         bool bTstFly = true;
-        while( m_pCurrentPam->GetPoint()->nNode.GetIndex() < m_pCurrentPam->GetMark()->nNode.GetIndex() ||
-              (m_pCurrentPam->GetPoint()->nNode.GetIndex() == m_pCurrentPam->GetMark()->nNode.GetIndex() &&
-               m_pCurrentPam->GetPoint()->nContent.GetIndex() <= m_pCurrentPam->GetMark()->nContent.GetIndex()) )
+        while( m_pCurrentPam->GetPoint()->GetNodeIndex() < m_pCurrentPam->GetMark()->GetNodeIndex() ||
+              (m_pCurrentPam->GetPoint()->GetNodeIndex() == m_pCurrentPam->GetMark()->GetNodeIndex() &&
+               m_pCurrentPam->GetPoint()->GetContentIndex() <= m_pCurrentPam->GetMark()->GetContentIndex()) )
         {
-            SwTextNode* pNd = m_pCurrentPam->GetPoint()->nNode.GetNode().GetTextNode();
+            SwTextNode* pNd = m_pCurrentPam->GetPoint()->GetNode().GetTextNode();
             if( pNd )
             {
                 // Should we have frames only?
@@ -136,7 +140,7 @@ ErrCode SwASCWriter::WriteStream()
                     m_pDoc->GetNodes().GetEndOfContent().GetIndex() &&
                     // And exactly this one is selected
                     m_pDoc->GetNodes().GetEndOfContent().GetIndex() - 1 ==
-                    m_pCurrentPam->GetPoint()->nNode.GetIndex() )
+                    m_pCurrentPam->GetPoint()->GetNodeIndex() )
                 {
                     // Print the frame's content.
                     // It is always at position 0!
@@ -191,7 +195,7 @@ ErrCode SwASCWriter::WriteStream()
                 break;
 
             if( m_bShowProgress )
-                ::SetProgressState( sal_Int32(m_pCurrentPam->GetPoint()->nNode.GetIndex()),
+                ::SetProgressState( sal_Int32(m_pCurrentPam->GetPoint()->GetNodeIndex()),
                                     m_pDoc->GetDocShell() );   // How far?
 
         }
@@ -210,12 +214,11 @@ void SwASCWriter::SetupFilterOptions(SfxMedium& rMedium)
     const SfxItemSet* pSet = rMedium.GetItemSet();
     if( nullptr != pSet )
     {
-        const SfxPoolItem* pItem;
-        if( SfxItemState::SET == pSet->GetItemState( SID_FILE_FILTEROPTIONS, true, &pItem ) )
+        if( const SfxStringItem* pItem = pSet->GetItemIfSet( SID_FILE_FILTEROPTIONS ) )
         {
             SwAsciiOptions aOpt;
             OUString sItemOpt;
-            sItemOpt = static_cast<const SfxStringItem*>(pItem)->GetValue();
+            sItemOpt = pItem->GetValue();
             aOpt.ReadUserData(sItemOpt);
             SetAsciiOptions(aOpt);
         }
@@ -223,7 +226,7 @@ void SwASCWriter::SetupFilterOptions(SfxMedium& rMedium)
 }
 
 void GetASCWriter(
-    const OUString& rFltNm, [[maybe_unused]] const OUString& /*rBaseURL*/, WriterRef& xRet )
+    std::u16string_view rFltNm, [[maybe_unused]] const OUString& /*rBaseURL*/, WriterRef& xRet )
 {
   xRet = new SwASCWriter( rFltNm );
 }

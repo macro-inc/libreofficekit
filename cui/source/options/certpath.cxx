@@ -11,12 +11,12 @@
 #include <osl/file.hxx>
 #include <osl/security.hxx>
 #include <sfx2/filedlghelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include "certpath.hxx"
 
 #include <com/sun/star/xml/crypto/NSSInitializer.hpp>
 #include <com/sun/star/ui/dialogs/ExecutableDialogResults.hpp>
-#include <com/sun/star/ui/dialogs/FolderPicker.hpp>
+#include <com/sun/star/ui/dialogs/XFolderPicker2.hpp>
 #include <comphelper/processfactory.hxx>
 
 using namespace ::com::sun::star;

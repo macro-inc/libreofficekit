@@ -286,7 +286,7 @@ public:
         @descr  For DDE links: Decodes to application name and topic.
         For OLE object links: Decodes to class name and document URL.
         @return  true = decoding was successful, returned strings are valid (not empty). */
-    static bool         DecodeLink( OUString& rApplic, OUString& rTopic, const OUString& rEncUrl );
+    static bool         DecodeLink( OUString& rApplic, OUString& rTopic, std::u16string_view aEncUrl );
 };
 
 // Cached values ==============================================================
@@ -319,7 +319,7 @@ public:
     /** Returns the cached Calc error code, if this value has Error type, else 0. */
     FormulaError        GetScError() const;
 
-protected:
+private:
     typedef ::std::unique_ptr< const ScTokenArray >   ScTokenArrayPtr;
 
     OUString            maStr;      /// Cached value is a string.

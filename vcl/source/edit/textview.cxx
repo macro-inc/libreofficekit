@@ -20,6 +20,7 @@
 #include <memory>
 #include <i18nutil/searchopt.hxx>
 #include <o3tl/deleter.hxx>
+#include <utility>
 #include <vcl/textview.hxx>
 #include <vcl/texteng.hxx>
 #include <vcl/settings.hxx>
@@ -62,7 +63,7 @@
 #include <algorithm>
 #include <cstddef>
 
-TETextDataObject::TETextDataObject( const OUString& rText ) : maText( rText )
+TETextDataObject::TETextDataObject( OUString aText ) : maText(std::move( aText ))
 {
 }
 
@@ -85,7 +86,7 @@ css::uno::Any TETextDataObject::getTransferData( const css::datatransfer::DataFl
     }
     else if ( nT == SotClipboardFormatId::HTML )
     {
-        sal_uLong nLen = GetHTMLStream().TellEnd();
+        sal_uInt64 nLen = GetHTMLStream().TellEnd();
         GetHTMLStream().Seek(0);
 
         css::uno::Sequence< sal_Int8 > aSeq( nLen );
@@ -503,7 +504,7 @@ bool TextView::KeyInput( const KeyEvent& rKeyEvent )
             {
                 if ( !mpImpl->mbReadOnly && !rKeyEvent.GetKeyCode().IsShift() &&
                         !rKeyEvent.GetKeyCode().IsMod1() && !rKeyEvent.GetKeyCode().IsMod2() &&
-                        ImplCheckTextLen( OUString('x') ) )
+                        ImplCheckTextLen( u"x" ) )
                 {
                     aCurSel = mpImpl->mpTextEngine->ImpInsertText( aCurSel, '\t', !IsInsertMode() );
                     bModified = true;
@@ -517,7 +518,7 @@ bool TextView::KeyInput( const KeyEvent& rKeyEvent )
                 // do not swallow Shift-RETURN, as this would disable multi-line entries
                 // in dialogs & property editors
                 if ( !mpImpl->mbReadOnly && !rKeyEvent.GetKeyCode().IsMod1() &&
-                        !rKeyEvent.GetKeyCode().IsMod2() && ImplCheckTextLen( OUString('x') ) )
+                        !rKeyEvent.GetKeyCode().IsMod2() && ImplCheckTextLen( u"x" ) )
                 {
                     mpImpl->mpTextEngine->UndoActionStart();
                     aCurSel = mpImpl->mpTextEngine->ImpInsertParaBreak( aCurSel );
@@ -552,7 +553,7 @@ bool TextView::KeyInput( const KeyEvent& rKeyEvent )
                 if ( TextEngine::IsSimpleCharInput( rKeyEvent ) )
                 {
                     sal_Unicode nCharCode = rKeyEvent.GetCharCode();
-                    if ( !mpImpl->mbReadOnly && ImplCheckTextLen( OUString(nCharCode) ) )    // otherwise swallow the character anyway
+                    if ( !mpImpl->mbReadOnly && ImplCheckTextLen( OUStringChar(nCharCode) ) )    // otherwise swallow the character anyway
                     {
                         aCurSel = mpImpl->mpTextEngine->ImpInsertText( nCharCode, aCurSel, !IsInsertMode(), true );
                         bModified = true;
@@ -1016,7 +1017,17 @@ TextSelection const & TextView::ImpMoveCursor( const KeyEvent& rKeyEvent )
                             break;
         case KEY_DOWN:      aPaM = CursorDown( aPaM );
                             break;
-        case KEY_HOME:      aPaM = bCtrl ? CursorStartOfDoc() : CursorStartOfLine( aPaM );
+        case KEY_HOME:
+            if (bCtrl)
+            {
+                aPaM = CursorStartOfDoc();
+            }
+            else
+            {
+                // tdf#145764 - move cursor to the beginning or the first non-space character in the same line
+                const TextPaM aFirstWordPaM = CursorFirstWord(aPaM);
+                aPaM = aPaM.GetIndex() == aFirstWordPaM.GetIndex() ? CursorStartOfLine(aPaM) : aFirstWordPaM;
+            }
                             break;
         case KEY_END:       aPaM = bCtrl ? CursorEndOfDoc() : CursorEndOfLine( aPaM );
                             break;
@@ -1152,6 +1163,17 @@ TextPaM TextView::CursorRight( const TextPaM& rPaM, sal_uInt16 nCharacterIterato
         aPaM.GetPara()++;
         aPaM.GetIndex() = 0;
     }
+
+    return aPaM;
+}
+
+TextPaM TextView::CursorFirstWord( const TextPaM& rPaM )
+{
+    TextPaM aPaM(rPaM);
+    TextNode* pNode = mpImpl->mpTextEngine->mpDoc->GetNodes()[aPaM.GetPara()].get();
+
+    css::uno::Reference<css::i18n::XBreakIterator> xBI = mpImpl->mpTextEngine->GetBreakIterator();
+    aPaM.GetIndex() = xBI->beginOfSentence(pNode->GetText(), 0, mpImpl->mpTextEngine->GetLocale());
 
     return aPaM;
 }
@@ -1699,12 +1721,12 @@ bool TextView::ImplTruncateNewText( OUString& rNewText ) const
     return bTruncated;
 }
 
-bool TextView::ImplCheckTextLen( const OUString& rNewText ) const
+bool TextView::ImplCheckTextLen( std::u16string_view rNewText ) const
 {
     bool bOK = true;
     if ( mpImpl->mpTextEngine->GetMaxTextLen() )
     {
-        sal_Int32 n = mpImpl->mpTextEngine->GetTextLen() + rNewText.getLength();
+        sal_Int32 n = mpImpl->mpTextEngine->GetTextLen() + rNewText.size();
         if ( n > mpImpl->mpTextEngine->GetMaxTextLen() )
         {
             // calculate how much text is being deleted

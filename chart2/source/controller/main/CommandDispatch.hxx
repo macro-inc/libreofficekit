@@ -18,9 +18,9 @@
  */
 #pragma once
 
-#include <MutexContainer.hxx>
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/compbase.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <com/sun/star/frame/XDispatch.hpp>
 #include <com/sun/star/util/XModifyListener.hpp>
 
@@ -44,7 +44,7 @@ typedef ::cppu::WeakComponentImplHelper<
 /** This is the base class for an XDispatch.
  */
 class CommandDispatch :
-        public MutexContainer,
+        public cppu::BaseMutex,
         public impl::CommandDispatch_Base
 {
 public:
@@ -121,7 +121,7 @@ private:
     css::uno::Reference< css::uno::XComponentContext > m_xContext;
     css::uno::Reference< css::util::XURLTransformer >  m_xURLTransformer;
 
-    typedef std::map< OUString, std::unique_ptr<::comphelper::OInterfaceContainerHelper2> >
+    typedef std::map< OUString, ::comphelper::OInterfaceContainerHelper3<css::frame::XStatusListener> >
         tListenerMap;
 
     tListenerMap m_aListeners;

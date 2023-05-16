@@ -27,7 +27,7 @@
 #include <com/sun/star/accessibility/AccessibleRole.hpp>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <cppuhelper/supportsservice.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
+#include <o3tl/safeint.hxx>
 #include <vcl/menu.hxx>
 #include <vcl/vclevent.hxx>
 
@@ -111,7 +111,7 @@ void OAccessibleMenuBaseComponent::SetEnabled( bool bEnabled )
     if ( m_bEnabled == bEnabled )
         return;
 
-    sal_Int16 nStateType=AccessibleStateType::ENABLED;
+    sal_Int64 nStateType=AccessibleStateType::ENABLED;
     if (IsMenuHideDisabledEntries())
     {
         nStateType = AccessibleStateType::VISIBLE;
@@ -195,7 +195,7 @@ void OAccessibleMenuBaseComponent::SetChecked( bool bChecked )
 
 void OAccessibleMenuBaseComponent::UpdateEnabled( sal_Int32 i, bool bEnabled )
 {
-    if ( i >= 0 && i < static_cast<sal_Int32>(m_aAccessibleChildren.size()) )
+    if ( i >= 0 && o3tl::make_unsigned(i) < m_aAccessibleChildren.size() )
     {
         Reference< XAccessible > xChild( m_aAccessibleChildren[i] );
         if ( xChild.is() )
@@ -210,7 +210,7 @@ void OAccessibleMenuBaseComponent::UpdateEnabled( sal_Int32 i, bool bEnabled )
 
 void OAccessibleMenuBaseComponent::UpdateFocused( sal_Int32 i, bool bFocused )
 {
-    if ( i >= 0 && i < static_cast<sal_Int32>(m_aAccessibleChildren.size()) )
+    if ( i >= 0 && o3tl::make_unsigned(i) < m_aAccessibleChildren.size() )
     {
         Reference< XAccessible > xChild( m_aAccessibleChildren[i] );
         if ( xChild.is() )
@@ -242,7 +242,7 @@ void OAccessibleMenuBaseComponent::UpdateSelected( sal_Int32 i, bool bSelected )
 {
     NotifyAccessibleEvent( AccessibleEventId::SELECTION_CHANGED, Any(), Any() );
 
-    if ( i >= 0 && i < static_cast<sal_Int32>(m_aAccessibleChildren.size()) )
+    if ( i >= 0 && o3tl::make_unsigned(i) < m_aAccessibleChildren.size() )
     {
         Reference< XAccessible > xChild( m_aAccessibleChildren[i] );
         if ( xChild.is() )
@@ -257,7 +257,7 @@ void OAccessibleMenuBaseComponent::UpdateSelected( sal_Int32 i, bool bSelected )
 
 void OAccessibleMenuBaseComponent::UpdateChecked( sal_Int32 i, bool bChecked )
 {
-    if ( i >= 0 && i < static_cast<sal_Int32>(m_aAccessibleChildren.size()) )
+    if ( i >= 0 && o3tl::make_unsigned(i) < m_aAccessibleChildren.size() )
     {
         Reference< XAccessible > xChild( m_aAccessibleChildren[i] );
         if ( xChild.is() )
@@ -272,7 +272,7 @@ void OAccessibleMenuBaseComponent::UpdateChecked( sal_Int32 i, bool bChecked )
 
 void OAccessibleMenuBaseComponent::UpdateAccessibleName( sal_Int32 i )
 {
-    if ( i >= 0 && i < static_cast<sal_Int32>(m_aAccessibleChildren.size()) )
+    if ( i >= 0 && o3tl::make_unsigned(i) < m_aAccessibleChildren.size() )
     {
         Reference< XAccessible > xChild( m_aAccessibleChildren[i] );
         if ( xChild.is() )
@@ -287,7 +287,7 @@ void OAccessibleMenuBaseComponent::UpdateAccessibleName( sal_Int32 i )
 
 void OAccessibleMenuBaseComponent::UpdateItemText( sal_Int32 i )
 {
-    if ( i >= 0 && i < static_cast<sal_Int32>(m_aAccessibleChildren.size()) )
+    if ( i >= 0 && o3tl::make_unsigned(i) < m_aAccessibleChildren.size() )
     {
         Reference< XAccessible > xChild( m_aAccessibleChildren[i] );
         if ( xChild.is() )
@@ -300,13 +300,13 @@ void OAccessibleMenuBaseComponent::UpdateItemText( sal_Int32 i )
 }
 
 
-sal_Int32 OAccessibleMenuBaseComponent::GetChildCount() const
+sal_Int64 OAccessibleMenuBaseComponent::GetChildCount() const
 {
     return m_aAccessibleChildren.size();
 }
 
 
-Reference< XAccessible > OAccessibleMenuBaseComponent::GetChild( sal_Int32 i )
+Reference< XAccessible > OAccessibleMenuBaseComponent::GetChild( sal_Int64 i )
 {
     Reference< XAccessible > xChild = m_aAccessibleChildren[i];
     if ( !xChild.is() )
@@ -351,7 +351,7 @@ Reference< XAccessible > OAccessibleMenuBaseComponent::GetChild( sal_Int32 i )
 Reference< XAccessible > OAccessibleMenuBaseComponent::GetChildAt( const awt::Point& rPoint )
 {
     Reference< XAccessible > xChild;
-    for ( sal_uInt32 i = 0, nCount = getAccessibleChildCount(); i < nCount; ++i )
+    for ( sal_Int64 i = 0, nCount = getAccessibleChildCount(); i < nCount; ++i )
     {
         Reference< XAccessible > xAcc = getAccessibleChild( i );
         if ( xAcc.is() )
@@ -376,11 +376,11 @@ Reference< XAccessible > OAccessibleMenuBaseComponent::GetChildAt( const awt::Po
 
 void OAccessibleMenuBaseComponent::InsertChild( sal_Int32 i )
 {
-    if ( i > static_cast<sal_Int32>(m_aAccessibleChildren.size()) )
-        i = m_aAccessibleChildren.size();
-
     if ( i < 0 )
         return;
+
+    if ( o3tl::make_unsigned(i) > m_aAccessibleChildren.size() )
+        i = m_aAccessibleChildren.size();
 
     // insert entry in child list
     m_aAccessibleChildren.insert( m_aAccessibleChildren.begin() + i, Reference< XAccessible >() );
@@ -410,7 +410,7 @@ void OAccessibleMenuBaseComponent::InsertChild( sal_Int32 i )
 
 void OAccessibleMenuBaseComponent::RemoveChild( sal_Int32 i )
 {
-    if ( i < 0 || i >= static_cast<sal_Int32>(m_aAccessibleChildren.size()) )
+    if ( i < 0 || o3tl::make_unsigned(i) >= m_aAccessibleChildren.size() )
         return;
 
     // keep the accessible of the removed item
@@ -688,22 +688,22 @@ Reference< XAccessibleContext > OAccessibleMenuBaseComponent::getAccessibleConte
 // XAccessibleContext
 
 
-Reference< XAccessibleStateSet > OAccessibleMenuBaseComponent::getAccessibleStateSet(  )
+sal_Int64 OAccessibleMenuBaseComponent::getAccessibleStateSet(  )
 {
     OExternalLockGuard aGuard( this );
 
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSetHelper = new utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if ( !rBHelper.bDisposed && !rBHelper.bInDispose )
     {
-        FillAccessibleStateSet( *pStateSetHelper );
+        FillAccessibleStateSet( nStateSet );
     }
     else
     {
-        pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+        nStateSet |= AccessibleStateType::DEFUNC;
     }
 
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 

@@ -40,6 +40,7 @@
 #include <comphelper/servicehelper.hxx>
 #include <cppuhelper/queryinterface.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <editeng/paperinf.hxx>
 #include <unotools/moduleoptions.hxx>
 #include <tools/mapunit.hxx>
 #include <tools/stream.hxx>
@@ -228,9 +229,9 @@ enum SmModelPropertyHandles
 
 }
 
-static rtl::Reference<PropertySetInfo> lcl_createModelPropertyInfo ()
+static const rtl::Reference<PropertySetInfo> & lcl_createModelPropertyInfo ()
 {
-    static PropertyMapEntry aModelPropertyInfoMap[] =
+    static const PropertyMapEntry aModelPropertyInfoMap[] =
     {
         { OUString("Alignment")                        , HANDLE_ALIGNMENT                          ,  ::cppu::UnoType<sal_Int16>::get(),                                     PROPERTY_NONE,  0                     },
         { OUString("BaseFontHeight")                   , HANDLE_BASE_FONT_HEIGHT                   ,  ::cppu::UnoType<sal_Int16>::get(),                                     PROPERTY_NONE,  0                     },
@@ -302,9 +303,9 @@ static rtl::Reference<PropertySetInfo> lcl_createModelPropertyInfo ()
         { OUString("BaseLine")                         , HANDLE_BASELINE                           ,  ::cppu::UnoType<sal_Int16>::get(),                                     PROPERTY_NONE,  0                     },
         { OUString("InteropGrabBag")                   , HANDLE_INTEROP_GRAB_BAG                   ,  cppu::UnoType<uno::Sequence< beans::PropertyValue >>::get(),           PROPERTY_NONE,  0                     },
         { OUString("SyntaxVersion")                    , HANDLE_STARMATH_VERSION                   ,  ::cppu::UnoType<sal_Int16>::get(),                             PROPERTY_NONE,  0                     },
-        { OUString(), 0, css::uno::Type(), 0, 0 }
     };
-    return rtl::Reference<PropertySetInfo>( new PropertySetInfo ( aModelPropertyInfoMap ) );
+    static const rtl::Reference<PropertySetInfo> PROPS_INFO = new PropertySetInfo ( aModelPropertyInfoMap );
+    return PROPS_INFO;
 }
 
 SmModel::SmModel( SfxObjectShell *pObjSh )
@@ -320,9 +321,6 @@ SmModel::~SmModel() noexcept
 uno::Any SAL_CALL SmModel::queryInterface( const uno::Type& rType )
 {
     uno::Any aRet =  ::cppu::queryInterface ( rType,
-                                    // OWeakObject interfaces
-                                    &dynamic_cast<XInterface&>(static_cast<XUnoTunnel&>(*this)),
-                                    static_cast< XWeak* > ( this ),
                                     // PropertySetHelper interfaces
                                     static_cast< XPropertySet* > ( this ),
                                     static_cast< XMultiPropertySet* > ( this ),
@@ -388,10 +386,9 @@ sal_Bool SmModel::supportsService(const OUString& rServiceName)
 
 uno::Sequence< OUString > SmModel::getSupportedServiceNames()
 {
-    return uno::Sequence<OUString>{
-        "com.sun.star.document.OfficeDocument",
-        "com.sun.star.formula.FormulaProperties"
-    };
+    static constexpr OUStringLiteral service1 = u"com.sun.star.document.OfficeDocument";
+    static constexpr OUStringLiteral service2 = u"com.sun.star.formula.FormulaProperties";
+    return uno::Sequence<OUString>{ service1, service2 };
 }
 
 void SmModel::_setPropertyValues(const PropertyMapEntry** ppEntries, const Any* pValues)
@@ -898,28 +895,6 @@ sal_Int32 SAL_CALL SmModel::getRendererCount(
     return 1;
 }
 
-
-static Size lcl_GuessPaperSize()
-{
-    Size aRes;
-    const LocaleDataWrapper& rLocWrp( AllSettings().GetLocaleDataWrapper() );
-    if( MeasurementSystem::Metric == rLocWrp.getMeasurementSystemEnum() )
-    {
-        // in 100th mm
-        PaperInfo aInfo( PAPER_A4 );
-        aRes.setWidth( aInfo.getWidth() );
-        aRes.setHeight( aInfo.getHeight() );
-    }
-    else
-    {
-        // in 100th mm
-        PaperInfo aInfo( PAPER_LETTER );
-        aRes.setWidth( aInfo.getWidth() );
-        aRes.setHeight( aInfo.getHeight() );
-    }
-    return aRes;
-}
-
 uno::Sequence< beans::PropertyValue > SAL_CALL SmModel::getRenderer(
         sal_Int32 nRenderer,
         const uno::Any& /*rSelection*/,
@@ -941,7 +916,7 @@ uno::Sequence< beans::PropertyValue > SAL_CALL SmModel::getRenderer(
     // if paper size is 0 (usually if no 'real' printer is found),
     // guess the paper size
     if (aPrtPaperSize.IsEmpty())
-        aPrtPaperSize = lcl_GuessPaperSize();
+        aPrtPaperSize = SvxPaperInfo::GetDefaultPaperSize(SmMapUnit());
     awt::Size   aPageSize( aPrtPaperSize.Width(), aPrtPaperSize.Height() );
 
     uno::Sequence< beans::PropertyValue > aRenderer(1);
@@ -1015,7 +990,7 @@ void SAL_CALL SmModel::render(
     // no real printer ??
     if (aPrtPaperSize.IsEmpty())
     {
-        aPrtPaperSize = lcl_GuessPaperSize();
+        aPrtPaperSize = SvxPaperInfo::GetDefaultPaperSize(SmMapUnit());
         // factors from Windows DIN A4
         aOutputSize    = Size( static_cast<tools::Long>(aPrtPaperSize.Width()  * 0.941),
                                static_cast<tools::Long>(aPrtPaperSize.Height() * 0.961));

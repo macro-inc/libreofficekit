@@ -23,6 +23,7 @@
 #include <comphelper/lok.hxx>
 #include <comphelper/processfactory.hxx>
 #include <config_global.h>
+#include <o3tl/safeint.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/window.hxx>
@@ -478,16 +479,16 @@ SvtScriptType EditEngine::GetScriptType( const ESelection& rSelection ) const
     return pImpEditEngine->GetItemScriptType( aSel );
 }
 
-LanguageType EditEngine::GetLanguage(const EditPaM& rPaM) const
+editeng::LanguageSpan EditEngine::GetLanguage(const EditPaM& rPaM) const
 {
     return pImpEditEngine->GetLanguage(rPaM);
 }
 
-LanguageType EditEngine::GetLanguage( sal_Int32 nPara, sal_Int32 nPos ) const
+editeng::LanguageSpan EditEngine::GetLanguage( sal_Int32 nPara, sal_Int32 nPos ) const
 {
     ContentNode* pNode = pImpEditEngine->GetEditDoc().GetObject( nPara );
     DBG_ASSERT( pNode, "GetLanguage - nPara is invalid!" );
-    return pNode ? pImpEditEngine->GetLanguage( EditPaM( pNode, nPos ) ) : LANGUAGE_DONTKNOW;
+    return pNode ? pImpEditEngine->GetLanguage( EditPaM( pNode, nPos ) ) : editeng::LanguageSpan{};
 }
 
 
@@ -637,14 +638,14 @@ tools::Rectangle EditEngine::GetParaBounds( sal_Int32 nPara )
     {
         sal_Int32 nTextHeight = pImpEditEngine->GetTextHeight();
         sal_Int32 nParaWidth = pImpEditEngine->CalcParaWidth( nPara, true );
-        sal_uLong nParaHeight = pImpEditEngine->GetParaHeight( nPara );
+        sal_Int32 nParaHeight = pImpEditEngine->GetParaHeight( nPara );
 
         return tools::Rectangle( nTextHeight - aPnt.Y() - nParaHeight, 0, nTextHeight - aPnt.Y(), nParaWidth );
     }
     else
     {
         sal_Int32 nParaWidth = pImpEditEngine->CalcParaWidth( nPara, true );
-        sal_uLong nParaHeight = pImpEditEngine->GetParaHeight( nPara );
+        sal_Int32 nParaHeight = pImpEditEngine->GetParaHeight( nPara );
 
         return tools::Rectangle( 0, aPnt.Y(), nParaWidth, aPnt.Y() + nParaHeight );
     }
@@ -1079,7 +1080,7 @@ bool EditEngine::PostKeyEvent( const KeyEvent& rKeyEvent, EditView* pEditView, v
                     aInfo.append(bDebugPaint ? "On" : "Off");
                     std::unique_ptr<weld::MessageDialog> xInfoBox(Application::CreateMessageDialog(pEditView->GetWindow()->GetFrameWeld(),
                                                                   VclMessageType::Info, VclButtonsType::Ok,
-                                                                  OStringToOUString(aInfo.makeStringAndClear(), RTL_TEXTENCODING_ASCII_US)));
+                                                                  OStringToOUString(aInfo, RTL_TEXTENCODING_ASCII_US)));
                     xInfoBox->run();
 
                 }
@@ -1328,7 +1329,7 @@ bool EditEngine::PostKeyEvent( const KeyEvent& rKeyEvent, EditView* pEditView, v
                             {
                                 OUString aComplete;
 
-                                LanguageType eLang = pImpEditEngine->GetLanguage( EditPaM( aStart.GetNode(), aStart.GetIndex()+1));
+                                LanguageType eLang = pImpEditEngine->GetLanguage( EditPaM( aStart.GetNode(), aStart.GetIndex()+1)).nLang;
                                 LanguageTag aLanguageTag( eLang);
 
                                 if (!pImpEditEngine->xLocaleDataWrapper.isInitialized())
@@ -1871,6 +1872,17 @@ bool EditEngine::IsFlatMode() const
     return !( pImpEditEngine->aStatus.UseCharAttribs() );
 }
 
+void EditEngine::SetSingleLine(bool bValue)
+{
+    if (bValue == pImpEditEngine->aStatus.IsSingleLine())
+        return;
+
+    if (bValue)
+        pImpEditEngine->aStatus.TurnOnFlags(EEControlBits::SINGLELINE);
+    else
+        pImpEditEngine->aStatus.TurnOffFlags(EEControlBits::SINGLELINE);
+}
+
 void EditEngine::SetControlWord( EEControlBits nWord )
 {
 
@@ -2005,14 +2017,13 @@ Point EditEngine::GetDocPosTopLeft( sal_Int32 nParagraph )
         else
         {
             const SvxLRSpaceItem& rLRItem = pImpEditEngine->GetLRSpaceItem( pPPortion->GetNode() );
-// TL_NF_LR         aPoint.X() = pImpEditEngine->GetXValue( (short)(rLRItem.GetTextLeft() + rLRItem.GetTextFirstLineOffset()) );
             sal_Int32 nSpaceBefore = 0;
             pImpEditEngine->GetSpaceBeforeAndMinLabelWidth( pPPortion->GetNode(), &nSpaceBefore );
             short nX = static_cast<short>(rLRItem.GetTextLeft()
                             + rLRItem.GetTextFirstLineOffset()
                             + nSpaceBefore);
-            aPoint.setX( pImpEditEngine->GetXValue( nX
-                             ) );
+
+            aPoint.setX(pImpEditEngine->scaleXSpacingValue(nX));
         }
         aPoint.setY( pImpEditEngine->GetParaPortions().GetYOffset( pPPortion ) );
     }
@@ -2040,7 +2051,7 @@ bool EditEngine::IsTextPos( const Point& rPaperPos, sal_uInt16 nBorder )
     // take unrotated positions for calculation here
     Point aDocPos = GetDocPos( rPaperPos );
 
-    if ( ( aDocPos.Y() > 0  ) && ( aDocPos.Y() < static_cast<tools::Long>(pImpEditEngine->GetTextHeight()) ) )
+    if ( ( aDocPos.Y() > 0  ) && ( o3tl::make_unsigned(aDocPos.Y()) < pImpEditEngine->GetTextHeight() ) )
         return pImpEditEngine->IsTextPos(aDocPos, nBorder);
     return false;
 }
@@ -2265,14 +2276,40 @@ bool EditEngine::HasText( const SvxSearchItem& rSearchItem )
     return pImpEditEngine->HasText( rSearchItem );
 }
 
-void EditEngine::SetGlobalCharStretching( sal_uInt16 nX, sal_uInt16 nY )
+void EditEngine::setGlobalScale(double fFontScaleX, double fFontScaleY, double fSpacingScaleX, double fSpacingScaleY)
 {
-    pImpEditEngine->SetCharStretching( nX, nY );
+    pImpEditEngine->setScale(fFontScaleX, fFontScaleY, fSpacingScaleX, fSpacingScaleY);
 }
 
-void EditEngine::GetGlobalCharStretching( sal_uInt16& rX, sal_uInt16& rY ) const
+void EditEngine::getGlobalSpacingScale(double& rX, double& rY) const
 {
-    pImpEditEngine->GetCharStretching( rX, rY );
+    pImpEditEngine->getSpacingScale(rX, rY);
+}
+
+basegfx::B2DTuple EditEngine::getGlobalSpacingScale() const
+{
+    double x = 0.0;
+    double y = 0.0;
+    pImpEditEngine->getSpacingScale(x, y);
+    return {x, y};
+}
+
+void EditEngine::getGlobalFontScale(double& rX, double& rY) const
+{
+    pImpEditEngine->getFontScale(rX, rY);
+}
+
+basegfx::B2DTuple EditEngine::getGlobalFontScale() const
+{
+    double x = 0.0;
+    double y = 0.0;
+    pImpEditEngine->getFontScale(x, y);
+    return {x, y};
+}
+
+void EditEngine::setRoundFontSizeToPt(bool bRound) const
+{
+    pImpEditEngine->setRoundToNearestPt(bRound);
 }
 
 bool EditEngine::ShouldCreateBigTextObject() const
@@ -2464,7 +2501,8 @@ css::uno::Reference< css::datatransfer::XTransferable >
 // ======================    Virtual Methods    ========================
 
 void EditEngine::DrawingText( const Point&, const OUString&, sal_Int32, sal_Int32,
-                              o3tl::span<const sal_Int32>, const SvxFont&, sal_Int32 /*nPara*/, sal_uInt8 /*nRightToLeft*/,
+                              o3tl::span<const sal_Int32>, o3tl::span<const sal_Bool>,
+                              const SvxFont&, sal_Int32 /*nPara*/, sal_uInt8 /*nRightToLeft*/,
                               const EEngineData::WrongSpellVector*, const SvxFieldData*, bool, bool,
                               const css::lang::Locale*, const Color&, const Color&)
 
@@ -2854,6 +2892,11 @@ bool EditEngine::IsPageOverflow() {
 
 void EditEngine::DisableAttributeExpanding() {
     pImpEditEngine->GetEditDoc().DisableAttributeExpanding();
+}
+
+void EditEngine::EnableSkipOutsideFormat(bool set)
+{
+    pImpEditEngine->EnableSkipOutsideFormat(set);
 }
 
 void EditEngine::SetLOKSpecialPaperSize(const Size& rSize)

@@ -58,9 +58,8 @@
  * @file
  *  For LWP filter architecture prototype
 */
-#include <stdio.h>
-
 #include <memory>
+#include <string_view>
 
 #include <lwpfilehdr.hxx>
 #include "lwpgrfobj.hxx"
@@ -69,6 +68,8 @@
 
 #include <lwpglobalmgr.hxx>
 #include <o3tl/numeric.hxx>
+#include <o3tl/sprintf.hxx>
+#include <rtl/string.hxx>
 #include "lwpframelayout.hxx"
 
 #include <xfilter/xfframe.hxx>
@@ -126,7 +127,7 @@ void LwpGraphicObject::Read()
         {
             m_aIPData.nBrightness = aServerContext[14];
             m_aIPData.nContrast = aServerContext[19];
-            m_aIPData.nEdgeEnchancement = aServerContext[24];
+            m_aIPData.nEdgeEnhancement = aServerContext[24];
             m_aIPData.nSmoothing = aServerContext[29];
             m_aIPData.bInvertImage = (aServerContext[34] == 0x01);
             m_aIPData.bAutoContrast = (aServerContext[44] == 0x00);
@@ -314,7 +315,7 @@ void LwpGraphicObject::GetBentoNamebyID(LwpObjectID const & rMyID, std::string& 
     sal_uInt32 nLow = rMyID.GetLow();
     char pTempStr[32];
     rName = std::string("Gr");
-    sprintf(pTempStr, "%X,%" SAL_PRIXUINT32, nHigh, nLow);
+    o3tl::sprintf(pTempStr, "%X,%" SAL_PRIXUINT32, nHigh, nLow);
     rName.append(pTempStr);
 }
 
@@ -369,11 +370,10 @@ sal_uInt32 LwpGraphicObject::GetGrafData(std::unique_ptr<sal_uInt8[]>& pGrafData
     std::string aGrfObjName;
     GetBentoNamebyID(rMyID,  aGrfObjName);
 
-    char sDName[64]="";
-    sprintf(sDName, "%s-D", aGrfObjName.c_str());
+    OString sDName=OString::Concat(std::string_view(aGrfObjName)) + "-D";
 
     // get bento stream by the name
-    pGrafStream = pBentoContainer->FindValueStreamWithPropertyName(sDName);
+    pGrafStream = pBentoContainer->FindValueStreamWithPropertyName(sDName.getStr());
 
     std::unique_ptr<SvMemoryStream> pMemGrafStream(static_cast<SvMemoryStream*>(pGrafStream));
 

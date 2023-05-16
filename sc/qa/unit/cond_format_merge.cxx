@@ -13,7 +13,7 @@
 #include <com/sun/star/sheet/XConditionalFormats.hpp>
 #include <com/sun/star/sheet/XSpreadsheet.hpp>
 #include <com/sun/star/sheet/XSpreadsheetDocument.hpp>
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 
 namespace com::sun::star::lang
 {
@@ -22,7 +22,7 @@ class XComponent;
 
 using namespace css;
 
-class ScCondFormatMergeTest : public CalcUnoApiTest
+class ScCondFormatMergeTest : public UnoApiTest
 {
 public:
     ScCondFormatMergeTest();
@@ -35,17 +35,13 @@ public:
 };
 
 ScCondFormatMergeTest::ScCondFormatMergeTest()
-    : CalcUnoApiTest("sc/qa/extras/testdocuments/")
+    : UnoApiTest("sc/qa/extras/testdocuments/")
 {
 }
 
 void ScCondFormatMergeTest::testCondFormatMerge()
 {
-    OUString aFileURL;
-    createFileURL(u"cond_format_merge.ods", aFileURL);
-    uno::Reference<lang::XComponent> mxComponent = loadFromDesktop(aFileURL);
-
-    CPPUNIT_ASSERT_MESSAGE("Component not loaded", mxComponent.is());
+    loadFromURL(u"cond_format_merge.ods");
 
     // get the first sheet
     uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
@@ -142,9 +138,6 @@ void ScCondFormatMergeTest::testCondFormatMerge()
     }
 
     CPPUNIT_ASSERT_EQUAL(5, nRanges);
-
-    closeDocument(mxComponent);
-    mxComponent.clear();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScCondFormatMergeTest);

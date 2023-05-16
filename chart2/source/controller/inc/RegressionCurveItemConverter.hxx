@@ -19,21 +19,22 @@
 #pragma once
 
 #include "ItemConverter.hxx"
+#include <rtl/ref.hxx>
 
 namespace com::sun::star::chart2 { class XRegressionCurveContainer; }
 namespace com::sun::star::lang { class XMultiServiceFactory; }
-
+namespace chart { class DataSeries; }
 class SdrModel;
 
 namespace chart::wrapper
 {
 
-class RegressionCurveItemConverter : public ItemConverter
+class RegressionCurveItemConverter final : public ItemConverter
 {
 public:
     RegressionCurveItemConverter(
         const css::uno::Reference< css::beans::XPropertySet > & rPropertySet,
-        const css::uno::Reference< css::chart2::XRegressionCurveContainer > & xRegCurveCnt,
+        rtl::Reference< ::chart::DataSeries > xRegCurveCnt,
         SfxItemPool& rItemPool,
         SdrModel& rDrawModel,
         const css::uno::Reference< css::lang::XMultiServiceFactory > & xNamedPropertyContainerFactory );
@@ -51,7 +52,7 @@ protected:
 
 private:
     std::shared_ptr< ItemConverter >  m_spGraphicConverter;
-    css::uno::Reference< css::chart2::XRegressionCurveContainer >  m_xCurveContainer;
+    rtl::Reference< ::chart::DataSeries >  m_xCurveContainer;
 };
 
 } //  namespace chart::wrapper

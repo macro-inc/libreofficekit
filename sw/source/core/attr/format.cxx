@@ -22,7 +22,6 @@
 #include <doc.hxx>
 #include <fmtcolfunc.hxx>
 #include <format.hxx>
-#include <frame.hxx>
 #include <frmatr.hxx>
 #include <hintids.hxx>
 #include <hints.hxx>
@@ -33,7 +32,7 @@
 #include <svx/sdr/attribute/sdrallfillattributeshelper.hxx>
 #include <svx/unobrushitemhelper.hxx>
 #include <svx/xdef.hxx>
-#include <swcache.hxx>
+#include <utility>
 
 using namespace com::sun::star;
 
@@ -58,10 +57,10 @@ SwFormat::SwFormat( SwAttrPool& rPool, const char* pFormatNm,
     }
 }
 
-SwFormat::SwFormat( SwAttrPool& rPool, const OUString& rFormatNm,
+SwFormat::SwFormat( SwAttrPool& rPool, OUString aFormatNm,
               const WhichRangesContainer& pWhichRanges, SwFormat* pDrvdFrame,
               sal_uInt16 nFormatWhich ) :
-    m_aFormatName( rFormatNm ),
+    m_aFormatName( std::move(aFormatNm) ),
     m_aSet( rPool, pWhichRanges ),
     m_nWhichId( nFormatWhich ),
     m_nPoolFormatId( USHRT_MAX ),
@@ -143,15 +142,13 @@ SwFormat &SwFormat::operator=(const SwFormat& rFormat)
     return *this;
 }
 
-void SwFormat::SetName( const OUString& rNewName, bool bBroadcast )
+void SwFormat::SetFormatName( const OUString& rNewName, bool bBroadcast )
 {
     OSL_ENSURE( !IsDefault(), "SetName: Defaultformat" );
     if( bBroadcast )
     {
-        SwStringMsgPoolItem aOld( RES_NAME_CHANGED, m_aFormatName );
-        SwStringMsgPoolItem aNew( RES_NAME_CHANGED, rNewName );
         m_aFormatName = rNewName;
-        const sw::LegacyModifyHint aHint(&aOld, &aNew);
+        const sw::NameChanged aHint(m_aFormatName, rNewName);
         SwClientNotify(*this, aHint);
     }
     else
@@ -230,8 +227,8 @@ void SwFormat::SwClientNotify(const SwModify&, const SfxHint& rHint)
         return;
     auto pLegacy = static_cast<const sw::LegacyModifyHint*>(&rHint);
 
-    std::unique_ptr<SwAttrSetChg> pOldClientChg, pNewClientChg;
-    auto pDependsHint = std::make_unique<sw::LegacyModifyHint>(pLegacy->m_pOld, pLegacy->m_pNew);
+    std::optional<SwAttrSetChg> oOldClientChg, oNewClientChg;
+    std::optional<sw::LegacyModifyHint> oDependsHint(std::in_place, pLegacy->m_pOld, pLegacy->m_pNew);
     const sal_uInt16 nWhich = pLegacy->GetWhich();
     InvalidateInSwCache(nWhich);
     switch(nWhich)
@@ -273,16 +270,16 @@ void SwFormat::SwClientNotify(const SwModify&, const SfxHint& rHint)
             if (pOldAttrSetChg && pNewAttrSetChg && pOldAttrSetChg->GetTheChgdSet() != &m_aSet)
             {
                 // pass only those that are not set...
-                pNewClientChg.reset(new SwAttrSetChg(*pNewAttrSetChg));
-                pNewClientChg->GetChgSet()->Differentiate(m_aSet);
-                if(pNewClientChg->Count()) // ... if any
+                oNewClientChg.emplace(*pNewAttrSetChg);
+                oNewClientChg->GetChgSet()->Differentiate(m_aSet);
+                if(oNewClientChg->Count()) // ... if any
                 {
-                    pOldClientChg.reset(new SwAttrSetChg(*pOldAttrSetChg));
-                    pOldClientChg->GetChgSet()->Differentiate(m_aSet);
-                    pDependsHint.reset(new sw::LegacyModifyHint(pOldClientChg.get(), pNewClientChg.get()));
+                    oOldClientChg.emplace(*pOldAttrSetChg);
+                    oOldClientChg->GetChgSet()->Differentiate(m_aSet);
+                    oDependsHint.emplace(&*oOldClientChg, &*oNewClientChg);
                 }
                 else
-                    pDependsHint.reset(nullptr);
+                    oDependsHint.reset();
             }
             break;
         }
@@ -308,13 +305,13 @@ void SwFormat::SwClientNotify(const SwModify&, const SfxHint& rHint)
             {
                 // DropCaps might come into this block
                 SAL_WARN_IF(RES_PARATR_DROP != nWhich, "sw.core", "Hint was sent without sender");
-                pDependsHint.reset(nullptr);
+                oDependsHint.reset();
             }
     }
-    if(pDependsHint)
+    if(oDependsHint)
     {
-        InvalidateInSwFntCache(pDependsHint->GetWhich());
-        SwModify::SwClientNotify(*this, *pDependsHint);
+        InvalidateInSwFntCache(oDependsHint->GetWhich());
+        SwModify::SwClientNotify(*this, *oDependsHint);
     }
 }
 
@@ -440,10 +437,10 @@ SfxItemState SwFormat::GetBackgroundState(std::unique_ptr<SvxBrushItem>& rItem) 
         return SfxItemState::DEFAULT;
     }
 
-    const SfxPoolItem* pItem = nullptr;
+    const SvxBrushItem* pItem = nullptr;
     SfxItemState eRet = m_aSet.GetItemState(RES_BACKGROUND, true, &pItem);
     if (pItem)
-        rItem.reset(&pItem->Clone()->StaticWhichCast(RES_BACKGROUND));
+        rItem.reset(pItem->Clone());
     return eRet;
 }
 
@@ -550,9 +547,7 @@ bool SwFormat::SetFormatAttr( const SfxItemSet& rSet )
 
     if (supportsFullDrawingLayerFillAttributeSet())
     {
-        const SfxPoolItem* pSource = nullptr;
-
-        if(SfxItemState::SET == aTempSet.GetItemState(RES_BACKGROUND, false, &pSource))
+        if(const SvxBrushItem* pSource = aTempSet.GetItemIfSet(RES_BACKGROUND, false))
         {
             // FALLBACKBREAKHERE should not be used; instead use [XATTR_FILL_FIRST .. XATTR_FILL_LAST]
             SAL_INFO("sw.core", "Do no longer use SvxBrushItem, instead use [XATTR_FILL_FIRST .. XATTR_FILL_LAST] FillAttributes (simple fallback is in place and used)");
@@ -560,8 +555,7 @@ bool SwFormat::SetFormatAttr( const SfxItemSet& rSet )
             // copy all items to be set anyways to a local ItemSet with is also prepared for the new
             // fill attribute ranges [XATTR_FILL_FIRST .. XATTR_FILL_LAST]. Add the attributes
             // corresponding as good as possible to the new fill properties and set the whole ItemSet
-            const SvxBrushItem& rSource(pSource->StaticWhichCast(RES_BACKGROUND));
-            setSvxBrushItemAsFillAttributesToTargetSet(rSource, aTempSet);
+            setSvxBrushItemAsFillAttributesToTargetSet(*pSource, aTempSet);
 
             if(IsModifyLocked())
             {

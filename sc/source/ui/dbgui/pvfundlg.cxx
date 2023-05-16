@@ -246,7 +246,6 @@ ScDPFunctionDlg::ScDPFunctionDlg(
     , mxLbBaseItem(m_xBuilder->weld_combo_box("baseitem"))
     , mxBtnOk(m_xBuilder->weld_button("ok"))
     , mxBtnCancel(m_xBuilder->weld_button("cancel"))
-    , mxExpander(m_xBuilder->weld_expander("expander"))
     , mrLabelVec(rLabelVec)
     , mbEmptyItem(false)
 {
@@ -601,6 +600,8 @@ namespace
                 return 1;
             case DataPilotFieldLayoutMode::OUTLINE_SUBTOTALS_BOTTOM:
                 return 2;
+            case DataPilotFieldLayoutMode::COMPACT_LAYOUT:
+                return 3;
         }
         return -1;
     }
@@ -615,6 +616,8 @@ namespace
                 return DataPilotFieldLayoutMode::OUTLINE_SUBTOTALS_TOP;
             case 2:
                 return DataPilotFieldLayoutMode::OUTLINE_SUBTOTALS_BOTTOM;
+            case 3:
+                return DataPilotFieldLayoutMode::COMPACT_LAYOUT;
         }
         return DataPilotFieldLayoutMode::TABULAR_LAYOUT;
     }

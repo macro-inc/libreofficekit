@@ -47,12 +47,14 @@ namespace xmloff::EnhancedCustomShapeToken {
         EAS_extrusion_first_light_direction,
         EAS_extrusion_second_light_direction,
         EAS_extrusion_metal,
+        EAS_extrusion_metal_type,
         EAS_shade_mode,
         EAS_extrusion_rotation_angle,
         EAS_extrusion_rotation_center,
         EAS_extrusion_shininess,
         EAS_extrusion_skew,
         EAS_extrusion_specularity,
+        EAS_extrusion_specularity_loext,
         EAS_projection,
         EAS_extrusion_viewpoint,
         EAS_extrusion_origin,
@@ -115,6 +117,7 @@ namespace xmloff::EnhancedCustomShapeToken {
         EAS_FirstLightDirection,
         EAS_SecondLightDirection,
         EAS_Metal,
+        EAS_MetalType,
         EAS_ShadeMode,
         EAS_RotateAngle,
         EAS_RotationCenter,
@@ -152,7 +155,7 @@ namespace xmloff::EnhancedCustomShapeToken {
         EAS_NotFound
     };
 
-    EnhancedCustomShapeTokenEnum EASGet( const OUString& );
+    EnhancedCustomShapeTokenEnum EASGet( std::u16string_view );
     EnhancedCustomShapeTokenEnum EASGet( sal_Int32 nToken );
     OUString EASGet( const EnhancedCustomShapeTokenEnum );
 }

@@ -121,8 +121,17 @@ Transliteration_body::transliterateImpl(
     // Yes, on massive use even such small things do count.
     if ( pOffset )
     {
-        std::vector<sal_Int32> aVec;
-        aVec.reserve(std::max<sal_Int32>(nLocalBuf, nCount) * NMAPPINGMAX);
+        sal_Int32* offsetData;
+        std::unique_ptr<sal_Int32[]> pOffsetHeapBuf;
+        sal_Int32 nOffsetCount = std::max<sal_Int32>(nLocalBuf, nCount);
+        if (nOffsetCount <= nLocalBuf)
+            offsetData = static_cast<sal_Int32*>(alloca(nOffsetCount * NMAPPINGMAX * sizeof(sal_Int32)));
+        else
+        {
+            pOffsetHeapBuf.reset(new sal_Int32[ nOffsetCount * NMAPPINGMAX ]);
+            offsetData = pOffsetHeapBuf.get();
+        }
+        sal_Int32* offsetDataEnd = offsetData;
 
         for (sal_Int32 i = 0; i < nCount; i++)
         {
@@ -130,12 +139,13 @@ Transliteration_body::transliterateImpl(
             MappingType nTmpMappingType = lcl_getMappingTypeForToggleCase( nMappingType, in[i] );
 
             const i18nutil::Mapping &map = i18nutil::casefolding::getValue( in, i, nCount, aLocale, nTmpMappingType );
-            std::fill_n(std::back_inserter(aVec), map.nmap, i + startPos);
+            std::fill_n(offsetDataEnd, map.nmap, i + startPos);
+            offsetDataEnd += map.nmap;
             std::copy_n(map.map, map.nmap, out + j);
             j += map.nmap;
         }
 
-        *pOffset = comphelper::containerToSequence(aVec);
+        *pOffset = css::uno::Sequence< sal_Int32 >(offsetData, offsetDataEnd - offsetData);
     }
     else
     {
@@ -225,11 +235,11 @@ Transliteration_titlecase::Transliteration_titlecase()
 
 /// @throws RuntimeException
 static OUString transliterate_titlecase_Impl(
-    const OUString& inStr, sal_Int32 startPos, sal_Int32 nCount,
+    std::u16string_view inStr, sal_Int32 startPos, sal_Int32 nCount,
     const Locale &rLocale,
     Sequence< sal_Int32 >* pOffset )
 {
-    const OUString aText( inStr.copy( startPos, nCount ) );
+    const OUString aText( inStr.substr( startPos, nCount ) );
 
     OUString aRes;
     if (!aText.isEmpty())
@@ -254,11 +264,14 @@ static OUString transliterate_titlecase_Impl(
         // The rest of the text should just become lowercase.
         aRes = xCharClassImpl->toTitle( aResolvedLigature, 0, nResolvedLen, rLocale ) +
                xCharClassImpl->toLower( aText, 1, aText.getLength() - 1, rLocale );
-        pOffset->realloc( aRes.getLength() );
+        if (pOffset)
+        {
+            pOffset->realloc( aRes.getLength() );
 
-        auto [begin, end] = asNonConstRange(*pOffset);
-        sal_Int32* pOffsetInt = std::fill_n(begin, nResolvedLen, 0);
-        std::iota(pOffsetInt, end, 1);
+            auto [begin, end] = asNonConstRange(*pOffset);
+            sal_Int32* pOffsetInt = std::fill_n(begin, nResolvedLen, 0);
+            std::iota(pOffsetInt, end, 1);
+        }
     }
     return aRes;
 }

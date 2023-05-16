@@ -32,6 +32,7 @@
 #include <vcl/devicecoordinate.hxx>
 #include <vcl/dllapi.h>
 #include <vcl/font.hxx>
+#include <vcl/kernarray.hxx>
 #include <vcl/region.hxx>
 #include <vcl/rendercontext/AddFontSubstituteFlags.hxx>
 #include <vcl/rendercontext/AntialiasingFlags.hxx>
@@ -50,6 +51,7 @@
 #include <vcl/wall.hxx>
 #include <vcl/metaactiontypes.hxx>
 #include <vcl/salnativewidgets.hxx>
+#include <vcl/settings.hxx>
 #include <vcl/vclreferencebase.hxx>
 
 #include <basegfx/numeric/ftools.hxx>
@@ -64,6 +66,7 @@
 #include <com/sun/star/awt/DeviceInfo.hpp>
 
 #include <memory>
+#include <optional>
 #include <string_view>
 #include <vector>
 
@@ -75,7 +78,6 @@ class ImplMultiTextLineInfo;
 class SalGraphics;
 class Gradient;
 class Hatch;
-class AllSettings;
 class BitmapReadAccess;
 class BitmapEx;
 class Image;
@@ -138,12 +140,6 @@ namespace com::sun::star::i18n {
     class XBreakIterator;
 }
 
-#if defined UNX
-#define GLYPH_FONT_HEIGHT   128
-#else
-#define GLYPH_FONT_HEIGHT   256
-#endif
-
 // OutputDevice-Types
 
 enum OutDevType { OUTDEV_WINDOW, OUTDEV_PRINTER, OUTDEV_VIRDEV, OUTDEV_PDF };
@@ -164,8 +160,6 @@ namespace vcl {
 }
 
 VCL_DLLPUBLIC void InvertFocusRect(vcl::RenderContext& rRenderContext, const tools::Rectangle& rRect);
-
-typedef struct _cairo_surface cairo_surface_t;
 
 /**
 * Some things multiple-inherit from VclAbstractDialog and OutputDevice,
@@ -237,12 +231,11 @@ private:
     Color                           maOverlineColor;
     RasterOp                        meRasterOp;
     Wallpaper                       maBackground;
-    std::unique_ptr<AllSettings>    mxSettings;
+    std::optional<AllSettings>      moSettings;
     MapMode                         maMapMode;
     Point                           maRefPoint;
     AntialiasingFlags               mnAntialiasing;
     LanguageType                    meTextLanguage;
-    bool mbTextRenderModeForResolutionIndependentLayout;
 
     mutable bool                    mbMap : 1;
     mutable bool                    mbClipRegion : 1;
@@ -292,7 +285,7 @@ public:
     GDIMetaFile*                GetConnectMetaFile() const { return mpMetaFile; }
 
     virtual void                SetSettings( const AllSettings& rSettings );
-    const AllSettings&          GetSettings() const { return *mxSettings; }
+    const AllSettings&          GetSettings() const { return *moSettings; }
 
     SystemGraphicsData          GetSystemGfxData() const;
     OUString                    GetRenderBackendName() const;
@@ -489,10 +482,6 @@ public:
 
     void                        SetAntialiasing( AntialiasingFlags nMode );
     AntialiasingFlags           GetAntialiasing() const { return mnAntialiasing; }
-
-    // Render glyphs with a mode suitable for rendering of resolution-independent layout positions.
-    void                        SetTextRenderModeForResolutionIndependentLayout(bool bMode);
-    bool                        GetTextRenderModeForResolutionIndependentLayout() const { return mbTextRenderModeForResolutionIndependentLayout; }
 
     void                        SetDrawMode( DrawModeFlags nDrawMode );
     DrawModeFlags               GetDrawMode() const { return mnDrawMode; }
@@ -769,7 +758,7 @@ private:
     SAL_DLLPRIVATE void         ImplDrawPolyPolygonWithB2DPolyPolygon(const basegfx::B2DPolyPolygon& rB2DPolyPoly);
     ///@}
 
-    SAL_DLLPRIVATE void         ImplDrawWaveLineBezier(tools::Long nStartX, tools::Long nStartY, tools::Long nEndX, tools::Long nEndY, tools::Long nWaveHeight, double fOrientation, tools::Long nLineWidth);
+    SAL_DLLPRIVATE void         ImplDrawWaveLineBezier(tools::Long nStartX, tools::Long nStartY, tools::Long nEndX, tools::Long nEndY, tools::Long nWaveHeight, Degree10 nOrientation, tools::Long nLineWidth);
 
 
     /** @name Curved shape functions
@@ -803,11 +792,6 @@ public:
     void                        DrawGradient( const tools::Rectangle& rRect, const Gradient& rGradient );
     void                        DrawGradient( const tools::PolyPolygon& rPolyPoly, const Gradient& rGradient );
 
-    void                        AddGradientActions(
-                                    const tools::Rectangle& rRect,
-                                    const Gradient& rGradient,
-                                    GDIMetaFile& rMtf );
-
 protected:
 
     virtual bool                UsePolyPolygonForComplexGradient() = 0;
@@ -818,14 +802,8 @@ private:
 
     SAL_DLLPRIVATE void         DrawLinearGradient( const tools::Rectangle& rRect, const Gradient& rGradient, const tools::PolyPolygon* pClipPolyPoly );
     SAL_DLLPRIVATE void         DrawComplexGradient( const tools::Rectangle& rRect, const Gradient& rGradient, const tools::PolyPolygon* pClipPolyPoly );
-
     SAL_DLLPRIVATE void         DrawGradientToMetafile( const tools::PolyPolygon& rPolyPoly, const Gradient& rGradient );
-    SAL_DLLPRIVATE void         DrawLinearGradientToMetafile( const tools::Rectangle& rRect, const Gradient& rGradient );
-    SAL_DLLPRIVATE void         DrawComplexGradientToMetafile( const tools::Rectangle& rRect, const Gradient& rGradient );
-
-    SAL_DLLPRIVATE tools::Long  GetLinearGradientSteps( const Gradient& rGradient, const tools::Rectangle& rRect, bool bMtf);
-    SAL_DLLPRIVATE tools::Long  GetComplexGradientSteps( const Gradient& rGradient, const tools::Rectangle& rRect, bool bMtf);
-
+    SAL_DLLPRIVATE tools::Long  GetGradientSteps(Gradient const& rGradient, tools::Rectangle const& rRect);
     SAL_DLLPRIVATE Color        GetSingleColorGradientFill();
     ///@}
 
@@ -979,7 +957,8 @@ public:
     */
     bool                        GetTextBoundRect( tools::Rectangle& rRect,
                                                   const OUString& rStr, sal_Int32 nBase = 0, sal_Int32 nIndex = 0, sal_Int32 nLen = -1,
-                                                  sal_uLong nLayoutWidth = 0, o3tl::span<const sal_Int32> pDXArray = {},
+                                                  sal_uLong nLayoutWidth = 0, KernArraySpan aDXArray = KernArraySpan(),
+                                                  o3tl::span<const sal_Bool> pKashidaArray = {},
                                                   const SalLayoutGlyphs* pGlyphs = nullptr ) const;
 
     tools::Rectangle            ImplGetTextBoundRect( const SalLayout& ) const;
@@ -990,24 +969,21 @@ public:
     bool                        GetTextOutlines( PolyPolyVector&,
                                                  const OUString& rStr, sal_Int32 nBase = 0, sal_Int32 nIndex = 0,
                                                  sal_Int32 nLen = -1,
-                                                 sal_uLong nLayoutWidth = 0, o3tl::span<const sal_Int32> pDXArray = {} ) const;
+                                                 sal_uLong nLayoutWidth = 0, KernArraySpan aDXArray = KernArraySpan(),
+                                                 o3tl::span<const sal_Bool> pKashidaArray = {} ) const;
 
     bool                        GetTextOutlines( basegfx::B2DPolyPolygonVector &rVector,
                                                  const OUString& rStr, sal_Int32 nBase, sal_Int32 nIndex = 0,
                                                  sal_Int32 nLen = -1,
-                                                 sal_uLong nLayoutWidth = 0, o3tl::span<const sal_Int32> pDXArray = {} ) const;
+                                                 sal_uLong nLayoutWidth = 0, KernArraySpan aDXArray = KernArraySpan(),
+                                                 o3tl::span<const sal_Bool> pKashidaArray = {} ) const;
 
 
     OUString                    GetEllipsisString( const OUString& rStr, tools::Long nMaxWidth,
                                                    DrawTextFlags nStyle = DrawTextFlags::EndEllipsis ) const;
 
-    tools::Long                        GetCtrlTextWidth( const OUString& rStr,
+    tools::Long                 GetCtrlTextWidth( const OUString& rStr,
                                                   const SalLayoutGlyphs* pLayoutCache = nullptr ) const;
-
-    static OUString             GetNonMnemonicString( const OUString& rStr, sal_Int32& rMnemonicPos );
-
-    static OUString             GetNonMnemonicString( const OUString& rStr )
-                                            { sal_Int32 nDummy; return GetNonMnemonicString( rStr, nDummy ); }
 
     /** Generate MetaTextActions for the text rect
 
@@ -1060,13 +1036,14 @@ public:
     float                       approximate_digit_width() const;
 
     void                        DrawTextArray( const Point& rStartPt, const OUString& rStr,
-                                               o3tl::span<const sal_Int32> pDXAry,
-                                               sal_Int32 nIndex = 0,
-                                               sal_Int32 nLen = -1,
+                                               KernArraySpan aKernArray,
+                                               o3tl::span<const sal_Bool> pKashidaAry,
+                                               sal_Int32 nIndex,
+                                               sal_Int32 nLen,
                                                SalLayoutFlags flags = SalLayoutFlags::NONE,
                                                const SalLayoutGlyphs* pLayoutCache = nullptr);
-    tools::Long                        GetTextArray( const OUString& rStr, std::vector<sal_Int32>* pDXAry,
-                                              sal_Int32 nIndex = 0, sal_Int32 nLen = -1,
+    tools::Long                        GetTextArray( const OUString& rStr, KernArray* pDXAry,
+                                              sal_Int32 nIndex = 0, sal_Int32 nLen = -1, bool bCaret = false,
                                               vcl::text::TextLayoutCache const* = nullptr,
                                               SalLayoutGlyphs const*const pLayoutCache = nullptr) const;
 
@@ -1085,8 +1062,13 @@ public:
                                               sal_Unicode nExtraChar, sal_Int32& rExtraCharPos,
                                               sal_Int32 nIndex, sal_Int32 nLen,
                                               tools::Long nCharExtra,
-                                              vcl::text::TextLayoutCache const* = nullptr) const;
-    static std::shared_ptr<vcl::text::TextLayoutCache> CreateTextLayoutCache(OUString const&);
+                                              vcl::text::TextLayoutCache const* = nullptr,
+                                              const SalLayoutGlyphs* pGlyphs = nullptr) const;
+    static std::shared_ptr<const vcl::text::TextLayoutCache> CreateTextLayoutCache(OUString const&);
+
+    SAL_DLLPRIVATE SalLayoutFlags GetBiDiLayoutFlags( std::u16string_view rStr,
+                                                      const sal_Int32 nMinIndex,
+                                                      const sal_Int32 nEndIndex ) const;
 
 protected:
     SAL_DLLPRIVATE void         ImplInitTextLineSize();
@@ -1124,6 +1106,7 @@ private:
     SAL_DLLPRIVATE void         ImplDrawStrikeoutChar( tools::Long nBaseX, tools::Long nBaseY, tools::Long nX, tools::Long nY, tools::Long nWidth, FontStrikeout eStrikeout, Color aColor );
     SAL_DLLPRIVATE void         ImplDrawMnemonicLine( tools::Long nX, tools::Long nY, tools::Long nWidth );
 
+    SAL_DLLPRIVATE bool         AttemptOLEFontScaleFix(vcl::Font& rFont, tools::Long nHeight) const;
 
     ///@}
 
@@ -1150,15 +1133,10 @@ public:
 
     bool GetFontFeatures(std::vector<vcl::font::Feature>& rFontFeatures) const;
 
-    SAL_DLLPRIVATE void         ImplGetEmphasisMark( tools::PolyPolygon& rPolyPoly, bool& rPolyLine, tools::Rectangle& rRect1, tools::Rectangle& rRect2,
-                                                     tools::Long& rYOff, tools::Long& rWidth, FontEmphasisMark eEmphasis, tools::Long nHeight );
-    SAL_DLLPRIVATE static FontEmphasisMark
-                                ImplGetEmphasisMarkStyle( const vcl::Font& rFont );
-
     bool                        GetGlyphBoundRects( const Point& rOrigin, const OUString& rStr, int nIndex,
                                                     int nLen, std::vector< tools::Rectangle >& rVector ) const;
 
-    sal_Int32                   HasGlyphs( const vcl::Font& rFont, const OUString& rStr,
+    sal_Int32                   HasGlyphs( const vcl::Font& rFont, std::u16string_view rStr,
                                            sal_Int32 nIndex = 0, sal_Int32 nLen = -1 ) const;
 
     tools::Long                        GetMinKashida() const;
@@ -1197,8 +1175,9 @@ public:
     //If bNewFontLists is true then drop and refetch lists of system fonts
     SAL_DLLPRIVATE static void  ImplUpdateAllFontData( bool bNewFontLists );
 
+    LogicalFontInstance const* GetFontInstance() const;
+
 protected:
-    SAL_DLLPRIVATE const LogicalFontInstance* GetFontInstance() const;
     SAL_DLLPRIVATE tools::Long GetEmphasisAscent() const { return mnEmphasisAscent; }
     SAL_DLLPRIVATE tools::Long GetEmphasisDescent() const { return mnEmphasisDescent; }
 
@@ -1246,7 +1225,9 @@ public:
     std::unique_ptr<SalLayout>
                                 ImplLayout( const OUString&, sal_Int32 nIndex, sal_Int32 nLen,
                                             const Point& rLogicPos = Point(0,0), tools::Long nLogicWidth=0,
-                                            o3tl::span<const sal_Int32> pLogicDXArray={}, SalLayoutFlags flags = SalLayoutFlags::NONE,
+                                            KernArraySpan aKernArray = KernArraySpan(),
+                                            o3tl::span<const sal_Bool> pKashidaArray={},
+                                            SalLayoutFlags flags = SalLayoutFlags::NONE,
                                             vcl::text::TextLayoutCache const* = nullptr,
                                             const SalLayoutGlyphs* pGlyphs = nullptr) const;
 
@@ -1699,7 +1680,7 @@ public:
      @returns Physical point on the device.
      */
     SAL_DLLPRIVATE Point        ImplLogicToDevicePixel( const Point& rLogicPt ) const;
-    SAL_DLLPRIVATE DevicePoint  ImplLogicToDeviceFontCoordinate(const Point& rLogicPt) const;
+    SAL_DLLPRIVATE DevicePoint  ImplLogicToDeviceSubPixel(const Point& rLogicPt) const;
 
     /** Convert a logical width to a width in units of device pixels.
 
@@ -1712,35 +1693,7 @@ public:
      @returns Width in units of device pixels.
      */
     SAL_DLLPRIVATE tools::Long         ImplLogicWidthToDevicePixel( tools::Long nWidth ) const;
-    SAL_DLLPRIVATE double              ImplLogicWidthToDeviceFontWidth(tools::Long nWidth) const;
-
-    SAL_DLLPRIVATE DeviceCoordinate LogicWidthToDeviceCoordinate( tools::Long nWidth ) const;
-
-    /** Convert a logical X coordinate to a device pixel's X coordinate.
-
-     To get the device's X coordinate, it must calculate the mapping offset
-     coordinate X position (if there is one - if not then it just adds
-     the pseudo-window offset to the logical X coordinate), the X-DPI of
-     the device and the mapping's X scaling factor.
-
-     @param         nX          Logical X coordinate
-
-     @returns Device's X pixel coordinate
-     */
-    SAL_DLLPRIVATE tools::Long         ImplLogicXToDevicePixel( tools::Long nX ) const;
-
-    /** Convert a logical Y coordinate to a device pixel's Y coordinate.
-
-     To get the device's Y coordinate, it must calculate the mapping offset
-     coordinate Y position (if there is one - if not then it just adds
-     the pseudo-window offset to the logical Y coordinate), the Y-DPI of
-     the device and the mapping's Y scaling factor.
-
-     @param         nY          Logical Y coordinate
-
-     @returns Device's Y pixel coordinate
-     */
-    SAL_DLLPRIVATE tools::Long         ImplLogicYToDevicePixel( tools::Long nY ) const;
+    SAL_DLLPRIVATE double              ImplLogicWidthToDeviceSubPixel(tools::Long nWidth) const;
 
     /** Convert a logical height to a height in units of device pixels.
 
@@ -1753,6 +1706,9 @@ public:
      @returns Height in units of device pixels.
      */
     SAL_DLLPRIVATE tools::Long         ImplLogicHeightToDevicePixel( tools::Long nHeight ) const;
+    SAL_DLLPRIVATE double              ImplLogicHeightToDeviceSubPixel(tools::Long nHeight) const;
+
+    SAL_DLLPRIVATE Point               SubPixelToLogic(const DevicePoint& rDevicePt) const;
 
     /** Convert device pixels to a width in logical units.
 
@@ -1775,17 +1731,6 @@ public:
      @returns Height in logical units.
      */
     SAL_DLLPRIVATE tools::Long         ImplDevicePixelToLogicHeight( tools::Long nHeight ) const;
-
-    /** Convert logical height to device pixels, with exact sub-pixel value.
-
-     To get the \em exact pixel height, it must calculate the Y-DPI of the device and the
-     map scaling factor.
-
-     @param         fLogicHeight     Exact height in logical units.
-
-     @returns Exact height in pixels - returns as a float to provide for subpixel value.
-     */
-    SAL_DLLPRIVATE float        ImplFloatLogicHeightToDevicePixel( float fLogicHeight ) const;
 
     /** Convert a logical size to the size on the physical device.
 
@@ -1854,8 +1799,35 @@ public:
      @since AOO bug 75163 (OpenOffice.org 2.4.3 - OOH 680 milestone 212)
      */
     SAL_DLLPRIVATE basegfx::B2DHomMatrix ImplGetDeviceTransformation() const;
-    ///@}
 
+private:
+    SAL_DLLPRIVATE DeviceCoordinate LogicWidthToDeviceCoordinate( tools::Long nWidth ) const;
+
+    /** Convert a logical X coordinate to a device pixel's X coordinate.
+
+     To get the device's X coordinate, it must calculate the mapping offset
+     coordinate X position (if there is one - if not then it just adds
+     the pseudo-window offset to the logical X coordinate), the X-DPI of
+     the device and the mapping's X scaling factor.
+
+     @param         nX          Logical X coordinate
+
+     @returns Device's X pixel coordinate
+     */
+    SAL_DLLPRIVATE tools::Long         ImplLogicXToDevicePixel( tools::Long nX ) const;
+
+    /** Convert a logical Y coordinate to a device pixel's Y coordinate.
+
+     To get the device's Y coordinate, it must calculate the mapping offset
+     coordinate Y position (if there is one - if not then it just adds
+     the pseudo-window offset to the logical Y coordinate), the Y-DPI of
+     the device and the mapping's Y scaling factor.
+
+     @param         nY          Logical Y coordinate
+
+     @returns Device's Y pixel coordinate
+     */
+    SAL_DLLPRIVATE tools::Long         ImplLogicYToDevicePixel( tools::Long nY ) const;
 
     /** @name Native Widget Rendering functions
 

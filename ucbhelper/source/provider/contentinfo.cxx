@@ -17,21 +17,14 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-/**************************************************************************
-                                TODO
- **************************************************************************
-
- *************************************************************************/
 #include <com/sun/star/beans/XPropertySetInfo.hpp>
 #include <com/sun/star/ucb/UnsupportedCommandException.hpp>
 #include <com/sun/star/ucb/XPersistentPropertySet.hpp>
 #include <com/sun/star/ucb/XCommandInfo.hpp>
 
-#include <cppuhelper/queryinterface.hxx>
-#include <osl/mutex.hxx>
 #include <ucbhelper/contenthelper.hxx>
+#include <utility>
 #include "contentinfo.hxx"
-#include <ucbhelper/macros.hxx>
 
 using namespace com::sun::star;
 
@@ -42,9 +35,9 @@ using namespace com::sun::star;
 namespace ucbhelper {
 
 PropertySetInfo::PropertySetInfo(
-    const uno::Reference< css::ucb::XCommandEnvironment >& rxEnv,
+    uno::Reference< css::ucb::XCommandEnvironment > xEnv,
     ContentImplHelper* pContent )
-: m_xEnv( rxEnv ),
+: m_xEnv(std::move( xEnv )),
   m_pContent( pContent )
 {
 }
@@ -62,54 +55,52 @@ PropertySetInfo::~PropertySetInfo()
 // virtual
 uno::Sequence< beans::Property > SAL_CALL PropertySetInfo::getProperties()
 {
-    if ( !m_xProps )
+    std::unique_lock aGuard( m_aMutex );
+    return getPropertiesImpl();
+}
+
+const uno::Sequence< beans::Property > & PropertySetInfo::getPropertiesImpl()
+{
+    if ( m_xProps )
+        return *m_xProps;
+
+    // Get info for core ( native) properties.
+
+    try
     {
-        osl::MutexGuard aGuard( m_aMutex );
-        if ( !m_xProps )
+        m_xProps = m_pContent->getProperties( m_xEnv );
+    }
+    catch ( uno::RuntimeException const & )
+    {
+        throw;
+    }
+    catch ( uno::Exception const & )
+    {
+        m_xProps.emplace();
+    }
+
+    // Get info for additional properties.
+
+    uno::Reference< css::ucb::XPersistentPropertySet >
+        xSet ( m_pContent->getAdditionalPropertySet( false ) );
+
+    if ( xSet.is() )
+    {
+        // Get property set info.
+        uno::Reference< beans::XPropertySetInfo > xInfo(
+            xSet->getPropertySetInfo() );
+        if ( xInfo.is() )
         {
-
-            // Get info for core ( native) properties.
-
-
-            try
+            const uno::Sequence< beans::Property >& rAddProps
+                = xInfo->getProperties();
+            sal_Int32 nAddProps = rAddProps.getLength();
+            if ( nAddProps > 0 )
             {
-                m_xProps = m_pContent->getProperties( m_xEnv );
-            }
-            catch ( uno::RuntimeException const & )
-            {
-                throw;
-            }
-            catch ( uno::Exception const & )
-            {
-                m_xProps.emplace();
-            }
+                sal_Int32 nPos = m_xProps->getLength();
+                m_xProps->realloc( nPos + nAddProps );
 
-
-            // Get info for additional properties.
-
-
-            uno::Reference< css::ucb::XPersistentPropertySet >
-                xSet ( m_pContent->getAdditionalPropertySet( false ) );
-
-            if ( xSet.is() )
-            {
-                // Get property set info.
-                uno::Reference< beans::XPropertySetInfo > xInfo(
-                    xSet->getPropertySetInfo() );
-                if ( xInfo.is() )
-                {
-                    const uno::Sequence< beans::Property >& rAddProps
-                        = xInfo->getProperties();
-                    sal_Int32 nAddProps = rAddProps.getLength();
-                    if ( nAddProps > 0 )
-                    {
-                        sal_Int32 nPos = m_xProps->getLength();
-                        m_xProps->realloc( nPos + nAddProps );
-
-                        std::copy(rAddProps.begin(), rAddProps.end(),
-                                  std::next(m_xProps->getArray(), nPos));
-                    }
-                }
+                std::copy(rAddProps.begin(), rAddProps.end(),
+                          std::next(m_xProps->getArray(), nPos));
             }
         }
     }
@@ -143,7 +134,7 @@ sal_Bool SAL_CALL PropertySetInfo::hasPropertyByName(
 
 void PropertySetInfo::reset()
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
     m_xProps.reset();
 }
 
@@ -151,9 +142,9 @@ void PropertySetInfo::reset()
 bool PropertySetInfo::queryProperty(
     std::u16string_view rName, beans::Property& rProp )
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    getProperties();
+    getPropertiesImpl();
 
     const beans::Property* pProps = m_xProps->getConstArray();
     sal_Int32 nCount = m_xProps->getLength();
@@ -175,9 +166,9 @@ bool PropertySetInfo::queryProperty(
 
 
 CommandProcessorInfo::CommandProcessorInfo(
-    const uno::Reference< css::ucb::XCommandEnvironment >& rxEnv,
+    uno::Reference< css::ucb::XCommandEnvironment > xEnv,
     ContentImplHelper* pContent )
-: m_xEnv( rxEnv ),
+: m_xEnv(std::move( xEnv )),
   m_pContent( pContent )
 {
 }
@@ -193,31 +184,30 @@ CommandProcessorInfo::~CommandProcessorInfo()
 
 
 // virtual
-uno::Sequence< css::ucb::CommandInfo > SAL_CALL
-CommandProcessorInfo::getCommands()
+uno::Sequence< css::ucb::CommandInfo > SAL_CALL CommandProcessorInfo::getCommands()
 {
-    if ( !m_xCommands )
+    std::unique_lock aGuard( m_aMutex );
+    return getCommandsImpl();
+}
+
+const uno::Sequence< css::ucb::CommandInfo > & CommandProcessorInfo::getCommandsImpl()
+{
+    if ( m_xCommands )
+        return *m_xCommands;
+
+    // Get info for commands.
+
+    try
     {
-        osl::MutexGuard aGuard( m_aMutex );
-        if ( !m_xCommands )
-        {
-
-            // Get info for commands.
-
-
-            try
-            {
-                m_xCommands = m_pContent->getCommands( m_xEnv );
-            }
-            catch ( uno::RuntimeException const & )
-            {
-                throw;
-            }
-            catch ( uno::Exception const & )
-            {
-                m_xCommands.emplace();
-            }
-        }
+        m_xCommands = m_pContent->getCommands( m_xEnv );
+    }
+    catch ( uno::RuntimeException const & )
+    {
+        throw;
+    }
+    catch ( uno::Exception const & )
+    {
+        m_xCommands.emplace();
     }
     return *m_xCommands;
 }
@@ -270,7 +260,7 @@ sal_Bool SAL_CALL CommandProcessorInfo::hasCommandByHandle( sal_Int32 Handle )
 
 void CommandProcessorInfo::reset()
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
     m_xCommands.reset();
 }
 
@@ -279,9 +269,9 @@ bool CommandProcessorInfo::queryCommand(
     std::u16string_view rName,
     css::ucb::CommandInfo& rCommand )
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    getCommands();
+    getCommandsImpl();
 
     const css::ucb::CommandInfo* pCommands
         = m_xCommands->getConstArray();
@@ -304,9 +294,9 @@ bool CommandProcessorInfo::queryCommand(
     sal_Int32 nHandle,
     css::ucb::CommandInfo& rCommand )
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    getCommands();
+    getCommandsImpl();
 
     const css::ucb::CommandInfo* pCommands = m_xCommands->getConstArray();
     sal_Int32 nCount = m_xCommands->getLength();

@@ -30,7 +30,8 @@
 #include <oox/export/utils.hxx>
 
 #include "format.hxx"
-#include "parse.hxx"
+#include "node.hxx"
+#include "parsebase.hxx"
 #include "smdllapi.hxx"
 #include "mathml/iterator.hxx"
 
@@ -41,7 +42,7 @@ class SmCursor;
 namespace oox::formulaimport { class XmlStream; }
 
 #define STAROFFICE_XML  "StarOffice XML (Math)"
-#define MATHML_XML      "MathML XML (Math)"
+inline constexpr OUStringLiteral MATHML_XML = u"MathML XML (Math)";
 
 /* Access to printer should happen through this class only
  * ==========================================================================

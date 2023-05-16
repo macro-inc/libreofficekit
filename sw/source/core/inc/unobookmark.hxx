@@ -36,6 +36,7 @@
 #include <IDocumentMarkAccess.hxx>
 
 class SwDoc;
+class SwXTextRange;
 
 typedef ::cppu::ImplInheritanceHelper
 <   ::sfx2::MetadatableMixin
@@ -46,6 +47,7 @@ typedef ::cppu::ImplInheritanceHelper
 ,   css::text::XTextContent
 > SwXBookmark_Base;
 
+/// UNO API wrapper around an internal sw::mark::IMark.
 class SwXBookmark
     : public SwXBookmark_Base
 {
@@ -60,7 +62,8 @@ protected:
     /// @throws css::uno::RuntimeException
     void attachToRangeEx(
             const css::uno::Reference< css::text::XTextRange > & xTextRange,
-            IDocumentMarkAccess::MarkType eType);
+            IDocumentMarkAccess::MarkType eType,
+            bool isFieldmarkSeparatorAtStart = false);
     /// @throws css::lang::IllegalArgumentException
     /// @throws css::uno::RuntimeException
     virtual void attachToRange(
@@ -83,7 +86,7 @@ protected:
 
 public:
 
-    static css::uno::Reference< css::text::XTextContent>
+    static rtl::Reference<SwXBookmark>
         CreateXBookmark(SwDoc & rDoc, ::sw::mark::IMark * pBookmark);
 
     /// @return IMark for this, but only if it lives in pDoc
@@ -183,21 +186,23 @@ typedef cppu::ImplInheritanceHelper< SwXBookmark,
         css::text::XTextField
     > SwXFieldmark_Base;
 
+/// UNO wrapper around an sw::mark::IFieldmark.
 class SwXFieldmark final
     : public SwXFieldmark_Base
 {
     ::sw::mark::ICheckboxFieldmark* getCheckboxFieldmark();
     bool const m_bReplacementObject;
+    bool m_isFieldmarkSeparatorAtStart = false;
 
-    css::uno::Reference<css::text::XTextRange>
+    rtl::Reference<SwXTextRange>
         GetCommand(::sw::mark::IFieldmark const& rMark);
-    css::uno::Reference<css::text::XTextRange>
+    rtl::Reference<SwXTextRange>
         GetResult(::sw::mark::IFieldmark const& rMark);
 
     SwXFieldmark(bool isReplacementObject, SwDoc* pDoc);
 
 public:
-    static css::uno::Reference<css::text::XTextContent>
+    static rtl::Reference<SwXBookmark>
         CreateXFieldmark(SwDoc & rDoc, ::sw::mark::IMark * pMark,
                 bool isReplacementObject = false);
 

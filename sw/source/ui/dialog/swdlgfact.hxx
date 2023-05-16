@@ -51,10 +51,12 @@
 #include <swuicnttab.hxx>
 #include <swuiidxmrk.hxx>
 #include <tautofmt.hxx>
+#include <utility>
 #include <wordcountdialog.hxx>
 #include <itabenum.hxx>
 #include <optional>
 #include <o3tl/deleter.hxx>
+#include <pagenumberdlg.hxx>
 
 
 class SwInsertAbstractDlg;
@@ -149,6 +151,20 @@ public:
     }
     virtual short Execute() override;
     virtual void FillOptions( SwAsciiOptions& rOptions ) override;
+};
+
+class AbstractSwPageNumberDlg_Impl : public AbstractSwPageNumberDlg
+{
+    std::shared_ptr<SwPageNumberDlg> m_xDlg;
+public:
+    explicit AbstractSwPageNumberDlg_Impl(std::shared_ptr<SwPageNumberDlg> p)
+        : m_xDlg(std::move(p))
+    {
+    }
+    virtual short Execute() override;
+    virtual bool StartExecuteAsync(AsyncContext &rCtx) override;
+    virtual int GetPageNumberPosition() const override;
+    virtual int GetPageNumberAlignment() const override;
 };
 
 class AbstractGenericDialog_Impl : public VclAbstractDialog
@@ -466,7 +482,6 @@ public:
     {
     }
     virtual short Execute() override;
-    virtual void AcceptAll(bool bAccept) override;
 };
 
 class SwGlossaryDlg;
@@ -523,7 +538,7 @@ protected:
     std::shared_ptr<weld::DialogController> m_xDlg;
 public:
     explicit AbstractInsTableDlg_Impl(std::shared_ptr<weld::DialogController> p)
-        : m_xDlg(p)
+        : m_xDlg(std::move(p))
     {
     }
     virtual void  GetValues( OUString& rName, sal_uInt16& rRow, sal_uInt16& rCol,
@@ -705,8 +720,9 @@ public:
     virtual VclPtr<SfxAbstractDialog> CreateSwAddressAbstractDlg(weld::Window* pParent, const SfxItemSet& rSet) override;
     virtual VclPtr<AbstractSwAsciiFilterDlg>  CreateSwAsciiFilterDlg(weld::Window* pParent, SwDocShell& rDocSh,
                                                                 SvStream* pStream) override;
-    virtual VclPtr<VclAbstractDialog> CreateSwInsertBookmarkDlg(weld::Window *pParent, SwWrtShell &rSh) override;
+    virtual VclPtr<VclAbstractDialog> CreateSwInsertBookmarkDlg(weld::Window *pParent, SwWrtShell &rSh, OUString const* pSelected) override;
     virtual VclPtr<VclAbstractDialog> CreateSwContentControlDlg(weld::Window *pParent, SwWrtShell &rSh) override;
+    virtual VclPtr<AbstractSwPageNumberDlg> CreateSwPageNumberDlg(weld::Window *pParent) override;
 
     VclPtr<AbstractSwContentControlListItemDlg>
     CreateSwContentControlListItemDlg(weld::Window* pParent,

@@ -24,6 +24,7 @@
 #include <editeng/fontitem.hxx>
 #include <editeng/langitem.hxx>
 #include <editeng/scripttypeitem.hxx>
+#include <i18nutil/transliteration.hxx>
 #include <svl/itempool.hxx>
 #include <svl/itemset.hxx>
 #include <svl/cjkoptions.hxx>
@@ -330,11 +331,11 @@ void ScViewUtil::ExecuteCharMap(const SvxFontItem& rOldFont,
 bool ScViewUtil::IsFullScreen( const SfxViewShell& rViewShell )
 {
     SfxBindings&    rBindings       = rViewShell.GetViewFrame()->GetBindings();
-    std::unique_ptr<SfxPoolItem> pItem;
+    std::unique_ptr<SfxBoolItem> pItem;
     bool            bIsFullScreen   = false;
 
     if (rBindings.QueryState( SID_WIN_FULLSCREEN, pItem ) >= SfxItemState::DEFAULT)
-        bIsFullScreen = static_cast< SfxBoolItem* >( pItem.get() )->GetValue();
+        bIsFullScreen = pItem->GetValue();
 
     return bIsFullScreen;
 }

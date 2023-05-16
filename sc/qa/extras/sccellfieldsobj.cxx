@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xelementaccess.hxx>
 #include <test/container/xenumerationaccess.hxx>
 #include <test/util/xrefreshable.hxx>
@@ -34,7 +34,7 @@ using namespace css::uno;
 
 namespace sc_apitest
 {
-class ScCellFieldsObj : public CalcUnoApiTest,
+class ScCellFieldsObj : public UnoApiTest,
                         public apitest::XElementAccess,
                         public apitest::XEnumerationAccess,
                         public apitest::XRefreshable
@@ -44,7 +44,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScCellFieldsObj);
 
@@ -59,20 +58,17 @@ public:
     CPPUNIT_TEST(testRefreshListener);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScCellFieldsObj::ScCellFieldsObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XElementAccess(cppu::UnoType<text::XTextField>::get())
 {
 }
 
 uno::Reference<uno::XInterface> ScCellFieldsObj::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     CPPUNIT_ASSERT_MESSAGE("no calc document", xDoc.is());
 
     uno::Reference<lang::XMultiServiceFactory> xMSF(xDoc, uno::UNO_QUERY_THROW);
@@ -93,14 +89,8 @@ uno::Reference<uno::XInterface> ScCellFieldsObj::init()
 
 void ScCellFieldsObj::setUp()
 {
-    CalcUnoApiTest::setUp();
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScCellFieldsObj::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    UnoApiTest::setUp();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScCellFieldsObj);

@@ -25,7 +25,6 @@
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/uno/Sequence.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
 
 namespace com::sun::star::beans { class XPropertySetInfo; }
 namespace com::sun::star::uno { class XComponentContext; }
@@ -127,14 +126,13 @@ namespace chart
 {
 
 GridProperties::GridProperties() :
-        ::property::OPropertySet( m_aMutex ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {}
 
 GridProperties::GridProperties( const GridProperties & rOther ) :
         impl::GridProperties_Base(rOther),
-        ::property::OPropertySet( rOther, m_aMutex ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+        ::property::OPropertySet( rOther ),
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {
 }
 
@@ -142,13 +140,14 @@ GridProperties::~GridProperties()
 {}
 
 // ____ OPropertySet ____
-uno::Any GridProperties::GetDefaultValue( sal_Int32 nHandle ) const
+void GridProperties::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = *StaticGridDefaults::get();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 ::cppu::IPropertyArrayHelper & SAL_CALL GridProperties::getInfoHelper()
@@ -171,28 +170,12 @@ uno::Reference< util::XCloneable > SAL_CALL GridProperties::createClone()
 // ____ XModifyBroadcaster ____
 void SAL_CALL GridProperties::addModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL GridProperties::removeModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 // ____ XModifyListener ____

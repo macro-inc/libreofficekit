@@ -33,7 +33,7 @@
 #include <connectivity/filtermanager.hxx>
 #include <TConnection.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <ParameterCont.hxx>
 #include <o3tl/safeint.hxx>
@@ -650,7 +650,7 @@ namespace dbtools
         ParametersRequest aRequest;
         aRequest.Parameters = m_pOuterParameters.get();
         aRequest.Connection = _rxConnection;
-        rtl::Reference<OInteractionRequest> pRequest = new OInteractionRequest( makeAny( aRequest ) );
+        rtl::Reference<OInteractionRequest> pRequest = new OInteractionRequest( Any( aRequest ) );
 
         // some knittings
         pRequest->addContinuation( pAbort );
@@ -707,14 +707,14 @@ namespace dbtools
             // TODO: shouldn't we subtract all the parameters which were already visited?
         if ( nParamsLeft )
         {
-            ::comphelper::OInterfaceIteratorHelper2 aIter( m_aParameterListeners );
+            ::comphelper::OInterfaceIteratorHelper3 aIter( m_aParameterListeners );
             Reference< XPropertySet > xProp = m_xComponent;
             OSL_ENSURE(xProp.is(),"Some already released my component!");
             DatabaseParameterEvent aEvent( xProp, m_pOuterParameters );
 
             _rClearForNotifies.clear();
             while ( aIter.hasMoreElements() && !bCanceled )
-                bCanceled = !static_cast< XDatabaseParameterListener* >( aIter.next() )->approveParameter( aEvent );
+                bCanceled = !aIter.next()->approveParameter( aEvent );
             _rClearForNotifies.reset();
         }
 

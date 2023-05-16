@@ -46,6 +46,7 @@
 #include <svx/xflgrit.hxx>
 #include <svx/xflftrit.hxx>
 #include <svx/xflhtit.hxx>
+#include <o3tl/string_view.hxx>
 #include <app.hrc>
 #include <stlsheet.hxx>
 #include <sdpage.hxx>
@@ -336,8 +337,8 @@ void FuTemplate::DoExecute( SfxRequest& rReq )
                     {
                         OUString aOutlineStr(SdResId(STR_PSEUDOSHEET_OUTLINE));
                         // determine number, mind the blank between name and number
-                        OUString aNumStr(aName.copy(aOutlineStr.getLength() + 1));
-                        sal_uInt16 nLevel = static_cast<sal_uInt16>(aNumStr.toInt32());
+                        std::u16string_view aNumStr(aName.subView(aOutlineStr.getLength() + 1));
+                        sal_uInt16 nLevel = static_cast<sal_uInt16>(o3tl::toInt32(aNumStr));
                         switch (nLevel)
                         {
                             case 1: ePO = PresentationObjects::Outline_1; break;
@@ -530,10 +531,9 @@ void FuTemplate::DoExecute( SfxRequest& rReq )
 
                         if( mpDoc->GetOnlineSpell() )
                         {
-                            const SfxPoolItem* pTempItem;
-                            if( SfxItemState::SET == rAttr.GetItemState(EE_CHAR_LANGUAGE, false, &pTempItem ) ||
-                                SfxItemState::SET == rAttr.GetItemState(EE_CHAR_LANGUAGE_CJK, false, &pTempItem ) ||
-                                SfxItemState::SET == rAttr.GetItemState(EE_CHAR_LANGUAGE_CTL, false, &pTempItem ) )
+                            if( SfxItemState::SET == rAttr.GetItemState(EE_CHAR_LANGUAGE, false ) ||
+                                SfxItemState::SET == rAttr.GetItemState(EE_CHAR_LANGUAGE_CJK, false ) ||
+                                SfxItemState::SET == rAttr.GetItemState(EE_CHAR_LANGUAGE_CTL, false ) )
                             {
                                 mpDoc->StopOnlineSpelling();
                                 mpDoc->StartOnlineSpelling();

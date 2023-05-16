@@ -41,15 +41,13 @@
 #include <com/sun/star/uno/RuntimeException.hpp>
 #include <com/sun/star/uno/Sequence.hxx>
 #include <comphelper/processfactory.hxx>
-#include <cppuhelper/exc_hlp.hxx>
 #include <comphelper/simplefileaccessinteraction.hxx>
 #include <osl/file.hxx>
 #include <rtl/ustring.hxx>
 #include <sal/log.hxx>
-#include <sal/types.h>
 #include <tools/datetime.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <ucbhelper/commandenvironment.hxx>
 #include <ucbhelper/content.hxx>
 #include <unotools/ucbhelper.hxx>
@@ -195,7 +193,7 @@ bool utl::UCBContentHelper::Kill(OUString const & url) {
     try {
         content(url).executeCommand(
             "delete",
-            css::uno::makeAny(true));
+            css::uno::Any(true));
         return true;
     } catch (css::uno::RuntimeException const &) {
         throw;
@@ -390,7 +388,7 @@ bool utl::UCBContentHelper::EqualURLs(
 bool utl::UCBContentHelper::ensureFolder(
     const css::uno::Reference< css::uno::XComponentContext >& xCtx,
     const css::uno::Reference< css::ucb::XCommandEnvironment >& xEnv,
-    const OUString& rFolder, ucbhelper::Content & result) noexcept
+    std::u16string_view rFolder, ucbhelper::Content & result) noexcept
 {
     try
     {

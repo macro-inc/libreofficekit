@@ -32,7 +32,6 @@
 #include <svl/numformat.hxx>
 #include <svl/zforlist.hxx>
 #include <svl/zformat.hxx>
-#include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/virdev.hxx>
 #include <stdlib.h>
@@ -40,6 +39,7 @@
 #include <vcl/uitest/logger.hxx>
 #include <vcl/uitest/eventdescription.hxx>
 #include <osl/diagnose.h>
+#include <formula/paramclass.hxx>
 
 #include <viewfunc.hxx>
 #include <tabvwsh.hxx>
@@ -48,7 +48,6 @@
 #include <patattr.hxx>
 #include <docpool.hxx>
 #include <sc.hrc>
-#include <strings.hrc>
 #include <undocell.hxx>
 #include <undoblk.hxx>
 #include <refundo.hxx>
@@ -80,6 +79,19 @@
 #include <stringutil.hxx>
 
 #include <memory>
+
+static void ShowFilteredRows(ScDocument& rDoc, SCTAB nTab, SCCOLROW nStartNo, SCCOLROW nEndNo,
+                             bool bShow)
+{
+    SCROW nFirstRow = nStartNo;
+    SCROW nLastRow = nStartNo;
+    do
+    {
+        if (!rDoc.RowFiltered(nFirstRow, nTab, nullptr, &nLastRow))
+            rDoc.ShowRows(nFirstRow, nLastRow < nEndNo ? nLastRow : nEndNo, nTab, bShow);
+        nFirstRow = nLastRow + 1;
+    } while (nFirstRow <= nEndNo);
+}
 
 static void lcl_PostRepaintCondFormat( const ScConditionalFormat *pCondFmt, ScDocShell *pDocSh )
 {
@@ -355,7 +367,6 @@ namespace
             : weld::MessageDialogController(pParent, "modules/scalc/ui/warnautocorrect.ui", "WarnAutoCorrect", "grid")
             , m_xError(m_xBuilder->weld_text_view("error"))
         {
-            m_xDialog->set_primary_text(ScResId(SCSTR_FORMULA_AUTOCORRECTION).trim());
             m_xDialog->set_default_response(RET_YES);
 
             const int nMaxWidth = m_xError->get_approximate_digit_width() * 65;
@@ -372,7 +383,8 @@ namespace
 //  input - undo OK
 void ScViewFunc::EnterData( SCCOL nCol, SCROW nRow, SCTAB nTab,
                             const OUString& rString,
-                            const EditTextObject* pData )
+                            const EditTextObject* pData,
+                            bool bMatrixExpand )
 {
     ScDocument& rDoc = GetViewData().GetDocument();
     ScMarkData rMark(GetViewData().GetMarkData());
@@ -528,6 +540,29 @@ void ScViewFunc::EnterData( SCCOL nCol, SCROW nRow, SCTAB nTab,
             if ( bOptChanged )
             {
                 pScMod->SetAppOptions(aAppOpt);
+            }
+
+            if (bMatrixExpand)
+            {
+                // If the outer function/operator returns an array/matrix then
+                // enter a matrix formula. ScViewFunc::EnterMatrix() takes care
+                // of selection/mark of the result dimensions or preselected
+                // mark. If the user wanted less or a single cell then should
+                // mark such prior to entering the formula.
+                const formula::FormulaToken* pToken = pArr->LastRPNToken();
+                if (pToken && (formula::FormulaCompiler::IsMatrixFunction( pToken->GetOpCode())
+                            || pToken->IsInForceArray()))
+                {
+                    // Discard this (still empty here) Undo action,
+                    // EnterMatrix() will create its own.
+                    if (bRecord)
+                        rFunc.EndListAction();
+
+                    // Use corrected formula string.
+                    EnterMatrix( aFormula, rDoc.GetGrammar());
+
+                    return;
+                }
             }
         }
 
@@ -747,7 +782,7 @@ void ScViewFunc::EnterData( SCCOL nCol, SCROW nRow, SCTAB nTab,
             if (bCommon)
                 AdjustRowHeight(nRow,nRow,true);
 
-            EnterData(nCol,nRow,nTab,aString);
+            EnterData( nCol, nRow, nTab, aString, nullptr, true /*bMatrixExpand*/);
         }
         else
         {
@@ -1089,7 +1124,7 @@ void ScViewFunc::ApplyPatternLines( const ScPatternAttr& rAttr, const SvxBoxItem
         aMarkRange = ScRange( GetViewData().GetCurX(),
                             GetViewData().GetCurY(), GetViewData().GetTabNo() );
         DoneBlockMode();
-        InitOwnBlockMode();
+        InitOwnBlockMode( aMarkRange );
         aFuncMark.SetMarkArea(aMarkRange);
         MarkDataChanged();
     }
@@ -1146,6 +1181,34 @@ void ScViewFunc::ApplyPatternLines( const ScPatternAttr& rAttr, const SvxBoxItem
     StartFormatArea();
 }
 
+static void ShrinkToDataArea(ScMarkData& rFuncMark, ScDocument& rDoc)
+{
+    // tdf#147842 if the marked area is the entire sheet, then shrink it to the data area.
+    // Otherwise ctrl-A, perform-action, will take a very long time as it tries to modify
+    // cells then we are not using.
+    if (rFuncMark.IsMultiMarked())
+        return;
+    ScRange aMarkArea = rFuncMark.GetMarkArea();
+    const ScSheetLimits& rLimits = rDoc.GetSheetLimits();
+    if (aMarkArea.aStart.Row() != 0 || aMarkArea.aStart.Col() != 0)
+        return;
+    if (aMarkArea.aEnd.Row() != rLimits.MaxRow() || aMarkArea.aEnd.Col() != rLimits.MaxCol())
+        return;
+    if (aMarkArea.aStart.Tab() != aMarkArea.aEnd.Tab())
+        return;
+    SCCOL nStartCol = aMarkArea.aStart.Col();
+    SCROW nStartRow = aMarkArea.aStart.Row();
+    SCCOL nEndCol = aMarkArea.aEnd.Col();
+    SCROW nEndRow = aMarkArea.aEnd.Row();
+    rDoc.ShrinkToDataArea(aMarkArea.aStart.Tab(), nStartCol, nStartRow, nEndCol, nEndRow);
+    aMarkArea.aStart.SetCol(nStartCol);
+    aMarkArea.aStart.SetRow(nStartRow);
+    aMarkArea.aEnd.SetCol(nEndCol);
+    aMarkArea.aEnd.SetRow(nEndRow);
+    rFuncMark.ResetMark();
+    rFuncMark.SetMarkArea(aMarkArea);
+}
+
 //  pattern only
 
 void ScViewFunc::ApplySelectionPattern( const ScPatternAttr& rAttr, bool bCursorOnly )
@@ -1154,6 +1217,7 @@ void ScViewFunc::ApplySelectionPattern( const ScPatternAttr& rAttr, bool bCursor
     ScDocShell* pDocSh      = rViewData.GetDocShell();
     ScDocument& rDoc        = pDocSh->GetDocument();
     ScMarkData aFuncMark( rViewData.GetMarkData() );       // local copy for UnmarkFiltered
+    ShrinkToDataArea( aFuncMark, rDoc );
     ScViewUtil::UnmarkFiltered( aFuncMark, rDoc );
 
     bool bRecord = true;
@@ -1252,9 +1316,9 @@ void ScViewFunc::ApplySelectionPattern( const ScPatternAttr& rAttr, bool bCursor
         std::unique_ptr<EditTextObject> pNewEditData;
         ScAddress aPos(nCol, nRow, nTab);
         ScRefCellValue aCell(rDoc, aPos);
-        if (aCell.meType == CELLTYPE_EDIT)
+        if (aCell.getType() == CELLTYPE_EDIT)
         {
-            const EditTextObject* pEditObj = aCell.mpEditText;
+            const EditTextObject* pEditObj = aCell.getEditText();
             pOldEditData = pEditObj->Clone();
             rDoc.RemoveEditTextCharAttribs(aPos, rAttr);
             pEditObj = rDoc.GetEditText(aPos);
@@ -2195,6 +2259,7 @@ void ScViewFunc::SetWidthOrHeight(
                 if ( eMode==SC_SIZE_OPTIMAL || eMode==SC_SIZE_VISOPT )
                 {
                     bool bAll = ( eMode==SC_SIZE_OPTIMAL );
+                    bool bFiltered = false;
                     if (!bAll)
                     {
                         //  delete CRFlags::ManualSize for all in range,
@@ -2213,6 +2278,14 @@ void ScViewFunc::SetWidthOrHeight(
                                 rDoc.SetRowFlags(nRow, nTab, nOld & ~CRFlags::ManualSize);
                         }
                     }
+                    else
+                    {
+                        SCROW nLastRow = nStartNo;
+                        if (rDoc.RowFiltered(nStartNo, nTab, nullptr, &nLastRow)
+                            || nLastRow < nEndNo)
+                            bFiltered = true;
+                    }
+
 
                     double nPPTX = GetViewData().GetPPTX();
                     double nPPTY = GetViewData().GetPPTY();
@@ -2231,8 +2304,9 @@ void ScViewFunc::SetWidthOrHeight(
                     aCxt.setForceAutoSize(bAll);
                     aCxt.setExtraHeight(nSizeTwips);
                     rDoc.SetOptimalHeight(aCxt, nStartNo, nEndNo, nTab, true);
-                    if (bAll)
-                        rDoc.ShowRows( nStartNo, nEndNo, nTab, true );
+
+                    if (bFiltered)
+                        ShowFilteredRows(rDoc, nTab, nStartNo, nEndNo, bShow);
 
                     //  Manual-Flag already (re)set in SetOptimalHeight in case of bAll=sal_True
                     //  (set for Extra-Height, else reset).
@@ -2245,7 +2319,8 @@ void ScViewFunc::SetWidthOrHeight(
                         rDoc.SetManualHeight( nStartNo, nEndNo, nTab, true );          // height was set manually
                     }
 
-                    rDoc.ShowRows( nStartNo, nEndNo, nTab, nSizeTwips != 0 );
+                    // tdf#36383 - Skip consecutive rows hidden by AutoFilter
+                    ShowFilteredRows(rDoc, nTab, nStartNo, nEndNo, nSizeTwips != 0);
 
                     if (!bShow && nStartNo <= nCurY && nCurY <= nEndNo && nTab == nCurTab)
                     {
@@ -2261,7 +2336,8 @@ void ScViewFunc::SetWidthOrHeight(
             {
                 for (SCCOL nCol=static_cast<SCCOL>(nStartNo); nCol<=static_cast<SCCOL>(nEndNo); nCol++)
                 {
-                    if ( eMode != SC_SIZE_VISOPT || !rDoc.ColHidden(nCol, nTab) )
+                    const bool bIsColHidden = rDoc.ColHidden(nCol, nTab);
+                    if ( eMode != SC_SIZE_VISOPT || !bIsColHidden )
                     {
                         sal_uInt16 nThisSize = nSizeTwips;
 
@@ -2270,7 +2346,11 @@ void ScViewFunc::SetWidthOrHeight(
                         if ( nThisSize )
                             rDoc.SetColWidth( nCol, nTab, nThisSize );
 
-                        rDoc.ShowCol( nCol, nTab, bShow );
+                        // tdf#131073 - Don't show hidden cols after setting optimal col width
+                        if (eMode == SC_SIZE_OPTIMAL)
+                            rDoc.ShowCol(nCol, nTab, !bIsColHidden);
+                        else
+                            rDoc.ShowCol( nCol, nTab, bShow );
 
                         if (!bShow && nCol == nCurX && nTab == nCurTab)
                         {
@@ -2396,9 +2476,10 @@ void ScViewFunc::SetMarkedWidthOrHeight( bool bWidth, ScSizeMode eMode, sal_uInt
         SCCOL nCol = GetViewData().GetCurX();
         SCROW nRow = GetViewData().GetCurY();
         SCTAB nTab = GetViewData().GetTabNo();
+        const ScRange aMarkRange( nCol, nRow, nTab);
         DoneBlockMode();
-        InitOwnBlockMode();
-        rMark.SetMultiMarkArea( ScRange( nCol,nRow,nTab ) );
+        InitOwnBlockMode( aMarkRange );
+        rMark.SetMultiMarkArea( aMarkRange );
         MarkDataChanged();
     }
 

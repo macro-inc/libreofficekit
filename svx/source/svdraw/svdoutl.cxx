@@ -17,9 +17,12 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <optional>
 #include <svx/svdoutl.hxx>
 #include <editeng/outliner.hxx>
+#include <svx/svdmodel.hxx>
 #include <svx/svdotext.hxx>
+#include <svx/svdpage.hxx>
 #include <editeng/editstat.hxx>
 #include <svl/itempool.hxx>
 #include <editeng/editview.hxx>
@@ -39,7 +42,7 @@ SdrOutliner::~SdrOutliner()
 
 void SdrOutliner::SetTextObj( const SdrTextObj* pObj )
 {
-    if( pObj && pObj != mxWeakTextObj.get() )
+    if( pObj && pObj != mxWeakTextObj.get().get() )
     {
         SetUpdateLayout(false);
         OutlinerMode nOutlinerMode2 = OutlinerMode::OutlineObject;
@@ -47,7 +50,7 @@ void SdrOutliner::SetTextObj( const SdrTextObj* pObj )
             nOutlinerMode2 = OutlinerMode::TextObject;
         Init( nOutlinerMode2 );
 
-        SetGlobalCharStretching();
+        setGlobalScale(100.0, 100.0, 100.0, 100.0);
 
         EEControlBits nStat = GetControlWord();
         nStat &= ~EEControlBits( EEControlBits::STRETCHING | EEControlBits::AUTOPAGESIZE );
@@ -61,12 +64,12 @@ void SdrOutliner::SetTextObj( const SdrTextObj* pObj )
         ClearPolygon();
     }
 
-    mxWeakTextObj.reset( const_cast< SdrTextObj* >(pObj) );
+    mxWeakTextObj = const_cast< SdrTextObj* >(pObj);
 }
 
 void SdrOutliner::SetTextObjNoInit( const SdrTextObj* pObj )
 {
-    mxWeakTextObj.reset( const_cast< SdrTextObj* >(pObj) );
+    mxWeakTextObj = const_cast< SdrTextObj* >(pObj);
 }
 
 OUString SdrOutliner::CalcFieldValue(const SvxFieldItem& rField, sal_Int32 nPara, sal_Int32 nPos,
@@ -75,8 +78,8 @@ OUString SdrOutliner::CalcFieldValue(const SvxFieldItem& rField, sal_Int32 nPara
     bool bOk = false;
     OUString aRet;
 
-    if(mxWeakTextObj.is())
-        bOk = mxWeakTextObj->CalcFieldValue(rField, nPara, nPos, false, rpTxtColor, rpFldColor, aRet);
+    if(auto pTextObj = mxWeakTextObj.get())
+        bOk = pTextObj->CalcFieldValue(rField, nPara, nPos, false, rpTxtColor, rpFldColor, aRet);
 
     if (!bOk)
         aRet = Outliner::CalcFieldValue(rField, nPara, nPos, rpTxtColor, rpFldColor);
@@ -86,7 +89,7 @@ OUString SdrOutliner::CalcFieldValue(const SvxFieldItem& rField, sal_Int32 nPara
 
 const SdrTextObj* SdrOutliner::GetTextObj() const
 {
-    return mxWeakTextObj.get();
+    return mxWeakTextObj.get().get();
 }
 
 bool SdrOutliner::hasEditViewCallbacks() const
@@ -102,6 +105,15 @@ bool SdrOutliner::hasEditViewCallbacks() const
     }
 
     return false;
+}
+
+std::optional<bool> SdrOutliner::GetCompatFlag(SdrCompatibilityFlag eFlag) const
+{
+    if( mpVisualizedPage )
+    {
+        return {mpVisualizedPage->getSdrModelFromSdrPage().GetCompatibilityFlag(eFlag)};
+    }
+    return {};
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -18,7 +18,7 @@
  */
 #pragma once
 
-#include "ChartType.hxx"
+#include <ChartType.hxx>
 
 namespace chart
 {
@@ -36,6 +36,8 @@ public:
     virtual css::uno::Sequence< OUString > SAL_CALL
         getSupportedServiceNames() override;
 
+    virtual rtl::Reference<ChartType> cloneChartType() const override;
+
 private:
     explicit ColumnChartType( const ColumnChartType & rOther );
 
@@ -45,7 +47,7 @@ private:
         getSupportedPropertyRoles() override;
 
     // ____ OPropertySet ____
-    virtual css::uno::Any GetDefaultValue( sal_Int32 nHandle ) const override;
+    virtual void GetDefaultValue( sal_Int32 nHandle, css::uno::Any& rAny ) const override;
     virtual ::cppu::IPropertyArrayHelper & SAL_CALL getInfoHelper() override;
 
     // ____ XPropertySet ____

@@ -249,7 +249,7 @@ namespace slideshow::internal
                 events.
              */
             DrawShape( const css::uno::Reference< css::drawing::XShape >&    xShape,
-                       const css::uno::Reference< css::drawing::XDrawPage >& xContainingPage,
+                       css::uno::Reference< css::drawing::XDrawPage > xContainingPage,
                        double                                       nPrio,
                        const Graphic&                               rGraphic,
                        const SlideShowContext&                      rContext ); // throw ShapeLoadFailedException;
@@ -349,7 +349,7 @@ namespace slideshow::internal
             /// whether a drawing layer animation has to be performed
             bool                                                                    mbDrawingLayerAnim;
 
-            /// tdf#150402 wether mpCurrMtf contains any Text with a PageField ("FIELD_SEQ_BEGIN;PageField")
+            /// tdf#150402 whether mpCurrMtf contains any Text with a PageField ("FIELD_SEQ_BEGIN;PageField")
             mutable bool                                                            mbContainsPageField;
         };
 

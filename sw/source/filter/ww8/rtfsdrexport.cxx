@@ -32,7 +32,7 @@
 #include <vcl/cvtgrf.hxx>
 #include <textboxhelper.hxx>
 #include <dcontact.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 #include <algorithm>
 #include "rtfexport.hxx"
@@ -56,11 +56,7 @@ RtfSdrExport::RtfSdrExport(RtfExport& rExport)
     memset(m_pShapeTypeWritten.get(), 0, ESCHER_ShpInst_COUNT * sizeof(bool));
 }
 
-RtfSdrExport::~RtfSdrExport()
-{
-    delete mpOutStrm;
-    mpOutStrm = nullptr;
-}
+RtfSdrExport::~RtfSdrExport() {}
 
 void RtfSdrExport::OpenContainer(sal_uInt16 nEscherContainer, int nRecInstance)
 {
@@ -369,8 +365,7 @@ void RtfSdrExport::Commit(EscherPropertyContainer& rProps, const tools::Rectangl
                     {
                         // We know the number of vertices at the end only, so we have to prepend them here.
                         m_aShapeProps.insert(std::pair<OString, OString>(
-                            "pVerticies",
-                            "8;" + OString::number(nVertices) + aVerticies.makeStringAndClear()));
+                            "pVerticies", "8;" + OString::number(nVertices) + aVerticies));
                     }
                     if (!aSegmentInfo.isEmpty())
                         m_aShapeProps.insert(std::pair<OString, OString>(
@@ -543,7 +538,8 @@ sal_Int32 RtfSdrExport::StartShape()
     m_rAttrOutput.RunText().append(
         "{" OOO_STRING_SVTOOLS_RTF_IGNORE OOO_STRING_SVTOOLS_RTF_SHPINST);
 
-    m_rAttrOutput.RunText().append(m_aShapeStyle.makeStringAndClear());
+    m_rAttrOutput.RunText().append(m_aShapeStyle);
+    m_aShapeStyle.setLength(0);
     // Ignore \shpbxpage, \shpbxmargin, and \shpbxcolumn, in favor of the posrelh property.
     m_rAttrOutput.RunText().append(OOO_STRING_SVTOOLS_RTF_SHPBXIGNORE);
     // Ignore \shpbypage, \shpbymargin, and \shpbycolumn, in favor of the posrelh property.
@@ -591,7 +587,7 @@ sal_Int32 RtfSdrExport::StartShape()
         }
     }
 
-    auto pTextObj = dynamic_cast<const SdrTextObj*>(m_pSdrObject);
+    auto pTextObj = DynCastSdrTextObj(m_pSdrObject);
     if (pTextObj)
     {
         const OutlinerParaObject* pParaObj = nullptr;
@@ -628,8 +624,7 @@ sal_Int32 RtfSdrExport::StartShape()
                              msfilter::rtfutil::OutString(rEditObj.GetText(0),
                                                           m_rExport.GetCurrentEncoding()));
 
-                auto pFontFamily
-                    = static_cast<const SvxFontItem*>(rItemSet.GetItem(SID_ATTR_CHAR_FONT));
+                const SvxFontItem* pFontFamily = rItemSet.GetItem(SID_ATTR_CHAR_FONT);
                 if (pFontFamily)
                 {
                     lcl_AppendSP(m_rAttrOutput.RunText(), "gtextFont",

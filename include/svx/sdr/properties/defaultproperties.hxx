@@ -27,6 +27,7 @@
 #include <svx/sdr/properties/properties.hxx>
 #include <svx/svxdllapi.h>
 #include <svl/itemset.hxx>
+#include <o3tl/span.hxx>
 
 struct _xmlTextWriter;
 typedef struct _xmlTextWriter* xmlTextWriterPtr;
@@ -39,20 +40,24 @@ namespace sdr::properties
             // the to be used ItemSet
             mutable std::optional<SfxItemSet> mxItemSet;
 
-            // create a new itemset
-            virtual SfxItemSet CreateObjectSpecificItemSet(SfxItemPool& rPool) override;
+            // create a new object specific itemset with object specific ranges.
+            virtual SfxItemSet CreateObjectSpecificItemSet(SfxItemPool& pPool) override;
 
-            // test changeability for a single item
-            virtual bool AllowItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr) const override;
+            // Test changeability for a single item. If an implementation wants to prevent
+            // changing an item it should override this method.
+            virtual bool AllowItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr) const;
 
-            // Do the ItemChange, may do special handling
-            virtual void ItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr) override;
+            // Do the internal ItemChange. If only nWhich is given, the item needs to be cleared.
+            // Also needs to handle if nWhich and pNewItem is 0, which means to clear all items.
+            virtual void ItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr);
 
-            // Called after ItemChange() is done for all items.
-            virtual void PostItemChange(const sal_uInt16 nWhich) override;
+            // Called after ItemChange() is done for all items. Allows local reactions on
+            // specific item changes
+            virtual void PostItemChange(const sal_uInt16 nWhich);
 
-            // react on ItemSet changes
-            virtual void ItemSetChanged(const SfxItemSet*) override;
+            // Internally react on ItemSet changes. The given span contains changed items.
+            // If nDeletedWhich is not 0, it indicates a deleted item.
+            virtual void ItemSetChanged(o3tl::span< const SfxPoolItem* const > aChangedItems, sal_uInt16 nDeletedWhich);
 
             // check if SfxItemSet exists
             bool HasSfxItemSet() const { return bool(mxItemSet); }
@@ -92,7 +97,8 @@ namespace sdr::properties
             virtual void SetObjectItemSet(const SfxItemSet& rSet) override;
 
             // set a new StyleSheet and broadcast
-            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr) override;
+            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast) override;
 
             // get the installed StyleSheet
             virtual SfxStyleSheet* GetStyleSheet() const override;

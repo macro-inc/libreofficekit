@@ -27,6 +27,7 @@
 #ifndef IOS
 #include <headless/svpgdi.hxx>
 #endif
+#include <salsys.hxx>
 
 #include <basegfx/vector/b2ivector.hxx>
 
@@ -55,7 +56,6 @@ SvpSalFrame::SvpSalFrame( SvpSalInstance* pInstance,
     m_nMaxWidth( 0 ),
     m_nMaxHeight( 0 )
 {
-    // SAL_DEBUG("SvpSalFrame::SvpSalFrame: " << this);
 #ifdef IOS
     // Nothing
 #elif defined ANDROID
@@ -86,7 +86,6 @@ SvpSalFrame::~SvpSalFrame()
 
     if( s_pFocusFrame == this )
     {
-        // SAL_DEBUG("SvpSalFrame::~SvpSalFrame: losing focus: " << this);
         s_pFocusFrame = nullptr;
         // call directly here, else an event for a destroyed frame would be dispatched
         CallCallback( SalEvent::LoseFocus, nullptr );
@@ -129,7 +128,6 @@ void SvpSalFrame::GetFocus()
     {
         if( s_pFocusFrame )
             s_pFocusFrame->LoseFocus();
-        // SAL_DEBUG("SvpSalFrame::GetFocus(): " << this);
         s_pFocusFrame = this;
         m_pInstance->PostEvent( this, nullptr, SalEvent::GetFocus );
     }
@@ -139,7 +137,6 @@ void SvpSalFrame::LoseFocus()
 {
     if( s_pFocusFrame == this )
     {
-        // SAL_DEBUG("SvpSalFrame::LoseFocus: " << this);
         m_pInstance->PostEvent( this, nullptr, SalEvent::LoseFocus );
         s_pFocusFrame = nullptr;
     }
@@ -147,7 +144,7 @@ void SvpSalFrame::LoseFocus()
 
 basegfx::B2IVector SvpSalFrame::GetSurfaceFrameSize() const
 {
-    basegfx::B2IVector aFrameSize( maGeometry.nWidth, maGeometry.nHeight );
+    basegfx::B2IVector aFrameSize( maGeometry.width(), maGeometry.height() );
     if( aFrameSize.getX() == 0 )
         aFrameSize.setX( 1 );
     if( aFrameSize.getY() == 0 )
@@ -185,7 +182,7 @@ void SvpSalFrame::PostPaint() const
 {
     if( m_bVisible )
     {
-        SalPaintEvent aPEvt(0, 0, maGeometry.nWidth, maGeometry.nHeight);
+        SalPaintEvent aPEvt(0, 0, maGeometry.width(), maGeometry.height());
         aPEvt.mbImmediateUpdate = false;
         CallCallback( SalEvent::Paint, &aPEvt );
     }
@@ -201,10 +198,6 @@ void SvpSalFrame::SetIcon( sal_uInt16 )
 }
 
 void SvpSalFrame::SetMenu( SalMenu* )
-{
-}
-
-void SvpSalFrame::DrawMenuBar()
 {
 }
 
@@ -225,7 +218,6 @@ void SvpSalFrame::Show( bool bVisible, bool bNoActivate )
 
     if (bVisible)
     {
-        // SAL_DEBUG("SvpSalFrame::Show: showing: " << this);
         m_bVisible = true;
         m_pInstance->PostEvent( this, nullptr, SalEvent::Resize );
         if( ! bNoActivate )
@@ -233,7 +225,6 @@ void SvpSalFrame::Show( bool bVisible, bool bNoActivate )
     }
     else
     {
-        // SAL_DEBUG("SvpSalFrame::Show: hiding: " << this);
         m_bVisible = false;
         LoseFocus();
     }
@@ -254,24 +245,24 @@ void SvpSalFrame::SetMaxClientSize( tools::Long nWidth, tools::Long nHeight )
 void SvpSalFrame::SetPosSize( tools::Long nX, tools::Long nY, tools::Long nWidth, tools::Long nHeight, sal_uInt16 nFlags )
 {
     if( (nFlags & SAL_FRAME_POSSIZE_X) != 0 )
-        maGeometry.nX = nX;
+        maGeometry.setX(nX);
     if( (nFlags & SAL_FRAME_POSSIZE_Y) != 0 )
-        maGeometry.nY = nY;
+        maGeometry.setY(nY);
     if( (nFlags & SAL_FRAME_POSSIZE_WIDTH) != 0 )
     {
-        maGeometry.nWidth = nWidth;
-        if( m_nMaxWidth > 0 && maGeometry.nWidth > o3tl::make_unsigned(m_nMaxWidth) )
-            maGeometry.nWidth = m_nMaxWidth;
-        if( m_nMinWidth > 0 && maGeometry.nWidth < o3tl::make_unsigned(m_nMinWidth) )
-            maGeometry.nWidth = m_nMinWidth;
+        maGeometry.setWidth(nWidth);
+        if (m_nMaxWidth > 0 && maGeometry.width() > m_nMaxWidth)
+            maGeometry.setWidth(m_nMaxWidth);
+        if (m_nMinWidth > 0 && maGeometry.width() < m_nMinWidth)
+            maGeometry.setWidth(m_nMinWidth);
     }
     if( (nFlags & SAL_FRAME_POSSIZE_HEIGHT) != 0 )
     {
-        maGeometry.nHeight = nHeight;
-        if( m_nMaxHeight > 0 && maGeometry.nHeight > o3tl::make_unsigned(m_nMaxHeight) )
-            maGeometry.nHeight = m_nMaxHeight;
-        if( m_nMinHeight > 0 && maGeometry.nHeight < o3tl::make_unsigned(m_nMinHeight) )
-            maGeometry.nHeight = m_nMinHeight;
+        maGeometry.setHeight(nHeight);
+        if (m_nMaxHeight > 0 && maGeometry.height() > m_nMaxHeight)
+            maGeometry.setHeight(m_nMaxHeight);
+        if (m_nMinHeight > 0 && maGeometry.height() < m_nMinHeight)
+            maGeometry.setHeight(m_nMinHeight);
     }
 #ifndef IOS
     basegfx::B2IVector aFrameSize = GetSurfaceFrameSize();
@@ -298,8 +289,8 @@ void SvpSalFrame::SetPosSize( tools::Long nX, tools::Long nY, tools::Long nWidth
 
 void SvpSalFrame::GetClientSize( tools::Long& rWidth, tools::Long& rHeight )
 {
-    rWidth = maGeometry.nWidth;
-    rHeight = maGeometry.nHeight;
+    rWidth = maGeometry.width();
+    rHeight = maGeometry.height();
 }
 
 void SvpSalFrame::GetWorkArea( tools::Rectangle& rRect )
@@ -313,48 +304,40 @@ SalFrame* SvpSalFrame::GetParent() const
     return m_pParent;
 }
 
-constexpr auto FRAMESTATE_MASK_GEOMETRY =
-     WindowStateMask::X     | WindowStateMask::Y |
-     WindowStateMask::Width | WindowStateMask::Height;
-
-void SvpSalFrame::SetWindowState( const SalFrameState *pState )
+void SvpSalFrame::SetWindowState(const vcl::WindowData *pState)
 {
     if (pState == nullptr)
         return;
 
     // Request for position or size change
-    if (!(pState->mnMask & FRAMESTATE_MASK_GEOMETRY))
+    if (!(pState->mask() & vcl::WindowDataMask::PosSize))
         return;
 
-    tools::Long nX = maGeometry.nX;
-    tools::Long nY = maGeometry.nY;
-    tools::Long nWidth = maGeometry.nWidth;
-    tools::Long nHeight = maGeometry.nHeight;
+    tools::Long nX = maGeometry.x();
+    tools::Long nY = maGeometry.y();
+    tools::Long nWidth = maGeometry.width();
+    tools::Long nHeight = maGeometry.height();
 
     // change requested properties
-    if (pState->mnMask & WindowStateMask::X)
-        nX = pState->mnX;
-    if (pState->mnMask & WindowStateMask::Y)
-        nY = pState->mnY;
-    if (pState->mnMask & WindowStateMask::Width)
-        nWidth = pState->mnWidth;
-    if (pState->mnMask & WindowStateMask::Height)
-        nHeight = pState->mnHeight;
+    if (pState->mask() & vcl::WindowDataMask::X)
+        nX = pState->x();
+    if (pState->mask() & vcl::WindowDataMask::Y)
+        nY = pState->y();
+    if (pState->mask() & vcl::WindowDataMask::Width)
+        nWidth = pState->width();
+    if (pState->mask() & vcl::WindowDataMask::Height)
+        nHeight = pState->height();
 
     SetPosSize( nX, nY, nWidth, nHeight,
                 SAL_FRAME_POSSIZE_X | SAL_FRAME_POSSIZE_Y |
                 SAL_FRAME_POSSIZE_WIDTH | SAL_FRAME_POSSIZE_HEIGHT );
 }
 
-bool SvpSalFrame::GetWindowState( SalFrameState* pState )
+bool SvpSalFrame::GetWindowState(vcl::WindowData* pState)
 {
-    pState->mnState = WindowStateState::Normal;
-    pState->mnX      = maGeometry.nX;
-    pState->mnY      = maGeometry.nY;
-    pState->mnWidth  = maGeometry.nWidth;
-    pState->mnHeight = maGeometry.nHeight;
-    pState->mnMask   = FRAMESTATE_MASK_GEOMETRY | WindowStateMask::State;
-
+    pState->setPosSize(maGeometry.posSize());
+    pState->setState(vcl::WindowState::Normal);
+    pState->setMask(vcl::WindowDataMask::PosSizeState);
     return true;
 }
 
@@ -441,7 +424,7 @@ void SvpSalFrame::UpdateSettings( AllSettings& rSettings )
         aStdFont.SetFontSize(Size(0, 12));
         aStyleSettings.SetMenuFont(aStdFont);
 
-        SvpSalGraphics* pGraphics = m_aGraphics.back();
+        SvpSalGraphics* pGraphics = m_aGraphics.empty() ? nullptr : m_aGraphics.back();
         bool bFreeGraphics = false;
         if (!pGraphics)
         {

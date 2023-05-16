@@ -107,8 +107,7 @@ static void lcl_SetUIPrefs(const SwViewOption &rPref, SwView* pView, SwViewShell
 
 SwWrtShell* GetActiveWrtShell()
 {
-    SwView *pActive = ::GetActiveView();
-    if( pActive )
+    if (SwView *pActive = GetActiveView())
         return &pActive->GetWrtShell();
     return nullptr;
 }
@@ -217,6 +216,7 @@ void SwModule::ApplyUserMetric( FieldUnit eMetric, bool bWeb )
                 GetUsrPref(false);
             pPref = m_pUsrPref.get();
         }
+        assert(pPref && "pPref is set by here");
         FieldUnit eOldMetric = pPref->GetMetric();
         if(eOldMetric != eMetric)
             pPref->SetMetric(eMetric);
@@ -253,6 +253,7 @@ void SwModule::ApplyRulerMetric( FieldUnit eMetric, bool bHorizontal, bool bWeb 
             GetUsrPref(false);
         pPref = m_pUsrPref.get();
     }
+    assert(pPref && "pPref will be set by now");
     if( bHorizontal )
         pPref->SetHScrollMetric(eMetric);
     else
@@ -289,6 +290,7 @@ void SwModule::ApplyUserCharUnit(bool bApplyChar, bool bWeb)
             GetUsrPref(false);
         pPref = m_pUsrPref.get();
     }
+    assert(pPref && "pPref is set by here");
     bool bOldApplyCharUnit = pPref->IsApplyCharUnit();
     bool bHasChanged = false;
     if(bOldApplyCharUnit != bApplyChar)
@@ -380,7 +382,7 @@ void SwModule::ShowDBObj(SwView const & rView, const SwDBData& rData)
         aSelection.setDataSource(rData.sDataSource);
         aSelection[DataAccessDescriptorProperty::Command]       <<= rData.sCommand;
         aSelection[DataAccessDescriptorProperty::CommandType]   <<= rData.nCommandType;
-        xControllerSelection->select(makeAny(aSelection.createPropertyValueSequence()));
+        xControllerSelection->select(Any(aSelection.createPropertyValueSequence()));
     }
     else {
         OSL_FAIL("no selection supplier in the beamer!");
@@ -600,35 +602,40 @@ FieldUnit SwModule::GetMetric( bool bWeb ) const
             GetUsrPref(false);
         pPref = m_pUsrPref.get();
     }
+    assert(pPref && "pPref is set by here");
     return pPref->GetMetric();
 }
 
 // Pass-through Update-Status
 sal_uInt16 SwModule::GetLinkUpdMode() const
 {
-    if(!m_pUsrPref)
+    if (!m_pUsrPref)
         GetUsrPref(false);
+    assert(m_pUsrPref && "m_pUsrPref is set by here");
     return o3tl::narrowing<sal_uInt16>(m_pUsrPref->GetUpdateLinkMode());
 }
 
 SwFieldUpdateFlags SwModule::GetFieldUpdateFlags() const
 {
-    if(!m_pUsrPref)
+    if (!m_pUsrPref)
         GetUsrPref(false);
+    assert(m_pUsrPref && "m_pUsrPref is set by here");
     return m_pUsrPref->GetFieldUpdateFlags();
 }
 
 void SwModule::ApplyFieldUpdateFlags(SwFieldUpdateFlags eFieldFlags)
 {
-    if(!m_pUsrPref)
+    if (!m_pUsrPref)
         GetUsrPref(false);
+    assert(m_pUsrPref && "m_pUsrPref is set by here");
     m_pUsrPref->SetFieldUpdateFlags(eFieldFlags);
 }
 
 void SwModule::ApplyLinkMode(sal_Int32 nNewLinkMode)
 {
-    if(!m_pUsrPref)
+    if (!m_pUsrPref)
         GetUsrPref(false);
+    assert(m_pUsrPref && "m_pUsrPref is set by here");
     m_pUsrPref->SetUpdateLinkMode(nNewLinkMode);
 }
 
@@ -657,8 +664,9 @@ void SwModule::CheckSpellChanges( bool bOnlineSpelling,
 
 void SwModule::ApplyDefaultPageMode(bool bIsSquaredPageMode)
 {
-    if(!m_pUsrPref)
+    if (!m_pUsrPref)
         GetUsrPref(false);
+    assert(m_pUsrPref && "pPref is set by here");
     m_pUsrPref->SetDefaultPageMode(bIsSquaredPageMode);
 }
 

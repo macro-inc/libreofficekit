@@ -47,7 +47,7 @@ ifeq ($(OS),ANDROID)
 liborcus_LIBS+=$(gb_STDLIBS)
 endif
 
-liborcus_CPPCLAGS=$(CPPFLAGS)
+liborcus_CPPFLAGS=$(CPPFLAGS)
 ifeq ($(SYSTEM_ZLIB),)
 liborcus_CPPFLAGS+=$(ZLIB_CFLAGS)
 endif
@@ -62,6 +62,8 @@ liborcus_CPPFLAGS+=$(gb_COMPILERDEFS_STDLIB_DEBUG)
 
 liborcus_CXXFLAGS=$(CXXFLAGS) $(gb_VISIBILITY_FLAGS) $(gb_VISIBILITY_FLAGS_CXX) $(CXXFLAGS_CXX11) -DBOOST_SYSTEM_NO_DEPRECATED
 liborcus_LDFLAGS=$(LDFLAGS) $(gb_LTOFLAGS)
+liborcus_CXXFLAGS+=$(call gb_ExternalProject_get_build_flags,liborcus)
+liborcus_LDFLAGS+=$(call gb_ExternalProject_get_link_flags,liborcus)
 ifeq ($(COM),MSC)
 liborcus_CXXFLAGS+=$(BOOST_CXXFLAGS)
 endif
@@ -76,14 +78,6 @@ endif
 
 ifeq ($(OS),LINUX)
 liborcus_LDFLAGS+=-Wl,-z,origin -Wl,-rpath,\$$$$ORIGIN
-endif
-
-ifeq ($(ENABLE_GDB_INDEX),TRUE)
-liborcus_LDFLAGS+=-Wl,--gdb-index
-liborcus_CXXFLAGS+=-ggnu-pubnames
-ifneq ($(USE_LD),)
-liborcus_LDFLAGS += $(USE_LD)
-endif
 endif
 
 $(call gb_ExternalProject_get_state_target,liborcus,build) :
@@ -114,7 +108,7 @@ $(call gb_ExternalProject_get_state_target,liborcus,build) :
 				boost_cv_lib_system=yes \
 				boost_cv_lib_filesystem=yes \
 			) \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
+			$(gb_CONFIGURE_PLATFORMS) \
 		&& $(if $(verbose),V=1) \
 		   $(MAKE) \
 		$(if $(filter MACOSX,$(OS)),\

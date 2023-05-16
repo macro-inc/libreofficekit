@@ -9,6 +9,8 @@
 
 $(eval $(call gb_Library_Library,localedata_es))
 
+$(eval $(call gb_Library_set_plugin_for_nodep,localedata_es,i18npool))
+
 $(eval $(call gb_Library_use_libraries,localedata_es,\
 	localedata_en \
 ))
@@ -34,6 +36,7 @@ $(eval $(call gb_Library_add_generated_exception_objects,localedata_es,\
 	CustomTarget/i18npool/localedata/localedata_es_UY \
 	CustomTarget/i18npool/localedata/localedata_es_VE \
 	CustomTarget/i18npool/localedata/localedata_gl_ES \
+	CustomTarget/i18npool/localedata/localedata_oc_ES_aranes \
 ))
 
 # vim: set noet sw=4 ts=4:

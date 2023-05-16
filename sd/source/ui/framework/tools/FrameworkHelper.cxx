@@ -31,17 +31,17 @@
 #include <com/sun/star/drawing/framework/XControllerManager.hpp>
 #include <com/sun/star/frame/XController.hpp>
 #include <comphelper/servicehelper.hxx>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 #include <svl/lstner.hxx>
 #include <rtl/ustrbuf.hxx>
 
 #include <sfx2/request.hxx>
 
-#include <MutexOwner.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <osl/doublecheckedlocking.h>
 #include <osl/getglobalmutex.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <memory>
 #include <unordered_map>
 
@@ -53,7 +53,7 @@ namespace {
 
 //----- CallbackCaller --------------------------------------------------------
 
-typedef ::cppu::WeakComponentImplHelper <
+typedef comphelper::WeakComponentImplHelper <
     css::drawing::framework::XConfigurationChangeListener
     > CallbackCallerInterfaceBase;
 
@@ -64,8 +64,7 @@ typedef ::cppu::WeakComponentImplHelper <
     actual callback object is called and the CallbackCaller destroys itself.
 */
 class CallbackCaller
-    : public ::sd::MutexOwner,
-      public CallbackCallerInterfaceBase
+    : public CallbackCallerInterfaceBase
 {
 public:
     /** Create a new CallbackCaller object.  This object controls its own
@@ -88,11 +87,11 @@ public:
     */
     CallbackCaller (
         const ::sd::ViewShellBase& rBase,
-        const OUString& rsEventType,
-        const ::sd::framework::FrameworkHelper::ConfigurationChangeEventFilter& rFilter,
-        const ::sd::framework::FrameworkHelper::Callback& rCallback);
+        OUString sEventType,
+        ::sd::framework::FrameworkHelper::ConfigurationChangeEventFilter aFilter,
+        ::sd::framework::FrameworkHelper::Callback aCallback);
 
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
     // XEventListener
     virtual void SAL_CALL disposing (const lang::EventObject& rEvent) override;
     // XConfigurationChangeListener
@@ -107,7 +106,7 @@ private:
 
 //----- LifetimeController ----------------------------------------------------
 
-typedef ::cppu::WeakComponentImplHelper <
+typedef comphelper::WeakComponentImplHelper <
     css::lang::XEventListener
     > LifetimeControllerInterfaceBase;
 
@@ -117,19 +116,17 @@ typedef ::cppu::WeakComponentImplHelper <
     one of them and Release() when both of them are destroyed.
 */
 class LifetimeController
-    : public ::sd::MutexOwner,
-      public LifetimeControllerInterfaceBase,
+    : public LifetimeControllerInterfaceBase,
       public SfxListener
 {
 public:
     explicit LifetimeController (::sd::ViewShellBase& rBase);
     virtual ~LifetimeController() override;
 
-    virtual void SAL_CALL disposing() override;
-
     /** XEventListener.  This method is called when the frame::XController
         is being destroyed.
     */
+    using WeakComponentImplHelperBase::disposing;
     virtual void SAL_CALL disposing (const lang::EventObject& rEvent) override;
 
     /** This method is called when the ViewShellBase is being destroyed.
@@ -250,19 +247,18 @@ public:
 //----- Framework::DisposeListener ---------------------------------------------
 
 namespace {
-    typedef ::cppu::WeakComponentImplHelper <
+    typedef comphelper::WeakComponentImplHelper <
         css::lang::XEventListener
         > FrameworkHelperDisposeListenerInterfaceBase;
 }
 
 class FrameworkHelper::DisposeListener
-    : public ::sd::MutexOwner,
-      public FrameworkHelperDisposeListenerInterfaceBase
+    : public FrameworkHelperDisposeListenerInterfaceBase
 {
 public:
-    explicit DisposeListener (const ::std::shared_ptr<FrameworkHelper>& rpHelper);
+    explicit DisposeListener (::std::shared_ptr<FrameworkHelper> pHelper);
 
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
     virtual void SAL_CALL disposing (const lang::EventObject& rEventObject) override;
 
@@ -513,7 +509,7 @@ void asyncUpdateEditMode(FrameworkHelper* const pHelper, const EditMode eEMode)
 }
 
 void FrameworkHelper::HandleModeChangeSlot (
-    sal_uLong nSlotId,
+    sal_uInt16 nSlotId,
     SfxRequest const & rRequest)
 {
     if ( ! mxConfigurationController.is())
@@ -527,7 +523,7 @@ void FrameworkHelper::HandleModeChangeSlot (
         const SfxItemSet* pRequestArguments = rRequest.GetArgs();
         if (pRequestArguments)
         {
-            const SfxBoolItem* pIsActive = rRequest.GetArg<SfxBoolItem>(static_cast<sal_uInt16>(nSlotId));
+            const SfxBoolItem* pIsActive = rRequest.GetArg<SfxBoolItem>(nSlotId);
             if (!pIsActive->GetValue ())
             {
                 if (nSlotId == SID_NOTES_MASTER_MODE)
@@ -765,16 +761,15 @@ Reference<XResourceId> FrameworkHelper::CreateResourceId (
 //----- FrameworkHelper::DisposeListener --------------------------------------
 
 FrameworkHelper::DisposeListener::DisposeListener (
-    const ::std::shared_ptr<FrameworkHelper>& rpHelper)
-    : FrameworkHelperDisposeListenerInterfaceBase(maMutex),
-      mpHelper(rpHelper)
+    ::std::shared_ptr<FrameworkHelper> pHelper)
+    : mpHelper(std::move(pHelper))
 {
     Reference<XComponent> xComponent (mpHelper->mxConfigurationController, UNO_QUERY);
     if (xComponent.is())
         xComponent->addEventListener(this);
 }
 
-void SAL_CALL FrameworkHelper::DisposeListener::disposing()
+void FrameworkHelper::DisposeListener::disposing(std::unique_lock<std::mutex>&)
 {
     Reference<XComponent> xComponent (mpHelper->mxConfigurationController, UNO_QUERY);
     if (xComponent.is())
@@ -805,13 +800,12 @@ namespace {
 
 CallbackCaller::CallbackCaller (
     const ::sd::ViewShellBase& rBase,
-    const OUString& rsEventType,
-    const ::sd::framework::FrameworkHelper::ConfigurationChangeEventFilter& rFilter,
-    const ::sd::framework::FrameworkHelper::Callback& rCallback)
-    : CallbackCallerInterfaceBase(MutexOwner::maMutex),
-      msEventType(rsEventType),
-      maFilter(rFilter),
-      maCallback(rCallback)
+    OUString  rsEventType,
+    ::sd::framework::FrameworkHelper::ConfigurationChangeEventFilter aFilter,
+    ::sd::framework::FrameworkHelper::Callback aCallback)
+    : msEventType(std::move(rsEventType)),
+      maFilter(std::move(aFilter)),
+      maCallback(std::move(aCallback))
 {
     try
     {
@@ -840,7 +834,7 @@ CallbackCaller::CallbackCaller (
     }
 }
 
-void CallbackCaller::disposing()
+void CallbackCaller::disposing(std::unique_lock<std::mutex>&)
 {
     try
     {
@@ -889,8 +883,7 @@ void SAL_CALL CallbackCaller::notifyConfigurationChange (
 //----- LifetimeController -------------------------------------------------
 
 LifetimeController::LifetimeController (::sd::ViewShellBase& rBase)
-    : LifetimeControllerInterfaceBase(maMutex),
-      mrBase(rBase),
+    : mrBase(rBase),
       mbListeningToViewShellBase(false),
       mbListeningToController(false)
 {
@@ -914,10 +907,6 @@ LifetimeController::LifetimeController (::sd::ViewShellBase& rBase)
 LifetimeController::~LifetimeController()
 {
     OSL_ASSERT(!mbListeningToController && !mbListeningToViewShellBase);
-}
-
-void LifetimeController::disposing()
-{
 }
 
 void SAL_CALL LifetimeController::disposing (const lang::EventObject&)

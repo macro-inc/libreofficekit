@@ -24,12 +24,12 @@
 #include <tools/globname.hxx>
 #include <rtl/ustring.hxx>
 #include <tools/stream.hxx>
-#include <svx/unoapi.hxx>
 #include <svx/svdobj.hxx>
 #include <svx/svdoole2.hxx>
 #include <com/sun/star/container/XIndexContainer.hpp>
 #include <com/sun/star/document/XDocumentPropertiesSupplier.hpp>
 #include <com/sun/star/drawing/FillStyle.hpp>
+#include <com/sun/star/drawing/XDrawPage.hpp>
 #include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/office/XAnnotation.hpp>
 #include <com/sun/star/office/XAnnotationAccess.hpp>
@@ -50,7 +50,9 @@
 #include <sfx2/docinf.hxx>
 #include <oox/export/utils.hxx>
 #include <oox/ole/olehelper.hxx>
+#include <sdfilter.hxx>
 #include <memory>
+#include <utility>
 
 class SfxObjectShell;
     // complete SfxObjectShell for SaveVBA under -fsanitize=function
@@ -63,7 +65,7 @@ using ::com::sun::star::beans::XPropertySet;
 
 //============================ PPTWriter ==================================
 
-PPTWriter::PPTWriter( tools::SvRef<SotStorage> const & rSvStorage,
+PPTWriter::PPTWriter( tools::SvRef<SotStorage> xSvStorage,
             css::uno::Reference< css::frame::XModel > const & rXModel,
             css::uno::Reference< css::task::XStatusIndicator > const & rXStatInd,
             SvMemoryStream* pVBA, sal_uInt32 nCnvrtFlags ) :
@@ -75,7 +77,7 @@ PPTWriter::PPTWriter( tools::SvRef<SotStorage> const & rSvStorage,
     mnTextStyle( 0 ),
     mbFontIndependentLineSpacing( false ),
     mnTextSize( 0 ),
-    mrStg                   ( rSvStorage ),
+    mrStg                   (std::move( xSvStorage )),
     mnVBAOleOfs             ( 0 ),
     mpVBA                   ( pVBA ),
     mnExEmbed               ( 0 ),
@@ -1070,9 +1072,8 @@ void ImplExportComments( const uno::Reference< drawing::XDrawPage >& xPage, SvMe
                 uno::Reference< office::XAnnotation > xAnnotation( xAnnotationEnumeration->nextElement() );
 
                 geometry::RealPoint2D aRealPoint2D( xAnnotation->getPosition() );
-                MapMode aMapDest( MapUnit::MapInch, Point(), Fraction( 1, 576 ), Fraction( 1, 576 ) );
-                Point aPoint( OutputDevice::LogicToLogic( Point( static_cast< sal_Int32 >( aRealPoint2D.X * 100.0 ),
-                    static_cast<sal_Int32>(aRealPoint2D.Y * 100.0)), MapMode(MapUnit::Map100thMM), aMapDest));
+                Point aPoint(o3tl::convert(aRealPoint2D.X, o3tl::Length::mm, o3tl::Length::master),
+                             o3tl::convert(aRealPoint2D.Y, o3tl::Length::mm, o3tl::Length::master));
 
                 OUString sAuthor( xAnnotation->getAuthor() );
                 uno::Reference< text::XText > xText( xAnnotation->getTextRange() );
@@ -1417,7 +1418,7 @@ void PPTWriter::ImplWriteAtomEnding()
 
 // - exported function -
 
-extern "C" SAL_DLLPUBLIC_EXPORT sal_Bool ExportPPT( const std::vector< css::beans::PropertyValue >& rMediaData,
+SAL_DLLPUBLIC_EXPORT bool ExportPPT( const std::vector< css::beans::PropertyValue >& rMediaData,
                     tools::SvRef<SotStorage> const & rSvStorage,
                     css::uno::Reference< css::frame::XModel > const & rXModel,
                     css::uno::Reference< css::task::XStatusIndicator > const & rXStatInd,
@@ -1430,7 +1431,7 @@ extern "C" SAL_DLLPUBLIC_EXPORT sal_Bool ExportPPT( const std::vector< css::bean
     return bStatus;
 }
 
-extern "C" SAL_DLLPUBLIC_EXPORT sal_Bool SaveVBA( SfxObjectShell& rDocShell, SvMemoryStream*& pBas )
+SAL_DLLPUBLIC_EXPORT bool SaveVBA( SfxObjectShell& rDocShell, SvMemoryStream*& pBas )
 {
     tools::SvRef<SotStorage> xDest( new SotStorage( new SvMemoryStream(), true ) );
     SvxImportMSVBasic aMSVBas( rDocShell, *xDest );

@@ -18,7 +18,7 @@
  */
 
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <canvas/canvastools.hxx>
 
 #include <math.h>
@@ -41,6 +41,8 @@
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 
 #include <cppcanvas/basegfxfactory.hxx>
+
+#include <svtools/colorcfg.hxx>
 
 #include <unoview.hxx>
 #include <slideshowexceptions.hxx>
@@ -77,7 +79,7 @@ namespace slideshow::internal
                                                                       const ShapeAttributeLayerSharedPtr&   pAttr )
             {
                 ::basegfx::B2DHomMatrix     aTransform;
-                const ::basegfx::B2DSize&   rSize( rShapeBounds.getRange() );
+                const basegfx::B2DSize rSize(rShapeBounds.getRange().getX(), rShapeBounds.getRange().getY());
 
                 const double nShearX( pAttr->isShearXAngleValid() ?
                                       pAttr->getShearXAngle() :
@@ -96,9 +98,9 @@ namespace slideshow::internal
                 // ensure valid size (zero size will inevitably lead
                 // to a singular transformation matrix)
                 aTransform.scale( ::basegfx::pruneScaleValue(
-                                      rSize.getX() ),
+                                      rSize.getWidth() ),
                                   ::basegfx::pruneScaleValue(
-                                      rSize.getY() ) );
+                                      rSize.getHeight() ) );
 
                 const bool bNeedShearX( !::basegfx::fTools::equalZero(nShearX) );
                 const bool bNeedShearY( !::basegfx::fTools::equalZero(nShearY) );
@@ -499,11 +501,11 @@ namespace slideshow::internal
                 // ensure valid size (zero size will inevitably lead
                 // to a singular transformation matrix).
                 aTransform.scale( ::basegfx::pruneScaleValue(
-                                      aSize.getX() /
+                                      aSize.getWidth() /
                                       ::basegfx::pruneScaleValue(
                                           rOrigSize.getX() ) ),
                                   ::basegfx::pruneScaleValue(
-                                      aSize.getY() /
+                                      aSize.getHeight() /
                                       ::basegfx::pruneScaleValue(
                                           rOrigSize.getY() ) ) );
 
@@ -606,10 +608,10 @@ namespace slideshow::internal
                 // (aka mirrored shapes) _still_ have the same bounds,
                 // only with mirrored content.
                 ::basegfx::B2DSize aSize;
-                aSize.setX( fabs( pAttr->isWidthValid() ?
+                aSize.setWidth( fabs( pAttr->isWidthValid() ?
                                   pAttr->getWidth() :
                                   rOrigBounds.getWidth() ) );
-                aSize.setY( fabs( pAttr->isHeightValid() ?
+                aSize.setHeight( fabs( pAttr->isHeightValid() ?
                                   pAttr->getHeight() :
                                   rOrigBounds.getHeight() ) );
 
@@ -624,8 +626,8 @@ namespace slideshow::internal
                 // the positional attribute retrieved from the
                 // ShapeAttributeLayer actually denotes the _middle_
                 // of the shape (do it as the PPTs do...)
-                return ::basegfx::B2DRectangle( aPos - 0.5*aSize,
-                                                aPos + 0.5*aSize );
+                return ::basegfx::B2DRectangle(aPos - 0.5 * basegfx::B2DPoint(aSize),
+                                               aPos + 0.5 * basegfx::B2DPoint(aSize));
             }
         }
 
@@ -688,19 +690,29 @@ namespace slideshow::internal
                                                rSize.getY() ),
                       0x000000FFU );
 
-            // fill the bounds rectangle in white. Subtract one pixel
-            // from both width and height, because the slide size is
-            // chosen one pixel larger than given by the drawing
-            // layer. This is because shapes with line style, that
-            // have the size of the slide would otherwise be cut
-            // off. OTOH, every other slide background (solid fill,
-            // gradient, bitmap) render one pixel less, thus revealing
-            // ugly white pixel to the right and the bottom.
+            // tdf#148884 in dark mode impress's auto text color assumes it will render against
+            // the DOCCOLOR by default, so leaving this as white gives white on white, this
+            // looks the simplest approach, propagate dark mode into slideshow mode instead
+            // of reformatting to render onto a white slideshow
+            svtools::ColorConfig aColorConfig;
+            Color aApplicationDocumentColor = aColorConfig.GetColorValue(svtools::DOCCOLOR).nColor;
+            cppcanvas::IntSRGBA nCanvasColor = cppcanvas::makeColor(aApplicationDocumentColor.GetRed(),
+                                                                    aApplicationDocumentColor.GetGreen(),
+                                                                    aApplicationDocumentColor.GetBlue(),
+                                                                    0xFF);
+
+            // fill the bounds rectangle in DOCCOLOR (typically white).
+            // Subtract one pixel from both width and height, because the slide
+            // size is chosen one pixel larger than given by the drawing layer.
+            // This is because shapes with line style, that have the size of
+            // the slide would otherwise be cut off. OTOH, every other slide
+            // background (solid fill, gradient, bitmap) render one pixel less,
+            // thus revealing ugly white pixel to the right and the bottom.
             fillRect( pCanvas,
                       ::basegfx::B2DRectangle( 0.0, 0.0,
                                                rSize.getX()-1,
                                                rSize.getY()-1 ),
-                      0xFFFFFFFFU );
+                      nCanvasColor );
         }
 
         ::basegfx::B2DRectangle getAPIShapeBounds( const uno::Reference< drawing::XShape >& xShape )

@@ -17,13 +17,18 @@
 #   the License at http://www.apache.org/licenses/LICENSE-2.0 .
 #
 
+ifneq ($(ENABLE_WASM_STRIP_CANVAS),TRUE)
+$(eval $(call gb_Helper_register_executables,NONE, \
+	canvasdemo \
+))
+endif
+
 $(eval $(call gb_Helper_register_executables,NONE, \
     $(call gb_Helper_optional,HELPTOOLS, \
 	HelpIndexer \
 	HelpLinker \
     ) \
 	bestreversemap \
-	canvasdemo \
 	cfgex \
 	concat-deps \
 	cpp \
@@ -44,6 +49,7 @@ $(eval $(call gb_Helper_register_executables,NONE, \
 	$(if $(filter iOS,$(OS)),LibreOffice) \
 	lngconvex \
 	localize \
+    $(call gb_CondExeLockfile,lockfile) \
 	makedepend \
 	mbsdiff \
 	osl_process_child \
@@ -54,42 +60,49 @@ $(eval $(call gb_Helper_register_executables,NONE, \
 	propex \
 	regsvrex \
 	saxparser \
-	sp2bv \
 	svidl \
 	$(if $(ENABLE_ONLINE_UPDATE_MAR),\
 		test_updater_dialog \
 	) \
 	treex \
 	ulfex \
-	unoidl-read \
-	unoidl-write \
+	unoidl-check \
 	xrmex \
 	$(if $(filter-out ANDROID iOS WNT,$(OS)), \
         svdemo \
+        minvcl \
         fftester \
         svptest \
         svpclient ) \
 	$(if $(filter LINUX %BSD SOLARIS,$(OS)), tilebench) \
 	$(if $(filter LINUX MACOSX SOLARIS WNT %BSD,$(OS)),icontest) \
-    $(if $(DISABLE_GUI),,ui-previewer) \
 	vcldemo \
 	tiledrendering \
-    mtfdemo \
-    visualbackendtest \
+	mtfdemo \
+	visualbackendtest \
+	listfonts \
+	listglyphs \
 	$(if $(and $(ENABLE_GTK3), $(filter LINUX %BSD SOLARIS,$(OS))), gtktiledviewer) \
 	$(if $(and $(ENABLE_GTKTILEDVIEWER), $(filter WNT,$(OS))), gtktiledviewer) \
+    $(if $(filter EMSCRIPTEN,$(OS)),wasm-qt5-mandelbrot) \
 ))
 
 $(eval $(call gb_Helper_register_executables_for_install,SDK,sdk, \
 	$(if $(filter MSC,$(COM)),$(if $(filter-out AARCH64,$(CPUNAME)),climaker)) \
 	cppumaker \
-	idlc \
 	javamaker \
-	$(if $(filter UCPP,$(BUILD_TYPE)),ucpp) \
+    $(call gb_CondExeSp2bv,sp2bv) \
 	$(if $(filter ODK,$(BUILD_TYPE)),unoapploader) \
-	unoidl-check \
+	unoidl-read \
+	unoidl-write \
 	$(if $(filter ODK,$(BUILD_TYPE)),uno-skeletonmaker) \
 ))
+
+ifneq ($(ENABLE_WASM_STRIP_ACCESSIBILITY),TRUE)
+$(eval $(call gb_Helper_register_executables_for_install,OOO,brand, \
+	$(if $(filter-out ANDROID HAIKU iOS MACOSX WNT,$(OS)),oosplash) \
+))
+endif
 
 $(eval $(call gb_Helper_register_executables_for_install,OOO,brand, \
 	$(if $(ENABLE_ONLINE_UPDATE_MAR),\
@@ -145,16 +158,21 @@ $(eval $(call gb_Helper_register_executables_for_install,OOO,brand, \
 	$(call gb_Helper_optional,FUZZERS,htmlfuzzer) \
 	$(call gb_Helper_optional,FUZZERS,sftfuzzer) \
 	$(call gb_Helper_optional,FUZZERS,dbffuzzer) \
-	$(if $(filter-out ANDROID HAIKU iOS MACOSX WNT,$(OS)),oosplash) \
+	$(call gb_Helper_optional,FUZZERS,webpfuzzer) \
+	$(call gb_Helper_optional,FUZZERS,lockfuzzer) \
 	soffice_bin \
-	$(if $(filter DESKTOP,$(BUILD_TYPE)),unopkg_bin) \
+    $(call gb_CondExeUnopkg, \
+        unopkg_bin \
+        $(if $(filter WNT,$(OS)), \
+            unopkg \
+            unopkg_com \
+        ) \
+    ) \
 	$(if $(filter WNT,$(OS)), \
 		soffice_exe \
 		soffice_com \
 		soffice_safe \
 		unoinfo \
-		unopkg \
-		unopkg_com \
 		$(if $(filter-out AARCH64,$(CPUNAME)),twain32shim) \
 	) \
 ))
@@ -231,11 +249,10 @@ endif
 
 $(eval $(call gb_Helper_register_executables_for_install,UREBIN,ure,\
 	$(if $(and $(ENABLE_JAVA),$(filter-out HAIKU MACOSX WNT,$(OS)),$(filter DESKTOP,$(BUILD_TYPE))),javaldx) \
-	$(if $(ENABLE_MACOSX_SANDBOX),, \
-		regmerge \
-		regview \
-	) \
-	$(if $(filter DESKTOP,$(BUILD_TYPE)),uno) \
+    $(call gb_CondExeRegistryTools, \
+        regview \
+    ) \
+    $(call gb_CondExeUno,uno) \
 ))
 
 $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,base, \
@@ -252,10 +269,13 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,calc, \
 	sc \
 	scd \
 	scfilt \
-	scui \
 	wpftcalc \
 	solver \
 	$(call gb_Helper_optional,SCRIPTING,vbaobj) \
+))
+
+$(eval $(call gb_Helper_register_plugins_for_install,OOOLIBS,calc, \
+    scui \
 ))
 
 $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,graphicfilter, \
@@ -280,34 +300,31 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,onlineupdate, \
 
 $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,gnome, \
 	$(if $(ENABLE_EVOAB2),evoab) \
-	$(if $(ENABLE_GTK3),vclplug_gtk3) \
-	$(if $(ENABLE_GTK4),vclplug_gtk4) \
 	$(if $(ENABLE_GIO),losessioninstall) \
 	$(if $(ENABLE_GIO),ucpgio1) \
 ))
 
-$(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,kde, \
-	$(if $(ENABLE_KF5),kf5be1) \
-	$(if $(USING_X11), \
-        $(if $(ENABLE_KF5),vclplug_kf5) \
-        $(if $(ENABLE_QT5),vclplug_qt5) \
-        $(if $(ENABLE_QT6),vclplug_qt6) \
-        $(if $(ENABLE_GTK3_KDE5),vclplug_gtk3_kde5) \
-	) \
+$(eval $(call gb_Helper_register_plugins_for_install,OOOLIBS,gnome, \
+    $(if $(ENABLE_GTK3),vclplug_gtk3) \
+    $(if $(ENABLE_GTK4),vclplug_gtk4) \
 ))
-ifneq ($(ENABLE_GTK3_KDE5),)
-$(eval $(call gb_Helper_register_executables_for_install,OOO,kde, \
-       lo_kde5filepicker \
-))
-endif
 
-ifeq ($(OS),HAIKU)
-$(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,haiku, \
+gb_haiku_or_kde := $(if $(filter HAIKU,$(OS)),haiku,kde)
+
+$(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,kde, \
+    $(if $(ENABLE_KF5),kf5be1) \
+))
+
+$(eval $(call gb_Helper_register_plugins_for_install,OOOLIBS,$(gb_haiku_or_kde), \
+    $(if $(ENABLE_KF5),vclplug_kf5) \
     $(if $(ENABLE_QT5),vclplug_qt5) \
     $(if $(ENABLE_QT6),vclplug_qt6) \
-    $(if $(ENABLE_KF5),vclplug_kf5) \
+    $(if $(ENABLE_GTK3_KDE5),vclplug_gtk3_kde5) \
 ))
-endif
+
+$(eval $(call gb_Helper_register_executables_for_install,OOO,$(gb_haiku_or_kde), \
+    $(if $(ENABLE_GTK3_KDE5),lo_kde5filepicker) \
+))
 
 $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,math, \
 	sm \
@@ -318,30 +335,63 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ogltrans, \
 	OGLTrans \
 ))
 
+ifeq ($(OS),EMSCRIPTEN)
 $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
-	acc \
+	lo-bootstrap \
+))
+endif
+
+ifneq ($(ENABLE_WASM_STRIP_CANVAS),TRUE)
+$(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
+	canvastools \
+	$(if $(ENABLE_CAIRO_CANVAS),cairocanvas) \
+	canvasfactory \
+	cppcanvas \
+	$(if $(filter WNT,$(OS)),directx9canvas) \
+	$(if $(ENABLE_OPENGL_CANVAS),oglcanvas) \
+	$(if $(filter WNT,$(OS)),gdipluscanvas) \
+	simplecanvas \
+	vclcanvas \
+))
+endif
+
+ifneq ($(ENABLE_WASM_STRIP_GUESSLANG),TRUE)
+$(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
+	guesslang \
+))
+endif
+
+ifneq ($(ENABLE_WASM_STRIP_HUNSPELL),TRUE)
+$(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
+	hyphen \
+	lnth \
+	spell \
+	$(if $(filter iOS MACOSX,$(OS)), \
+		MacOSXSpell \
+	) \
+))
+endif
+
+$(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
+    avmedia \
 	LanguageTool \
-	$(call gb_Helper_optional,AVMEDIA,avmedia) \
+    $(call gb_Helper_optional,AVMEDIA, \
 	$(if $(filter MACOSX,$(OS)),\
 		avmediaMacAVF \
 	) \
+    ) \
 	$(call gb_Helper_optional,SCRIPTING, \
 		basctl \
 		basprov \
 	) \
 	basegfx \
 	bib \
-	$(if $(ENABLE_CAIRO_CANVAS),cairocanvas) \
-	canvasfactory \
-	canvastools \
 	chartcore \
 	chartcontroller \
 	$(call gb_Helper_optional,OPENCL,clew) \
 	$(if $(filter $(OS),WNT),,cmdmail) \
-	cppcanvas \
 	configmgr \
 	ctl \
-	cui \
 	dba \
 	dbahsql \
 	$(call gb_Helper_optional,DBCONNECTIVITY, \
@@ -350,10 +400,9 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
 	dbtools \
 	deploymentmisc \
 	$(if $(filter-out MACOSX WNT,$(OS)),desktopbe1) \
-	$(if $(USING_X11),desktop_detector) \
 	$(call gb_Helper_optional,SCRIPTING,dlgprov) \
-	$(if $(filter WNT,$(OS)),directx9canvas) \
-	$(if $(ENABLE_OPENGL_CANVAS),oglcanvas) \
+	docmodel \
+	drawinglayercore \
 	drawinglayer \
 	editeng \
 	$(if $(filter WNT,$(OS)),emser) \
@@ -369,20 +418,16 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
 	frm \
 	fsstorage \
 	fwk \
-	$(if $(filter WNT,$(OS)),gdipluscanvas) \
-	guesslang \
     $(call gb_Helper_optionals_or,HELPTOOLS XMLHELP,helplinker) \
 	i18npool \
 	i18nsearch \
-	hyphen \
-    icg \
 	$(if $(ENABLE_JAVA),jdbc) \
+	$(if $(filter WNT,$(OS)),jumplist) \
 	$(if $(ENABLE_LDAP),ldapbe2) \
 	$(if $(filter WNT,$(OS)),WinUserInfoBe) \
 	localebe1 \
 	log \
 	lng \
-	lnth \
 	$(if $(filter $(OS),MACOSX),macbe1) \
 	$(if $(MERGELIBS),merged) \
 	migrationoo2 \
@@ -409,14 +454,10 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
 	scn \
 	sd \
 	sdd \
-	sdfilt \
-	sdui \
 	sfx \
-	simplecanvas \
 	slideshow \
 	sot \
-	spell \
-	$(if $(DISABLE_GUI),,spl) \
+	$(if $(or $(DISABLE_GUI),$(ENABLE_WASM_STRIP_SPLASH)),,spl) \
 	storagefd \
 	$(call gb_Helper_optional,SCRIPTING,stringresource) \
 	svgio \
@@ -446,7 +487,6 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
 		vbahelper \
 	) \
 	vcl \
-	vclcanvas \
 	writerperfect \
 	xmlscript \
 	xmlfa \
@@ -455,14 +495,10 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
 	xof \
 	xsltdlg \
 	xsltfilter \
-	$(if $(USING_X11), \
-		vclplug_gen \
-	) \
 	$(if $(filter $(OS),WNT), \
 		ado \
 		oleautobridge \
 		smplmail \
-		vclplug_win \
 		wininetbe1 \
 	) \
 	$(if $(filter $(OS),MACOSX), \
@@ -470,11 +506,19 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
 			AppleRemote \
 		) \
 		fps_aqua \
-		vclplug_osx \
 	) \
-	$(if $(filter iOS MACOSX,$(OS)), \
-		MacOSXSpell \
-	) \
+))
+
+$(eval $(call gb_Helper_register_plugins_for_install,OOOLIBS,ooo, \
+    acc \
+    $(if $(ENABLE_CUSTOMTARGET_COMPONENTS),components) \
+    cui \
+    $(if $(USING_X11),desktop_detector) \
+    icg \
+    sdui \
+    $(if $(ENABLE_GEN),vclplug_gen) \
+    $(if $(filter $(OS),WNT),vclplug_win) \
+    $(if $(filter $(OS),MACOSX),vclplug_osx) \
 ))
 
 $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,postgresqlsdbc, \
@@ -513,12 +557,15 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,writer, \
 	$(if $(ENABLE_LWP),lwpft) \
 	msword \
 	swd \
-	swui \
 	t602filter \
 	$(call gb_Helper_optional,SCRIPTING,vbaswobj) \
 	wpftwriter \
 	writerfilter \
 	$(call gb_Helper_optional,DBCONNECTIVITY,writer) \
+))
+
+$(eval $(call gb_Helper_register_plugins_for_install,OOOLIBS,writer, \
+    swui \
 ))
 
 # cli_cppuhelper is NONE even though it is actually in URE because it is CliNativeLibrary
@@ -557,13 +604,14 @@ $(eval $(call gb_Helper_register_libraries_for_install,PLAINLIBS_URE,ure, \
 	) \
 	log_uno_uno \
 	unsafe_uno_uno \
-	$(if $(filter EMSCRIPTEN,$(OS)),, \
+))
+
+$(eval $(call gb_Helper_register_plugins_for_install,PLAINLIBS_URE,ure, \
 		$(if $(filter MSC,$(COM)), \
 			$(if $(filter INTEL,$(CPUNAME)),msci_uno) \
 			$(if $(filter X86_64,$(CPUNAME)),mscx_uno) \
 			$(if $(filter AARCH64,$(CPUNAME)),msca_uno) \
 		, gcc3_uno) \
-	) \
 ))
 
 $(eval $(call gb_Helper_register_libraries_for_install,PRIVATELIBS_URE,ure, \
@@ -581,7 +629,6 @@ $(eval $(call gb_Helper_register_libraries_for_install,PRIVATELIBS_URE,ure, \
 	proxyfac \
 	reflection \
 	reg \
-	sal_textenc \
 	stocservices \
 	store \
 	unoidl \
@@ -589,28 +636,35 @@ $(eval $(call gb_Helper_register_libraries_for_install,PRIVATELIBS_URE,ure, \
 	xmlreader \
 ))
 
+$(eval $(call gb_Helper_register_plugins_for_install,PRIVATELIBS_URE,ure, \
+    $(call gb_CondLibSalTextenc,sal_textenc) \
+))
+
+ifneq ($(ENABLE_WASM_STRIP_ACCESSIBILITY),TRUE)
 $(eval $(call gb_Helper_register_libraries_for_install,PLAINLIBS_OOO,ooo, \
-	$(if $(ENABLE_GSTREAMER_1_0),avmediagst) \
-	$(if $(filter WNT,$(OS)),avmediawin) \
+	$(if $(filter WNT,$(OS)), \
+		winaccessibility \
+	) \
+))
+endif
+
+$(eval $(call gb_Helper_register_libraries_for_install,PLAINLIBS_OOO,ooo, \
+    $(call gb_Helper_optional,AVMEDIA, \
+        $(if $(ENABLE_GSTREAMER_1_0),avmediagst) \
+        $(if $(ENABLE_GTK4),avmediagtk) \
+        $(if $(filter WNT,$(OS)),avmediawin) \
+    ) \
 	cached1 \
-	collator_data \
 	comphelper \
 	$(call gb_Helper_optional,DBCONNECTIVITY,dbpool2) \
 	$(call gb_Helper_optional,BREAKPAD,crashreport) \
 	deployment \
 	deploymentgui \
-	dict_ja \
-	dict_zh \
 	embobj \
 	$(if $(ENABLE_JAVA),hsqldb) \
 	i18nutil \
-	index_data \
 	$(if $(and $(ENABLE_GTK3), $(filter LINUX %BSD SOLARIS,$(OS))), libreofficekitgtk) \
 	$(if $(and $(ENABLE_GTKTILEDVIEWER), $(filter WNT,$(OS))), libreofficekitgtk) \
-	localedata_en \
-	localedata_es \
-	localedata_euro \
-	localedata_others \
 	$(if $(ENABLE_JAVA), \
 		$(if $(filter $(OS),MACOSX),,officebean) \
 	) \
@@ -620,7 +674,6 @@ $(eval $(call gb_Helper_register_libraries_for_install,PLAINLIBS_OOO,ooo, \
 	sdbc2 \
 	sofficeapp \
 	srtrs1 \
-	textconv_dict \
 	ucb1 \
 	ucbhelper \
 	$(if $(WITH_WEBDAV),ucpdav1) \
@@ -629,7 +682,7 @@ $(eval $(call gb_Helper_register_libraries_for_install,PLAINLIBS_OOO,ooo, \
     $(call gb_Helper_optional,XMLHELP,ucpchelp1) \
 	ucphier1 \
 	ucppkg1 \
-	unopkgapp \
+    $(call gb_CondExeUnopkg,unopkgapp) \
 	xmlsecurity \
 	xsec_xmlsec \
 	xstor \
@@ -641,8 +694,19 @@ $(eval $(call gb_Helper_register_libraries_for_install,PLAINLIBS_OOO,ooo, \
 		fps \
 		inprocserv \
 		UAccCOM \
-		winaccessibility \
 	) \
+))
+
+$(eval $(call gb_Helper_register_plugins_for_install,PLAINLIBS_OOO,ooo, \
+    collator_data \
+    dict_ja \
+    dict_zh \
+    index_data \
+    localedata_en \
+    localedata_es \
+    localedata_euro \
+    localedata_others \
+    textconv_dict \
 ))
 
 ifeq ($(OS),WNT)
@@ -720,6 +784,7 @@ $(eval $(call gb_Helper_register_libraries_for_install,UNOVERLIBS,ure, \
 $(eval $(call gb_Helper_register_libraries,EXTENSIONLIBS, \
 	active_native \
 	passive_native \
+	crashextension \
 ))
 
 ifneq ($(ENABLE_JAVA),)
@@ -762,12 +827,6 @@ endif
 ifneq ($(ENABLE_SCRIPTING_JAVASCRIPT),)
 $(eval $(call gb_Helper_register_jars_for_install,OOO,extensions_rhino, \
 	ScriptProviderForJavaScript \
-))
-endif
-
-ifeq (CT2N,$(filter CT2N,$(BUILD_TYPE)))
-$(eval $(call gb_Helper_register_packages_for_install,extensions_ct2n,\
-	ct2n \
 ))
 endif
 
@@ -828,6 +887,7 @@ $(eval $(call gb_Helper_register_packages_for_install,libreofficekit,\
 
 $(eval $(call gb_Helper_register_packages_for_install,ure,\
 	instsetoo_native_setup_ure \
+    $(call gb_CondExeUno,uno_sh) \
 	ure_install \
 	$(if $(ENABLE_JAVA),\
 		jvmfwk_jvmfwk3_ini \
@@ -855,13 +915,23 @@ $(eval $(call gb_Helper_register_packages_for_install,sdk,\
 	odk_html \
 	odk_settings \
 	odk_settings_generated \
-	offapi_idl \
-	udkapi_idl \
 	$(if $(ENABLE_JAVA), \
 		odk_javadoc \
 		odk_uno_loader_classes \
 	) \
 ))
+
+ifneq ($(ENABLE_WASM_STRIP_PINGUSER),TRUE)
+$(eval $(call gb_Helper_register_packages_for_install,ooo,\
+	tipoftheday_images \
+))
+endif
+
+ifneq ($(ENABLE_WASM_STRIP_CANVAS),TRUE)
+$(eval $(call gb_Helper_register_packages_for_install,ooo,\
+	$(if $(ENABLE_OPENGL_CANVAS),canvas_opengl_shader) \
+))
+endif
 
 $(eval $(call gb_Helper_register_packages_for_install,ooo,\
 	$(if $(SYSTEM_LIBEXTTEXTCAT),,libexttextcat_fingerprint) \
@@ -892,26 +962,17 @@ $(eval $(call gb_Helper_register_packages_for_install,ooo,\
 	extras_persona_pink \
 	extras_persona_sand \
 	extras_persona_white \
-	extras_tplofficorr \
-	extras_tploffimisc \
+	extras_templates \
 	extras_tplpresnt \
-	extras_tpl_styles \
-	extras_tpldraw \
-	extras_tplpersonal \
 	extras_tplwizbitmap \
 	extras_tplwizdesktop \
-	extras_tplwizletter \
-	extras_tplwizfax \
-	extras_tplwizagenda \
-	extras_tplwizreport \
-	extras_tplwizstyles \
+	extras_tplwizard \
 	framework_dtd \
 	$(if $(filter $(OS),MACOSX),infoplist) \
 	oox_customshapes \
 	oox_generated \
 	package_dtd \
 	sd_web \
-	sfx2_emojiconfig \
 	$(call gb_Helper_optional,DESKTOP,\
 		$(if $(filter-out WNT,$(OS)),$(if $(ENABLE_MACOSX_SANDBOX),,shell_senddoc))) \
 	$(call gb_Helper_optional,DESKTOP,$(if $(filter-out EMSCRIPTEN MACOSX WNT,$(OS)),svx_gengal)) \
@@ -926,7 +987,7 @@ $(eval $(call gb_Helper_register_packages_for_install,ooo,\
 		$(if $(ENABLE_SCRIPTING_BEANSHELL),scripting_ScriptsBeanShell) \
 		$(if $(ENABLE_SCRIPTING_JAVASCRIPT),scripting_ScriptsJavaScript) \
 	) \
-	$(if $(DISABLE_SCRIPTING),,scripting_scriptbindinglib) \
+	$(call gb_Helper_optional,SCRIPTING,scripting_scriptbindinglib) \
 	$(if $(filter $(OS),MACOSX),sysui_osxicons) \
 	wizards_basicshare \
 	wizards_basicsrvaccess2base \
@@ -939,6 +1000,7 @@ $(eval $(call gb_Helper_register_packages_for_install,ooo,\
 	wizards_basicsrvsfdatabases \
 	wizards_basicsrvsfdialogs \
 	wizards_basicsrvsfdocuments \
+	wizards_basicsrvsfunittests \
 	wizards_basicsrvsfwidgets \
 	wizards_basicsrvstandard \
 	wizards_basicsrvtemplate \
@@ -947,13 +1009,11 @@ $(eval $(call gb_Helper_register_packages_for_install,ooo,\
 	wizards_basicusr \
 	wizards_properties \
 	wizards_wizardshare \
-	tipoftheday_images \
 	toolbarmode_images \
 	vcl_theme_definitions \
 	$(if $(filter WNT,$(OS)), \
 		vcl_opengl_denylist \
 	) \
-	$(if $(ENABLE_OPENGL_CANVAS),canvas_opengl_shader) \
 	$(if $(filter SKIA,$(BUILD_TYPE)), \
 		vcl_skia_denylist ) \
 	$(if $(DISABLE_PYTHON),,$(if $(filter-out AIX,$(OS)), \
@@ -977,7 +1037,7 @@ $(eval $(call gb_Helper_register_packages_for_install,ooo,\
 
 $(eval $(call gb_Helper_register_packages_for_install,ooo_fonts,\
 	extras_fonts \
-	$(if $(USING_X11)$(DISABLE_GUI)$(filter ANDROID,$(OS)), \
+	$(if $(USING_X11)$(DISABLE_GUI)$(filter ANDROID EMSCRIPTEN,$(OS)), \
 		postprocess_fontconfig) \
 	$(call gb_Helper_optional,MORE_FONTS,\
 		fonts_alef \
@@ -986,9 +1046,7 @@ $(eval $(call gb_Helper_register_packages_for_install,ooo_fonts,\
 		fonts_carlito \
 		$(if $(MPL_SUBSET),,fonts_culmus) \
 		fonts_dejavu \
-		fonts_emojione_color \
 		fonts_gentium \
-		$(if $(MPL_SUBSET),,fonts_kacst) \
 		fonts_karla \
 		fonts_liberation \
 		fonts_liberation_narrow \
@@ -996,10 +1054,9 @@ $(eval $(call gb_Helper_register_packages_for_install,ooo_fonts,\
 		fonts_libre_hebrew \
 		fonts_noto \
 		fonts_opendyslexic \
+		fonts_opensans \
 		fonts_reem \
-		fonts_sourcecode \
 		fonts_sourcesans \
-		fonts_sourceserif \
 		fonts_scheherazade \
 	) \
 	$(call gb_Helper_optional,NOTO_FONT,\
@@ -1045,7 +1102,7 @@ $(eval $(call gb_Helper_register_packages_for_install,brand,\
 	desktop_branding \
 	$(if $(CUSTOM_BRAND_DIR),desktop_branding_custom) \
 	$(if $(filter DESKTOP,$(BUILD_TYPE)),desktop_scripts_install) \
-	$(if $(and $(filter-out MACOSX HAIKU WNT,$(OS)),$(filter DESKTOP,$(BUILD_TYPE))),\
+	$(if $(and $(filter-out EMSCRIPTEN HAIKU MACOSX WNT,$(OS)),$(filter DESKTOP,$(BUILD_TYPE))),\
 		$(if $(DISABLE_GUI),, \
 			desktop_soffice_sh \
 		) \
@@ -1112,7 +1169,6 @@ $(eval $(call gb_ExternalExecutable_register_executables,\
 	genccode \
 	gencmn \
 	python \
-	ucpp \
 	xmllint \
 	xsltproc \
 ))
@@ -1120,7 +1176,7 @@ $(eval $(call gb_ExternalExecutable_register_executables,\
 # Resources
 $(eval $(call gb_Helper_register_mos,\
 	acc \
-	avmedia \
+    $(call gb_Helper_optional,AVMEDIA,avmedia) \
 	$(call gb_Helper_optional,SCRIPTING,basctl) \
 	chart \
 	cnr \
@@ -1156,9 +1212,14 @@ $(eval $(call gb_Helper_register_mos,\
 ))
 
 # UI configuration
+ifneq ($(ENABLE_WASM_STRIP_DBACCESS),TRUE)
+$(eval $(call gb_Helper_register_uiconfigs,\
+	$(call gb_Helper_optional,DBCONNECTIVITY,dbaccess) \
+))
+endif
+
 $(eval $(call gb_Helper_register_uiconfigs,\
 	cui \
-	$(call gb_Helper_optional,DBCONNECTIVITY,dbaccess) \
 	desktop \
 	editeng \
 	filter \

@@ -50,6 +50,7 @@
 #include <editeng/contouritem.hxx>
 #include <editeng/crossedoutitem.hxx>
 #include <editeng/fontitem.hxx>
+#include <editeng/formatbreakitem.hxx>
 #include <editeng/fhgtitem.hxx>
 #include <editeng/justifyitem.hxx>
 #include <editeng/legacyitem.hxx>
@@ -63,6 +64,7 @@
 #include <legacyitem.hxx>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 /*
@@ -249,10 +251,10 @@ SwBoxAutoFormat::SwBoxAutoFormat()
     m_aHorJustify = std::make_unique<SvxHorJustifyItem>(SvxCellHorJustify::Standard, 0);
     m_aVerJustify = std::make_unique<SvxVerJustifyItem>(SvxCellVerJustify::Standard, 0);
     m_aStacked = std::make_unique<SfxBoolItem>(0 );
-    m_aMargin = std::make_unique<SvxMarginItem>(0 );
+    m_aMargin = std::make_unique<SvxMarginItem>( TypedWhichId<SvxMarginItem>(0) );
     m_aLinebreak = std::make_unique<SfxBoolItem>(0 );
     m_aRotateAngle = std::make_unique<SfxInt32Item>(0 );
-    m_aRotateMode = std::make_unique<SvxRotateModeItem>(SVX_ROTATE_MODE_STANDARD, 0 );
+    m_aRotateMode = std::make_unique<SvxRotateModeItem>(SVX_ROTATE_MODE_STANDARD, TypedWhichId<SvxRotateModeItem>(0) );
 
 // FIXME - add attribute IDs for the diagonal line items
 //    aTLBR( RES_... ),
@@ -359,8 +361,8 @@ bool SwBoxAutoFormat::Save( SvStream& rStream, sal_uInt16 fileVersion ) const
     return ERRCODE_NONE == rStream.GetError();
 }
 
-SwTableAutoFormat::SwTableAutoFormat( const OUString& rName )
-    : m_aName( rName )
+SwTableAutoFormat::SwTableAutoFormat( OUString aName )
+    : m_aName( std::move(aName) )
     , m_nStrResId( USHRT_MAX )
     , m_aKeepWithNextPara(std::make_shared<SvxFormatKeepItem>(false, RES_KEEP))
     , m_aRepeatHeading( 0 )
@@ -532,8 +534,7 @@ void SwTableAutoFormat::UpdateFromSet( sal_uInt8 nPos,
 
     const SwTableBoxNumFormat* pNumFormatItem;
     const SvNumberformat* pNumFormat = nullptr;
-    if( SfxItemState::SET == rSet.GetItemState( RES_BOXATR_FORMAT, true,
-        reinterpret_cast<const SfxPoolItem**>(&pNumFormatItem) ) && pNFormatr &&
+    if( pNFormatr && (pNumFormatItem = rSet.GetItemIfSet( RES_BOXATR_FORMAT )) &&
         nullptr != (pNumFormat = pNFormatr->GetEntry( pNumFormatItem->GetValue() )) )
         pFormat->SetValueFormat( pNumFormat->GetFormatstring(),
                                 pNumFormat->GetLanguage(),
@@ -682,8 +683,8 @@ void SwTableAutoFormat::RestoreTableProperties(SwTable &table) const
 
     pFormat->SetFormatAttr(rSet);
 
-    SwEditShell *pShell = pDoc->GetEditShell();
-    pDoc->SetRowSplit(*pShell->getShellCursor(false), SwFormatRowSplit(m_bRowSplit));
+    if (SwEditShell *pShell = pDoc->GetEditShell())
+        pDoc->SetRowSplit(*pShell->getShellCursor(false), SwFormatRowSplit(m_bRowSplit));
 
     table.SetRowsToRepeat(m_aRepeatHeading);
 }
@@ -699,7 +700,7 @@ void SwTableAutoFormat::StoreTableProperties(const SwTable &table)
         return;
 
     SwEditShell *pShell = pDoc->GetEditShell();
-    std::unique_ptr<SwFormatRowSplit> pRowSplit = SwDoc::GetRowSplit(*pShell->getShellCursor(false));
+    std::unique_ptr<SwFormatRowSplit> pRowSplit(pShell ? SwDoc::GetRowSplit(*pShell->getShellCursor(false)) : nullptr);
     m_bRowSplit = pRowSplit && pRowSplit->GetValue();
     pRowSplit.reset();
 
@@ -729,6 +730,13 @@ bool SwTableAutoFormat::LastRowEndColumnIsRow()
 bool SwTableAutoFormat::LastRowStartColumnIsRow()
 {
     return GetBoxFormat(12) == GetBoxFormat(13);
+}
+bool SwTableAutoFormat::HasHeaderRow() const
+{   // Wild guessing for PDF export: is header different from odd or body?
+    // It would be vastly better to do like SdrTableObj and have flags that
+    // determine which "special" styles apply, instead of horrible guessing.
+    return !(GetBoxFormat(1) == GetBoxFormat(5))
+        || !(GetBoxFormat(1) == GetBoxFormat(10));
 }
 
 bool SwTableAutoFormat::Load( SvStream& rStream, const SwAfVersions& rVersions )
@@ -1067,9 +1075,9 @@ bool SwTableAutoFormatTable::Load( SvStream& rStream )
                     (AUTOFORMAT_ID_504 <= nVal && nVal <= AUTOFORMAT_ID) )
             {
                 sal_uInt8 nChrSet, nCnt;
-                tools::Long nPos = rStream.Tell();
+                sal_uInt64 nPos = rStream.Tell();
                 rStream.ReadUChar( nCnt ).ReadUChar( nChrSet );
-                if( rStream.Tell() != sal_uLong(nPos + nCnt) )
+                if( rStream.Tell() != nPos + nCnt )
                 {
                     OSL_ENSURE( false, "The Header contains more or newer Data" );
                     rStream.Seek( nPos + nCnt );
@@ -1150,7 +1158,7 @@ bool SwTableAutoFormatTable::Save( SvStream& rStream ) const
             bRet = rFormat.Save(rStream, AUTOFORMAT_FILE_VERSION);
         }
     }
-    rStream.Flush();
+    rStream.FlushBuffer();
     return bRet;
 }
 

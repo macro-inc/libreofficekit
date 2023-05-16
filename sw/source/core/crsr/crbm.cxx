@@ -128,7 +128,7 @@ bool IsMarkHidden(SwRootFrame const& rLayout, ::sw::mark::IMark const& rMark)
     {
         return false;
     }
-    SwNode const& rNode(rMark.GetMarkPos().nNode.GetNode());
+    SwNode const& rNode(rMark.GetMarkPos().GetNode());
     SwTextNode const*const pTextNode(rNode.GetTextNode());
     if (pTextNode == nullptr)
     {   // UNO_BOOKMARK may point to table node
@@ -143,21 +143,21 @@ bool IsMarkHidden(SwRootFrame const& rLayout, ::sw::mark::IMark const& rMark)
     if (rMark.IsExpanded())
     {
         SwTextFrame const*const pOtherFrame(static_cast<SwTextFrame const*>(
-            rMark.GetOtherMarkPos().nNode.GetNode().GetTextNode()->getLayoutFrame(&rLayout)));
+            rMark.GetOtherMarkPos().GetNode().GetTextNode()->getLayoutFrame(&rLayout)));
         return pFrame == pOtherFrame
             && pFrame->MapModelToViewPos(rMark.GetMarkPos())
                 == pFrame->MapModelToViewPos(rMark.GetOtherMarkPos());
     }
     else
     {
-        if (rMark.GetMarkPos().nContent.GetIndex() == pTextNode->Len())
+        if (rMark.GetMarkPos().GetContentIndex() == pTextNode->Len())
         {   // at end of node: never deleted (except if node deleted)
             return pTextNode->GetRedlineMergeFlag() == SwNode::Merge::Hidden;
         }
         else
         {   // check character following mark pos
             return pFrame->MapModelToViewPos(rMark.GetMarkPos())
-                == pFrame->MapModelToView(pTextNode, rMark.GetMarkPos().nContent.GetIndex() + 1);
+                == pFrame->MapModelToView(pTextNode, rMark.GetMarkPos().GetContentIndex() + 1);
         }
     }
 }
@@ -290,16 +290,16 @@ bool SwCursorShell::IsFormProtected()
     return getIDocumentMarkAccess()->getFieldmarkFor(pos);
 }
 
-::sw::mark::IFieldmark* SwCursorShell::GetFieldmarkAfter()
+sw::mark::IFieldmark* SwCursorShell::GetFieldmarkAfter(bool bLoop)
 {
     SwPosition pos(*GetCursor()->GetPoint());
-    return getIDocumentMarkAccess()->getFieldmarkAfter(pos);
+    return getIDocumentMarkAccess()->getFieldmarkAfter(pos, bLoop);
 }
 
-::sw::mark::IFieldmark* SwCursorShell::GetFieldmarkBefore()
+sw::mark::IFieldmark* SwCursorShell::GetFieldmarkBefore(bool bLoop)
 {
     SwPosition pos(*GetCursor()->GetPoint());
-    return getIDocumentMarkAccess()->getFieldmarkBefore(pos);
+    return getIDocumentMarkAccess()->getFieldmarkBefore(pos, bLoop);
 }
 
 bool SwCursorShell::GotoFieldmark(::sw::mark::IFieldmark const * const pMark)
@@ -309,8 +309,8 @@ bool SwCursorShell::GotoFieldmark(::sw::mark::IFieldmark const * const pMark)
     // watch Cursor-Moves
     CursorStateHelper aCursorSt(*this);
     aCursorSt.SetCursorToMark(pMark);
-    ++aCursorSt.m_pCursor->GetPoint()->nContent;
-    --aCursorSt.m_pCursor->GetMark()->nContent;
+    aCursorSt.m_pCursor->GetPoint()->AdjustContent(+1);
+    aCursorSt.m_pCursor->GetMark()->AdjustContent(-1);
 
     if(aCursorSt.RollbackIfIllegal()) return false;
 

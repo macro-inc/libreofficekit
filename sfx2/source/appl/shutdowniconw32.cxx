@@ -30,6 +30,7 @@
 #include <sfx2/strings.hrc>
 #include <shlobj.h>
 #include <objidl.h>
+#include <osl/diagnose.h>
 #include <osl/thread.h>
 #include <systools/win32/qswin32.h>
 #include <comphelper/sequenceashashmap.hxx>
@@ -37,11 +38,6 @@
 #include <o3tl/char16_t2wchar_t.hxx>
 
 #include <set>
-
-using namespace ::osl;
-
-using ::com::sun::star::uno::Sequence;
-using ::com::sun::star::beans::PropertyValue;
 
 
 #define EXECUTER_WINDOWCLASS    L"SO Executer Class"
@@ -83,12 +79,12 @@ static void OnDrawItem(HWND hwnd, LPDRAWITEMSTRUCT lpdis);
 
 namespace {
 
-typedef struct tagMYITEM
+struct MYITEM
 {
     OUString text;
     OUString module;
     UINT iconId;
-} MYITEM;
+};
 
 }
 
@@ -99,35 +95,32 @@ static void addMenuItem( HMENU hMenu, UINT id, UINT iconId, const OUString& text
     mi.cbSize = sizeof( mi );
     if( id == static_cast<UINT>( -1 ) )
     {
-        mi.fMask=MIIM_TYPE;
+        mi.fMask=MIIM_FTYPE;
         mi.fType=MFT_SEPARATOR;
     }
     else
     {
         if( bOwnerdraw )
         {
-            mi.fMask=MIIM_TYPE | MIIM_STATE | MIIM_ID | MIIM_DATA;
+            mi.fMask=MIIM_FTYPE | MIIM_STATE | MIIM_ID | MIIM_DATA;
             mi.fType=MFT_OWNERDRAW;
-            mi.fState=MFS_ENABLED;
-            mi.wID = id;
 
             MYITEM *pMyItem = new MYITEM;
             pMyItem->text = text;
             pMyItem->iconId = iconId;
             pMyItem->module = module;
-            mi.dwItemData = reinterpret_cast<DWORD_PTR>(pMyItem);
+            mi.dwItemData = reinterpret_cast<ULONG_PTR>(pMyItem);
         }
         else
         {
-            mi.fMask=MIIM_TYPE | MIIM_STATE | MIIM_ID | MIIM_DATA;
-            mi.fType=MFT_STRING;
-            mi.fState=MFS_ENABLED;
-            mi.wID = id;
+            mi.fMask=MIIM_STRING | MIIM_STATE | MIIM_ID;
             mi.dwTypeData = o3tl::toW(
                 const_cast<sal_Unicode *>(text.getStr()));
             mi.cch = text.getLength();
         }
 
+        mi.fState = MFS_ENABLED;
+        mi.wID = id;
         if ( IDM_TEMPLATE == id )
             mi.fState |= MFS_DEFAULT;
     }
@@ -164,8 +157,8 @@ static HMENU createSystrayMenu( )
         SvtModuleOptions::EModule   eModuleIdentifier;
         UINT                        nMenuItemID;
         UINT                        nMenuIconID;
-        const char*                 pAsciiURLDescription;
-    }   aMenuItems[] =
+        rtl::OUStringConstExpr      sURLDescription;
+    } static const aMenuItems[] =
     {
         { SvtModuleOptions::EModule::WRITER,    IDM_WRITER, ICON_TEXT_DOCUMENT,         WRITER_URL },
         { SvtModuleOptions::EModule::CALC,      IDM_CALC,   ICON_SPREADSHEET_DOCUMENT,  CALC_URL },
@@ -176,21 +169,19 @@ static HMENU createSystrayMenu( )
     };
 
     // insert the menu entries for launching the applications
-    for ( size_t i = 0; i < SAL_N_ELEMENTS(aMenuItems); ++i )
+    for (const auto& [eModuleIdentifier, nMenuItemID, nMenuIconID, sURL] : aMenuItems)
     {
-        if ( !aModuleOptions.IsModuleInstalled( aMenuItems[i].eModuleIdentifier ) )
+        if ( !aModuleOptions.IsModuleInstalled( eModuleIdentifier ) )
             // the complete application is not even installed
             continue;
-
-        OUString sURL( OUString::createFromAscii( aMenuItems[i].pAsciiURLDescription ) );
 
         if ( aFileNewAppsAvailable.find( sURL ) == aFileNewAppsAvailable.end() )
             // the application is installed, but the entry has been configured to *not* appear in the File/New
             // menu => also let not appear it in the quickstarter
             continue;
 
-        addMenuItem( hMenu, aMenuItems[i].nMenuItemID, aMenuItems[i].nMenuIconID,
-            ShutdownIcon::GetUrlDescription( sURL ), pos, true, "" );
+        addMenuItem( hMenu, nMenuItemID, nMenuIconID,
+            ShutdownIcon::GetUrlDescription( sURL.asView() ), pos, true, "" );
     }
 
 
@@ -217,18 +208,13 @@ static void deleteSystrayMenu( HMENU hMenu )
         return;
 
     MENUITEMINFOW mi = {};
-    int pos=0;
     mi.cbSize = sizeof( mi );
     mi.fMask = MIIM_DATA;
 
-    while( GetMenuItemInfoW( hMenu, pos++, true, &mi ) )
+    for (UINT pos = 0; GetMenuItemInfoW(hMenu, pos, true, &mi); ++pos)
     {
-        MYITEM *pMyItem = reinterpret_cast<MYITEM*>(mi.dwItemData);
-        if( pMyItem )
-        {
-            pMyItem->text.clear();
+        if (MYITEM* pMyItem = reinterpret_cast<MYITEM*>(mi.dwItemData))
             delete pMyItem;
-        }
         mi.fMask = MIIM_DATA;
     }
 }
@@ -462,7 +448,7 @@ static DWORD WINAPI SystrayThread( LPVOID /*lpParam*/ )
 
     for (;;)
     {
-        auto const bRet = GetMessageW(&msg, nullptr, 0, 0);
+        int const bRet = GetMessageW(&msg, nullptr, 0, 0);
         if (bRet == 0)
         {
             break;

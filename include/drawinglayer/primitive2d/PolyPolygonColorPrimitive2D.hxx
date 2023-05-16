@@ -21,7 +21,7 @@
 
 #include <drawinglayer/drawinglayerdllapi.h>
 
-#include <drawinglayer/primitive2d/BufferedDecompositionPrimitive2D.hxx>
+#include <drawinglayer/primitive2d/baseprimitive2d.hxx>
 #include <basegfx/polygon/b2dpolypolygon.hxx>
 #include <basegfx/color/bcolor.hxx>
 
@@ -44,7 +44,7 @@ private:
 
 public:
     /// constructor
-    PolyPolygonColorPrimitive2D(const basegfx::B2DPolyPolygon& rPolyPolygon,
+    PolyPolygonColorPrimitive2D(basegfx::B2DPolyPolygon aPolyPolygon,
                                 const basegfx::BColor& rBColor);
 
     /// data read access

@@ -20,6 +20,7 @@
 #pragma once
 
 #include <rtl/ustring.hxx>
+#include <utility>
 
 namespace tdoc_ucp {
 
@@ -44,8 +45,8 @@ private:
     void init() const;
 
 public:
-    explicit Uri( const OUString & rUri )
-    : m_aUri( rUri ), m_eState( UNKNOWN ) {}
+    explicit Uri( OUString aUri )
+    : m_aUri(std::move( aUri )), m_eState( UNKNOWN ) {}
 
     bool operator== ( const Uri & rOther ) const
     { init(); return m_aUri == rOther.m_aUri; }
@@ -99,7 +100,7 @@ inline bool Uri::isDocument() const
 {
     init();
     return ( ( !m_aDocId.isEmpty() ) /* not root */
-             && ( m_aPath.copy( m_aDocId.getLength() + 1 ).getLength() < 2 ) );
+             && ( m_aPath.subView( m_aDocId.getLength() + 1 ).size() < 2 ) );
 }
 
 } // namespace tdoc_ucp

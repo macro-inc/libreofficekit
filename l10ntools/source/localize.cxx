@@ -20,7 +20,6 @@
 #include <sal/config.h>
 
 #include <cassert>
-#include <cstddef>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -46,6 +45,8 @@
 #include <po.hxx>
 
 namespace {
+
+OString libraryPathEnvVarOverride;
 
 bool matchList(
     std::u16string_view rUrl, const std::u16string_view* pList, size_t nLength)
@@ -90,6 +91,17 @@ void handleCommand(
     OStringBuffer buf;
     if (rExecutable == "uiex" || rExecutable == "hrcex")
     {
+#if !defined _WIN32
+        // For now, this is only needed by some Linux ASan builds, so keep it simply and disable it
+        // on  Windows (which doesn't support the relevant shell syntax for (un-)setting environment
+        // variables).
+        auto const n = libraryPathEnvVarOverride.indexOf('=');
+        if (n == -1) {
+            buf.append("unset -v " + libraryPathEnvVarOverride + " && ");
+        } else {
+            buf.append(libraryPathEnvVarOverride + " ");
+        }
+#endif
         auto const env = getenv("SRC_ROOT");
         assert(env != nullptr);
         buf.append(env);
@@ -97,6 +109,11 @@ void handleCommand(
     }
     else
     {
+#if defined MACOSX
+        if (auto const env = getenv("DYLD_LIBRARY_PATH")) {
+            buf.append(OString::Concat("DYLD_LIBRARY_PATH=") + env + " ");
+        }
+#endif
         auto const env = getenv("WORKDIR_FOR_BUILD");
         assert(env != nullptr);
         buf.append(env);
@@ -117,14 +134,14 @@ void handleCommand(
 }
 
 void InitPoFile(
-    std::string_view rProject, const OString& rInPath,
-    const OString& rPotDir, const OString& rOutPath )
+    std::string_view rProject, std::string_view rInPath,
+    std::string_view rPotDir, const OString& rOutPath )
 {
     //Create directory for po file
     {
         OUString outDir =
             OStringToOUString(
-                rPotDir.subView(0,rPotDir.lastIndexOf('/')), RTL_TEXTENCODING_UTF8);
+                rPotDir.substr(0,rPotDir.rfind('/')), RTL_TEXTENCODING_UTF8);
         OUString outDirUrl;
         if (osl::FileBase::getFileURLFromSystemPath(outDir, outDirUrl)
             != osl::FileBase::E_None)
@@ -151,9 +168,9 @@ void InitPoFile(
         throw false; //TODO
     }
 
-    const sal_Int32 nProjectInd = rInPath.indexOf(rProject);
-    const OString relativPath =
-        rInPath.copy(nProjectInd, rInPath.lastIndexOf('/')- nProjectInd);
+    const size_t nProjectInd = rInPath.find(rProject);
+    const std::string_view relativPath =
+        rInPath.substr(nProjectInd, rInPath.rfind('/')- nProjectInd);
 
     PoHeader aTmp(relativPath);
     aPoOutPut.writeHeader(aTmp);
@@ -175,7 +192,7 @@ bool fileExists(const OString& fileName)
 
 OString gDestRoot;
 
-bool handleFile(std::string_view rProject, const OUString& rUrl, const OString& rPotDir)
+bool handleFile(std::string_view rProject, const OUString& rUrl, std::string_view rPotDir)
 {
     struct Command {
         std::u16string_view extension;
@@ -217,7 +234,7 @@ bool handleFile(std::string_view rProject, const OUString& rUrl, const OString& 
                 if (bSimpleModuleCase)
                     sOutPath = gDestRoot + "/" + rProject + "/messages.pot";
                 else
-                    sOutPath = rPotDir + ".pot";
+                    sOutPath = OString::Concat(rPotDir) + ".pot";
 
                 if (!fileExists(sOutPath))
                 {
@@ -281,7 +298,7 @@ bool handleFile(std::string_view rProject, const OUString& rUrl, const OString& 
 
 void handleFilesOfDir(
     std::vector<OUString>& aFiles, std::string_view rProject,
-    const OString& rPotDir )
+    std::string_view rPotDir )
 {
     ///Handle files in lexical order
     std::sort(aFiles.begin(), aFiles.end());
@@ -486,16 +503,17 @@ SAL_IMPLEMENT_MAIN_WITH_ARGS(argc, argv)
 {
     try
     {
-        if (argc != 3)
+        if (argc != 4)
         {
             std::cerr
                 << ("localize (c)2001 by Sun Microsystems\n\n"
                     "As part of the L10N framework, localize extracts en-US\n"
                     "strings for translation out of the toplevel modules defined\n"
                     "in projects array in l10ntools/source/localize.cxx.\n\n"
-                    "Syntax: localize <source-root> <outfile>\n");
+                    "Syntax: localize <source-root> <outfile> <library-path-env-var-override>\n");
             exit(EXIT_FAILURE);
         }
+        libraryPathEnvVarOverride = argv[3];
         handleProjects(argv[1],argv[2]);
     }
     catch (std::exception& e)

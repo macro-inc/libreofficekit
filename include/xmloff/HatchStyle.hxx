@@ -20,7 +20,6 @@
 #ifndef INCLUDED_XMLOFF_HATCHSTYLE_HXX
 #define INCLUDED_XMLOFF_HATCHSTYLE_HXX
 
-#include <config_options.h>
 #include <sal/config.h>
 #include <xmloff/dllapi.h>
 #include <rtl/ustring.hxx>
@@ -40,7 +39,6 @@ class XMLOFF_DLLPUBLIC XMLHatchStyleImport
 
 public:
     XMLHatchStyleImport( SvXMLImport& rImport );
-    ~XMLHatchStyleImport();
 
     void importXML(
         const css::uno::Reference< css::xml::sax::XFastAttributeList>& xAttrList,
@@ -54,7 +52,6 @@ class XMLOFF_DLLPUBLIC XMLHatchStyleExport
 
 public:
     XMLHatchStyleExport( SvXMLExport& rExport );
-    ~XMLHatchStyleExport();
 
     void exportXML( const OUString& rStrName, const css::uno::Any& rValue );
 };

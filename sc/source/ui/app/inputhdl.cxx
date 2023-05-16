@@ -49,6 +49,7 @@
 #include <svl/zforlist.hxx>
 #include <unotools/localedatawrapper.hxx>
 #include <unotools/charclass.hxx>
+#include <utility>
 #include <vcl/help.hxx>
 #include <vcl/jsdialog/executor.hxx>
 #include <vcl/commandevent.hxx>
@@ -67,6 +68,7 @@
 #include <tabvwsh.hxx>
 #include <docsh.hxx>
 #include <scmod.hxx>
+#include <formulaopt.hxx>
 #include <uiitems.hxx>
 #include <global.hxx>
 #include <sc.hrc>
@@ -97,15 +99,7 @@
 
 using namespace formula;
 
-bool ScInputHandler::bOptLoaded = false;            // Evaluate App options
-bool ScInputHandler::bAutoComplete = false;         // Is set in KeyInput
-
 namespace {
-
-// Formula data replacement character for a pair of parentheses at end of
-// function name, to force sorting parentheses before all other characters.
-// Collation may treat parentheses differently.
-const sal_Unicode cParenthesesReplacement = 0x0001;
 
 ScTypedCaseStrSet::const_iterator findText(
     const ScTypedCaseStrSet& rDataSet, ScTypedCaseStrSet::const_iterator const & itPos,
@@ -165,7 +159,7 @@ OUString getExactMatch(const ScTypedCaseStrSet& rDataSet, const OUString& rStrin
 
 // This assumes that rResults is a sorted ring w.r.t ScTypedStrData::LessCaseInsensitive() or
 // in the reverse direction, whose origin is specified by nRingOrigin.
-sal_Int32 getLongestCommonPrefixLength(const std::vector<OUString>& rResults, const OUString& rUserEntry, sal_Int32 nRingOrigin)
+sal_Int32 getLongestCommonPrefixLength(const std::vector<OUString>& rResults, std::u16string_view aUserEntry, sal_Int32 nRingOrigin)
 {
     sal_Int32 nResults = rResults.size();
     if (!nResults)
@@ -174,7 +168,7 @@ sal_Int32 getLongestCommonPrefixLength(const std::vector<OUString>& rResults, co
     if (nResults == 1)
         return rResults[0].getLength();
 
-    sal_Int32 nMinLen = rUserEntry.getLength();
+    sal_Int32 nMinLen = aUserEntry.size();
     sal_Int32 nLastIdx = nRingOrigin ? nRingOrigin - 1 : nResults - 1;
     const OUString& rFirst = rResults[nRingOrigin];
     const OUString& rLast = rResults[nLastIdx];
@@ -347,6 +341,20 @@ void ScInputHandler::SendReferenceMarks( const SfxViewShell* pViewShell,
                 LOK_CALLBACK_REFERENCE_MARKS, aPayload.getStr() );
 }
 
+static inline void incPos( const sal_Unicode c, sal_Int32& rPos, ESelection& rSel )
+{
+    ++rPos;
+    if (c == '\n')
+    {
+        ++rSel.nEndPara;
+        rSel.nEndPos = 0;
+    }
+    else
+    {
+        ++rSel.nEndPos;
+    }
+}
+
 void ScInputHandler::InitRangeFinder( const OUString& rFormula )
 {
     DeleteRangeFinder();
@@ -356,7 +364,7 @@ void ScInputHandler::InitRangeFinder( const OUString& rFormula )
     ScDocument& rDoc = pDocSh->GetDocument();
     const sal_Unicode cSheetSep = rDoc.GetSheetSeparator();
 
-    OUString aDelimiters = ScEditUtil::ModifyDelimiters(" !~\"");
+    OUString aDelimiters = ScEditUtil::ModifyDelimiters(" !~%\"\t\n");
         // delimiters (in addition to ScEditUtil): only characters that are
         // allowed in formulas next to references and the quotation mark (so
         // string constants can be skipped)
@@ -372,6 +380,7 @@ void ScInputHandler::InitRangeFinder( const OUString& rFormula )
     sal_Int32 nLen = rFormula.getLength();
     sal_Int32 nPos = 0;
     sal_Int32 nStart = 0;
+    ESelection aSel;
     sal_uInt16 nCount = 0;
     ScRange aRange;
     while ( nPos < nLen && nCount < RANGEFIND_MAX )
@@ -381,14 +390,16 @@ void ScInputHandler::InitRangeFinder( const OUString& rFormula )
         {
             if ( pChar[nPos] == '"' )                       // String
             {
-                ++nPos;
+                incPos( pChar[nPos], nPos, aSel);
                 while (nPos<nLen && pChar[nPos] != '"')     // Skip until end
-                    ++nPos;
+                    incPos( pChar[nPos], nPos, aSel);
             }
-            ++nPos; // Separator or closing quote
+            incPos( pChar[nPos], nPos, aSel);  // Separator or closing quote
         }
 
-        //  text between separators
+        // Text between separators. We only consider within one line/paragraph.
+        aSel.nStartPara = aSel.nEndPara;
+        aSel.nStartPos = aSel.nEndPos;
         nStart = nPos;
 handle_r1c1:
         {
@@ -406,7 +417,7 @@ handle_r1c1:
                     if (ScGlobal::UnicodeStrChr(aDelimiters.getStr(), pChar[nPos]))
                         break;
                 }
-                ++nPos;
+                incPos( pChar[nPos], nPos, aSel);
             }
         }
 
@@ -417,7 +428,7 @@ handle_r1c1:
             '-' == pChar[nPos] && '[' == pChar[nPos-1] &&
             formula::FormulaGrammar::CONV_XL_R1C1 == rDoc.GetAddressConvention() )
         {
-            nPos++;
+            incPos( pChar[nPos], nPos, aSel);
             goto handle_r1c1;
         }
 
@@ -449,9 +460,8 @@ handle_r1c1:
                     pRangeFindList.reset(new ScRangeFindList( pDocSh->GetTitle() ));
                 }
 
-                Color nColor = pRangeFindList->Insert( ScRangeFindData( aRange, nFlags, nStart, nPos ) );
+                Color nColor = pRangeFindList->Insert( ScRangeFindData( aRange, nFlags, aSel));
 
-                ESelection aSel( 0, nStart, 0, nPos );
                 SfxItemSet aSet( mpEditEngine->GetEmptyItemSet() );
                 aSet.Put( SvxColorItem( nColor, EE_CHAR_COLOR ) );
                 mpEditEngine->QuickSetAttribs( aSet, aSel );
@@ -626,8 +636,9 @@ static void lcl_Replace( EditView* pView, const OUString& rNewStr, const ESelect
     // To do that we need to cancel the selection from above (before QuickInsertText)
     pView->InsertText( OUString() );
 
-    sal_Int32 nLen = pEngine->GetTextLen(0);
-    ESelection aSel( 0, nLen, 0, nLen );
+    const sal_Int32 nPara = pEngine->GetParagraphCount() - 1;
+    const sal_Int32 nLen = pEngine->GetTextLen(nPara);
+    ESelection aSel( nPara, nLen, nPara, nLen );
     pView->SetSelection( aSel ); // Set cursor to the end
 }
 
@@ -637,8 +648,6 @@ void ScInputHandler::UpdateRange( sal_uInt16 nIndex, const ScRange& rNew )
     if ( pDocView && pRangeFindList && nIndex < pRangeFindList->Count() )
     {
         ScRangeFindData& rData = pRangeFindList->GetObject( nIndex );
-        sal_Int32 nOldStart = rData.nSelStart;
-        sal_Int32 nOldEnd = rData.nSelEnd;
         Color nNewColor = pRangeFindList->FindColor( rNew, nIndex );
 
         ScRange aJustified = rNew;
@@ -646,32 +655,39 @@ void ScInputHandler::UpdateRange( sal_uInt16 nIndex, const ScRange& rNew )
         ScDocument& rDoc = pDocView->GetViewData().GetDocument();
         const ScAddress::Details aAddrDetails( rDoc, aCursorPos );
         OUString aNewStr(aJustified.Format(rDoc, rData.nFlags, aAddrDetails));
-        ESelection aOldSel( 0, nOldStart, 0, nOldEnd );
         SfxItemSet aSet( mpEditEngine->GetEmptyItemSet() );
 
         DataChanging();
 
-        lcl_Replace( pTopView, aNewStr, aOldSel );
-        lcl_Replace( pTableView, aNewStr, aOldSel );
+        lcl_Replace( pTopView, aNewStr, rData.maSel );
+        lcl_Replace( pTableView, aNewStr, rData.maSel );
+
+        // We are within one paragraph.
+        const sal_Int32 nDiff = aNewStr.getLength() - (rData.maSel.nEndPos - rData.maSel.nStartPos);
+        rData.maSel.nEndPos += nDiff;
+
         aSet.Put( SvxColorItem( nNewColor, EE_CHAR_COLOR ) );
-        mpEditEngine->QuickSetAttribs( aSet, aOldSel );
+        mpEditEngine->QuickSetAttribs( aSet, rData.maSel );
 
         bInRangeUpdate = true;
         DataChanged();
         bInRangeUpdate = false;
 
-        tools::Long nDiff = aNewStr.getLength() - static_cast<tools::Long>(nOldEnd-nOldStart);
-
         rData.aRef = rNew;
-        rData.nSelEnd = rData.nSelEnd + nDiff;
         rData.nColor = nNewColor;
 
-        sal_uInt16 nCount = static_cast<sal_uInt16>(pRangeFindList->Count());
-        for (sal_uInt16 i=nIndex+1; i<nCount; i++)
+        if (nDiff)
         {
-            ScRangeFindData& rNext = pRangeFindList->GetObject( i );
-            rNext.nSelStart = rNext.nSelStart + nDiff;
-            rNext.nSelEnd   = rNext.nSelEnd   + nDiff;
+            const size_t nCount = pRangeFindList->Count();
+            for (size_t i = nIndex + 1; i < nCount; ++i)
+            {
+                ScRangeFindData& rNext = pRangeFindList->GetObject( i );
+                if (rNext.maSel.nStartPara != rData.maSel.nStartPara)
+                    break;
+
+                rNext.maSel.nStartPos += nDiff;
+                rNext.maSel.nEndPos   += nDiff;
+            }
         }
 
         EditView* pActiveView = pTopView ? pTopView : pTableView;
@@ -848,12 +864,6 @@ ScInputHandler::ScInputHandler()
     pDelayTimer.reset( new Timer( "ScInputHandlerDelay timer" ) );
     pDelayTimer->SetTimeout( 500 ); // 500 ms delay
     pDelayTimer->SetInvokeHandler( LINK( this, ScInputHandler, DelayTimer ) );
-
-    if (comphelper::LibreOfficeKit::isActive())
-    {
-        ScInputHandler::bOptLoaded = true;            // Evaluate App options
-        ScInputHandler::bAutoComplete = true;         // Is set in KeyInput
-    }
 }
 
 ScInputHandler::~ScInputHandler()
@@ -1029,27 +1039,11 @@ void ScInputHandler::GetFormulaData()
 
     const OUString aParenthesesReplacement( cParenthesesReplacement);
     const ScFunctionList* pFuncList = ScGlobal::GetStarCalcFunctionList();
-    sal_uInt32 nListCount = pFuncList->GetCount();
-    for(sal_uInt32 i=0;i<nListCount;i++)
-    {
-        const ScFuncDesc* pDesc = pFuncList->GetFunction( i );
-        if ( pDesc->mxFuncName )
-        {
-            const sal_Unicode* pName = pDesc->mxFuncName->getStr();
-            const sal_Int32 nLen = pDesc->mxFuncName->getLength();
-            // fdo#75264 fill maFormulaChar with all characters used in formula names
-            for ( sal_Int32 j = 0; j < nLen; j++ )
-            {
-                sal_Unicode c = pName[ j ];
-                maFormulaChar.insert( c );
-            }
-            OUString aFuncName = *pDesc->mxFuncName + aParenthesesReplacement;
-            pFormulaData->insert(ScTypedStrData(aFuncName, 0.0, 0.0, ScTypedStrData::Standard));
-            pDesc->initArgumentInfo();
-            OUString aEntry = pDesc->getSignature();
-            pFormulaDataPara->insert(ScTypedStrData(aEntry, 0.0, 0.0, ScTypedStrData::Standard));
-        }
-    }
+    const sal_uInt32 nListCount = pFuncList->GetCount();
+    const InputHandlerFunctionNames& rFunctionNames = ScGlobal::GetInputHandlerFunctionNames();
+    *pFormulaData     = rFunctionNames.maFunctionData;
+    *pFormulaDataPara = rFunctionNames.maFunctionDataPara;
+    maFormulaChar     = rFunctionNames.maFunctionChar;
 
     // Increase suggestion priority of MRU formulas
     const ScAppOptions& rOpt = SC_MOD()->GetAppOptions();
@@ -1074,8 +1068,19 @@ void ScInputHandler::GetFormulaData()
         }
     }
     miAutoPosFormula = pFormulaData->end();
-    rDoc.GetFormulaEntries( *pFormulaData );
-    rDoc.GetFormulaEntries( *pFormulaDataPara );
+
+    // tdf#142031 - collect all the characters for the formula suggestion auto input
+    ScTypedCaseStrSet aStrSet;
+    rDoc.GetFormulaEntries( aStrSet );
+    for (auto iter = aStrSet.begin(); iter != aStrSet.end(); ++iter)
+    {
+        const OUString aFuncName = ScGlobal::getCharClass().uppercase((*iter).GetString());
+        // fdo#75264 fill maFormulaChar with all characters used in formula names
+        for (sal_Int32 j = 0; j < aFuncName.getLength(); j++)
+            maFormulaChar.insert(aFuncName[j]);
+    }
+    pFormulaData->insert(aStrSet.begin(), aStrSet.end());
+    pFormulaDataPara->insert(aStrSet.begin(), aStrSet.end());
 }
 
 IMPL_LINK( ScInputHandler, ShowHideTipVisibleParentListener, VclWindowEvent&, rEvent, void )
@@ -1118,9 +1123,9 @@ void ScInputHandler::HideTipBelow()
 namespace
 {
 
-bool lcl_hasSingleToken(const OUString& s, sal_Unicode c)
+bool lcl_hasSingleToken(std::u16string_view s, sal_Unicode c)
 {
-    return !s.isEmpty() && s.indexOf(c)<0;
+    return !s.empty() && s.find(c) == std::u16string_view::npos;
 }
 
 }
@@ -1515,7 +1520,7 @@ void ScInputHandler::ShowFuncList( const ::std::vector< OUString > & rFuncStrVec
     {
         OUString aMessage( ScResId( STR_FUNCTIONS_FOUND ) );
         aMessage = aMessage.replaceFirst("%2", OUString::number(nRemainNumber));
-        aMessage = aMessage.replaceFirst("%1", aTipStr.makeStringAndClear());
+        aMessage = aMessage.replaceFirst("%1", aTipStr);
         aTipStr = aMessage;
     }
     FormulaHelper aHelper(ScGlobal::GetStarCalcFunctionMgr());
@@ -1798,13 +1803,23 @@ void ScInputHandler::LOKPasteFunctionData(const OUString& rFunctionName)
     }
 }
 
-void ScInputHandler::LOKSendFormulabarUpdate(const SfxViewShell* pActiveViewSh,
+void ScInputHandler::LOKSendFormulabarUpdate(EditView* pActiveView,
+                                             const SfxViewShell* pActiveViewSh,
                                              const OUString& rText,
                                              const ESelection& rSelection)
 {
-    OUString aSelection =
-        OUString::number(rSelection.nStartPos) + ";" + OUString::number(rSelection.nEndPos) + ";" +
-        OUString::number(rSelection.nStartPara) + ";" + OUString::number(rSelection.nEndPara);
+    OUString aSelection;
+    if (pActiveView)
+    {
+        aSelection = OUString::number(pActiveView->GetPosWithField(0, rSelection.nStartPos)) + ";" +
+            OUString::number(pActiveView->GetPosWithField(0, rSelection.nEndPos)) + ";" +
+            OUString::number(rSelection.nStartPara) + ";" + OUString::number(rSelection.nEndPara);
+    }
+    else
+    {
+        aSelection = OUString::number(rSelection.nStartPos) + ";" + OUString::number(rSelection.nEndPos) + ";" +
+            OUString::number(rSelection.nStartPara) + ";" + OUString::number(rSelection.nEndPara);
+    }
 
     std::unique_ptr<jsdialog::ActionDataMap> pData = std::make_unique<jsdialog::ActionDataMap>();
     (*pData)["action_type"] = "setText";
@@ -2505,11 +2520,10 @@ bool ScInputHandler::StartTable( sal_Unicode cTyped, bool bFromCommand, bool bIn
             {
                 // Percent format?
                 const SfxItemSet& rAttrSet = pPattern->GetItemSet();
-                const SfxPoolItem* pItem;
 
-                if ( SfxItemState::SET == rAttrSet.GetItemState( ATTR_VALUE_FORMAT, true, &pItem ) )
+                if ( const SfxUInt32Item* pItem = rAttrSet.GetItemIfSet( ATTR_VALUE_FORMAT ) )
                 {
-                    sal_uInt32 nFormat = static_cast<const SfxUInt32Item*>(pItem)->GetValue();
+                    sal_uInt32 nFormat = pItem->GetValue();
                     if (SvNumFormatType::PERCENT == rDoc.GetFormatTable()->GetType( nFormat ))
                         nCellPercentFormatDecSep = rDoc.GetFormatTable()->GetFormatDecimalSep( nFormat).toChar();
                     else
@@ -2519,8 +2533,8 @@ bool ScInputHandler::StartTable( sal_Unicode cTyped, bool bFromCommand, bool bIn
                     nCellPercentFormatDecSep = 0; // Default: no percent
 
                 // Validity specified?
-                if ( SfxItemState::SET == rAttrSet.GetItemState( ATTR_VALIDDATA, true, &pItem ) )
-                    nValidation = static_cast<const SfxUInt32Item*>(pItem)->GetValue();
+                if ( const SfxUInt32Item* pItem = rAttrSet.GetItemIfSet( ATTR_VALIDDATA ) )
+                    nValidation = pItem->GetValue();
                 else
                     nValidation = 0;
 
@@ -2594,7 +2608,7 @@ bool ScInputHandler::StartTable( sal_Unicode cTyped, bool bFromCommand, bool bIn
 
             UpdateAdjust( cTyped );
 
-            if ( bAutoComplete )
+            if ( SC_MOD()->GetAppOptions().GetAutoComplete() )
                 GetColData();
 
             if (!cTyped && !bCreatingFuncView && StartsLikeFormula(aStr))
@@ -2793,7 +2807,7 @@ void ScInputHandler::DataChanged( bool bFromTopNotify, bool bSetModified )
         if (pActiveView)
             aSel = pActiveView->GetSelection();
 
-        ScInputHandler::LOKSendFormulabarUpdate(pActiveViewSh,
+        ScInputHandler::LOKSendFormulabarUpdate(pActiveView, pActiveViewSh,
                                                 ScEditUtil::GetMultilineString(*mpEditEngine),
                                                 aSel);
     }
@@ -2828,13 +2842,14 @@ void ScInputHandler::UpdateFormulaMode()
             bFormulaMode = true;
             pRefViewSh = pActiveViewSh;
             pSfxApp->Broadcast( SfxHint( SfxHintId::ScRefModeChanged ) );
-            SC_MOD()->SetRefInputHdl(this);
+            ScModule* pMod = SC_MOD();
+            pMod->SetRefInputHdl(this);
             if (pInputWin)
                 pInputWin->SetFormulaMode(true);
 
             // in LOK, we always need to perform the GetFormulaData() call so
             // that the formula insertion works
-            if (bAutoComplete || comphelper::LibreOfficeKit::isActive())
+            if (comphelper::LibreOfficeKit::isActive() || pMod->GetAppOptions().GetAutoComplete())
                 GetFormulaData();
 
             UpdateParenthesis();
@@ -3024,12 +3039,12 @@ void ScInputHandler::SetMode( ScInputMode eNewMode, const OUString* pInitText, S
 /**
  * @return true if rString only contains digits (no autocorrect then)
  */
-static bool lcl_IsNumber(const OUString& rString)
+static bool lcl_IsNumber(std::u16string_view aString)
 {
-    sal_Int32 nLen = rString.getLength();
-    for (sal_Int32 i=0; i<nLen; i++)
+    size_t nLen = aString.size();
+    for (size_t i=0; i<nLen; i++)
     {
-        sal_Unicode c = rString[i];
+        sal_Unicode c = aString[i];
         if ( c < '0' || c > '9' )
             return false;
     }
@@ -3160,6 +3175,8 @@ void ScInputHandler::EnterHandler( ScEnterMode nBlockMode, bool bBeforeSavingInL
     }
 
     std::vector<editeng::MisspellRanges> aMisspellRanges;
+    // UpdateLayout must be true during CompleteOnlineSpelling
+    const bool bUpdateLayout = mpEditEngine->SetUpdateLayout( true );
     mpEditEngine->CompleteOnlineSpelling();
     bool bSpellErrors = !bFormulaMode && mpEditEngine->HasOnlineSpellErrors();
     if ( bSpellErrors )
@@ -3291,7 +3308,7 @@ void ScInputHandler::EnterHandler( ScEnterMode nBlockMode, bool bBeforeSavingInL
             mpEditEngine->ClearSpellErrors();
             pObject = mpEditEngine->CreateTextObject();
         }
-        else if (bAutoComplete) // Adjust Upper/Lower case
+        else if (SC_MOD()->GetAppOptions().GetAutoComplete()) // Adjust Upper/Lower case
         {
             // Perform case-matching only when the typed text is partial.
             if (pColumnData && aAutoSearch.getLength() < aString.getLength())
@@ -3427,6 +3444,8 @@ void ScInputHandler::EnterHandler( ScEnterMode nBlockMode, bool bBeforeSavingInL
     mbEditingExistingContent = false;
     bInOwnChange = false;
     bInEnterHandler = false;
+    if (bUpdateLayout)
+        mpEditEngine->SetUpdateLayout( true );
 }
 
 void ScInputHandler::CancelHandler()
@@ -3465,10 +3484,14 @@ void ScInputHandler::CancelHandler()
 
     eMode = SC_INPUT_NONE;
     StopInputWinEngine( true );
+    SCCOL nMaxCol(MAXCOL);
     if (pExecuteSh)
+    {
         pExecuteSh->StopEditShell();
+        nMaxCol = pExecuteSh->GetViewData().GetDocument().MaxCol();
+    }
 
-    aCursorPos.Set(pExecuteSh->GetViewData().GetDocument().MaxCol()+1,0,0); // Invalid flag
+    aCursorPos.Set(nMaxCol+1,0,0); // Invalid flag
     mpEditEngine->SetTextCurrentDefaults(OUString());
 
     if ( !pLastState && pExecuteSh )
@@ -3712,12 +3735,6 @@ void ScInputHandler::ClearText()
 
 bool ScInputHandler::KeyInput( const KeyEvent& rKEvt, bool bStartEdit /* = false */ )
 {
-    if (!bOptLoaded)
-    {
-        bAutoComplete = SC_MOD()->GetAppOptions().GetAutoComplete();
-        bOptLoaded = true;
-    }
-
     vcl::KeyCode aCode = rKEvt.GetKeyCode();
     sal_uInt16 nModi  = aCode.GetModifier();
     bool bShift   = aCode.IsShift();
@@ -3938,7 +3955,7 @@ bool ScInputHandler::KeyInput( const KeyEvent& rKEvt, bool bStartEdit /* = false
                 }
 
                 // AutoInput:
-                if ( bUsed && bAutoComplete )
+                if ( bUsed && SC_MOD()->GetAppOptions().GetAutoComplete() )
                 {
                     bUseTab = false;
                     if (pFormulaData)
@@ -4082,12 +4099,6 @@ void ScInputHandler::InputCommand( const CommandEvent& rCEvt )
     }
     else
     {
-        if (!bOptLoaded)
-        {
-            bAutoComplete = SC_MOD()->GetAppOptions().GetAutoComplete();
-            bOptLoaded = true;
-        }
-
         HideTip();
         HideTipBelow();
 
@@ -4262,14 +4273,14 @@ void ScInputHandler::NotifyChange( const ScInputHdlState* pState,
                         EditView* pActiveView = pTopView ? pTopView : pTableView;
                         ESelection aSel = pActiveView ? pActiveView->GetSelection() : ESelection();
 
-                        // if we switched content completly - don't send huge numbers
+                        // if we switched content completely - don't send huge numbers
                         if (aSel.nStartPara == EE_PARA_NOT_FOUND)
                             aSel.nStartPara = 0;
 
                         if (aSel.nEndPara == EE_PARA_NOT_FOUND)
                             aSel.nEndPara = 0;
 
-                        ScInputHandler::LOKSendFormulabarUpdate(pActiveViewSh, aString, aSel);
+                        ScInputHandler::LOKSendFormulabarUpdate(pActiveView, pActiveViewSh, aString, aSel);
                         // TODO: deprecated?
                         pActiveViewSh->libreOfficeKitViewCallback(LOK_CALLBACK_CELL_FORMULA, aString.toUtf8().getStr());
                     }
@@ -4433,12 +4444,15 @@ void ScInputHandler::InputSelection( const EditView* pView )
     {
         EditView* pActiveView = pTopView ? pTopView : pTableView;
         ESelection aSel = pActiveView ? pActiveView->GetSelection() : ESelection();
-        ScInputHandler::LOKSendFormulabarUpdate(pActiveViewSh, GetEditString(), aSel);
+        ScInputHandler::LOKSendFormulabarUpdate(pActiveView, pActiveViewSh, GetEditString(), aSel);
     }
 }
 
 void ScInputHandler::InputChanged( const EditView* pView, bool bFromNotify )
 {
+    if ( !pView )
+        return;
+
     UpdateActiveView();
 
     // #i20282# DataChanged needs to know if this is from the input line's modify handler
@@ -4574,7 +4588,7 @@ void ScInputHandler::InputSetSelection( sal_Int32 nStart, sal_Int32 nEnd )
     bModified = true;
 }
 
-void ScInputHandler::InputReplaceSelection( const OUString& rStr )
+void ScInputHandler::InputReplaceSelection( std::u16string_view aStr )
 {
     if (!pRefViewSh)
         pRefViewSh = pActiveViewSh;
@@ -4582,13 +4596,13 @@ void ScInputHandler::InputReplaceSelection( const OUString& rStr )
     OSL_ENSURE(nFormSelEnd>=nFormSelStart,"Selection broken...");
 
     sal_Int32 nOldLen = nFormSelEnd - nFormSelStart;
-    sal_Int32 nNewLen = rStr.getLength();
+    sal_Int32 nNewLen = aStr.size();
 
     OUStringBuffer aBuf(aFormText);
     if (nOldLen)
         aBuf.remove(nFormSelStart, nOldLen);
     if (nNewLen)
-        aBuf.insert(nFormSelStart, rStr);
+        aBuf.insert(nFormSelStart, aStr);
 
     aFormText = aBuf.makeStringAndClear();
 
@@ -4625,12 +4639,12 @@ void ScInputHandler::InputTurnOffWinEngine()
 ScInputHdlState::ScInputHdlState( const ScAddress& rCurPos,
                                   const ScAddress& rStartPos,
                                   const ScAddress& rEndPos,
-                                  const OUString& rString,
+                                  OUString _aString,
                                   const EditTextObject* pData )
     :   aCursorPos  ( rCurPos ),
         aStartPos   ( rStartPos ),
         aEndPos     ( rEndPos ),
-        aString     ( rString ),
+        aString     (std::move( _aString )),
         pEditData   ( pData ? pData->Clone() : nullptr )
 {
 }

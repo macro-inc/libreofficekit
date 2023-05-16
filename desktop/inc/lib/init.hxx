@@ -252,7 +252,7 @@ namespace desktop {
         const int mnDocumentId;
         std::set<OUString> maFontsMissing;
 
-        explicit LibLODocument_Impl(const css::uno::Reference<css::lang::XComponent>& xComponent,
+        explicit LibLODocument_Impl(css::uno::Reference<css::lang::XComponent> xComponent,
                                     int nDocumentId);
         ~LibLODocument_Impl();
     };

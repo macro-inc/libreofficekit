@@ -27,10 +27,13 @@
 #include <comphelper/lok.hxx>
 #include <comphelper/processfactory.hxx>
 #include <o3tl/safeint.hxx>
+#include <utility>
 #include <vcl/commandevent.hxx>
+#include <vcl/commandinfoprovider.hxx>
 #include <vcl/event.hxx>
 #include <vcl/svapp.hxx>
 #include <svtools/acceleratorexecute.hxx>
+#include <osl/diagnose.h>
 
 using namespace css;
 using namespace css::uno;
@@ -41,8 +44,8 @@ namespace sfx2::sidebar {
 
 TabBar::TabBar(vcl::Window* pParentWindow,
                const Reference<frame::XFrame>& rxFrame,
-               const std::function<void (const OUString&)>& rDeckActivationFunctor,
-               const PopupMenuProvider& rPopupMenuProvider,
+               std::function<void (const OUString&)> aDeckActivationFunctor,
+               PopupMenuProvider  aPopupMenuProvider,
                SidebarController* rParentSidebarController
               )
     : InterimItemWindow(pParentWindow, "sfx/ui/tabbar.ui", "TabBar")
@@ -50,17 +53,21 @@ TabBar::TabBar(vcl::Window* pParentWindow,
     , mxAuxBuilder(Application::CreateBuilder(m_xContainer.get(), "sfx/ui/tabbarcontents.ui"))
     , mxTempToplevel(mxAuxBuilder->weld_box("toplevel"))
     , mxContents(mxAuxBuilder->weld_widget("TabBarContents"))
-    , mxMenuButton(mxAuxBuilder->weld_menu_button("menubutton"))
-    , mxMainMenu(mxAuxBuilder->weld_menu("mainmenu"))
-    , mxSubMenu(mxAuxBuilder->weld_menu("submenu"))
     , mxMeasureBox(mxAuxBuilder->weld_widget("measure"))
-    , maDeckActivationFunctor(rDeckActivationFunctor)
-    , maPopupMenuProvider(rPopupMenuProvider)
+    , maDeckActivationFunctor(std::move(aDeckActivationFunctor))
+    , maPopupMenuProvider(std::move(aPopupMenuProvider))
     , pParentSidebarController(rParentSidebarController)
 {
     InitControlBase(mxMenuButton.get());
 
     mxTempToplevel->move(mxContents.get(), m_xContainer.get());
+
+    // For Gtk4 defer menu_button until after the contents have been
+    // transferred to its final home (where the old parent is a GtkWindow to
+    // support loading the accelerators in the menu for Gtk3)
+    mxMenuButton = mxAuxBuilder->weld_menu_button("menubutton");
+    mxMainMenu = mxAuxBuilder->weld_menu("mainmenu");
+    mxSubMenu = mxAuxBuilder->weld_menu("submenu");
 
     gDefaultWidth = m_xContainer->get_preferred_size().Width();
 
@@ -83,12 +90,14 @@ TabBar::~TabBar()
 
 void TabBar::dispose()
 {
-    m_xContainer->move(mxContents.get(), mxTempToplevel.get());
     maItems.clear();
     mxMeasureBox.reset();
     mxSubMenu.reset();
     mxMainMenu.reset();
     mxMenuButton.reset();
+    m_xContainer->move(mxContents.get(), mxTempToplevel.get());
+    mxContents.reset();
+    mxTempToplevel.reset();
     mxAuxBuilder.reset();
     InterimItemWindow::dispose();
 }
@@ -169,8 +178,8 @@ void TabBar::DataChanged(const DataChangedEvent& rDataChangedEvent)
 
 bool TabBar::EventNotify(NotifyEvent& rEvent)
 {
-    MouseNotifyEvent nType = rEvent.GetType();
-    if(MouseNotifyEvent::KEYINPUT == nType)
+    NotifyEventType nType = rEvent.GetType();
+    if(NotifyEventType::KEYINPUT == nType)
     {
         const vcl::KeyCode& rKeyCode = rEvent.GetKeyEvent()->GetKeyCode();
         if (!mpAccel)
@@ -184,7 +193,7 @@ bool TabBar::EventNotify(NotifyEvent& rEvent)
             return InterimItemWindow::EventNotify(rEvent);
         return true;
     }
-    else if(MouseNotifyEvent::COMMAND == nType)
+    else if(NotifyEventType::COMMAND == nType)
     {
         const CommandEvent& rCommandEvent = *rEvent.GetCommandEvent();
         if(rCommandEvent.GetCommand() == CommandEventId::Wheel)
@@ -225,7 +234,11 @@ void TabBar::CreateTabItem(weld::Toolbar& rItem, const DeckDescriptor& rDeckDesc
     rItem.set_accessible_name(rDeckDescriptor.msTitle);
     rItem.set_accessible_description(rDeckDescriptor.msHelpText);
     rItem.set_tooltip_text(rDeckDescriptor.msHelpText);
-    rItem.set_item_tooltip_text("toggle", rDeckDescriptor.msHelpText);
+    const OUString sCommand = ".uno:SidebarDeck." + rDeckDescriptor.msId;
+    OUString sShortcut = vcl::CommandInfoProvider::GetCommandShortcut(sCommand, mxFrame);
+    if (!sShortcut.isEmpty())
+        sShortcut = u" (" + sShortcut + u")";
+    rItem.set_item_tooltip_text("toggle", rDeckDescriptor.msHelpText + sShortcut);
 }
 
 css::uno::Reference<css::graphic::XGraphic> TabBar::GetItemImage(const DeckDescriptor& rDeckDescriptor) const

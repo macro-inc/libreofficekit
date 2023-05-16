@@ -62,8 +62,8 @@ using uno::Any;
 constexpr sal_uInt16 nUnknownWhich = RES_UNKNOWNATR_CONTAINER;
 
 SvXMLImportItemMapper::SvXMLImportItemMapper(
-                                SvXMLItemMapEntriesRef const & rMapEntries ) :
-    mrMapEntries( rMapEntries )
+                                SvXMLItemMapEntriesRef aMapEntries ) :
+    mrMapEntries(std::move( aMapEntries ))
 {
 }
 
@@ -134,7 +134,7 @@ void SvXMLImportItemMapper::importXML( SfxItemSet& rSet,
                     }
 
                     if( bPut )
-                        rSet.Put( *pNewItem );
+                        rSet.Put( std::move(pNewItem) );
                 }
                 else
                 {
@@ -995,6 +995,13 @@ bool SvXMLImportItemMapper::PutXMLValue(
                 // below.
                 Any aAny;
                 aAny <<= static_cast<sal_uInt16>(SvxFrameDirection::Vertical_LR_BT);
+                bOk = rItem.PutValue(aAny, 0);
+            }
+            else if (IsXMLToken(rValue, XML_TB_RL90))
+            {
+                // Read tb-rl90 from the extension namespace.
+                Any aAny;
+                aAny <<= static_cast<sal_uInt16>(SvxFrameDirection::Vertical_RL_TB90);
                 bOk = rItem.PutValue(aAny, 0);
             }
             else

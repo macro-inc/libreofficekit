@@ -23,6 +23,7 @@
 #include <osl/diagnose.h>
 #include <vcl/dibtools.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/sprintf.hxx>
 #include <tools/stream.hxx>
 #include <memory>
 #include <unotools/configmgr.hxx>
@@ -31,7 +32,7 @@
 #include <rtl/bootstrap.hxx>
 
 #ifdef DBG_UTIL
-#include <vcl/pngwrite.hxx>
+#include <vcl/filter/PngImageWriter.hxx>
 #endif
 
 // GDI-Array
@@ -306,7 +307,7 @@ record_type_name(sal_uInt32 nRecType)
         // Yes, return a pointer to a static buffer. This is a very
         // local debugging output function, so no big deal.
         static char buffer[11];
-        sprintf(buffer, "0x%08" SAL_PRIxUINT32, nRecType);
+        o3tl::sprintf(buffer, "0x%08" SAL_PRIxUINT32, nRecType);
         return buffer;
     }
 #endif
@@ -331,7 +332,7 @@ SvStream& operator>>(SvStream& rInStream, BLENDFUNCTION& rBlendFun)
     return rInStream;
 }
 
-bool ImplReadRegion( basegfx::B2DPolyPolygon& rPolyPoly, SvStream& rStream, sal_uInt32 nLen )
+bool ImplReadRegion( basegfx::B2DPolyPolygon& rPolyPoly, SvStream& rStream, sal_uInt32 nLen, Point aWinOrg )
 {
     if (nLen < 32) // 32 bytes - Size of RegionDataHeader
         return false;
@@ -349,7 +350,7 @@ bool ImplReadRegion( basegfx::B2DPolyPolygon& rPolyPoly, SvStream& rStream, sal_
     rStream.ReadInt32(nRight);
     rStream.ReadInt32(nBottom);
 
-    if (!rStream.good() || nCountRects == 0 || nType != RDH_RECTANGLES)
+    if (!rStream.good() || nCountRects == 0 || nType != emfio::RDH_RECTANGLES)
         return false;
 
     SAL_INFO("emfio", "\t\tBounds Left: " << nLeft << ", top: " << nTop << ", right: " << nRight << ", bottom: " << nBottom);
@@ -368,6 +369,10 @@ bool ImplReadRegion( basegfx::B2DPolyPolygon& rPolyPoly, SvStream& rStream, sal_
         rStream.ReadInt32(nTop);
         rStream.ReadInt32(nRight);
         rStream.ReadInt32(nBottom);
+        nLeft += aWinOrg.X();
+        nRight += aWinOrg.X();
+        nTop += aWinOrg.Y();
+        nBottom += aWinOrg.Y();
         rPolyPoly.append( basegfx::utils::createPolygonFromRect( ::basegfx::B2DRectangle( nLeft, nTop, nRight, nBottom ) ) );
         SAL_INFO("emfio", "\t\t" << i << " Left: " << nLeft << ", top: " << nTop << ", right: " << nRight << ", bottom: " << nBottom);
     }
@@ -730,7 +735,7 @@ namespace emfio
         for ( sal_uInt32 i = 0; ( i < nNumberOfPolylines ) && mpInputStream->good(); i++ )
         {
             tools::Polygon aPolygon = ReadPolygon<T>(0, pnPolylinePointCount[i], nNextPos);
-            DrawPolyLine(aPolygon, false, mbRecordPath);
+            DrawPolyLine(std::move(aPolygon), false, mbRecordPath);
         }
     }
 
@@ -1019,7 +1024,7 @@ namespace emfio
                         sal_uInt32 nMapMode(0);
                         mpInputStream->ReadUInt32( nMapMode );
                         SAL_INFO("emfio", "\t\tMapMode: 0x" << std::hex << nMapMode << std::dec);
-                        SetMapMode( nMapMode );
+                        SetMapMode( static_cast<MappingMode>(nMapMode) );
                     }
                     break;
 
@@ -1027,7 +1032,7 @@ namespace emfio
                     {
                         mpInputStream->ReadUInt32( nDat32 );
                         SAL_INFO("emfio", "\t\tBkMode: 0x" << std::hex << nDat32 << std::dec);
-                        SetBkMode( static_cast<BkMode>(nDat32) );
+                        SetBkMode( static_cast<BackgroundMode>(nDat32) );
                     }
                     break;
 
@@ -1133,7 +1138,7 @@ namespace emfio
                         XForm aTempXForm;
                         *mpInputStream >> aTempXForm;
                         mpInputStream->ReadUInt32( nMode );
-                        ModifyWorldTransform( aTempXForm, nMode );
+                        ModifyWorldTransform( aTempXForm, static_cast<ModifyWorldTransformMode>(nMode) );
                     }
                     break;
 
@@ -1144,187 +1149,48 @@ namespace emfio
                     }
                     break;
 
-                    case EMR_CREATEPEN :
+                    case EMR_CREATEPEN:
                     {
-                        mpInputStream->ReadUInt32( nIndex );
-                        if ( ( nIndex & ENHMETA_STOCK_OBJECT ) == 0 )
+                        mpInputStream->ReadUInt32(nIndex);
+                        if ((nIndex & ENHMETA_STOCK_OBJECT) == 0)
                         {
-                            LineInfo    aLineInfo;
-                            sal_uInt32 nStyle(0);
+                            sal_uInt32 nPenStyle(0);
                             sal_Int32 nPenWidth(0), nIgnored;
-
-                            mpInputStream->ReadUInt32( nStyle ).ReadInt32( nPenWidth ).ReadInt32( nIgnored );
-
-                            SAL_INFO("emfio", "\t\tIndex: " << nIndex << " Style: 0x" << std::hex << nStyle << std::dec << " PenWidth: " << nPenWidth);
-                            // According to documentation: nStyle = PS_COSMETIC = 0x0 - line with a width of one logical unit and a style that is a solid color
-                            // tdf#140271 Based on observed behaviour the line width is not constant with PS_COSMETIC
-
-                            // Width 0 means default width for LineInfo (HairLine) with 1 pixel wide
-                            aLineInfo.SetWidth( nPenWidth );
-
-                            bool bTransparent = false;
-                            switch( nStyle & PS_STYLE_MASK )
-                            {
-                                case PS_DASHDOTDOT :
-                                    aLineInfo.SetStyle( LineStyle::Dash );
-                                    aLineInfo.SetDashCount( 1 );
-                                    aLineInfo.SetDotCount( 2 );
-                                break;
-                                case PS_DASHDOT :
-                                    aLineInfo.SetStyle( LineStyle::Dash );
-                                    aLineInfo.SetDashCount( 1 );
-                                    aLineInfo.SetDotCount( 1 );
-                                break;
-                                case PS_DOT :
-                                    aLineInfo.SetStyle( LineStyle::Dash );
-                                    aLineInfo.SetDashCount( 0 );
-                                    aLineInfo.SetDotCount( 1 );
-                                break;
-                                case PS_DASH :
-                                    aLineInfo.SetStyle( LineStyle::Dash );
-                                    aLineInfo.SetDashCount( 1 );
-                                    aLineInfo.SetDotCount( 0 );
-                                break;
-                                case PS_NULL :
-                                    bTransparent = true;
-                                    aLineInfo.SetStyle( LineStyle::NONE );
-                                break;
-                                case PS_INSIDEFRAME :
-                                case PS_SOLID :
-                                default :
-                                    aLineInfo.SetStyle( LineStyle::Solid );
-                            }
-                            switch( nStyle & PS_ENDCAP_STYLE_MASK )
-                            {
-                                case PS_ENDCAP_ROUND :
-                                    if ( nPenWidth )
-                                    {
-                                        aLineInfo.SetLineCap( css::drawing::LineCap_ROUND );
-                                        break;
-                                    }
-                                    [[fallthrough]];
-                                case PS_ENDCAP_SQUARE :
-                                    if ( nPenWidth )
-                                    {
-                                        aLineInfo.SetLineCap( css::drawing::LineCap_SQUARE );
-                                        break;
-                                    }
-                                    [[fallthrough]];
-                                case PS_ENDCAP_FLAT :
-                                default :
-                                    aLineInfo.SetLineCap( css::drawing::LineCap_BUTT );
-                            }
-                            switch( nStyle & PS_JOIN_STYLE_MASK )
-                            {
-                                case PS_JOIN_ROUND :
-                                    aLineInfo.SetLineJoin ( basegfx::B2DLineJoin::Round );
-                                break;
-                                case PS_JOIN_MITER :
-                                    aLineInfo.SetLineJoin ( basegfx::B2DLineJoin::Miter );
-                                break;
-                                case PS_JOIN_BEVEL :
-                                    aLineInfo.SetLineJoin ( basegfx::B2DLineJoin::Bevel );
-                                break;
-                                default :
-                                    aLineInfo.SetLineJoin ( basegfx::B2DLineJoin::NONE );
-                            }
-                            CreateObjectIndexed(nIndex, std::make_unique<WinMtfLineStyle>( ReadColor(), aLineInfo, bTransparent ));
+                            mpInputStream->ReadUInt32(nPenStyle).ReadInt32(nPenWidth).ReadInt32(nIgnored);
+                            SAL_INFO("emfio", "\t\tIndex: " << nIndex << " Style: 0x" << std::hex
+                                                            << nPenStyle << std::dec
+                                                            << " PenWidth: " << nPenWidth);
+                            if ((nPenStyle & PS_STYLE_MASK) > PS_INSIDEFRAME)
+                                nPenStyle = PS_COSMETIC;
+                            if ((nPenStyle & PS_GEOMETRIC) == 0)
+                                nPenWidth = 0;
+                            CreateObjectIndexed(nIndex, std::make_unique<WinMtfLineStyle>(ReadColor(), nPenStyle, nPenWidth));
                         }
                     }
                     break;
 
-                    case EMR_EXTCREATEPEN :
+                    case EMR_EXTCREATEPEN:
                     {
-                        mpInputStream->ReadUInt32( nIndex );
-                        if ( ( nIndex & ENHMETA_STOCK_OBJECT ) == 0 )
+                        mpInputStream->ReadUInt32(nIndex);
+                        if ((nIndex & ENHMETA_STOCK_OBJECT) == 0)
                         {
-                            sal_uInt32  offBmi, cbBmi, offBits, cbBits, nStyle, nWidth, nBrushStyle, elpNumEntries;
-                            sal_Int32   elpHatch;
-                            mpInputStream->ReadUInt32( offBmi ).ReadUInt32( cbBmi ).ReadUInt32( offBits ).ReadUInt32( cbBits ). ReadUInt32( nStyle ).ReadUInt32( nWidth ).ReadUInt32( nBrushStyle );
-
-                            SAL_INFO("emfio", "\t\tStyle: 0x" << std::hex << nStyle << std::dec);
+                            sal_uInt32 offBmi, cbBmi, offBits, cbBits, nPenStyle, nWidth, nBrushStyle, elpNumEntries;
+                            sal_Int32 elpHatch;
+                            mpInputStream->ReadUInt32(offBmi).ReadUInt32(cbBmi).ReadUInt32(offBits).ReadUInt32(cbBits);
+                            mpInputStream->ReadUInt32(nPenStyle).ReadUInt32(nWidth).ReadUInt32(nBrushStyle);
+                            SAL_INFO("emfio", "\t\tStyle: 0x" << std::hex << nPenStyle << std::dec);
+                            if ((nPenStyle & PS_STYLE_MASK) > PS_INSIDEFRAME)
+                                nPenStyle = PS_COSMETIC;
+                            if ((nPenStyle & PS_GEOMETRIC) == 0)
+                                nWidth = 0;
                             SAL_INFO("emfio", "\t\tWidth: " << nWidth);
                             Color aColorRef = ReadColor();
-                            mpInputStream->ReadInt32( elpHatch ).ReadUInt32( elpNumEntries );
+                            mpInputStream->ReadInt32(elpHatch).ReadUInt32(elpNumEntries);
 
                             if (!mpInputStream->good())
                                 bStatus = false;
                             else
-                            {
-                                LineInfo    aLineInfo;
-                                if ( nWidth )
-                                    aLineInfo.SetWidth( nWidth );
-
-                                bool bTransparent = false;
-
-                                switch( nStyle & PS_STYLE_MASK )
-                                {
-                                    case PS_DASHDOTDOT :
-                                        aLineInfo.SetStyle( LineStyle::Dash );
-                                        aLineInfo.SetDashCount( 1 );
-                                        aLineInfo.SetDotCount( 2 );
-                                    break;
-                                    case PS_DASHDOT :
-                                        aLineInfo.SetStyle( LineStyle::Dash );
-                                        aLineInfo.SetDashCount( 1 );
-                                        aLineInfo.SetDotCount( 1 );
-                                    break;
-                                    case PS_DOT :
-                                        aLineInfo.SetStyle( LineStyle::Dash );
-                                        aLineInfo.SetDashCount( 0 );
-                                        aLineInfo.SetDotCount( 1 );
-                                    break;
-                                    case PS_DASH :
-                                        aLineInfo.SetStyle( LineStyle::Dash );
-                                        aLineInfo.SetDashCount( 1 );
-                                        aLineInfo.SetDotCount( 0 );
-                                    break;
-                                    case PS_NULL :
-                                        bTransparent = true;
-                                        aLineInfo.SetStyle( LineStyle::NONE );
-                                    break;
-
-                                    case PS_INSIDEFRAME :
-                                    case PS_SOLID :
-                                    default :
-                                        aLineInfo.SetStyle( LineStyle::Solid );
-                                }
-                                switch( nStyle & PS_ENDCAP_STYLE_MASK )
-                                {
-                                    case PS_ENDCAP_ROUND :
-                                        if ( aLineInfo.GetWidth() )
-                                        {
-                                            aLineInfo.SetLineCap( css::drawing::LineCap_ROUND );
-                                            break;
-                                        }
-                                        [[fallthrough]];
-                                    case PS_ENDCAP_SQUARE :
-                                        if ( aLineInfo.GetWidth() )
-                                        {
-                                            aLineInfo.SetLineCap( css::drawing::LineCap_SQUARE );
-                                            break;
-                                        }
-                                        [[fallthrough]];
-                                    case PS_ENDCAP_FLAT :
-                                    default :
-                                        aLineInfo.SetLineCap( css::drawing::LineCap_BUTT );
-                                }
-                                switch( nStyle & PS_JOIN_STYLE_MASK )
-                                {
-                                    case PS_JOIN_ROUND :
-                                        aLineInfo.SetLineJoin ( basegfx::B2DLineJoin::Round );
-                                    break;
-                                    case PS_JOIN_MITER :
-                                        aLineInfo.SetLineJoin ( basegfx::B2DLineJoin::Miter );
-                                    break;
-                                    case PS_JOIN_BEVEL :
-                                        aLineInfo.SetLineJoin ( basegfx::B2DLineJoin::Bevel );
-                                    break;
-                                    default :
-                                        aLineInfo.SetLineJoin ( basegfx::B2DLineJoin::NONE );
-                                }
-                                CreateObjectIndexed(nIndex, std::make_unique<WinMtfLineStyle>( aColorRef, aLineInfo, bTransparent ));
-                            }
+                                CreateObjectIndexed(nIndex, std::make_unique<WinMtfLineStyle>(aColorRef, nPenStyle, nWidth));
                         }
                     }
                     break;
@@ -1336,7 +1202,8 @@ namespace emfio
                         {
                             sal_uInt32  nStyle;
                             mpInputStream->ReadUInt32( nStyle );
-                            CreateObjectIndexed(nIndex, std::make_unique<WinMtfFillStyle>( ReadColor(), ( nStyle == BS_HOLLOW ) ));
+                            BrushStyle eStyle = static_cast<BrushStyle>(nStyle);
+                            CreateObjectIndexed(nIndex, std::make_unique<WinMtfFillStyle>( ReadColor(), ( eStyle == BrushStyle::BS_HOLLOW ) ));
                         }
                     }
                     break;
@@ -1363,7 +1230,7 @@ namespace emfio
                             tools::Long dh = h / 2;
                             Point aCenter( nX32 + dw, nY32 + dh );
                             tools::Polygon aPoly( aCenter, dw, dh );
-                            DrawPolygon( aPoly, mbRecordPath );
+                            DrawPolygon( std::move(aPoly), mbRecordPath );
                         }
                     }
                     break;
@@ -1378,7 +1245,7 @@ namespace emfio
                                           Point(nX32, ny32) };
                         tools::Polygon aPoly(4, aPoints);
                         aPoly.Optimize( PolyOptimizeFlags::CLOSE );
-                        DrawPolygon( aPoly, mbRecordPath );
+                        DrawPolygon( std::move(aPoly), mbRecordPath );
                     }
                     break;
 
@@ -1386,7 +1253,7 @@ namespace emfio
                     {
                         mpInputStream->ReadInt32( nX32 ).ReadInt32( nY32 ).ReadInt32( nx32 ).ReadInt32( ny32 ).ReadUInt32( nW ).ReadUInt32( nH );
                         tools::Polygon aRoundRectPoly( ReadRectangle( nX32, nY32, nx32, ny32 ), nW, nH );
-                        DrawPolygon( aRoundRectPoly, mbRecordPath );
+                        DrawPolygon( std::move(aRoundRectPoly), mbRecordPath );
                     }
                     break;
 
@@ -1404,9 +1271,9 @@ namespace emfio
                             tools::Polygon aPoly(ReadRectangle(nX32, nY32, nx32, ny32), Point(nStartX, nStartY), Point(nEndX, nEndY), PolyStyle::Arc, IsArcDirectionClockWise());
 
                             if ( nRecType == EMR_CHORD )
-                                DrawPolygon( aPoly, mbRecordPath );
+                                DrawPolygon( std::move(aPoly), mbRecordPath );
                             else
-                                DrawPolyLine( aPoly, nRecType == EMR_ARCTO, mbRecordPath );
+                                DrawPolyLine( std::move(aPoly), nRecType == EMR_ARCTO, mbRecordPath );
                         }
                     }
                     break;
@@ -1420,7 +1287,7 @@ namespace emfio
                         else
                         {
                             tools::Polygon aPoly(ReadRectangle(nX32, nY32, nx32, ny32), Point(nStartX, nStartY), Point(nEndX, nEndY), PolyStyle::Pie, IsArcDirectionClockWise());
-                            DrawPolygon( aPoly, mbRecordPath );
+                            DrawPolygon( std::move(aPoly), mbRecordPath );
                         }
                     }
                     break;
@@ -1466,7 +1333,7 @@ namespace emfio
                     {
                         sal_Int32 nClippingMode(0);
                         mpInputStream->ReadInt32(nClippingMode);
-                        SetClipPath(GetPathObj(), nClippingMode, true);
+                        SetClipPath(GetPathObj(), static_cast<RegionMode>(nClippingMode), true);
                     }
                     break;
 
@@ -1484,7 +1351,7 @@ namespace emfio
 
                             // This record's region data should be ignored if mode
                             // is RGN_COPY - see EMF spec section 2.3.2.2
-                            if (nClippingMode == RGN_COPY)
+                            if (static_cast<RegionMode>(nClippingMode) == RegionMode::RGN_COPY)
                             {
                                 SetDefaultClipPath();
                             }
@@ -1492,9 +1359,9 @@ namespace emfio
                             {
                                 basegfx::B2DPolyPolygon aPolyPoly;
                                 if (cbRgnData)
-                                    ImplReadRegion(aPolyPoly, *mpInputStream, nRemainingRecSize);
+                                    ImplReadRegion(aPolyPoly, *mpInputStream, nRemainingRecSize, GetWinOrg());
                                 const tools::PolyPolygon aPolyPolygon(aPolyPoly);
-                                SetClipPath(aPolyPolygon, nClippingMode, false);
+                                SetClipPath(aPolyPolygon, static_cast<RegionMode>(nClippingMode), false);
                             }
                         }
                     }
@@ -1641,16 +1508,22 @@ namespace emfio
                                         }
                                     }
 
-    #ifdef DBG_UTIL
+#ifdef DBG_UTIL
                                     static bool bDoSaveForVisualControl(false); // loplugin:constvars:ignore
 
                                     if(bDoSaveForVisualControl)
                                     {
-                                        SvFileStream aNew("c:\\metafile_content.png", StreamMode::WRITE|StreamMode::TRUNC);
-                                        vcl::PNGWriter aPNGWriter(aBitmapEx);
-                                        aPNGWriter.Write(aNew);
+                                        // VCL_DUMP_BMP_PATH should be like C:/path/ or ~/path/
+                                        static const OUString sDumpPath(OUString::createFromAscii(std::getenv("VCL_DUMP_BMP_PATH")));
+                                        if(!sDumpPath.isEmpty())
+                                        {
+                                            SvFileStream aNew(sDumpPath + "metafile_content.png",
+                                                            StreamMode::WRITE | StreamMode::TRUNC);
+                                            vcl::PngImageWriter aPNGWriter(aNew);
+                                            aPNGWriter.write(aBitmapEx);
+                                        }
                                     }
-    #endif
+#endif
                                     maBmpSaveList.emplace_back(aBitmapEx, aRect, SRCAND|SRCINVERT);
                                 }
                             }
@@ -1912,9 +1785,9 @@ namespace emfio
                         else
                         {
                             const tools::Rectangle aRect( nLeftRect, nTopRect, nRightRect, nBottomRect );
-                            const BkMode mnBkModeBackup = mnBkMode;
+                            const BackgroundMode mnBkModeBackup = mnBkMode;
                             if ( nOptions & ETO_NO_RECT ) // Don't draw the background rectangle and text background
-                                mnBkMode = BkMode::Transparent;
+                                mnBkMode = BackgroundMode::Transparent;
                             else if ( nOptions & ETO_OPAQUE )
                                 DrawRectWithBGColor( aRect );
 
@@ -1951,7 +1824,7 @@ namespace emfio
                                 SAL_INFO("emfio", "\t\tText: " << aText);
                                 SAL_INFO("emfio", "\t\tDxBuffer:");
 
-                                std::vector<sal_Int32> aDXAry;
+                                KernArray aDXAry;
                                 std::unique_ptr<tools::Long[]> pDYAry;
 
                                 sal_Int32 nDxSize;
@@ -1991,7 +1864,7 @@ namespace emfio
                                             }
                                         }
 
-                                        aDXAry[i] = 0;
+                                        aDXAry.set(i, 0);
                                         if (nOptions & ETO_PDY)
                                         {
                                             pDYAry[i] = 0;
@@ -2001,7 +1874,7 @@ namespace emfio
                                         {
                                             sal_Int32 nDxTmp = 0;
                                             mpInputStream->ReadInt32(nDxTmp);
-                                            aDXAry[i] = o3tl::saturating_add(aDXAry[i], nDxTmp);
+                                            aDXAry.set(i, o3tl::saturating_add(aDXAry[i], nDxTmp));
                                             if (nOptions & ETO_PDY)
                                             {
                                                 sal_Int32 nDyTmp = 0;
@@ -2018,7 +1891,7 @@ namespace emfio
                                     Push(); // Save the current clip. It will be restored after text drawing
                                     IntersectClipRect( aRect );
                                 }
-                                DrawText(aPos, aText, aDXAry.empty() ? nullptr : &aDXAry, pDYAry.get(), mbRecordPath, nGfxMode);
+                                DrawText(aPos, aText, aDXAry.empty() ? nullptr : &aDXAry, pDYAry.get(), mbRecordPath, static_cast<GraphicsMode>(nGfxMode));
                                 if ( nOptions & ETO_CLIPPED )
                                     Pop();
                             }
@@ -2068,7 +1941,7 @@ namespace emfio
                             mpInputStream->ReadUInt32( nRgnDataSize ).ReadUInt32( nIndex );
                             nRemainingRecSize -= 24;
 
-                            if (ImplReadRegion(aPolyPoly, *mpInputStream, nRemainingRecSize))
+                            if (ImplReadRegion(aPolyPoly, *mpInputStream, nRemainingRecSize, GetWinOrg()))
                             {
                                 Push();
                                 SelectObject( nIndex );
@@ -2093,7 +1966,7 @@ namespace emfio
                             mpInputStream->ReadUInt32( nRgnDataSize );
                             nRemainingRecSize -= 20;
 
-                            if (ImplReadRegion(aPolyPoly, *mpInputStream, nRemainingRecSize))
+                            if (ImplReadRegion(aPolyPoly, *mpInputStream, nRemainingRecSize, GetWinOrg()))
                             {
                                 tools::PolyPolygon aPolyPolygon(aPolyPoly);
                                 DrawPolyPolygon( aPolyPolygon );
@@ -2358,7 +2231,7 @@ namespace emfio
         if (nLeft > nRight || nTop > nBottom)
         {
             SAL_WARN("emfio", "broken rectangle");
-            return tools::Rectangle::Justify(Point(nLeft, nTop), Point(nRight, nBottom));
+            return tools::Rectangle::Normalize(Point(nLeft, nTop), Point(nRight, nBottom));
         }
 
         return tools::Rectangle(nLeft, nTop, nRight, nBottom);

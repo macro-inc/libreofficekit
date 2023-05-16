@@ -21,7 +21,7 @@ $(eval $(call gb_Library_Library,sw))
 
 $(eval $(call gb_Library_add_sdi_headers,sw,sw/sdi/swslots))
 
-$(eval $(call gb_Library_set_componentfile,sw,sw/util/sw))
+$(eval $(call gb_Library_set_componentfile,sw,sw/util/sw,services))
 
 $(eval $(call gb_Library_set_precompiled_header,sw,sw/inc/pch/precompiled_sw))
 
@@ -51,13 +51,15 @@ $(eval $(call gb_Library_add_defs,sw,\
 ))
 
 $(eval $(call gb_Library_use_libraries,sw,\
-    $(call gb_Helper_optional,AVMEDIA,avmedia) \
+    avmedia \
     basegfx \
     comphelper \
     cppu \
     cppuhelper \
     $(call gb_Helper_optional,DBCONNECTIVITY, \
         dbtools) \
+    docmodel \
+    drawinglayercore \
     drawinglayer \
     editeng \
     i18nlangtag \
@@ -93,11 +95,8 @@ $(eval $(call gb_Library_use_externals,sw,\
 	libxml2 \
 ))
 
+ifneq ($(ENABLE_WASM_STRIP_ACCESSIBILITY),TRUE)
 $(eval $(call gb_Library_add_exception_objects,sw,\
-    sw/source/core/SwNumberTree/SwNodeNum \
-    sw/source/core/SwNumberTree/SwNumberTree \
-    sw/source/core/access/AccessibilityCheck \
-    sw/source/core/access/AccessibilityIssue \
     sw/source/core/access/acccell \
     sw/source/core/access/acccontext \
     sw/source/core/access/accdoc \
@@ -124,12 +123,22 @@ $(eval $(call gb_Library_add_exception_objects,sw,\
     sw/source/core/access/acctextframe \
     sw/source/core/access/parachangetrackinginfo \
     sw/source/core/access/textmarkuphelper \
+    sw/source/uibase/docvw/SidebarWinAcc \
+))
+endif
+
+$(eval $(call gb_Library_add_exception_objects,sw,\
+    sw/source/core/SwNumberTree/SwNodeNum \
+    sw/source/core/SwNumberTree/SwNumberTree \
+    sw/source/core/access/AccessibilityCheck \
+    sw/source/core/access/AccessibilityIssue \
     sw/source/core/attr/BorderCacheOwner \
     sw/source/core/attr/calbck \
     sw/source/core/attr/cellatr \
     sw/source/core/attr/fmtfollowtextflow \
     sw/source/core/attr/fmtwrapinfluenceonobjpos \
     sw/source/core/attr/format \
+    sw/source/core/attr/formatflysplit \
     sw/source/core/attr/hints \
     sw/source/core/attr/swatrset \
     sw/source/core/bastyp/SwSmartTagMgr \
@@ -358,6 +367,7 @@ $(eval $(call gb_Library_add_exception_objects,sw,\
     sw/source/core/layout/wsfrm \
     sw/source/core/model/ModelTraverser \
     sw/source/core/model/SearchResultLocator \
+    sw/source/core/model/ThemeColorChanger \
     sw/source/core/objectpositioning/anchoredobjectposition \
     sw/source/core/objectpositioning/ascharanchoredobjectposition \
     sw/source/core/objectpositioning/environmentofanchoredobject \
@@ -432,6 +442,7 @@ $(eval $(call gb_Library_add_exception_objects,sw,\
     sw/source/core/txtnode/atrtox \
     sw/source/core/txtnode/attrlinebreak \
     sw/source/core/txtnode/chrfmt \
+    sw/source/core/txtnode/justify \
     sw/source/core/txtnode/fmtatr2 \
     sw/source/core/txtnode/fntcache \
     sw/source/core/txtnode/fntcap \
@@ -633,7 +644,6 @@ $(eval $(call gb_Library_add_exception_objects,sw,\
     sw/source/uibase/docvw/PostItMgr \
     sw/source/uibase/docvw/ShadowOverlayObject \
     sw/source/uibase/docvw/SidebarTxtControl \
-    sw/source/uibase/docvw/SidebarWinAcc \
     sw/source/uibase/docvw/HeaderFooterWin \
     sw/source/uibase/docvw/OutlineContentVisibilityWin \
     sw/source/uibase/docvw/contentcontrolaliasbutton \
@@ -808,6 +818,8 @@ $(eval $(call gb_Library_add_exception_objects,sw,\
     sw/source/uibase/dbui/dbtree \
     sw/source/uibase/dbui/mailmergetoolbarcontrols \
 ))
+
+$(eval $(call gb_Library_add_componentimpl,sw,mailmerge))
 endif
 
 $(eval $(call gb_SdiTarget_SdiTarget,sw/sdi/swslots,sw/sdi/swriter))

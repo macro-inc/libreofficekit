@@ -18,8 +18,6 @@
  */
 
 
-#include <vcl/svapp.hxx>
-
 #include <svl/srchitem.hxx>
 #include <editeng/lspcitem.hxx>
 #include <editeng/adjustitem.hxx>
@@ -35,6 +33,7 @@
 #include <sal/log.hxx>
 #include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
+#include <osl/thread.h>
 
 #include <editxml.hxx>
 
@@ -73,6 +72,7 @@
 #include <svtools/rtfkeywd.hxx>
 #include <editeng/edtdlg.hxx>
 
+#include <cstddef>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -116,10 +116,6 @@ EditPaM ImpEditEngine::ReadText( SvStream& rInput, EditSelection aSel )
     bool bDone = rInput.ReadByteStringLine( aTmpStr, rInput.GetStreamCharSet() );
     while ( bDone )
     {
-        if (aTmpStr.getLength() > MAXCHARSINPARA)
-        {
-            aTmpStr = aTmpStr.copy(0, MAXCHARSINPARA);
-        }
         aPaM = ImpInsertText( EditSelection( aPaM, aPaM ), aTmpStr );
         aPaM = ImpInsertParaBreak( aPaM );
         bDone = rInput.ReadByteStringLine( aTmpStr, rInput.GetStreamCharSet() );
@@ -252,7 +248,7 @@ bool ImpEditEngine::WriteItemListAsRTF( ItemList& rLst, SvStream& rOutput, sal_I
 
 static void lcl_FindValidAttribs( ItemList& rLst, ContentNode* pNode, sal_Int32 nIndex, sal_uInt16 nScriptType )
 {
-    sal_uInt16 nAttr = 0;
+    std::size_t nAttr = 0;
     EditCharAttrib* pAttr = GetAttrib( pNode->GetCharAttribs().GetAttribs(), nAttr );
     while ( pAttr && ( pAttr->GetStart() <= nIndex ) )
     {
@@ -313,8 +309,8 @@ ErrCode ImpEditEngine::WriteRTF( SvStream& rOutput, EditSelection aSel )
         {
             SvxFontItem const*const pFontItem = static_cast<const SvxFontItem*>(pItem);
             bool bAlreadyExist = false;
-            sal_uLong nTestMax = nScriptType ? aFontTable.size() : 1;
-            for ( sal_uLong nTest = 0; !bAlreadyExist && ( nTest < nTestMax ); nTest++ )
+            size_t nTestMax = nScriptType ? aFontTable.size() : 1;
+            for ( size_t nTest = 0; !bAlreadyExist && ( nTest < nTestMax ); nTest++ )
             {
                 bAlreadyExist = *aFontTable[ nTest ] == *pFontItem;
             }
@@ -361,6 +357,16 @@ ErrCode ImpEditEngine::WriteRTF( SvStream& rOutput, EditSelection aSel )
         rOutput.WriteUInt32AsString( nVal );
 
         rtl_TextEncoding eChrSet = pFontItem->GetCharSet();
+        // tdf#47679 OpenSymbol is not encoded in Symbol Encoding
+        // and anyway we always attempt to write as eDestEnc
+        // of RTL_TEXTENCODING_MS_1252 and pay no attention
+        // on export what encoding we claim to use for these
+        // fonts.
+        if (IsOpenSymbol(pFontItem->GetFamilyName()))
+        {
+            SAL_WARN_IF(eChrSet == RTL_TEXTENCODING_SYMBOL, "editeng", "OpenSymbol should not have charset of RTL_TEXTENCODING_SYMBOL in new documents");
+            eChrSet = RTL_TEXTENCODING_UTF8;
+        }
         DBG_ASSERT( eChrSet != 9, "SystemCharSet?!" );
         if( RTL_TEXTENCODING_DONTKNOW == eChrSet )
             eChrSet = osl_getThreadTextEncoding();
@@ -642,7 +648,6 @@ ErrCode ImpEditEngine::WriteRTF( SvStream& rOutput, EditSelection aSel )
     }
     // RTF-trailer ...
     rOutput.WriteCharPtr( "}}" );    // 1xparentheses paragraphs, 1xparentheses RTF document
-    rOutput.Flush();
 
     aFontTable.clear();
 
@@ -1046,8 +1051,9 @@ std::unique_ptr<EditTextObject> ImpEditEngine::CreateTextObject( EditSelection a
         auto& rCAttriblist = pC->GetCharAttribs();
 
         // and the Attribute...
-        sal_uInt16 nAttr = 0;
+        std::size_t nAttr = 0;
         EditCharAttrib* pAttr = GetAttrib( pNode->GetCharAttribs().GetAttribs(), nAttr );
+        rCAttriblist.reserve(rCAttriblist.size() + pNode->GetCharAttribs().GetAttribs().size());
         while ( pAttr )
         {
             // In a blank paragraph keep the attributes!
@@ -1087,7 +1093,7 @@ std::unique_ptr<EditTextObject> ImpEditEngine::CreateTextObject( EditSelection a
     // sleeper set up when Olli paragraphs not hacked!
     if ( bAllowBigObjects && bOnlyFullParagraphs && IsFormatted() && IsUpdateLayout() && ( nTextPortions >= nBigObjectStart ) )
     {
-        XParaPortionList* pXList = new XParaPortionList( GetRefDevice(), GetColumnWidth(aPaperSize), nStretchX, nStretchY );
+        XParaPortionList* pXList = new XParaPortionList(GetRefDevice(), GetColumnWidth(aPaperSize), mfFontScaleX, mfFontScaleY, mfSpacingScaleX, mfSpacingScaleY);
         pTxtObj->SetPortionInfo(std::unique_ptr<XParaPortionList>(pXList));
         for ( nNode = nStartNode; nNode <= nEndNode; nNode++  )
         {
@@ -1172,9 +1178,11 @@ EditSelection ImpEditEngine::InsertTextObject( const EditTextObject& rTextObject
     XParaPortionList* pPortionInfo = rTextObjectImpl.GetPortionInfo();
 
     if ( pPortionInfo && ( static_cast<tools::Long>(pPortionInfo->GetPaperWidth()) == GetColumnWidth(aPaperSize) )
-            && ( pPortionInfo->GetRefMapMode() == GetRefDevice()->GetMapMode() )
-            && ( pPortionInfo->GetStretchX() == nStretchX )
-            && ( pPortionInfo->GetStretchY() == nStretchY ) )
+            && pPortionInfo->GetRefMapMode() == GetRefDevice()->GetMapMode()
+            && pPortionInfo->getFontScaleX() == mfFontScaleX
+            && pPortionInfo->getFontScaleY() == mfFontScaleY
+            && pPortionInfo->getSpacingScaleX() == mfSpacingScaleX
+            && pPortionInfo->getSpacingScaleY() == mfSpacingScaleY)
     {
         if ( (pPortionInfo->GetRefDevPtr() == GetRefDevice()) ||
              (pPortionInfo->RefDevIsVirtual() && GetRefDevice()->IsVirtual()) )
@@ -1383,25 +1391,34 @@ void ImpEditEngine::SetAllMisspellRanges( const std::vector<editeng::MisspellRan
     }
 }
 
-LanguageType ImpEditEngine::GetLanguage( const EditPaM& rPaM, sal_Int32* pEndPos ) const
+editeng::LanguageSpan ImpEditEngine::GetLanguage( const EditPaM& rPaM, sal_Int32* pEndPos ) const
 {
     short nScriptTypeI18N = GetI18NScriptType( rPaM, pEndPos ); // pEndPos will be valid now, pointing to ScriptChange or NodeLen
     SvtScriptType nScriptType = SvtLanguageOptions::FromI18NToSvtScriptType(nScriptTypeI18N);
     sal_uInt16 nLangId = GetScriptItemId( EE_CHAR_LANGUAGE, nScriptType );
     const SvxLanguageItem* pLangItem = &static_cast<const SvxLanguageItem&>(rPaM.GetNode()->GetContentAttribs().GetItem( nLangId ));
     const EditCharAttrib* pAttr = rPaM.GetNode()->GetCharAttribs().FindAttrib( nLangId, rPaM.GetIndex() );
+
+    editeng::LanguageSpan aLang;
+
     if ( pAttr )
+    {
         pLangItem = static_cast<const SvxLanguageItem*>(pAttr->GetItem());
+        aLang.nStart = pAttr->GetStart();
+        aLang.nEnd = pAttr->GetEnd();
+    }
 
     if ( pEndPos && pAttr && ( pAttr->GetEnd() < *pEndPos ) )
         *pEndPos = pAttr->GetEnd();
 
-    return pLangItem->GetLanguage();
+    aLang.nLang = pLangItem->GetLanguage();
+
+    return aLang;
 }
 
 css::lang::Locale ImpEditEngine::GetLocale( const EditPaM& rPaM ) const
 {
-    return LanguageTag( GetLanguage( rPaM ) ).getLocale();
+    return LanguageTag( GetLanguage( rPaM ).nLang ).getLocale();
 }
 
 Reference< XSpellChecker1 > const & ImpEditEngine::GetSpeller()
@@ -1492,7 +1509,7 @@ bool ImpEditEngine::HasConvertibleTextPortion( LanguageType nSrcLang )
             // specified position is evaluated.
             if (nEnd > nStart)  // empty para?
                 ++nStart;
-            LanguageType nLangFound = pEditEngine->GetLanguage( k, nStart );
+            LanguageType nLangFound = pEditEngine->GetLanguage( k, nStart ).nLang;
 #ifdef DEBUG
             lang::Locale aLocale( LanguageTag::convertToLocale( nLangFound ) );
 #endif
@@ -1677,7 +1694,7 @@ void ImpEditEngine::ImpConvert( OUString &rConvTxt, LanguageType &rConvTxtLang,
             // thus we usually have to add 1 in order to get the language
             // of the text right to the cursor position
             const sal_Int32 nLangIdx = nEnd > nStart ? nStart + 1 : nStart;
-            LanguageType nLangFound = pEditEngine->GetLanguage( aCurStart.nPara, nLangIdx );
+            LanguageType nLangFound = pEditEngine->GetLanguage( aCurStart.nPara, nLangIdx ).nLang;
 #ifdef DEBUG
             lang::Locale aLocale( LanguageTag::convertToLocale( nLangFound ) );
 #endif
@@ -1840,7 +1857,7 @@ Reference< XSpellAlternatives > ImpEditEngine::ImpSpell( EditView* pEditView )
 
         if ( !aWord.isEmpty() )
         {
-            LanguageType eLang = GetLanguage( aCurSel.Max() );
+            LanguageType eLang = GetLanguage( aCurSel.Max() ).nLang;
             SvxSpellWrapper::CheckSpellLang( xSpeller, eLang );
             xSpellAlt = xSpeller->spell( aWord, static_cast<sal_uInt16>(eLang), aEmptySeq );
         }
@@ -1889,7 +1906,7 @@ Reference< XSpellAlternatives > ImpEditEngine::ImpFindNextError(EditSelection& r
         }
 
         if ( !aWord.isEmpty() )
-            xSpellAlt = xSpeller->spell( aWord, static_cast<sal_uInt16>(GetLanguage( aCurSel.Max() )), aEmptySeq );
+            xSpellAlt = xSpeller->spell( aWord, static_cast<sal_uInt16>(GetLanguage( aCurSel.Max() ).nLang), aEmptySeq );
 
         if ( !xSpellAlt.is() )
             aCurSel = WordRight( aCurSel.Min(), css::i18n::WordType::DICTIONARY_WORD );
@@ -1973,7 +1990,7 @@ void ImpEditEngine::AddPortion(
 
     svx::SpellPortion aPortion;
     aPortion.sText = GetSelected( rSel );
-    aPortion.eLanguage = GetLanguage( rSel.Min() );
+    aPortion.eLanguage = GetLanguage( rSel.Min() ).nLang;
     aPortion.xAlternatives = xAlt;
     aPortion.bIsField = bIsField;
     rToFill.push_back(aPortion);
@@ -2008,7 +2025,7 @@ void ImpEditEngine::AddPortionIterated(
         //set the mark equal to the point
         EditPaM aCursor(aStart);
         rEditView.pImpEditView->SetEditSelection( aCursor );
-        LanguageType eStartLanguage = GetLanguage( aCursor );
+        LanguageType eStartLanguage = GetLanguage( aCursor ).nLang;
         //search for a field attribute at the beginning - only the end position
         //of this field is kept to end a portion at that position
         const EditCharAttrib* pFieldAttr = aCursor.GetNode()->GetCharAttribs().
@@ -2034,7 +2051,7 @@ void ImpEditEngine::AddPortionIterated(
             if (bIsField)
                 nEndField = _pFieldAttr->GetEnd();
 
-            LanguageType eCurLanguage = GetLanguage( aCursor );
+            LanguageType eCurLanguage = GetLanguage( aCursor ).nLang;
             if(eCurLanguage != eStartLanguage || bIsField || bIsEndField)
             {
                 eStartLanguage = eCurLanguage;
@@ -2136,7 +2153,7 @@ void ImpEditEngine::ApplyChangedSentence(EditView const & rEditView,
         for(const auto& rCurrentNewPortion : rNewPortions)
         {
             //set the language attribute
-            LanguageType eCurLanguage = GetLanguage( aCurrentPaM );
+            LanguageType eCurLanguage = GetLanguage( aCurrentPaM ).nLang;
             if(eCurLanguage != rCurrentNewPortion.eLanguage)
             {
                 SvtScriptType nScriptType = SvtLanguageOptions::GetScriptTypeOfLanguage( rCurrentNewPortion.eLanguage );
@@ -2260,7 +2277,7 @@ void ImpEditEngine::DoOnlineSpelling( ContentNode* pThisNodeOnly, bool bSpellAtC
                 {
                     const sal_Int32 nWStart = aSel.Min().GetIndex();
                     const sal_Int32 nWEnd = aSel.Max().GetIndex();
-                    if ( !xSpeller->isValid( aWord, static_cast<sal_uInt16>(GetLanguage( EditPaM( aSel.Min().GetNode(), nWStart+1 ) )), aEmptySeq ) )
+                    if ( !xSpeller->isValid( aWord, static_cast<sal_uInt16>(GetLanguage( EditPaM( aSel.Min().GetNode(), nWStart+1 ) ).nLang), aEmptySeq ) )
                     {
                         // Check if already marked correctly...
                         const sal_Int32 nXEnd = bDottAdded ? nWEnd -1 : nWEnd;
@@ -2406,7 +2423,7 @@ EESpellState ImpEditEngine::HasSpellErrors()
         aWord = GetSelected( aCurSel );
         if ( !aWord.isEmpty() )
         {
-            LanguageType eLang = GetLanguage( aCurSel.Max() );
+            LanguageType eLang = GetLanguage( aCurSel.Max() ).nLang;
             SvxSpellWrapper::CheckSpellLang( xSpeller, eLang );
             xSpellAlt = xSpeller->spell( aWord, static_cast<sal_uInt16>(eLang), aEmptySeq );
         }
@@ -2434,7 +2451,7 @@ EESpellState ImpEditEngine::StartThesaurus(EditView* pEditView, weld::Widget* pD
 
     EditAbstractDialogFactory* pFact = EditAbstractDialogFactory::Create();
     ScopedVclPtr<AbstractThesaurusDialog> xDlg(pFact->CreateThesaurusDialog(pDialogParent, xThes,
-                                               aWord, GetLanguage( aCurSel.Max() ) ));
+                                               aWord, GetLanguage( aCurSel.Max() ).nLang ));
     if (xDlg->Execute() == RET_OK)
     {
         // Replace Word...
@@ -2664,7 +2681,13 @@ EditSelection ImpEditEngine::TransliterateText( const EditSelection& rSelection,
     aSel.Adjust( aEditDoc );
 
     if ( !aSel.HasRange() )
-        aSel = SelectWord( aSel );
+    {
+        /* Cursor is inside of a word */
+        if (nTransliterationMode == TransliterationFlags::SENTENCE_CASE)
+            aSel = SelectSentence( aSel );
+        else
+            aSel = SelectWord( aSel );
+    }
 
     // tdf#107176: if there's still no range, just return aSel
     if ( !aSel.HasRange() )
@@ -2741,6 +2764,21 @@ EditSelection ImpEditEngine::TransliterateText( const EditSelection& rSelection,
                         nWordType);
             }
 
+            /* Nothing to do if user selection lies entirely outside of word start and end boundary computed above.
+             * Skip this node, because otherwise the below logic for constraining to the selection will fail */
+            if (aSttBndry.startPos >= aSel.Max().GetIndex() || aEndBndry.endPos <= aSel.Min().GetIndex()) {
+                continue;
+            }
+
+            // prevent going outside of the user's selection, which may
+            // start or end in the middle of a word
+            if (nNode == nStartNode) {
+                aSttBndry.startPos = std::max(aSttBndry.startPos, aSel.Min().GetIndex());
+                aSttBndry.endPos   = std::min(aSttBndry.endPos,   aSel.Max().GetIndex());
+                aEndBndry.startPos = std::max(aEndBndry.startPos, aSttBndry.startPos);
+                aEndBndry.endPos   = std::min(aEndBndry.endPos,   aSel.Max().GetIndex());
+            }
+
             i18n::Boundary aCurWordBndry( aSttBndry );
             while (aCurWordBndry.endPos && aCurWordBndry.startPos <= aEndBndry.startPos)
             {
@@ -2751,7 +2789,7 @@ EditSelection ImpEditEngine::TransliterateText( const EditSelection& rSelection,
 
                 Sequence< sal_Int32 > aOffsets;
                 OUString aNewText( aTransliterationWrapper.transliterate(aNodeStr,
-                        GetLanguage( EditPaM( pNode, nCurrentStart + 1 ) ),
+                        GetLanguage( EditPaM( pNode, nCurrentStart + 1 ) ).nLang,
                         nCurrentStart, nLen, &aOffsets ));
 
                 if (aNodeStr != aNewText)
@@ -2829,6 +2867,12 @@ EditSelection ImpEditEngine::TransliterateText( const EditSelection& rSelection,
                     nCurrentEnd = nLastEnd;
             }
 
+            // prevent making any change outside of the user's selection
+            nCurrentStart = std::max(aSel.Min().GetIndex(), nCurrentStart);
+            nCurrentEnd = std::min(aSel.Max().GetIndex(), nCurrentEnd);
+            nLastStart = std::max(aSel.Min().GetIndex(), nLastStart);
+            nLastEnd = std::min(aSel.Max().GetIndex(), nLastEnd);
+
             while (nCurrentStart < nLastEnd)
             {
                 const sal_Int32 nLen = nCurrentEnd - nCurrentStart;
@@ -2836,7 +2880,7 @@ EditSelection ImpEditEngine::TransliterateText( const EditSelection& rSelection,
 
                 Sequence< sal_Int32 > aOffsets;
                 OUString aNewText( aTransliterationWrapper.transliterate( aNodeStr,
-                        GetLanguage( EditPaM( pNode, nCurrentStart + 1 ) ),
+                        GetLanguage( EditPaM( pNode, nCurrentStart + 1 ) ).nLang,
                         nCurrentStart, nLen, &aOffsets ));
 
                 if (aNodeStr != aNewText)
@@ -2866,7 +2910,7 @@ EditSelection ImpEditEngine::TransliterateText( const EditSelection& rSelection,
             {
                 if ( bConsiderLanguage )
                 {
-                    nLanguage = GetLanguage( EditPaM( pNode, nCurrentStart+1 ), &nCurrentEnd );
+                    nLanguage = GetLanguage( EditPaM( pNode, nCurrentStart+1 ), &nCurrentEnd ).nLang;
                     if ( nCurrentEnd > nEndPos )
                         nCurrentEnd = nEndPos;
                 }
@@ -2998,7 +3042,7 @@ short ImpEditEngine::ReplaceTextOnly(
         else
         {
             DBG_ASSERT( nDiff == 1, "TransliterateText - Diff other than expected! But should work..." );
-            GetEditDoc().InsertText( EditPaM( pNode, nCurrentPos ), OUString(rNewText[n]) );
+            GetEditDoc().InsertText( EditPaM( pNode, nCurrentPos ), OUStringChar(rNewText[n]) );
 
         }
         nDiffs = sal::static_int_cast< short >(nDiffs + nDiff);
@@ -3059,6 +3103,20 @@ sal_Int32 ImpEditEngine::LogicToTwips(sal_Int32 n)
     MapMode aTwipsMode( MapUnit::MapTwip );
     aSz = pRefDev->LogicToLogic( aSz, nullptr, &aTwipsMode );
     return aSz.Width();
+}
+
+double ImpEditEngine::roundToNearestPt(double fInput) const
+{
+    if (mbRoundToNearestPt)
+    {
+        double fInputPt = o3tl::convert(fInput, o3tl::Length::mm100, o3tl::Length::pt);
+        auto nInputRounded = basegfx::fround(fInputPt);
+        return o3tl::convert(double(nInputRounded), o3tl::Length::pt, o3tl::Length::mm100);
+    }
+    else
+    {
+        return fInput;
+    }
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

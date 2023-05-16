@@ -39,8 +39,9 @@
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/types.hxx>
+#include <o3tl/safeint.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 
@@ -166,7 +167,7 @@ namespace pcr
         sal_Int32 index = std::find( std::cbegin(aValues), std::cend(aValues), nAsInt ) - std::cbegin(aValues);
 
         std::vector< OUString > aDescriptions( getDescriptions() );
-        if ( ( index >= 0 ) && ( index < static_cast<sal_Int32>(aDescriptions.size()) ) )
+        if ( ( index >= 0 ) && ( o3tl::make_unsigned(index) < aDescriptions.size() ) )
             sDescription = aDescriptions[ index ];
         else
         {
@@ -303,7 +304,7 @@ namespace pcr
         // create an introspection adapter for the component
         Reference< XIntrospection > xIntrospection = theIntrospection::get( m_xContext );
 
-        Reference< XIntrospectionAccess > xIntrospectionAccess( xIntrospection->inspect( makeAny( _rxIntrospectee ) ) );
+        Reference< XIntrospectionAccess > xIntrospectionAccess( xIntrospection->inspect( Any( _rxIntrospectee ) ) );
         if ( !xIntrospectionAccess.is() )
             throw RuntimeException("The introspection service could not handle the given component.", *this );
 

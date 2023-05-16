@@ -28,8 +28,7 @@
 
 #include <comphelper/processfactory.hxx>
 #include <ucbhelper/commandenvironment.hxx>
-#include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 
 namespace svt

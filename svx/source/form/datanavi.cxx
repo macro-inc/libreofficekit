@@ -30,16 +30,16 @@
 #include <o3tl/safeint.hxx>
 #include <o3tl/string_view.hxx>
 #include <svx/svxids.hrc>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/resmgr.hxx>
 #include <svx/xmlexchg.hxx>
-#include <unotools/pathoptions.hxx>
 #include <unotools/viewoptions.hxx>
 #include <sfx2/filedlghelper.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/objsh.hxx>
 #include <sfx2/bindings.hxx>
 #include <sfx2/dispatch.hxx>
+#include <utility>
 #include <vcl/commandevent.hxx>
 #include <vcl/event.hxx>
 #include <vcl/weld.hxx>
@@ -147,42 +147,55 @@ namespace svxform
         }
 
         std::unique_ptr<weld::Builder> xBuilder(Application::CreateBuilder(m_xItemList.get(), "svx/ui/formdatamenu.ui"));
-        std::unique_ptr<weld::Menu> xMenu(xBuilder->weld_menu("menu"));
+        m_xMenu = xBuilder->weld_menu("menu");
+        m_aRemovedMenuEntries.clear();
 
         if (DGTInstance == m_eGroup)
-            xMenu->set_visible("additem", false);
+            m_aRemovedMenuEntries.insert("additem");
         else
         {
-            xMenu->set_visible("addelement", false);
-            xMenu->set_visible("addattribute", false);
+            m_aRemovedMenuEntries.insert("addelement");
+            m_aRemovedMenuEntries.insert("addattribute");
 
             if (DGTSubmission == m_eGroup)
             {
-                xMenu->set_label("additem", SvxResId(RID_STR_DATANAV_ADD_SUBMISSION));
-                xMenu->set_label("edit", SvxResId(RID_STR_DATANAV_EDIT_SUBMISSION));
-                xMenu->set_label("delete", SvxResId(RID_STR_DATANAV_REMOVE_SUBMISSION));
+                m_xMenu->set_label("additem", SvxResId(RID_STR_DATANAV_ADD_SUBMISSION));
+                m_xMenu->set_label("edit", SvxResId(RID_STR_DATANAV_EDIT_SUBMISSION));
+                m_xMenu->set_label("delete", SvxResId(RID_STR_DATANAV_REMOVE_SUBMISSION));
             }
             else
             {
-                xMenu->set_label("additem", SvxResId(RID_STR_DATANAV_ADD_BINDING));
-                xMenu->set_label("edit", SvxResId(RID_STR_DATANAV_EDIT_BINDING));
-                xMenu->set_label("delete", SvxResId(RID_STR_DATANAV_REMOVE_BINDING));
+                m_xMenu->set_label("additem", SvxResId(RID_STR_DATANAV_ADD_BINDING));
+                m_xMenu->set_label("edit", SvxResId(RID_STR_DATANAV_EDIT_BINDING));
+                m_xMenu->set_label("delete", SvxResId(RID_STR_DATANAV_REMOVE_BINDING));
             }
         }
-        EnableMenuItems(xMenu.get());
-        OString sCommand = xMenu->popup_at_rect(m_xItemList.get(), tools::Rectangle(aPos, Size(1,1)));
+        for (const auto& rRemove : m_aRemovedMenuEntries)
+            m_xMenu->remove(rRemove);
+        EnableMenuItems();
+        OString sCommand = m_xMenu->popup_at_rect(m_xItemList.get(), tools::Rectangle(aPos, Size(1,1)));
         if (!sCommand.isEmpty())
             DoMenuAction(sCommand);
+        m_xMenu.reset();
         return true;
     }
 
     void XFormsPage::DeleteAndClearTree()
     {
         m_xItemList->all_foreach([this](weld::TreeIter& rEntry) {
-            delete reinterpret_cast<ItemNode*>(m_xItemList->get_id(rEntry).toInt64());
+            delete weld::fromId<ItemNode*>(m_xItemList->get_id(rEntry));
             return false;
         });
         m_xItemList->clear();
+    }
+
+    void XFormsPage::SelectFirstEntry()
+    {
+        if (m_xItemList->get_iter_first(*m_xScratchIter))
+        {
+            m_xItemList->select(*m_xScratchIter);
+            ItemSelectHdl(*m_xItemList);
+        }
     }
 
     XFormsPage::XFormsPage(weld::Container* pPage, DataNavigatorWindow* _pNaviWin, DataGroupType _eGroup)
@@ -242,7 +255,7 @@ namespace svxform
 
     IMPL_LINK_NOARG(XFormsPage, ItemSelectHdl, weld::TreeView&, void)
     {
-        EnableMenuItems(nullptr);
+        EnableMenuItems();
         PrepDnD();
     }
 
@@ -272,7 +285,7 @@ namespace svxform
         if(!xDataTypes.is())
             return;
 
-        ItemNode *pItemNode = reinterpret_cast<ItemNode*>(m_xItemList->get_id(*m_xScratchIter).toInt64());
+        ItemNode *pItemNode = weld::fromId<ItemNode*>(m_xItemList->get_id(*m_xScratchIter));
         if (!pItemNode)
         {
             // the only known (and allowed?) case where this happens are sub-entries of a submission
@@ -282,24 +295,34 @@ namespace svxform
             DBG_ASSERT(bSelected && !m_xItemList->get_iter_depth(*m_xScratchIter), "DataTreeListBox::StartDrag: what kind of entry *is* this?");
                 // on the submission page, we have only top-level entries (the submission themself)
                 // plus direct children of those (facets of a submission)
-            pItemNode = bSelected ? reinterpret_cast<ItemNode*>(m_xItemList->get_id(*m_xScratchIter).toInt64()) : nullptr;
+            pItemNode = bSelected ? weld::fromId<ItemNode*>(m_xItemList->get_id(*m_xScratchIter)) : nullptr;
             if (!pItemNode)
                 return;
         }
 
-        OXFormsDescriptor desc;
-        desc.szName = m_xItemList->get_text(*m_xScratchIter);
-        if(pItemNode->m_xNode.is()) {
-            // a valid node interface tells us that we need to create a control from a binding
-            desc.szServiceName = GetServiceNameForNode(pItemNode->m_xNode);
-            desc.xPropSet = GetBindingForNode(pItemNode->m_xNode);
-            DBG_ASSERT( desc.xPropSet.is(), "DataTreeListBox::StartDrag(): invalid node binding" );
-        }
-        else {
-            desc.szServiceName = FM_COMPONENT_COMMANDBUTTON;
-            desc.xPropSet = pItemNode->m_xPropSet;
-        }
-        xTransferable = rtl::Reference<TransferDataContainer>(new OXFormsTransferable(desc));
+        OUString szName = m_xItemList->get_text(*m_xScratchIter);
+        Reference<css::xml::dom::XNode> xNode(pItemNode->m_xNode);
+        Reference<XPropertySet> xPropSet(pItemNode->m_xPropSet);
+
+        // tdf#154535 create the OXFormsDescriptor on-demand so we don't cause an unwanted
+        // Binding to be created unless we are forced to.
+        auto fnCreateFormsDescriptor = [this, szName, xNode, xPropSet](){
+            OXFormsDescriptor desc;
+            desc.szName = szName;
+            if (xNode) {
+                // a valid node interface tells us that we need to create a control from a binding
+                desc.szServiceName = GetServiceNameForNode(xNode);
+                desc.xPropSet = GetBindingForNode(xNode);
+                DBG_ASSERT( desc.xPropSet.is(), "DataTreeListBox::StartDrag(): invalid node binding" );
+            }
+            else {
+                desc.szServiceName = FM_COMPONENT_COMMANDBUTTON;
+                desc.xPropSet = xPropSet;
+            }
+            return desc;
+        };
+
+        xTransferable = rtl::Reference<TransferDataContainer>(new OXFormsTransferable(fnCreateFormsDescriptor));
         m_xItemList->enable_drag_source(xTransferable, DND_ACTION_COPY);
     }
 
@@ -339,7 +362,7 @@ namespace svxform
                     if ( !sName.isEmpty() )
                     {
                         ItemNode* pNode = new ItemNode( xChild );
-                        OUString sId(OUString::number(reinterpret_cast<sal_uInt64>(pNode)));
+                        OUString sId(weld::toId(pNode));
                         std::unique_ptr<weld::TreeIter> xEntry = m_xItemList->make_iterator();
                         m_xItemList->insert(_pParent, -1, &sName, &sId, nullptr, nullptr, false, xEntry.get());
                         m_xItemList->set_image(*xEntry, aExpImg);
@@ -355,7 +378,7 @@ namespace svxform
                                 {
                                     Reference< css::xml::dom::XNode > xAttr = xMap->item(j);
                                     pNode = new ItemNode( xAttr );
-                                    OUString sSubId(OUString::number(reinterpret_cast<sal_uInt64>(pNode)));
+                                    OUString sSubId(weld::toId(pNode));
                                     OUString sAttrName = m_xUIHelper->getNodeDisplayName( xAttr, bShowDetails );
                                     m_xItemList->insert(xEntry.get(), -1, &sAttrName, &sSubId, nullptr, nullptr, false, m_xScratchIter.get());
                                     m_xItemList->set_image(*m_xScratchIter, aExpImg);
@@ -394,7 +417,7 @@ namespace svxform
                     {
                         Reference< css::xforms::XSubmission > xNewSubmission = aDlg.GetNewSubmission();
                         Reference< XSet > xSubmissions = xModel->getSubmissions();
-                        xSubmissions->insert( makeAny( xNewSubmission ) );
+                        xSubmissions->insert( Any( xNewSubmission ) );
                         AddEntry(xNewSubmission, m_xScratchIter.get());
                         m_xItemList->select(*m_xScratchIter);
                         bIsDocModified = true;
@@ -427,7 +450,7 @@ namespace svxform
                     }
 
                     DBG_ASSERT( bEntry, "XFormsPage::DoToolBoxAction(): no entry" );
-                    ItemNode* pParentNode = reinterpret_cast<ItemNode*>(m_xItemList->get_id(*xEntry).toInt64());
+                    ItemNode* pParentNode = weld::fromId<ItemNode*>(m_xItemList->get_id(*xEntry));
                     DBG_ASSERT( pParentNode, "XFormsPage::DoToolBoxAction(): no parent node" );
                     xParentNode = pParentNode->m_xNode;
                     Reference< css::xml::dom::XNode > xNewNode;
@@ -498,7 +521,7 @@ namespace svxform
                         pResId = RID_STR_DATANAV_ADD_BINDING;
                         xNewBinding = xModel->createBinding();
                         Reference< XSet > xBindings = xModel->getBindings();
-                        xBindings->insert( makeAny( xNewBinding ) );
+                        xBindings->insert( Any( xNewBinding ) );
                         pNode.reset(new ItemNode( xNewBinding ));
                         eType = DITBinding;
                     }
@@ -551,7 +574,7 @@ namespace svxform
                         try
                         {
                             Reference< XSet > xBindings = xModel->getBindings();
-                            xBindings->remove( makeAny( xNewBinding ) );
+                            xBindings->remove( Any( xNewBinding ) );
                         }
                         catch ( Exception const & )
                         {
@@ -573,7 +596,7 @@ namespace svxform
                 {
                     m_xItemList->iter_parent(*xEntry);
                 }
-                ItemNode* pNode = reinterpret_cast<ItemNode*>(m_xItemList->get_id(*xEntry).toInt64());
+                ItemNode* pNode = weld::fromId<ItemNode*>(m_xItemList->get_id(*xEntry));
                 if ( DGTInstance == m_eGroup || DGTBinding == m_eGroup )
                 {
                     if ( DGTInstance == m_eGroup && !m_sInstanceURL.isEmpty() )
@@ -674,7 +697,7 @@ namespace svxform
         }
 
         m_pNaviWin->DisableNotify( false );
-        EnableMenuItems( nullptr );
+        EnableMenuItems();
         if ( bIsDocModified )
             svxform::DataNavigatorWindow::SetDocModified();
         return bHandled;
@@ -699,7 +722,7 @@ namespace svxform
         {
             DBG_UNHANDLED_EXCEPTION("svx");
         }
-        OUString sId(OUString::number(reinterpret_cast<sal_uInt64>(_pNewNode.release())));
+        OUString sId(weld::toId(_pNewNode.release()));
         m_xItemList->insert(xParent.get(), -1, &sName, &sId, nullptr, nullptr, false, pRet);
         m_xItemList->set_image(*pRet, aImage);
         if (xParent && !m_xItemList->get_row_expanded(*xParent) && m_xItemList->iter_has_child(*xParent))
@@ -722,7 +745,7 @@ namespace svxform
             {
                 // ID
                 _rEntry->getPropertyValue( PN_SUBMISSION_ID ) >>= sTemp;
-                OUString sId(OUString::number(reinterpret_cast<sal_uInt64>(pNode)));
+                OUString sId(weld::toId(pNode));
                 m_xItemList->insert(nullptr, -1, &sTemp, &sId, nullptr, nullptr, false, pRet);
                 m_xItemList->set_image(*pRet, aImage);
                 std::unique_ptr<weld::TreeIter> xRes(m_xItemList->make_iterator());
@@ -769,7 +792,7 @@ namespace svxform
                 _rEntry->getPropertyValue( PN_BINDING_EXPR ) >>= sTemp;
                 sName += sTemp;
 
-                OUString sId(OUString::number(reinterpret_cast<sal_uInt64>(pNode)));
+                OUString sId(weld::toId(pNode));
                 m_xItemList->insert(nullptr, -1, &sName, &sId, nullptr, nullptr, false, pRet);
                 m_xItemList->set_image(*pRet, aImage);
             }
@@ -863,7 +886,7 @@ namespace svxform
         {
             Reference< css::xforms::XModel > xModel( m_xUIHelper, UNO_QUERY );
             DBG_ASSERT( xModel.is(), "XFormsPage::RemoveEntry(): no model" );
-            ItemNode* pNode = reinterpret_cast<ItemNode*>(m_xItemList->get_id(*xEntry).toInt64());
+            ItemNode* pNode = weld::fromId<ItemNode*>(m_xItemList->get_id(*xEntry));
             DBG_ASSERT( pNode, "XFormsPage::RemoveEntry(): no node" );
 
             if ( DGTInstance == m_eGroup )
@@ -887,7 +910,7 @@ namespace svxform
                         std::unique_ptr<weld::TreeIter> xParent(m_xItemList->make_iterator(xEntry.get()));
                         bool bParent = m_xItemList->iter_parent(*xParent); (void)bParent;
                         assert(bParent && "XFormsPage::RemoveEntry(): no parent entry");
-                        ItemNode* pParentNode = reinterpret_cast<ItemNode*>((m_xItemList->get_id(*xParent).toInt64()));
+                        ItemNode* pParentNode = weld::fromId<ItemNode*>(m_xItemList->get_id(*xParent));
                         DBG_ASSERT( pParentNode && pParentNode->m_xNode.is(), "XFormsPage::RemoveEntry(): no parent XNode" );
 
                         Reference< css::xml::dom::XNode > xPNode;
@@ -931,9 +954,9 @@ namespace svxform
                     try
                     {
                         if ( bSubmission )
-                            xModel->getSubmissions()->remove( makeAny( pNode->m_xPropSet ) );
+                            xModel->getSubmissions()->remove( Any( pNode->m_xPropSet ) );
                         else // then Binding Page
-                            xModel->getBindings()->remove( makeAny( pNode->m_xPropSet ) );
+                            xModel->getBindings()->remove( Any( pNode->m_xPropSet ) );
                         bRet = true;
                     }
                     catch ( Exception const & )
@@ -1084,7 +1107,7 @@ namespace svxform
 
                                     ItemNode* pNode = new ItemNode( xPropSet );
 
-                                    OUString sId(OUString::number(reinterpret_cast<sal_uInt64>(pNode)));
+                                    OUString sId(weld::toId(pNode));
                                     m_xItemList->insert(nullptr, -1, &sEntry, &sId, nullptr, nullptr, false, xRes.get());
                                     m_xItemList->set_image(*xRes, aImage);
                                 }
@@ -1103,7 +1126,7 @@ namespace svxform
                 break;
         }
 
-        EnableMenuItems( nullptr );
+        EnableMenuItems();
 
         return sRet;
     }
@@ -1161,7 +1184,14 @@ namespace svxform
         return DoToolBoxAction(rMenuID);
     }
 
-    void XFormsPage::EnableMenuItems(weld::Menu* pMenu)
+    void XFormsPage::SetMenuEntrySensitive(const OString& rIdent, bool bSensitive)
+    {
+        if (m_aRemovedMenuEntries.find(rIdent) != m_aRemovedMenuEntries.end())
+            return;
+        m_xMenu->set_sensitive(rIdent, bSensitive);
+    }
+
+    void XFormsPage::EnableMenuItems()
     {
         bool bEnableAdd = false;
         bool bEnableEdit = false;
@@ -1178,7 +1208,7 @@ namespace svxform
                 m_xItemList->iter_parent(*xEntry);
                 bSubmitChild = true;
             }
-            ItemNode* pNode = reinterpret_cast<ItemNode*>(m_xItemList->get_id(*xEntry).toInt64());
+            ItemNode* pNode = weld::fromId<ItemNode*>(m_xItemList->get_id(*xEntry));
             if ( pNode && ( pNode->m_xNode.is() || pNode->m_xPropSet.is() ) )
             {
                 bEnableEdit = true;
@@ -1212,13 +1242,13 @@ namespace svxform
         m_xToolBox->set_item_sensitive("edit", bEnableEdit);
         m_xToolBox->set_item_sensitive("delete", bEnableRemove);
 
-        if (pMenu)
+        if (m_xMenu)
         {
-            pMenu->set_sensitive("additem", bEnableAdd);
-            pMenu->set_sensitive("addelement", bEnableAdd);
-            pMenu->set_sensitive("addattribute", bEnableAdd);
-            pMenu->set_sensitive("edit", bEnableEdit);
-            pMenu->set_sensitive("delete", bEnableRemove);
+            SetMenuEntrySensitive("additem", bEnableAdd);
+            SetMenuEntrySensitive("addelement", bEnableAdd);
+            SetMenuEntrySensitive("addattribute", bEnableAdd);
+            SetMenuEntrySensitive("edit", bEnableEdit);
+            SetMenuEntrySensitive("delete", bEnableRemove);
         }
         if ( DGTInstance != m_eGroup )
             return;
@@ -1227,7 +1257,7 @@ namespace svxform
         TranslateId pResId2 = RID_STR_DATANAV_REMOVE_ELEMENT;
         if (bEntry)
         {
-            ItemNode* pNode = reinterpret_cast<ItemNode*>(m_xItemList->get_id(*xEntry).toInt64());
+            ItemNode* pNode = weld::fromId<ItemNode*>(m_xItemList->get_id(*xEntry));
             if ( pNode && pNode->m_xNode.is() )
             {
                 try
@@ -1247,10 +1277,10 @@ namespace svxform
         }
         m_xToolBox->set_item_label("edit", SvxResId(pResId1));
         m_xToolBox->set_item_label("delete", SvxResId(pResId2));
-        if (pMenu)
+        if (m_xMenu)
         {
-            pMenu->set_label("edit", SvxResId( pResId1 ) );
-            pMenu->set_label("delete", SvxResId( pResId2 ) );
+            m_xMenu->set_label("edit", SvxResId( pResId1 ) );
+            m_xMenu->set_label("delete", SvxResId( pResId2 ) );
         }
     }
 
@@ -1305,6 +1335,10 @@ namespace svxform
 
         // load xforms models of the current document
         LoadModels();
+
+        // tdf#154322 select the first entry of the current page by default
+        if (XFormsPage* pPage = GetPage(sPageId))
+            pPage->SelectFirstEntry();
     }
 
     DataNavigatorWindow::~DataNavigatorWindow()
@@ -1399,7 +1433,7 @@ namespace svxform
                                 xUIHelper->newModel( m_xFrameModel, sNewName ), UNO_SET_THROW );
 
                             Reference< XPropertySet > xModelProps( xNewModel, UNO_QUERY_THROW );
-                            xModelProps->setPropertyValue("ExternalData", makeAny( !bDocumentData ) );
+                            xModelProps->setPropertyValue("ExternalData", Any( !bDocumentData ) );
 
                             m_xModelsBox->append_text(sNewName);
                             m_xModelsBox->set_active(m_xModelsBox->get_count() - 1);
@@ -1445,7 +1479,7 @@ namespace svxform
                         Reference< css::xforms::XFormsSupplier > xFormsSupp( m_xFrameModel, UNO_QUERY_THROW );
                         Reference< XNameContainer > xXForms( xFormsSupp->getXForms(), UNO_SET_THROW );
                         Reference< XPropertySet > xModelProps( xXForms->getByName( sSelectedModel ), UNO_QUERY_THROW );
-                        xModelProps->setPropertyValue( "ExternalData", makeAny( !bDocumentData ) );
+                        xModelProps->setPropertyValue( "ExternalData", Any( !bDocumentData ) );
                         bIsDocModified = true;
                     }
                     catch( const Exception& )
@@ -1926,7 +1960,7 @@ namespace svxform
     {
         SfxObjectShell* pCurrentDoc = SfxObjectShell::Current();
         DBG_ASSERT( pCurrentDoc, "DataNavigatorWindow::SetDocModified(): no objectshell" );
-        if ( !pCurrentDoc->IsModified() && pCurrentDoc->IsEnableSetModified() )
+        if (pCurrentDoc && !pCurrentDoc->IsModified() && pCurrentDoc->IsEnableSetModified())
             pCurrentDoc->SetModified();
     }
 
@@ -2066,7 +2100,6 @@ namespace svxform
         , m_xDefaultED(m_xBuilder->weld_entry("value"))
         , m_xDefaultBtn(m_xBuilder->weld_button("browse"))
         , m_xSettingsFrame(m_xBuilder->weld_widget("settingsframe"))
-        , m_xDataTypeFT(m_xBuilder->weld_label("datatypeft"))
         , m_xDataTypeLB(m_xBuilder->weld_combo_box("datatype"))
         , m_xRequiredCB(m_xBuilder->weld_check_button("required"))
         , m_xRequiredBtn(m_xBuilder->weld_button("requiredcond"))
@@ -2097,7 +2130,7 @@ namespace svxform
                 {
                     Reference < XSet > xBindings = xModel->getBindings();
                     if ( xBindings.is() )
-                        xBindings->remove( makeAny( m_xTempBinding ) );
+                        xBindings->remove( Any( m_xTempBinding ) );
                 }
                 catch (const Exception&)
                 {
@@ -2146,7 +2179,7 @@ namespace svxform
             sTemp = TRUE_VALUE;
         else if ( !bIsChecked && !sTemp.isEmpty() )
             sTemp.clear();
-        m_xTempBinding->setPropertyValue( sPropName, makeAny( sTemp ) );
+        m_xTempBinding->setPropertyValue( sPropName, Any( sTemp ) );
     }
 
     IMPL_LINK(AddDataItemDialog, ConditionHdl, weld::Button&, rBtn, void)
@@ -2188,7 +2221,7 @@ namespace svxform
             {
 
                 m_xTempBinding->setPropertyValue(
-                    sPropName, makeAny( sNewCondition ) );
+                    sPropName, Any( sNewCondition ) );
             }
         }
     }
@@ -2244,7 +2277,7 @@ namespace svxform
         }
 
         OUString sDataType( m_xDataTypeLB->get_active_text() );
-        m_xTempBinding->setPropertyValue( PN_BINDING_TYPE, makeAny( sDataType ) );
+        m_xTempBinding->setPropertyValue( PN_BINDING_TYPE, Any( sDataType ) );
 
         if ( bIsHandleBinding )
         {
@@ -2253,9 +2286,9 @@ namespace svxform
             try
             {
                 OUString sValue = m_xNameED->get_text();
-                m_pItemNode->m_xPropSet->setPropertyValue( PN_BINDING_ID, makeAny( sValue ) );
+                m_pItemNode->m_xPropSet->setPropertyValue( PN_BINDING_ID, Any( sValue ) );
                 sValue = m_xDefaultED->get_text();
-                m_pItemNode->m_xPropSet->setPropertyValue( PN_BINDING_EXPR, makeAny( sValue ) );
+                m_pItemNode->m_xPropSet->setPropertyValue( PN_BINDING_EXPR, Any( sValue ) );
             }
             catch ( Exception const & )
             {
@@ -2350,7 +2383,7 @@ namespace svxform
                             m_xTempBinding = m_xUIHelper->cloneBindingAsGhost( m_xBinding );
                             Reference < XSet > xBindings = xModel->getBindings();
                             if ( xBindings.is() )
-                                xBindings->insert( makeAny( m_xTempBinding ) );
+                                xBindings->insert( Any( m_xTempBinding ) );
                         }
                     }
 
@@ -2377,7 +2410,7 @@ namespace svxform
                         m_xTempBinding = m_xUIHelper->cloneBindingAsGhost( m_pItemNode->m_xPropSet );
                         Reference < XSet > xBindings = xModel->getBindings();
                         if ( xBindings.is() )
-                            xBindings->insert( makeAny( m_xTempBinding ) );
+                            xBindings->insert( Any( m_xTempBinding ) );
                     }
                     catch ( Exception const & )
                     {
@@ -2515,11 +2548,11 @@ namespace svxform
     }
 
     AddConditionDialog::AddConditionDialog(weld::Window* pParent,
-        const OUString& _rPropertyName,
+        OUString _aPropertyName,
         const Reference< XPropertySet >& _rPropSet)
         : GenericDialogController(pParent, "svx/ui/addconditiondialog.ui", "AddConditionDialog")
         , m_aResultIdle("svx AddConditionDialog m_aResultIdle")
-        , m_sPropertyName(_rPropertyName)
+        , m_sPropertyName(std::move(_aPropertyName))
         , m_xBinding(_rPropSet)
         , m_xConditionED(m_xBuilder->weld_text_view("condition"))
         , m_xResultWin(m_xBuilder->weld_text_view("result"))
@@ -2588,7 +2621,7 @@ namespace svxform
         aDlg.run();
         try
         {
-            m_xBinding->setPropertyValue( PN_BINDING_NAMESPACES, makeAny( xNameContnr ) );
+            m_xBinding->setPropertyValue( PN_BINDING_NAMESPACES, Any( xNameContnr ) );
         }
         catch ( Exception const & )
         {
@@ -2726,9 +2759,9 @@ namespace svxform
                 OUString sURL(m_xNamespacesList->get_text(i, 1));
 
                 if ( m_rNamespaces->hasByName( sPrefix ) )
-                    m_rNamespaces->replaceByName( sPrefix, makeAny( sURL ) );
+                    m_rNamespaces->replaceByName( sPrefix, Any( sURL ) );
                 else
-                    m_rNamespaces->insertByName( sPrefix, makeAny( sURL ) );
+                    m_rNamespaces->insertByName( sPrefix, Any( sURL ) );
             }
         }
         catch ( Exception const & )
@@ -2883,21 +2916,21 @@ namespace svxform
             OUString sTemp = m_xNameED->get_text();
             try
             {
-                m_xSubmission->setPropertyValue( PN_SUBMISSION_ID, makeAny( sTemp ) );
+                m_xSubmission->setPropertyValue( PN_SUBMISSION_ID, Any( sTemp ) );
                 sTemp = m_xActionED->get_text();
-                m_xSubmission->setPropertyValue( PN_SUBMISSION_ACTION, makeAny( sTemp ) );
+                m_xSubmission->setPropertyValue( PN_SUBMISSION_ACTION, Any( sTemp ) );
                 sTemp = m_aMethodString.toAPI( m_xMethodLB->get_active_text() );
-                m_xSubmission->setPropertyValue( PN_SUBMISSION_METHOD, makeAny( sTemp ) );
+                m_xSubmission->setPropertyValue( PN_SUBMISSION_METHOD, Any( sTemp ) );
                 sTemp = m_xRefED->get_text();
-                m_xSubmission->setPropertyValue( PN_SUBMISSION_REF, makeAny( sTemp ) );
+                m_xSubmission->setPropertyValue( PN_SUBMISSION_REF, Any( sTemp ) );
                 OUString sEntry = m_xBindLB->get_active_text();
                 sal_Int32 nColonIdx = sEntry.indexOf(':');
                 if (nColonIdx != -1)
                     sEntry = sEntry.copy(0, nColonIdx);
                 sTemp = sEntry;
-                m_xSubmission->setPropertyValue( PN_SUBMISSION_BIND, makeAny( sTemp ) );
+                m_xSubmission->setPropertyValue( PN_SUBMISSION_BIND, Any( sTemp ) );
                 sTemp = m_aReplaceString.toAPI( m_xReplaceLB->get_active_text() );
-                m_xSubmission->setPropertyValue( PN_SUBMISSION_REPLACE, makeAny( sTemp ) );
+                m_xSubmission->setPropertyValue( PN_SUBMISSION_REPLACE, Any( sTemp ) );
             }
             catch ( Exception const & )
             {
@@ -3044,7 +3077,6 @@ namespace svxform
     AddInstanceDialog::AddInstanceDialog(weld::Window* pParent, bool _bEdit)
         : GenericDialogController(pParent, "svx/ui/addinstancedialog.ui", "AddInstanceDialog")
         , m_xNameED(m_xBuilder->weld_entry("name"))
-        , m_xURLFT(m_xBuilder->weld_label("urlft"))
         , m_xURLED(new SvtURLBox(m_xBuilder->weld_combo_box("url")))
         , m_xFilePickerBtn(m_xBuilder->weld_button("browse"))
         , m_xLinkInstanceCB(m_xBuilder->weld_check_button("link"))

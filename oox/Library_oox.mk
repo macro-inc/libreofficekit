@@ -44,8 +44,10 @@ $(eval $(call gb_Library_use_libraries,oox,\
     cppu \
     cppuhelper \
     editeng \
+    docmodel \
     expwrap \
     drawinglayer \
+    docmodel \
     msfilter \
     sal \
     i18nlangtag \
@@ -81,30 +83,12 @@ $(eval $(call gb_Library_use_externals,oox,\
 endif
 endif
 
-$(eval $(call gb_Library_set_componentfile,oox,oox/util/oox))
+$(eval $(call gb_Library_set_componentfile,oox,oox/util/oox,services))
 
+# WASM_CHART change
+ifeq (,$(ENABLE_WASM_STRIP_CHART))
 $(eval $(call gb_Library_add_exception_objects,oox,\
-    oox/source/core/binarycodec \
-    oox/source/core/contexthandler2 \
-    oox/source/core/contexthandler \
-    oox/source/core/fastparser \
-    oox/source/core/fasttokenhandler \
-    oox/source/core/filterbase \
-    oox/source/core/filterdetect \
-    oox/source/core/fragmenthandler2 \
-    oox/source/core/fragmenthandler \
-    oox/source/core/recordparser \
-    oox/source/core/relations \
-    oox/source/core/relationshandler \
-    oox/source/core/xmlfilterbase \
-    oox/source/crypto/AgileEngine \
-    oox/source/crypto/CryptTools \
-    oox/source/crypto/DocumentEncryption \
-    oox/source/crypto/DocumentDecryption \
-    oox/source/crypto/Standard2007Engine \
-    oox/source/crypto/StrongEncryptionDataSpace \
-    oox/source/docprop/docprophandler \
-    oox/source/docprop/ooxmldocpropimport \
+    oox/source/export/chartexport \
     oox/source/drawingml/chart/axiscontext \
     oox/source/drawingml/chart/axisconverter \
     oox/source/drawingml/chart/axismodel \
@@ -134,6 +118,31 @@ $(eval $(call gb_Library_add_exception_objects,oox,\
     oox/source/drawingml/chart/typegroupcontext \
     oox/source/drawingml/chart/typegroupconverter \
     oox/source/drawingml/chart/typegroupmodel \
+))
+endif
+
+$(eval $(call gb_Library_add_exception_objects,oox,\
+    oox/source/core/binarycodec \
+    oox/source/core/contexthandler2 \
+    oox/source/core/contexthandler \
+    oox/source/core/fastparser \
+    oox/source/core/fasttokenhandler \
+    oox/source/core/filterbase \
+    oox/source/core/filterdetect \
+    oox/source/core/fragmenthandler2 \
+    oox/source/core/fragmenthandler \
+    oox/source/core/recordparser \
+    oox/source/core/relations \
+    oox/source/core/relationshandler \
+    oox/source/core/xmlfilterbase \
+    oox/source/crypto/AgileEngine \
+    oox/source/crypto/CryptTools \
+    oox/source/crypto/DocumentEncryption \
+    oox/source/crypto/DocumentDecryption \
+    oox/source/crypto/Standard2007Engine \
+    oox/source/crypto/StrongEncryptionDataSpace \
+    oox/source/docprop/docprophandler \
+    oox/source/docprop/ooxmldocpropimport \
     oox/source/drawingml/clrschemecontext \
     oox/source/drawingml/clrscheme \
     oox/source/drawingml/colorchoicecontext \
@@ -145,6 +154,7 @@ $(eval $(call gb_Library_add_exception_objects,oox,\
     oox/source/drawingml/diagram/datamodel \
     oox/source/drawingml/diagram/datamodelcontext \
     oox/source/drawingml/diagram/diagram \
+    oox/source/drawingml/diagram/diagramhelper \
     oox/source/drawingml/diagram/diagramdefinitioncontext \
     oox/source/drawingml/diagram/diagramfragmenthandler \
     oox/source/drawingml/diagram/diagramlayoutatoms \
@@ -211,17 +221,18 @@ $(eval $(call gb_Library_add_exception_objects,oox,\
     oox/source/drawingml/themeelementscontext \
     oox/source/drawingml/themefragmenthandler \
     oox/source/drawingml/ThemeOverrideFragmentHandler \
+    oox/source/drawingml/ThemeFilterBase \
     oox/source/drawingml/transform2dcontext \
     oox/source/dump/dffdumper \
     oox/source/dump/dumperbase \
     oox/source/dump/oledumper \
     oox/source/dump/pptxdumper \
-    oox/source/export/chartexport \
     oox/source/export/ColorPropertySet \
     oox/source/export/drawingml \
     oox/source/export/DMLPresetShapeExport \
     oox/source/export/shapes \
     oox/source/export/vmlexport \
+    oox/source/export/ThemeExport \
     oox/source/helper/attributelist \
     oox/source/helper/binaryinputstream \
     oox/source/helper/binaryoutputstream \

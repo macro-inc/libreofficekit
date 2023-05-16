@@ -97,19 +97,21 @@ SFX_IMPL_INTERFACE(SwTextShell, SwBaseShell)
 
 IMPL_STATIC_LINK( SwTextShell, DialogClosedHdl, css::ui::dialogs::DialogClosedEvent*, pEvent, void )
 {
-    SwView* pView = ::GetActiveView();
-    SwWrtShell& rWrtShell = pView->GetWrtShell();
+    if (SwView* pView = GetActiveView())
+    {
+        SwWrtShell& rWrtShell = pView->GetWrtShell();
 
-    sal_Int16 nDialogRet = pEvent->DialogResult;
-    if( nDialogRet == ui::dialogs::ExecutableDialogResults::CANCEL )
-    {
-        rWrtShell.Undo();
-        rWrtShell.GetIDocumentUndoRedo().ClearRedo();
-    }
-    else
-    {
-        OSL_ENSURE( nDialogRet == ui::dialogs::ExecutableDialogResults::OK,
-            "dialog execution failed" );
+        sal_Int16 nDialogRet = pEvent->DialogResult;
+        if( nDialogRet == ui::dialogs::ExecutableDialogResults::CANCEL )
+        {
+            rWrtShell.Undo();
+            rWrtShell.GetIDocumentUndoRedo().ClearRedo();
+        }
+        else
+        {
+            OSL_ENSURE( nDialogRet == ui::dialogs::ExecutableDialogResults::OK,
+                "dialog execution failed" );
+        }
     }
 }
 
@@ -328,28 +330,28 @@ void SwTextShell::ExecInsert(SfxRequest &rReq)
                     if ( pMarginItem )
                         aMargin = pMarginItem->GetSize();
 
-                    xSet->setPropertyValue("FrameURL", uno::makeAny( pURLItem->GetValue() ) );
+                    xSet->setPropertyValue("FrameURL", uno::Any( pURLItem->GetValue() ) );
                     if ( pNameItem )
-                        xSet->setPropertyValue("FrameName", uno::makeAny( pNameItem->GetValue() ) );
+                        xSet->setPropertyValue("FrameName", uno::Any( pNameItem->GetValue() ) );
 
                     if ( eScroll == ScrollingMode::Auto )
                         xSet->setPropertyValue("FrameIsAutoScroll",
-                            uno::makeAny( true ) );
+                            uno::Any( true ) );
                     else
                         xSet->setPropertyValue("FrameIsScrollingMode",
-                            uno::makeAny( eScroll == ScrollingMode::Yes ) );
+                            uno::Any( eScroll == ScrollingMode::Yes ) );
 
                     if ( pBorderItem )
                         xSet->setPropertyValue("FrameIsBorder",
-                            uno::makeAny( pBorderItem->GetValue() ) );
+                            uno::Any( pBorderItem->GetValue() ) );
 
                     if ( pMarginItem )
                     {
                         xSet->setPropertyValue("FrameMarginWidth",
-                            uno::makeAny( sal_Int32( aMargin.Width() ) ) );
+                            uno::Any( sal_Int32( aMargin.Width() ) ) );
 
                         xSet->setPropertyValue("FrameMarginHeight",
-                            uno::makeAny( sal_Int32( aMargin.Height() ) ) );
+                            uno::Any( sal_Int32( aMargin.Height() ) ) );
                     }
                 }
                 catch (const uno::Exception&)
@@ -434,11 +436,12 @@ void SwTextShell::ExecInsert(SfxRequest &rReq)
         bool bModifier1 = rReq.GetModifier() == KEY_MOD1;
         if(pArgs)
         {
+            const SfxUInt16Item* pColsItem = nullptr;
             if(FN_INSERT_FRAME_INTERACT_NOCOL != nSlot &&
-                pArgs->GetItemState(SID_ATTR_COLUMNS, false, &pItem) == SfxItemState::SET)
-                nCols = static_cast<const SfxUInt16Item *>(pItem)->GetValue();
-            if(pArgs->GetItemState(SID_MODIFIER, false, &pItem) == SfxItemState::SET)
-                bModifier1 |= KEY_MOD1 == static_cast<const SfxUInt16Item *>(pItem)->GetValue();
+                (pColsItem = pArgs->GetItemIfSet(SID_ATTR_COLUMNS, false)))
+                nCols = pColsItem->GetValue();
+            if(const SfxUInt16Item* pModifierItem = pArgs->GetItemIfSet(SID_MODIFIER, false))
+                bModifier1 |= KEY_MOD1 == pModifierItem->GetValue();
         }
         if(bModifier1 )
         {
@@ -496,9 +499,9 @@ void SwTextShell::ExecInsert(SfxRequest &rReq)
                 aPos = static_cast<const SfxPointItem *>(pItem)->GetValue();
             if(pArgs->GetItemState(FN_PARAM_2, false, &pItem)  == SfxItemState::SET)
                 aSize = static_cast<const SvxSizeItem *>(pItem)->GetSize();
-            if(pArgs->GetItemState(SID_ATTR_COLUMNS, false, &pItem)  == SfxItemState::SET)
+            if(const SfxUInt16Item* pColsItem = pArgs->GetItemIfSet(SID_ATTR_COLUMNS, false))
             {
-                const sal_uInt16 nCols = static_cast<const SfxUInt16Item *>(pItem)->GetValue();
+                const sal_uInt16 nCols = pColsItem->GetValue();
                 if( !bSingleCol && 1 < nCols )
                 {
                     SwFormatCol aFormatCol;
@@ -685,10 +688,8 @@ void SwTextShell::StateInsert( SfxItemSet &rSet )
                     rSh.GetCurAttr( aSet );
 
                     SvxHyperlinkItem aHLinkItem;
-                    const SfxPoolItem* pItem;
-                    if(SfxItemState::SET == aSet.GetItemState(RES_TXTATR_INETFMT, false, &pItem))
+                    if(const SwFormatINetFormat* pINetFormat = aSet.GetItemIfSet(RES_TXTATR_INETFMT, false))
                     {
-                        const SwFormatINetFormat* pINetFormat = static_cast<const SwFormatINetFormat*>(pItem);
                         aHLinkItem.SetURL(pINetFormat->GetValue());
                         aHLinkItem.SetTargetFrame(pINetFormat->GetTargetFrame());
                         aHLinkItem.SetIntName(pINetFormat->GetName());
@@ -924,17 +925,15 @@ SfxItemSet SwTextShell::CreateInsertFrameItemSet(SwFlyFrameAttrMgr& rMgr)
 void SwTextShell::InsertSymbol( SfxRequest& rReq )
 {
     const SfxItemSet *pArgs = rReq.GetArgs();
-    const SfxPoolItem* pItem = nullptr;
+    const SfxStringItem* pItem = nullptr;
     if( pArgs )
-        pArgs->GetItemState(GetPool().GetWhich(SID_CHARMAP), false, &pItem);
+        pItem = pArgs->GetItemIfSet(SID_CHARMAP, false);
 
     OUString aChars, aFontName;
     if ( pItem )
     {
-        aChars = static_cast<const SfxStringItem*>(pItem)->GetValue();
-        const SfxPoolItem* pFtItem = nullptr;
-        pArgs->GetItemState( GetPool().GetWhich(SID_ATTR_SPECIALCHAR), false, &pFtItem);
-        const SfxStringItem* pFontItem = dynamic_cast<const SfxStringItem*>( pFtItem  );
+        aChars = pItem->GetValue();
+        const SfxStringItem* pFontItem = pArgs->GetItemIfSet( SID_ATTR_SPECIALCHAR, false );
         if ( pFontItem )
             aFontName = pFontItem->GetValue();
     }
@@ -957,11 +956,11 @@ void SwTextShell::InsertSymbol( SfxRequest& rReq )
         }
         else
         {
-            aFont.reset(static_cast<SvxFontItem*>(
-                        aSet.Get(
+            TypedWhichId<SvxFontItem> nFontWhich =
                             GetWhichOfScript(
                                 RES_CHRATR_FONT,
-                                SvtLanguageOptions::GetI18NScriptTypeOfLanguage( GetAppLanguage() ) )).Clone()));
+                                SvtLanguageOptions::GetI18NScriptTypeOfLanguage( GetAppLanguage() ) );
+            aFont.reset(aSet.Get(nFontWhich).Clone());
         }
 
         if (aFontName.isEmpty())
@@ -1014,9 +1013,11 @@ void SwTextShell::InsertSymbol( SfxRequest& rReq )
         }
         else
         {
-            aFont.reset(static_cast<SvxFontItem*>(aSet.Get( GetWhichOfScript(
+            TypedWhichId<SvxFontItem> nFontWhich =
+                GetWhichOfScript(
                         RES_CHRATR_FONT,
-                        SvtLanguageOptions::GetI18NScriptTypeOfLanguage( GetAppLanguage() ) )).Clone()));
+                        SvtLanguageOptions::GetI18NScriptTypeOfLanguage( GetAppLanguage() ) );
+            aFont.reset(aSet.Get( nFontWhich ).Clone());
         }
     }
 
@@ -1083,7 +1084,7 @@ void SwTextShell::InsertSymbol( SfxRequest& rReq )
 
     if ( !aChars.isEmpty() )
     {
-        rReq.AppendItem( SfxStringItem( GetPool().GetWhich(SID_CHARMAP), aChars ) );
+        rReq.AppendItem( SfxStringItem( SID_CHARMAP, aChars ) );
         rReq.AppendItem( SfxStringItem( SID_ATTR_SPECIALCHAR, aNewFont.GetFamilyName() ) );
         rReq.Done();
     }

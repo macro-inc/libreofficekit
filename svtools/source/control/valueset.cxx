@@ -23,7 +23,6 @@
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <tools/debug.hxx>
-#include <comphelper/base64.hxx>
 #include <vcl/canvastools.hxx>
 #include <vcl/decoview.hxx>
 #include <vcl/event.hxx>
@@ -256,16 +255,8 @@ IMPL_LINK(ValueSet, ImplScrollHdl, weld::ScrolledWindow&, rScrollWin, void)
 
 void ValueSet::Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle&)
 {
-    if (GetStyle() & WB_FLATVALUESET)
-    {
-        const StyleSettings& rStyleSettings = rRenderContext.GetSettings().GetStyleSettings();
-        rRenderContext.SetLineColor();
-        rRenderContext.SetFillColor(rStyleSettings.GetFaceColor());
-        tools::Long nOffY = maVirDev->GetOutputSizePixel().Height();
-        Size aWinSize(GetOutputSizePixel());
-        rRenderContext.DrawRect(tools::Rectangle(Point(0, nOffY ), Point( aWinSize.Width(), aWinSize.Height())));
-    }
-
+    rRenderContext.SetBackground(Application::GetSettings().GetStyleSettings().GetFaceColor());
+    rRenderContext.Erase();
     ImplDraw(rRenderContext);
 }
 
@@ -767,9 +758,9 @@ void ValueSet::SelectItem( sal_uInt16 nItemId )
     if (weld::DrawingArea* pNeedsFormatToScroll = !mnCols ? GetDrawingArea() : nullptr)
     {
         Format(pNeedsFormatToScroll->get_ref_device());
-        // reset scrollbar so its set to the later calculated mnFirstLine on
+        // reset scrollbar so it's set to the later calculated mnFirstLine on
         // the next Format
-        RecalcScrollBar(); // reset scrollbar so its set to the later calculated
+        RecalcScrollBar();
     }
 
     // if necessary scroll to the visible area
@@ -1516,22 +1507,20 @@ void ValueSet::ImplDrawItemText(vcl::RenderContext& rRenderContext, const OUStri
     tools::Long nTxtWidth = rRenderContext.GetTextWidth(rText);
     tools::Long nTxtOffset = mnTextOffset;
 
+    rRenderContext.Push(vcl::PushFlags::TEXTCOLOR);
+
     // delete rectangle and show text
-    if (GetStyle() & WB_FLATVALUESET)
-    {
-        const StyleSettings& rStyleSettings = rRenderContext.GetSettings().GetStyleSettings();
-        rRenderContext.SetLineColor();
-        rRenderContext.SetFillColor(rStyleSettings.GetFaceColor());
-        rRenderContext.DrawRect(tools::Rectangle(Point(0, nTxtOffset), Point(aWinSize.Width(), aWinSize.Height())));
-        rRenderContext.SetTextColor(rStyleSettings.GetButtonTextColor());
-    }
-    else
-    {
+    const bool bFlat(GetStyle() & WB_FLATVALUESET);
+    if (!bFlat)
         nTxtOffset += NAME_LINE_HEIGHT+NAME_LINE_OFF_Y;
-        rRenderContext.SetBackground(Application::GetSettings().GetStyleSettings().GetFaceColor());
-        rRenderContext.Erase(tools::Rectangle(Point(0, nTxtOffset), Point(aWinSize.Width(), aWinSize.Height())));
-    }
+
+    rRenderContext.SetTextColor(Application::GetSettings().GetStyleSettings().GetButtonTextColor());
+    // tdf#153787 highlighted entry text is drawn in the same Paint as the selected text, so can
+    // overwrite already rendered text
+    rRenderContext.Erase(tools::Rectangle(Point(0, nTxtOffset), Point(aWinSize.Width(), aWinSize.Height())));
     rRenderContext.DrawText(Point((aWinSize.Width() - nTxtWidth) / 2, nTxtOffset + (NAME_OFFSET / 2)), rText);
+
+    rRenderContext.Pop();
 }
 
 void ValueSet::StyleUpdated()

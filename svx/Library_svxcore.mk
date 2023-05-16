@@ -19,12 +19,17 @@
 
 $(eval $(call gb_Library_Library,svxcore))
 
-$(eval $(call gb_Library_set_componentfile,svxcore,svx/util/svxcore))
+$(eval $(call gb_Library_set_componentfile,svxcore,svx/util/svxcore,services))
+
+$(eval $(call gb_Library_add_componentimpls,svxcore, \
+    $(if $(ENABLE_WASM_STRIP_BASIC_DRAW_MATH_IMPRESS),,draw) \
+))
 
 $(eval $(call gb_Library_add_sdi_headers,svxcore,svx/sdi/svxslots))
 
 $(eval $(call gb_Library_use_custom_headers,svxcore,\
 	officecfg/registry \
+	oox/generated \
 ))
 
 $(eval $(call gb_Library_use_sdk_api,svxcore))
@@ -49,7 +54,7 @@ $(eval $(call gb_Library_add_defs,svxcore,\
 ))
 
 $(eval $(call gb_Library_use_libraries,svxcore,\
-    $(call gb_Helper_optional,AVMEDIA,avmedia) \
+    avmedia \
     basegfx \
     sb \
     comphelper \
@@ -57,6 +62,8 @@ $(eval $(call gb_Library_use_libraries,svxcore,\
     cppu \
     $(call gb_Helper_optional,DBCONNECTIVITY, \
         dbtools) \
+    docmodel \
+    drawinglayercore \
     drawinglayer \
     editeng \
     fwk \
@@ -80,15 +87,11 @@ $(eval $(call gb_Library_use_libraries,svxcore,\
 
 $(eval $(call gb_Library_use_externals,svxcore,\
 	boost_headers \
+    epoxy \
 	icuuc \
 	icu_headers \
 	libxml2 \
 ))
-ifeq ($(DISABLE_GUI),)
-$(eval $(call gb_Library_use_externals,svxcore,\
-     epoxy \
- ))
-endif
 
 ifeq ($(OS),MACOSX)
 
@@ -109,6 +112,8 @@ $(eval $(call gb_Library_add_exception_objects,svxcore,\
     svx/source/customshapes/EnhancedCustomShapeFunctionParser \
     svx/source/customshapes/EnhancedCustomShapeGeometry \
     svx/source/customshapes/EnhancedCustomShapeTypeNames \
+    svx/source/diagram/datamodel \
+    svx/source/diagram/IDiagramHelper \
     svx/source/dialog/dialmgr \
     svx/source/dialog/dlgutil \
     svx/source/dialog/hexcolorcontrol \
@@ -214,6 +219,7 @@ $(eval $(call gb_Library_add_exception_objects,svxcore,\
     svx/source/items/customshapeitem \
     svx/source/items/drawitem \
     svx/source/items/e3ditem \
+    svx/source/items/RectangleAlignmentItem \
     svx/source/items/galleryitem \
     svx/source/items/grfitem \
     svx/source/sdr/animation/scheduler \
@@ -257,7 +263,7 @@ $(eval $(call gb_Library_add_exception_objects,svxcore,\
     svx/source/sdr/contact/viewobjectcontactofsdrole2obj \
     svx/source/sdr/contact/viewobjectcontactofunocontrol \
     svx/source/sdr/contact/viewobjectcontactofgraphic \
-    svx/source/sdr/contact/sdrmediawindow \
+    $(call gb_Helper_optional,AVMEDIA,svx/source/sdr/contact/sdrmediawindow) \
     svx/source/sdr/contact/viewobjectcontactofsdrmediaobj \
     svx/source/sdr/contact/viewcontactofsdrcaptionobj \
     svx/source/sdr/contact/viewcontactofvirtobj \
@@ -423,6 +429,7 @@ $(eval $(call gb_Library_add_exception_objects,svxcore,\
     svx/source/table/tablerows \
     svx/source/table/tableundo \
     svx/source/table/viewcontactoftableobj \
+    svx/source/theme/ThemeColorChanger \
     svx/source/tbxctrls/extrusioncontrols \
     svx/source/tbxctrls/fontworkgallery \
     svx/source/tbxctrls/linectrl \

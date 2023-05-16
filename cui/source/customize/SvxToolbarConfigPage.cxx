@@ -27,7 +27,7 @@
 
 #include <sfx2/sfxsids.hrc>
 #include <svl/stritem.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 #include <helpids.h>
@@ -106,7 +106,7 @@ SvxToolbarConfigPage::SvxToolbarConfigPage(weld::Container* pPage,
     m_aURLToSelect = ITEM_TOOLBAR_URL;
     m_aURLToSelect += "standardbar";
 
-    const SfxPoolItem* pItem = rSet.GetItem(rSet.GetPool()->GetWhich(SID_CONFIG));
+    const SfxPoolItem* pItem = rSet.GetItem(SID_CONFIG);
 
     if (pItem)
     {
@@ -125,8 +125,7 @@ void SvxToolbarConfigPage::ListModified()
     pEntries->clear();
 
     for (int i = 0; i < m_xContentsListBox->n_children(); ++i)
-        pEntries->push_back(
-            reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(i).toInt64()));
+        pEntries->push_back(weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(i)));
 
     GetSaveInData()->SetModified();
     GetTopLevelSelection()->SetModified();
@@ -140,8 +139,7 @@ SvxToolbarConfigPage::~SvxToolbarConfigPage()
 {
     for (int i = 0, nCount = m_xSaveInListBox->get_count(); i < nCount; ++i)
     {
-        ToolbarSaveInData* pData
-            = reinterpret_cast<ToolbarSaveInData*>(m_xSaveInListBox->get_id(i).toInt64());
+        ToolbarSaveInData* pData = weld::fromId<ToolbarSaveInData*>(m_xSaveInListBox->get_id(i));
         delete pData;
     }
     m_xSaveInListBox->clear();
@@ -186,8 +184,7 @@ void SvxToolbarConfigPage::DeleteSelectedContent()
         return;
 
     // get currently selected entry
-    SvxConfigEntry* pEntry
-        = reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry).toInt64());
+    SvxConfigEntry* pEntry = weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry));
 
     SvxConfigEntry* pToolbar = GetTopLevelSelection();
 
@@ -253,8 +250,7 @@ void SvxToolbarConfigPage::Init()
     {
         for (sal_Int32 i = 0; i < nCount; ++i)
         {
-            SvxConfigEntry* pData
-                = reinterpret_cast<SvxConfigEntry*>(m_xTopLevelListBox->get_id(i).toInt64());
+            SvxConfigEntry* pData = weld::fromId<SvxConfigEntry*>(m_xTopLevelListBox->get_id(i));
 
             if (pData->GetCommand().equals(m_aURLToSelect))
             {
@@ -297,7 +293,7 @@ IMPL_LINK(SvxToolbarConfigPage, GearHdl, const OString&, rIdent, void)
 
     if (rIdent == "toolbar_gear_add")
     {
-        OUString prefix = CuiResId(RID_SVXSTR_NEW_TOOLBAR);
+        OUString prefix = CuiResId(RID_CUISTR_NEW_TOOLBAR);
 
         OUString aNewName
             = SvxConfigPageHelper::generateCustomName(prefix, GetSaveInData()->GetEntries());
@@ -319,8 +315,8 @@ IMPL_LINK(SvxToolbarConfigPage, GearHdl, const OString&, rIdent, void)
             // Where to save the new toolbar? (i.e. Modulewise or documentwise)
             int nInsertPos = aNameDialog.m_xSaveInListBox->get_active();
 
-            ToolbarSaveInData* pData = reinterpret_cast<ToolbarSaveInData*>(
-                m_xSaveInListBox->get_id(nInsertPos).toInt64());
+            ToolbarSaveInData* pData
+                = weld::fromId<ToolbarSaveInData*>(m_xSaveInListBox->get_id(nInsertPos));
 
             if (GetSaveInData() != pData)
             {
@@ -335,7 +331,7 @@ IMPL_LINK(SvxToolbarConfigPage, GearHdl, const OString&, rIdent, void)
 
             pData->CreateToolbar(pToolbar);
 
-            OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pToolbar)));
+            OUString sId(weld::toId(pToolbar));
             m_xTopLevelListBox->append(sId, pToolbar->GetName());
             m_xTopLevelListBox->set_active_id(sId);
             SelectElement();
@@ -354,17 +350,17 @@ IMPL_LINK(SvxToolbarConfigPage, GearHdl, const OString&, rIdent, void)
     else if (rIdent == "toolbar_gear_rename")
     {
         sal_Int32 nSelectionPos = m_xTopLevelListBox->get_active();
-        SvxConfigEntry* pToolbar = reinterpret_cast<SvxConfigEntry*>(
-            m_xTopLevelListBox->get_id(nSelectionPos).toInt64());
+        SvxConfigEntry* pToolbar
+            = weld::fromId<SvxConfigEntry*>(m_xTopLevelListBox->get_id(nSelectionPos));
         ToolbarSaveInData* pSaveInData = static_cast<ToolbarSaveInData*>(GetSaveInData());
 
         //Rename the toolbar
         OUString sCurrentName(SvxConfigPageHelper::stripHotKey(pToolbar->GetName()));
-        OUString sDesc = CuiResId(RID_SVXSTR_LABEL_NEW_NAME);
+        OUString sDesc = CuiResId(RID_CUISTR_LABEL_NEW_NAME);
 
         SvxNameDialog aNameDialog(GetFrameWeld(), sCurrentName, sDesc);
         aNameDialog.set_help_id(HID_SVX_CONFIG_RENAME_TOOLBAR);
-        aNameDialog.set_title(CuiResId(RID_SVXSTR_RENAME_TOOLBAR));
+        aNameDialog.set_title(CuiResId(RID_CUISTR_RENAME_TOOLBAR));
 
         if (aNameDialog.run() == RET_OK)
         {
@@ -378,7 +374,7 @@ IMPL_LINK(SvxToolbarConfigPage, GearHdl, const OString&, rIdent, void)
 
             // have to use remove and insert to change the name
             m_xTopLevelListBox->remove(nSelectionPos);
-            OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pToolbar)));
+            OUString sId(weld::toId(pToolbar));
             m_xTopLevelListBox->insert(nSelectionPos, sNewName, &sId, nullptr, nullptr);
             m_xTopLevelListBox->set_active_id(sId);
         }
@@ -473,14 +469,14 @@ IMPL_LINK(SvxToolbarConfigPage, ModifyItemHdl, const OString&, rIdent, void)
     {
         int nActEntry = m_xContentsListBox->get_selected_index();
         SvxConfigEntry* pEntry
-            = reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry).toInt64());
+            = weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry));
 
         OUString aNewName(SvxConfigPageHelper::stripHotKey(pEntry->GetName()));
-        OUString aDesc = CuiResId(RID_SVXSTR_LABEL_NEW_NAME);
+        OUString aDesc = CuiResId(RID_CUISTR_LABEL_NEW_NAME);
 
         SvxNameDialog aNameDialog(GetFrameWeld(), aNewName, aDesc);
         aNameDialog.set_help_id(HID_SVX_CONFIG_RENAME_TOOLBAR_ITEM);
-        aNameDialog.set_title(CuiResId(RID_SVXSTR_RENAME_TOOLBAR));
+        aNameDialog.set_title(CuiResId(RID_CUISTR_RENAME_TOOLBAR));
 
         if (aNameDialog.run() == RET_OK)
         {
@@ -499,7 +495,7 @@ IMPL_LINK(SvxToolbarConfigPage, ModifyItemHdl, const OString&, rIdent, void)
     {
         int nActEntry = m_xContentsListBox->get_selected_index();
         SvxConfigEntry* pEntry
-            = reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry).toInt64());
+            = weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry));
 
         SvxIconSelectorDialog aIconDialog(GetFrameWeld(), GetSaveInData()->GetImageManager(),
                                           GetSaveInData()->GetParentImageManager());
@@ -534,7 +530,7 @@ IMPL_LINK(SvxToolbarConfigPage, ModifyItemHdl, const OString&, rIdent, void)
 
                     m_xContentsListBox->remove(nActEntry);
 
-                    OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pEntry)));
+                    OUString sId(weld::toId(pEntry));
                     m_xContentsListBox->insert(nActEntry, sId);
                     m_xContentsListBox->set_toggle(nActEntry, pEntry->IsVisible() ? TRISTATE_TRUE
                                                                                   : TRISTATE_FALSE);
@@ -556,7 +552,7 @@ IMPL_LINK(SvxToolbarConfigPage, ModifyItemHdl, const OString&, rIdent, void)
     {
         int nActEntry = m_xContentsListBox->get_selected_index();
         SvxConfigEntry* pEntry
-            = reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry).toInt64());
+            = weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry));
 
         css::uno::Reference<css::graphic::XGraphic> backup = pEntry->GetBackupGraphic();
 
@@ -571,7 +567,7 @@ IMPL_LINK(SvxToolbarConfigPage, ModifyItemHdl, const OString&, rIdent, void)
 
             m_xContentsListBox->remove(nActEntry);
 
-            OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pEntry)));
+            OUString sId(weld::toId(pEntry));
             m_xContentsListBox->insert(nActEntry, sId);
             m_xContentsListBox->set_toggle(nActEntry,
                                            pEntry->IsVisible() ? TRISTATE_TRUE : TRISTATE_FALSE);
@@ -594,7 +590,7 @@ IMPL_LINK(SvxToolbarConfigPage, ModifyItemHdl, const OString&, rIdent, void)
     {
         int nActEntry = m_xContentsListBox->get_selected_index();
         SvxConfigEntry* pEntry
-            = reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry).toInt64());
+            = weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry));
 
         ToolbarSaveInData* pSaveInData = static_cast<ToolbarSaveInData*>(GetSaveInData());
 
@@ -622,7 +618,7 @@ IMPL_LINK(SvxToolbarConfigPage, ModifyItemHdl, const OString&, rIdent, void)
 
             m_xContentsListBox->remove(nActEntry);
 
-            OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pEntry)));
+            OUString sId(weld::toId(pEntry));
             m_xContentsListBox->insert(nActEntry, sId);
             m_xContentsListBox->set_toggle(nActEntry,
                                            pEntry->IsVisible() ? TRISTATE_TRUE : TRISTATE_FALSE);
@@ -657,11 +653,11 @@ IMPL_LINK_NOARG(SvxToolbarConfigPage, ResetToolbarHdl, weld::Button&, void)
     sal_Int32 nSelectionPos = m_xTopLevelListBox->get_active();
 
     SvxConfigEntry* pToolbar
-        = reinterpret_cast<SvxConfigEntry*>(m_xTopLevelListBox->get_id(nSelectionPos).toInt64());
+        = weld::fromId<SvxConfigEntry*>(m_xTopLevelListBox->get_id(nSelectionPos));
 
     std::unique_ptr<weld::MessageDialog> xQueryBox(Application::CreateMessageDialog(
         GetFrameWeld(), VclMessageType::Question, VclButtonsType::YesNo,
-        CuiResId(RID_SVXSTR_CONFIRM_RESTORE_DEFAULT)));
+        CuiResId(RID_CUISTR_CONFIRM_RESTORE_DEFAULT)));
     if (xQueryBox->run() == RET_YES)
     {
         ToolbarSaveInData* pSaveInData = static_cast<ToolbarSaveInData*>(GetSaveInData());
@@ -679,8 +675,7 @@ void SvxToolbarConfigPage::UpdateButtonStates()
 
     bool bIsSeparator
         = selection != -1
-          && reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(selection).toInt64())
-                 ->IsSeparator();
+          && weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(selection))->IsSeparator();
     bool bIsValidSelection = (m_xContentsListBox->n_children() != 0 && selection != -1);
 
     m_xMoveUpButton->set_sensitive(bIsValidSelection);
@@ -698,7 +693,7 @@ void SvxToolbarConfigPage::UpdateButtonStates()
 
 short SvxToolbarConfigPage::QueryReset()
 {
-    OUString msg = CuiResId(RID_SVXSTR_CONFIRM_TOOLBAR_RESET);
+    OUString msg = CuiResId(RID_CUISTR_CONFIRM_TOOLBAR_RESET);
 
     OUString saveInName = m_xSaveInListBox->get_active_text();
 
@@ -753,7 +748,7 @@ void SvxToolbarConfigPage::SelectElement()
     SvxEntries* pEntries = pToolbar->GetEntries();
     for (auto const& entry : *pEntries)
     {
-        OUString sId(OUString::number(reinterpret_cast<sal_Int64>(entry)));
+        OUString sId(weld::toId(entry));
         m_xContentsListBox->insert(i, sId);
         if (entry->IsBinding() && !entry->IsSeparator())
             m_xContentsListBox->set_toggle(i, entry->IsVisible() ? TRISTATE_TRUE : TRISTATE_FALSE);
@@ -777,8 +772,7 @@ void SvxToolbarConfigPage::AddFunction(int nTarget)
     if (nNewLBEntry == -1)
         return;
 
-    SvxConfigEntry* pEntry
-        = reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(nNewLBEntry).toInt64());
+    SvxConfigEntry* pEntry = weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(nNewLBEntry));
 
     if (pEntry->IsBinding()) //TODO sep ?
     {
@@ -813,8 +807,7 @@ SvxToolbarEntriesListBox::~SvxToolbarEntriesListBox() {}
 
 void SvxToolbarEntriesListBox::ChangedVisibility(int nRow)
 {
-    SvxConfigEntry* pEntryData
-        = reinterpret_cast<SvxConfigEntry*>(m_xControl->get_id(nRow).toInt64());
+    SvxConfigEntry* pEntryData = weld::fromId<SvxConfigEntry*>(m_xControl->get_id(nRow));
 
     if (pEntryData->IsBinding())
     {
@@ -840,8 +833,7 @@ IMPL_LINK(SvxToolbarEntriesListBox, KeyInputHdl, const KeyEvent&, rKeyEvent, boo
     if (rKeyEvent.GetKeyCode() == KEY_SPACE)
     {
         int nRow = m_xControl->get_selected_index();
-        SvxConfigEntry* pEntryData
-            = reinterpret_cast<SvxConfigEntry*>(m_xControl->get_id(nRow).toInt64());
+        SvxConfigEntry* pEntryData = weld::fromId<SvxConfigEntry*>(m_xControl->get_id(nRow));
         if (pEntryData->IsBinding() && !pEntryData->IsSeparator())
         {
             m_xControl->set_toggle(nRow, m_xControl->get_toggle(nRow) == TRISTATE_TRUE
@@ -872,8 +864,7 @@ IMPL_LINK(SvxToolbarConfigPage, ContentContextMenuHdl, const CommandEvent&, rCEv
 
     bool bIsSeparator
         = nSelectIndex != -1
-          && reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(nSelectIndex).toInt64())
-                 ->IsSeparator();
+          && weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(nSelectIndex))->IsSeparator();
     bool bIsValidSelection = (m_xContentsListBox->n_children() != 0 && nSelectIndex != -1);
 
     std::unique_ptr<weld::Builder> xBuilder(

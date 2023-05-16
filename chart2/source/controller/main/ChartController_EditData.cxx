@@ -17,8 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <ChartWindow.hxx>
 #include <ChartController.hxx>
+#include <ChartModel.hxx>
 
 #include <dlg_DataEditor.hxx>
 #include "UndoGuard.hxx"
@@ -26,7 +26,6 @@
 #include <strings.hrc>
 
 #include <vcl/svapp.hxx>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 
 using namespace ::com::sun::star;
 
@@ -37,7 +36,7 @@ namespace chart
 
 void ChartController::executeDispatch_EditData()
 {
-    Reference< chart2::XChartDocument > xChartDoc( getModel(), uno::UNO_QUERY );
+    rtl::Reference<::chart::ChartModel> xChartDoc( getChartModel(), uno::UNO_QUERY );
     if (xChartDoc.is())
     {
         SolarMutexGuard aSolarGuard;

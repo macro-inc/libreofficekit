@@ -124,8 +124,7 @@ public:
 
 SvFileStream* EmbeddedDBPerformanceTest::getWordListStream()
 {
-    OUString wlPath;
-    createFileURL(u"wordlist", wlPath);
+    OUString wlPath = createFileURL(u"wordlist");
     return new SvFileStream(wlPath, StreamMode::READ);
 }
 
@@ -195,7 +194,7 @@ void EmbeddedDBPerformanceTest::doPerformanceTestOnODB(
     std::u16string_view rDBName,
     const bool bUsePreparedStatement)
 {
-    ::utl::TempFile aFile;
+    ::utl::TempFileNamed aFile;
     aFile.EnableKillingFile();
 
     {

@@ -21,6 +21,7 @@
 #include <jobdata.hxx>
 #include <printerinfomanager.hxx>
 #include <tools/stream.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <rtl/strbuf.hxx>
 #include <memory>
@@ -127,24 +128,28 @@ bool JobData::getStreamBuffer( void*& pData, sal_uInt32& bytes )
 
     aLine.append("printer=");
     aLine.append(OUStringToOString(m_aPrinterName, RTL_TEXTENCODING_UTF8));
-    aStream.WriteLine(aLine.makeStringAndClear());
+    aStream.WriteLine(aLine);
+    aLine.setLength(0);
 
     aLine.append("orientation=");
     if (m_eOrientation == orientation::Landscape)
         aLine.append("Landscape");
     else
         aLine.append("Portrait");
-    aStream.WriteLine(aLine.makeStringAndClear());
+    aStream.WriteLine(aLine);
+    aLine.setLength(0);
 
     aLine.append("copies=");
     aLine.append(static_cast<sal_Int32>(m_nCopies));
-    aStream.WriteLine(aLine.makeStringAndClear());
+    aStream.WriteLine(aLine);
+    aLine.setLength(0);
 
     if (m_nPDFDevice > 0)
     {
         aLine.append("collate=");
         aLine.append(OString::boolean(m_bCollate));
-        aStream.WriteLine(aLine.makeStringAndClear());
+        aStream.WriteLine(aLine);
+        aLine.setLength(0);
     }
 
     aLine.append("marginadjustment=");
@@ -155,23 +160,28 @@ bool JobData::getStreamBuffer( void*& pData, sal_uInt32& bytes )
     aLine.append(static_cast<sal_Int32>(m_nTopMarginAdjust));
     aLine.append(',');
     aLine.append(static_cast<sal_Int32>(m_nBottomMarginAdjust));
-    aStream.WriteLine(aLine.makeStringAndClear());
+    aStream.WriteLine(aLine);
+    aLine.setLength(0);
 
     aLine.append("colordepth=");
     aLine.append(static_cast<sal_Int32>(m_nColorDepth));
-    aStream.WriteLine(aLine.makeStringAndClear());
+    aStream.WriteLine(aLine);
+    aLine.setLength(0);
 
     aLine.append("pslevel=");
     aLine.append(static_cast<sal_Int32>(m_nPSLevel));
-    aStream.WriteLine(aLine.makeStringAndClear());
+    aStream.WriteLine(aLine);
+    aLine.setLength(0);
 
     aLine.append("pdfdevice=");
     aLine.append(static_cast<sal_Int32>(m_nPDFDevice));
-    aStream.WriteLine(aLine.makeStringAndClear());
+    aStream.WriteLine(aLine);
+    aLine.setLength(0);
 
     aLine.append("colordevice=");
     aLine.append(static_cast<sal_Int32>(m_nColorDevice));
-    aStream.WriteLine(aLine.makeStringAndClear());
+    aStream.WriteLine(aLine);
+    aLine.setLength(0);
 
     // now append the PPDContext stream buffer
     aStream.WriteLine( "PPDContextData" );
@@ -226,12 +236,12 @@ bool JobData::constructFromStreamBuffer( const void* pData, sal_uInt32 bytes, Jo
         else if (aLine.startsWith(orientatationEquals))
         {
             bOrientation = true;
-            rJobData.m_eOrientation = aLine.copy(RTL_CONSTASCII_LENGTH(orientatationEquals)).equalsIgnoreAsciiCase("landscape") ? orientation::Landscape : orientation::Portrait;
+            rJobData.m_eOrientation = o3tl::equalsIgnoreAsciiCase(aLine.subView(RTL_CONSTASCII_LENGTH(orientatationEquals)), "landscape") ? orientation::Landscape : orientation::Portrait;
         }
         else if (aLine.startsWith(copiesEquals))
         {
             bCopies = true;
-            rJobData.m_nCopies = aLine.copy(RTL_CONSTASCII_LENGTH(copiesEquals)).toInt32();
+            rJobData.m_nCopies = o3tl::toInt32(aLine.subView(RTL_CONSTASCII_LENGTH(copiesEquals)));
         }
         else if (aLine.startsWith(collateEquals))
         {
@@ -241,30 +251,30 @@ bool JobData::constructFromStreamBuffer( const void* pData, sal_uInt32 bytes, Jo
         {
             bMargin = true;
             sal_Int32 nIdx {RTL_CONSTASCII_LENGTH(marginadjustmentEquals)};
-            rJobData.m_nLeftMarginAdjust = aLine.getToken(0, ',', nIdx).toInt32();
-            rJobData.m_nRightMarginAdjust = aLine.getToken(0, ',', nIdx).toInt32();
-            rJobData.m_nTopMarginAdjust = aLine.getToken(0, ',', nIdx).toInt32();
-            rJobData.m_nBottomMarginAdjust = aLine.getToken(0, ',', nIdx).toInt32();
+            rJobData.m_nLeftMarginAdjust = o3tl::toInt32(o3tl::getToken(aLine, 0, ',', nIdx));
+            rJobData.m_nRightMarginAdjust = o3tl::toInt32(o3tl::getToken(aLine, 0, ',', nIdx));
+            rJobData.m_nTopMarginAdjust = o3tl::toInt32(o3tl::getToken(aLine, 0, ',', nIdx));
+            rJobData.m_nBottomMarginAdjust = o3tl::toInt32(o3tl::getToken(aLine, 0, ',', nIdx));
         }
         else if (aLine.startsWith(colordepthEquals))
         {
             bColorDepth = true;
-            rJobData.m_nColorDepth = aLine.copy(RTL_CONSTASCII_LENGTH(colordepthEquals)).toInt32();
+            rJobData.m_nColorDepth = o3tl::toInt32(aLine.subView(RTL_CONSTASCII_LENGTH(colordepthEquals)));
         }
         else if (aLine.startsWith(colordeviceEquals))
         {
             bColorDevice = true;
-            rJobData.m_nColorDevice = aLine.copy(RTL_CONSTASCII_LENGTH(colordeviceEquals)).toInt32();
+            rJobData.m_nColorDevice = o3tl::toInt32(aLine.subView(RTL_CONSTASCII_LENGTH(colordeviceEquals)));
         }
         else if (aLine.startsWith(pslevelEquals))
         {
             bPSLevel = true;
-            rJobData.m_nPSLevel = aLine.copy(RTL_CONSTASCII_LENGTH(pslevelEquals)).toInt32();
+            rJobData.m_nPSLevel = o3tl::toInt32(aLine.subView(RTL_CONSTASCII_LENGTH(pslevelEquals)));
         }
         else if (aLine.startsWith(pdfdeviceEquals))
         {
             bPDFDevice = true;
-            rJobData.m_nPDFDevice = aLine.copy(RTL_CONSTASCII_LENGTH(pdfdeviceEquals)).toInt32();
+            rJobData.m_nPDFDevice = o3tl::toInt32(aLine.subView(RTL_CONSTASCII_LENGTH(pdfdeviceEquals)));
         }
         else if (aLine == "PPDContextData" && bPrinter)
         {

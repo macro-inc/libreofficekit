@@ -176,13 +176,12 @@ ScTabView::ScTabView( vcl::Window* pParent, ScDocShell& rDocSh, ScTabViewShell* 
     aViewData( rDocSh, pViewShell ),
     aFunctionSet( &aViewData ),
     aHdrFunc( &aViewData ),
-    aVScrollTop( VclPtr<ScrollBar>::Create( pFrameWin, WinBits( WB_VSCROLL | WB_DRAG ) ) ),
-    aVScrollBottom( VclPtr<ScrollBar>::Create( pFrameWin, WinBits( WB_VSCROLL | WB_DRAG ) ) ),
-    aHScrollLeft( VclPtr<ScrollBar>::Create( pFrameWin, WinBits( WB_HSCROLL | WB_DRAG ) ) ),
-    aHScrollRight( VclPtr<ScrollBar>::Create( pFrameWin, WinBits( WB_HSCROLL | WB_DRAG ) ) ),
+    aVScrollTop( VclPtr<ScrollAdaptor>::Create( pFrameWin, false ) ),
+    aVScrollBottom( VclPtr<ScrollAdaptor>::Create( pFrameWin, false ) ),
+    aHScrollLeft( VclPtr<ScrollAdaptor>::Create( pFrameWin, true ) ),
+    aHScrollRight( VclPtr<ScrollAdaptor>::Create( pFrameWin, true ) ),
     aCornerButton( VclPtr<ScCornerButton>::Create( pFrameWin, &aViewData ) ),
     aTopButton( VclPtr<ScCornerButton>::Create( pFrameWin, &aViewData ) ),
-    aScrollBarBox( VclPtr<ScrollBarBox>::Create( pFrameWin, WB_SIZEABLE ) ),
     aScrollTimer("ScTabView aScrollTimer"),
     pTimerWindow( nullptr ),
     aExtraEditViewManager( pViewShell, pGridWin ),
@@ -221,21 +220,20 @@ ScTabView::ScTabView( vcl::Window* pParent, ScDocShell& rDocSh, ScTabViewShell* 
     Init();
 }
 
-void ScTabView::InitScrollBar( ScrollBar& rScrollBar, tools::Long nMaxVal )
+void ScTabView::InitScrollBar(ScrollAdaptor& rScrollBar, tools::Long nMaxVal, const Link<weld::Scrollbar&, void>& rLink)
 {
     rScrollBar.SetRange( Range( 0, nMaxVal ) );
     rScrollBar.SetLineSize( 1 );
     rScrollBar.SetPageSize( 1 );                // is queried separately
     rScrollBar.SetVisibleSize( 10 );            // is reset by Resize
 
-    rScrollBar.SetScrollHdl( LINK(this, ScTabView, ScrollHdl) );
-    rScrollBar.SetEndScrollHdl( LINK(this, ScTabView, EndScrollHdl) );
+    rScrollBar.SetScrollHdl(rLink);
+    rScrollBar.SetMouseReleaseHdl(LINK(this, ScTabView, EndScrollHdl));
 
     rScrollBar.EnableRTL( aViewData.GetDocument().IsLayoutRTL( aViewData.GetTabNo() ) );
 }
 
 //  Scroll-Timer
-
 void ScTabView::SetTimer( ScGridWindow* pWin, const MouseEvent& rMEvt )
 {
     pTimerWindow = pWin;
@@ -374,10 +372,6 @@ void ScTabView::DoResize( const Point& rOffset, const Size& rSize, bool bInner )
 
             nSizeY -= nBarY;
         }
-
-        //  window at the bottom right
-        lcl_SetPosSize( *aScrollBarBox, Point( nPosX+nSizeX, nPosY+nSizeY ), Size( nBarX, nBarY ),
-                        nTotalWidth, bLayoutRTL );
 
         if (bHScroll) // Scrollbars horizontal
         {
@@ -523,7 +517,6 @@ void ScTabView::DoResize( const Point& rOffset, const Size& rSize, bool bInner )
     if (bTabControl && ! bHScroll )
     {
         nBarY = aHScrollLeft->GetSizePixel().Height();
-        nBarX = aVScrollBottom->GetSizePixel().Width();
 
         tools::Long nSize1 = nSizeX;
 
@@ -533,8 +526,6 @@ void ScTabView::DoResize( const Point& rOffset, const Size& rSize, bool bInner )
         lcl_SetPosSize( *pTabControl, Point(nPosX, nPosY+nSizeY-nBarY),
                                         Size(nTabSize, nBarY), nTotalWidth, bLayoutRTL );
         nSizeY -= nBarY;
-        lcl_SetPosSize( *aScrollBarBox, Point( nPosX+nSizeX, nPosY+nSizeY ), Size( nBarX, nBarY ),
-                                        nTotalWidth, bLayoutRTL );
 
         if( bVScroll )
         {
@@ -945,6 +936,23 @@ Point ScTabView::GetGridOffset() const
 
 // ---  Scroll-Bars  --------------------------------------------------------
 
+void ScTabView::SetZoomPercentFromCommand(sal_uInt16 nZoomPercent)
+{
+    // scroll wheel doesn't set the AppOptions default
+
+    bool bSyncZoom = SC_MOD()->GetAppOptions().GetSynchronizeZoom();
+    SetZoomType(SvxZoomType::PERCENT, bSyncZoom);
+    Fraction aFract(nZoomPercent, 100);
+    SetZoom(aFract, aFract, bSyncZoom);
+    PaintGrid();
+    PaintTop();
+    PaintLeft();
+    aViewData.GetBindings().Invalidate( SID_ATTR_ZOOM);
+    aViewData.GetBindings().Invalidate( SID_ATTR_ZOOMSLIDER);
+    aViewData.GetBindings().Invalidate( SID_ZOOM_IN);
+    aViewData.GetBindings().Invalidate( SID_ZOOM_OUT);
+}
+
 bool ScTabView::ScrollCommand( const CommandEvent& rCEvt, ScSplitPos ePos )
 {
     HideNoteMarker();
@@ -959,27 +967,15 @@ bool ScTabView::ScrollCommand( const CommandEvent& rCEvt, ScSplitPos ePos )
             //  and can't be changed directly
 
             const Fraction& rOldY = aViewData.GetZoomY();
-            tools::Long nOld = static_cast<tools::Long>( rOldY * 100 );
-            tools::Long nNew;
+            sal_uInt16 nOld = static_cast<tools::Long>( rOldY * 100 );
+            sal_uInt16 nNew;
             if ( pData->GetDelta() < 0 )
-                nNew = std::max( tools::Long(MINZOOM), basegfx::zoomtools::zoomOut( nOld ));
+                nNew = std::max( MINZOOM, basegfx::zoomtools::zoomOut( nOld ));
             else
-                nNew = std::min( tools::Long(MAXZOOM), basegfx::zoomtools::zoomIn( nOld ));
+                nNew = std::min( MAXZOOM, basegfx::zoomtools::zoomIn( nOld ));
             if ( nNew != nOld )
             {
-                // scroll wheel doesn't set the AppOptions default
-
-                bool bSyncZoom = SC_MOD()->GetAppOptions().GetSynchronizeZoom();
-                SetZoomType( SvxZoomType::PERCENT, bSyncZoom );
-                Fraction aFract( nNew, 100 );
-                SetZoom( aFract, aFract, bSyncZoom );
-                PaintGrid();
-                PaintTop();
-                PaintLeft();
-                aViewData.GetBindings().Invalidate( SID_ATTR_ZOOM );
-                aViewData.GetBindings().Invalidate( SID_ATTR_ZOOMSLIDER );
-                aViewData.GetBindings().Invalidate( SID_ZOOM_IN);
-                aViewData.GetBindings().Invalidate( SID_ZOOM_OUT);
+                SetZoomPercentFromCommand(nNew);
             }
 
             bDone = true;
@@ -989,24 +985,87 @@ bool ScTabView::ScrollCommand( const CommandEvent& rCEvt, ScSplitPos ePos )
     {
         ScHSplitPos eHPos = WhichH(ePos);
         ScVSplitPos eVPos = WhichV(ePos);
-        ScrollBar* pHScroll = ( eHPos == SC_SPLIT_LEFT ) ? aHScrollLeft.get() : aHScrollRight.get();
-        ScrollBar* pVScroll = ( eVPos == SC_SPLIT_TOP )  ? aVScrollTop.get()  : aVScrollBottom.get();
+        ScrollAdaptor* pHScroll = ( eHPos == SC_SPLIT_LEFT ) ? aHScrollLeft.get() : aHScrollRight.get();
+        ScrollAdaptor* pVScroll = ( eVPos == SC_SPLIT_TOP )  ? aVScrollTop.get()  : aVScrollBottom.get();
         if ( pGridWin[ePos] )
             bDone = pGridWin[ePos]->HandleScrollCommand( rCEvt, pHScroll, pVScroll );
     }
     return bDone;
 }
 
-IMPL_LINK_NOARG(ScTabView, EndScrollHdl, ScrollBar*, void)
+bool ScTabView::GestureZoomCommand(const CommandEvent& rCEvt)
 {
-    if ( bDragging )
+    HideNoteMarker();
+
+    const CommandGestureZoomData* pData = rCEvt.GetGestureZoomData();
+    if (!pData)
+        return false;
+
+    if (aViewData.GetViewShell()->GetViewFrame()->GetFrame().IsInPlace())
+        return false;
+
+    if (pData->meEventType == GestureEventZoomType::Begin)
+    {
+        mfLastZoomScale = pData->mfScaleDelta;
+        return true;
+    }
+
+    if (pData->meEventType == GestureEventZoomType::Update)
+    {
+        double deltaBetweenEvents = (pData->mfScaleDelta - mfLastZoomScale) / mfLastZoomScale;
+        mfLastZoomScale = pData->mfScaleDelta;
+
+        // Accumulate fractional zoom to avoid small zoom changes from being ignored
+        mfAccumulatedZoom += deltaBetweenEvents;
+        int nZoomChangePercent = mfAccumulatedZoom * 100;
+        mfAccumulatedZoom -= nZoomChangePercent / 100.0;
+
+        const Fraction& rOldY = aViewData.GetZoomY();
+        sal_uInt16 nOld = static_cast<tools::Long>(rOldY * 100);
+        sal_uInt16 nNew = nOld + nZoomChangePercent;
+        nNew = std::clamp<sal_uInt16>(nNew, MINZOOM, MAXZOOM);
+
+        if (nNew != nOld)
+        {
+            SetZoomPercentFromCommand(nNew);
+        }
+
+        return true;
+    }
+    return true;
+}
+
+IMPL_LINK_NOARG(ScTabView, HScrollLeftHdl, weld::Scrollbar&, void)
+{
+    ScrollHdl(aHScrollLeft.get());
+}
+
+IMPL_LINK_NOARG(ScTabView, HScrollRightHdl, weld::Scrollbar&, void)
+{
+    ScrollHdl(aHScrollRight.get());
+}
+
+IMPL_LINK_NOARG(ScTabView, VScrollTopHdl, weld::Scrollbar&, void)
+{
+    ScrollHdl(aVScrollTop.get());
+}
+
+IMPL_LINK_NOARG(ScTabView, VScrollBottomHdl, weld::Scrollbar&, void)
+{
+    ScrollHdl(aVScrollBottom.get());
+}
+
+IMPL_LINK_NOARG(ScTabView, EndScrollHdl, const MouseEvent&, bool)
+{
+    if (bDragging)
     {
         UpdateScrollBars();
         bDragging = false;
     }
+    return false;
 }
 
-IMPL_LINK( ScTabView, ScrollHdl, ScrollBar*, pScroll, void )
+void ScTabView::ScrollHdl(ScrollAdaptor* pScroll)
 {
     bool bHoriz = ( pScroll == aHScrollLeft.get() || pScroll == aHScrollRight.get() );
     tools::Long nViewPos;
@@ -1019,7 +1078,7 @@ IMPL_LINK( ScTabView, ScrollHdl, ScrollBar*, pScroll, void )
 
     bool bLayoutRTL = aViewData.GetDocument().IsLayoutRTL( aViewData.GetTabNo() );
 
-    ScrollType eType = pScroll->GetType();
+    ScrollType eType = pScroll->GetScrollType();
     if ( eType == ScrollType::Drag )
     {
         if (!bDragging)
@@ -1085,8 +1144,10 @@ IMPL_LINK( ScTabView, ScrollHdl, ScrollBar*, pScroll, void )
             Help::ShowQuickHelp(pScroll->GetParent(), aRect, aHelpStr, nAlign);
         }
     }
+    else
+        bDragging = false;
 
-    tools::Long nDelta = pScroll->GetDelta();
+    tools::Long nDelta(0);
     switch ( eType )
     {
         case ScrollType::LineUp:
@@ -1109,6 +1170,7 @@ IMPL_LINK( ScTabView, ScrollHdl, ScrollBar*, pScroll, void )
             if ( pScroll == aVScrollBottom.get() ) nDelta = aViewData.VisibleCellsY( SC_SPLIT_BOTTOM );
             if (nDelta==0) nDelta=1;
             break;
+        default: // added to avoid warnings
         case ScrollType::Drag:
             {
                 // only scroll in the correct direction, do not jitter around hidden ranges
@@ -1120,23 +1182,31 @@ IMPL_LINK( ScTabView, ScrollHdl, ScrollBar*, pScroll, void )
 
                 tools::Long nScrollPos = GetScrollBarPos( *pScroll ) + nScrollMin;
                 nDelta = nScrollPos - nViewPos;
-                if ( nScrollPos > nPrevDragPos )
+
+                // tdf#152406 Disable anti-jitter code for scroll wheel events
+                // After moving thousands of columns to the right via
+                // horizontal scroll wheel or trackpad swipe events, most
+                // vertical scroll wheel or trackpad swipe events will trigger
+                // the anti-jitter code because nScrollPos and nPrevDragPos
+                // will be equal and nDelta will be overriden and set to zero.
+                // So, only use the anti-jitter code for mouse drag events.
+                if ( eType == ScrollType::Drag )
                 {
-                    if (nDelta<0) nDelta=0;
+                    if ( nScrollPos > nPrevDragPos )
+                    {
+                        if (nDelta<0) nDelta=0;
+                    }
+                    else if ( nScrollPos < nPrevDragPos )
+                    {
+                        if (nDelta>0) nDelta=0;
+                    }
+                    else
+                        nDelta = 0;
                 }
-                else if ( nScrollPos < nPrevDragPos )
-                {
-                    if (nDelta>0) nDelta=0;
-                }
-                else
-                    nDelta = 0;
+
                 nPrevDragPos = nScrollPos;
             }
             break;
-        default:
-        {
-            // added to avoid warnings
-        }
     }
 
     if (nDelta)
@@ -1470,7 +1540,6 @@ void ScTabView::UpdateShow()
     ShowHide( aHScrollRight.get(), bShowH && bHScrollMode );
     ShowHide( aVScrollBottom.get(), bVScrollMode );
     ShowHide( aVScrollTop.get(), bShowV && bVScrollMode );
-    ShowHide( aScrollBarBox.get(), bVScrollMode || bHScrollMode );
 
     ShowHide( pHSplitter, bHScrollMode || bShowH );         // always generated
     ShowHide( pVSplitter, bVScrollMode || bShowV );
@@ -1933,6 +2002,7 @@ void ScTabView::FreezeSplitters( bool bFreeze, SplitMethod eSplitMethod, SCCOLRO
     vcl::Window* pWin = pGridWin[ePos];
 
     bool bLayoutRTL = aViewData.GetDocument().IsLayoutRTL( aViewData.GetTabNo() );
+    bool bUpdateFix = false;
 
     if ( bFreeze )
     {
@@ -2000,24 +2070,33 @@ void ScTabView::FreezeSplitters( bool bFreeze, SplitMethod eSplitMethod, SCCOLRO
 
         if (eSplitMethod == SC_SPLIT_METHOD_ROW || eSplitMethod == SC_SPLIT_METHOD_CURSOR)
         {
-             if (eOldV != SC_SPLIT_NONE)
-             {
-                 nTopPos = aViewData.GetPosY(SC_SPLIT_TOP);
-                 if (aViewData.GetPosY(SC_SPLIT_BOTTOM) > nBottomPos)
-                     nBottomPos = aViewData.GetPosY(SC_SPLIT_BOTTOM);
-             }
-             aSplit = aViewData.GetScrPos( nPosX, nPosY, ePos, true );
-             if (aSplit.Y() > 0)
-             {
-                 aViewData.SetVSplitMode( SC_SPLIT_FIX );
-                 aViewData.SetVSplitPos( aSplit.Y() + aWinStart.Y() );
-                 aViewData.SetFixPosY( nPosY );
+            if (eOldV != SC_SPLIT_NONE)
+            {
+                nTopPos = aViewData.GetPosY(SC_SPLIT_TOP);
+                if (aViewData.GetPosY(SC_SPLIT_BOTTOM) > nBottomPos)
+                    nBottomPos = aViewData.GetPosY(SC_SPLIT_BOTTOM);
+            }
+            aSplit = aViewData.GetScrPos(nPosX, nPosY, ePos, true);
+            if (aSplit.Y() > 0)
+            {
+                aViewData.SetVSplitMode(SC_SPLIT_FIX);
+                aViewData.SetVSplitPos(aSplit.Y() + aWinStart.Y());
+                aViewData.SetFixPosY(nPosY);
 
-                 aViewData.SetPosY(SC_SPLIT_TOP, nTopPos);
-                 aViewData.SetPosY(SC_SPLIT_BOTTOM, nBottomPos);
-             }
-             else
-                 aViewData.SetVSplitMode( SC_SPLIT_NONE );
+                aViewData.SetPosY(SC_SPLIT_TOP, nTopPos);
+                aViewData.SetPosY(SC_SPLIT_BOTTOM, nBottomPos);
+            }
+            else if (nPosY == 1 && eSplitMethod == SC_SPLIT_METHOD_ROW)
+            {
+                // Freeze first row, but row 1 is not visible on screen now == special handling
+                aViewData.SetVSplitMode(SC_SPLIT_FIX);
+                aViewData.SetFixPosY(nPosY);
+
+                aViewData.SetPosY(SC_SPLIT_TOP, 0);
+                bUpdateFix = true;
+            }
+            else
+                aViewData.SetVSplitMode(SC_SPLIT_NONE);
         }
 
         if (eSplitMethod == SC_SPLIT_METHOD_COL || eSplitMethod == SC_SPLIT_METHOD_CURSOR)
@@ -2041,6 +2120,16 @@ void ScTabView::FreezeSplitters( bool bFreeze, SplitMethod eSplitMethod, SCCOLRO
                 aViewData.SetPosX(SC_SPLIT_LEFT, nLeftPos);
                 aViewData.SetPosX(SC_SPLIT_RIGHT, nRightPos);
             }
+            else if (nPosX == 1 && eSplitMethod == SC_SPLIT_METHOD_COL)
+            {
+                // Freeze first column, but col A is not visible on screen now == special handling
+                aViewData.SetHSplitMode(SC_SPLIT_FIX);
+                aViewData.SetFixPosX(nPosX);
+
+                aViewData.SetPosX(SC_SPLIT_RIGHT, aViewData.GetPosX(SC_SPLIT_LEFT));
+                aViewData.SetPosX(SC_SPLIT_LEFT, 0);
+                bUpdateFix = true;
+            }
             else
                 aViewData.SetHSplitMode( SC_SPLIT_NONE );
         }
@@ -2060,7 +2149,7 @@ void ScTabView::FreezeSplitters( bool bFreeze, SplitMethod eSplitMethod, SCCOLRO
             p->SetMapMode( p->GetDrawMapMode() );
     SetNewVisArea();
 
-    RepeatResize(false);
+    RepeatResize(bUpdateFix);
 
     UpdateShow();
     PaintLeft();
@@ -2076,6 +2165,8 @@ void ScTabView::FreezeSplitters( bool bFreeze, SplitMethod eSplitMethod, SCCOLRO
 
 void ScTabView::RemoveSplit()
 {
+    if (aViewData.GetHSplitMode() == SC_SPLIT_FIX || aViewData.GetVSplitMode() == SC_SPLIT_FIX)
+        aViewData.GetDocShell()->SetDocumentModified();
     DoHSplit( 0 );
     DoVSplit( 0 );
     RepeatResize();
@@ -2231,7 +2322,6 @@ void ScTabView::EnableRefInput(bool bFlag)
     aHScrollRight->EnableInput(bFlag);
     aVScrollBottom->EnableInput(bFlag);
     aVScrollTop->EnableInput(bFlag);
-    aScrollBarBox->EnableInput(bFlag);
 
     // from here on dynamically created ones
 
@@ -2594,7 +2684,7 @@ void lcl_ExtendTiledDimension(bool bColumn, const SCCOLROW nEnd, const SCCOLROW 
         tools::Rectangle(0, aOldSize.getHeight(), aNewSize.getWidth(), aNewSize.getHeight());
 
     // Only invalidate if spreadsheet has extended to the right or bottom
-    if ((bColumn && aNewArea.getWidth()) || (!bColumn && aNewArea.getHeight()))
+    if ((bColumn && aNewArea.getOpenWidth()) || (!bColumn && aNewArea.getOpenHeight()))
     {
         rTabView.UpdateSelectionOverlay();
         SfxLokHelper::notifyInvalidation(rViewData.GetViewShell(), &aNewArea);

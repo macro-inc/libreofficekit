@@ -23,11 +23,15 @@ $(eval $(call gb_CppunitTest_add_exception_objects,xmloff_text, \
 $(eval $(call gb_CppunitTest_use_libraries,xmloff_text, \
     comphelper \
     cppu \
+    cppuhelper \
+    docmodel \
     embobj \
     sal \
+    subsequenttest \
     test \
     unotest \
     utl \
+    tl \
 ))
 
 $(eval $(call gb_CppunitTest_use_sdk_api,xmloff_text))

@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <sal/config.h>
 #include <sal/log.hxx>
 
@@ -60,8 +62,12 @@ XmlFilterBase* PowerPointImport::mpDebugFilterBase = nullptr;
 
 PowerPointImport::PowerPointImport( const Reference< XComponentContext >& rxContext ) :
     XmlFilterBase( rxContext ),
+#if ENABLE_WASM_STRIP_CHART
+    // WASM_CHART change
+    mxChartConv( )
+#else
     mxChartConv( std::make_shared<::oox::drawingml::chart::ChartConverter>() )
-
+#endif
 {
 #if OSL_DEBUG_LEVEL > 0
     mpDebugFilterBase = this;
@@ -176,6 +182,11 @@ const ::oox::drawingml::Theme* PowerPointImport::getCurrentTheme() const
     return mpActualSlidePersist ? mpActualSlidePersist->getTheme().get() : nullptr;
 }
 
+std::shared_ptr<::oox::drawingml::Theme> PowerPointImport::getCurrentThemePtr() const
+{
+    return mpActualSlidePersist ? mpActualSlidePersist->getTheme() : std::shared_ptr<::oox::drawingml::Theme>();
+}
+
 sal_Bool SAL_CALL PowerPointImport::filter( const Sequence< PropertyValue >& rDescriptor )
 {
     if( XmlFilterBase::filter( rDescriptor ) )
@@ -185,8 +196,8 @@ sal_Bool SAL_CALL PowerPointImport::filter( const Sequence< PropertyValue >& rDe
     {
         uno::Sequence<uno::Any> aArguments(comphelper::InitAnyPropertySequence(
         {
-            {"IsPPTM", uno::makeAny(exportVBA())},
-            {"IsTemplate", uno::makeAny(isExportTemplate())},
+            {"IsPPTM", uno::Any(exportVBA())},
+            {"IsTemplate", uno::Any(isExportTemplate())},
         }));
 
         Reference<css::lang::XMultiServiceFactory> aFactory(getComponentContext()->getServiceManager(), UNO_QUERY_THROW);

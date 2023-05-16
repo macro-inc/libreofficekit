@@ -27,9 +27,9 @@
 #include <svtools/ehdl.hxx>
 #include <svtools/inettbc.hxx>
 #include <svtools/sfxecode.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <linkarea.hxx>
-#include <rangeutl.hxx>
 #include <docsh.hxx>
 #include <tablink.hxx>
 #include <scresid.hxx>
@@ -136,8 +136,8 @@ void ScLinkedAreaDlg::LoadDocument( const OUString& rFile, const OUString& rFilt
 }
 
 void ScLinkedAreaDlg::InitFromOldLink( const OUString& rFile, const OUString& rFilter,
-                                        const OUString& rOptions, const OUString& rSource,
-                                        sal_uLong nRefresh )
+                                        const OUString& rOptions, std::u16string_view rSource,
+                                        sal_Int32 nRefreshDelaySeconds )
 {
     LoadDocument( rFile, rFilter, rOptions );
     if (m_pSourceShell)
@@ -150,20 +150,20 @@ void ScLinkedAreaDlg::InitFromOldLink( const OUString& rFile, const OUString& rF
 
     UpdateSourceRanges();
 
-    if (!rSource.isEmpty())
+    if (!rSource.empty())
     {
         sal_Int32 nIdx {0};
         do
         {
-            m_xLbRanges->select_text(rSource.getToken(0, ';', nIdx));
+            m_xLbRanges->select_text(OUString(o3tl::getToken(rSource, 0, ';', nIdx)));
         }
         while (nIdx>0);
     }
 
-    bool bDoRefresh = (nRefresh != 0);
+    bool bDoRefresh = (nRefreshDelaySeconds != 0);
     m_xBtnReload->set_active(bDoRefresh);
     if (bDoRefresh)
-        m_xNfDelay->set_value(nRefresh);
+        m_xNfDelay->set_value(nRefreshDelaySeconds);
 
     UpdateEnable();
 }
@@ -325,10 +325,10 @@ OUString ScLinkedAreaDlg::GetSource() const
     return aBuf.makeStringAndClear();
 }
 
-sal_uLong ScLinkedAreaDlg::GetRefresh() const
+sal_Int32 ScLinkedAreaDlg::GetRefreshDelaySeconds() const
 {
     if (m_xBtnReload->get_active())
-        return sal::static_int_cast<sal_uLong>(m_xNfDelay->get_value());
+        return m_xNfDelay->get_value();
     else
         return 0;   // disabled
 }

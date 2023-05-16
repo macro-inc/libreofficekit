@@ -37,7 +37,7 @@
 
 #include <rtl/ustring.hxx>
 #include <cppuhelper/implbase.hxx>
-#include <comphelper/multicontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 
 #include <tools/link.hxx>
 #include <vcl/weld.hxx>
@@ -45,6 +45,7 @@
 #include <vcl/timer.hxx>
 #include <vcl/toolbox.hxx>
 
+#include <mutex>
 #include <unordered_map>
 
 class PopupMenu;
@@ -54,6 +55,7 @@ class Menu;
 namespace framework
 {
 
+class ImageOrientationController;
 class ToolBarManager;
 
 class ToolBarManagerImpl
@@ -63,12 +65,7 @@ public:
     virtual void Init() = 0;
     virtual void Destroy() = 0;
     virtual css::uno::Reference<css::awt::XWindow> GetInterface() = 0;
-    virtual css::uno::Reference<css::frame::XStatusListener> CreateToolBoxController(
-                            const css::uno::Reference<css::frame::XFrame>& rFrame,
-                            ToolBoxItemId nId,
-                            const OUString& aCommandURL ) = 0;
     virtual void InsertItem(ToolBoxItemId nId,
-                            const OUString& rString,
                             const OUString& rCommandURL,
                             const OUString& rTooltip,
                             const OUString& rLabel,
@@ -93,6 +90,7 @@ public:
     virtual void ConnectCallbacks(ToolBarManager* pManager) = 0;
     virtual void SetMenuType(ToolBoxMenuType eType) = 0;
     virtual void MergeToolbar(ToolBoxItemId & rItemId,
+                              sal_uInt16 nFirstItem,
                               const OUString& rModuleIdentifier,
                               CommandToInfoMap& rCommandMap,
                               MergeToolbarInstruction& rInstruction) = 0;
@@ -114,11 +112,11 @@ class ToolBarManager final : public ToolbarManager_Base
     public:
         ToolBarManager( const css::uno::Reference< css::uno::XComponentContext >& rxContext,
                         const css::uno::Reference< css::frame::XFrame >& rFrame,
-                        const OUString& rResourceName,
+                        OUString aResourceName,
                         ToolBox* pToolBar );
         ToolBarManager( const css::uno::Reference< css::uno::XComponentContext >& rxContext,
                         const css::uno::Reference< css::frame::XFrame >& rFrame,
-                        const OUString& rResourceName,
+                        OUString aResourceName,
                         weld::Toolbar* pToolBar,
                         weld::Builder* pBuilder );
         virtual ~ToolBarManager() override;
@@ -143,7 +141,9 @@ class ToolBarManager final : public ToolbarManager_Base
 
         void CheckAndUpdateImages();
         void RequestImages();
-        void FillToolbar( const css::uno::Reference< css::container::XIndexAccess >& rToolBarData );
+        void FillToolbar( const css::uno::Reference< css::container::XIndexAccess >& rToolBarData,
+                          const css::uno::Reference< css::container::XIndexAccess >& rContextData,
+                          const OUString& rContextToolbarName );
         void FillAddonToolbar( const css::uno::Sequence< css::uno::Sequence< css::beans::PropertyValue > >& rAddonToolbar );
         void FillOverflowToolbar( ToolBox const * pParent );
         void notifyRegisteredControllers( const OUString& aUIElementName, const OUString& aCommand );
@@ -192,6 +192,9 @@ class ToolBarManager final : public ToolbarManager_Base
 
     private:
         void Init();
+        void FillToolbarFromContainer(const css::uno::Reference< css::container::XIndexAccess >& rItemContainer,
+                                      const OUString& rResourceName, ToolBoxItemId& nId, ToolBoxItemId& nAddonId);
+        void ToggleButton(const OUString& rResourceName, std::u16string_view rCommand);
         void AddCustomizeMenuItems(ToolBox const * pToolBar);
         void InitImageManager();
         void RemoveControllers();
@@ -218,18 +221,21 @@ class ToolBarManager final : public ToolbarManager_Base
              m_bUpdateControllers : 1;
 
         sal_Int16 m_eSymbolSize;
+        sal_uInt16 m_nContextMinPos;
 
         std::unique_ptr<ToolBarManagerImpl>                          m_pImpl;
         VclPtr<ToolBox>                                              m_pToolBar;
+        weld::Toolbar*                                               m_pWeldedToolBar;
 
         OUString                                                     m_aModuleIdentifier;
         OUString                                                     m_aResourceName;
+        OUString                                                     m_aContextResourceName;
 
         css::uno::Reference< css::util::XURLTransformer >            m_xURLTransformer;
         css::uno::Reference< css::frame::XFrame >                    m_xFrame;
         ToolBarControllerMap                                         m_aControllerMap;
-        osl::Mutex                                                   m_mutex;
-        comphelper::OMultiTypeInterfaceContainerHelper2              m_aListenerContainer;   /// container for ALL Listener
+        std::mutex                                                   m_mutex;
+        comphelper::OInterfaceContainerHelper4<XEventListener>       m_aListenerContainer;
         css::uno::Reference< css::uno::XComponentContext >           m_xContext;
         css::uno::Reference< css::frame::XUIControllerFactory >      m_xToolbarControllerFactory;
         css::uno::Reference< css::ui::XImageManager >                m_xModuleImageManager;
@@ -241,6 +247,7 @@ class ToolBarManager final : public ToolbarManager_Base
         OUString                                                     m_sIconTheme;
 
         rtl::Reference< ToolBarManager >                             m_aOverflowManager;
+        rtl::Reference< ImageOrientationController >                 m_aImageController;
 };
 
 }

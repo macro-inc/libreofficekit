@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/sheet/xsheetconditionalentry.hxx>
 #include <test/sheet/xsheetcondition.hxx>
 
@@ -36,7 +36,7 @@ using namespace com::sun::star;
 
 namespace sc_apitest
 {
-class ScTableConditionalEntryObj : public CalcUnoApiTest,
+class ScTableConditionalEntryObj : public UnoApiTest,
                                    public apitest::XSheetConditionalEntry,
                                    public apitest::XSheetCondition
 {
@@ -45,7 +45,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScTableConditionalEntryObj);
 
@@ -59,13 +58,10 @@ public:
     CPPUNIT_TEST(testGetSetSourcePosition);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScTableConditionalEntryObj::ScTableConditionalEntryObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
 {
 }
 
@@ -101,15 +97,9 @@ uno::Reference<uno::XInterface> ScTableConditionalEntryObj::init()
 
 void ScTableConditionalEntryObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
     mxComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScTableConditionalEntryObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScTableConditionalEntryObj);

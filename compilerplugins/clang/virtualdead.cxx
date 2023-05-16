@@ -68,6 +68,8 @@ public:
 
     virtual void run() override
     {
+        handler.enableTreeWideAnalysisMode();
+
         TraverseDecl(compiler.getASTContext().getTranslationUnitDecl());
 
         // dump all our output in one write call - this is to try and limit IO "crosstalk" between multiple processes
@@ -117,8 +119,6 @@ std::string niceName(const CXXMethodDecl* cxxMethodDecl)
 
 bool VirtualDead::VisitCXXMethodDecl(const CXXMethodDecl* methodDecl)
 {
-    if (ignoreLocation(methodDecl))
-        return true;
     if (!methodDecl->isVirtual() || methodDecl->isDeleted())
         return true;
     if (isa<CXXDestructorDecl>(methodDecl))
@@ -242,8 +242,8 @@ std::string VirtualDead::getCallValue(const Expr* arg)
     // Get the expression contents.
     // This helps us find params which are always initialised with something like "OUString()".
     SourceManager& SM = compiler.getSourceManager();
-    SourceLocation startLoc = compat::getBeginLoc(arg);
-    SourceLocation endLoc = compat::getEndLoc(arg);
+    SourceLocation startLoc = arg->getBeginLoc();
+    SourceLocation endLoc = arg->getEndLoc();
     const char* p1 = SM.getCharacterData(startLoc);
     const char* p2 = SM.getCharacterData(endLoc);
     if (!p1 || !p2 || (p2 - p1) < 0 || (p2 - p1) > 40)

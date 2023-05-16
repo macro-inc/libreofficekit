@@ -32,6 +32,7 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <comphelper/propertysethelper.hxx>
 #include <comphelper/propertysetinfo.hxx>
+#include <o3tl/string_view.hxx>
 #include <tools/debug.hxx>
 #include <tools/urlobj.hxx>
 #include <svx/xtable.hxx>
@@ -165,7 +166,6 @@ enum SdDocumentSettingsPropertyHandles
             { OUString("IsPrintOutline"),        HANDLE_PRINTOUTLINE,        cppu::UnoType<bool>::get(),                0,  MID_PRINTER },
             { OUString("SlidesPerHandout"),      HANDLE_SLIDESPERHANDOUT,    ::cppu::UnoType<sal_Int16>::get(),    0,  MID_PRINTER },
             { OUString("HandoutsHorizontal"),    HANDLE_HANDOUTHORIZONTAL,   cppu::UnoType<bool>::get(),                0,  MID_PRINTER },
-            { OUString(), 0, css::uno::Type(), 0, 0 }
         };
 
         static PropertyMapEntry const aDrawSettingsInfoMap[] =
@@ -173,7 +173,6 @@ enum SdDocumentSettingsPropertyHandles
             { OUString("MeasureUnit"),           HANDLE_MEASUREUNIT,         ::cppu::UnoType<sal_Int16>::get(),    0,  0 },
             { OUString("ScaleNumerator"),        HANDLE_SCALE_NUM,           ::cppu::UnoType<sal_Int32>::get(),    0,  0 },
             { OUString("ScaleDenominator"),      HANDLE_SCALE_DOM,           ::cppu::UnoType<sal_Int32>::get(),    0,  0 },
-            { OUString(), 0, css::uno::Type(), 0, 0 }
         };
 
         static PropertyMapEntry const aCommonSettingsInfoMap[] =
@@ -220,11 +219,13 @@ enum SdDocumentSettingsPropertyHandles
             { OUString("EmbedAsianScriptFonts"),   HANDLE_EMBED_ASIAN_SCRIPT_FONTS,   cppu::UnoType<bool>::get(), 0,  0 },
             { OUString("EmbedComplexScriptFonts"), HANDLE_EMBED_COMPLEX_SCRIPT_FONTS, cppu::UnoType<bool>::get(), 0,  0 },
             { OUString("ImagePreferredDPI"), HANDLE_IMAGE_PREFERRED_DPI, cppu::UnoType<sal_Int32>::get(), 0,  0 },
-            { OUString(), 0, css::uno::Type(), 0, 0 }
         };
 
         rtl::Reference<PropertySetInfo> xInfo = new PropertySetInfo( aCommonSettingsInfoMap );
-        xInfo->add( bIsDraw ? aDrawSettingsInfoMap : aImpressSettingsInfoMap );
+        if (bIsDraw)
+            xInfo->add( aDrawSettingsInfoMap );
+        else
+            xInfo->add( aImpressSettingsInfoMap );
 
         return xInfo;
     }
@@ -289,10 +290,10 @@ struct {
     { "BitmapTableURL", XPropertyListType::Bitmap }
 };
 
-static XPropertyListType getTypeOfName( const OUString &aName )
+static XPropertyListType getTypeOfName( std::u16string_view aName )
 {
     for(const auto & rURLPropertyName : aURLPropertyNames) {
-        if( aName.equalsAscii( rURLPropertyName.pName ) )
+        if( o3tl::equalsAscii( aName, rURLPropertyName.pName ) )
             return rURLPropertyName.t;
     }
     return XPropertyListType::Unknown;
@@ -425,8 +426,8 @@ DocumentSettings::_setPropertyValues(const PropertyMapEntry** ppEntries,
     VclPtr<SfxPrinter> pPrinter = pDocSh->GetPrinter( false );
     if( pPrinter )
     {
-        SdOptionsPrintItem const * pPrinterOptions = nullptr;
-        if(pPrinter->GetOptions().GetItemState( ATTR_OPTIONS_PRINT, false, reinterpret_cast<const SfxPoolItem**>(&pPrinterOptions)) == SfxItemState::SET)
+        SdOptionsPrintItem const * pPrinterOptions = pPrinter->GetOptions().GetItemIfSet( ATTR_OPTIONS_PRINT, false );
+        if(pPrinterOptions)
             aOptionsPrintItem.GetOptionsPrint() = pPrinterOptions->GetOptionsPrint();
     }
     else
@@ -1099,8 +1100,8 @@ DocumentSettings::_getPropertyValues(
     SfxPrinter* pPrinter = pDocSh->GetPrinter( false );
     if( pPrinter )
     {
-        SdOptionsPrintItem const * pPrinterOptions = nullptr;
-        if(pPrinter->GetOptions().GetItemState( ATTR_OPTIONS_PRINT, false, reinterpret_cast<const SfxPoolItem**>(&pPrinterOptions)) == SfxItemState::SET)
+        SdOptionsPrintItem const * pPrinterOptions = pPrinter->GetOptions().GetItemIfSet( ATTR_OPTIONS_PRINT, false );
+        if (pPrinterOptions)
             aOptionsPrintItem.GetOptionsPrint() = pPrinterOptions->GetOptionsPrint();
     }
     else

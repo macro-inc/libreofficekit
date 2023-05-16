@@ -34,9 +34,12 @@ namespace oox::drawingml {
 struct TextBodyProperties
 {
     PropertyMap                                     maPropertyMap;
-    OptValue< sal_Int32 >                           moRotation;
+    // TextPreRotateAngle. Used in diagram (SmartArt) import.
+    std::optional< sal_Int32 >                      moTextPreRotation;
+    // TextRotateAngle. ODF draw:text-rotate-angle, OOXML 'rot' attribute in <bodyPr> element
+    std::optional< sal_Int32 >                      moTextAreaRotation;
     bool                                            mbAnchorCtr;
-    OptValue< sal_Int32 >                           moVert;
+    std::optional< sal_Int32 >                      moVert;
     bool                                            moUpright = false;
     std::array<std::optional<sal_Int32>, 4> moInsets;
     std::optional< sal_Int32 >                    moTextOffUpper;
@@ -48,7 +51,7 @@ struct TextBodyProperties
     /// Normal autofit: font scale (default: 100%).
     sal_Int32 mnFontScale = 100000;
     OUString msHorzOverflow;
-    OUString msVertOverflow;
+    std::optional< sal_Int32 > moVertOverflow{};
 
     std::array<std::optional<sal_Int32>, 4> maTextDistanceValues;
 

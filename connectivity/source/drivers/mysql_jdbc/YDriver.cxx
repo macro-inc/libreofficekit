@@ -49,8 +49,8 @@ namespace
 {
 OUString getJavaDriverClass(css::uno::Sequence<css::beans::PropertyValue> const& info)
 {
-    return comphelper::NamedValueCollection(info).getOrDefault("JavaDriverClass",
-                                                               OUString("com.mysql.jdbc.Driver"));
+    return comphelper::NamedValueCollection::getOrDefault(info, u"JavaDriverClass",
+                                                          OUString("com.mysql.jdbc.Driver"));
 }
 }
 
@@ -115,9 +115,9 @@ T_DRIVERTYPE lcl_getDriverType(std::u16string_view _sUrl)
     return eRet;
 }
 
-OUString transformUrl(const OUString& _sUrl)
+OUString transformUrl(std::u16string_view _sUrl)
 {
-    OUString sNewUrl = _sUrl.copy(11);
+    OUString sNewUrl(_sUrl.substr(11));
     if (isOdbcUrl(_sUrl))
         sNewUrl = "sdbc:" + sNewUrl;
     else if (isNativeUrl(_sUrl))
@@ -158,36 +158,36 @@ Sequence<PropertyValue> lcl_convertProperties(T_DRIVERTYPE _eType,
 
     if (_eType == T_DRIVERTYPE::Odbc)
     {
-        aProps.push_back(PropertyValue("Silent", 0, makeAny(true), PropertyState_DIRECT_VALUE));
-        aProps.push_back(PropertyValue("PreventGetVersionColumns", 0, makeAny(true),
-                                       PropertyState_DIRECT_VALUE));
+        aProps.push_back(PropertyValue("Silent", 0, Any(true), PropertyState_DIRECT_VALUE));
+        aProps.push_back(
+            PropertyValue("PreventGetVersionColumns", 0, Any(true), PropertyState_DIRECT_VALUE));
     }
     else if (_eType == T_DRIVERTYPE::Jdbc)
     {
         if (!jdc)
         {
             aProps.push_back(PropertyValue("JavaDriverClass", 0,
-                                           makeAny(OUString("com.mysql.jdbc.Driver")),
+                                           Any(OUString("com.mysql.jdbc.Driver")),
                                            PropertyState_DIRECT_VALUE));
         }
     }
     else
     {
         aProps.push_back(
-            PropertyValue("PublicConnectionURL", 0, makeAny(_sUrl), PropertyState_DIRECT_VALUE));
+            PropertyValue("PublicConnectionURL", 0, Any(_sUrl), PropertyState_DIRECT_VALUE));
     }
     aProps.push_back(
-        PropertyValue("IsAutoRetrievingEnabled", 0, makeAny(true), PropertyState_DIRECT_VALUE));
+        PropertyValue("IsAutoRetrievingEnabled", 0, Any(true), PropertyState_DIRECT_VALUE));
     aProps.push_back(PropertyValue("AutoRetrievingStatement", 0,
-                                   makeAny(OUString("SELECT LAST_INSERT_ID()")),
+                                   Any(OUString("SELECT LAST_INSERT_ID()")),
                                    PropertyState_DIRECT_VALUE));
     aProps.push_back(
-        PropertyValue("ParameterNameSubstitution", 0, makeAny(true), PropertyState_DIRECT_VALUE));
+        PropertyValue("ParameterNameSubstitution", 0, Any(true), PropertyState_DIRECT_VALUE));
     return Sequence<PropertyValue>(aProps.data(), aProps.size());
 }
 }
 
-Reference<XDriver> ODriverDelegator::loadDriver(const OUString& url,
+Reference<XDriver> ODriverDelegator::loadDriver(std::u16string_view url,
                                                 const Sequence<PropertyValue>& info)
 {
     Reference<XDriver> xDriver;
@@ -232,8 +232,8 @@ Reference<XConnection> SAL_CALL ODriverDelegator::connect(const OUString& url,
             Sequence<PropertyValue> aConvertedProperties = lcl_convertProperties(eType, info, url);
             if (eType == T_DRIVERTYPE::Jdbc)
             {
-                ::comphelper::NamedValueCollection aSettings(info);
-                OUString sIanaName = aSettings.getOrDefault("CharSet", OUString());
+                OUString sIanaName = ::comphelper::NamedValueCollection::getOrDefault(
+                    info, u"CharSet", OUString());
                 if (!sIanaName.isEmpty())
                 {
                     ::dbtools::OCharsetMap aLookupIanaName;

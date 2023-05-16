@@ -9,11 +9,10 @@
  */
 #pragma once
 
+#include <utility>
 #include <vcl/bitmap.hxx>
 #include <vcl/dllapi.h>
-#include <vcl/graphicfilter.hxx>
 #include <vcl/test/TestResult.hxx>
-#include <basegfx/matrix/b2dhommatrix.hxx>
 
 #include <vector>
 
@@ -27,13 +26,13 @@ class VCL_PLUGIN_PUBLIC VclTestResult
 
 public:
     VclTestResult(OUString atestName, OUString atestStatus, Bitmap atestBitmap)
-        : m_aTestName(atestName)
-        , m_aTestStatus(atestStatus)
+        : m_aTestName(std::move(atestName))
+        , m_aTestStatus(std::move(atestStatus))
         , m_aResultantBitmap(atestBitmap)
     {
     }
     const OUString& getTestName() const { return m_aTestName; }
-    const OUString& getStatus() const { return m_aTestStatus; }
+    OUString getStatus(bool bLocalize = false);
     const Bitmap& getBitmap() const { return m_aResultantBitmap; }
 };
 
@@ -159,7 +158,7 @@ class VCL_PLUGIN_PUBLIC GraphicsRenderTests
 
 public:
     std::vector<VclTestResult>& getTestResults();
-    OUString getResultString();
+    OUString getResultString(bool bLocalize = false);
     void run(bool storeResultBitmap = false);
 
     GraphicsRenderTests()

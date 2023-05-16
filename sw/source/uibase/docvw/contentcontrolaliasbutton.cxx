@@ -15,7 +15,7 @@
 #include <drawinglayer/primitive2d/textlayoutdevice.hxx>
 #include <drawinglayer/primitive2d/textprimitive2d.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
-#include <drawinglayer/processor2d/processorfromoutputdevice.hxx>
+#include <drawinglayer/processor2d/processor2dtools.hxx>
 #include <vcl/metric.hxx>
 
 #include <HeaderFooterWin.hxx>
@@ -102,7 +102,8 @@ void SwContentControlAliasButton::PaintButton()
     SwFrameButtonPainter::PaintButton(aSeq, aRect, /*bOnTop=*/false);
 
     // Create the text primitive
-    basegfx::BColor aLineColor = SwViewOption::GetHeaderFooterMarkColor().getBColor();
+    const SwViewOption* pVOpt = GetEditWin()->GetView().GetWrtShell().GetViewOptions();
+    basegfx::BColor aLineColor = pVOpt->GetHeaderFooterMarkColor().getBColor();
     basegfx::B2DVector aFontSize;
     drawinglayer::attribute::FontAttribute aFontAttr
         = drawinglayer::primitive2d::getFontAttributeFromVclFont(aFontSize, m_xVirDev->GetFont(),
@@ -119,13 +120,13 @@ void SwContentControlAliasButton::PaintButton()
 
     aSeq.push_back(drawinglayer::primitive2d::Primitive2DReference(
         new drawinglayer::primitive2d::TextSimplePortionPrimitive2D(
-            aTextMatrix, m_sLabel, 0, m_sLabel.getLength(), std::vector<double>(), aFontAttr,
-            css::lang::Locale(), aLineColor)));
+            aTextMatrix, m_sLabel, 0, m_sLabel.getLength(), std::vector<double>(), {},
+            std::move(aFontAttr), css::lang::Locale(), aLineColor)));
 
     // Create the processor and process the primitives
     drawinglayer::geometry::ViewInformation2D aViewInfo;
     std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> pProcessor
-        = drawinglayer::processor2d::createBaseProcessor2DFromOutputDevice(*m_xVirDev, aViewInfo);
+        = drawinglayer::processor2d::createProcessor2DFromOutputDevice(*m_xVirDev, aViewInfo);
 
     pProcessor->process(aSeq);
 

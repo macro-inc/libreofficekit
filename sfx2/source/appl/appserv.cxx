@@ -18,6 +18,8 @@
  */
 
 #include <config_features.h>
+#include <config_wasm_strip.h>
+
 #include <com/sun/star/drawing/ModuleDispatcher.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/frame/DispatchResultEvent.hpp>
@@ -47,12 +49,12 @@
 #include <comphelper/sequence.hxx>
 
 #include <svtools/addresstemplate.hxx>
-#include <svtools/miscopt.hxx>
 #include <svtools/restartdialog.hxx>
+#include <svtools/colorcfg.hxx>
 #include <svl/visitem.hxx>
 
 #include <unotools/configmgr.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/weld.hxx>
 #include <svl/intitem.hxx>
 #include <svl/eitem.hxx>
@@ -61,7 +63,6 @@
 #include <basic/basrdll.hxx>
 #include <basic/sberrors.hxx>
 #include <vcl/help.hxx>
-#include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
 #include <osl/file.hxx>
 #include <vcl/EnumContext.hxx>
@@ -77,6 +78,7 @@
 #include <sfx2/request.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/bindings.hxx>
+#include <sfx2/minfitem.hxx>
 #include <sfx2/msg.hxx>
 #include <sfx2/objface.hxx>
 #include <sfx2/objsh.hxx>
@@ -225,8 +227,8 @@ static void showDocument( const char* pBaseName )
     try {
         Reference < XDesktop2 > xDesktop = Desktop::create( ::comphelper::getProcessComponentContext() );
         auto args(::comphelper::InitPropertySequence({
-            {"ViewOnly",    makeAny(true)},
-            {"ReadOnly",    makeAny(true)}
+            {"ViewOnly",    Any(true)},
+            {"ReadOnly",    Any(true)}
         }));
 
         OUString aURL;
@@ -244,12 +246,11 @@ namespace
     Reference<XFrame> GetRequestFrame(const SfxRequest& rReq)
     {
         const SfxItemSet* pArgs = rReq.GetInternalArgs_Impl();
-        const SfxPoolItem* pItem = nullptr;
+        const SfxUnoFrameItem* pItem = nullptr;
         Reference <XFrame> xFrame;
-        if (pArgs && pArgs->GetItemState(SID_FILLFRAME, false, &pItem) == SfxItemState::SET)
+        if (pArgs && (pItem = pArgs->GetItemIfSet(SID_FILLFRAME, false)))
         {
-            assert( dynamic_cast< const SfxUnoFrameItem *>( pItem ) && "SfxApplication::OfaExec_Impl: XFrames are to be transported via SfxUnoFrameItem by now!" );
-            xFrame = static_cast< const SfxUnoFrameItem*>( pItem )->GetFrame();
+            xFrame = pItem->GetFrame();
         }
         return xFrame;
     }
@@ -319,11 +320,10 @@ namespace
 weld::Window* SfxRequest::GetFrameWeld() const
 {
     const SfxItemSet* pIntArgs = GetInternalArgs_Impl();
-    const SfxPoolItem* pItem = nullptr;
-    if (pIntArgs && pIntArgs->GetItemState(SID_DIALOG_PARENT, false, &pItem) == SfxItemState::SET)
+    const SfxUnoAnyItem* pItem = nullptr;
+    if (pIntArgs && (pItem = pIntArgs->GetItemIfSet(SID_DIALOG_PARENT, false)))
     {
-        assert(dynamic_cast<const SfxUnoAnyItem*>(pItem));
-        auto aAny = static_cast<const SfxUnoAnyItem*>(pItem)->GetValue();
+        auto aAny = pItem->GetValue();
         Reference<awt::XWindow> xWindow;
         aAny >>= xWindow;
         return Application::GetFrameWeld(xWindow);
@@ -424,13 +424,31 @@ void SfxApplication::MiscExec_Impl( SfxRequest& rReq )
 
             const SfxStringItem* pStringItem = rReq.GetArg<SfxStringItem>(SID_CONFIG);
 
-            SfxItemSetFixed<SID_CONFIG, SID_CONFIG> aSet( GetPool() );
+            SfxItemSetFixed<SID_CONFIG, SID_CONFIG, SID_MACROINFO, SID_MACROINFO> aSet( GetPool() );
 
+            // SID_CONFIG property will determine the default page shown
             if ( pStringItem )
             {
                 aSet.Put( SfxStringItem(
                     SID_CONFIG, pStringItem->GetValue() ) );
             }
+            else if (rReq.GetSlot() == SID_CONFIGEVENT)
+            {
+                aSet.Put( SfxStringItem(
+                    SID_CONFIG, "private:resource/event/" ) );
+            }
+            else if (rReq.GetSlot() == SID_TOOLBOXOPTIONS)
+            {
+                aSet.Put( SfxStringItem(
+                    SID_CONFIG, "private:resource/toolbar/" ) );
+            }
+
+#if HAVE_FEATURE_SCRIPTING
+            // Preselect a macro in the 'keyboard' page
+            if (auto const item = rReq.GetArg<SfxMacroInfoItem>(SID_MACROINFO)) {
+                aSet.Put(*item);
+            }
+#endif
 
             Reference <XFrame> xFrame(GetRequestFrame(rReq));
             ScopedVclPtr<SfxAbstractTabDialog> pDlg(pFact->CreateCustomizeTabDialog(rReq.GetFrameWeld(),
@@ -526,6 +544,7 @@ void SfxApplication::MiscExec_Impl( SfxRequest& rReq )
             sfx2::openUriExternally(sURL, false, rReq.GetFrameWeld());
             break;
         }
+#if !ENABLE_WASM_STRIP_PINGUSER
         case SID_GETINVOLVED:
         {
             // Open get involved/join us page based on locales
@@ -561,6 +580,7 @@ void SfxApplication::MiscExec_Impl( SfxRequest& rReq )
             sfx2::openUriExternally(sURL, false, rReq.GetFrameWeld());
             break;
         }
+#endif
         case SID_SHOW_LICENSE:
         {
             LicenseDialog aDialog(rReq.GetFrameWeld());
@@ -571,6 +591,19 @@ void SfxApplication::MiscExec_Impl( SfxRequest& rReq )
         case SID_SHOW_CREDITS:
         {
             showDocument( "CREDITS" );
+            break;
+        }
+
+        case FN_CHANGE_THEME:
+        {
+            const SfxStringItem* pNewThemeArg = rReq.GetArg<SfxStringItem>(FN_PARAM_NEW_THEME);
+            if (!pNewThemeArg)
+            {
+                SAL_WARN("sfx.appl", "FN_CHANGE_THEME: no theme name");
+                break;
+            }
+            svtools::EditableColorConfig aEditableConfig;
+            aEditableConfig.LoadScheme(pNewThemeArg->GetValue());
             break;
         }
 
@@ -640,6 +673,7 @@ void SfxApplication::MiscExec_Impl( SfxRequest& rReq )
             break;
         }
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#if !ENABLE_WASM_STRIP_PINGUSER
         case SID_TIPOFTHEDAY:
         {
             SfxAbstractDialogFactory* pFact = SfxAbstractDialogFactory::Create();
@@ -648,6 +682,7 @@ void SfxApplication::MiscExec_Impl( SfxRequest& rReq )
             bDone = true;
             break;
         }
+#endif
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         case SID_WIDGET_TEST_DIALOG:
         {
@@ -794,7 +829,7 @@ void SfxApplication::MiscExec_Impl( SfxRequest& rReq )
                 }
 
                 // Save new toolbar mode for a current module
-                aAppNode.setNodeValue( "Active", makeAny( aNewName ) );
+                aAppNode.setNodeValue( "Active", Any( aNewName ) );
                 aAppNode.commit();
             }
 
@@ -969,7 +1004,7 @@ void SfxApplication::MiscExec_Impl( SfxRequest& rReq )
 
                             if ( aCommandArg == aCurrentMode )
                             {
-                                aModeNode.setNodeValue( "UserToolbars", makeAny( aBackup ) );
+                                aModeNode.setNodeValue( "UserToolbars", Any( aBackup ) );
                                 break;
                             }
                         }
@@ -1098,7 +1133,7 @@ void SfxApplication::MiscExec_Impl( SfxRequest& rReq )
                 if (aAppNode.isValid())
                 {
                     bool isLocked = comphelper::getBOOL(aAppNode.getNodeValue("Locked"));
-                    aAppNode.setNodeValue("Locked", makeAny(!isLocked));
+                    aAppNode.setNodeValue("Locked", Any(!isLocked));
                     aAppNode.commit();
                     //TODO: apply immediately w/o restart needed
                     SolarMutexGuard aGuard;
@@ -1516,12 +1551,12 @@ void SfxApplication::OfaExec_Impl( SfxRequest& rReq )
         case SID_BASICCHOOSER:
         {
             const SfxItemSet* pArgs = rReq.GetArgs();
-            const SfxPoolItem* pItem;
+            const SfxBoolItem* pItem;
             bool bChooseOnly = false;
             Reference< XModel > xLimitToModel;
-            if(pArgs && SfxItemState::SET == pArgs->GetItemState(SID_RECORDMACRO, false, &pItem) )
+            if(pArgs && (pItem = pArgs->GetItemIfSet(SID_RECORDMACRO, false)) )
             {
-                bool bRecord = static_cast<const SfxBoolItem*>(pItem)->GetValue();
+                bool bRecord = pItem->GetValue();
                 if ( bRecord )
                 {
                     // !Hack
@@ -1543,14 +1578,21 @@ void SfxApplication::OfaExec_Impl( SfxRequest& rReq )
         {
             SAL_INFO("sfx.appl", "handling SID_MACROORGANIZER");
             const SfxItemSet* pArgs = rReq.GetArgs();
-            const SfxPoolItem* pItem;
             sal_Int16 nTabId = 0;
-            if(pArgs && SfxItemState::SET == pArgs->GetItemState(SID_MACROORGANIZER, false, &pItem) )
+            Reference <XFrame> xFrame;
+            if (pArgs)
             {
-                nTabId = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+                if (const SfxUInt16Item* pItem = pArgs->GetItemIfSet(SID_MACROORGANIZER, false))
+                    nTabId = pItem->GetValue();
+                if (const SfxBoolItem* pItem = rReq.GetArg<SfxBoolItem>(FN_PARAM_2))
+                {
+                    // if set then default to showing the macros of the document associated
+                    // with this frame
+                    if (pItem->GetValue())
+                        xFrame = GetRequestFrame(rReq);
+                }
             }
-
-            SfxApplication::MacroOrganizer(rReq.GetFrameWeld(), nTabId);
+            SfxApplication::MacroOrganizer(rReq.GetFrameWeld(), xFrame, nTabId);
             rReq.Done();
         }
         break;
@@ -1612,11 +1654,11 @@ void SfxApplication::OfaExec_Impl( SfxRequest& rReq )
             SfxAbstractDialogFactory* pFact = SfxAbstractDialogFactory::Create();
             SAL_INFO("sfx.appl", "SfxApplication::OfaExec_Impl: case ScriptOrg");
             const SfxItemSet* pArgs = rReq.GetArgs();
-            const SfxPoolItem* pItem;
+            const SfxScriptOrganizerItem* pItem;
             OUString aLanguage;
-            if(pArgs && SfxItemState::SET == pArgs->GetItemState(SID_SCRIPTORGANIZER, false, &pItem) )
+            if(pArgs && (pItem = pArgs->GetItemIfSet(SID_SCRIPTORGANIZER, false) ))
             {
-                aLanguage = static_cast<const SfxScriptOrganizerItem*>(pItem)->getLanguage();
+                aLanguage = pItem->getLanguage();
             }
 
             OUString aLang( aLanguage );
@@ -1658,8 +1700,7 @@ void SfxApplication::OfaExec_Impl( SfxRequest& rReq )
             SfxItemSetFixed<SID_AUTO_CORRECT_DLG, SID_AUTO_CORRECT_DLG> aSet(GetPool());
             const SfxPoolItem* pItem=nullptr;
             const SfxItemSet* pSet = rReq.GetArgs();
-            SfxItemPool* pSetPool = pSet ? pSet->GetPool() : nullptr;
-            if ( pSet && pSet->GetItemState( pSetPool->GetWhich( SID_AUTO_CORRECT_DLG ), false, &pItem ) == SfxItemState::SET )
+            if ( pSet && pSet->GetItemState( SID_AUTO_CORRECT_DLG, false, &pItem ) == SfxItemState::SET )
                 aSet.Put( *pItem );
 
             ScopedVclPtr<SfxAbstractTabDialog> pDlg(pFact->CreateAutoCorrTabDialog(rReq.GetFrameWeld(), &aSet));

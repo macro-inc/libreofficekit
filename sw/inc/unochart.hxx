@@ -39,7 +39,7 @@
 #include <com/sun/star/util/XModifiable.hpp>
 #include <com/sun/star/util/XModifyListener.hpp>
 
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/weakref.hxx>
 
@@ -59,7 +59,7 @@ struct SwRangeDescriptor;
 class SwSelBoxes;
 namespace com::sun::star::table { class XCell; }
 
-bool FillRangeDescriptor( SwRangeDescriptor &rDesc, const OUString &rCellRangeName );
+bool FillRangeDescriptor( SwRangeDescriptor &rDesc, std::u16string_view rCellRangeName );
 
 class SwChartHelper
 {
@@ -125,7 +125,7 @@ class SwChartDataProvider final :
     // all tables of the document.
     mutable Map_Set_DataSequenceRef_t       m_aDataSequences;
 
-    ::comphelper::OInterfaceContainerHelper2      m_aEventListeners;
+    ::comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_aEventListeners;
     const SwDoc *                           m_pDoc;
     bool                                    m_bDisposed;
 
@@ -137,9 +137,9 @@ class SwChartDataProvider final :
     css::uno::Reference< css::chart2::data::XDataSource > Impl_createDataSource( const css::uno::Sequence< css::beans::PropertyValue >& aArguments, bool bTestOnly = false );
     /// @throws css::lang::IllegalArgumentException
     /// @throws css::uno::RuntimeException
-    css::uno::Reference< css::chart2::data::XDataSequence > Impl_createDataSequenceByRangeRepresentation( const OUString& aRangeRepresentation, bool bTestOnly = false );
+    css::uno::Reference< css::chart2::data::XDataSequence > Impl_createDataSequenceByRangeRepresentation( std::u16string_view aRangeRepresentation, bool bTestOnly = false );
 
-    static OUString GetBrokenCellRangeForExport( const OUString &rCellRangeRepresentation );
+    static OUString GetBrokenCellRangeForExport( std::u16string_view rCellRangeRepresentation );
 
 public:
     SwChartDataProvider( const SwDoc& rDoc );
@@ -233,8 +233,8 @@ class SwChartDataSequence final :
     public SvtListener
 {
     SwFrameFormat* m_pFormat;
-    ::comphelper::OInterfaceContainerHelper2          m_aEvtListeners;
-    ::comphelper::OInterfaceContainerHelper2          m_aModifyListeners;
+    ::comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_aEvtListeners;
+    ::comphelper::OInterfaceContainerHelper4<css::util::XModifyListener> m_aModifyListeners;
     css::chart2::data::DataSequenceRole               m_aRole;
 
     OUString  m_aRowLabelText;
@@ -329,8 +329,8 @@ SwChartLabeledDataSequenceBaseClass;
 class SwChartLabeledDataSequence final :
     public SwChartLabeledDataSequenceBaseClass
 {
-    ::comphelper::OInterfaceContainerHelper2                           m_aEventListeners;
-    ::comphelper::OInterfaceContainerHelper2                           m_aModifyListeners;
+    ::comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_aEventListeners;
+    ::comphelper::OInterfaceContainerHelper4<css::util::XModifyListener> m_aModifyListeners;
 
     css::uno::Reference< css::chart2::data::XDataSequence >     m_xData;
     css::uno::Reference< css::chart2::data::XDataSequence >     m_xLabels;

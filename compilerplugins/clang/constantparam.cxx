@@ -61,6 +61,8 @@ public:
 
     virtual void run() override
     {
+        handler.enableTreeWideAnalysisMode();
+
         // ignore some files that make clang crash inside EvaluateAsInt
         std::string fn(handler.getMainFileName());
         loplugin::normalizeDotDotInFilePath(fn);
@@ -104,18 +106,12 @@ void ConstantParam::addToCallSet(const FunctionDecl* functionDecl, int paramInde
 {
     if (functionDecl->getInstantiatedFromMemberFunction())
         functionDecl = functionDecl->getInstantiatedFromMemberFunction();
-#if CLANG_VERSION < 90000
-    else if (functionDecl->getClassScopeSpecializationPattern())
-        functionDecl = functionDecl->getClassScopeSpecializationPattern();
-#endif
     else if (functionDecl->getTemplateInstantiationPattern())
         functionDecl = functionDecl->getTemplateInstantiationPattern();
 
     if (!functionDecl->getNameInfo().getLoc().isValid())
         return;
     if (functionDecl->isVariadic())
-        return;
-    if (ignoreLocation(functionDecl))
         return;
     // ignore stuff that forms part of the stable URE interface
     if (isInUnoIncludeFile(functionDecl))
@@ -125,7 +121,6 @@ void ConstantParam::addToCallSet(const FunctionDecl* functionDecl, int paramInde
     if (!loplugin::hasPathnamePrefix(filename, SRCDIR "/"))
         return;
     filename = filename.substr(strlen(SRCDIR)+1);
-
 
     MyCallSiteInfo aInfo;
     aInfo.returnType = functionDecl->getReturnType().getCanonicalType().getAsString();
@@ -152,8 +147,8 @@ void ConstantParam::addToCallSet(const FunctionDecl* functionDecl, int paramInde
     aInfo.paramIndex = paramIndex;
     if (paramIndex < (int)functionDecl->getNumParams())
         aInfo.paramType = functionDecl->getParamDecl(paramIndex)->getType().getCanonicalType().getAsString();
-    aInfo.callValue = callValue;
 
+    aInfo.callValue = callValue;
     aInfo.sourceLocation = filename.str() + ":" + std::to_string(compiler.getSourceManager().getSpellingLineNumber(expansionLoc));
     loplugin::normalizeDotDotInFilePath(aInfo.sourceLocation);
 
@@ -202,8 +197,8 @@ std::string ConstantParam::getCallValue(const Expr* arg)
     // Get the expression contents.
     // This helps us find params which are always initialised with something like "OUString()".
     SourceManager& SM = compiler.getSourceManager();
-    SourceLocation startLoc = compat::getBeginLoc(arg);
-    SourceLocation endLoc = compat::getEndLoc(arg);
+    SourceLocation startLoc = arg->getBeginLoc();
+    SourceLocation endLoc = arg->getEndLoc();
     const char *p1 = SM.getCharacterData( startLoc );
     const char *p2 = SM.getCharacterData( endLoc );
     if (!p1 || !p2 || (p2 - p1) < 0 || (p2 - p1) > 40) {
@@ -211,10 +206,10 @@ std::string ConstantParam::getCallValue(const Expr* arg)
     }
     unsigned n = Lexer::MeasureTokenLength( endLoc, SM, compiler.getLangOpts());
     std::string s( p1, p2 - p1 + n);
-    // strip linefeed and tab characters so they don't interfere with the parsing of the log file
-    std::replace( s.begin(), s.end(), '\r', ' ');
-    std::replace( s.begin(), s.end(), '\n', ' ');
-    std::replace( s.begin(), s.end(), '\t', ' ');
+    // sanitize call value, makes using command line tools (and python) much less error prone
+    for (auto const & ch : s)
+        if (ch < 32)
+            return "sanitised";
 
     // now normalize the value. For some params, like OUString, we can pass it as OUString() or "" and they are the same thing
     if (s == "OUString()")
@@ -249,10 +244,6 @@ bool ConstantParam::VisitCallExpr(const CallExpr * callExpr) {
     // work our way back to the root definition for template methods
     if (functionDecl->getInstantiatedFromMemberFunction())
         functionDecl = functionDecl->getInstantiatedFromMemberFunction();
-#if CLANG_VERSION < 90000
-    else if (functionDecl->getClassScopeSpecializationPattern())
-        functionDecl = functionDecl->getClassScopeSpecializationPattern();
-#endif
     else if (functionDecl->getTemplateInstantiationPattern())
         functionDecl = functionDecl->getTemplateInstantiationPattern();
 

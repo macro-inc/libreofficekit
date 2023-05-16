@@ -24,17 +24,20 @@
 #include <docsh.hxx>
 #include <swdtflvr.hxx>
 
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/core/frmedt/data/";
-
 /// Covers sw/source/core/frmedt/ fixes.
 class SwCoreFrmedtTest : public SwModelTestBase
 {
+public:
+    SwCoreFrmedtTest()
+        : SwModelTestBase("/sw/qa/core/frmedt/data/")
+    {
+    }
 };
 
 CPPUNIT_TEST_FIXTURE(SwCoreFrmedtTest, testTextboxReanchor)
 {
     // Load a document with a textframe and a textbox(shape+textframe).
-    load(DATA_DIRECTORY, "textbox-reanchor.odt");
+    createSwDoc("textbox-reanchor.odt");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
     SdrPage* pDrawPage = pDoc->getIDocumentDrawModelAccess().GetDrawModel()->GetPage(0);
@@ -51,9 +54,9 @@ CPPUNIT_TEST_FIXTURE(SwCoreFrmedtTest, testTextboxReanchor)
     SwFrameFormat* pTextFrameFormat = FindFrameFormat(pTextFrameObj);
     CPPUNIT_ASSERT_EQUAL(OUString("Frame2"), pTextFrameFormat->GetName());
     SwFrameFormat* pDrawShapeFormat = FindFrameFormat(pDrawShape);
-    SwNodeOffset nOldAnchor = pDrawShapeFormat->GetAnchor().GetContentAnchor()->nNode.GetIndex();
+    SwNodeOffset nOldAnchor = pDrawShapeFormat->GetAnchor().GetAnchorNode()->GetIndex();
     pShell->FindAnchorPos(pTextFrameObj->GetLastBoundRect().Center(), true);
-    SwNodeOffset nNewAnchor = pDrawShapeFormat->GetAnchor().GetContentAnchor()->nNode.GetIndex();
+    SwNodeOffset nNewAnchor = pDrawShapeFormat->GetAnchor().GetAnchorNode()->GetIndex();
     // Without the accompanying fix in place, this test would have failed with:
     // - Expected: 6
     // - Actual  : 9
@@ -65,19 +68,17 @@ CPPUNIT_TEST_FIXTURE(SwCoreFrmedtTest, testVertPosFromBottomBoundingBox)
 {
     // Insert a shape and anchor it vertically in a way, so its position is from the top of the page
     // bottom margin area.
-    mxComponent = loadFromDesktop("private:factory/swriter", "com.sun.star.text.TextDocument");
+    createSwDoc();
     uno::Reference<css::lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XShape> xShape(
         xFactory->createInstance("com.sun.star.drawing.RectangleShape"), uno::UNO_QUERY);
     xShape->setSize(awt::Size(10000, 10000));
     uno::Reference<beans::XPropertySet> xShapeProps(xShape, uno::UNO_QUERY);
-    xShapeProps->setPropertyValue("AnchorType",
-                                  uno::makeAny(text::TextContentAnchorType_AT_CHARACTER));
-    xShapeProps->setPropertyValue("VertOrient", uno::makeAny(text::VertOrientation::NONE));
+    xShapeProps->setPropertyValue("AnchorType", uno::Any(text::TextContentAnchorType_AT_CHARACTER));
+    xShapeProps->setPropertyValue("VertOrient", uno::Any(text::VertOrientation::NONE));
     xShapeProps->setPropertyValue("VertOrientRelation",
-                                  uno::makeAny(text::RelOrientation::PAGE_PRINT_AREA_BOTTOM));
-    xShapeProps->setPropertyValue("VertOrientPosition",
-                                  uno::makeAny(static_cast<sal_Int32>(-11000)));
+                                  uno::Any(text::RelOrientation::PAGE_PRINT_AREA_BOTTOM));
+    xShapeProps->setPropertyValue("VertOrientPosition", uno::Any(static_cast<sal_Int32>(-11000)));
     uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(mxComponent, uno::UNO_QUERY);
     xDrawPageSupplier->getDrawPage()->add(xShape);
 
@@ -93,13 +94,13 @@ CPPUNIT_TEST_FIXTURE(SwCoreFrmedtTest, testVertPosFromBottomBoundingBox)
     RndStdIds eAnchorType = RndStdIds::FLY_AT_CHAR;
     SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
     const auto& rFrameFormats = *pDoc->GetFrameFormats();
-    const SwPosition* pContentPos = rFrameFormats[0]->GetAnchor().GetContentAnchor();
+    const SwFormatAnchor* pFormatAhchor = &rFrameFormats[0]->GetAnchor();
     sal_Int16 eHoriRelOrient = text::RelOrientation::PAGE_FRAME;
     sal_Int16 eVertRelOrient = text::RelOrientation::PAGE_PRINT_AREA_BOTTOM;
     bool bFollowTextFlow = false;
     bool bMirror = false;
     Size aPercentSize;
-    pWrtShell->CalcBoundRect(aBoundRect, eAnchorType, eHoriRelOrient, eVertRelOrient, pContentPos,
+    pWrtShell->CalcBoundRect(aBoundRect, eAnchorType, eHoriRelOrient, eVertRelOrient, pFormatAhchor,
                              bFollowTextFlow, bMirror, nullptr, &aPercentSize);
 
     // Without the accompanying fix in place, this test would have failed with:
@@ -113,7 +114,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreFrmedtTest, testVertPosFromBottomBoundingBox)
 CPPUNIT_TEST_FIXTURE(SwCoreFrmedtTest, testPasteFlyInTextBox)
 {
     // Given a document that contains a textbox, which contains an sw image (fly frame)
-    load(DATA_DIRECTORY, "paste-fly-in-textbox.docx");
+    createSwDoc("paste-fly-in-textbox.docx");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     SwDocShell* pDocShell = pTextDoc->GetDocShell();
     SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
@@ -137,6 +138,34 @@ CPPUNIT_TEST_FIXTURE(SwCoreFrmedtTest, testPasteFlyInTextBox)
     // - Actual  : 4
     // i.e. the image was pasted twice.
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(3), pDoc->GetSpzFrameFormats()->GetFormatCount());
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreFrmedtTest, testTextBoxSelectCursorPos)
+{
+    // Given a document with a fly+draw format pair (textbox):
+    createSwDoc("paste-fly-in-textbox.docx");
+
+    // When selecting the fly format:
+    SwDoc* pDoc = getSwDoc();
+    SdrPage* pPage = pDoc->getIDocumentDrawModelAccess().GetDrawModel()->GetPage(0);
+    SdrObject* pFlyObject = pPage->GetObj(1);
+    SwDrawContact* pFlyContact = static_cast<SwDrawContact*>(pFlyObject->GetUserCall());
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_uInt16>(RES_FLYFRMFMT), pFlyContact->GetFormat()->Which());
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    pWrtShell->SelectObj(Point(), 0, pFlyObject);
+
+    // Then make sure the cursor is the anchor of the draw format:
+    SdrObject* pDrawObject = pPage->GetObj(0);
+    SwDrawContact* pDrawContact = static_cast<SwDrawContact*>(pDrawObject->GetUserCall());
+    SwFrameFormat* pDrawFormat = pDrawContact->GetFormat();
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_uInt16>(RES_DRAWFRMFMT), pDrawFormat->Which());
+    SwNodeOffset nAnchor = pDrawFormat->GetAnchor().GetContentAnchor()->GetNode().GetIndex();
+    SwNodeOffset nCursor = pWrtShell->GetCurrentShellCursor().GetPointNode().GetIndex();
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 15 (anchor of draw format)
+    // - Actual  : 6 (in-fly-format position)
+    // i.e. the cursor had a broken position after trying to select the fly format.
+    CPPUNIT_ASSERT_EQUAL(nAnchor, nCursor);
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

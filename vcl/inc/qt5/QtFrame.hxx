@@ -33,7 +33,7 @@
 
 #include <QtCore/QObject>
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && QT5_USING_X11
+#if CHECK_ANY_QT_USING_X11
 #include <unx/screensaverinhibitor.hxx>
 // any better way to get rid of the X11 / Qt type clashes?
 #undef Bool
@@ -101,11 +101,8 @@ class VCLPLUG_QT_PUBLIC QtFrame : public QObject, public SalFrame
     sal_uInt32 m_nRestoreScreen;
     QRect m_aRestoreGeometry;
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && QT5_USING_X11
+#if CHECK_ANY_QT_USING_X11
     ScreenSaverInhibitor m_ScreenSaverInhibitor;
-#endif
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && QT5_USING_X11)                                      \
-    || (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0) && QT6_USING_X11)
     ModKeyFlags m_nKeyModifiers;
 #endif
 
@@ -161,7 +158,6 @@ public:
     virtual void SetTitle(const OUString& rTitle) override;
     virtual void SetIcon(sal_uInt16 nIcon) override;
     virtual void SetMenu(SalMenu* pMenu) override;
-    virtual void DrawMenuBar() override;
 
     virtual void registerDragSource(QtDragSource* pDragSource);
     virtual void deregisterDragSource(QtDragSource const* pDragSource);
@@ -183,8 +179,8 @@ public:
     virtual SalFrame* GetParent() const override;
     virtual void SetModal(bool bModal) override;
     virtual bool GetModal() const override;
-    virtual void SetWindowState(const SalFrameState* pState) override;
-    virtual bool GetWindowState(SalFrameState* pState) override;
+    virtual void SetWindowState(const vcl::WindowData*) override;
+    virtual bool GetWindowState(vcl::WindowData*) override;
     virtual void ShowFullScreen(bool bFullScreen, sal_Int32 nDisplay) override;
     virtual void StartPresentation(bool bStart) override;
     virtual void SetAlwaysOnTop(bool bOnTop) override;

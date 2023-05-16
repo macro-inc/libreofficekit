@@ -37,7 +37,7 @@ using vcl::WizardTypes::CommitPageReason;
 class SwMailMergeWizard final : public ::vcl::RoadmapWizardMachine
 {
     SwView*                 m_pSwView;
-    OUString                sDocumentURL;
+    OUString                m_sDocumentURL;
     bool                    m_bDocumentLoad;
 
     std::shared_ptr<SwMailMergeConfigItem> m_xConfigItem;
@@ -59,14 +59,14 @@ class SwMailMergeWizard final : public ::vcl::RoadmapWizardMachine
     virtual OUString                getStateDisplayName( WizardState _nState ) const override;
 
 public:
-    SwMailMergeWizard(SwView& rView, std::shared_ptr<SwMailMergeConfigItem> const & rConfigItem);
+    SwMailMergeWizard(SwView& rView, std::shared_ptr<SwMailMergeConfigItem> xConfigItem);
     virtual ~SwMailMergeWizard() override;
 
     SwView*                     GetSwView() {return m_pSwView;}
     SwMailMergeConfigItem&      GetConfigItem() { return *m_xConfigItem;}
 
-    void                    SetReloadDocument(const OUString& rURL) {sDocumentURL = rURL;}
-    const OUString&         GetReloadDocument() const {return sDocumentURL;}
+    void                    SetReloadDocument(const OUString& rURL) {m_sDocumentURL = rURL;}
+    const OUString&         GetReloadDocument() const {return m_sDocumentURL;}
 
     //next step requires loading of document
     void                    SetDocumentLoad(bool bSet) {m_bDocumentLoad = bSet;}

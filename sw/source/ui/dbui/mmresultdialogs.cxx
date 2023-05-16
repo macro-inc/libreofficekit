@@ -264,13 +264,15 @@ SwMMResultSaveDialog::SwMMResultSaveDialog(weld::Window* pParent)
     m_xFromRB->connect_toggled(aLink);
     // m_pSaveAsOneRB is the default, so disable m_xFromNF and m_xToNF initially.
     aLink.Call(*m_xSaveAsOneRB);
-    SwView* pView = ::GetActiveView();
-    const std::shared_ptr<SwMailMergeConfigItem>& xConfigItem = pView->GetMailMergeConfigItem();
-    assert(xConfigItem);
-    sal_Int32 nCount = xConfigItem->GetMergedDocumentCount();
-    m_xFromNF->set_max(nCount);
-    m_xToNF->set_max(nCount);
-    m_xToNF->set_value(nCount);
+    if (SwView* pView = GetActiveView())
+    {
+        const std::shared_ptr<SwMailMergeConfigItem>& xConfigItem = pView->GetMailMergeConfigItem();
+        assert(xConfigItem);
+        sal_Int32 nCount = xConfigItem->GetMergedDocumentCount();
+        m_xFromNF->set_max(nCount);
+        m_xToNF->set_max(nCount);
+        m_xToNF->set_value(nCount);
+    }
 
     m_xOKButton->connect_clicked(LINK(this, SwMMResultSaveDialog, SaveOutputHdl_Impl));
 }
@@ -281,7 +283,6 @@ SwMMResultSaveDialog::~SwMMResultSaveDialog()
 
 SwMMResultPrintDialog::SwMMResultPrintDialog(weld::Window* pParent)
     : SfxDialogController(pParent, "modules/swriter/ui/mmresultprintdialog.ui", "MMResultPrintDialog")
-    , m_xPrinterFT(m_xBuilder->weld_label("printerft"))
     , m_xPrinterLB(m_xBuilder->weld_combo_box("printers"))
     , m_xPrinterSettingsPB(m_xBuilder->weld_button("printersettings"))
     , m_xPrintAllRB(m_xBuilder->weld_radio_button("printallrb"))
@@ -314,12 +315,9 @@ SwMMResultPrintDialog::~SwMMResultPrintDialog()
 SwMMResultEmailDialog::SwMMResultEmailDialog(weld::Window* pParent)
     : SfxDialogController(pParent, "modules/swriter/ui/mmresultemaildialog.ui", "MMResultEmailDialog")
     , m_sConfigureMail(SwResId(ST_CONFIGUREMAIL))
-    , m_xMailToFT(m_xBuilder->weld_label("mailtoft"))
     , m_xMailToLB(m_xBuilder->weld_combo_box("mailto"))
     , m_xCopyToPB(m_xBuilder->weld_button("copyto"))
-    , m_xSubjectFT(m_xBuilder->weld_label("subjectft"))
     , m_xSubjectED(m_xBuilder->weld_entry("subject"))
-    , m_xSendAsFT(m_xBuilder->weld_label("sendasft"))
     , m_xSendAsLB(m_xBuilder->weld_combo_box("sendas"))
     , m_xSendAsPB(m_xBuilder->weld_button("sendassettings"))
     , m_xAttachmentGroup(m_xBuilder->weld_widget("attachgroup"))
@@ -361,7 +359,9 @@ SwMMResultEmailDialog::~SwMMResultEmailDialog()
 void SwMMResultPrintDialog::FillInPrinterSettings()
 {
     //fill printer ListBox
-    SwView* pView = ::GetActiveView();
+    SwView* pView = GetActiveView();
+    if (!pView)
+        return;
     const std::shared_ptr<SwMailMergeConfigItem>& xConfigItem = pView->GetMailMergeConfigItem();
     const std::vector<OUString>& rPrinters = Printer::GetPrinterQueues();
     unsigned int nCount = rPrinters.size();
@@ -394,7 +394,9 @@ void SwMMResultPrintDialog::FillInPrinterSettings()
 
 void SwMMResultEmailDialog::FillInEmailSettings()
 {
-    SwView* pView = ::GetActiveView();
+    SwView* pView = GetActiveView();
+    if (!pView)
+        return;
     const std::shared_ptr<SwMailMergeConfigItem>& xConfigItem = pView->GetMailMergeConfigItem();
     assert(xConfigItem);
 
@@ -550,7 +552,9 @@ int documentEndPageNumber(SwMailMergeConfigItem* pConfigItem, int document, bool
 
 IMPL_LINK_NOARG(SwMMResultSaveDialog, SaveOutputHdl_Impl, weld::Button&, void)
 {
-    SwView* pView = ::GetActiveView();
+    SwView* pView = GetActiveView();
+    if (!pView)
+        return;
     std::shared_ptr<SwMailMergeConfigItem> xConfigItem = pView->GetMailMergeConfigItem();
     assert(xConfigItem);
 
@@ -584,10 +588,7 @@ IMPL_LINK_NOARG(SwMMResultSaveDialog, SaveOutputHdl_Impl, weld::Button&, void)
 
     if (m_xSaveAsOneRB->get_active())
     {
-        uno::Sequence< beans::PropertyValue > aValues(1);
-        beans::PropertyValue* pValues = aValues.getArray();
-        pValues[0].Name = "FilterName";
-        pValues[0].Value <<= sFilter;
+        uno::Sequence< beans::PropertyValue > aValues { comphelper::makePropertyValue("FilterName", sFilter) };
 
         uno::Reference< frame::XStorable > xStore( pTargetView->GetDocShell()->GetModel(), uno::UNO_QUERY);
         ErrCode nErrorCode = ERRCODE_NONE;
@@ -612,7 +613,7 @@ IMPL_LINK_NOARG(SwMMResultSaveDialog, SaveOutputHdl_Impl, weld::Button&, void)
     else
     {
         OUString sTargetTempURL = URIHelper::SmartRel2Abs(
-            INetURLObject(), utl::TempFile::CreateTempName(),
+            INetURLObject(), utl::CreateTempName(),
             URIHelper::GetMaybeFileHdl());
         std::shared_ptr<const SfxFilter> pSfxFlt = SwIoSystem::GetFilterOfFormat(
                 FILTER_XML,
@@ -749,7 +750,9 @@ IMPL_LINK_NOARG(SwMMResultSaveDialog, SaveOutputHdl_Impl, weld::Button&, void)
 
 IMPL_LINK(SwMMResultPrintDialog, PrinterChangeHdl_Impl, weld::ComboBox&, rBox, void)
 {
-    SwView* pView = ::GetActiveView();
+    SwView* pView = GetActiveView();
+    if (!pView)
+        return;
     const std::shared_ptr<SwMailMergeConfigItem>& xConfigItem = pView->GetMailMergeConfigItem();
     assert(xConfigItem);
     if (rBox.get_active() != -1)
@@ -785,7 +788,9 @@ IMPL_LINK(SwMMResultPrintDialog, PrinterChangeHdl_Impl, weld::ComboBox&, rBox, v
 
 IMPL_LINK_NOARG(SwMMResultPrintDialog, PrintHdl_Impl, weld::Button&, void)
 {
-    SwView* pView = ::GetActiveView();
+    SwView* pView = GetActiveView();
+    if (!pView)
+        return;
     std::shared_ptr<SwMailMergeConfigItem> xConfigItem = pView->GetMailMergeConfigItem();
     assert(xConfigItem);
 
@@ -899,7 +904,9 @@ IMPL_LINK_NOARG(SwMMResultEmailDialog, SendAsHdl_Impl, weld::Button&, void)
 // Send documents as e-mail
 IMPL_LINK_NOARG(SwMMResultEmailDialog, SendDocumentsHdl_Impl, weld::Button&, void)
 {
-    SwView* pView = ::GetActiveView();
+    SwView* pView = GetActiveView();
+    if (!pView)
+        return;
     std::shared_ptr<SwMailMergeConfigItem> xConfigItem = pView->GetMailMergeConfigItem();
     assert(xConfigItem);
 
@@ -994,7 +1001,7 @@ IMPL_LINK_NOARG(SwMMResultEmailDialog, SendDocumentsHdl_Impl, weld::Button&, voi
         case MM_DOCTYPE_HTML:
         {
             bAsBody = true;
-            eEncoding = SvxHtmlOptions::GetTextEncoding();
+            eEncoding = RTL_TEXTENCODING_UTF8;
         }
         break;
         case MM_DOCTYPE_TEXT:
@@ -1085,16 +1092,13 @@ IMPL_LINK_NOARG(SwMMResultEmailDialog, SendDocumentsHdl_Impl, weld::Button&, voi
         sFilterOptions = "EmbedImages";
     }
     OUString sTargetTempURL = URIHelper::SmartRel2Abs(
-        INetURLObject(), utl::TempFile::CreateTempName(),
+        INetURLObject(), utl::CreateTempName(),
         URIHelper::GetMaybeFileHdl());
     std::shared_ptr<const SfxFilter> pTargetSfxFlt = SwIoSystem::GetFilterOfFormat(
             FILTER_XML,
             SwDocShell::Factory().GetFilterContainer() );
 
-    uno::Sequence< beans::PropertyValue > aValues(1);
-    beans::PropertyValue* pValues = aValues.getArray();
-    pValues[0].Name = "FilterName";
-    pValues[0].Value <<= pTargetSfxFlt->GetFilterName();
+    uno::Sequence< beans::PropertyValue > aValues { comphelper::makePropertyValue("FilterName", pTargetSfxFlt->GetFilterName()) };
 
     uno::Reference< frame::XStorable > xStore( pTargetView->GetDocShell()->GetModel(), uno::UNO_QUERY);
     xStore->storeToURL( sTargetTempURL, aValues   );
@@ -1140,7 +1144,7 @@ IMPL_LINK_NOARG(SwMMResultEmailDialog, SendDocumentsHdl_Impl, weld::Button&, voi
         //then save it
         SfxStringItem aName(SID_FILE_NAME,
                 URIHelper::SmartRel2Abs(
-                    INetURLObject(), utl::TempFile::CreateTempName(),
+                    INetURLObject(), utl::CreateTempName(),
                     URIHelper::GetMaybeFileHdl()) );
 
         {
@@ -1201,7 +1205,7 @@ IMPL_LINK_NOARG(SwMMResultEmailDialog, SendDocumentsHdl_Impl, weld::Button&, voi
                     OSL_FAIL("no output file created?");
                     continue;
                 }
-                OString sLine;
+                OStringBuffer sLine;
                 bool bDone = pInStream->ReadLine( sLine );
                 while ( bDone )
                 {
@@ -1224,7 +1228,7 @@ IMPL_LINK_NOARG(SwMMResultEmailDialog, SendDocumentsHdl_Impl, weld::Button&, voi
                 sAttachment += ".";
                 sAttachment = comphelper::string::setToken(sAttachment, nTokenCount, '.', sExtension);
             }
-            else if (sAttachment.getToken( nTokenCount - 1, '.') != sExtension)
+            else if (o3tl::getToken(sAttachment, nTokenCount - 1, '.') != sExtension)
                 sAttachment += sExtension;
             aDesc.sAttachmentName = sAttachment;
             aDesc.sMimeType = sMimeType;

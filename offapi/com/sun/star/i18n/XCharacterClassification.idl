@@ -17,13 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef __com_sun_star_i18n_XCharacterClassification_idl__
-#define __com_sun_star_i18n_XCharacterClassification_idl__
-
-#include <com/sun/star/i18n/ParseResult.idl>
-#include <com/sun/star/lang/Locale.idl>
-#include <com/sun/star/uno/XInterface.idl>
-
 
 module com { module sun { module star { module i18n {
 
@@ -113,6 +106,16 @@ published interface XCharacterClassification : com::sun::star::uno::XInterface
             A number with appropriate flags set to indicate what type of
             characters the string contains, each flag value being one of
             KCharacterType values.
+
+        @note The accumulated bits of several characters are meaningless
+            as soon as characters of different classifications are
+            involved, which even may have a common subset like
+            KCharacterType::LETTER or KCharacterType::PRINTABLE, unless
+            it is to be determined what overall character properties are
+            present in the string. Use getCharacterType() of single
+            characters instead and handle bits as needed if sets of
+            character properties are to be obtained.
+
     */
     long getStringType( [in] string aText, [in] long nPos, [in] long nCount,
                         [in] com::sun::star::lang::Locale aLocale );
@@ -268,7 +271,5 @@ published interface XCharacterClassification : com::sun::star::uno::XInterface
 };
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

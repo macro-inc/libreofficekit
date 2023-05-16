@@ -21,6 +21,7 @@
 #include <extended/AccessibleBrowseBoxTable.hxx>
 #include <extended/AccessibleBrowseBoxHeaderBar.hxx>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
+#include <utility>
 #include <vcl/accessibletableprovider.hxx>
 #include <toolkit/helper/convert.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
@@ -89,7 +90,7 @@ void SAL_CALL AccessibleBrowseBox::disposing()
 
 // css::accessibility::XAccessibleContext
 
-sal_Int32 SAL_CALL AccessibleBrowseBox::getAccessibleChildCount()
+sal_Int64 SAL_CALL AccessibleBrowseBox::getAccessibleChildCount()
 {
     SolarMethodGuard aGuard(getMutex());
     ensureIsAlive();
@@ -99,10 +100,13 @@ sal_Int32 SAL_CALL AccessibleBrowseBox::getAccessibleChildCount()
 
 
 css::uno::Reference< css::accessibility::XAccessible > SAL_CALL
-AccessibleBrowseBox::getAccessibleChild( sal_Int32 nChildIndex )
+AccessibleBrowseBox::getAccessibleChild( sal_Int64 nChildIndex )
 {
     SolarMethodGuard aGuard(getMutex());
     ensureIsAlive();
+
+    if (nChildIndex < 0 || nChildIndex >= getAccessibleChildCount())
+        throw lang::IndexOutOfBoundsException();
 
     css::uno::Reference< css::accessibility::XAccessible > xRet;
     if( nChildIndex >= 0 )
@@ -222,7 +226,7 @@ AccessibleBrowseBox::implGetHeaderBar(AccessibleBrowseBoxObjType eObjType)
 }
 
 css::uno::Reference< css::accessibility::XAccessible >
-AccessibleBrowseBox::implGetFixedChild( sal_Int32 nChildIndex )
+AccessibleBrowseBox::implGetFixedChild( sal_Int64 nChildIndex )
 {
     css::uno::Reference< css::accessibility::XAccessible > xRet;
     switch( nChildIndex )
@@ -267,8 +271,8 @@ void AccessibleBrowseBox::commitHeaderBarEvent( sal_Int16 _nEventId,
 
 // = AccessibleBrowseBoxAccess
 
-AccessibleBrowseBoxAccess::AccessibleBrowseBoxAccess( const css::uno::Reference< css::accessibility::XAccessible >& _rxParent, ::vcl::IAccessibleTableProvider& _rBrowseBox )
-        :m_xParent( _rxParent )
+AccessibleBrowseBoxAccess::AccessibleBrowseBoxAccess( css::uno::Reference< css::accessibility::XAccessible > _xParent, ::vcl::IAccessibleTableProvider& _rBrowseBox )
+        :m_xParent(std::move( _xParent ))
         ,m_rBrowseBox( _rBrowseBox )
 {
 }
@@ -281,7 +285,7 @@ AccessibleBrowseBoxAccess::~AccessibleBrowseBoxAccess()
 
 void AccessibleBrowseBoxAccess::dispose()
 {
-    ::osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     if (m_xContext.is())
     {
@@ -293,7 +297,7 @@ void AccessibleBrowseBoxAccess::dispose()
 
 css::uno::Reference< css::accessibility::XAccessibleContext > SAL_CALL AccessibleBrowseBoxAccess::getAccessibleContext()
 {
-    ::osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     // if the context died meanwhile (there is no listener, so it won't tell us explicitly when this happens),
     // then reset and re-create.

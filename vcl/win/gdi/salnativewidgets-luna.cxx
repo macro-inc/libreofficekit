@@ -39,10 +39,12 @@
 
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
+#include <toolbarvalue.hxx>
 
 #include <win/svsys.h>
 #include <win/salgdi.h>
 #include <win/saldata.hxx>
+#include <win/salframe.h>
 #include <win/scoped_gdi.hxx>
 #include <win/wingdiimpl.hxx>
 
@@ -56,137 +58,6 @@
 
 typedef std::map< std::wstring, HTHEME > ThemeMap;
 static ThemeMap aThemeMap;
-
-/****************************************************
- wrap visual styles API to avoid linking against it
- it is not available on all Windows platforms
-*****************************************************/
-
-namespace {
-
-class VisualStylesAPI
-{
-private:
-    typedef HTHEME  (WINAPI * OpenThemeData_Proc_T) ( HWND hwnd, LPCWSTR pszClassList );
-    typedef HRESULT (WINAPI * CloseThemeData_Proc_T) ( HTHEME hTheme );
-    typedef HRESULT (WINAPI * GetThemeBackgroundContentRect_Proc_T) ( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT *pBoundingRect, RECT *pContentRect );
-    typedef HRESULT (WINAPI * DrawThemeBackground_Proc_T) ( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT *pRect, const RECT *pClipRect );
-    typedef HRESULT (WINAPI * DrawThemeText_Proc_T) ( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, LPCWSTR pszText, int iCharCount, DWORD dwTextFlags, DWORD dwTextFlags2, const RECT *pRect );
-    typedef HRESULT (WINAPI * GetThemePartSize_Proc_T) ( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, RECT *prc, THEMESIZE eSize, SIZE *psz );
-    typedef BOOL    (WINAPI * IsThemeActive_Proc_T) ( void );
-
-    OpenThemeData_Proc_T                    lpfnOpenThemeData;
-    CloseThemeData_Proc_T                   lpfnCloseThemeData;
-    GetThemeBackgroundContentRect_Proc_T    lpfnGetThemeBackgroundContentRect;
-    DrawThemeBackground_Proc_T              lpfnDrawThemeBackground;
-    DrawThemeText_Proc_T                    lpfnDrawThemeText;
-    GetThemePartSize_Proc_T                 lpfnGetThemePartSize;
-    IsThemeActive_Proc_T                    lpfnIsThemeActive;
-
-    oslModule mhModule;
-
-public:
-    VisualStylesAPI();
-    ~VisualStylesAPI();
-
-    HTHEME OpenThemeData( HWND hwnd, LPCWSTR pszClassList );
-    HRESULT CloseThemeData( HTHEME hTheme );
-    HRESULT GetThemeBackgroundContentRect( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT *pBoundingRect, RECT *pContentRect );
-    HRESULT DrawThemeBackground( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT *pRect, const RECT *pClipRect );
-    HRESULT DrawThemeText( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, LPCWSTR pszText, int iCharCount, DWORD dwTextFlags, DWORD dwTextFlags2, const RECT *pRect );
-    HRESULT GetThemePartSize( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, RECT *prc, THEMESIZE eSize, SIZE *psz );
-    bool IsThemeActive();
-};
-
-}
-
-static VisualStylesAPI vsAPI;
-
-VisualStylesAPI::VisualStylesAPI()
-    : lpfnOpenThemeData( nullptr ),
-      lpfnCloseThemeData( nullptr ),
-      lpfnGetThemeBackgroundContentRect( nullptr ),
-      lpfnDrawThemeBackground( nullptr ),
-      lpfnDrawThemeText( nullptr ),
-      lpfnGetThemePartSize( nullptr ),
-      lpfnIsThemeActive( nullptr )
-{
-    OUString aLibraryName( "uxtheme.dll" );
-    mhModule = osl_loadModule( aLibraryName.pData, SAL_LOADMODULE_DEFAULT );
-
-    if ( mhModule )
-    {
-        lpfnOpenThemeData = reinterpret_cast<OpenThemeData_Proc_T>(osl_getAsciiFunctionSymbol( mhModule, "OpenThemeData" ));
-        lpfnCloseThemeData = reinterpret_cast<CloseThemeData_Proc_T>(osl_getAsciiFunctionSymbol( mhModule, "CloseThemeData" ));
-        lpfnGetThemeBackgroundContentRect = reinterpret_cast<GetThemeBackgroundContentRect_Proc_T>(osl_getAsciiFunctionSymbol( mhModule, "GetThemeBackgroundContentRect" ));
-        lpfnDrawThemeBackground = reinterpret_cast<DrawThemeBackground_Proc_T>(osl_getAsciiFunctionSymbol( mhModule, "DrawThemeBackground" ));
-        lpfnDrawThemeText = reinterpret_cast<DrawThemeText_Proc_T>(osl_getAsciiFunctionSymbol( mhModule, "DrawThemeText" ));
-        lpfnGetThemePartSize = reinterpret_cast<GetThemePartSize_Proc_T>(osl_getAsciiFunctionSymbol( mhModule, "GetThemePartSize" ));
-        lpfnIsThemeActive = reinterpret_cast<IsThemeActive_Proc_T>(osl_getAsciiFunctionSymbol( mhModule, "IsThemeActive" ));
-    }
-}
-
-VisualStylesAPI::~VisualStylesAPI()
-{
-    if( mhModule )
-        osl_unloadModule( mhModule );
-}
-
-HTHEME VisualStylesAPI::OpenThemeData( HWND hwnd, LPCWSTR pszClassList )
-{
-    if(lpfnOpenThemeData)
-        return (*lpfnOpenThemeData) (hwnd, pszClassList);
-    else
-        return nullptr;
-}
-
-HRESULT VisualStylesAPI::CloseThemeData( HTHEME hTheme )
-{
-    if(lpfnCloseThemeData)
-        return (*lpfnCloseThemeData) (hTheme);
-    else
-        return S_FALSE;
-}
-
-HRESULT VisualStylesAPI::GetThemeBackgroundContentRect( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT *pBoundingRect, RECT *pContentRect )
-{
-    if(lpfnGetThemeBackgroundContentRect)
-        return (*lpfnGetThemeBackgroundContentRect) ( hTheme, hdc, iPartId, iStateId, pBoundingRect, pContentRect );
-    else
-        return S_FALSE;
-}
-
-HRESULT VisualStylesAPI::DrawThemeBackground( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT *pRect, const RECT *pClipRect )
-{
-    if(lpfnDrawThemeBackground)
-        return (*lpfnDrawThemeBackground) (hTheme, hdc, iPartId, iStateId, pRect, pClipRect);
-    else
-        return S_FALSE;
-}
-
-HRESULT VisualStylesAPI::DrawThemeText( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, LPCWSTR pszText, int iCharCount, DWORD dwTextFlags, DWORD dwTextFlags2, const RECT *pRect )
-{
-    if(lpfnDrawThemeText)
-        return (*lpfnDrawThemeText) (hTheme, hdc, iPartId, iStateId, pszText, iCharCount, dwTextFlags, dwTextFlags2, pRect);
-    else
-        return S_FALSE;
-}
-
-HRESULT VisualStylesAPI::GetThemePartSize( HTHEME hTheme, HDC hdc, int iPartId, int iStateId, RECT *prc, THEMESIZE eSize, SIZE *psz )
-{
-    if(lpfnGetThemePartSize)
-        return (*lpfnGetThemePartSize) (hTheme, hdc, iPartId, iStateId, prc, eSize, psz);
-    else
-        return S_FALSE;
-}
-
-bool VisualStylesAPI::IsThemeActive()
-{
-    if(lpfnIsThemeActive)
-        return (*lpfnIsThemeActive) ();
-    else
-        return false;
-}
 
 /*********************************************************
  * Initialize XP theming and local stuff
@@ -205,16 +76,18 @@ void SalData::initNWF()
 void SalData::deInitNWF()
 {
     for( auto& rEntry : aThemeMap )
-        vsAPI.CloseThemeData(rEntry.second);
+        CloseThemeData(rEntry.second);
     aThemeMap.clear();
 }
 
-static HTHEME getThemeHandle( HWND hWnd, LPCWSTR name )
+static HTHEME getThemeHandle(HWND hWnd, LPCWSTR name, WinSalGraphicsImplBase* pGraphicsImpl)
 {
     if( GetSalData()->mbThemeChanged )
     {
         // throw away invalid theme handles
         SalData::deInitNWF();
+        // throw away native control cache
+        pGraphicsImpl->ClearNativeControlCache();
         GetSalData()->mbThemeChanged = false;
     }
 
@@ -222,7 +95,7 @@ static HTHEME getThemeHandle( HWND hWnd, LPCWSTR name )
     if( (iter = aThemeMap.find( name )) != aThemeMap.end() )
         return iter->second;
     // theme not found -> add it to map
-    HTHEME hTheme = vsAPI.OpenThemeData( hWnd, name );
+    HTHEME hTheme = OpenThemeData( hWnd, name );
     if( hTheme != nullptr )
         aThemeMap[name] = hTheme;
     return hTheme;
@@ -238,33 +111,33 @@ bool WinSalGraphics::isNativeControlSupported( ControlType nType, ControlPart nP
         case ControlType::Radiobutton:
         case ControlType::Checkbox:
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"Button");
+                hTheme = getThemeHandle(mhWnd, L"Button", mWinSalGraphicsImplBase);
             break;
         case ControlType::Scrollbar:
             if( nPart == ControlPart::DrawBackgroundHorz || nPart == ControlPart::DrawBackgroundVert )
                 return false;   // no background painting needed
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"Scrollbar");
+                hTheme = getThemeHandle(mhWnd, L"Scrollbar", mWinSalGraphicsImplBase);
             break;
         case ControlType::Combobox:
             if( nPart == ControlPart::HasBackgroundTexture )
                 return false;   // we do not paint the inner part (ie the selection background/focus indication)
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"Edit");
+                hTheme = getThemeHandle(mhWnd, L"Edit", mWinSalGraphicsImplBase);
             else if( nPart == ControlPart::ButtonDown )
-                hTheme = getThemeHandle( mhWnd, L"Combobox");
+                hTheme = getThemeHandle(mhWnd, L"Combobox", mWinSalGraphicsImplBase);
             break;
         case ControlType::Spinbox:
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"Edit");
+                hTheme = getThemeHandle(mhWnd, L"Edit", mWinSalGraphicsImplBase);
             else if( nPart == ControlPart::AllButtons ||
                 nPart == ControlPart::ButtonUp || nPart == ControlPart::ButtonDown ||
                 nPart == ControlPart::ButtonLeft|| nPart == ControlPart::ButtonRight )
-                hTheme = getThemeHandle( mhWnd, L"Spin");
+                hTheme = getThemeHandle(mhWnd, L"Spin", mWinSalGraphicsImplBase);
             break;
         case ControlType::SpinButtons:
             if( nPart == ControlPart::Entire || nPart == ControlPart::AllButtons )
-                hTheme = getThemeHandle( mhWnd, L"Spin");
+                hTheme = getThemeHandle(mhWnd, L"Spin", mWinSalGraphicsImplBase);
             break;
         case ControlType::Editbox:
         case ControlType::MultilineEditbox:
@@ -272,36 +145,36 @@ bool WinSalGraphics::isNativeControlSupported( ControlType nType, ControlPart nP
                 return false;   // we do not paint the inner part (ie the selection background/focus indication)
                 //return TRUE;
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"Edit");
+                hTheme = getThemeHandle(mhWnd, L"Edit", mWinSalGraphicsImplBase);
             break;
         case ControlType::Listbox:
             if( nPart == ControlPart::HasBackgroundTexture )
                 return false;   // we do not paint the inner part (ie the selection background/focus indication)
             if( nPart == ControlPart::Entire || nPart == ControlPart::ListboxWindow )
-                hTheme = getThemeHandle( mhWnd, L"Listview");
+                hTheme = getThemeHandle(mhWnd, L"Listview", mWinSalGraphicsImplBase);
             else if( nPart == ControlPart::ButtonDown )
-                hTheme = getThemeHandle( mhWnd, L"Combobox");
+                hTheme = getThemeHandle(mhWnd, L"Combobox", mWinSalGraphicsImplBase);
             break;
         case ControlType::TabPane:
         case ControlType::TabBody:
         case ControlType::TabItem:
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"Tab");
+                hTheme = getThemeHandle(mhWnd, L"Tab", mWinSalGraphicsImplBase);
             break;
         case ControlType::Toolbar:
             if( nPart == ControlPart::Entire || nPart == ControlPart::Button )
-                hTheme = getThemeHandle( mhWnd, L"Toolbar");
+                hTheme = getThemeHandle(mhWnd, L"Toolbar", mWinSalGraphicsImplBase);
             else
                 // use rebar theme for grip and background
-                hTheme = getThemeHandle( mhWnd, L"Rebar");
+                hTheme = getThemeHandle(mhWnd, L"Rebar", mWinSalGraphicsImplBase);
             break;
         case ControlType::Menubar:
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"Rebar");
+                hTheme = getThemeHandle(mhWnd, L"Rebar", mWinSalGraphicsImplBase);
             else if( GetSalData()->mbThemeMenuSupport )
             {
                 if( nPart == ControlPart::MenuItem )
-                    hTheme = getThemeHandle( mhWnd, L"Menu" );
+                    hTheme = getThemeHandle(mhWnd, L"Menu", mWinSalGraphicsImplBase);
             }
             break;
         case ControlType::MenuPopup:
@@ -312,20 +185,20 @@ bool WinSalGraphics::isNativeControlSupported( ControlType nType, ControlPart nP
                     nPart == ControlPart::MenuItemCheckMark ||
                     nPart == ControlPart::MenuItemRadioMark ||
                     nPart == ControlPart::Separator )
-                    hTheme = getThemeHandle( mhWnd, L"Menu" );
+                    hTheme = getThemeHandle(mhWnd, L"Menu", mWinSalGraphicsImplBase);
             }
             break;
         case ControlType::Progress:
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"Progress");
+                hTheme = getThemeHandle(mhWnd, L"Progress", mWinSalGraphicsImplBase);
             break;
         case ControlType::Slider:
             if( nPart == ControlPart::TrackHorzArea || nPart == ControlPart::TrackVertArea )
-                hTheme = getThemeHandle( mhWnd, L"Trackbar" );
+                hTheme = getThemeHandle(mhWnd, L"Trackbar", mWinSalGraphicsImplBase);
             break;
         case ControlType::ListNode:
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"TreeView" );
+                hTheme = getThemeHandle(mhWnd, L"TreeView", mWinSalGraphicsImplBase);
             break;
         default:
             hTheme = nullptr;
@@ -346,13 +219,13 @@ bool WinSalGraphics::hitTestNativeControl( ControlType,
 
 static bool ImplDrawTheme( HTHEME hTheme, HDC hDC, int iPart, int iState, RECT rc, const OUString& aStr)
 {
-    HRESULT hr = vsAPI.DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
+    HRESULT hr = DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
 
     if( aStr.getLength() )
     {
         RECT rcContent;
-        hr = vsAPI.GetThemeBackgroundContentRect( hTheme, hDC, iPart, iState, &rc, &rcContent);
-        hr = vsAPI.DrawThemeText( hTheme, hDC, iPart, iState,
+        hr = GetThemeBackgroundContentRect( hTheme, hDC, iPart, iState, &rc, &rcContent);
+        hr = DrawThemeText( hTheme, hDC, iPart, iState,
             o3tl::toW(aStr.getStr()), -1,
             DT_CENTER | DT_VCENTER | DT_SINGLELINE,
             0, &rcContent);
@@ -360,12 +233,18 @@ static bool ImplDrawTheme( HTHEME hTheme, HDC hDC, int iPart, int iState, RECT r
     return (hr == S_OK);
 }
 
+// TS_TRUE returns optimal size
+static std::optional<Size> ImplGetThemeSize(HTHEME hTheme, HDC hDC, int iPart, int iState, LPCRECT pRect, THEMESIZE eTS = TS_TRUE)
+{
+    if (SIZE aSz; SUCCEEDED(GetThemePartSize(hTheme, hDC, iPart, iState, pRect, eTS, &aSz)))
+        return Size(aSz.cx, aSz.cy);
+    return {};
+}
+
 static tools::Rectangle ImplGetThemeRect( HTHEME hTheme, HDC hDC, int iPart, int iState, const tools::Rectangle& /* aRect */, THEMESIZE eTS = TS_TRUE )
 {
-    SIZE aSz;
-    HRESULT hr = vsAPI.GetThemePartSize( hTheme, hDC, iPart, iState, nullptr, eTS, &aSz ); // TS_TRUE returns optimal size
-    if( hr == S_OK )
-        return tools::Rectangle( 0, 0, aSz.cx, aSz.cy );
+    if (const std::optional<Size> oSz = ImplGetThemeSize(hTheme, hDC, iPart, iState, nullptr, eTS))
+        return tools::Rectangle( 0, 0, oSz->Width(), oSz->Height() );
     else
         return tools::Rectangle();
 }
@@ -490,32 +369,65 @@ static void impl_drawAeroToolbar( HDC hDC, RECT rc, bool bHorizontal )
     }
 }
 
-/**
- * Gives the actual rectangle used for rendering by ControlType::MenuPopup's
- * ControlPart::MenuItemCheckMark or ControlPart::MenuItemRadioMark.
- */
-static tools::Rectangle GetMenuPopupMarkRegion(const ImplControlValue& rValue)
+static bool implDrawNativeMenuMark(HDC hDC, HTHEME hTheme, RECT rc, ControlPart nPart,
+                                   ControlState nState, OUString const& aCaption)
 {
-    tools::Rectangle aRet;
-
-    auto pMVal = dynamic_cast<const MenupopupValue*>(&rValue);
-    if (!pMVal)
-        return aRet;
-
-    aRet.SetTop(pMVal->maItemRect.Top());
-    aRet.SetBottom(pMVal->maItemRect.Bottom() + 1); // see below in drawNativeControl
-    if (AllSettings::GetLayoutRTL())
-    {
-        aRet.SetRight(pMVal->maItemRect.Right() + 1);
-        aRet.SetLeft(aRet.Right() - (pMVal->getNumericVal() - pMVal->maItemRect.Left()));
-    }
+    int iState = (nState & ControlState::ENABLED) ? MCB_NORMAL : MCB_DISABLED;
+    ImplDrawTheme(hTheme, hDC, MENU_POPUPCHECKBACKGROUND, iState, rc, aCaption);
+    if (nPart == ControlPart::MenuItemCheckMark)
+        iState = (nState & ControlState::ENABLED) ? MC_CHECKMARKNORMAL : MC_CHECKMARKDISABLED;
     else
+        iState = (nState & ControlState::ENABLED) ? MC_BULLETNORMAL : MC_BULLETDISABLED;
+    // tdf#133697: Get true size of mark, to avoid stretching
+    if (auto oSize = ImplGetThemeSize(hTheme, hDC, MENU_POPUPCHECK, iState, &rc))
     {
-        aRet.SetRight(pMVal->getNumericVal());
-        aRet.SetLeft(pMVal->maItemRect.Left());
+        // center the mark inside the passed rectangle
+        if (const auto dx = (rc.right - rc.left - oSize->Width() + 1) / 2; dx > 0)
+        {
+            rc.left += dx;
+            rc.right = rc.left + oSize->Width();
+        }
+        if (const auto dy = (rc.bottom - rc.top - oSize->Height() + 1) / 2; dy > 0)
+        {
+            rc.top += dy;
+            rc.bottom = rc.top + oSize->Height();
+        }
+    }
+    return ImplDrawTheme(hTheme, hDC, MENU_POPUPCHECK, iState, rc, aCaption);
+}
+
+bool UseDarkMode()
+{
+    static bool bOSSupportsDarkMode = OSSupportsDarkMode();
+    if (!bOSSupportsDarkMode)
+        return false;
+
+    bool bRet(false);
+    switch (MiscSettings::GetDarkMode())
+    {
+        case 0: // auto
+        default:
+        {
+            HINSTANCE hUxthemeLib = LoadLibraryExW(L"uxtheme.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+            if (!hUxthemeLib)
+                return false;
+
+            typedef bool(WINAPI* ShouldAppsUseDarkMode_t)();
+            if (auto ShouldAppsUseDarkMode = reinterpret_cast<ShouldAppsUseDarkMode_t>(GetProcAddress(hUxthemeLib, MAKEINTRESOURCEA(132))))
+                bRet = ShouldAppsUseDarkMode();
+
+            FreeLibrary(hUxthemeLib);
+            break;
+        }
+        case 1: // light
+            bRet = false;
+            break;
+        case 2: // dark
+            bRet = true;
+            break;
     }
 
-    return aRet;
+    return bRet;
 }
 
 static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
@@ -523,7 +435,8 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
                             ControlPart nPart,
                             ControlState nState,
                             const ImplControlValue& aValue,
-                            OUString const & aCaption )
+                            OUString const & aCaption,
+                            bool bUseDarkMode )
 {
     // a listbox dropdown is actually a combobox dropdown
     if( nType == ControlType::Listbox )
@@ -555,7 +468,7 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
                 iState = ABS_UPHOT;
             else
                 iState = ABS_UPNORMAL;
-            hr = vsAPI.DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
+            hr = DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
             return (hr == S_OK);
         }
         if( nPart == ControlPart::ButtonDown )
@@ -569,7 +482,7 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
                 iState = ABS_DOWNHOT;
             else
                 iState = ABS_DOWNNORMAL;
-            hr = vsAPI.DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
+            hr = DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
             return (hr == S_OK);
         }
         if( nPart == ControlPart::ButtonLeft )
@@ -583,7 +496,7 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
                 iState = ABS_LEFTHOT;
             else
                 iState = ABS_LEFTNORMAL;
-            hr = vsAPI.DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
+            hr = DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
             return (hr == S_OK);
         }
         if( nPart == ControlPart::ButtonRight )
@@ -597,7 +510,7 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
                 iState = ABS_RIGHTHOT;
             else
                 iState = ABS_RIGHTNORMAL;
-            hr = vsAPI.DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
+            hr = DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
             return (hr == S_OK);
         }
         if( nPart == ControlPart::ThumbHorz || nPart == ControlPart::ThumbVert )
@@ -613,18 +526,18 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
                 iState = SCRBS_NORMAL;
 
             SIZE sz;
-            vsAPI.GetThemePartSize(hTheme, hDC, iPart, iState, nullptr, TS_MIN, &sz);
-            vsAPI.GetThemePartSize(hTheme, hDC, iPart, iState, nullptr, TS_TRUE, &sz);
-            vsAPI.GetThemePartSize(hTheme, hDC, iPart, iState, nullptr, TS_DRAW, &sz);
+            GetThemePartSize(hTheme, hDC, iPart, iState, nullptr, TS_MIN, &sz);
+            GetThemePartSize(hTheme, hDC, iPart, iState, nullptr, TS_TRUE, &sz);
+            GetThemePartSize(hTheme, hDC, iPart, iState, nullptr, TS_DRAW, &sz);
 
-            hr = vsAPI.DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
+            hr = DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
             // paint gripper on thumb if enough space
             if( ( (nPart == ControlPart::ThumbVert) && (rc.bottom-rc.top > 12) ) ||
                 ( (nPart == ControlPart::ThumbHorz) && (rc.right-rc.left > 12) ) )
             {
                 iPart = (nPart == ControlPart::ThumbHorz) ? SBP_GRIPPERHORZ : SBP_GRIPPERVERT;
                 iState = 0;
-                vsAPI.DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
+                DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
             }
             return (hr == S_OK);
         }
@@ -647,7 +560,7 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
                 iState = SCRBS_HOT;
             else
                 iState = SCRBS_NORMAL;
-            hr = vsAPI.DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
+            hr = DrawThemeBackground( hTheme, hDC, iPart, iState, &rc, nullptr);
             return (hr == S_OK);
         }
     }
@@ -821,12 +734,27 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
 
         //SIZE sz;
         //THEMESIZE eSize = TS_DRAW; // TS_MIN, TS_TRUE, TS_DRAW
-        //vsAPI.GetThemePartSize( hTheme, hDC, iPart, iState, &rc, eSize, &sz);
+        //GetThemePartSize( hTheme, hDC, iPart, iState, &rc, eSize, &sz);
 
         return ImplDrawTheme( hTheme, hDC, iPart, iState, rc, aCaption);
     }
 
-    if( ( nType == ControlType::Editbox ) || ( nType == ControlType::MultilineEditbox ) )
+    if (nType == ControlType::Editbox)
+    {
+        iPart = EP_EDITBORDER_NOSCROLL;
+        if( !(nState & ControlState::ENABLED) )
+            iState = EPSN_DISABLED;
+        else if( nState & ControlState::FOCUSED )
+            iState = EPSN_FOCUSED;
+        else if( nState & ControlState::ROLLOVER )
+            iState = EPSN_HOT;
+        else
+            iState = EPSN_NORMAL;
+
+        return ImplDrawTheme( hTheme, hDC, iPart, iState, rc, aCaption);
+    }
+
+    if (nType == ControlType::MultilineEditbox)
     {
         iPart = EP_EDITTEXT;
         if( !(nState & ControlState::ENABLED) )
@@ -852,12 +780,34 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
 
     if( nType == ControlType::TabPane )
     {
+        // tabpane in tabcontrols gets drawn in "darkmode" as if it was a
+        // a "light" theme, so bodge this by drawing a frame directly
+        if (bUseDarkMode)
+        {
+            Color aColor(Application::GetSettings().GetStyleSettings().GetDisableColor());
+            ScopedHBRUSH hbrush(CreateSolidBrush(RGB(aColor.GetRed(),
+                                                     aColor.GetGreen(),
+                                                     aColor.GetBlue())));
+            FrameRect(hDC, &rc, hbrush.get());
+            return true;
+        }
         iPart = TABP_PANE;
         return ImplDrawTheme( hTheme, hDC, iPart, iState, rc, aCaption);
     }
 
     if( nType == ControlType::TabBody )
     {
+        // tabbody in main window gets drawn in white in "darkmode", so bodge this here
+        if (bUseDarkMode)
+        {
+            Color aColor(Application::GetSettings().GetStyleSettings().GetWindowColor());
+            ScopedHBRUSH hbrush(CreateSolidBrush(RGB(aColor.GetRed(),
+                                                     aColor.GetGreen(),
+                                                     aColor.GetBlue())));
+            FillRect(hDC, &rc, hbrush.get());
+            return true;
+        }
+
         iPart = TABP_BODY;
         return ImplDrawTheme( hTheme, hDC, iPart, iState, rc, aCaption);
     }
@@ -879,7 +829,8 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
             iPart = TABP_TABITEMLEFTEDGE;
         else if (rValue.isRightAligned())
             iPart = TABP_TABITEMRIGHTEDGE;
-        else iPart = TABP_TABITEM;
+        else
+            iPart = TABP_TABITEM;
 
         if( !(nState & ControlState::ENABLED) )
             iState = TILES_DISABLED;
@@ -904,6 +855,38 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
             iState = TILES_FOCUSED;    // may need to draw focus rect
         else
             iState = TILES_NORMAL;
+
+        // tabitem in tabcontrols gets drawn in "darkmode" as if it was a
+        // a "light" theme, so bodge this by drawing with a button instead
+        if (bUseDarkMode)
+        {
+            Color aColor;
+            if (iState == TILES_SELECTED)
+                aColor = Application::GetSettings().GetStyleSettings().GetActiveTabColor();
+            else
+                aColor = Application::GetSettings().GetStyleSettings().GetInactiveTabColor();
+            ScopedHBRUSH hbrush(CreateSolidBrush(RGB(aColor.GetRed(),
+                                                     aColor.GetGreen(),
+                                                     aColor.GetBlue())));
+            FillRect(hDC, &rc, hbrush.get());
+
+            aColor = Application::GetSettings().GetStyleSettings().GetDisableColor();
+            ScopedSelectedHPEN hPen(hDC, CreatePen(PS_SOLID, 1, RGB(aColor.GetRed(),
+                                                                    aColor.GetGreen(),
+                                                                    aColor.GetBlue())));
+            POINT apt[4];
+            apt[0].x = rc.left;
+            apt[0].y = rc.bottom - (iPart == TABP_TABITEMLEFTEDGE ? 1 : 2);
+            apt[1].x = rc.left;
+            apt[1].y = rc.top;
+            apt[2].x = rc.right;
+            apt[2].y = rc.top;
+            apt[3].x = rc.right;
+            apt[3].y = rc.bottom - 1;
+            Polyline(hDC, apt, SAL_N_ELEMENTS(apt));
+            return true;
+        }
+
         return ImplDrawTheme( hTheme, hDC, iPart, iState, rc, aCaption);
     }
 
@@ -942,6 +925,17 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
                     rc.top = 0; // extend potential gradient to cover menu bar as well
             }
 
+            // toolbar in main window gets drawn in white in "darkmode", so bodge this here
+            if (bUseDarkMode)
+            {
+                Color aColor(Application::GetSettings().GetStyleSettings().GetWindowColor());
+                ScopedHBRUSH hbrush(CreateSolidBrush(RGB(aColor.GetRed(),
+                                                         aColor.GetGreen(),
+                                                         aColor.GetBlue())));
+                FillRect(hDC, &rc, hbrush.get());
+                return true;
+            }
+
             // make it more compatible with Aero
             if (ImplGetSVData()->maNWFData.mbDockingAreaAvoidTBFrames &&
                !Application::GetSettings().GetStyleSettings().GetHighContrastMode())
@@ -962,6 +956,17 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
             {
                 const MenubarValue *pValue = static_cast<const MenubarValue*>(&aValue);
                 rc.bottom += pValue->maTopDockingAreaHeight;    // extend potential gradient to cover docking area as well
+
+                // menubar in main window gets drawn in white in "darkmode", so bodge this here
+                if (bUseDarkMode)
+                {
+                    Color aColor(Application::GetSettings().GetStyleSettings().GetWindowColor());
+                    ScopedHBRUSH hbrush(CreateSolidBrush(RGB(aColor.GetRed(),
+                                                             aColor.GetGreen(),
+                                                             aColor.GetBlue())));
+                    FillRect(hDC, &rc, hbrush.get());
+                    return true;
+                }
 
                 // make it more compatible with Aero
                 if (ImplGetSVData()->maNWFData.mbDockingAreaAvoidTBFrames &&
@@ -1005,7 +1010,7 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
         if( ! ImplDrawTheme( hTheme, hDC, PP_BAR, iState, rc, aCaption) )
             return false;
         RECT aProgressRect = rc;
-        if( vsAPI.GetThemeBackgroundContentRect( hTheme, hDC, PP_BAR, iState, &rc, &aProgressRect) != S_OK )
+        if( GetThemeBackgroundContentRect( hTheme, hDC, PP_BAR, iState, &rc, &aProgressRect) != S_OK )
             return false;
 
         tools::Long nProgressWidth = aValue.getNumericVal();
@@ -1105,26 +1110,8 @@ static bool ImplDrawNativeControl( HDC hDC, HTHEME hTheme, RECT rc,
             }
             else if( nPart == ControlPart::MenuItemCheckMark || nPart == ControlPart::MenuItemRadioMark )
             {
-                if( nState & ControlState::PRESSED )
-                {
-                    RECT aBGRect = rc;
-                    if( aValue.getType() == ControlType::MenuPopup )
-                    {
-                        tools::Rectangle aRectangle = GetMenuPopupMarkRegion(aValue);
-                        aBGRect.top = aRectangle.Top();
-                        aBGRect.left = aRectangle.Left();
-                        aBGRect.bottom = aRectangle.Bottom();
-                        aBGRect.right = aRectangle.Right();
-                        rc = aBGRect;
-                    }
-                    iState = (nState & ControlState::ENABLED) ? MCB_NORMAL : MCB_DISABLED;
-                    ImplDrawTheme( hTheme, hDC, MENU_POPUPCHECKBACKGROUND, iState, aBGRect, aCaption );
-                    if( nPart == ControlPart::MenuItemCheckMark )
-                        iState = (nState & ControlState::ENABLED) ? MC_CHECKMARKNORMAL : MC_CHECKMARKDISABLED;
-                    else
-                        iState = (nState & ControlState::ENABLED) ? MC_BULLETNORMAL : MC_BULLETDISABLED;
-                    return ImplDrawTheme( hTheme, hDC, MENU_POPUPCHECK, iState, rc, aCaption );
-                }
+                if (nState & ControlState::PRESSED)
+                    return implDrawNativeMenuMark(hDC, hTheme, rc, nPart, nState, aCaption);
                 else
                     return true; // unchecked: do nothing
             }
@@ -1164,7 +1151,7 @@ bool WinSalGraphics::drawNativeControl( ControlType nType,
     tools::Rectangle cacheRect = rControlRegion;
     Size keySize = cacheRect.GetSize();
 
-    WinSalGraphicsImplBase* pImpl = dynamic_cast<WinSalGraphicsImplBase*>(mpImpl.get());
+    WinSalGraphicsImplBase* pImpl = mWinSalGraphicsImplBase;
     if( !pImpl->UseRenderNativeControl())
         pImpl = nullptr;
 
@@ -1181,17 +1168,6 @@ bool WinSalGraphics::drawNativeControl( ControlType nType,
         }
     }
 
-    if (pImpl && nType == ControlType::MenuPopup && (nPart == ControlPart::MenuItemCheckMark || nPart == ControlPart::MenuItemRadioMark))
-    {
-        tools::Rectangle aRectangle = GetMenuPopupMarkRegion(aValue);
-        if (!aRectangle.IsEmpty())
-        {
-            cacheRect = GetMenuPopupMarkRegion(aValue);
-            buttonRect = cacheRect;
-            keySize = cacheRect.GetSize();
-        }
-    }
-
 
     ControlCacheKey aControlCacheKey(nType, nPart, nState, keySize);
     if (pImpl != nullptr && pImpl->TryRenderCachedNativeControl(aControlCacheKey, buttonRect.Left(), buttonRect.Top()))
@@ -1199,73 +1175,112 @@ bool WinSalGraphics::drawNativeControl( ControlType nType,
         return true;
     }
 
+    const bool bUseDarkMode = UseDarkMode();
+    if (bUseDarkMode)
+        SetWindowTheme(mhWnd, L"Explorer", nullptr);
+
     switch( nType )
     {
         case ControlType::Pushbutton:
         case ControlType::Radiobutton:
         case ControlType::Checkbox:
-            hTheme = getThemeHandle( mhWnd, L"Button");
+            hTheme = getThemeHandle(mhWnd, L"Button", mWinSalGraphicsImplBase);
             break;
         case ControlType::Scrollbar:
-            hTheme = getThemeHandle( mhWnd, L"Scrollbar");
+            if (bUseDarkMode)
+            {
+                // tdf#153273 undo the earlier SetWindowTheme, and use an explicit Explorer::Scrollbar
+                // a) with "Scrollbar" and SetWindowTheme(... "Explorer" ...) then scrollbars in dialog
+                // and main windows are dark, but dropdowns are light
+                // b) with "Explorer::Scrollbar" and SetWindowTheme(... "Explorer" ...) then scrollbars
+                // in dropdowns are dark, but scrollbars in dialogs and main windows are sort of "extra
+                // dark"
+                // c) with "Explorer::Scrollbar" and no SetWindowTheme both cases are dark
+                SetWindowTheme(mhWnd, nullptr, nullptr);
+                hTheme = getThemeHandle(mhWnd, L"Explorer::Scrollbar", mWinSalGraphicsImplBase);
+            }
+            else
+                hTheme = getThemeHandle(mhWnd, L"Scrollbar", mWinSalGraphicsImplBase);
             break;
         case ControlType::Combobox:
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"Edit");
+            {
+                if (bUseDarkMode && !(nState & ControlState::FOCUSED))
+                    SetWindowTheme(mhWnd, L"CFD", nullptr);
+                hTheme = getThemeHandle(mhWnd, L"Edit", mWinSalGraphicsImplBase);
+            }
             else if( nPart == ControlPart::ButtonDown )
-                hTheme = getThemeHandle( mhWnd, L"Combobox");
+            {
+                if (bUseDarkMode)
+                    SetWindowTheme(mhWnd, L"CFD", nullptr);
+                hTheme = getThemeHandle(mhWnd, L"Combobox", mWinSalGraphicsImplBase);
+            }
             break;
         case ControlType::Spinbox:
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"Edit");
+            {
+                if (bUseDarkMode && !(nState & ControlState::FOCUSED))
+                    SetWindowTheme(mhWnd, L"CFD", nullptr);
+                hTheme = getThemeHandle(mhWnd, L"Edit", mWinSalGraphicsImplBase);
+            }
             else
-                hTheme = getThemeHandle( mhWnd, L"Spin");
+                hTheme = getThemeHandle(mhWnd, L"Spin", mWinSalGraphicsImplBase);
             break;
         case ControlType::SpinButtons:
-            hTheme = getThemeHandle( mhWnd, L"Spin");
+            hTheme = getThemeHandle(mhWnd, L"Spin", mWinSalGraphicsImplBase);
             break;
         case ControlType::Editbox:
+            if (bUseDarkMode && !(nState & ControlState::FOCUSED))
+                SetWindowTheme(mhWnd, L"CFD", nullptr);
+            hTheme = getThemeHandle(mhWnd, L"Edit", mWinSalGraphicsImplBase);
+            break;
         case ControlType::MultilineEditbox:
-            hTheme = getThemeHandle( mhWnd, L"Edit");
+            hTheme = getThemeHandle(mhWnd, L"Edit", mWinSalGraphicsImplBase);
             break;
         case ControlType::Listbox:
             if( nPart == ControlPart::Entire || nPart == ControlPart::ListboxWindow )
-                hTheme = getThemeHandle( mhWnd, L"Listview");
+                hTheme = getThemeHandle(mhWnd, L"Listview", mWinSalGraphicsImplBase);
             else if( nPart == ControlPart::ButtonDown )
-                hTheme = getThemeHandle( mhWnd, L"Combobox");
+            {
+                if (bUseDarkMode)
+                    SetWindowTheme(mhWnd, L"CFD", nullptr);
+                hTheme = getThemeHandle(mhWnd, L"Combobox", mWinSalGraphicsImplBase);
+            }
+            break;
+        case ControlType::TabBody:
+            hTheme = getThemeHandle(mhWnd, L"Tab", mWinSalGraphicsImplBase);
             break;
         case ControlType::TabPane:
-        case ControlType::TabBody:
         case ControlType::TabItem:
-            hTheme = getThemeHandle( mhWnd, L"Tab");
+            hTheme = getThemeHandle(mhWnd, L"Tab", mWinSalGraphicsImplBase);
             break;
         case ControlType::Toolbar:
             if( nPart == ControlPart::Entire || nPart == ControlPart::Button )
-                hTheme = getThemeHandle( mhWnd, L"Toolbar");
+                hTheme = getThemeHandle(mhWnd, L"Toolbar", mWinSalGraphicsImplBase);
             else
                 // use rebar for grip and background
-                hTheme = getThemeHandle( mhWnd, L"Rebar");
+                hTheme = getThemeHandle(mhWnd, L"Rebar", mWinSalGraphicsImplBase);
             break;
         case ControlType::Menubar:
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"Rebar");
+                hTheme = getThemeHandle(mhWnd, L"Rebar", mWinSalGraphicsImplBase);
             else if( GetSalData()->mbThemeMenuSupport )
             {
                 if( nPart == ControlPart::MenuItem )
-                    hTheme = getThemeHandle( mhWnd, L"Menu" );
+                    hTheme = getThemeHandle(mhWnd, L"Menu", mWinSalGraphicsImplBase);
             }
             break;
         case ControlType::Progress:
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"Progress");
+                hTheme = getThemeHandle(mhWnd, L"Progress", mWinSalGraphicsImplBase);
             break;
         case ControlType::ListNode:
             if( nPart == ControlPart::Entire )
-                hTheme = getThemeHandle( mhWnd, L"TreeView");
+                hTheme = getThemeHandle(mhWnd, L"TreeView", mWinSalGraphicsImplBase);
             break;
         case ControlType::Slider:
             if( nPart == ControlPart::TrackHorzArea || nPart == ControlPart::TrackVertArea )
-                hTheme = getThemeHandle( mhWnd, L"Trackbar" );
+                hTheme = getThemeHandle(mhWnd, L"Trackbar", mWinSalGraphicsImplBase);
             break;
         case ControlType::MenuPopup:
             if( GetSalData()->mbThemeMenuSupport )
@@ -1274,7 +1289,7 @@ bool WinSalGraphics::drawNativeControl( ControlType nType,
                     nPart == ControlPart::MenuItemCheckMark || nPart == ControlPart::MenuItemRadioMark ||
                     nPart == ControlPart::Separator
                     )
-                    hTheme = getThemeHandle( mhWnd, L"Menu" );
+                    hTheme = getThemeHandle(mhWnd, L"Menu", mWinSalGraphicsImplBase);
             }
             break;
         default:
@@ -1283,7 +1298,11 @@ bool WinSalGraphics::drawNativeControl( ControlType nType,
     }
 
     if( !hTheme )
+    {
+        if (bUseDarkMode)
+            SetWindowTheme(mhWnd, nullptr, nullptr);
         return false;
+    }
 
     RECT rc;
     rc.left   = buttonRect.Left();
@@ -1298,7 +1317,7 @@ bool WinSalGraphics::drawNativeControl( ControlType nType,
         // set default text alignment
         int ta = SetTextAlign(getHDC(), TA_LEFT|TA_TOP|TA_NOUPDATECP);
 
-        bOk = ImplDrawNativeControl(getHDC(), hTheme, rc, nType, nPart, nState, aValue, aCaptionStr);
+        bOk = ImplDrawNativeControl(getHDC(), hTheme, rc, nType, nPart, nState, aValue, aCaptionStr, bUseDarkMode);
 
         // restore alignment
         SetTextAlign(getHDC(), ta);
@@ -1314,13 +1333,15 @@ bool WinSalGraphics::drawNativeControl( ControlType nType,
         SetTextAlign(aWhiteDC->getCompatibleHDC(), TA_LEFT|TA_TOP|TA_NOUPDATECP);
         aWhiteDC->fill(RGB(0xff, 0xff, 0xff));
 
-        if (ImplDrawNativeControl(aBlackDC->getCompatibleHDC(), hTheme, rc, nType, nPart, nState, aValue, aCaptionStr) &&
-            ImplDrawNativeControl(aWhiteDC->getCompatibleHDC(), hTheme, rc, nType, nPart, nState, aValue, aCaptionStr))
+        if (ImplDrawNativeControl(aBlackDC->getCompatibleHDC(), hTheme, rc, nType, nPart, nState, aValue, aCaptionStr, bUseDarkMode) &&
+            ImplDrawNativeControl(aWhiteDC->getCompatibleHDC(), hTheme, rc, nType, nPart, nState, aValue, aCaptionStr, bUseDarkMode))
         {
             bOk = pImpl->RenderAndCacheNativeControl(*aWhiteDC, *aBlackDC, cacheRect.Left(), cacheRect.Top(), aControlCacheKey);
         }
     }
 
+    if (bUseDarkMode)
+        SetWindowTheme(mhWnd, nullptr, nullptr);
     return bOk;
 }
 
@@ -1347,7 +1368,7 @@ bool WinSalGraphics::getNativeControlRegion(  ControlType nType,
             // the vertical gripper is not supported in most themes and it makes no
             // sense to only support horizontal gripper
 
-            HTHEME hTheme = getThemeHandle( mhWnd, L"Rebar");
+            HTHEME hTheme = getThemeHandle(mhWnd, L"Rebar", mWinSalGraphicsImplBase);
             if( hTheme )
             {
             tools::Rectangle aRect( ImplGetThemeRect( hTheme, hDC, nPart == ControlPart::ThumbHorz ? RP_GRIPPERVERT : RP_GRIPPER,
@@ -1367,7 +1388,7 @@ bool WinSalGraphics::getNativeControlRegion(  ControlType nType,
         }
         if( nPart == ControlPart::Button )
         {
-            HTHEME hTheme = getThemeHandle( mhWnd, L"Toolbar");
+            HTHEME hTheme = getThemeHandle(mhWnd, L"Toolbar", mWinSalGraphicsImplBase);
             if( hTheme )
             {
                 tools::Rectangle aRect( ImplGetThemeRect( hTheme, hDC, TP_SPLITBUTTONDROPDOWN,
@@ -1381,7 +1402,7 @@ bool WinSalGraphics::getNativeControlRegion(  ControlType nType,
     }
     if( nType == ControlType::Progress && nPart == ControlPart::Entire )
     {
-        HTHEME hTheme = getThemeHandle( mhWnd, L"Progress");
+        HTHEME hTheme = getThemeHandle(mhWnd, L"Progress", mWinSalGraphicsImplBase);
         if( hTheme )
         {
             tools::Rectangle aRect( ImplGetThemeRect( hTheme, hDC, PP_BAR,
@@ -1394,7 +1415,7 @@ bool WinSalGraphics::getNativeControlRegion(  ControlType nType,
     }
     if( (nType == ControlType::Listbox || nType == ControlType::Combobox ) && nPart == ControlPart::Entire )
     {
-        HTHEME hTheme = getThemeHandle( mhWnd, L"Combobox");
+        HTHEME hTheme = getThemeHandle(mhWnd, L"Combobox", mWinSalGraphicsImplBase);
         if( hTheme )
         {
             tools::Rectangle aBoxRect( rControlRegion );
@@ -1413,7 +1434,7 @@ bool WinSalGraphics::getNativeControlRegion(  ControlType nType,
 
     if( (nType == ControlType::Editbox || nType == ControlType::Spinbox) && nPart == ControlPart::Entire )
     {
-        HTHEME hTheme = getThemeHandle( mhWnd, L"Edit");
+        HTHEME hTheme = getThemeHandle(mhWnd, L"Edit", mWinSalGraphicsImplBase);
         if( hTheme )
         {
             // get border size
@@ -1452,16 +1473,24 @@ bool WinSalGraphics::getNativeControlRegion(  ControlType nType,
             if( nPart == ControlPart::MenuItemCheckMark ||
                 nPart == ControlPart::MenuItemRadioMark )
             {
-                HTHEME hTheme = getThemeHandle( mhWnd, L"Menu");
+                HTHEME hTheme = getThemeHandle(mhWnd, L"Menu", mWinSalGraphicsImplBase);
                 tools::Rectangle aBoxRect( rControlRegion );
                 tools::Rectangle aRect( ImplGetThemeRect( hTheme, hDC,
                     MENU_POPUPCHECK,
                     MC_CHECKMARKNORMAL,
                     aBoxRect ) );
-                if( aBoxRect.GetWidth() && aBoxRect.GetHeight() )
+                if (!aRect.IsEmpty())
                 {
-                    rNativeContentRegion = aRect;
-                    rNativeBoundingRegion = rNativeContentRegion;
+                    if (MARGINS mg;
+                        SUCCEEDED(GetThemeMargins(hTheme, hDC, MENU_POPUPCHECK, MC_CHECKMARKNORMAL,
+                                                  TMT_CONTENTMARGINS, nullptr, &mg)))
+                    {
+                        aRect.AdjustLeft(-mg.cxLeftWidth);
+                        aRect.AdjustRight(mg.cxRightWidth);
+                        aRect.AdjustTop(-mg.cyTopHeight);
+                        aRect.AdjustBottom(mg.cyBottomHeight);
+                    }
+                    rNativeContentRegion = rNativeBoundingRegion = aRect;
                     bRet = true;
                 }
             }
@@ -1470,7 +1499,7 @@ bool WinSalGraphics::getNativeControlRegion(  ControlType nType,
 
     if( nType == ControlType::Slider && ( (nPart == ControlPart::ThumbHorz) || (nPart == ControlPart::ThumbVert) ) )
     {
-        HTHEME hTheme = getThemeHandle( mhWnd, L"Trackbar");
+        HTHEME hTheme = getThemeHandle(mhWnd, L"Trackbar", mWinSalGraphicsImplBase);
         if( hTheme )
         {
             int iPart = (nPart == ControlPart::ThumbHorz) ? TKP_THUMB : TKP_THUMBVERT;
@@ -1533,7 +1562,7 @@ bool WinSalGraphics::getNativeControlRegion(  ControlType nType,
 
 void WinSalGraphics::updateSettingsNative( AllSettings& rSettings )
 {
-    if ( !vsAPI.IsThemeActive() )
+    if ( !IsThemeActive() )
         return;
 
     StyleSettings aStyleSettings = rSettings.GetStyleSettings();

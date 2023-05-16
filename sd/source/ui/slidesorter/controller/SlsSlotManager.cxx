@@ -62,7 +62,6 @@
 #include <sfx2/request.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/bindings.hxx>
-#include <sfx2/dispatch.hxx>
 #include <sfx2/sidebar/Sidebar.hxx>
 #include <svx/svxids.hrc>
 #include <svx/svxdlg.hxx>
@@ -72,7 +71,7 @@
 #include <svl/itempool.hxx>
 #include <com/sun/star/drawing/XMasterPagesSupplier.hpp>
 #include <com/sun/star/drawing/XDrawPages.hpp>
-
+#include <osl/diagnose.h>
 
 #include <memory>
 
@@ -115,10 +114,6 @@ void collectUIInformation(std::map<OUString, OUString>&& aParameters, const OUSt
 
 SlotManager::SlotManager (SlideSorter& rSlideSorter)
     : mrSlideSorter(rSlideSorter)
-{
-}
-
-SlotManager::~SlotManager()
 {
 }
 
@@ -573,7 +568,7 @@ void SlotManager::GetMenuState (SfxItemSet& rSet)
                     else
                     {
                         // check if the object is in edit, then if it's temporarily not empty
-                        SdrTextObj* pTextObj = dynamic_cast< SdrTextObj* >( pObj );
+                        SdrTextObj* pTextObj = DynCastSdrTextObj( pObj );
                         if( pTextObj )
                         {
                             if( pTextObj->CanCreateEditOutlinerParaObject() )

@@ -18,22 +18,21 @@
  */
 
 #include <svx/svdmark.hxx>
-#include <tools/diagnose_ex.h>
-
-#include <com/sun/star/frame/XModel.hpp>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <editsh.hxx>
 #include <fesh.hxx>
 #include <doc.hxx>
 #include <IDocumentUndoRedo.hxx>
 #include <IDocumentRedlineAccess.hxx>
-#include <pam.hxx>
 #include <UndoCore.hxx>
 #include <swundo.hxx>
 #include <flyfrm.hxx>
 #include <frmfmt.hxx>
 #include <docsh.hxx>
 #include <pagefrm.hxx>
+#include <textboxhelper.hxx>
+#include <fmtanchr.hxx>
 
 #include <wrtsh.hxx>
 
@@ -64,6 +63,13 @@ void SwEditShell::HandleUndoRedoContext(::sw::UndoRedoContext & rContext)
         if (RES_DRAWFRMFMT == pSelFormat->Which())
         {
             SdrObject* pSObj = pSelFormat->FindSdrObject();
+
+            // Before layout calc, inline anchored textboxes have to be synced unless crash.
+            if (pSelFormat->GetAnchor().GetAnchorId() == RndStdIds::FLY_AS_CHAR
+                && pSelFormat->GetOtherTextBoxFormats())
+                SwTextBoxHelper::synchronizeGroupTextBoxProperty(SwTextBoxHelper::changeAnchor,
+                                                                 pSelFormat, pSObj);
+
             static_cast<SwFEShell*>(this)->SelectObj(
                     pSObj->GetCurrentBoundRect().Center() );
         }
@@ -98,7 +104,7 @@ void SwEditShell::HandleUndoRedoContext(::sw::UndoRedoContext & rContext)
 
 void SwEditShell::Undo(sal_uInt16 const nCount, sal_uInt16 nOffset)
 {
-    MakeAllOutlineContentTemporarilyVisible a(GetDoc());
+    MakeAllOutlineContentTemporarilyVisible a(GetDoc(), true);
 
     CurrShell aCurr( this );
 
@@ -155,7 +161,7 @@ void SwEditShell::Undo(sal_uInt16 const nCount, sal_uInt16 nOffset)
 
 void SwEditShell::Redo(sal_uInt16 const nCount)
 {
-    MakeAllOutlineContentTemporarilyVisible a(GetDoc());
+    MakeAllOutlineContentTemporarilyVisible a(GetDoc(), true);
 
     CurrShell aCurr( this );
 

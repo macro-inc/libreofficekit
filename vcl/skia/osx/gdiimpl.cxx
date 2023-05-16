@@ -26,7 +26,9 @@
 #include <tools/sk_app/mac/WindowContextFactory_mac.h>
 
 #include <quartz/ctfonts.hxx>
+#include <skia/quartz/cgutils.h>
 
+#include <SkBitmap.h>
 #include <SkCanvas.h>
 #include <SkFont.h>
 #include <SkFontMgr_mac_ct.h>
@@ -37,7 +39,7 @@ using namespace SkiaHelper;
 AquaSkiaSalGraphicsImpl::AquaSkiaSalGraphicsImpl(AquaSalGraphics& rParent,
                                                  AquaSharedAttributes& rShared)
     : SkiaSalGraphicsImpl(rParent, rShared.mpFrame)
-    , AquaGraphicsBackendBase(rShared)
+    , AquaGraphicsBackendBase(rShared, this)
 {
     Init(); // mac code doesn't call Init()
 }
@@ -93,30 +95,14 @@ void AquaSkiaSalGraphicsImpl::Flush() { performFlush(); }
 
 void AquaSkiaSalGraphicsImpl::Flush(const tools::Rectangle&) { performFlush(); }
 
+void AquaSkiaSalGraphicsImpl::WindowBackingPropertiesChanged() { windowBackingPropertiesChanged(); }
+
 void AquaSkiaSalGraphicsImpl::flushSurfaceToWindowContext()
 {
     if (!isGPU())
         flushSurfaceToScreenCG();
     else
         SkiaSalGraphicsImpl::flushSurfaceToWindowContext();
-}
-
-constexpr static uint32_t toCGBitmapType(SkColorType color, SkAlphaType alpha)
-{
-    if (alpha == kPremul_SkAlphaType)
-    {
-        return color == kBGRA_8888_SkColorType
-                   ? (uint32_t(kCGImageAlphaPremultipliedFirst)
-                      | uint32_t(kCGBitmapByteOrder32Little))
-                   : (uint32_t(kCGImageAlphaPremultipliedLast) | uint32_t(kCGBitmapByteOrder32Big));
-    }
-    else
-    {
-        assert(alpha == kOpaque_SkAlphaType);
-        return color == kBGRA_8888_SkColorType
-                   ? (uint32_t(kCGImageAlphaNoneSkipFirst) | uint32_t(kCGBitmapByteOrder32Little))
-                   : (uint32_t(kCGImageAlphaNoneSkipLast) | uint32_t(kCGBitmapByteOrder32Big));
-    }
 }
 
 // For Raster we use our own screen blitting (see above).
@@ -138,22 +124,61 @@ void AquaSkiaSalGraphicsImpl::flushSurfaceToScreenCG()
     // This creates the bitmap context from the cropped part, writable_addr32() will get
     // the first pixel of mDirtyRect.topLeft(), and using pixmap.rowBytes() ensures the following
     // pixel lines will be read from correct positions.
-    CGContextRef context = CGBitmapContextCreate(
-        pixmap.writable_addr32(mDirtyRect.x() * mScaling, mDirtyRect.y() * mScaling),
-        mDirtyRect.width() * mScaling, mDirtyRect.height() * mScaling, 8, pixmap.rowBytes(),
-        GetSalData()->mxRGBSpace, toCGBitmapType(image->colorType(), image->alphaType()));
-    if (!context)
+    if (pixmap.bounds() != mDirtyRect && pixmap.bounds().bottom() == mDirtyRect.bottom())
     {
-        SAL_WARN("vcl.skia", "flushSurfaceToScreenGC(): Failed to allocate bitmap context");
+        // HACK for tdf#145843: If mDirtyRect includes the last line but not the first pixel of it,
+        // then the rowBytes() trick would lead to the CG* functions thinking that even pixels after
+        // the pixmap data belong to the area (since the shifted x()+rowBytes() points there) and
+        // at least on Intel Mac they would actually read those data, even though I see no good reason
+        // to do that, as that's beyond the x()+width() for the last line. That could be handled
+        // by creating a subset SkImage (which as is said above copies data), or set the x coordinate
+        // to 0, which will then make rowBytes() match the actual data.
+        mDirtyRect.fLeft = 0;
+        assert(mDirtyRect.width() == pixmap.bounds().width());
+    }
+
+    // tdf#145843 Do not use CGBitmapContextCreate() to create a bitmap context
+    // As described in the comment in the above code, CGBitmapContextCreate()
+    // and CGBitmapContextCreateWithData() will try to access pixels up to
+    // mDirtyRect.x() + pixmap.bounds.width() for each row. When reading the
+    // last line in the SkPixmap, the buffer allocated for the SkPixmap ends at
+    // mDirtyRect.x() + mDirtyRect.width() and mDirtyRect.width() is clamped to
+    // pixmap.bounds.width() - mDirtyRect.x().
+    // This behavior looks like an optimization within CGBitmapContextCreate()
+    // to draw with a single memcpy() so fix this bug by chaining the
+    // CGDataProvider(), CGImageCreate(), and CGImageCreateWithImageInRect()
+    // functions to create the screen image.
+    CGDataProviderRef dataProvider = CGDataProviderCreateWithData(
+        nullptr, pixmap.writable_addr32(0, 0), pixmap.computeByteSize(), nullptr);
+    if (!dataProvider)
+    {
+        SAL_WARN("vcl.skia", "flushSurfaceToScreenGC(): Failed to allocate data provider");
         return;
     }
-    CGImageRef screenImage = CGBitmapContextCreateImage(context);
+
+    CGImageRef fullImage = CGImageCreate(pixmap.bounds().width(), pixmap.bounds().height(), 8,
+                                         8 * image->imageInfo().bytesPerPixel(), pixmap.rowBytes(),
+                                         GetSalData()->mxRGBSpace,
+                                         SkiaToCGBitmapType(image->colorType(), image->alphaType()),
+                                         dataProvider, nullptr, false, kCGRenderingIntentDefault);
+    if (!fullImage)
+    {
+        CGDataProviderRelease(dataProvider);
+        SAL_WARN("vcl.skia", "flushSurfaceToScreenGC(): Failed to allocate full image");
+        return;
+    }
+
+    CGImageRef screenImage = CGImageCreateWithImageInRect(
+        fullImage, CGRectMake(mDirtyRect.x() * mScaling, mDirtyRect.y() * mScaling,
+                              mDirtyRect.width() * mScaling, mDirtyRect.height() * mScaling));
     if (!screenImage)
     {
-        CGContextRelease(context);
+        CGImageRelease(fullImage);
+        CGDataProviderRelease(dataProvider);
         SAL_WARN("vcl.skia", "flushSurfaceToScreenGC(): Failed to allocate screen image");
         return;
     }
+
     mrShared.maContextHolder.saveState();
     // Drawing to the actual window has scaling active, so use unscaled coordinates, the scaling matrix will scale them
     // to the proper screen coordinates. Unless the scaling is fake for debugging, in which case scale them to draw
@@ -178,7 +203,9 @@ void AquaSkiaSalGraphicsImpl::flushSurfaceToScreenCG()
     mrShared.maContextHolder.restoreState();
 
     CGImageRelease(screenImage);
-    CGContextRelease(context);
+    CGImageRelease(fullImage);
+    CGDataProviderRelease(dataProvider);
+
     // This is also in VCL coordinates.
     mrShared.refreshRect(mDirtyRect.x(), mDirtyRect.y(), mDirtyRect.width(), mDirtyRect.height());
 }
@@ -205,7 +232,7 @@ bool AquaSkiaSalGraphicsImpl::drawNativeControl(ControlType nType, ControlPart n
     memset(data.get(), 0, bytes);
     CGContextRef context = CGBitmapContextCreate(
         data.get(), width, height, 8, width * 4, GetSalData()->mxRGBSpace,
-        toCGBitmapType(mSurface->imageInfo().colorType(), kPremul_SkAlphaType));
+        SkiaToCGBitmapType(mSurface->imageInfo().colorType(), kPremul_SkAlphaType));
     if (!context)
     {
         SAL_WARN("vcl.skia", "drawNativeControl(): Failed to allocate bitmap context");
@@ -214,10 +241,10 @@ bool AquaSkiaSalGraphicsImpl::drawNativeControl(ControlType nType, ControlPart n
     // Setup context state for drawing (performDrawNativeControl() e.g. fills background in some cases).
     CGContextSetFillColorSpace(context, GetSalData()->mxRGBSpace);
     CGContextSetStrokeColorSpace(context, GetSalData()->mxRGBSpace);
-    RGBAColor lineColor = RGBAColor(mLineColor);
+    RGBAColor lineColor(mLineColor);
     CGContextSetRGBStrokeColor(context, lineColor.GetRed(), lineColor.GetGreen(),
                                lineColor.GetBlue(), lineColor.GetAlpha());
-    RGBAColor fillColor = RGBAColor(mFillColor);
+    RGBAColor fillColor(mFillColor);
     CGContextSetRGBFillColor(context, fillColor.GetRed(), fillColor.GetGreen(), fillColor.GetBlue(),
                              fillColor.GetAlpha());
     // Adjust for our drawn-to coordinates in the bitmap.
@@ -255,7 +282,7 @@ bool AquaSkiaSalGraphicsImpl::drawNativeControl(ControlType nType, ControlPart n
                                            boundingRegion.GetWidth(), boundingRegion.GetHeight());
         assert(drawRect.width() * mScaling == bitmap.width()); // no scaling should be needed
         getDrawCanvas()->drawImageRect(bitmap.asImage(), drawRect, SkSamplingOptions());
-        ++mPendingOperationsToFlush; // tdf#136369
+        ++pendingOperationsToFlush; // tdf#136369
         postDraw();
     }
     return bOK;
@@ -264,8 +291,8 @@ bool AquaSkiaSalGraphicsImpl::drawNativeControl(ControlType nType, ControlPart n
 void AquaSkiaSalGraphicsImpl::drawTextLayout(const GenericSalLayout& rLayout,
                                              bool bSubpixelPositioning)
 {
-    const CoreTextStyle& rStyle = *static_cast<const CoreTextStyle*>(&rLayout.GetFont());
-    const vcl::font::FontSelectPattern& rFontSelect = rStyle.GetFontSelectPattern();
+    const CoreTextFont& rFont = *static_cast<const CoreTextFont*>(&rLayout.GetFont());
+    const vcl::font::FontSelectPattern& rFontSelect = rFont.GetFontSelectPattern();
     int nHeight = rFontSelect.mnHeight;
     int nWidth = rFontSelect.mnWidth ? rFontSelect.mnWidth : nHeight;
     if (nWidth == 0 || nHeight == 0)
@@ -276,7 +303,7 @@ void AquaSkiaSalGraphicsImpl::drawTextLayout(const GenericSalLayout& rLayout,
 
     if (!fontManager)
     {
-        SystemFontList* fontList = GetCoretextFontList();
+        std::unique_ptr<SystemFontList> fontList = GetCoretextFontList();
         if (fontList == nullptr)
         {
             SAL_WARN("vcl.skia", "DrawTextLayout(): No coretext font list");
@@ -288,19 +315,21 @@ void AquaSkiaSalGraphicsImpl::drawTextLayout(const GenericSalLayout& rLayout,
         }
     }
 
-    CTFontRef pFont
-        = static_cast<CTFontRef>(CFDictionaryGetValue(rStyle.GetStyleDict(), kCTFontAttributeName));
-    sk_sp<SkTypeface> typeface = SkMakeTypefaceFromCTFont(pFont);
+    sk_sp<SkTypeface> typeface = SkMakeTypefaceFromCTFont(rFont.GetCTFont());
     SkFont font(typeface);
     font.setSize(nHeight);
-    //    font.setScaleX(rStyle.mfFontStretch); TODO
-    if (rStyle.mbFauxBold)
+    //    font.setScaleX(rFont.mfFontStretch); TODO
+    if (rFont.NeedsArtificialBold())
         font.setEmbolden(true);
 
     SkFont::Edging ePreferredAliasing
         = bSubpixelPositioning ? SkFont::Edging::kSubpixelAntiAlias : SkFont::Edging::kAntiAlias;
     if (bSubpixelPositioning)
+    {
+        // note that SkFont defaults to a BaselineSnap of true, so I think really only
+        // subpixel in text direction
         font.setSubpixel(true);
+    }
     font.setEdging(mrShared.mbNonAntialiasedText ? SkFont::Edging::kAlias : ePreferredAliasing);
 
     // Vertical font, use width as "height".

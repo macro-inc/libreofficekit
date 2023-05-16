@@ -26,12 +26,12 @@
 #include <com/sun/star/accessibility/AccessibleRole.hpp>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
 #include <comphelper/accessibletexthelper.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/window.hxx>
 #include <vcl/menu.hxx>
+#include <vcl/mnemonic.hxx>
 #include <vcl/settings.hxx>
 #include <i18nlangtag/languagetag.hxx>
 
@@ -180,7 +180,7 @@ OUString OAccessibleMenuItemComponent::GetAccessibleName()
         sName = m_pParent->GetAccessibleName( nItemId );
         if ( sName.isEmpty() )
             sName = m_pParent->GetItemText( nItemId );
-        sName = OutputDevice::GetNonMnemonicString( sName );
+        sName = removeMnemonicFromString( sName );
 #if defined(_WIN32)
         if ( m_pParent->GetAccelKey( nItemId ).GetName().getLength() )
             sName += "\t" + m_pParent->GetAccelKey(nItemId).GetName();
@@ -206,28 +206,28 @@ OUString OAccessibleMenuItemComponent::GetItemText()
 {
     OUString sText;
     if ( m_pParent )
-        sText = OutputDevice::GetNonMnemonicString( m_pParent->GetItemText( m_pParent->GetItemId( m_nItemPos ) ) );
+        sText = removeMnemonicFromString( m_pParent->GetItemText( m_pParent->GetItemId( m_nItemPos ) ) );
 
     return sText;
 }
 
 
-void OAccessibleMenuItemComponent::FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet )
+void OAccessibleMenuItemComponent::FillAccessibleStateSet( sal_Int64& rStateSet )
 {
     bool bEnabled = IsEnabled();
     if ( bEnabled )
     {
-        rStateSet.AddState( AccessibleStateType::ENABLED );
-        rStateSet.AddState( AccessibleStateType::SENSITIVE );
+        rStateSet |= AccessibleStateType::ENABLED;
+        rStateSet |= AccessibleStateType::SENSITIVE;
     }
 
     if ( IsVisible() )
     {
-        rStateSet.AddState( AccessibleStateType::SHOWING );
+        rStateSet |= AccessibleStateType::SHOWING;
         if( !IsMenuHideDisabledEntries() || bEnabled )
-            rStateSet.AddState( AccessibleStateType::VISIBLE );
+            rStateSet |= AccessibleStateType::VISIBLE;
     }
-    rStateSet.AddState( AccessibleStateType::OPAQUE );
+    rStateSet |= AccessibleStateType::OPAQUE;
 }
 
 
@@ -287,7 +287,7 @@ void SAL_CALL OAccessibleMenuItemComponent::disposing()
 // XAccessibleContext
 
 
-sal_Int32 OAccessibleMenuItemComponent::getAccessibleChildCount()
+sal_Int64 OAccessibleMenuItemComponent::getAccessibleChildCount()
 {
     OExternalLockGuard aGuard( this );
 
@@ -295,7 +295,7 @@ sal_Int32 OAccessibleMenuItemComponent::getAccessibleChildCount()
 }
 
 
-Reference< XAccessible > OAccessibleMenuItemComponent::getAccessibleChild( sal_Int32 i )
+Reference< XAccessible > OAccessibleMenuItemComponent::getAccessibleChild( sal_Int64 i )
 {
     OExternalLockGuard aGuard( this );
 
@@ -314,7 +314,7 @@ Reference< XAccessible > OAccessibleMenuItemComponent::getAccessibleParent(  )
 }
 
 
-sal_Int32 OAccessibleMenuItemComponent::getAccessibleIndexInParent(  )
+sal_Int64 OAccessibleMenuItemComponent::getAccessibleIndexInParent(  )
 {
     OExternalLockGuard aGuard( this );
 

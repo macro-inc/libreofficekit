@@ -21,6 +21,7 @@
 #include <sfx2/app.hxx>
 #include <sfx2/bindings.hxx>
 #include <sfx2/docfac.hxx>
+#include <sfx2/docfile.hxx>
 #include <sfx2/docfilt.hxx>
 #include <sfx2/doctempl.hxx>
 #include <sfx2/fcontnr.hxx>
@@ -55,9 +56,14 @@
 #include <rtl/ref.hxx>
 #include <sal/log.hxx>
 #include <svl/eitem.hxx>
+#include <svl/stritem.hxx>
+#include <unotools/fcm.hxx>
 #include <unotools/moduleoptions.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <tools/stream.hxx>
+#include <tools/urlobj.hxx>
 #include <vcl/svapp.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace com::sun::star;
 using ::com::sun::star::beans::PropertyValue;
@@ -137,7 +143,7 @@ private:
                         ) const;
 
     static sal_uInt16   impl_findSlotParam(
-                            const OUString& i_rFactoryURL
+                            std::u16string_view i_rFactoryURL
                         );
 
     static SfxObjectShellRef   impl_findObjectShell(
@@ -440,20 +446,20 @@ bool SfxFrameLoader_Impl::impl_determineTemplateDocument( ::comphelper::NamedVal
 }
 
 
-sal_uInt16 SfxFrameLoader_Impl::impl_findSlotParam( const OUString& i_rFactoryURL )
+sal_uInt16 SfxFrameLoader_Impl::impl_findSlotParam( std::u16string_view i_rFactoryURL )
 {
-    OUString sSlotParam;
-    const sal_Int32 nParamPos = i_rFactoryURL.indexOf( '?' );
-    if ( nParamPos >= 0 )
+    std::u16string_view sSlotParam;
+    const size_t nParamPos = i_rFactoryURL.find( '?' );
+    if ( nParamPos != std::u16string_view::npos )
     {
         // currently only the "slot" parameter is supported
-        const sal_Int32 nSlotPos = i_rFactoryURL.indexOf( "slot=", nParamPos );
-        if ( nSlotPos > 0 )
-            sSlotParam = i_rFactoryURL.copy( nSlotPos + 5 );
+        const size_t nSlotPos = i_rFactoryURL.find( u"slot=", nParamPos );
+        if ( nSlotPos > 0 && nSlotPos != std::u16string_view::npos )
+            sSlotParam = i_rFactoryURL.substr( nSlotPos + 5 );
     }
 
-    if ( !sSlotParam.isEmpty() )
-        return sal_uInt16( sSlotParam.toInt32() );
+    if ( !sSlotParam.empty() )
+        return sal_uInt16( o3tl::toInt32(sSlotParam) );
 
     return 0;
 }
@@ -539,8 +545,7 @@ SfxInterfaceId SfxFrameLoader_Impl::impl_determineEffectiveViewId_nothrow( const
                 if ( !( xViewData->getByIndex( 0 ) >>= aViewData ) )
                     break;
 
-                ::comphelper::NamedValueCollection aNamedViewData( aViewData );
-                OUString sViewId = aNamedViewData.getOrDefault( "ViewId", OUString() );
+                OUString sViewId = ::comphelper::NamedValueCollection::getOrDefault( aViewData, u"ViewId", OUString() );
                 if ( sViewId.isEmpty() )
                     break;
 
@@ -576,15 +581,30 @@ Reference< XController2 > SfxFrameLoader_Impl::impl_createDocumentView( const Re
     ), UNO_SET_THROW );
 
     // introduce model/view/controller to each other
-    xController->attachModel( i_rModel );
-    i_rModel->connectController( xController );
-    i_rFrame->setComponent( xController->getComponentWindow(), xController );
-    xController->attachFrame( i_rFrame );
-    i_rModel->setCurrentController( xController );
+    utl::ConnectFrameControllerModel(i_rFrame, xController, i_rModel);
 
     return xController;
 }
 
+std::shared_ptr<const SfxFilter> getEmptyURLFilter(std::u16string_view sURL)
+{
+    INetURLObject aParser(sURL);
+    const OUString aExt = aParser.getExtension(INetURLObject::LAST_SEGMENT, true,
+                                               INetURLObject::DecodeMechanism::WithCharset);
+    const SfxFilterMatcher& rMatcher = SfxGetpApp()->GetFilterMatcher();
+
+    // Requiring the export+preferred flags helps to find the relevant filter, e.g. .doc -> WW8 (and
+    // not WW6 or Mac_Word).
+    std::shared_ptr<const SfxFilter> pFilter = rMatcher.GetFilter4Extension(
+        aExt, SfxFilterFlags::IMPORT | SfxFilterFlags::EXPORT | SfxFilterFlags::PREFERED);
+    if (!pFilter)
+    {
+        // retry without PREFERED so we can find at least something for 0-byte *.ods
+        pFilter
+            = rMatcher.GetFilter4Extension(aExt, SfxFilterFlags::IMPORT | SfxFilterFlags::EXPORT);
+    }
+    return pFilter;
+}
 
 sal_Bool SAL_CALL SfxFrameLoader_Impl::load( const Sequence< PropertyValue >& rArgs,
                                              const Reference< XFrame >& _rTargetFrame )
@@ -608,6 +628,7 @@ sal_Bool SAL_CALL SfxFrameLoader_Impl::load( const Sequence< PropertyValue >& rA
     // check for factory URLs to create a new doc, instead of loading one
     const OUString sURL = aDescriptor.getOrDefault( "URL", OUString() );
     const bool bIsFactoryURL = sURL.startsWith( "private:factory/" );
+    std::shared_ptr<const SfxFilter> pEmptyURLFilter;
     bool bInitNewModel = bIsFactoryURL;
     const bool bIsDefault = bIsFactoryURL && !bExternalModel;
     if (!aDescriptor.has("Replaceable"))
@@ -640,6 +661,28 @@ sal_Bool SAL_CALL SfxFrameLoader_Impl::load( const Sequence< PropertyValue >& rA
     {
         // compatibility
         aDescriptor.put( "FileName", aDescriptor.get( "URL" ) );
+
+        if (!bIsFactoryURL && !bExternalModel && tools::isEmptyFileUrl(sURL))
+        {
+            pEmptyURLFilter = getEmptyURLFilter(sURL);
+            if (pEmptyURLFilter)
+            {
+                aDescriptor.put("DocumentService", pEmptyURLFilter->GetServiceName());
+                if (impl_determineTemplateDocument(aDescriptor))
+                {
+                    // if the media descriptor allowed us to determine a template document
+                    // to create the new document from, then do not init a new document model
+                    // from scratch (below), but instead load the template document
+                    bInitNewModel = false;
+                    // Do not try to load from empty UCB content
+                    aDescriptor.remove("UCBContent");
+                }
+                else
+                {
+                    bInitNewModel = true;
+                }
+            }
+        }
     }
 
     bool bLoadSuccess = false;
@@ -691,6 +734,20 @@ sal_Bool SAL_CALL SfxFrameLoader_Impl::load( const Sequence< PropertyValue >& rA
         // SfxObjectShellLock would be even dangerous here, since the lifetime control should be done outside in case of success
         const SfxObjectShellRef xDoc = impl_findObjectShell( xModel );
         ENSURE_OR_THROW( xDoc.is(), "no SfxObjectShell for the given model" );
+
+        if (pEmptyURLFilter)
+        {
+            // Detach the medium from the template, and set proper document name and filter
+            auto pMedium = xDoc->GetMedium();
+            auto pItemSet = pMedium->GetItemSet();
+            pItemSet->ClearItem(SID_TEMPLATE);
+            pItemSet->Put(SfxStringItem(SID_FILTER_NAME, pEmptyURLFilter->GetFilterName()));
+            pMedium->SetName(sURL, true);
+            pMedium->SetFilter(pEmptyURLFilter);
+            pMedium->GetInitFileDate(true);
+            xDoc->SetLoading(SfxLoadedFlags::NONE);
+            xDoc->FinishedLoading();
+        }
 
         // ensure the ID of the to-be-created view is in the descriptor, if possible
         const SfxInterfaceId nViewId = impl_determineEffectiveViewId_nothrow( *xDoc, aDescriptor );

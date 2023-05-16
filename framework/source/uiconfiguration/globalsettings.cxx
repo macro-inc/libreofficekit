@@ -29,6 +29,7 @@
 #include <comphelper/propertysequence.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <mutex>
+#include <utility>
 
 //  Defines
 
@@ -48,7 +49,7 @@ class GlobalSettings_Access : public ::cppu::WeakImplHelper<
                                   css::lang::XEventListener>
 {
     public:
-        explicit GlobalSettings_Access( const css::uno::Reference< css::uno::XComponentContext >& rxContext );
+        explicit GlobalSettings_Access( css::uno::Reference< css::uno::XComponentContext > xContext );
 
         // XComponent
         virtual void SAL_CALL dispose() override;
@@ -78,14 +79,14 @@ class GlobalSettings_Access : public ::cppu::WeakImplHelper<
 
 }
 
-GlobalSettings_Access::GlobalSettings_Access( const css::uno::Reference< css::uno::XComponentContext >& rxContext ) :
+GlobalSettings_Access::GlobalSettings_Access( css::uno::Reference< css::uno::XComponentContext > xContext ) :
     m_bDisposed( false ),
     m_bConfigRead( false ),
     m_aNodeRefStates( "States" ),
     m_aPropStatesEnabled( "StatesEnabled" ),
     m_aPropLocked( "Locked" ),
     m_aPropDocked( "Docked" ),
-    m_xContext( rxContext )
+    m_xContext(std::move( xContext ))
 {
 }
 
@@ -160,29 +161,29 @@ bool GlobalSettings_Access::GetToolbarStateInfo( GlobalSettings::StateInfo eStat
         impl_initConfigAccess();
     }
 
-    if ( m_xConfigAccess.is() )
-    {
-        try
-        {
-            css::uno::Any a = m_xConfigAccess->getByName( m_aNodeRefStates );
-            css::uno::Reference< css::container::XNameAccess > xNameAccess;
-            if ( a >>= xNameAccess )
-            {
-                if ( eStateInfo == GlobalSettings::STATEINFO_LOCKED )
-                    a = xNameAccess->getByName( m_aPropLocked );
-                else if ( eStateInfo == GlobalSettings::STATEINFO_DOCKED )
-                    a = xNameAccess->getByName( m_aPropDocked );
+    if ( !m_xConfigAccess.is() )
+        return false;
 
-                aValue = a;
-                return true;
-            }
-        }
-        catch ( const css::container::NoSuchElementException& )
+    try
+    {
+        css::uno::Any a = m_xConfigAccess->getByName( m_aNodeRefStates );
+        css::uno::Reference< css::container::XNameAccess > xNameAccess;
+        if ( a >>= xNameAccess )
         {
+            if ( eStateInfo == GlobalSettings::STATEINFO_LOCKED )
+                a = xNameAccess->getByName( m_aPropLocked );
+            else if ( eStateInfo == GlobalSettings::STATEINFO_DOCKED )
+                a = xNameAccess->getByName( m_aPropDocked );
+
+            aValue = a;
+            return true;
         }
-        catch ( const css::uno::Exception& )
-        {
-        }
+    }
+    catch ( const css::container::NoSuchElementException& )
+    {
+    }
+    catch ( const css::uno::Exception& )
+    {
     }
 
     return false;
@@ -226,8 +227,8 @@ static GlobalSettings_Access* GetGlobalSettings( const css::uno::Reference< css:
     return pStaticSettings.get();
 }
 
-GlobalSettings::GlobalSettings( const css::uno::Reference< css::uno::XComponentContext >& rxContext ) :
-    m_xContext( rxContext )
+GlobalSettings::GlobalSettings( css::uno::Reference< css::uno::XComponentContext > xContext ) :
+    m_xContext(std::move( xContext ))
 {
 }
 

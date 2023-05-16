@@ -36,7 +36,7 @@
 
 #include <memory>
 
-class ScrollBar;
+class ScrollAdaptor;
 class Printer;
 class KeyEvent;
 class MouseEvent;
@@ -48,9 +48,8 @@ namespace basctl
 
 class DialogWindowLayout;
 
-#define DLGED_PAGE_WIDTH_MIN    1280
-#define DLGED_PAGE_HEIGHT_MIN   1024
-
+constexpr auto DLGED_PAGE_WIDTH_MIN = 1280;
+constexpr auto DLGED_PAGE_HEIGHT_MIN = 1024;
 
 // DlgEdHint
 
@@ -108,12 +107,12 @@ private:
     static void Print( Printer* pPrinter, const OUString& rTitle );
 
 private:
-    VclPtr<ScrollBar>          pHScroll;
-    VclPtr<ScrollBar>          pVScroll;
+    VclPtr<ScrollAdaptor>      pHScroll;
+    VclPtr<ScrollAdaptor>      pVScroll;
     std::unique_ptr<DlgEdModel> pDlgEdModel; // never nullptr
     DlgEdPage*          pDlgEdPage;  // never nullptr
     std::unique_ptr<DlgEdView> pDlgEdView; // never nullptr
-    DlgEdForm*          pDlgEdForm; // never nullptr
+    rtl::Reference<DlgEdForm>  pDlgEdForm; // never nullptr
     css::uno::Reference< css::container::XNameContainer >     m_xUnoControlDialogModel;
     css::uno::Reference< css::awt::XControlContainer >        m_xControlContainer;
     css::uno::Sequence< css::datatransfer::DataFlavor >       m_ClipboardDataFlavors;
@@ -150,10 +149,10 @@ public:
     css::uno::Reference< css::awt::XControlContainer > const &
                     GetWindowControlContainer();
 
-    void            SetScrollBars( ScrollBar* pHScroll, ScrollBar* pVScroll );
+    void            SetScrollBars(ScrollAdaptor* pHScroll, ScrollAdaptor* pVScroll);
     void            InitScrollBars();
-    ScrollBar*      GetHScroll() const { return pHScroll; }
-    ScrollBar*      GetVScroll() const { return pVScroll; }
+    ScrollAdaptor*  GetHScroll() const { return pHScroll; }
+    ScrollAdaptor*  GetVScroll() const { return pVScroll; }
     void            DoScroll();
     void            UpdateScrollBars();
 

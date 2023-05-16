@@ -29,13 +29,14 @@
 #include <svtools/imagemgr.hxx>
 #include <sfx2/filedlghelper.hxx>
 #include <tools/urlobj.hxx>
+#include <utility>
 #include <vcl/weld.hxx>
 #include <vcl/svapp.hxx>
 
 #include <com/sun/star/util/URL.hpp>
 #include <com/sun/star/util/XURLTransformer.hpp>
 #include <com/sun/star/frame/theAutoRecovery.hpp>
-#include <com/sun/star/ui/dialogs/FolderPicker.hpp>
+#include <com/sun/star/ui/dialogs/XFolderPicker2.hpp>
 #include <com/sun/star/ui/dialogs/ExecutableDialogResults.hpp>
 #include <com/sun/star/util/URLTransformer.hpp>
 #include <osl/file.hxx>
@@ -46,9 +47,14 @@ namespace svx::DocRecovery
 
 using namespace ::osl;
 
-RecoveryCore::RecoveryCore(const css::uno::Reference< css::uno::XComponentContext >& rxContext,
+#define COLUMN_STANDARDIMAGE -1
+#define COLUMN_DISPLAYNAME 0
+#define COLUMN_STATUSIMAGE 1
+#define COLUMN_STATUSTEXT 2
+
+RecoveryCore::RecoveryCore(css::uno::Reference< css::uno::XComponentContext > xContext,
                                  bool                                            bUsedForSaving)
-    : m_xContext        ( rxContext    )
+    : m_xContext        (std::move( xContext    ))
     , m_pListener       ( nullptr            )
     , m_bListenForSaving(bUsedForSaving)
 {
@@ -189,6 +195,33 @@ void RecoveryCore::forgetBrokenTempEntries()
     }
 }
 
+// should only be called with valid m_xRealCore
+void RecoveryCore::forgetAllRecoveryEntriesMarkedForDiscard()
+{
+    assert(m_xRealCore);
+
+    // potential to move in a separate function
+    css::util::URL aRemoveURL = impl_getParsedURL(RECOVERY_CMD_DO_ENTRY_CLEANUP);
+    css::uno::Sequence<css::beans::PropertyValue> lRemoveArgs(2);
+    auto plRemoveArgs = lRemoveArgs.getArray();
+    plRemoveArgs[0].Name = PROP_DISPATCHASYNCHRON;
+    plRemoveArgs[0].Value <<= false;
+    plRemoveArgs[1].Name = PROP_ENTRYID;
+
+    // work on a copied list only ...
+    // Reason: We will get notifications from the core for every
+    // changed or removed element. And that will change our m_lURLs list.
+    // That's not a good idea, if we use a stl iterator inbetween .-)
+    TURLList lURLs = m_lURLs;
+    for (const TURLInfo& rInfo : lURLs)
+    {
+        if (!rInfo.ShouldDiscard)
+            continue;
+
+        plRemoveArgs[1].Value <<= rInfo.ID;
+        m_xRealCore->dispatch(aRemoveURL, lRemoveArgs);
+    }
+}
 
 void RecoveryCore::forgetAllRecoveryEntries()
 {
@@ -291,6 +324,8 @@ void RecoveryCore::doRecovery()
 {
     if (!m_xRealCore.is())
         return;
+
+    forgetAllRecoveryEntriesMarkedForDiscard();
 
     css::util::URL aURL = impl_getParsedURL(RECOVERY_CMD_DO_RECOVERY);
 
@@ -645,29 +680,31 @@ RecoveryDialog::RecoveryDialog(weld::Window* pParent, RecoveryCore* pCore)
     , m_eRecoveryState(RecoveryDialog::E_RECOVERY_PREPARED)
     , m_bWaitForCore(false)
     , m_bWasRecoveryStarted(false)
+//    , m_aColumnOffset(0)
+    , m_aToggleCount(0)
     , m_aSuccessRecovStr(SvxResId(RID_SVXSTR_SUCCESSRECOV))
     , m_aOrigDocRecovStr(SvxResId(RID_SVXSTR_ORIGDOCRECOV))
     , m_aRecovFailedStr(SvxResId(RID_SVXSTR_RECOVFAILED))
     , m_aRecovInProgrStr(SvxResId(RID_SVXSTR_RECOVINPROGR))
     , m_aNotRecovYetStr(SvxResId(RID_SVXSTR_NOTRECOVYET))
+    , m_aWillBeDiscStr(SvxResId(RID_SVXSTR_WILLDISCARD))
     , m_xDescrFT(m_xBuilder->weld_label("desc"))
     , m_xProgressBar(m_xBuilder->weld_progress_bar("progress"))
     , m_xFileListLB(m_xBuilder->weld_tree_view("filelist"))
     , m_xNextBtn(m_xBuilder->weld_button("next"))
     , m_xCancelBtn(m_xBuilder->weld_button("cancel"))
 {
-    const auto nWidth = m_xFileListLB->get_approximate_digit_width() * 70;
+    const auto nWidth = m_xFileListLB->get_approximate_digit_width() * 80;
     m_xFileListLB->set_size_request(nWidth, m_xFileListLB->get_height_rows(10));
     m_xProgressBar->set_size_request(m_xProgressBar->get_approximate_digit_width() * 50, -1);
     m_xProgress = new PluginProgress(m_xProgressBar.get());
 
-    std::vector<int> aWidths
-    {
-        o3tl::narrowing<int>(m_xFileListLB->get_checkbox_column_width()),
-        o3tl::narrowing<int>(60 * nWidth / 100),
-        o3tl::narrowing<int>(m_xFileListLB->get_checkbox_column_width())
-    };
+    std::vector<int> aWidths;
+    aWidths.push_back(60 * nWidth / 100);
+    aWidths.push_back(5 * nWidth / 100);
     m_xFileListLB->set_column_fixed_widths(aWidths);
+    m_xFileListLB->enable_toggle_buttons(weld::ColumnToggleType::Check);
+    m_xFileListLB->connect_toggled( LINK(this, RecoveryDialog, ToggleRowHdl) );
 
     m_xNextBtn->set_sensitive(true);
     m_xNextBtn->connect_clicked( LINK( this, RecoveryDialog, NextButtonHdl ) );
@@ -679,11 +716,13 @@ RecoveryDialog::RecoveryDialog(weld::Window* pParent, RecoveryCore* pCore)
     {
         const TURLInfo& rInfo = rURLList[i];
         m_xFileListLB->append();
-        m_xFileListLB->set_id(i, OUString::number(reinterpret_cast<sal_IntPtr>(&rInfo)));
-        m_xFileListLB->set_image(i, rInfo.StandardImageId, 0);
-        m_xFileListLB->set_text(i, rInfo.DisplayName, 1);
-        m_xFileListLB->set_image(i, impl_getStatusImage(rInfo), 2);
-        m_xFileListLB->set_text(i, impl_getStatusString(rInfo), 3);
+        m_xFileListLB->set_toggle(i, TRISTATE_TRUE);
+        m_xFileListLB->set_id(i, weld::toId(&rInfo));
+        m_xFileListLB->set_image(i, rInfo.StandardImageId, COLUMN_STANDARDIMAGE);
+        m_xFileListLB->set_text(i, rInfo.DisplayName, COLUMN_DISPLAYNAME);
+        m_xFileListLB->set_image(i, impl_getStatusImage(rInfo), COLUMN_STATUSIMAGE);
+        m_xFileListLB->set_text(i, impl_getStatusString(rInfo), COLUMN_STATUSTEXT);
+        m_aToggleCount++;
     }
 
     // mark first item
@@ -871,14 +910,14 @@ void RecoveryDialog::updateItems()
     int c = m_xFileListLB->n_children();
     for (int i = 0; i < c; ++i)
     {
-        TURLInfo* pInfo = reinterpret_cast<TURLInfo*>(m_xFileListLB->get_id(i).toInt64());
+        TURLInfo* pInfo = weld::fromId<TURLInfo*>(m_xFileListLB->get_id(i));
         if ( !pInfo )
             continue;
 
-        m_xFileListLB->set_image(i, impl_getStatusImage(*pInfo), 2);
+        m_xFileListLB->set_image(i, impl_getStatusImage(*pInfo), COLUMN_STATUSIMAGE);
         OUString sStatus = impl_getStatusString( *pInfo );
         if (!sStatus.isEmpty())
-            m_xFileListLB->set_text(i, sStatus, 3);
+            m_xFileListLB->set_text(i, sStatus, COLUMN_STATUSTEXT);
     }
 }
 
@@ -887,7 +926,7 @@ void RecoveryDialog::stepNext(TURLInfo* pItem)
     int c = m_xFileListLB->n_children();
     for (int i=0; i < c; ++i)
     {
-        TURLInfo* pInfo = reinterpret_cast<TURLInfo*>(m_xFileListLB->get_id(i).toInt64());
+        TURLInfo* pInfo = weld::fromId<TURLInfo*>(m_xFileListLB->get_id(i));
         if (pInfo->ID != pItem->ID)
             continue;
 
@@ -945,6 +984,52 @@ IMPL_LINK_NOARG(RecoveryDialog, CancelButtonHdl, weld::Button&, void)
     }
 }
 
+IMPL_LINK_NOARG(RecoveryDialog, ToggleRowHdl, const weld::TreeView::iter_col&, void)
+{
+    int aIndex = m_xFileListLB->get_selected_index();
+    TriState eState = m_xFileListLB->get_toggle(aIndex);
+
+    if (m_bWasRecoveryStarted)
+    {
+        switch (eState)
+        {
+            case TRISTATE_FALSE:
+                 eState = TRISTATE_TRUE;
+                break;
+            case TRISTATE_TRUE:
+                eState = TRISTATE_FALSE;
+                break;
+            default:
+                // should never happen
+                assert(false);
+                break;
+        }
+
+        // revert toggle
+        m_xFileListLB->set_toggle(aIndex, eState);
+    }
+    else
+    {
+        impl_updateItemDescription(aIndex, eState);
+
+        switch (eState)
+        {
+            case TRISTATE_FALSE:
+                m_aToggleCount--;
+                break;
+            case TRISTATE_TRUE:
+                m_aToggleCount++;
+                break;
+            default:
+                // should never happen
+                assert(false);
+                break;
+        }
+
+        m_xNextBtn->set_sensitive(m_aToggleCount != 0);
+    }
+}
+
 OUString RecoveryDialog::impl_getStatusString( const TURLInfo& rInfo ) const
 {
     OUString sStatus;
@@ -964,6 +1049,9 @@ OUString RecoveryDialog::impl_getStatusString( const TURLInfo& rInfo ) const
             break;
         case E_NOT_RECOVERED_YET :
             sStatus = m_aNotRecovYetStr;
+            break;
+        case E_WILL_BE_DISCARDED:
+            sStatus = m_aWillBeDiscStr;
             break;
         default:
             break;
@@ -989,6 +1077,33 @@ OUString RecoveryDialog::impl_getStatusImage( const TURLInfo& rInfo )
             break;
     }
     return sStatus;
+}
+
+void RecoveryDialog::impl_updateItemDescription(int row, const TriState& rState)
+{
+    TURLInfo* pInfo = reinterpret_cast<TURLInfo*>(m_xFileListLB->get_id(row).toInt64());
+    if (!pInfo)
+        return;
+
+    switch (rState)
+    {
+        case TRISTATE_FALSE:
+            pInfo->RecoveryState = ERecoveryState::E_WILL_BE_DISCARDED;
+            pInfo->ShouldDiscard = true;
+            break;
+        case TRISTATE_TRUE:
+            pInfo->RecoveryState = ERecoveryState::E_NOT_RECOVERED_YET;
+            pInfo->ShouldDiscard = false;
+            break;
+        default:
+            // should never happen
+            assert(false);
+            break;
+    }
+
+    OUString sStatus = impl_getStatusString(*pInfo);
+    if (!sStatus.isEmpty())
+        m_xFileListLB->set_text(row, sStatus, COLUMN_STATUSTEXT);
 }
 
 BrokenRecoveryDialog::BrokenRecoveryDialog(weld::Window* pParent,
@@ -1044,7 +1159,7 @@ void BrokenRecoveryDialog::impl_refresh()
 
         m_bExecutionNeeded = true;
 
-        m_xFileListLB->append(OUString::number(reinterpret_cast<sal_IntPtr>(&rInfo)), rInfo.DisplayName, rInfo.StandardImageId);
+        m_xFileListLB->append(weld::toId(&rInfo), rInfo.DisplayName, rInfo.StandardImageId);
     }
     m_sSavePath.clear();
     m_xOkBtn->grab_focus();

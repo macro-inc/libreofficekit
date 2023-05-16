@@ -27,11 +27,13 @@
 #include <osl/diagnose.h>
 #include <unotools/tempfile.hxx>
 #include <unotools/ucbstreamhelper.hxx>
+#include <unotools/streamwrap.hxx>
 #include <comphelper/fileformat.h>
 #include <comphelper/lok.hxx>
 #include <comphelper/storagehelper.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <sot/storage.hxx>
+#include <utility>
 #include <vcl/gdimtf.hxx>
 #include <vcl/jobset.hxx>
 #include <vcl/svapp.hxx>
@@ -109,10 +111,10 @@ void ScTransferObj::PaintToDev( OutputDevice* pDev, ScDocument& rDoc, double nPr
     ScPrintFunc::DrawToDev( rDoc, pDev, nPrintFactor, aBound, &aViewData, false/*bMetaFile*/ );
 }
 
-ScTransferObj::ScTransferObj( ScDocumentUniquePtr pClipDoc, const TransferableObjectDescriptor& rDesc ) :
-    m_pDoc( std::move(pClipDoc ) ),
+ScTransferObj::ScTransferObj( const std::shared_ptr<ScDocument>& pClipDoc, TransferableObjectDescriptor aDesc ) :
+    m_pDoc( pClipDoc ),
     m_nNonFiltered(0),
-    m_aObjDesc( rDesc ),
+    m_aObjDesc(std::move( aDesc )),
     m_nDragHandleX( 0 ),
     m_nDragHandleY( 0 ),
     m_nSourceCursorX( m_pDoc->MaxCol() + 1 ),
@@ -312,9 +314,9 @@ bool ScTransferObj::GetData( const datatransfer::DataFlavor& rFlavor, const OUSt
             const ScPatternAttr* pPattern = m_pDoc->GetPattern( nCol, nRow, nTab );
             ScTabEditEngine aEngine( *pPattern, m_pDoc->GetEditPool(), m_pDoc.get() );
             ScRefCellValue aCell(*m_pDoc, aPos);
-            if (aCell.meType == CELLTYPE_EDIT)
+            if (aCell.getType() == CELLTYPE_EDIT)
             {
-                const EditTextObject* pObj = aCell.mpEditText;
+                const EditTextObject* pObj = aCell.getEditText();
                 aEngine.SetTextCurrentDefaults(*pObj);
             }
             else
@@ -506,10 +508,10 @@ bool ScTransferObj::WriteObject( tools::SvRef<SotTempStream>& rxOStm, void* pUse
             {
                 // TODO/MBA: testing
                 SfxObjectShell*   pEmbObj = static_cast<SfxObjectShell*>(pUserObject);
-                ::utl::TempFile     aTempFile;
-                aTempFile.EnableKillingFile();
+                ::utl::TempFileFast aTempFile;
+                SvStream* pTempStream = aTempFile.GetStream(StreamMode::READWRITE);
                 uno::Reference< embed::XStorage > xWorkStore =
-                    ::comphelper::OStorageHelper::GetStorageFromURL( aTempFile.GetURL(), embed::ElementModes::READWRITE );
+                    ::comphelper::OStorageHelper::GetStorageFromStream( new utl::OStreamWrapper(*pTempStream) );
 
                 // write document storage
                 pEmbObj->SetupStorage( xWorkStore, SOFFICE_FILEFORMAT_CURRENT, false );
@@ -523,13 +525,8 @@ bool ScTransferObj::WriteObject( tools::SvRef<SotTempStream>& rxOStm, void* pUse
                 if ( xTransact.is() )
                     xTransact->commit();
 
-                std::unique_ptr<SvStream> pSrcStm = ::utl::UcbStreamHelper::CreateStream( aTempFile.GetURL(), StreamMode::READ );
-                if( pSrcStm )
-                {
-                    rxOStm->SetBufferSize( 0xff00 );
-                    rxOStm->WriteStream( *pSrcStm );
-                    pSrcStm.reset();
-                }
+                rxOStm->SetBufferSize( 0xff00 );
+                rxOStm->WriteStream( *pTempStream );
 
                 bRet = true;
 
@@ -813,22 +810,18 @@ void ScTransferObj::InitDocShell(bool bLimitToPageSize)
         rDestDoc.UpdateChartListenerCollection();
 }
 
-SfxObjectShell* ScTransferObj::SetDrawClipDoc( bool bAnyOle )
+SfxObjectShell* ScTransferObj::SetDrawClipDoc( bool bAnyOle, const std::shared_ptr<ScDocument>& pDoc )
 {
     // update ScGlobal::xDrawClipDocShellRef
 
     ScGlobal::xDrawClipDocShellRef.clear();
     if (bAnyOle)
     {
-        ScGlobal::xDrawClipDocShellRef = new ScDocShell(SfxModelFlags::EMBEDDED_OBJECT | SfxModelFlags::DISABLE_EMBEDDED_SCRIPTS); // there must be a ref
+        ScGlobal::xDrawClipDocShellRef = new ScDocShell(SfxModelFlags::EMBEDDED_OBJECT | SfxModelFlags::DISABLE_EMBEDDED_SCRIPTS, pDoc); // there must be a ref
         ScGlobal::xDrawClipDocShellRef->DoInitNew();
-        return ScGlobal::xDrawClipDocShellRef.get();
     }
-    else
-    {
-        ScGlobal::xDrawClipDocShellRef.clear();
-        return nullptr;
-    }
+
+    return ScGlobal::xDrawClipDocShellRef.get();
 }
 
 void ScTransferObj::StripRefs( ScDocument& rDoc,

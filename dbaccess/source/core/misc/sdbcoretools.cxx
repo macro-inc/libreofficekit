@@ -27,10 +27,9 @@
 #include <com/sun/star/embed/XTransactedObject.hpp>
 #include <com/sun/star/embed/ElementModes.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/interaction.hxx>
 #include <rtl/ref.hxx>
-#include <rtl/ustrbuf.hxx>
 
 namespace dbaccess
 {

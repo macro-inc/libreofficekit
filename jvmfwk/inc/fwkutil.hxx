@@ -22,7 +22,6 @@
 #include <config_folders.h>
 
 #include <sal/config.h>
-#include <sal/log.hxx>
 #include <rtl/bootstrap.hxx>
 #include <rtl/byteseq.hxx>
 #include <osl/mutex.hxx>
@@ -47,7 +46,7 @@ osl::Mutex& FwkMutex();
 rtl::ByteSequence encodeBase16(const rtl::ByteSequence& rawData);
 rtl::ByteSequence decodeBase16(const rtl::ByteSequence& data);
 
-OUString getDirFromFile(const OUString& usFilePath);
+OUString getDirFromFile(std::u16string_view usFilePath);
 
 enum FileStatus
 {

@@ -27,6 +27,7 @@
 #include <oox/drawingml/drawingmltypes.hxx>
 #include <com/sun/star/graphic/XGraphicMapper.hpp>
 #include <rtl/ref.hxx>
+#include <tools/color.hxx>
 
 namespace oox::drawingml::table {
 
@@ -51,6 +52,9 @@ public:
     /** Has to be implemented by each filter, returns the current theme. */
     virtual const ::oox::drawingml::Theme* getCurrentTheme() const override;
 
+    /** May be implemented by filters which handle Diagrams, default returns empty ptr */
+    virtual std::shared_ptr<::oox::drawingml::Theme> getCurrentThemePtr() const override;
+
     void setCurrentTheme(const ::oox::drawingml::ThemePtr& pTheme);
 
     /** Has to be implemented by each filter to return the collection of VML shapes. */
@@ -65,8 +69,6 @@ public:
     virtual bool exportDocument() override { return true; }
 
     ::Color getSchemeColor( sal_Int32 nToken ) const;
-
-    void importTheme();
 
     void setGraphicMapper(css::uno::Reference<css::graphic::XGraphicMapper> const & rxGraphicMapper)
     {

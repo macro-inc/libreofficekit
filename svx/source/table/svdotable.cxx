@@ -52,9 +52,7 @@
 #include <editeng/frmdiritem.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <libxml/xmlwriter.h>
-#include <rtl/ustrbuf.hxx>
-#include <tools/diagnose_ex.h>
-#include <tools/UnitConversion.hxx>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -668,8 +666,11 @@ void SdrTableObjImpl::DragEdge( bool mbHorizontal, int nEdge, sal_Int32 nOffset 
 // XModifyListener
 
 
-void SAL_CALL SdrTableObjImpl::modified( const css::lang::EventObject& /*aEvent*/ )
+void SAL_CALL SdrTableObjImpl::modified( const css::lang::EventObject& aEvent )
 {
+    if (aEvent.Source == mxTableStyle && mpTableObj)
+        static_cast<TextProperties&>(mpTableObj->GetProperties()).increaseVersion();
+
     update();
 }
 
@@ -748,12 +749,24 @@ void SdrTableObjImpl::dumpAsXml(xmlTextWriterPtr pWriter) const
 // XEventListener
 
 
-void SAL_CALL SdrTableObjImpl::disposing( const css::lang::EventObject& /*Source*/ )
+void SAL_CALL SdrTableObjImpl::disposing( const css::lang::EventObject& Source )
 {
-    mxActiveCell.clear();
-    mxTable.clear();
-    mpLayouter.reset();
-    mpTableObj = nullptr;
+    assert(Source.Source == mxTableStyle);
+    (void)Source;
+
+    Reference<XIndexAccess> xDefaultStyle;
+    try
+    {
+        Reference<XStyleFamiliesSupplier> xSupplier(mpTableObj->getSdrModelFromSdrObject().getUnoModel(), UNO_QUERY_THROW);
+        Reference<XNameAccess> xTableFamily(xSupplier->getStyleFamilies()->getByName("table"), UNO_QUERY_THROW);
+        xDefaultStyle.set(xTableFamily->getByName("default"), UNO_QUERY_THROW);
+    }
+    catch( Exception& )
+    {
+        TOOLS_WARN_EXCEPTION("svx.table", "");
+    }
+
+    mpTableObj->setTableStyle(xDefaultStyle);
 }
 
 
@@ -866,12 +879,16 @@ std::unique_ptr<sdr::contact::ViewContact> SdrTableObj::CreateObjectSpecificView
 SdrTableObj::SdrTableObj(SdrModel& rSdrModel)
 :   SdrTextObj(rSdrModel)
 {
+    osl_atomic_increment(&m_refCount); // other I get deleted during construction
     init( 1, 1 );
+    osl_atomic_decrement(&m_refCount);
 }
 
 SdrTableObj::SdrTableObj(SdrModel& rSdrModel, SdrTableObj const & rSource)
 :   SdrTextObj(rSdrModel, rSource)
 {
+    osl_atomic_increment(&m_refCount);
+
     init( 1, 1 );
 
     TableModelNotifyGuard aGuard( mpImpl.is() ? mpImpl->mxTable.get() : nullptr );
@@ -889,6 +906,8 @@ SdrTableObj::SdrTableObj(SdrModel& rSdrModel, SdrTableObj const & rSource)
     // use SdrTableObjImpl::operator= now to
     // copy model data and other stuff (see there)
     *mpImpl = *rSource.mpImpl;
+
+    osl_atomic_decrement(&m_refCount);
 }
 
 SdrTableObj::SdrTableObj(
@@ -899,6 +918,8 @@ SdrTableObj::SdrTableObj(
 :   SdrTextObj(rSdrModel, rNewRect)
     ,maLogicRect(rNewRect)
 {
+    osl_atomic_increment(&m_refCount);
+
     if( nColumns <= 0 )
         nColumns = 1;
 
@@ -906,6 +927,8 @@ SdrTableObj::SdrTableObj(
         nRows = 1;
 
     init( nColumns, nRows );
+
+    osl_atomic_decrement(&m_refCount);
 }
 
 
@@ -1479,7 +1502,7 @@ void SdrTableObj::TakeObjInfo(SdrObjTransformInfoRec& rInfo) const
 
 SdrObjKind SdrTableObj::GetObjIdentifier() const
 {
-    return OBJ_TABLE;
+    return SdrObjKind::Table;
 }
 
 void SdrTableObj::TakeTextRect( SdrOutliner& rOutliner, tools::Rectangle& rTextRect, bool bNoEditText, tools::Rectangle* pAnchorRect, bool /*bLineWidth*/ ) const
@@ -1566,19 +1589,6 @@ void SdrTableObj::TakeTextRect( const CellPos& rPos, SdrOutliner& rOutliner, too
         *pAnchorRect=aAnkRect;
 
     rTextRect=tools::Rectangle(aTextPos,aTextSiz);
-}
-
-CellRef SdrTableObj::getCell(const CellPos& rPos) const
-{
-    if (mpImpl.is())
-    {
-        return mpImpl->getCell(rPos);
-    }
-    else
-    {
-        static CellRef xCell;
-        return xCell;
-    }
 }
 
 const CellRef& SdrTableObj::getActiveCell() const
@@ -1788,7 +1798,7 @@ OUString SdrTableObj::TakeObjNamePlural() const
 }
 
 
-SdrTableObj* SdrTableObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> SdrTableObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new SdrTableObj(rTargetModel, *this);
 }
@@ -1931,8 +1941,8 @@ void SdrTableObj::NbcSetLogicRect(const tools::Rectangle& rRect)
 {
     maLogicRect=rRect;
     ImpJustifyRect(maLogicRect);
-    const bool bWidth = maLogicRect.getWidth() != maRect.getWidth();
-    const bool bHeight = maLogicRect.getHeight() != maRect.getHeight();
+    const bool bWidth = maLogicRect.getOpenWidth() != maRect.getOpenWidth();
+    const bool bHeight = maLogicRect.getOpenHeight() != maRect.getOpenHeight();
     maRect = maLogicRect;
     if (mpImpl->mbSkipChangeLayout)
         // Avoid distributing newly available space between existing cells.
@@ -1946,7 +1956,7 @@ void SdrTableObj::NbcSetLogicRect(const tools::Rectangle& rRect)
 void SdrTableObj::AdjustToMaxRect( const tools::Rectangle& rMaxRect, bool /* bShrinkOnly = false */ )
 {
     tools::Rectangle aAdjustRect( rMaxRect );
-    aAdjustRect.setHeight( GetLogicRect().getHeight() );
+    aAdjustRect.setHeight( GetLogicRect().getOpenHeight() );
     SetLogicRect( aAdjustRect );
 }
 
@@ -2041,15 +2051,15 @@ WritingMode SdrTableObj::GetWritingMode() const
 
     WritingMode eWritingMode = WritingMode_LR_TB;
     const SfxItemSet &rSet = pStyle->GetItemSet();
-    const SfxPoolItem *pItem;
 
-    if ( rSet.GetItemState( SDRATTR_TEXTDIRECTION, false, &pItem ) == SfxItemState::SET )
-        eWritingMode = static_cast< const SvxWritingModeItem * >( pItem )->GetValue();
+    if ( const SvxWritingModeItem *pItem = rSet.GetItemIfSet( SDRATTR_TEXTDIRECTION ))
+        eWritingMode = pItem->GetValue();
 
-    if ( ( eWritingMode != WritingMode_TB_RL ) &&
-         ( rSet.GetItemState( EE_PARA_WRITINGDIR, false, &pItem ) == SfxItemState::SET ) )
+    if ( const SvxFrameDirectionItem *pItem;
+        ( eWritingMode != WritingMode_TB_RL ) &&
+         ( pItem = rSet.GetItemIfSet( EE_PARA_WRITINGDIR, false ) ) )
     {
-        if ( static_cast< const SvxFrameDirectionItem * >( pItem )->GetValue() == SvxFrameDirection::Horizontal_LR_TB )
+        if ( pItem->GetValue() == SvxFrameDirection::Horizontal_LR_TB )
             eWritingMode = WritingMode_LR_TB;
         else
             eWritingMode = WritingMode_RL_TB;
@@ -2306,7 +2316,7 @@ bool SdrTableObj::BegCreate(SdrDragStat& rStat)
 {
     rStat.SetOrtho4Possible();
     tools::Rectangle aRect1(rStat.GetStart(), rStat.GetNow());
-    aRect1.Justify();
+    aRect1.Normalize();
     rStat.SetActionRect(aRect1);
     maRect = aRect1;
     return true;
@@ -2348,7 +2358,7 @@ basegfx::B2DPolyPolygon SdrTableObj::TakeCreatePoly(const SdrDragStat& rDrag) co
 {
     tools::Rectangle aRect1;
     rDrag.TakeCreateRect(aRect1);
-    aRect1.Justify();
+    aRect1.Normalize();
 
     basegfx::B2DPolyPolygon aRetval;
     const basegfx::B2DRange aRange = vcl::unotools::b2DRectangleFromRectangle(aRect1);
@@ -2386,7 +2396,7 @@ void SdrTableObj::SaveGeoData(SdrObjGeoData& rGeo) const
 
 void SdrTableObj::RestoreGeoData(const SdrObjGeoData& rGeo)
 {
-    DBG_ASSERT( dynamic_cast< const TableObjectGeoData* >( &rGeo ), "svx::SdrTableObj::SaveGeoData(), illegal geo data!" );
+    DBG_ASSERT( dynamic_cast< const TableObjectGeoData* >( &rGeo ), "svx::SdrTableObj::RestoreGeoData(), illegal geo data!" );
 
     maLogicRect = static_cast<const TableObjectGeoData &>(rGeo).maLogicRect;
 
@@ -2407,16 +2417,12 @@ void SdrTableObj::CropTableModelToSelection(const CellPos& rStart, const CellPos
     mpImpl->CropTableModelToSelection(rStart, rEnd);
 }
 
-sal_Int32 SdrTableObj::getHeightWithoutFitting()
+void SdrTableObj::LayoutTableHeight(tools::Rectangle& rArea, bool bFit)
 {
-    tools::Rectangle aRect{};
     if( mpImpl.is() && mpImpl->mpLayouter)
     {
-        mpImpl->mpLayouter->LayoutTableHeight(aRect, /*bFit=*/false);
-        return aRect.GetHeight();
+        mpImpl->mpLayouter->LayoutTableHeight(rArea, bFit);
     }
-    else
-        return 0;
 }
 
 void SdrTableObj::DistributeColumns( sal_Int32 nFirstColumn, sal_Int32 nLastColumn, const bool bOptimize, const bool bMinimize )

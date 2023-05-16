@@ -234,7 +234,7 @@ void SwDrawTextShell::GetFormTextState(SfxItemSet& rSet)
     if ( rMarkList.GetMarkCount() == 1 )
         pObj = rMarkList.GetMark(0)->GetMarkedSdrObj();
 
-    const SdrTextObj* pTextObj = dynamic_cast< const SdrTextObj* >(pObj);
+    const SdrTextObj* pTextObj = DynCastSdrTextObj(pObj);
     const bool bDeactivate(
         !pObj ||
         !pTextObj ||
@@ -675,18 +675,16 @@ void SwDrawTextShell::InsertSymbol(SfxRequest& rReq)
     if(!pOLV)
         return;
     const SfxItemSet *pArgs = rReq.GetArgs();
-    const SfxPoolItem* pItem = nullptr;
+    const SfxStringItem* pItem = nullptr;
     if( pArgs )
-        pArgs->GetItemState(GetPool().GetWhich(SID_CHARMAP), false, &pItem);
+        pItem = pArgs->GetItemIfSet(SID_CHARMAP, false);
 
     OUString sSym;
     OUString sFontName;
     if ( pItem )
     {
-        sSym = static_cast<const SfxStringItem*>(pItem)->GetValue();
-        const SfxPoolItem* pFtItem = nullptr;
-        pArgs->GetItemState( GetPool().GetWhich(SID_ATTR_SPECIALCHAR), false, &pFtItem);
-        const SfxStringItem* pFontItem = dynamic_cast<const SfxStringItem*>( pFtItem  );
+        sSym = pItem->GetValue();
+        const SfxStringItem* pFontItem = pArgs->GetItemIfSet( SID_ATTR_SPECIALCHAR, false);
         if ( pFontItem )
             sFontName = pFontItem->GetValue();
     }
@@ -701,9 +699,13 @@ void SwDrawTextShell::InsertSymbol(SfxRequest& rReq)
         if( pI )
             aSetDlgFont.reset(static_cast<SvxFontItem*>(pI->Clone()));
         else
-            aSetDlgFont.reset(static_cast<SvxFontItem*>(aSet.Get( GetWhichOfScript(
+        {
+            TypedWhichId<SvxFontItem> nFontWhich =
+                GetWhichOfScript(
                         SID_ATTR_CHAR_FONT,
-                        SvtLanguageOptions::GetI18NScriptTypeOfLanguage( GetAppLanguage() ) )).Clone()));
+                        SvtLanguageOptions::GetI18NScriptTypeOfLanguage( GetAppLanguage() ) );
+            aSetDlgFont.reset(aSet.Get( nFontWhich ).Clone());
+        }
         if (sFontName.isEmpty())
             sFontName = aSetDlgFont->GetFamilyName();
     }
@@ -777,7 +779,7 @@ void SwDrawTextShell::InsertSymbol(SfxRequest& rReq)
     pOutliner->SetUpdateLayout(true);
     pOLV->ShowCursor();
 
-    rReq.AppendItem( SfxStringItem( GetPool().GetWhich(SID_CHARMAP), sSym ) );
+    rReq.AppendItem( SfxStringItem( SID_CHARMAP, sSym ) );
     if(!aFont.GetFamilyName().isEmpty())
         rReq.AppendItem( SfxStringItem( SID_ATTR_SPECIALCHAR, aFont.GetFamilyName() ) );
     rReq.Done();

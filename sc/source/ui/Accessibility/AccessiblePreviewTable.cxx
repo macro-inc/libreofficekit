@@ -37,7 +37,6 @@
 #include <vcl/window.hxx>
 #include <vcl/svapp.hxx>
 #include <svl/hint.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <comphelper/sequence.hxx>
 
 using namespace ::com::sun::star;
@@ -346,7 +345,7 @@ sal_Bool SAL_CALL ScAccessiblePreviewTable::isAccessibleSelected( sal_Int32 nRow
     return false;
 }
 
-sal_Int32 SAL_CALL ScAccessiblePreviewTable::getAccessibleIndex( sal_Int32 nRow, sal_Int32 nColumn )
+sal_Int64 SAL_CALL ScAccessiblePreviewTable::getAccessibleIndex( sal_Int32 nRow, sal_Int32 nColumn )
 {
     SolarMutexGuard aGuard;
     IsObjectValid();
@@ -357,32 +356,32 @@ sal_Int32 SAL_CALL ScAccessiblePreviewTable::getAccessibleIndex( sal_Int32 nRow,
         throw lang::IndexOutOfBoundsException();
 
     //  index iterates horizontally
-    sal_Int32 nRet = nRow * mpTableInfo->GetCols() + nColumn;
+    sal_Int64 nRet = static_cast<sal_Int64>(nRow) * static_cast<sal_Int64>(mpTableInfo->GetCols()) + nColumn;
     return nRet;
 }
 
-sal_Int32 SAL_CALL ScAccessiblePreviewTable::getAccessibleRow( sal_Int32 nChildIndex )
+sal_Int32 SAL_CALL ScAccessiblePreviewTable::getAccessibleRow( sal_Int64 nChildIndex )
 {
     SolarMutexGuard aGuard;
     IsObjectValid();
 
     FillTableInfo();
 
-    if ( !mpTableInfo || nChildIndex < 0 || nChildIndex >= static_cast<sal_Int32>(mpTableInfo->GetRows()) * mpTableInfo->GetCols() )
+    if ( !mpTableInfo || nChildIndex < 0 || nChildIndex >= static_cast<sal_Int64>(mpTableInfo->GetRows()) * mpTableInfo->GetCols() )
         throw lang::IndexOutOfBoundsException();
 
     sal_Int32 nRow = nChildIndex / mpTableInfo->GetCols();
     return nRow;
 }
 
-sal_Int32 SAL_CALL ScAccessiblePreviewTable::getAccessibleColumn( sal_Int32 nChildIndex )
+sal_Int32 SAL_CALL ScAccessiblePreviewTable::getAccessibleColumn( sal_Int64 nChildIndex )
 {
     SolarMutexGuard aGuard;
     IsObjectValid();
 
     FillTableInfo();
 
-    if ( !mpTableInfo || nChildIndex < 0 || nChildIndex >= static_cast<sal_Int32>(mpTableInfo->GetRows()) * mpTableInfo->GetCols() )
+    if ( !mpTableInfo || nChildIndex < 0 || nChildIndex >= static_cast<sal_Int64>(mpTableInfo->GetRows()) * mpTableInfo->GetCols() )
         throw lang::IndexOutOfBoundsException();
 
     sal_Int32 nCol = nChildIndex % static_cast<sal_Int32>(mpTableInfo->GetCols());
@@ -453,7 +452,7 @@ void SAL_CALL ScAccessiblePreviewTable::grabFocus()
 
 //=====  XAccessibleContext  ==============================================
 
-sal_Int32 SAL_CALL ScAccessiblePreviewTable::getAccessibleChildCount()
+sal_Int64 SAL_CALL ScAccessiblePreviewTable::getAccessibleChildCount()
 {
     SolarMutexGuard aGuard;
     IsObjectValid();
@@ -462,11 +461,11 @@ sal_Int32 SAL_CALL ScAccessiblePreviewTable::getAccessibleChildCount()
 
     tools::Long nRet = 0;
     if ( mpTableInfo )
-        nRet = static_cast<sal_Int32>(mpTableInfo->GetCols()) * mpTableInfo->GetRows();
+        nRet = static_cast<sal_Int64>(mpTableInfo->GetCols()) * mpTableInfo->GetRows();
     return nRet;
 }
 
-uno::Reference< XAccessible > SAL_CALL ScAccessiblePreviewTable::getAccessibleChild( sal_Int32 nIndex )
+uno::Reference< XAccessible > SAL_CALL ScAccessiblePreviewTable::getAccessibleChild( sal_Int64 nIndex )
 {
     SolarMutexGuard aGuard;
     IsObjectValid();
@@ -481,8 +480,8 @@ uno::Reference< XAccessible > SAL_CALL ScAccessiblePreviewTable::getAccessibleCh
         {
             // nCol, nRow are within the visible table, not the document
             sal_Int32 nCol = nIndex % nColumns;
-            sal_Int32 nRow = nIndex / nColumns;
-
+            sal_Int64 nRow = nIndex / nColumns;
+            assert(nRow <= std::numeric_limits<sal_Int32>::max());
             xRet = getAccessibleCellAt( nRow, nCol );
         }
     }
@@ -493,34 +492,34 @@ uno::Reference< XAccessible > SAL_CALL ScAccessiblePreviewTable::getAccessibleCh
     return xRet;
 }
 
-sal_Int32 SAL_CALL ScAccessiblePreviewTable::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL ScAccessiblePreviewTable::getAccessibleIndexInParent()
 {
     return mnIndex;
 }
 
-uno::Reference< XAccessibleStateSet > SAL_CALL ScAccessiblePreviewTable::getAccessibleStateSet()
+sal_Int64 SAL_CALL ScAccessiblePreviewTable::getAccessibleStateSet()
 {
     SolarMutexGuard aGuard;
-    uno::Reference<XAccessibleStateSet> xParentStates;
+    sal_Int64 nParentStates = 0;
     if (getAccessibleParent().is())
     {
         uno::Reference<XAccessibleContext> xParentContext = getAccessibleParent()->getAccessibleContext();
-        xParentStates = xParentContext->getAccessibleStateSet();
+        nParentStates = xParentContext->getAccessibleStateSet();
     }
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSet = new utl::AccessibleStateSetHelper();
-    if (IsDefunc(xParentStates))
-        pStateSet->AddState(AccessibleStateType::DEFUNC);
+    sal_Int64 nStateSet = 0;
+    if (IsDefunc(nParentStates))
+        nStateSet |= AccessibleStateType::DEFUNC;
     else
     {
-        pStateSet->AddState(AccessibleStateType::MANAGES_DESCENDANTS);
-        pStateSet->AddState(AccessibleStateType::ENABLED);
-        pStateSet->AddState(AccessibleStateType::OPAQUE);
+        nStateSet |= AccessibleStateType::MANAGES_DESCENDANTS;
+        nStateSet |= AccessibleStateType::ENABLED;
+        nStateSet |= AccessibleStateType::OPAQUE;
         if (isShowing())
-            pStateSet->AddState(AccessibleStateType::SHOWING);
+            nStateSet |= AccessibleStateType::SHOWING;
         if (isVisible())
-            pStateSet->AddState(AccessibleStateType::VISIBLE);
+            nStateSet |= AccessibleStateType::VISIBLE;
     }
-    return pStateSet;
+    return nStateSet;
 }
 
 //=====  XServiceInfo  ====================================================
@@ -617,10 +616,10 @@ tools::Rectangle ScAccessiblePreviewTable::GetBoundingBox() const
     return aRect;
 }
 
-bool ScAccessiblePreviewTable::IsDefunc( const uno::Reference<XAccessibleStateSet>& rxParentStates )
+bool ScAccessiblePreviewTable::IsDefunc( sal_Int64 nParentStates )
 {
     return ScAccessibleContextBase::IsDefunc() || (mpViewShell == nullptr) || !getAccessibleParent().is() ||
-        (rxParentStates.is() && rxParentStates->contains(AccessibleStateType::DEFUNC));
+        (nParentStates & AccessibleStateType::DEFUNC);
 }
 
 void ScAccessiblePreviewTable::FillTableInfo() const

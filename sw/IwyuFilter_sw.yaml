@@ -339,6 +339,9 @@ excludelist:
     - com/sun/star/text/XDocumentIndex.hpp
     # Needed for UnoImplPtr template
     - unobaseclass.hxx
+    sw/source/core/inc/unolinebreak.hxx:
+    # Needed for UnoImplPtr template
+    - unobaseclass.hxx
     sw/source/core/inc/unometa.hxx:
     # Base class needs complete type
     - com/sun/star/lang/XServiceInfo.hpp
@@ -390,6 +393,8 @@ excludelist:
     sw/qa/extras/odfexport/odfexport.cxx:
     # Needed for getProperty template
     - com/sun/star/graphic/XGraphic.hpp
+    #Actually used
+    - comphelper/scopeguard.hxx
     sw/qa/extras/odfimport/odfimport.cxx:
     # Needed for direct member access
     - com/sun/star/text/XTextSection.hpp
@@ -418,6 +423,9 @@ excludelist:
     - com/sun/star/graphic/XGraphic.hpp
     - com/sun/star/text/TableColumnSeparator.hpp
     - com/sun/star/text/XTextColumns.hpp
+    sw/qa/extras/ooxmlexport/ooxmlexport17.cxx:
+    # Actually used
+    - comphelper/scopeguard.hxx
     sw/qa/extras/ooxmlimport/ooxmlimport2.cxx:
     # Needed for direct member access
     - com/sun/star/document/XEmbeddedObjectSupplier2.hpp
@@ -431,6 +439,15 @@ excludelist:
     sw/qa/extras/uiwriter/uiwriter.cxx:
     # Needed for for-loop range
     - PostItMgr.hxx
+    sw/qa/extras/uiwriter/uiwriter4.cxx:
+    # Needed in C++20 mode
+    - o3tl/cppunittraitshelper.hxx
+    sw/qa/extras/uiwriter/uiwriter6.cxx:
+    # Needed in C++20 mode
+    - o3tl/cppunittraitshelper.hxx
+    sw/qa/uibase/uiview/uiview.cxx:
+    # Actually used
+    - comphelper/scopeguard.hxx
     sw/qa/extras/unowriter/unowriter.cxx:
     # Needed for direct member access
     - com/sun/star/awt/XDevice.hpp
@@ -442,15 +459,9 @@ excludelist:
     sw/qa/extras/ww8import/ww8import.cxx:
     # Needed for for-loop range
     - com/sun/star/graphic/XGraphic.hpp
-    sw/source/filter/ww8/ww8scan.hxx:
-    # OSL_BIGENDIAN is being checked
-    - osl/endian.h
     sw/qa/extras/layout/layout.cxx:
     - comphelper/scopeguard.hxx
     - com/sun/star/linguistic2/LinguServiceManager.hpp
-    sw/source/core/access/acccontext.cxx:
-    # Actually used
-    - com/sun/star/accessibility/XAccessibleStateSet.hpp
     sw/source/core/access/AccessibilityCheck.cxx:
     # Needed for template
     - com/sun/star/frame/XModel.hpp
@@ -501,9 +512,6 @@ excludelist:
     sw/source/core/undo/untbl.cxx:
     # Needed for linker visibility of sw_DebugRedline
     - docredln.hxx
-    sw/source/core/edit/edglss.cxx:
-    # OSL_BIGENDIAN is being checked
-    - osl/endian.h
     sw/source/core/edit/edfcol.cxx:
     # Actually used
     - comphelper/scopeguard.hxx
@@ -511,12 +519,18 @@ excludelist:
     # Needed for macros to work
     - editeng/unoprnms.hxx
     - com/sun/star/lang/Locale.hpp
+    sw/source/core/layout/layact.cxx:
+    # Actually used
+    - comphelper/scopeguard.hxx
     sw/source/core/swg/SwXMLBlockExport.cxx:
     # Actually used
     - com/sun/star/xml/sax/XDocumentHandler.hpp
     sw/source/core/swg/SwXMLSectionList.cxx:
     # Actually used
     - vector
+    sw/source/core/text/porrst.cxx:
+    # Actually used
+    - comphelper/scopeguard.hxx
     sw/source/core/text/txtftn.cxx:
     # Needed for template
     - com/sun/star/text/XTextRange.hpp
@@ -546,9 +560,6 @@ excludelist:
     # Actually used
     - com/sun/star/beans/SetPropertyTolerantFailed.hpp
     - com/sun/star/beans/GetPropertyTolerantResult.hpp
-    sw/source/core/unocore/unoobj.cxx:
-    # OSL_BIGENDIAN is being checked
-    - osl/endian.h
     sw/source/core/unocore/unotextmarkup.cxx:
     # Actually used
     - com/sun/star/text/TextMarkupDescriptor.hpp
@@ -594,16 +605,9 @@ excludelist:
     # Actually used
     - com/sun/star/i18n/BreakIterator.hpp
     sw/source/filter/ww8/ww8graf.cxx:
-    # OSL_BIGENDIAN is being checked
-    - osl/endian.h
     # Needed for implicit dtor
     - ww8par2.hxx
-    sw/source/filter/ww8/ww8par4.cxx:
-    # OSL_BIGENDIAN is being checked
-    - osl/endian.h
     sw/source/filter/ww8/wrtww8.cxx:
-    # OSL_BIGENDIAN is being checked
-    - osl/endian.h
     - com/sun/star/frame/XModel.hpp
     sw/source/filter/xml/xmlbrsh.cxx:
     # Needed for XMLOFF_WARN_UNKNOWN_ELEMENT
@@ -635,15 +639,15 @@ excludelist:
     sw/source/uibase/app/docst.cxx:
     # Needed for template
     - com/sun/star/frame/XModel.hpp
+    sw/source/uibase/config/modcfg.cxx:
+    # Needed for TypedWhichId macros in editeng/editids.hrc
+    - svl/typedwhich.hxx
     sw/source/uibase/dbui/mmconfigitem.cxx:
     # Actually used
     - com/sun/star/sdbc/XDataSource.hpp
     sw/source/uibase/dochdl/gloshdl.cxx:
     # Needed for direct member access
     - docsh.hxx
-    sw/source/uibase/dochdl/swdtflvr.cxx:
-    # OSL_BIGENDIAN is being checked
-    - osl/endian.h
     sw/source/uibase/docvw/edtdd.cxx:
     # Needed for extern variable
     - edtdd.hxx
@@ -758,6 +762,7 @@ excludelist:
     - svx/xlncapit.hxx
     - svx/xlinjoit.hxx
     - svx/galleryitem.hxx
+    - svx/sdangitm.hxx
     - sfx2/msg.hxx
     sw/source/uibase/shells/textsh.cxx:
     # Needed for defines in swslots.hxx
@@ -867,6 +872,8 @@ excludelist:
     sw/qa/extras/ooxmlimport/ooxmlimport.cxx:
     # Required in C++20 mode.
     - o3tl/cppunittraitshelper.hxx
+    # Actually used
+    - comphelper/scopeguard.hxx
     sw/qa/extras/ooxmlexport/ooxmlexport.cxx:
     # Required in C++20 mode.
     - o3tl/cppunittraitshelper.hxx

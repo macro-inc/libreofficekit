@@ -27,13 +27,12 @@ class SwWrtShell;
 class SwSplitTableDlg final : public weld::GenericDialogController
 {
 private:
-    std::unique_ptr<weld::RadioButton> m_xHorzBox;
-    std::unique_ptr<weld::RadioButton> m_xContentCopyRB;
     std::unique_ptr<weld::RadioButton> m_xBoxAttrCopyWithParaRB;
     std::unique_ptr<weld::RadioButton> m_xBoxAttrCopyNoParaRB;
     std::unique_ptr<weld::RadioButton> m_xBorderCopyRB;
 
-    SwWrtShell& rShell;
+    SwWrtShell& m_rShell;
+    SplitTable_HeadlineOption m_nSplit;
 
     void Apply();
 
@@ -48,7 +47,8 @@ public:
         return nRet;
     }
 
-    SplitTable_HeadlineOption GetSplitMode() const {
+    SplitTable_HeadlineOption GetSplitMode() const
+    {
         auto nSplit = SplitTable_HeadlineOption::ContentCopy;
         if (m_xBoxAttrCopyWithParaRB->get_active())
             nSplit = SplitTable_HeadlineOption::BoxAttrAllCopy;

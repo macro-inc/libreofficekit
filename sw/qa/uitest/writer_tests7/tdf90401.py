@@ -1,14 +1,16 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
 
 from uitest.framework import UITestCase
 #from uitest.uihelper.common import type_text
 from uitest.uihelper.common import get_state_as_dict
 from uitest.uihelper.common import get_url_for_data_file
-from uitest.uihelper.common import select_pos
 from libreoffice.uno.propertyvalue import mkPropertyValues
 from org.libreoffice.unotest import systemPathToFileUrl
 from tempfile import TemporaryDirectory
@@ -24,11 +26,9 @@ class tdf90401(UITestCase):
         with TemporaryDirectory() as tempdir:
             xFilePath = os.path.join(tempdir, 'tdf90401-tmp.fodt')
 
-            with self.ui_test.load_file(get_url_for_data_file('redline-autocorrect.fodt')) as writer_doc:
-                xWriterDoc = self.xUITest.getTopFocusWindow()
-                xWriterEdit = xWriterDoc.getChild('writer_edit')
+            with self.ui_test.load_file(get_url_for_data_file('redline-autocorrect.fodt')):
 
-                selection = self.xUITest.executeCommand('.uno:SelectAll')
+                self.xUITest.executeCommand('.uno:SelectAll')
                 self.xUITest.executeCommand('.uno:InsertAnnotation')
 
                 # enable remove personal info security option
@@ -60,6 +60,8 @@ class tdf90401(UITestCase):
                     xFileName.executeAction('TYPE', mkPropertyValues({'KEYCODE':'BACKSPACE'}))
                     xFileName.executeAction('TYPE', mkPropertyValues({'TEXT': xFilePath}))
 
+            self.ui_test.wait_until_file_is_available(xFilePath)
+
             with self.ui_test.load_file(systemPathToFileUrl(xFilePath)) as writer_doc2:
 
                 # check removed personal info on comments
@@ -89,12 +91,9 @@ class tdf90401(UITestCase):
         with TemporaryDirectory() as tempdir:
             xFilePath = os.path.join(tempdir, 'redline-para-join-tmp.docx')
 
-            with self.ui_test.load_file(get_url_for_data_file('redline-para-join.docx')) as writer_doc:
+            with self.ui_test.load_file(get_url_for_data_file('redline-para-join.docx')):
 
-                xWriterDoc = self.xUITest.getTopFocusWindow()
-                xWriterEdit = xWriterDoc.getChild('writer_edit')
-
-                selection = self.xUITest.executeCommand('.uno:SelectAll')
+                self.xUITest.executeCommand('.uno:SelectAll')
                 self.xUITest.executeCommand('.uno:InsertAnnotation')
 
                 # enable remove personal info security option
@@ -130,6 +129,8 @@ class tdf90401(UITestCase):
                     # DOCX confirmation dialog is displayed
                     with self.ui_test.execute_dialog_through_action(xOpen, "CLICK", close_button="save"):
                         pass
+
+            self.ui_test.wait_until_file_is_available(xFilePath)
 
             with self.ui_test.load_file(systemPathToFileUrl(xFilePath)) as writer_doc2:
 

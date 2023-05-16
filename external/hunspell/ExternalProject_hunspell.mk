@@ -19,16 +19,15 @@ hunspell_CPPFLAGS+=$(gb_COMPILERDEFS_STDLIB_DEBUG)
 
 hunspell_CXXFLAGS:=$(CXXFLAGS) $(gb_LTOFLAGS) \
        $(gb_EMSCRIPTEN_CPPFLAGS) \
-       $(if $(ENABLE_OPTIMIZED),$(gb_COMPILEROPTFLAGS),$(gb_COMPILERNOOPTFLAGS)) \
-       $(if $(debug),$(gb_DEBUGINFO_FLAGS))
+       $(call gb_ExternalProject_get_build_flags,hunspell)
 
-hunspell_LDFLAGS:=$(gb_LTOFLAGS)
+hunspell_LDFLAGS:=$(gb_LTOFLAGS) $(call gb_ExternalProject_get_link_flags,hunspell)
 
 $(call gb_ExternalProject_get_state_target,hunspell,build):
 	$(call gb_Trace_StartRange,hunspell,EXTERNAL)
 	$(call gb_ExternalProject_run,build,\
 		$(gb_RUN_CONFIGURE) ./configure --disable-shared --disable-nls --with-pic \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM))\
+			$(gb_CONFIGURE_PLATFORMS) \
 			$(if $(filter AIX,$(OS)),CFLAGS="-D_LINUX_SOURCE_COMPAT") \
 			$(if $(hunspell_CPPFLAGS),CPPFLAGS='$(hunspell_CPPFLAGS)') \
 			$(if $(hunspell_CXXFLAGS),CXXFLAGS='$(hunspell_CXXFLAGS)') \

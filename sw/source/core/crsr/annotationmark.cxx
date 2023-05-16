@@ -51,10 +51,10 @@ namespace sw::mark
     void AnnotationMark::InitDoc(SwDoc& io_rDoc,
             sw::mark::InsertMode const, SwPosition const*const)
     {
-        SwTextNode *pTextNode = GetMarkEnd().nNode.GetNode().GetTextNode();
+        SwTextNode *pTextNode = GetMarkEnd().GetNode().GetTextNode();
         assert(pTextNode);
         SwTextField *const pTextField = pTextNode->GetFieldTextAttrAt(
-            GetMarkEnd().nContent.GetIndex()-1, true);
+            GetMarkEnd().GetContentIndex()-1, ::sw::GetTextAttrMode::Default);
         assert(pTextField != nullptr);
         auto pPostItField
             = dynamic_cast<const SwPostItField*>(pTextField->GetFormatField().GetField());

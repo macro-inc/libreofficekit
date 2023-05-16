@@ -37,8 +37,10 @@
 #include <osl/diagnose.h>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
+#include <utility>
 #include <yesno.hrc>
 #include <comphelper/types.hxx>
+#include <o3tl/string_view.hxx>
 #include "modulepcr.hxx"
 
 #include <algorithm>
@@ -57,7 +59,7 @@ class StringRepresentation:
         lang::XInitialization>
 {
 public:
-    explicit StringRepresentation(uno::Reference< uno::XComponentContext > const & context);
+    explicit StringRepresentation(uno::Reference< uno::XComponentContext > context);
     StringRepresentation (const StringRepresentation&) = delete;
     StringRepresentation& operator=(const StringRepresentation&) = delete;
 
@@ -127,8 +129,8 @@ private:
 
 }
 
-StringRepresentation::StringRepresentation(uno::Reference< uno::XComponentContext > const & context) :
-    m_xContext(context)
+StringRepresentation::StringRepresentation(uno::Reference< uno::XComponentContext > context) :
+    m_xContext(std::move(context))
 {}
 
 // com.sun.star.uno.XServiceInfo:
@@ -304,9 +306,9 @@ namespace
         {
             return OUString::number( _rIntValue );
         }
-        sal_Int32 operator()( const OUString& _rStringValue ) const
+        sal_Int32 operator()( std::u16string_view _rStringValue ) const
         {
-            return _rStringValue.toInt32();
+            return o3tl::toInt32(_rStringValue);
         }
     };
 
@@ -336,16 +338,16 @@ namespace
     }
 
     template < class ElementType, class Transformer >
-    void splitComposedStringToSequence( const OUString& _rComposed, Sequence< ElementType >& _out_SplitUp, const Transformer& _rTransformer )
+    void splitComposedStringToSequence( std::u16string_view _rComposed, Sequence< ElementType >& _out_SplitUp, const Transformer& _rTransformer )
     {
         _out_SplitUp.realloc( 0 );
-        if ( _rComposed.isEmpty() )
+        if ( _rComposed.empty() )
             return;
         sal_Int32 tokenPos = 0;
         do
         {
             _out_SplitUp.realloc( _out_SplitUp.getLength() + 1 );
-            _out_SplitUp.getArray()[ _out_SplitUp.getLength() - 1 ] = static_cast<ElementType>(_rTransformer( _rComposed.getToken( 0, '\n', tokenPos ) ));
+            _out_SplitUp.getArray()[ _out_SplitUp.getLength() - 1 ] = static_cast<ElementType>(_rTransformer( OUString(o3tl::getToken(_rComposed, 0, '\n', tokenPos )) ));
         }
         while ( tokenPos != -1 );
     }
@@ -416,10 +418,6 @@ bool StringRepresentation::convertGenericValueToString( const uno::Any& _rValue,
     }
     break;
     case uno::TypeClass_CONSTANT:
-        {
-            int i = 0;
-            ++i;
-        }
         break;
 
     // some structs
@@ -482,7 +480,7 @@ uno::Any StringRepresentation::convertStringToSimple( const OUString& _rValue,co
             }
 
             if ( !aReturn.hasValue() )
-                aReturn = m_xTypeConverter->convertToSimpleType( makeAny( _rValue ), _ePropertyType );
+                aReturn = m_xTypeConverter->convertToSimpleType( Any( _rValue ), _ePropertyType );
         }
         catch( const script::CannotConvertException& ) { }
         catch( const lang::IllegalArgumentException& ) { }

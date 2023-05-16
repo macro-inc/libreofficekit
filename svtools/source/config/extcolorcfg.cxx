@@ -31,9 +31,10 @@
 #include <com/sun/star/uno/Sequence.h>
 #include <comphelper/sequence.hxx>
 #include <svl/hint.hxx>
-#include <osl/mutex.hxx>
+#include <mutex>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
@@ -50,9 +51,9 @@ namespace svtools
 static sal_Int32            nExtendedColorRefCount_Impl = 0;
 namespace
 {
-    ::osl::Mutex& ColorMutex_Impl()
+    std::mutex& ColorMutex_Impl()
     {
-        static ::osl::Mutex SINGLETON;
+        static std::mutex SINGLETON;
         return SINGLETON;
     }
 }
@@ -255,12 +256,12 @@ void ExtendedColorConfig_Impl::Load(const OUString& rScheme)
         for(sal_Int32 j = 0;pDispIter != pDispEnd;++pDispIter,++j)
         {
             sal_Int32 nIndex = 0;
-            pDispIter->getToken(0,'/',nIndex);
-            OUString sName = pDispIter->copy(nIndex);
-            sName = sName.copy(0,sName.lastIndexOf(sDisplayName));
+            o3tl::getToken(*pDispIter, 0, '/', nIndex);
+            std::u16string_view sName = pDispIter->subView(nIndex);
+            sName = sName.substr(0, sName.rfind(sDisplayName));
             OUString sCurrentDisplayName;
             aDisplayNamesValue[j] >>= sCurrentDisplayName;
-            aDisplayNameMap.emplace(sName,sCurrentDisplayName);
+            aDisplayNameMap.emplace(OUString(sName),sCurrentDisplayName);
         }
     }
 
@@ -338,7 +339,7 @@ void ExtendedColorConfig_Impl::FillComponentColors(const uno::Sequence < OUStrin
                 if ( aConfigValues.find(*pColorIter) == aConfigValues.end() )
                 {
                     sal_Int32 nIndex = 0;
-                    pColorIter->getToken(2,'/',nIndex);
+                    o3tl::getToken(*pColorIter, 2, '/', nIndex);
                     OUString sName(pColorIter->copy(nIndex)),sDisplayName;
                     OUString sTemp = sName.copy(0,sName.lastIndexOf(sColor));
 
@@ -508,7 +509,7 @@ IMPL_LINK( ExtendedColorConfig_Impl, DataChangedEventListener, VclSimpleEvent&, 
 
 ExtendedColorConfig::ExtendedColorConfig()
 {
-    ::osl::MutexGuard aGuard( ColorMutex_Impl() );
+    std::unique_lock aGuard( ColorMutex_Impl() );
     if ( !m_pImpl )
         m_pImpl = new ExtendedColorConfig_Impl;
     ++nExtendedColorRefCount_Impl;
@@ -517,7 +518,7 @@ ExtendedColorConfig::ExtendedColorConfig()
 
 ExtendedColorConfig::~ExtendedColorConfig()
 {
-    ::osl::MutexGuard aGuard( ColorMutex_Impl() );
+    std::unique_lock aGuard( ColorMutex_Impl() );
     EndListening( *m_pImpl);
     if(!--nExtendedColorRefCount_Impl)
     {

@@ -18,9 +18,7 @@
 #include "compat.hxx"
 #include "plugin.hxx"
 
-#if CLANG_VERSION >= 110000
 #include "clang/AST/ParentMapContext.h"
-#endif
 
 /**
 Look for fields that are only ever assigned a single constant value.
@@ -96,6 +94,8 @@ public:
 
     virtual void run() override
     {
+        handler.enableTreeWideAnalysisMode();
+
         TraverseDecl(compiler.getASTContext().getTranslationUnitDecl());
 
         if (!isUnitTestMode())
@@ -115,11 +115,11 @@ public:
         else
         {
             for (const MyFieldAssignmentInfo & s : assignedSet)
-                if (s.fieldDecl && compiler.getSourceManager().isInMainFile(compat::getBeginLoc(s.fieldDecl)))
+                if (s.fieldDecl && compiler.getSourceManager().isInMainFile(s.fieldDecl->getBeginLoc()))
                     report(
                         DiagnosticsEngine::Warning,
                         "assign %0",
-                        compat::getBeginLoc(s.fieldDecl))
+                        s.fieldDecl->getBeginLoc())
                         << s.value;
         }
     }
@@ -182,8 +182,7 @@ bool SingleValFields::VisitFieldDecl( const FieldDecl* fieldDecl )
 {
     auto canonicalDecl = fieldDecl->getCanonicalDecl();
 
-    if( ignoreLocation( canonicalDecl )
-        || isInUnoIncludeFile( compiler.getSourceManager().getSpellingLoc(canonicalDecl->getLocation())) )
+    if( isInUnoIncludeFile( compiler.getSourceManager().getSpellingLoc(canonicalDecl->getLocation())) )
         return true;
 
     MyFieldInfo aInfo;
@@ -214,8 +213,7 @@ bool SingleValFields::VisitVarDecl( const VarDecl* varDecl )
     if (!canonicalDecl->getLocation().isValid())
         return true;
 
-    if( ignoreLocation( canonicalDecl )
-        || isInUnoIncludeFile( compiler.getSourceManager().getSpellingLoc(canonicalDecl->getLocation())) )
+    if( isInUnoIncludeFile( compiler.getSourceManager().getSpellingLoc(canonicalDecl->getLocation())) )
         return true;
 
     MyFieldInfo aInfo;
@@ -235,9 +233,6 @@ bool SingleValFields::VisitVarDecl( const VarDecl* varDecl )
 
 bool SingleValFields::VisitCXXConstructorDecl( const CXXConstructorDecl* decl )
 {
-    if( ignoreLocation( decl ) )
-        return true;
-
     // doesn't count as a write to fields because it's self->self
     if (decl->isCopyOrMoveConstructor())
         return true;
@@ -268,8 +263,6 @@ bool SingleValFields::VisitMemberExpr( const MemberExpr* memberExpr )
     const FieldDecl* fieldDecl = dyn_cast<FieldDecl>(decl);
     if (!fieldDecl)
         return true;
-    if (ignoreLocation(memberExpr))
-        return true;
     walkPotentialAssign(fieldDecl, memberExpr);
     return true;
 }
@@ -284,8 +277,6 @@ bool SingleValFields::VisitDeclRefExpr( const DeclRefExpr* declRefExpr )
     if (varDecl->getType().isConstQualified())
         return true;
     if (!(varDecl->isStaticLocal() || varDecl->isStaticDataMember() || varDecl->hasGlobalStorage()))
-        return true;
-    if (ignoreLocation(declRefExpr))
         return true;
     walkPotentialAssign(varDecl, declRefExpr);
     return true;
@@ -429,7 +420,7 @@ void SingleValFields::walkPotentialAssign( const DeclaratorDecl* fieldOrVarDecl,
         {
             break;
         }
-        else if ( isa<ArrayInitLoopExpr>(parent) || isa<GCCAsmStmt>(parent) || isa<VAArgExpr>(parent))
+        else if ( isa<ArrayInitLoopExpr>(parent) || isa<AtomicExpr>(parent) || isa<GCCAsmStmt>(parent) || isa<VAArgExpr>(parent))
         {
             bPotentiallyAssignedTo = true;
             break;
@@ -445,7 +436,7 @@ void SingleValFields::walkPotentialAssign( const DeclaratorDecl* fieldOrVarDecl,
         report(
              DiagnosticsEngine::Warning,
              "oh dear, what can the matter be?",
-              compat::getBeginLoc(memberExpr))
+              memberExpr->getBeginLoc())
               << memberExpr->getSourceRange();
         parent->dump();
     }

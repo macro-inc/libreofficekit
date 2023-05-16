@@ -28,6 +28,7 @@ class SfxObjectShell;
 class ScDrawObjData;
 class ScMacroInfo;
 class ScMarkData;
+enum class SdrObjKind : sal_uInt16;
 
 class ScTabDeletedHint final : public SfxHint
 {
@@ -110,7 +111,7 @@ private:
     void            ResizeLastRectFromAnchor( const SdrObject* pObj, ScDrawObjData& rData, bool bNegativePage, bool bCanResize );
 
 public:
-                    ScDrawLayer( ScDocument* pDocument, const OUString& rName );
+                    ScDrawLayer( ScDocument* pDocument, OUString aName );
     virtual         ~ScDrawLayer() override;
 
     virtual rtl::Reference<SdrPage> AllocPage(bool bMasterPage) override;
@@ -173,7 +174,7 @@ public:
                     //  (ChartListenerCollection etc. must use GetPersistName directly)
     static OUString GetVisibleName( const SdrObject* pObj );
 
-    SdrObject*      GetNamedObject( std::u16string_view rName, sal_uInt16 nId, SCTAB& rFoundTab ) const;
+    SdrObject*      GetNamedObject( std::u16string_view rName, SdrObjKind nId, SCTAB& rFoundTab ) const;
                     // if pnCounter != NULL, the search for a name starts with this index + 1,
                     // and the index really used is returned.
     OUString        GetNewGraphicName( tools::Long* pnCounter = nullptr ) const;

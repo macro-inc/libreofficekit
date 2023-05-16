@@ -34,13 +34,12 @@ Color BMCOL(sal_uInt32 _col) {
 
 }
 
-CGMBitmap::CGMBitmap( CGM& rCGM ) :
-    mpCGM                           ( &rCGM ),
-    pCGMBitmapDescriptor            ( new CGMBitmapDescriptor )
+CGMBitmap::CGMBitmap(CGM& rCGM)
+    : mpCGM(&rCGM)
+    , pCGMBitmapDescriptor(new CGMBitmapDescriptor)
 {
     ImplGetBitmap( *pCGMBitmapDescriptor );
 };
-
 
 CGMBitmap::~CGMBitmap()
 {
@@ -216,17 +215,17 @@ void CGMBitmap::ImplGetBitmap( CGMBitmapDescriptor& rDesc )
         double nX = rDesc.mnR.X - rDesc.mnQ.X;
         double nY = rDesc.mnR.Y - rDesc.mnQ.Y;
 
-        rDesc.mndy = sqrt( nX * nX + nY * nY );
+        rDesc.mndy = std::hypot(nX, nY);
 
         nX = rDesc.mnR.X - rDesc.mnP.X;
         nY = rDesc.mnR.Y - rDesc.mnP.Y;
 
-        rDesc.mndx = sqrt( nX * nX + nY * nY );
+        rDesc.mndx = std::hypot(nX, nY);
 
         nX = rDesc.mnR.X - rDesc.mnP.X;
         nY = rDesc.mnR.Y - rDesc.mnP.Y;
 
-        double fSqrt = sqrt(nX * nX + nY * nY);
+        double fSqrt = std::hypot(nX, nY);
         rDesc.mnOrientation = fSqrt != 0.0 ? basegfx::rad2deg(acos(nX / fSqrt)) : 0.0;
         if ( nY > 0 )
             rDesc.mnOrientation = 360 - rDesc.mnOrientation;
@@ -240,7 +239,7 @@ void CGMBitmap::ImplGetBitmap( CGMBitmapDescriptor& rDesc )
         nX = fCos * nX + fSin * nY;
         nY = -( fSin * nX - fCos * nY );
 
-        fSqrt = sqrt(nX * nX + nY * nY);
+        fSqrt = std::hypot(nX, nY);
         fAngle = fSqrt != 0.0 ? basegfx::rad2deg(acos(nX / fSqrt)) : 0.0;
         if ( nY > 0 )
             fAngle = 360 - fAngle;
@@ -375,11 +374,22 @@ bool CGMBitmap::ImplGetDimensions( CGMBitmapDescriptor& rDesc )
 
 void CGMBitmap::ImplInsert( CGMBitmapDescriptor const & rSource, CGMBitmapDescriptor& rDest )
 {
-    if (utl::ConfigManager::IsFuzzing() && rDest.mxBitmap.GetSizePixel().Height() + rSource.mnY > SAL_MAX_UINT16)
+    ++mpCGM->mnBitmapInserts;
+    static const bool bFuzzing = utl::ConfigManager::IsFuzzing();
+    if (bFuzzing)
     {
-        SAL_WARN("filter.icgm", "bitmap would expand too much");
-        rDest.mbStatus = false;
-        return;
+        if (rDest.mxBitmap.GetSizePixel().Height() + rSource.mnY > SAL_MAX_UINT16)
+        {
+            SAL_WARN("filter.icgm", "bitmap would expand too much");
+            rDest.mbStatus = false;
+            return;
+        }
+        if (mpCGM->mnBitmapInserts > 1024)
+        {
+            SAL_WARN("filter.icgm", "too many inserts");
+            rDest.mbStatus = false;
+            return;
+        }
     }
     rDest.mxBitmap.Expand( 0, rSource.mnY );
     rDest.mxBitmap.CopyPixel( tools::Rectangle( Point( 0, rDest.mnY ), Size( rSource.mnX, rSource.mnY ) ),

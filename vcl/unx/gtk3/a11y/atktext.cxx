@@ -254,24 +254,6 @@ text_wrapper_get_text (AtkText *text,
 
     g_return_val_if_fail( (end_offset == -1) || (end_offset >= start_offset), nullptr );
 
-    /* at-spi expects the delete event to be send before the deletion happened
-     * so we save the deleted string object in the UNO event notification and
-     * fool libatk-bridge.so here ..
-     */
-    void * pData = g_object_get_data( G_OBJECT(text), "ooo::text_changed::delete" );
-    if( pData != nullptr )
-    {
-        accessibility::TextSegment * pTextSegment =
-            static_cast <accessibility::TextSegment *> (pData);
-
-        if( pTextSegment->SegmentStart == start_offset &&
-            pTextSegment->SegmentEnd == end_offset )
-        {
-            OString aUtf8 = OUStringToOString( pTextSegment->SegmentText, RTL_TEXTENCODING_UTF8 );
-            return g_strdup( aUtf8.getStr() );
-        }
-    }
-
     try {
         css::uno::Reference<css::accessibility::XAccessibleText> pText
             = getText( text );
@@ -669,9 +651,9 @@ text_wrapper_get_character_extents( AtkText          *text,
             if (coords == ATK_XY_SCREEN || coords == ATK_XY_WINDOW)
             {
                 g_return_if_fail( ATK_IS_COMPONENT( text ) );
-                SAL_WNODEPRECATED_DECLARATIONS_PUSH
-                atk_component_get_position( ATK_COMPONENT( text ), &origin_x, &origin_y, coords);
-                SAL_WNODEPRECATED_DECLARATIONS_POP
+                gint nWidth = -1;
+                gint nHeight = -1;
+                atk_component_get_extents(ATK_COMPONENT(text), &origin_x, &origin_y, &nWidth, &nHeight, coords);
             }
 
             *x = aRect.X + origin_x;
@@ -720,9 +702,9 @@ text_wrapper_get_offset_at_point (AtkText     *text,
             if (coords == ATK_XY_SCREEN || coords == ATK_XY_WINDOW)
             {
                 g_return_val_if_fail( ATK_IS_COMPONENT( text ), -1 );
-                SAL_WNODEPRECATED_DECLARATIONS_PUSH
-                atk_component_get_position( ATK_COMPONENT( text ), &origin_x, &origin_y, coords);
-                SAL_WNODEPRECATED_DECLARATIONS_POP
+                gint nWidth = -1;
+                gint nHeight = -1;
+                atk_component_get_extents(ATK_COMPONENT(text), &origin_x, &origin_y, &nWidth, &nHeight, coords);
             }
 
             return pText->getIndexAtPoint( awt::Point(x - origin_x, y - origin_y) );

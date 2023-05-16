@@ -60,7 +60,7 @@ static std::unique_ptr<SvStream> lcl_CreateStream( const OUString& rFileName, St
                 ::ucbhelper::Content aCnt(
                     rFileName, Reference < XCommandEnvironment >(),
                     comphelper::getProcessComponentContext() );
-                aCnt.executeCommand( "delete", css::uno::makeAny( true ) );
+                aCnt.executeCommand( "delete", css::uno::Any( true ) );
             }
 
             catch ( const CommandAbortedException& )
@@ -200,7 +200,7 @@ std::unique_ptr<SvStream> UcbStreamHelper::CreateStream( const Reference < XInpu
     if ( xLockBytes.is() )
     {
         if ( !bCloseStream )
-            xLockBytes->setDontClose_Impl();
+            xLockBytes->setDontClose();
 
         pStream.reset( new SvStream( xLockBytes.get() ) );
         pStream->SetBufferSize( 4096 );
@@ -219,7 +219,7 @@ std::unique_ptr<SvStream> UcbStreamHelper::CreateStream( const Reference < XStre
         if ( xLockBytes.is() )
         {
             if ( !bCloseStream )
-                xLockBytes->setDontClose_Impl();
+                xLockBytes->setDontClose();
 
             pStream.reset( new SvStream( xLockBytes.get() ) );
             pStream->SetBufferSize( 4096 );

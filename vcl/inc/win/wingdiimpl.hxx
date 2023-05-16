@@ -19,7 +19,7 @@ class ControlCacheKey;
 class WinSalGraphicsImplBase
 {
 public:
-    virtual ~WinSalGraphicsImplBase(){};
+    virtual ~WinSalGraphicsImplBase() {}
 
     // If true is returned, the following functions are used for drawing controls.
     virtual bool UseRenderNativeControl() const { return false; }
@@ -27,21 +27,23 @@ public:
                                               int /*nX*/, int /*nY*/)
     {
         abort();
-    };
+    }
     virtual bool RenderAndCacheNativeControl(CompatibleDC& /*rWhite*/, CompatibleDC& /*rBlack*/,
                                              int /*nX*/, int /*nY*/,
                                              ControlCacheKey& /*aControlCacheKey*/)
     {
         abort();
-    };
+    }
 
-    virtual void ClearDevFontCache(){};
+    virtual void ClearDevFontCache() {}
 
-    virtual void Flush(){};
+    virtual void Flush() {}
 
     // Implementation for WinSalGraphics::DrawTextLayout().
     // Returns true if handled, if false, then WinSalGraphics will handle it itself.
     virtual bool DrawTextLayout(const GenericSalLayout&) { return false; }
+
+    virtual void ClearNativeControlCache() {}
 };
 
 #endif // INCLUDED_VCL_INC_WIN_WINGDIIMPL_HXX

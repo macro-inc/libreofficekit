@@ -50,6 +50,7 @@
 #include <SpellDialog.hxx>
 #include <optlingu.hxx>
 #include <treeopt.hxx>
+#include <svtools/colorcfg.hxx>
 #include <svtools/langtab.hxx>
 #include <sal/log.hxx>
 #include <i18nlangtag/languagetag.hxx>
@@ -160,6 +161,7 @@ SpellDialog::SpellDialog(SpellDialogChildWindow* pChildWindow,
     : SfxModelessDialogController (_pBindings, pChildWindow,
         pParent, "cui/ui/spellingdialog.ui", "SpellingDialog")
     , aDialogUndoLink(LINK (this, SpellDialog, DialogUndoHdl))
+    , m_pInitHdlEvent(nullptr)
     , bFocusLocked(true)
     , rParent(*pChildWindow)
     , pImpl( new SpellDialog_Impl )
@@ -218,11 +220,19 @@ SpellDialog::SpellDialog(SpellDialogChildWindow* pChildWindow,
     //InitHdl wants to use virtual methods, so it
     //can't be called during the ctor, so init
     //it on next event cycle post-ctor
-    Application::PostUserEvent(LINK(this, SpellDialog, InitHdl));
+    m_pInitHdlEvent = Application::PostUserEvent(LINK(this, SpellDialog, InitHdl));
 }
 
 SpellDialog::~SpellDialog()
 {
+    if (m_xOptionsDlg)
+    {
+        m_xOptionsDlg->response(RET_CANCEL);
+        m_xOptionsDlg.reset();
+    }
+
+    if (m_pInitHdlEvent)
+        Application::RemoveUserEvent(m_pInitHdlEvent);
     if (pImpl)
     {
         // save possibly modified user-dictionaries
@@ -369,16 +379,10 @@ void SpellDialog::SpellContinue_Impl(std::unique_ptr<UndoChangeGroupGuard>* pGua
         {
             m_xNotInDictFT.get(),
             m_xSentenceED->GetDrawingArea(),
-            m_xLanguageFT.get(),
-            nullptr
+            m_xLanguageFT.get()
         };
-        sal_Int32 nIdx = 0;
-        do
-        {
-            aControls[nIdx]->set_sensitive(true);
-        }
-        while(aControls[++nIdx]);
-
+        for (weld::Widget* pWidget : aControls)
+            pWidget->set_sensitive(true);
     }
     if( bNextSentence )
     {
@@ -392,6 +396,7 @@ void SpellDialog::SpellContinue_Impl(std::unique_ptr<UndoChangeGroupGuard>* pGua
  */
 IMPL_LINK_NOARG( SpellDialog, InitHdl, void*, void)
 {
+    m_pInitHdlEvent = nullptr;
     m_xDialog->freeze();
     //show or hide AutoCorrect depending on the modules abilities
     m_xAutoCorrPB->set_visible(rParent.HasAutoCorrection());
@@ -406,7 +411,9 @@ IMPL_LINK_NOARG( SpellDialog, InitHdl, void*, void)
     InitUserDicts();
 
     LockFocusChanges(true);
-    if( m_xChangePB->get_sensitive() )
+    if(m_xSentenceED->IsEnabled())
+        m_xSentenceED->GrabFocus();
+    else if( m_xChangePB->get_sensitive() )
         m_xChangePB->grab_focus();
     else if( m_xIgnorePB->get_sensitive() )
         m_xIgnorePB->grab_focus();
@@ -461,19 +468,22 @@ IMPL_LINK_NOARG(SpellDialog, CheckGrammarHdl, weld::Toggleable&, void)
 
 void SpellDialog::StartSpellOptDlg_Impl()
 {
-    SfxItemSetFixed<SID_AUTOSPELL_CHECK,SID_AUTOSPELL_CHECK> aSet( SfxGetpApp()->GetPool() );
-    SfxSingleTabDialogController aDlg(m_xDialog.get(), &aSet, "cui/ui/spelloptionsdialog.ui", "SpellOptionsDialog");
+    auto xSet = std::make_shared<SfxItemSetFixed<SID_AUTOSPELL_CHECK,SID_AUTOSPELL_CHECK>>( SfxGetpApp()->GetPool() );
+    m_xOptionsDlg = std::make_shared<SfxSingleTabDialogController>(
+        m_xDialog.get(), xSet.get(), "content", "cui/ui/spelloptionsdialog.ui", "SpellOptionsDialog");
 
-    std::unique_ptr<SfxTabPage> xPage = SvxLinguTabPage::Create(aDlg.get_content_area(), &aDlg, &aSet);
+    std::unique_ptr<SfxTabPage> xPage = SvxLinguTabPage::Create(m_xOptionsDlg->get_content_area(), m_xOptionsDlg.get(), xSet.get());
     static_cast<SvxLinguTabPage*>(xPage.get())->HideGroups( GROUP_MODULES );
-    aDlg.SetTabPage(std::move(xPage));
-    if (RET_OK == aDlg.run())
-    {
-        InitUserDicts();
-        const SfxItemSet* pOutSet = aDlg.GetOutputItemSet();
-        if(pOutSet)
-            OfaTreeOptionsDialog::ApplyLanguageOptions(*pOutSet);
-    }
+    m_xOptionsDlg->SetTabPage(std::move(xPage));
+    weld::GenericDialogController::runAsync(m_xOptionsDlg, [this, xSet] (sal_uInt32 nResult) {
+        if (RET_OK == nResult)
+        {
+            InitUserDicts();
+            const SfxItemSet* pOutSet = m_xOptionsDlg->GetOutputItemSet();
+            if(pOutSet)
+                OfaTreeOptionsDialog::ApplyLanguageOptions(*pOutSet);
+        }
+    });
 }
 
 namespace
@@ -974,15 +984,11 @@ void SpellDialog::InvalidateDialog()
         m_xChangePB.get(),
         m_xChangeAllPB.get(),
         m_xAutoCorrPB.get(),
-        m_xUndoPB.get(),
-        nullptr
+        m_xUndoPB.get()
     };
-    sal_Int16 i = 0;
-    while(aDisableArr[i])
-    {
-        aDisableArr[i]->set_sensitive(false);
-        i++;
-    }
+    for (weld::Widget* pWidget : aDisableArr)
+        pWidget->set_sensitive(false);
+
     SfxModelessDialogController::Deactivate();
 }
 
@@ -1141,6 +1147,13 @@ void SentenceEditWindow_Impl::SetDrawingArea(weld::DrawingArea* pDrawingArea)
     WeldEditView::SetDrawingArea(pDrawingArea);
     // tdf#132288 don't merge equal adjacent attributes
     m_xEditEngine->DisableAttributeExpanding();
+
+    // tdf#142631 use document background color in this widget
+    Color aBgColor = svtools::ColorConfig().GetColorValue(svtools::DOCCOLOR).nColor;
+    OutputDevice& rDevice = pDrawingArea->get_ref_device();
+    rDevice.SetBackground(aBgColor);
+    m_xEditView->SetBackgroundColor(aBgColor);
+    m_xEditEngine->SetBackgroundColor(aBgColor);
 }
 
 SentenceEditWindow_Impl::~SentenceEditWindow_Impl()
@@ -1672,8 +1685,12 @@ void SentenceEditWindow_Impl::MoveErrorMarkTo(sal_Int32 nStart, sal_Int32 nEnd, 
     m_xEditEngine->RemoveAttribs(aAll, false, EE_CHAR_WEIGHT_CJK);
     m_xEditEngine->RemoveAttribs(aAll, false, EE_CHAR_WEIGHT_CTL);
 
+    // tdf#116566 Use color defined in the current Color Scheme
+    Color aSpellErrorCollor = svtools::ColorConfig().GetColorValue(svtools::SPELL).nColor;
+    Color aGrammarErrorCollor = svtools::ColorConfig().GetColorValue(svtools::GRAMMAR).nColor;
+
     SfxItemSet aSet(m_xEditEngine->GetEmptyItemSet());
-    aSet.Put(SvxColorItem(bGrammarError ? COL_LIGHTBLUE : COL_LIGHTRED, EE_CHAR_COLOR));
+    aSet.Put(SvxColorItem(bGrammarError ? aGrammarErrorCollor : aSpellErrorCollor, EE_CHAR_COLOR));
     aSet.Put(SvxWeightItem(WEIGHT_BOLD, EE_CHAR_WEIGHT));
     aSet.Put(SvxWeightItem(WEIGHT_BOLD, EE_CHAR_WEIGHT_CJK));
     aSet.Put(SvxWeightItem(WEIGHT_BOLD, EE_CHAR_WEIGHT_CTL));
@@ -1821,7 +1838,7 @@ void SentenceEditWindow_Impl::SetAlternatives( const Reference< XSpellAlternativ
         aLocale = xAlt->getLocale();
         aAlts   = xAlt->getAlternatives();
     }
-    SpellErrorDescription aDesc( false, aWord, aLocale, aAlts, nullptr);
+    SpellErrorDescription aDesc( false, aWord, std::move(aLocale), aAlts, nullptr);
     SfxGrabBagItem aSpellErrorDescription(EE_CHAR_GRABBAG);
     aSpellErrorDescription.GetGrabBag()["SpellErrorDescription"] <<= aDesc.toSequence();
     SetAttrib(aSpellErrorDescription, m_nErrorStart, m_nErrorEnd);
@@ -2068,15 +2085,10 @@ void SentenceEditWindow_Impl::SetUndoEditMode(bool bSet)
         pSpellDialog->m_xLanguageLB->get_widget(),
         pSpellDialog->m_xAddToDictMB.get(),
         pSpellDialog->m_xAddToDictPB.get(),
-        pSpellDialog->m_xAutoCorrPB.get(),
-        nullptr
+        pSpellDialog->m_xAutoCorrPB.get()
     };
-    sal_Int32 nIdx = 0;
-    do
-    {
-        aControls[nIdx]->set_sensitive(false);
-    }
-    while(aControls[++nIdx]);
+    for (weld::Widget* pWidget : aControls)
+        pWidget->set_sensitive(false);
 
     //remove error marks
     ESelection aAll(0, 0, 0, EE_TEXTPOS_ALL);

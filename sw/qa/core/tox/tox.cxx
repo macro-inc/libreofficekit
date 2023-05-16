@@ -43,7 +43,7 @@ CPPUNIT_TEST_FIXTURE(Test, testAuthorityLinkClick)
         comphelper::makePropertyValue("Year", OUString("2020")),
         comphelper::makePropertyValue("URL", OUString("http://www.example.com/test.pdf")),
     };
-    xField->setPropertyValue("Fields", uno::makeAny(aFields));
+    xField->setPropertyValue("Fields", uno::Any(aFields));
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
@@ -84,7 +84,7 @@ CPPUNIT_TEST_FIXTURE(Test, testAuthorityTableEntryURL)
         comphelper::makePropertyValue("Title", OUString("Title")),
         comphelper::makePropertyValue("URL", OUString("http://www.example.com/test.pdf#page=1")),
     };
-    xField->setPropertyValue("Fields", uno::makeAny(aFields));
+    xField->setPropertyValue("Fields", uno::Any(aFields));
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
@@ -116,7 +116,8 @@ CPPUNIT_TEST_FIXTURE(Test, testAuthorityTableEntryURL)
 CPPUNIT_TEST_FIXTURE(Test, testAuthorityTableEntryClick)
 {
     // Given an empty document:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
 
     // When inserting a biblio entry field with an URL:
     uno::Reference<lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
@@ -129,7 +130,7 @@ CPPUNIT_TEST_FIXTURE(Test, testAuthorityTableEntryClick)
         comphelper::makePropertyValue("Title", OUString("Title")),
         comphelper::makePropertyValue("URL", OUString("http://www.example.com/test.pdf#page=1")),
     };
-    xField->setPropertyValue("Fields", uno::makeAny(aFields));
+    xField->setPropertyValue("Fields", uno::Any(aFields));
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
@@ -159,7 +160,8 @@ CPPUNIT_TEST_FIXTURE(Test, testAuthorityTableEntryClick)
 CPPUNIT_TEST_FIXTURE(Test, testAuthorityTableEntryRelClick)
 {
     // Given an empty document with a file:// base URL:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
     uno::Sequence<beans::PropertyValue> aArgs = {
         comphelper::makePropertyValue("FilterName", OUString("writer8")),
@@ -177,7 +179,7 @@ CPPUNIT_TEST_FIXTURE(Test, testAuthorityTableEntryRelClick)
         comphelper::makePropertyValue("Title", OUString("Title")),
         comphelper::makePropertyValue("URL", OUString("test.pdf#page=1")),
     };
-    xField->setPropertyValue("Fields", uno::makeAny(aFields));
+    xField->setPropertyValue("Fields", uno::Any(aFields));
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
@@ -223,7 +225,7 @@ CPPUNIT_TEST_FIXTURE(Test, testAuthorityTableURLDeduplication)
             comphelper::makePropertyValue("Title", OUString("Title")),
             comphelper::makePropertyValue("URL", OUString(rURL)),
         };
-        xField->setPropertyValue("Fields", uno::makeAny(aFields));
+        xField->setPropertyValue("Fields", uno::Any(aFields));
         uno::Reference<text::XTextContent> xContent(xField, uno::UNO_QUERY);
         xText->insertTextContent(xCursor, xContent, /*bAbsorb=*/false);
     }

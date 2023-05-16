@@ -63,7 +63,7 @@ namespace drawinglayer::primitive2d
         public:
             /// constructor
             PatternFillPrimitive2D(
-                const basegfx::B2DPolyPolygon& rMask,
+                basegfx::B2DPolyPolygon aMask,
                 Primitive2DContainer&& rChildren,
                 const basegfx::B2DRange& rReferenceRange);
 
@@ -85,7 +85,7 @@ namespace drawinglayer::primitive2d
             virtual sal_uInt32 getPrimitive2DID() const override;
 
             // XAccounting
-            virtual sal_Int64 SAL_CALL estimateUsage() override;
+            virtual sal_Int64 estimateUsage() override;
 
             /// helper which creates the content - checks if clipping is needed and eventually
             /// creates buffered content to speed up rendering

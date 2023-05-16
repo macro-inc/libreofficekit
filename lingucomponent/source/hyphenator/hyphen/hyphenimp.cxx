@@ -23,8 +23,6 @@
 #include <cppuhelper/factory.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/weak.hxx>
-#include <com/sun/star/registry/XRegistryKey.hpp>
-#include <com/sun/star/lang/XSingleServiceFactory.hpp>
 #include <com/sun/star/linguistic2/XLinguProperties.hpp>
 #include <i18nlangtag/languagetag.hxx>
 #include <tools/debug.hxx>
@@ -40,12 +38,9 @@
 #include <rtl/textenc.h>
 #include <sal/log.hxx>
 
-#include <linguistic/lngprops.hxx>
 #include <linguistic/misc.hxx>
 #include <svtools/strings.hrc>
 #include <unotools/charclass.hxx>
-#include <unotools/pathoptions.hxx>
-#include <unotools/useroptions.hxx>
 #include <unotools/lingucfg.hxx>
 #include <unotools/resmgr.hxx>
 #include <osl/file.hxx>
@@ -182,7 +177,7 @@ Sequence< Locale > SAL_CALL Hyphenator::getLocales()
                         mvDicts[k].aPtr = nullptr;
                         mvDicts[k].eEnc = RTL_TEXTENCODING_DONTKNOW;
                         mvDicts[k].aLoc = aLanguageTag.getLocale();
-                        mvDicts[k].apCC.reset( new CharClass( aLanguageTag ) );
+                        mvDicts[k].apCC.reset( new CharClass( std::move(aLanguageTag) ) );
                         // also both files have to be in the same directory and the
                         // file names must only differ in the extension (.aff/.dic).
                         // Thus we use the first location only and strip the extension part.

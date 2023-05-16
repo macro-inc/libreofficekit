@@ -75,7 +75,7 @@ struct StdFontInfo
 
     explicit            StdFontInfo();
     explicit            StdFontInfo(
-                            const OUString& rName,
+                            OUString aName,
                             sal_uInt32 nHeight );
 };
 
@@ -146,11 +146,11 @@ public:
     OleFormCtrlExportHelper( const css::uno::Reference< css::uno::XComponentContext >& rxCtx, const css::uno::Reference< css::frame::XModel >& xDocModel, const css::uno::Reference< css::awt::XControlModel >& xModel );
     ~OleFormCtrlExportHelper();
 
-    OUString getGUID() const
+    std::u16string_view getGUID() const
     {
-        OUString sResult;
+        std::u16string_view sResult;
         if ( maGUID.getLength() > 2 )
-            sResult = maGUID.copy(1, maGUID.getLength() - 2 );
+            sResult = maGUID.subView(1, maGUID.getLength() - 2 );
         return sResult;
     }
     const OUString& getFullName() const { return maFullName; }
@@ -169,13 +169,13 @@ public:
 // implementation into the sd module itself.
 class OOX_DLLPUBLIC MSConvertOCXControls : public SvxMSConvertOCXControls
 {
-protected:
     css::uno::Reference< css::uno::XComponentContext > mxCtx;
     ::oox::GraphicHelper maGrfHelper;
 
+protected:
     bool importControlFromStream( ::oox::BinaryInputStream& rInStrm,
                                   css::uno::Reference< css::form::XFormComponent > & rxFormComp,
-                                  const OUString& rGuidString );
+                                  std::u16string_view rGuidString );
     bool importControlFromStream( ::oox::BinaryInputStream& rInStrm,
                                   css::uno::Reference< css::form::XFormComponent > & rxFormComp,
                                   const OUString& rGuidString,

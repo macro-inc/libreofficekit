@@ -1,13 +1,16 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 from uitest.framework import UITestCase
-from uitest.uihelper.common import get_url_for_data_file
+from uitest.uihelper.common import get_url_for_data_file, get_state_as_dict
 from libreoffice.uno.propertyvalue import mkPropertyValues
 from libreoffice.calc.document import get_cell_by_position
+from libreoffice.calc.paste_special import reset_default_values
 
 class tdf65856(UITestCase):
 
@@ -22,10 +25,10 @@ class tdf65856(UITestCase):
             #mark cell D1
             gridwin.executeAction("SELECT", mkPropertyValues({"CELL": "D1"}))
             with self.ui_test.execute_dialog_through_command(".uno:PasteSpecial") as xDialog:
+                reset_default_values(self, xDialog)
 
                 xmove_right = xDialog.getChild("move_right")
                 xmove_right.executeAction("CLICK", tuple())
-
 
             #check
             self.assertEqual(get_cell_by_position(calc_doc, 0, 0, 0).getString(), "T1")
@@ -54,10 +57,10 @@ class tdf65856(UITestCase):
             #mark cell B2
             gridwin.executeAction("SELECT", mkPropertyValues({"CELL": "B2"}))
             with self.ui_test.execute_dialog_through_command(".uno:PasteSpecial") as xDialog:
-
                 xmove_right = xDialog.getChild("move_right")
-                xmove_right.executeAction("CLICK", tuple())
 
+                # tdf#69750: Without the fix in place, this test would have failed here
+                self.assertEqual("true", get_state_as_dict(xmove_right)["Checked"])
 
             #check
             self.assertEqual(get_cell_by_position(calc_doc, 0, 1, 1).getString(), "1")
@@ -83,4 +86,3 @@ class tdf65856(UITestCase):
             self.assertEqual(get_cell_by_position(calc_doc, 0, 4, 3).getFormula(), "=F4")
 
 # vim: set shiftwidth=4 softtabstop=4 expandtab:
-

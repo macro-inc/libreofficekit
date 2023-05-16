@@ -257,7 +257,7 @@ Any SAL_CALL CDOTransferable::getTransferData( const DataFlavor& aFlavor )
              m_bUnicodeRegistered )
         {
              OUString aUnicodeText = synthesizeUnicodeText( );
-             Any aAny = makeAny( aUnicodeText );
+             Any aAny( aUnicodeText );
              return aAny;
         }
         // #i124085# CF_DIBV5 should not be possible, but keep for reading from the
@@ -336,7 +336,7 @@ void CDOTransferable::initFlavorListFromFormatList(const std::vector<sal_uInt32>
     for (sal_uInt32 cfFormat : rFormats)
     {
         // we use locales only to determine the
-        // charset if there is text on the cliboard
+        // charset if there is text on the clipboard
         // we don't offer this format
         if (CF_LOCALE == cfFormat)
             continue;

@@ -25,7 +25,7 @@
 #include <rtl/ustring.hxx>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/mediadescriptor.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <com/sun/star/container/XNameAccess.hpp>
@@ -114,7 +114,7 @@ void OLEHandler::lcl_attribute(Id rName, Value & rVal)
                     try
                     {
                         uno::Reference<beans::XPropertySet> xShapeProps(m_xShape, uno::UNO_QUERY);
-                        xShapeProps->setPropertyValue("Opaque", uno::makeAny(false));
+                        xShapeProps->setPropertyValue("Opaque", uno::Any(false));
                     }
                     catch( const uno::Exception& )
                     {
@@ -176,12 +176,12 @@ void OLEHandler::lcl_sprm(Sprm & rSprm)
 
                     xShapeProps->setPropertyValue(
                         getPropertyName( PROP_SURROUND ),
-                        uno::makeAny( static_cast<sal_Int32>(m_nWrapMode) ) );
+                        uno::Any( static_cast<sal_Int32>(m_nWrapMode) ) );
 
                     // Through shapes in the header or footer(that spill into the body) should be in the background.
                     // It is just assumed that all shapes will spill into the body.
                     if( m_rDomainMapper.IsInHeaderFooter() )
-                        xShapeProps->setPropertyValue("Opaque", uno::makeAny(m_nWrapMode != text::WrapTextMode_THROUGH));
+                        xShapeProps->setPropertyValue("Opaque", uno::Any(m_nWrapMode != text::WrapTextMode_THROUGH));
                 }
                 catch( const uno::Exception& )
                 {
@@ -236,24 +236,24 @@ void OLEHandler::importStream(const uno::Reference<uno::XComponentContext>& xCom
         m_sProgId);
 }
 
-OUString OLEHandler::getCLSID(const uno::Reference<uno::XComponentContext>& xComponentContext) const
+OUString OLEHandler::getCLSID() const
 {
     OUString aRet;
 
     // See officecfg/registry/data/org/openoffice/Office/Embedding.xcu.
     if (m_sProgId == "Word.Document.12")
     {
-        if (officecfg::Office::Common::Filter::Microsoft::Import::WinWordToWriter::get(xComponentContext))
+        if (officecfg::Office::Common::Filter::Microsoft::Import::WinWordToWriter::get())
             aRet = "8BC6B165-B1B2-4EDD-aa47-dae2ee689dd6";
     }
     else if (m_sProgId == "Excel.Sheet.12")
     {
-        if (officecfg::Office::Common::Filter::Microsoft::Import::ExcelToCalc::get(xComponentContext))
+        if (officecfg::Office::Common::Filter::Microsoft::Import::ExcelToCalc::get())
             aRet = "47BBB4CB-CE4C-4E80-A591-42D9AE74950F";
     }
     else if (m_sProgId == "Equation.3")
     {
-        if (officecfg::Office::Common::Filter::Microsoft::Import::MathTypeToMath::get(xComponentContext))
+        if (officecfg::Office::Common::Filter::Microsoft::Import::MathTypeToMath::get())
             aRet = "078B7ABA-54FC-457F-8551-6147E776A997";
     }
     else

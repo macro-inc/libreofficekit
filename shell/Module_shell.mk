@@ -9,9 +9,9 @@
 
 $(eval $(call gb_Module_Module,shell))
 
-ifeq ($(filter DESKTOP,$(BUILD_TYPE)),DESKTOP)
-$(eval $(call gb_Module_add_targets,shell,\
-	Executable_lngconvex \
+ifneq (,$(filter DESKTOP,$(BUILD_TYPE)))
+$(eval $(call gb_Module_add_targets_for_build,shell,\
+    $(if $(filter WNT,$(OS)),Executable_lngconvex) \
 ))
 endif
 
@@ -51,6 +51,7 @@ $(eval $(call gb_Module_add_targets,shell,\
 	Executable_senddoc \
 	Library_smplmail \
 	Library_wininetbe \
+	Library_jumplist \
 	Executable_spsupp_helper \
 ))
 

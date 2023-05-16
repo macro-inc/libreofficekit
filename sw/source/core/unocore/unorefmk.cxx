@@ -20,13 +20,12 @@
 #include <memory>
 #include <utility>
 
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/weak.hxx>
-#include <osl/mutex.hxx>
 #include <sal/config.h>
 #include <svl/listener.hxx>
 #include <vcl/svapp.hxx>
@@ -63,20 +62,17 @@ using namespace ::com::sun::star;
 class SwXReferenceMark::Impl
     : public SvtListener
 {
-private:
-    ::osl::Mutex m_Mutex; // just for OInterfaceContainerHelper2
-
 public:
-    uno::WeakReference<uno::XInterface> m_wThis;
-    ::comphelper::OInterfaceContainerHelper2 m_EventListeners;
+    unotools::WeakReference<SwXReferenceMark> m_wThis;
+    std::mutex m_Mutex; // just for OInterfaceContainerHelper4
+    ::comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_EventListeners;
     bool m_bIsDescriptor;
     SwDoc* m_pDoc;
     const SwFormatRefMark* m_pMarkFormat;
     OUString m_sMarkName;
 
     Impl(SwDoc* const pDoc, SwFormatRefMark* const pRefMark)
-        : m_EventListeners(m_Mutex)
-        , m_bIsDescriptor(nullptr == pRefMark)
+        : m_bIsDescriptor(nullptr == pRefMark)
         , m_pDoc(pDoc)
         , m_pMarkFormat(pRefMark)
     {
@@ -106,7 +102,8 @@ void SwXReferenceMark::Impl::Invalidate()
         return;
     }
     lang::EventObject const ev(xThis);
-    m_EventListeners.disposeAndClear(ev);
+    std::unique_lock aGuard(m_Mutex);
+    m_EventListeners.disposeAndClear(aGuard, ev);
 }
 
 void SwXReferenceMark::Impl::Notify(const SfxHint& rHint)
@@ -125,26 +122,25 @@ SwXReferenceMark::~SwXReferenceMark()
 {
 }
 
-uno::Reference<text::XTextContent>
+rtl::Reference<SwXReferenceMark>
 SwXReferenceMark::CreateXReferenceMark(
         SwDoc & rDoc, SwFormatRefMark *const pMarkFormat)
 {
     // i#105557: do not iterate over the registered clients: race condition
-    uno::Reference<text::XTextContent> xMark;
+    rtl::Reference<SwXReferenceMark> xMark;
     if (pMarkFormat)
     {
         xMark = pMarkFormat->GetXRefMark();
     }
     if (!xMark.is())
     {
-        rtl::Reference<SwXReferenceMark> pMark(new SwXReferenceMark(&rDoc, pMarkFormat));
-        xMark = pMark;
+        xMark = new SwXReferenceMark(&rDoc, pMarkFormat);
         if (pMarkFormat)
         {
             pMarkFormat->SetXRefMark(xMark);
         }
         // need a permanent Reference to initialize m_wThis
-        pMark->m_pImpl->m_wThis = xMark;
+        xMark->m_pImpl->m_wThis = xMark.get();
     }
     return xMark;
 }
@@ -217,8 +213,8 @@ void SwXReferenceMark::Impl::InsertRefMark(SwPaM& rPam,
     std::vector<SwTextAttr *> oldMarks;
     if (bMark)
     {
-        oldMarks = rPam.GetNode().GetTextNode()->GetTextAttrsAt(
-            rPam.GetPoint()->nContent.GetIndex(), RES_TXTATR_REFMARK);
+        oldMarks = rPam.GetPointNode().GetTextNode()->GetTextAttrsAt(
+            rPam.GetPoint()->GetContentIndex(), RES_TXTATR_REFMARK);
     }
 
     rDoc2.getIDocumentContentOperations().InsertPoolItem( rPam, aRefMark, nInsertFlags );
@@ -235,8 +231,8 @@ void SwXReferenceMark::Impl::InsertRefMark(SwPaM& rPam,
         // #i107672#
         // ensure that we do not retrieve a different mark at the same position
         std::vector<SwTextAttr *> const newMarks(
-            rPam.GetNode().GetTextNode()->GetTextAttrsAt(
-                rPam.GetPoint()->nContent.GetIndex(), RES_TXTATR_REFMARK));
+            rPam.GetPointNode().GetTextNode()->GetTextAttrsAt(
+                rPam.GetPoint()->GetContentIndex(), RES_TXTATR_REFMARK));
         std::vector<SwTextAttr *>::const_iterator const iter(
             std::find_if(newMarks.begin(), newMarks.end(),
                 NotContainedIn<SwTextAttr *>(oldMarks)));
@@ -248,10 +244,10 @@ void SwXReferenceMark::Impl::InsertRefMark(SwPaM& rPam,
     }
     else
     {
-        SwTextNode *pTextNd = rPam.GetNode().GetTextNode();
+        SwTextNode *pTextNd = rPam.GetPointNode().GetTextNode();
         assert(pTextNd);
-        pTextAttr = pTextNd ? rPam.GetNode().GetTextNode()->GetTextAttrForCharAt(
-                rPam.GetPoint()->nContent.GetIndex() - 1, RES_TXTATR_REFMARK) : nullptr;
+        pTextAttr = pTextNd ? rPam.GetPointNode().GetTextNode()->GetTextAttrForCharAt(
+                rPam.GetPoint()->GetContentIndex() - 1, RES_TXTATR_REFMARK) : nullptr;
     }
 
     if (!pTextAttr)
@@ -361,14 +357,16 @@ void SAL_CALL SwXReferenceMark::addEventListener(
         const uno::Reference< lang::XEventListener > & xListener)
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.addInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.addInterface(aGuard, xListener);
 }
 
 void SAL_CALL SwXReferenceMark::removeEventListener(
         const uno::Reference< lang::XEventListener > & xListener)
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.removeInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.removeInterface(aGuard, xListener);
 }
 
 OUString SAL_CALL SwXReferenceMark::getName()
@@ -597,17 +595,19 @@ SwXMetaText::createTextCursorByRange(
     return xCursor;
 }
 
-// the Meta has a cached list of text portions for its contents
-// this list is created by SwXTextPortionEnumeration
-// the Meta listens at the SwTextNode and throws away the cache when it changes
+/**
+ * the Meta has a cached list of text portions for its contents
+ * this list is created by SwXTextPortionEnumeration
+ * the Meta listens at the SwTextNode and throws away the cache when it changes
+ *
+ * This inner part of SwXMeta is deleted with a locked SolarMutex.
+ */
 class SwXMeta::Impl : public SvtListener
 {
-private:
-    ::osl::Mutex m_Mutex; // just for OInterfaceContainerHelper2
-
 public:
-    uno::WeakReference<uno::XInterface> m_wThis;
-    ::comphelper::OInterfaceContainerHelper2 m_EventListeners;
+    unotools::WeakReference<SwXMeta> m_wThis;
+    std::mutex m_Mutex; // just for OInterfaceContainerHelper4
+    ::comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_EventListeners;
     std::unique_ptr<const TextRangeList_t> m_pTextPortions;
     // 3 possible states: not attached, attached, disposed
     bool m_bIsDisposed;
@@ -618,13 +618,12 @@ public:
 
     Impl(SwXMeta& rThis, SwDoc& rDoc,
             ::sw::Meta* const pMeta,
-            uno::Reference<text::XText> const& xParentText,
+            uno::Reference<text::XText> xParentText,
             std::unique_ptr<TextRangeList_t const> pPortions)
-        : m_EventListeners(m_Mutex)
-        , m_pTextPortions(std::move(pPortions))
+        : m_pTextPortions(std::move(pPortions))
         , m_bIsDisposed(false)
         , m_bIsDescriptor(nullptr == pMeta)
-        , m_xParentText(xParentText)
+        , m_xParentText(std::move(xParentText))
         , m_xText(new SwXMetaText(rDoc, rThis))
         , m_pMeta(pMeta)
     {
@@ -660,7 +659,8 @@ void SwXMeta::Impl::Notify(const SfxHint& rHint)
         return;
     }
     lang::EventObject const ev(xThis);
-    m_EventListeners.disposeAndClear(ev);
+    std::unique_lock aGuard(m_Mutex);
+    m_EventListeners.disposeAndClear(aGuard, ev);
 }
 
 uno::Reference<text::XText> const & SwXMeta::GetParentText() const
@@ -684,42 +684,38 @@ SwXMeta::~SwXMeta()
 {
 }
 
-uno::Reference<rdf::XMetadatable>
+rtl::Reference<SwXMeta>
 SwXMeta::CreateXMeta(SwDoc & rDoc, bool const isField)
 {
-    SwXMeta *const pXMeta(isField
-            ? new SwXMetaField(& rDoc) : new SwXMeta(& rDoc));
     // this is why the constructor is private: need to acquire pXMeta here
-    uno::Reference<rdf::XMetadatable> const xMeta(pXMeta);
+    rtl::Reference<SwXMeta> xMeta(isField
+            ? new SwXMetaField(& rDoc) : new SwXMeta(& rDoc));
     // need a permanent Reference to initialize m_wThis
-    pXMeta->m_pImpl->m_wThis = xMeta;
+    xMeta->m_pImpl->m_wThis = xMeta.get();
     return xMeta;
 }
 
-uno::Reference<rdf::XMetadatable>
+rtl::Reference<SwXMeta>
 SwXMeta::CreateXMeta(::sw::Meta & rMeta,
             uno::Reference<text::XText> const& i_xParent,
             std::unique_ptr<TextRangeList_t const> && pPortions)
 {
     // re-use existing SwXMeta
     // #i105557#: do not iterate over the registered clients: race condition
-    uno::Reference<rdf::XMetadatable> xMeta(rMeta.GetXMeta());
+    rtl::Reference<SwXMeta> xMeta(rMeta.GetXMeta());
     if (xMeta.is())
     {
         if (pPortions) // set cache in the XMeta to the given portions
         {
-            SwXMeta *const pXMeta(
-                comphelper::getFromUnoTunnel<SwXMeta>(xMeta));
-            assert(pXMeta);
             // NB: the meta must always be created with the complete content
             // if SwXTextPortionEnumeration is created for a selection,
             // it must be checked that the Meta is contained in the selection!
-            pXMeta->m_pImpl->m_pTextPortions = std::move(pPortions);
+            xMeta->m_pImpl->m_pTextPortions = std::move(pPortions);
             // ??? is this necessary?
-            if (pXMeta->m_pImpl->m_xParentText.get() != i_xParent.get())
+            if (xMeta->m_pImpl->m_xParentText.get() != i_xParent.get())
             {
                 SAL_WARN("sw.uno", "SwXMeta with different parent?");
-                pXMeta->m_pImpl->m_xParentText.set(i_xParent);
+                xMeta->m_pImpl->m_xParentText.set(i_xParent);
             }
         }
         return xMeta;
@@ -739,17 +735,16 @@ SwXMeta::CreateXMeta(::sw::Meta & rMeta,
         xParentText.set( ::sw::CreateParentXText(pTextNode->GetDoc(), aPos) );
     }
     if (!xParentText.is()) { return nullptr; }
-    SwXMeta *const pXMeta( (RES_TXTATR_META == rMeta.GetFormatMeta()->Which())
+    // this is why the constructor is private: need to acquire pXMeta here
+    xMeta = (RES_TXTATR_META == rMeta.GetFormatMeta()->Which())
         ? new SwXMeta     (&pTextNode->GetDoc(), &rMeta, xParentText,
                             std::move(pPortions))
         : new SwXMetaField(&pTextNode->GetDoc(), &rMeta, xParentText,
-                            std::move(pPortions)));
-    // this is why the constructor is private: need to acquire pXMeta here
-    xMeta.set(pXMeta);
+                            std::move(pPortions));
     // in order to initialize the weak pointer cache in the core object
     rMeta.SetXMeta(xMeta);
     // need a permanent Reference to initialize m_wThis
-    pXMeta->m_pImpl->m_wThis = xMeta;
+    xMeta->m_pImpl->m_wThis = xMeta.get();
     return xMeta;
 }
 
@@ -786,7 +781,7 @@ bool SwXMeta::CheckForOwnMemberMeta(const SwPaM & rPam, const bool bAbsorb)
         throw lang::DisposedException();
 
     SwPosition const * const pStartPos( rPam.Start() );
-    if (&pStartPos->nNode.GetNode() != pTextNode)
+    if (&pStartPos->GetNode() != pTextNode)
     {
         throw lang::IllegalArgumentException(
             "trying to insert into a nesting text content, but start "
@@ -794,7 +789,7 @@ bool SwXMeta::CheckForOwnMemberMeta(const SwPaM & rPam, const bool bAbsorb)
                 nullptr, 0);
     }
     bool bForceExpandHints(false);
-    const sal_Int32 nStartPos(pStartPos->nContent.GetIndex());
+    const sal_Int32 nStartPos(pStartPos->GetContentIndex());
     // not <= but < because nMetaStart is behind dummy char!
     // not >= but > because == means insert at end!
     if ((nStartPos < nMetaStart) || (nStartPos > nMetaEnd))
@@ -811,14 +806,14 @@ bool SwXMeta::CheckForOwnMemberMeta(const SwPaM & rPam, const bool bAbsorb)
     if (rPam.HasMark() && bAbsorb)
     {
         SwPosition const * const pEndPos( rPam.End() );
-        if (&pEndPos->nNode.GetNode() != pTextNode)
+        if (&pEndPos->GetNode() != pTextNode)
         {
             throw lang::IllegalArgumentException(
                 "trying to insert into a nesting text content, but end "
                     "of text range not in same paragraph as text content",
                     nullptr, 0);
         }
-        const sal_Int32 nEndPos(pEndPos->nContent.GetIndex());
+        const sal_Int32 nEndPos(pEndPos->GetContentIndex());
         // not <= but < because nMetaStart is behind dummy char!
         // not >= but > because == means insert at end!
         if ((nEndPos < nMetaStart) || (nEndPos > nMetaEnd))
@@ -877,7 +872,8 @@ SwXMeta::addEventListener(
         uno::Reference< lang::XEventListener> const & xListener )
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.addInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.addInterface(aGuard, xListener);
 }
 
 void SAL_CALL
@@ -885,7 +881,8 @@ SwXMeta::removeEventListener(
         uno::Reference< lang::XEventListener> const & xListener )
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.removeInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.removeInterface(aGuard, xListener);
 }
 
 void SAL_CALL
@@ -897,7 +894,8 @@ SwXMeta::dispose()
     {
         m_pImpl->m_pTextPortions.reset();
         lang::EventObject const ev(static_cast< ::cppu::OWeakObject&>(*this));
-        m_pImpl->m_EventListeners.disposeAndClear(ev);
+        std::unique_lock aGuard(m_pImpl->m_Mutex);
+        m_pImpl->m_EventListeners.disposeAndClear(aGuard, ev);
         m_pImpl->m_bIsDisposed = true;
         m_pImpl->m_xText->Invalidate();
     }
@@ -1002,7 +1000,7 @@ SwXMeta::AttachImpl(const uno::Reference< text::XTextRange > & i_xTextRange,
     m_pImpl->EndListeningAll();
     m_pImpl->m_pMeta = pMeta.get();
     m_pImpl->StartListening(pMeta->GetNotifier());
-    pMeta->SetXMeta(uno::Reference<rdf::XMetadatable>(this));
+    pMeta->SetXMeta(this);
 
     m_pImpl->m_xParentText = ::sw::CreateParentXText(*pDoc, *aPam.GetPoint());
 

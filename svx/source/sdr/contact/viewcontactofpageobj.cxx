@@ -23,7 +23,7 @@
 #include <svx/sdr/contact/viewobjectcontact.hxx>
 #include <sdr/contact/viewobjectcontactofpageobj.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 
 namespace sdr::contact
 {
@@ -59,20 +59,20 @@ void ViewContactOfPageObj::ActionChanged()
     }
 }
 
-drawinglayer::primitive2d::Primitive2DContainer
-ViewContactOfPageObj::createViewIndependentPrimitive2DSequence() const
+void ViewContactOfPageObj::createViewIndependentPrimitive2DSequence(
+    drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
 {
     // create graphical visualisation data. Since this is the view-independent version which should not be used,
     // create a replacement graphic visualisation here. Use GetLastBoundRect to access the model data directly
     // which is aOutRect for SdrPageObj.
     const tools::Rectangle aModelRectangle(GetPageObj().GetLastBoundRect());
     const basegfx::B2DRange aModelRange = vcl::unotools::b2DRectangleFromRectangle(aModelRectangle);
-    const basegfx::B2DPolygon aOutline(basegfx::utils::createPolygonFromRect(aModelRange));
+    basegfx::B2DPolygon aOutline(basegfx::utils::createPolygonFromRect(aModelRange));
     const basegfx::BColor aYellow(1.0, 1.0, 0.0);
     const drawinglayer::primitive2d::Primitive2DReference xReference(
-        new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(aOutline, aYellow));
+        new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(std::move(aOutline), aYellow));
 
-    return drawinglayer::primitive2d::Primitive2DContainer{ xReference };
+    rVisitor.visit(xReference);
 }
 }
 

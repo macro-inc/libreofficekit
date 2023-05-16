@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_features.h>
 #include <svx/MediaShellHelpers.hxx>
 #include <avmedia/mediaitem.hxx>
 #include <sfx2/request.hxx>
@@ -24,8 +25,6 @@
 #include <svl/whiter.hxx>
 #include <svx/sdr/contact/viewcontactofsdrmediaobj.hxx>
 #include <svx/svdmrkv.hxx>
-
-#include <memory>
 
 namespace svx::MediaShellHelpers
 {
@@ -41,6 +40,7 @@ void GetState(const SdrMarkView* pSdrView, SfxItemSet& rSet)
         if (SID_AVMEDIA_TOOLBOX != nWhich)
             continue;
 
+#if HAVE_FEATURE_AVMEDIA
         const SdrMarkList& rMarkList = pSdrView->GetMarkedObjectList();
         bool bDisable = true;
 
@@ -60,12 +60,18 @@ void GetState(const SdrMarkView* pSdrView, SfxItemSet& rSet)
         }
 
         if (bDisable)
+#endif
             rSet.DisableItem(SID_AVMEDIA_TOOLBOX);
     }
 }
 
 const ::avmedia::MediaItem* Execute(const SdrMarkView* pSdrView, SfxRequest const& rReq)
 {
+#if !HAVE_FEATURE_AVMEDIA
+    (void)pSdrView;
+    (void)rReq;
+    return nullptr;
+#else
     if (!pSdrView)
         return nullptr;
 
@@ -73,12 +79,11 @@ const ::avmedia::MediaItem* Execute(const SdrMarkView* pSdrView, SfxRequest cons
         return nullptr;
 
     const SfxItemSet* pArgs = rReq.GetArgs();
-    const SfxPoolItem* pItem;
+    if (!pArgs)
+        return nullptr;
 
-    if (!pArgs || (SfxItemState::SET != pArgs->GetItemState(SID_AVMEDIA_TOOLBOX, false, &pItem)))
-        pItem = nullptr;
-
-    if (!pItem)
+    const ::avmedia::MediaItem* pMediaItem = pArgs->GetItemIfSet(SID_AVMEDIA_TOOLBOX, false);
+    if (!pMediaItem)
         return nullptr;
 
     const SdrMarkList& rMarkList = pSdrView->GetMarkedObjectList();
@@ -91,11 +96,11 @@ const ::avmedia::MediaItem* Execute(const SdrMarkView* pSdrView, SfxRequest cons
     if (!dynamic_cast<SdrMediaObj*>(pObj))
         return nullptr;
 
-    const ::avmedia::MediaItem* pMediaItem = static_cast<const ::avmedia::MediaItem*>(pItem);
     static_cast<sdr::contact::ViewContactOfSdrMediaObj&>(pObj->GetViewContact())
         .executeMediaItem(*pMediaItem);
 
     return pMediaItem;
+#endif
 }
 
 } // end of namespace svx::MediaShellHelpers

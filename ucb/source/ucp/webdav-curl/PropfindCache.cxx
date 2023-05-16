@@ -8,6 +8,8 @@
  */
 
 #include <osl/time.h>
+
+#include <utility>
 #include "PropfindCache.hxx"
 
 namespace http_dav_ucp
@@ -22,9 +24,9 @@ namespace http_dav_ucp
     {
     }
 
-    PropertyNames::PropertyNames( const OUString& rURL ) :
+    PropertyNames::PropertyNames( OUString aURL ) :
         m_nStaleTime( 0 ),
-        m_sURL( rURL ),
+        m_sURL(std::move( aURL )),
         m_aPropertiesNames()
     {
     }
@@ -42,7 +44,7 @@ namespace http_dav_ucp
     bool PropertyNamesCache::getCachedPropertyNames( const OUString& rURL, PropertyNames& rCacheElement )
     {
         // search the URL in the static map
-        osl::MutexGuard aGuard( m_aMutex );
+        std::unique_lock aGuard( m_aMutex );
         PropNameCache::const_iterator it;
         it = m_aTheCache.find( rURL );
         if ( it == m_aTheCache.end() )
@@ -66,7 +68,7 @@ namespace http_dav_ucp
 
     void PropertyNamesCache::removeCachedPropertyNames( const OUString& rURL )
     {
-        osl::MutexGuard aGuard( m_aMutex );
+        std::unique_lock aGuard( m_aMutex );
         PropNameCache::const_iterator it;
         it = m_aTheCache.find( rURL );
         if ( it != m_aTheCache.end() )
@@ -77,7 +79,7 @@ namespace http_dav_ucp
 
     void PropertyNamesCache::addCachePropertyNames( PropertyNames& rCacheElement, const sal_uInt32 nLifeTime )
     {
-        osl::MutexGuard aGuard( m_aMutex );
+        std::unique_lock aGuard( m_aMutex );
         OUString aURL( rCacheElement.getURL() );
         TimeValue t1;
         osl_getSystemTime( &t1 );

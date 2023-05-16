@@ -23,11 +23,15 @@ $(eval $(call gb_CppunitTest_add_exception_objects,xmloff_draw, \
 $(eval $(call gb_CppunitTest_use_libraries,xmloff_draw, \
     comphelper \
     cppu \
+    cppuhelper \
+    docmodel \
     embobj \
     sal \
+    subsequenttest \
     test \
     unotest \
     utl \
+    tl \
     avmedia \
     svxcore \
     vcl \
@@ -45,5 +49,9 @@ $(eval $(call gb_CppunitTest_use_custom_headers,xmloff_draw,\
 ))
 
 $(eval $(call gb_CppunitTest_use_configuration,xmloff_draw))
+
+$(eval $(call gb_CppunitTest_add_arguments,xmloff_draw, \
+    -env:arg-env=$(gb_Helper_LIBRARY_PATH_VAR)"$$$${$(gb_Helper_LIBRARY_PATH_VAR)+=$$$$$(gb_Helper_LIBRARY_PATH_VAR)}" \
+))
 
 # vim: set noet sw=4 ts=4:

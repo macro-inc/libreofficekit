@@ -113,6 +113,12 @@ namespace DOM
 
         void dispatchSubtreeModified();
 
+        void checkNoParent(css::uno::Reference< css::xml::dom::XNode >const& xNode);
+
+        static void checkNoParent(const xmlNodePtr pNode);
+
+        void checkSameOwner(css::uno::Reference< css::xml::dom::XNode >const& xNode);
+
     public:
 
         virtual ~CNode() override;
@@ -130,7 +136,8 @@ namespace DOM
         virtual void fastSaxify( Context& io_rContext );
 
         // constrains child relationship between nodes based on type
-        virtual bool IsChildTypeAllowed(css::xml::dom::NodeType const nodeType);
+        virtual bool IsChildTypeAllowed(css::xml::dom::NodeType nodeType,
+                css::xml::dom::NodeType const* pReplacedNodeType);
 
         // ---- DOM interfaces
 

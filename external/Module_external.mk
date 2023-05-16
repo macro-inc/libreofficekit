@@ -16,7 +16,6 @@ endif
 $(eval $(call gb_Module_add_moduledirs,external,\
 	$(call gb_Helper_optional,XMLSEC,xmlsec) \
 	$(call gb_Helper_optional,ABW,libabw) \
-	$(call gb_Helper_optional,APR,apr) \
 	$(call gb_Helper_optional,BOOST,boost) \
 	$(call gb_Helper_optional,BOX2D,box2d) \
 	$(call gb_Helper_optional,BREAKPAD,breakpad) \
@@ -29,8 +28,8 @@ $(eval $(call gb_Module_add_moduledirs,external,\
 	$(call gb_Helper_optional,LIBCMIS,libcmis) \
 	$(call gb_Helper_optional,COINMP,coinmp) \
 	$(call gb_Helper_optional,CPPUNIT,cppunit) \
-	$(call gb_Helper_optional,CT2N,ct2n) \
 	$(call gb_Helper_optional,CURL,curl) \
+	$(call gb_Helper_optional,DRAGONBOX,dragonbox) \
 	dtoa \
 	$(call gb_Helper_optional,EBOOK,libebook) \
 	$(call gb_Helper_optional,EPM,epm) \
@@ -52,7 +51,6 @@ $(eval $(call gb_Module_add_moduledirs,external,\
 	$(call gb_Helper_optional,ICU,icu) \
 	$(call gb_Helper_optional,JFREEREPORT,jfreereport) \
 	$(call gb_Helper_optional,LIBJPEG_TURBO,libjpeg-turbo) \
-	$(call gb_Helper_optional,LANGUAGETOOL,languagetool) \
 	$(call gb_Helper_optional,LCMS2,lcms2) \
 	$(call gb_Helper_optional,LIBASSUAN,libassuan) \
 	$(call gb_Helper_optional,LIBATOMIC_OPS,libatomic_ops) \
@@ -78,7 +76,6 @@ $(eval $(call gb_Module_add_moduledirs,external,\
 	$(call gb_Helper_optional,MSPUB,libmspub) \
 	$(call gb_Helper_optional,MWAW,libmwaw) \
 	$(call gb_Helper_optional,MYTHES,mythes) \
-	$(call gb_Helper_optional,NEON,neon) \
 	$(call gb_Helper_optional,NOTO_FONT,noto_font) \
 	$(call gb_Helper_optional,NSS,nss) \
 	$(call gb_Helper_optional,ODFGEN,libodfgen) \
@@ -95,11 +92,9 @@ $(eval $(call gb_Module_add_moduledirs,external,\
 	$(call gb_Helper_optional,REDLAND,redland) \
 	$(call gb_Helper_optional,REVENGE,librevenge) \
 	$(call gb_Helper_optional,RHINO,rhino) \
-	$(call gb_Helper_optional,SERF,serf) \
 	$(call gb_Helper_optional,SKIA,skia) \
 	$(call gb_Helper_optional,STAROFFICE,libstaroffice) \
 	$(if $(filter WNT,$(OS)),twain_dsm) \
-	$(call gb_Helper_optional,UCPP,ucpp) \
 	$(call gb_Helper_optional,VISIO,libvisio) \
 	$(call gb_Helper_optional,WPD,libwpd) \
 	$(call gb_Helper_optional,WPG,libwpg) \

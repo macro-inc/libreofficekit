@@ -20,6 +20,8 @@
 #include "Pattern.hxx"
 #include <property.hxx>
 #include <services.hxx>
+#include <tools/debug.hxx>
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/form/FormComponentType.hpp>
 
 using ::com::sun::star::uno::Reference;
@@ -28,7 +30,6 @@ using ::com::sun::star::uno::XComponentContext;
 using ::com::sun::star::beans::Property;
 using ::com::sun::star::uno::XInterface;
 using ::com::sun::star::uno::Any;
-using ::com::sun::star::uno::makeAny;
 using ::com::sun::star::sdbc::XRowSet;
 using ::com::sun::star::uno::UNO_QUERY;
 
@@ -126,32 +127,32 @@ bool OPatternModel::commitControlValueToDbColumn( bool /*_bPostReset*/ )
 {
     Any aNewValue( m_xAggregateFastSet->getFastPropertyValue( getValuePropertyAggHandle() ) );
 
-    if ( aNewValue != m_aLastKnownValue )
-    {
-        OUString sNewValue;
-        aNewValue >>= sNewValue;
+    if ( aNewValue == m_aLastKnownValue )
+        return true;
 
-        if  (   !aNewValue.hasValue()
-            ||  (   sNewValue.isEmpty()         // an empty string
-                &&  m_bEmptyIsNull              // which should be interpreted as NULL
-                )
+    OUString sNewValue;
+    aNewValue >>= sNewValue;
+
+    if  (   !aNewValue.hasValue()
+        ||  (   sNewValue.isEmpty()         // an empty string
+            &&  m_bEmptyIsNull              // which should be interpreted as NULL
             )
-        {
-            m_xColumnUpdate->updateNull();
-        }
-        else
-        {
-            OSL_ENSURE(m_pFormattedValue,
-                       "OPatternModel::commitControlValueToDbColumn: no value helper!");
-            if (!m_pFormattedValue)
-                return false;
-
-            if ( !m_pFormattedValue->setFormattedValue( sNewValue ) )
-                return false;
-        }
-
-        m_aLastKnownValue = aNewValue;
+        )
+    {
+        m_xColumnUpdate->updateNull();
     }
+    else
+    {
+        OSL_ENSURE(m_pFormattedValue,
+                   "OPatternModel::commitControlValueToDbColumn: no value helper!");
+        if (!m_pFormattedValue)
+            return false;
+
+        if ( !m_pFormattedValue->setFormattedValue( sNewValue ) )
+            return false;
+    }
+
+    m_aLastKnownValue = aNewValue;
 
     return true;
 }
@@ -200,7 +201,7 @@ Any OPatternModel::translateDbColumnToControlValue()
     else
         m_aLastKnownValue.clear();
 
-    return m_aLastKnownValue.hasValue() ? m_aLastKnownValue : makeAny( OUString() );
+    return m_aLastKnownValue.hasValue() ? m_aLastKnownValue : Any( OUString() );
         // (m_aLastKnownValue is allowed to be VOID, the control value isn't)
 }
 
@@ -208,7 +209,7 @@ Any OPatternModel::translateDbColumnToControlValue()
 
 Any OPatternModel::getDefaultForReset() const
 {
-    return makeAny( m_aDefaultText );
+    return Any( m_aDefaultText );
 }
 
 void OPatternModel::resetNoBroadcast()

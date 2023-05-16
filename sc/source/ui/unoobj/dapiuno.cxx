@@ -20,7 +20,9 @@
 #include <algorithm>
 #include <cmath>
 
+#include <o3tl/safeint.hxx>
 #include <svl/hint.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <sal/log.hxx>
 
@@ -99,62 +101,59 @@ using ::com::sun::star::table::CellRangeAddress;
 
 namespace {
 
-const SfxItemPropertyMapEntry* lcl_GetDataPilotDescriptorBaseMap()
+o3tl::span<const SfxItemPropertyMapEntry> lcl_GetDataPilotDescriptorBaseMap()
 {
     static const SfxItemPropertyMapEntry aDataPilotDescriptorBaseMap_Impl[] =
     {
-        {u"" SC_UNO_DP_COLGRAND,     0,  cppu::UnoType<bool>::get(),  0, 0 },
-        {u"" SC_UNO_DP_DRILLDOWN,    0,  cppu::UnoType<bool>::get(),  0, 0 },
-        {u"" SC_UNO_DP_GRANDTOTAL_NAME,0,cppu::UnoType<OUString>::get(), beans::PropertyAttribute::MAYBEVOID, 0 },
-        {u"" SC_UNO_DP_IGNORE_EMPTYROWS,   0,  cppu::UnoType<bool>::get(),  0, 0 },
-        {u"" SC_UNO_DP_IMPORTDESC,   0,  cppu::UnoType<uno::Sequence<beans::PropertyValue>>::get(), 0, 0 },
-        {u"" SC_UNO_DP_REPEATEMPTY,     0,  cppu::UnoType<bool>::get(),  0, 0 },
-        {u"" SC_UNO_DP_ROWGRAND,     0,  cppu::UnoType<bool>::get(),  0, 0 },
-        {u"" SC_UNO_DP_SERVICEARG,   0,  cppu::UnoType<uno::Sequence<beans::PropertyValue>>::get(), 0, 0 },
-        {u"" SC_UNO_DP_SHOWFILTER,     0,  cppu::UnoType<bool>::get(),  0, 0 },
-        {u"" SC_UNO_DP_SOURCESERVICE,   0,  cppu::UnoType<OUString>::get(), 0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNO_DP_COLGRAND,     0,  cppu::UnoType<bool>::get(),  0, 0 },
+        { SC_UNO_DP_DRILLDOWN,    0,  cppu::UnoType<bool>::get(),  0, 0 },
+        { SC_UNO_DP_GRANDTOTAL_NAME,0,cppu::UnoType<OUString>::get(), beans::PropertyAttribute::MAYBEVOID, 0 },
+        { SC_UNO_DP_IGNORE_EMPTYROWS,   0,  cppu::UnoType<bool>::get(),  0, 0 },
+        { SC_UNO_DP_IMPORTDESC,   0,  cppu::UnoType<uno::Sequence<beans::PropertyValue>>::get(), 0, 0 },
+        { SC_UNO_DP_REPEATEMPTY,     0,  cppu::UnoType<bool>::get(),  0, 0 },
+        { SC_UNO_DP_ROWGRAND,     0,  cppu::UnoType<bool>::get(),  0, 0 },
+        { SC_UNO_DP_SERVICEARG,   0,  cppu::UnoType<uno::Sequence<beans::PropertyValue>>::get(), 0, 0 },
+        { SC_UNO_DP_SHOWFILTER,     0,  cppu::UnoType<bool>::get(),  0, 0 },
+        { SC_UNO_DP_SOURCESERVICE,   0,  cppu::UnoType<OUString>::get(), 0, 0 },
     };
     return aDataPilotDescriptorBaseMap_Impl;
 }
 
-const SfxItemPropertyMapEntry* lcl_GetDataPilotFieldMap()
+o3tl::span<const SfxItemPropertyMapEntry> lcl_GetDataPilotFieldMap()
 {
     using namespace ::com::sun::star::beans::PropertyAttribute;
     static const SfxItemPropertyMapEntry aDataPilotFieldMap_Impl[] =
     {
-        {u"" SC_UNONAME_AUTOSHOW,     0,  cppu::UnoType<DataPilotFieldAutoShowInfo>::get(),   MAYBEVOID, 0 },
-        {u"" SC_UNONAME_FUNCTION,     0,  cppu::UnoType<GeneralFunction>::get(),              0, 0 },
-        {u"" SC_UNONAME_FUNCTION2,    0,  cppu::UnoType<sal_Int16>::get(),             0, 0 },
-        {u"" SC_UNONAME_GROUPINFO,    0,  cppu::UnoType<DataPilotFieldGroupInfo>::get(),      MAYBEVOID, 0 },
-        {u"" SC_UNONAME_HASAUTOSHOW,  0,  cppu::UnoType<bool>::get(),                          0, 0 },
-        {u"" SC_UNONAME_HASLAYOUTINFO,0,  cppu::UnoType<bool>::get(),                          0, 0 },
-        {u"" SC_UNONAME_HASREFERENCE, 0,  cppu::UnoType<bool>::get(),                          0, 0 },
-        {u"" SC_UNONAME_HASSORTINFO,  0,  cppu::UnoType<bool>::get(),                          0, 0 },
-        {u"" SC_UNONAME_ISGROUP,      0,  cppu::UnoType<bool>::get(),                          0, 0 },
-        {u"" SC_UNONAME_LAYOUTINFO,   0,  cppu::UnoType<DataPilotFieldLayoutInfo>::get(),     MAYBEVOID, 0 },
-        {u"" SC_UNONAME_ORIENT,       0,  cppu::UnoType<DataPilotFieldOrientation>::get(),    MAYBEVOID, 0 },
-        {u"" SC_UNONAME_REFERENCE,    0,  cppu::UnoType<DataPilotFieldReference>::get(),      MAYBEVOID, 0 },
-        {u"" SC_UNONAME_SELPAGE,      0,  cppu::UnoType<OUString>::get(),                     0, 0 },
-        {u"" SC_UNONAME_SHOWEMPTY,    0,  cppu::UnoType<bool>::get(),                          0, 0 },
-        {u"" SC_UNONAME_REPEATITEMLABELS,    0,  cppu::UnoType<bool>::get(),                          0, 0 },
-        {u"" SC_UNONAME_SORTINFO,     0,  cppu::UnoType<DataPilotFieldSortInfo>::get(),       MAYBEVOID, 0 },
-        {u"" SC_UNONAME_SUBTOTALS,    0,  cppu::UnoType<Sequence<GeneralFunction>>::get(),    0, 0 },
-        {u"" SC_UNONAME_SUBTOTALS2,   0,  cppu::UnoType<Sequence<sal_Int16>>::get(),   0, 0 },
-        {u"" SC_UNONAME_USESELPAGE,   0,  cppu::UnoType<bool>::get(),                          0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_AUTOSHOW,     0,  cppu::UnoType<DataPilotFieldAutoShowInfo>::get(),   MAYBEVOID, 0 },
+        { SC_UNONAME_FUNCTION,     0,  cppu::UnoType<GeneralFunction>::get(),              0, 0 },
+        { SC_UNONAME_FUNCTION2,    0,  cppu::UnoType<sal_Int16>::get(),             0, 0 },
+        { SC_UNONAME_GROUPINFO,    0,  cppu::UnoType<DataPilotFieldGroupInfo>::get(),      MAYBEVOID, 0 },
+        { SC_UNONAME_HASAUTOSHOW,  0,  cppu::UnoType<bool>::get(),                          0, 0 },
+        { SC_UNONAME_HASLAYOUTINFO,0,  cppu::UnoType<bool>::get(),                          0, 0 },
+        { SC_UNONAME_HASREFERENCE, 0,  cppu::UnoType<bool>::get(),                          0, 0 },
+        { SC_UNONAME_HASSORTINFO,  0,  cppu::UnoType<bool>::get(),                          0, 0 },
+        { SC_UNONAME_ISGROUP,      0,  cppu::UnoType<bool>::get(),                          0, 0 },
+        { SC_UNONAME_LAYOUTINFO,   0,  cppu::UnoType<DataPilotFieldLayoutInfo>::get(),     MAYBEVOID, 0 },
+        { SC_UNONAME_ORIENT,       0,  cppu::UnoType<DataPilotFieldOrientation>::get(),    MAYBEVOID, 0 },
+        { SC_UNONAME_REFERENCE,    0,  cppu::UnoType<DataPilotFieldReference>::get(),      MAYBEVOID, 0 },
+        { SC_UNONAME_SELPAGE,      0,  cppu::UnoType<OUString>::get(),                     0, 0 },
+        { SC_UNONAME_SHOWEMPTY,    0,  cppu::UnoType<bool>::get(),                          0, 0 },
+        { SC_UNONAME_REPEATITEMLABELS,    0,  cppu::UnoType<bool>::get(),                          0, 0 },
+        { SC_UNONAME_SORTINFO,     0,  cppu::UnoType<DataPilotFieldSortInfo>::get(),       MAYBEVOID, 0 },
+        { SC_UNONAME_SUBTOTALS,    0,  cppu::UnoType<Sequence<GeneralFunction>>::get(),    0, 0 },
+        { SC_UNONAME_SUBTOTALS2,   0,  cppu::UnoType<Sequence<sal_Int16>>::get(),   0, 0 },
+        { SC_UNONAME_USESELPAGE,   0,  cppu::UnoType<bool>::get(),                          0, 0 },
     };
     return aDataPilotFieldMap_Impl;
 }
 
-const SfxItemPropertyMapEntry* lcl_GetDataPilotItemMap()
+o3tl::span<const SfxItemPropertyMapEntry> lcl_GetDataPilotItemMap()
 {
     static const SfxItemPropertyMapEntry aDataPilotItemMap_Impl[] =
     {
-        {u"" SC_UNONAME_ISHIDDEN,     0,  cppu::UnoType<bool>::get(),          0, 0 },
-        {u"" SC_UNONAME_POS,          0,  cppu::UnoType<sal_Int32>::get(),    0, 0 },
-        {u"" SC_UNONAME_SHOWDETAIL,   0,  cppu::UnoType<bool>::get(),          0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_ISHIDDEN,     0,  cppu::UnoType<bool>::get(),          0, 0 },
+        { SC_UNONAME_POS,          0,  cppu::UnoType<sal_Int32>::get(),    0, 0 },
+        { SC_UNONAME_SHOWDETAIL,   0,  cppu::UnoType<bool>::get(),          0, 0 },
     };
     return aDataPilotItemMap_Impl;
 }
@@ -295,8 +294,8 @@ static sal_Int32 lcl_GetObjectIndex( ScDPObject* pDPObj, const ScFieldIdentifier
     return -1;  // none
 }
 
-ScDataPilotTablesObj::ScDataPilotTablesObj(ScDocShell* pDocSh, SCTAB nT) :
-    pDocShell( pDocSh ),
+ScDataPilotTablesObj::ScDataPilotTablesObj(ScDocShell& rDocSh, SCTAB nT) :
+    pDocShell( &rDocSh ),
     nTab( nT )
 {
     pDocShell->GetDocument().AddUnoObject(*this);
@@ -340,7 +339,7 @@ rtl::Reference<ScDataPilotTableObj> ScDataPilotTablesObj::GetObjectByIndex_Impl(
                 {
                     if ( nFound == nIndex )
                     {
-                        return new ScDataPilotTableObj( pDocShell, nTab, rDPObj.GetName() );
+                        return new ScDataPilotTableObj(*pDocShell, nTab, rDPObj.GetName());
                     }
                     ++nFound;
                 }
@@ -353,7 +352,7 @@ rtl::Reference<ScDataPilotTableObj> ScDataPilotTablesObj::GetObjectByIndex_Impl(
 rtl::Reference<ScDataPilotTableObj> ScDataPilotTablesObj::GetObjectByName_Impl(const OUString& rName)
 {
     if (hasByName(rName))
-        return new ScDataPilotTableObj( pDocShell, nTab, rName );
+        return new ScDataPilotTableObj(*pDocShell, nTab, rName);
     return nullptr;
 }
 
@@ -361,7 +360,7 @@ Reference<XDataPilotDescriptor> SAL_CALL ScDataPilotTablesObj::createDataPilotDe
 {
     SolarMutexGuard aGuard;
     if (pDocShell)
-        return new ScDataPilotDescriptor(pDocShell);
+        return new ScDataPilotDescriptor(*pDocShell);
     return nullptr;
 }
 
@@ -499,7 +498,6 @@ Any SAL_CALL ScDataPilotTablesObj::getByIndex( sal_Int32 nIndex )
 
 uno::Type SAL_CALL ScDataPilotTablesObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<XDataPilotTable2>::get();
 }
 
@@ -579,9 +577,9 @@ sal_Bool SAL_CALL ScDataPilotTablesObj::hasByName( const OUString& aName )
     return false;
 }
 
-ScDataPilotDescriptorBase::ScDataPilotDescriptorBase(ScDocShell* pDocSh) :
+ScDataPilotDescriptorBase::ScDataPilotDescriptorBase(ScDocShell& rDocSh) :
     maPropSet( lcl_GetDataPilotDescriptorBaseMap() ),
-    pDocShell( pDocSh )
+    pDocShell( &rDocSh )
 {
     pDocShell->GetDocument().AddUnoObject(*this);
 }
@@ -989,10 +987,10 @@ const Sequence<sal_Int8>& ScDataPilotDescriptorBase::getUnoTunnelId()
     return theScDataPilotDescriptorBaseUnoTunnelId.getSeq();
 }
 
-ScDataPilotTableObj::ScDataPilotTableObj(ScDocShell* pDocSh, SCTAB nT, const OUString& rN) :
-    ScDataPilotDescriptorBase( pDocSh ),
+ScDataPilotTableObj::ScDataPilotTableObj(ScDocShell& rDocSh, SCTAB nT, OUString aN) :
+    ScDataPilotDescriptorBase( rDocSh ),
     nTab( nT ),
-    aName( rN ),
+    aName(std::move( aN )),
     aModifyListeners( 0 )
 {
 }
@@ -1259,9 +1257,9 @@ void ScDataPilotTableObj::Refreshed_Impl()
         rDoc.AddUnoListenerCall( xModifyListener, aEvent );
 }
 
-ScDataPilotDescriptor::ScDataPilotDescriptor(ScDocShell* pDocSh) :
-    ScDataPilotDescriptorBase( pDocSh ),
-    mpDPObject(new ScDPObject(pDocSh ? &pDocSh->GetDocument() : nullptr) )
+ScDataPilotDescriptor::ScDataPilotDescriptor(ScDocShell& rDocSh) :
+    ScDataPilotDescriptorBase( rDocSh ),
+    mpDPObject(new ScDPObject(&rDocSh.GetDocument()))
 {
     ScDPSaveData aSaveData;
     // set defaults like in ScPivotParam constructor
@@ -1270,7 +1268,7 @@ ScDataPilotDescriptor::ScDataPilotDescriptor(ScDocShell* pDocSh) :
     aSaveData.SetIgnoreEmptyRows( false );
     aSaveData.SetRepeatIfEmpty( false );
     mpDPObject->SetSaveData(aSaveData);
-    ScSheetSourceDesc aSheetDesc(pDocSh ? &pDocSh->GetDocument() : nullptr);
+    ScSheetSourceDesc aSheetDesc(&rDocSh.GetDocument());
     mpDPObject->SetSheetDesc(aSheetDesc);
 }
 
@@ -1323,9 +1321,9 @@ ScDataPilotChildObjBase::ScDataPilotChildObjBase( ScDataPilotDescriptorBase& rPa
 {
 }
 
-ScDataPilotChildObjBase::ScDataPilotChildObjBase( ScDataPilotDescriptorBase& rParent, const ScFieldIdentifier& rFieldId ) :
+ScDataPilotChildObjBase::ScDataPilotChildObjBase( ScDataPilotDescriptorBase& rParent, ScFieldIdentifier aFieldId ) :
     mxParent( &rParent ),
-    maFieldId( rFieldId )
+    maFieldId(std::move( aFieldId ))
 {
 }
 
@@ -1580,7 +1578,6 @@ Any SAL_CALL ScDataPilotFieldsObj::getByIndex( sal_Int32 nIndex )
 
 uno::Type SAL_CALL ScDataPilotFieldsObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<XPropertySet>::get();
 }
 
@@ -1638,10 +1635,10 @@ ScDataPilotFieldObj::ScDataPilotFieldObj(
 }
 
 ScDataPilotFieldObj::ScDataPilotFieldObj( ScDataPilotDescriptorBase& rParent,
-        const ScFieldIdentifier& rFieldId, const Any& rOrient ) :
+        const ScFieldIdentifier& rFieldId, Any aOrient ) :
     ScDataPilotChildObjBase( rParent, rFieldId ),
     maPropSet( lcl_GetDataPilotFieldMap() ),
-    maOrient( rOrient )
+    maOrient(std::move( aOrient ))
 {
 }
 
@@ -2834,7 +2831,7 @@ sal_Int32 SAL_CALL ScDataPilotFieldGroupsObj::getCount()
 Any SAL_CALL ScDataPilotFieldGroupsObj::getByIndex( sal_Int32 nIndex )
 {
     SolarMutexGuard aGuard;
-    if ((nIndex < 0) || (nIndex >= static_cast< sal_Int32 >( maGroups.size() )))
+    if ((nIndex < 0) || (o3tl::make_unsigned(nIndex) >= maGroups.size()))
         throw IndexOutOfBoundsException();
     return Any( Reference< XNameAccess >( new ScDataPilotFieldGroupObj( *this, maGroups[ nIndex ].maName ) ) );
 }
@@ -2851,7 +2848,6 @@ Reference<XEnumeration> SAL_CALL ScDataPilotFieldGroupsObj::createEnumeration()
 
 uno::Type SAL_CALL ScDataPilotFieldGroupsObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<XNameAccess>::get();
 }
 
@@ -2907,9 +2903,9 @@ OUString lclExtractMember( const Any& rElement )
 
 } // namespace
 
-ScDataPilotFieldGroupObj::ScDataPilotFieldGroupObj( ScDataPilotFieldGroupsObj& rParent, const OUString& rGroupName ) :
+ScDataPilotFieldGroupObj::ScDataPilotFieldGroupObj( ScDataPilotFieldGroupsObj& rParent, OUString aGroupName ) :
     mxParent( &rParent ),
-    maGroupName( rGroupName )
+    maGroupName(std::move( aGroupName ))
 {
 }
 
@@ -3007,7 +3003,7 @@ Any SAL_CALL ScDataPilotFieldGroupObj::getByIndex( sal_Int32 nIndex )
 {
     SolarMutexGuard aGuard;
     ScFieldGroupMembers& rMembers = mxParent->getFieldGroup( maGroupName ).maMembers;
-    if ((nIndex < 0) || (nIndex >= static_cast< sal_Int32 >( rMembers.size() )))
+    if ((nIndex < 0) || (o3tl::make_unsigned(nIndex) >= rMembers.size()))
         throw IndexOutOfBoundsException();
     return Any( Reference< XNamed >( new ScDataPilotFieldGroupItemObj( *this, rMembers[ nIndex ] ) ) );
 }
@@ -3024,7 +3020,6 @@ Reference< XEnumeration > SAL_CALL ScDataPilotFieldGroupObj::createEnumeration()
 
 uno::Type SAL_CALL ScDataPilotFieldGroupObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<XNamed>::get();
 }
 
@@ -3050,9 +3045,9 @@ void SAL_CALL ScDataPilotFieldGroupObj::setName( const OUString& rName )
     maGroupName = rName;
 }
 
-ScDataPilotFieldGroupItemObj::ScDataPilotFieldGroupItemObj( ScDataPilotFieldGroupObj& rParent, const OUString& rName ) :
+ScDataPilotFieldGroupItemObj::ScDataPilotFieldGroupItemObj( ScDataPilotFieldGroupObj& rParent, OUString aName ) :
     mxParent( &rParent ),
-    maName( rName )
+    maName(std::move( aName ))
 {
 }
 
@@ -3176,7 +3171,6 @@ Any SAL_CALL ScDataPilotItemsObj::getByIndex( sal_Int32 nIndex )
 
 uno::Type SAL_CALL ScDataPilotItemsObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<XPropertySet>::get();
 }
 

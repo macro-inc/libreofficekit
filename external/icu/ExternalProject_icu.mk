@@ -20,14 +20,15 @@ ifeq ($(OS),WNT)
 $(call gb_ExternalProject_get_state_target,icu,build) :
 	$(call gb_Trace_StartRange,icu,EXTERNAL)
 	$(call gb_ExternalProject_run,build,\
-		autoconf \
+		autoconf -f \
 		&& export LIB="$(ILIB)" PYTHONWARNINGS="default" \
 			gb_ICU_XFLAGS="-FS $(SOLARINC) $(gb_DEBUGINFO_FLAGS) $(if $(MSVC_USE_DEBUG_RUNTIME),-MDd,-MD -Gy)" \
 		&& CFLAGS="$${gb_ICU_XFLAGS}" CPPFLAGS="$(SOLARINC)" CXXFLAGS="$${gb_ICU_XFLAGS}" \
 			INSTALL=`cygpath -m /usr/bin/install` $(if $(MSVC_USE_DEBUG_RUNTIME),LDFLAGS="-DEBUG") \
 			$(gb_RUN_CONFIGURE) ./configure \
 				$(if $(MSVC_USE_DEBUG_RUNTIME),--enable-debug --disable-release) \
-				$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) \
+				$(gb_CONFIGURE_PLATFORMS) \
+				$(if $(CROSS_COMPILING), \
 					--with-cross-build=$(WORKDIR_FOR_BUILD)/UnpackedTarball/icu/source \
 					--disable-tools --disable-extras) \
 		&& $(MAKE) $(if $(CROSS_COMPILING),DATASUBDIR=data) $(if $(verbose),VERBOSE=1) \
@@ -39,22 +40,21 @@ else # $(OS)
 icu_CFLAGS:="$(CFLAGS) \
 	$(if $(filter iOS,$(OS)),-DUCONFIG_NO_FILE_IO) \
 	$(if $(SYSBASE),-I$(SYSBASE)/usr/include) \
-	$(if $(ENABLE_OPTIMIZED),$(gb_COMPILEROPTFLAGS),$(gb_COMPILERNOOPTFLAGS)) \
+	$(call gb_ExternalProject_get_build_flags,icu) \
 	$(if $(ENABLE_LTO),$(gb_LTOFLAGS)) \
 	$(if $(filter GCC,$(COM)),-fno-strict-aliasing) \
-	$(if $(call gb_Module__symbols_enabled,icu),$(gb_DEBUGINFO_FLAGS)) \
 	$(if $(filter FUZZERS,$(BUILD_TYPE)),-DU_USE_STRTOD_L=0) \
 	$(if $(filter ANDROID,$(OS)),-fvisibility=hidden -fno-omit-frame-pointer)"
 icu_CXXFLAGS:="$(CXXFLAGS) $(CXXFLAGS_CXX11) \
 	$(if $(filter iOS,$(OS)),-DUCONFIG_NO_FILE_IO) \
-	$(if $(ENABLE_OPTIMIZED),$(gb_COMPILEROPTFLAGS),$(gb_COMPILERNOOPTFLAGS)) \
+	$(call gb_ExternalProject_get_build_flags,icu) \
 	$(if $(ENABLE_LTO),$(gb_LTOFLAGS)) \
 	$(if $(filter GCC,$(COM)),-fno-strict-aliasing) \
-	$(if $(call gb_Module__symbols_enabled,icu),$(gb_DEBUGINFO_FLAGS)) \
 	$(if $(filter FUZZERS,$(BUILD_TYPE)),-DU_USE_STRTOD_L=0) \
-	$(if $(filter ANDROID,$(OS)),-fvisibility=hidden -fno-omit-frame-pointer $(SOLARINC))"
+	$(if $(filter ANDROID,$(OS)),-fvisibility=hidden -fno-omit-frame-pointer -I$(SRCDIR)/include)"
 icu_LDFLAGS:=" \
 	$(if $(ENABLE_LTO),$(gb_LTOFLAGS)) \
+	$(call gb_ExternalProject_get_link_flags,icu) \
 	$(if $(filter TRUE,$(HAVE_LD_HASH_STYLE)),-Wl$(COMMA)--hash-style=$(WITH_LINKER_HASH_STYLE)) \
     $(if $(SYSBASE),-L../lib -L../../lib -L../stubdata -L../../stubdata -L$(SYSBASE)/usr/lib) \
     $(if $(filter TRUE,$(HAVE_LD_BSYMBOLIC_FUNCTIONS)), -Wl$(COMMA)-Bsymbolic-functions) \
@@ -66,7 +66,7 @@ icu_LDFLAGS:=" \
 $(call gb_ExternalProject_get_state_target,icu,build) :
 	$(call gb_Trace_StartRange,icu,EXTERNAL)
 	$(call gb_ExternalProject_run,build,\
-		autoconf && \
+		autoconf -f && \
 		CPPFLAGS=$(icu_CPPFLAGS) CFLAGS=$(icu_CFLAGS) \
 		CXXFLAGS=$(icu_CXXFLAGS) LDFLAGS=$(icu_LDFLAGS) \
 		PYTHONWARNINGS="default" \
@@ -78,7 +78,8 @@ $(call gb_ExternalProject_get_state_target,icu,build) :
 			$(if $(filter TRUE,$(DISABLE_DYNLOADING)),\
 				--with-data-packaging=static --enable-static --disable-shared --disable-dyload,\
 				--disable-static --enable-shared $(if $(filter ANDROID,$(OS)),--with-library-suffix=lo)) \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)\
+			$(gb_CONFIGURE_PLATFORMS) \
+			$(if $(CROSS_COMPILING), \
 				--with-cross-build=$(WORKDIR_FOR_BUILD)/UnpackedTarball/icu/source \
 				--disable-tools --disable-extras) \
 			AR="$(AR)" RANLIB="$(RANLIB)" \

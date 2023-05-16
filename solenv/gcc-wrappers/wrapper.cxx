@@ -60,8 +60,11 @@ void setupccenv() {
     std::string inctmp(incbuf);
     free(incbuf);
 
-    // 3 = strlen(" -I")
+    // 2 = strlen("-I")
     for(size_t pos=0,len=0;pos<inctmp.length();) {
+        while (pos != inctmp.length() && inctmp[pos] == ' ') {
+            ++pos;
+        }
         size_t endpos=inctmp.find(" -I",pos+1);
         if(endpos==std::string::npos)
             endpos=inctmp.length();
@@ -70,9 +73,9 @@ void setupccenv() {
         while(len>0&&inctmp[pos+len-1]==' ')
             --len;
 
-        if(len>3) {
+        if(len>2) {
             includepath.append(";");
-            includepath.append(inctmp,pos+3,len-3);
+            includepath.append(inctmp,pos+2,len-2);
         }
         pos=endpos;
     }
@@ -104,11 +107,12 @@ std::string processccargs(const std::vector<std::string>& rawargs, std::string &
     std::string linkargs;
     bool block_linkargs = false;
 
-    // instead of using synced PDB access (-FS), use individual PDB files based on output
+    // Instead of using synced PDB access (-FS), use individual PDB files based on output.
+    // In fact, simply use -Z7, which doesn't use PDB files at all and writes all debug into the .obj file.
     const char *const pEnvIndividualPDBs(getenv("MSVC_USE_INDIVIDUAL_PDBS"));
     const bool bIndividualPDBs = (pEnvIndividualPDBs && !strcmp(pEnvIndividualPDBs, "TRUE"));
     const char *const pEnvEnableZ7Debug(getenv("ENABLE_Z7_DEBUG"));
-    const bool bEnableZ7Debug = (pEnvEnableZ7Debug && !strcmp(pEnvEnableZ7Debug, "TRUE"));
+    const bool bEnableZ7Debug = (pEnvEnableZ7Debug && !strcmp(pEnvEnableZ7Debug, "TRUE")) || bIndividualPDBs;
 
     for(std::vector<std::string>::const_iterator i = rawargs.begin(); i != rawargs.end(); ++i) {
         if (env_prefix_next_arg)
@@ -149,21 +153,12 @@ std::string processccargs(const std::vector<std::string>& rawargs, std::string &
                      << (*i) << "\"" << std::endl;
                 exit(1);
             }
-
-            if (bIndividualPDBs && !bEnableZ7Debug)
-            {
-                if (dot == std::string::npos)
-                    args.append(" -Fd" + *i + ".pdb");
-                else
-                    args.append(" -Fd" + (*i).substr(0, dot) + ".pdb");
-            }
         }
         else if(*i == "-g" || !(*i).compare(0,5,"-ggdb")) {
             if(!bEnableZ7Debug)
             {
                 args.append("-Zi");
-                if (!bIndividualPDBs)
-                    args.append(" -FS");
+                args.append(" -FS");
             }
             else
             {

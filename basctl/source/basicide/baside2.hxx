@@ -20,6 +20,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <layout.hxx>
 #include "breakpoint.hxx"
 #include "linenumberwindow.hxx"
@@ -31,6 +32,7 @@
 #include <vcl/weld.hxx>
 
 #include <svtools/colorcfg.hxx>
+#include <svtools/scrolladaptor.hxx>
 #include <o3tl/enumarray.hxx>
 #include <rtl/ustrbuf.hxx>
 
@@ -73,7 +75,7 @@ private:
     ModulWindow&                     rModulWindow;
 
     rtl::Reference< ChangesListener > listener_;
-    osl::Mutex                        mutex_;
+    std::mutex                        mutex_;
     css::uno::Reference< css::beans::XMultiPropertySet >
                                       notifier_;
 
@@ -93,8 +95,9 @@ private:
 
     virtual void    Notify( SfxBroadcaster& rBC, const SfxHint& rHint ) override;
 
-    void            ImpDoHighlight( sal_uLong nLineOff );
+    void            ImpDoHighlight( sal_uInt32 nLineOff );
     void            ImplSetFont();
+    sal_uInt16      nCurrentZoomLevel;
 
     bool            bHighlighting;
     bool            bDoSyntaxHighlight;
@@ -103,7 +106,7 @@ private:
     virtual css::uno::Reference< css::awt::XWindowPeer > GetComponentInterface(bool bCreate = true) override;
     CodeCompleteDataCache aCodeCompleteCache;
     VclPtr<CodeCompleteWindow> pCodeCompleteWnd;
-    OUString GetActualSubName( sal_uLong nLine ); // gets the actual subroutine name according to line number
+    OUString GetActualSubName( sal_uInt32 nLine ); // gets the actual subroutine name according to line number
     void SetupAndShowCodeCompleteWnd(const std::vector< OUString >& aEntryVect, TextSelection aSel );
     void HandleAutoCorrect();
     void HandleAutoCloseParen();
@@ -122,7 +125,7 @@ private:
     virtual void    LoseFocus() override;
     virtual void    RequestHelp( const HelpEvent& rHEvt ) override;
 
-    void            DoSyntaxHighlight( sal_uLong nPara );
+    void            DoSyntaxHighlight( sal_uInt32 nPara );
     OUString        GetWordAtCursor();
     bool            ImpCanModify();
 
@@ -137,8 +140,8 @@ public:
     void            CreateProgress( const OUString& rText, sal_uInt32 nRange );
     void            DestroyProgress();
 
-    void            ParagraphInsertedDeleted( sal_uLong nNewPara, bool bInserted );
-    void            DoDelayedSyntaxHighlight( sal_uLong nPara );
+    void            ParagraphInsertedDeleted( sal_uInt32 nNewPara, bool bInserted );
+    void            DoDelayedSyntaxHighlight( sal_uInt32 nPara );
 
     void            CreateEditEngine();
     void            SetScrollBarRanges();
@@ -152,7 +155,10 @@ public:
     void            ChangeFontColor( Color aColor );
     void            UpdateSyntaxHighlighting ();
 
-    bool            GetProcedureName(OUString const & rLine, OUString& rProcType, OUString& rProcName) const;
+    void            SetEditorZoomLevel(sal_uInt16 nNewZoomLevel);
+    sal_uInt16      GetCurrentZoom() { return nCurrentZoomLevel; }
+
+    bool            GetProcedureName(std::u16string_view rLine, OUString& rProcType, OUString& rProcName) const;
 
     FactoryFunction GetUITestFactory() const override;
 };
@@ -252,12 +258,13 @@ private:
     VclPtr<BreakPointWindow> aBrkWindow;
     VclPtr<LineNumberWindow> aLineNumberWindow;
     VclPtr<EditorWindow>     aEdtWindow;
-    VclPtr<ScrollBar>        aEWVScrollBar;
+    VclPtr<ScrollAdaptor>    aEWVScrollBar;
+    VclPtr<ScrollAdaptor>    aEWHScrollBar;
 
     virtual void DataChanged(DataChangedEvent const & rDCEvt) override;
 
     virtual void        Resize() override;
-    DECL_LINK( ScrollHdl, ScrollBar*, void );
+    DECL_LINK(ScrollHdl, weld::Scrollbar&, void);
 
 public:
     explicit ComplexEditorWindow( ModulWindow* pParent );
@@ -266,7 +273,8 @@ public:
     BreakPointWindow&   GetBrkWindow()      { return *aBrkWindow; }
     LineNumberWindow&   GetLineNumberWindow() { return *aLineNumberWindow; }
     EditorWindow&       GetEdtWindow()      { return *aEdtWindow; }
-    ScrollBar&          GetEWVScrollBar()   { return *aEWVScrollBar; }
+    ScrollAdaptor&      GetEWVScrollBar()   { return *aEWVScrollBar; }
+    ScrollAdaptor&      GetEWHScrollBar()   { return *aEWHScrollBar; }
 
     void SetLineNumberDisplay(bool b);
 };
@@ -293,10 +301,10 @@ protected:
     virtual void    GetFocus() override;
     virtual void    Paint( vcl::RenderContext& rRenderContext, const tools::Rectangle& ) override;
     virtual void    DoInit() override;
-    virtual void    DoScroll( ScrollBar* pCurScrollBar ) override;
+    virtual void    DoScroll(Scrollable* pCurScrollBar) override;
 
 public:
-    ModulWindow( ModulWindowLayout* pParent, const ScriptDocument& rDocument, const OUString& aLibName, const OUString& aName, OUString const & aModule );
+    ModulWindow( ModulWindowLayout* pParent, const ScriptDocument& rDocument, const OUString& aLibName, const OUString& aName, OUString aModule );
 
                     virtual ~ModulWindow() override;
     virtual void    dispose() override;
@@ -359,7 +367,8 @@ public:
     EditorWindow&       GetEditorWindow()       { return m_aXEditorWindow->GetEdtWindow(); }
     BreakPointWindow&   GetBreakPointWindow()   { return m_aXEditorWindow->GetBrkWindow(); }
     LineNumberWindow&   GetLineNumberWindow()   { return m_aXEditorWindow->GetLineNumberWindow(); }
-    ScrollBar&          GetEditVScrollBar()     { return m_aXEditorWindow->GetEWVScrollBar(); }
+    ScrollAdaptor&      GetEditVScrollBar()     { return m_aXEditorWindow->GetEWVScrollBar(); }
+    ScrollAdaptor&      GetEditHScrollBar()     { return m_aXEditorWindow->GetEWHScrollBar(); }
     ExtTextEngine*      GetEditEngine()         { return GetEditorWindow().GetEditEngine(); }
     TextView*           GetEditView()           { return GetEditorWindow().GetEditView(); }
     BreakPointList&     GetBreakPoints()        { return GetBreakPointWindow().GetBreakPoints(); }

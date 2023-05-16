@@ -70,18 +70,18 @@ public:
 
     // IAccessibleTableCell interfaces
     STDMETHOD(get_columnExtent)(long*) override;
-    STDMETHOD(get_columnHeaderCells)(IUnknown***, long*) override { return E_FAIL; }
+    STDMETHOD(get_columnHeaderCells)(IUnknown***, long*) override;
     STDMETHOD(get_columnIndex)(long*) override;
     STDMETHOD(get_rowExtent)(long*) override;
-    STDMETHOD(get_rowHeaderCells)(IUnknown***, long*) override { return E_FAIL; }
+    STDMETHOD(get_rowHeaderCells)(IUnknown***, long*) override;
     STDMETHOD(get_rowIndex)(long*) override;
     STDMETHOD(get_isSelected)(boolean*) override;
-    STDMETHOD(get_rowColumnExtents)(long*, long*, long*, long*, boolean*) { return E_FAIL; }
-    STDMETHOD(get_table)(IUnknown**) { return E_FAIL; }
+    STDMETHOD(get_rowColumnExtents)(long*, long*, long*, long*, boolean*) override;
+    STDMETHOD(get_table)(IUnknown**) override;
 
 private:
     css::uno::Reference<css::accessibility::XAccessibleTable> m_xTable;
-    sal_Int32 m_nIndexInParent;
+    sal_Int64 m_nIndexInParent;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

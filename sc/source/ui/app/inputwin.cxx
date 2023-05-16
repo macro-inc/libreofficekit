@@ -44,7 +44,6 @@
 #include <svl/stritem.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weldutils.hxx>
-#include <vcl/virdev.hxx>
 #include <unotools/charclass.hxx>
 
 #include <inputwin.hxx>
@@ -83,6 +82,7 @@ const tools::Long LEFT_OFFSET = 5;              // Left offset of input line
 const tools::Long INPUTWIN_MULTILINES = 6;      // Initial number of lines within multiline dropdown
 const tools::Long TOOLBOX_WINDOW_HEIGHT = 22;   // Height of toolbox window in pixels - TODO: The same on all systems?
 const tools::Long POSITION_COMBOBOX_WIDTH = 18; // Width of position combobox in characters
+const int RESIZE_HOTSPOT_HEIGHT = 4;
 
 using com::sun::star::uno::Reference;
 using com::sun::star::uno::UNO_QUERY;
@@ -166,6 +166,7 @@ ScInputWindow::ScInputWindow( vcl::Window* pParent, const SfxBindings* pBind ) :
         pInputHdl       ( nullptr ),
         mpViewShell     ( nullptr ),
         mnMaxY          (0),
+        mnStandardItemHeight(0),
         bIsOkCancelMode ( false ),
         bInResize       ( false )
 {
@@ -239,6 +240,8 @@ ScInputWindow::ScInputWindow( vcl::Window* pParent, const SfxBindings* pBind ) :
 
         HideItem( SID_INPUT_CANCEL );
         HideItem( SID_INPUT_OK );
+
+        mnStandardItemHeight = GetItemRect(SID_INPUT_SUM).GetHeight();
     }
 
     SetHelpId( HID_SC_INPUTWIN ); // For the whole input row
@@ -475,31 +478,36 @@ void ScInputWindow::Resize()
 {
     ToolBox::Resize();
 
-    Size aSize = GetSizePixel();
+    Size aStartSize = GetSizePixel();
+    Size aSize = aStartSize;
 
+    auto nLines = mxTextWindow->GetNumLines();
     //(-10) to allow margin between sidebar and formulabar
     tools::Long margin = (comphelper::LibreOfficeKit::isActive()) ? 10 : 0;
     Size aTextWindowSize(aSize.Width() - mxTextWindow->GetPosPixel().X() - LEFT_OFFSET - margin,
-                         mxTextWindow->GetPixelHeightForLines());
+                         mxTextWindow->GetPixelHeightForLines(nLines));
     mxTextWindow->SetSizePixel(aTextWindowSize);
 
-    aSize.setHeight(CalcWindowSizePixel().Height() + 1);
-    ScInputBarGroup* pGroupBar = mxTextWindow.get();
-    if (pGroupBar)
+    int nTopOffset = 0;
+    if (nLines > 1)
     {
-        // To ensure smooth display and prevent the items in the toolbar being
-        // repositioned (vertically) we lock the vertical positioning of the toolbox
-        // items when we are displaying > 1 line.
-        // So, we need to adjust the height of the toolbox accordingly. If we don't
-        // then the largest item (e.g. the GroupBar window) will actually be
-        // positioned such that the toolbar will cut off the bottom of that item
-        if (pGroupBar->GetNumLines() > 1)
-        {
-            Size aGroupBarSize = pGroupBar->GetSizePixel();
-            aSize.setHeight(aGroupBarSize.Height() + 2 * (pGroupBar->GetVertOffset() + 1));
-        }
+        // Initially there is 1 line and the edit is vertically centered in the toolbar
+        // Later, if expanded then the vertical position of the edit will remain at
+        // that initial position, so when calculating the overall size of the expanded
+        // toolbar we have to include that initial offset in order to not make
+        // the edit overlap the RESIZE_HOTSPOT_HEIGHT area so that dragging to resize
+        // is still possible.
+        int nNormalHeight = mxTextWindow->GetPixelHeightForLines(1);
+        int nInitialTopMargin = (mnStandardItemHeight - nNormalHeight) / 2;
+        if (nInitialTopMargin > 0)
+            nTopOffset = nInitialTopMargin;
     }
-    SetSizePixel(aSize);
+
+    // add empty space of RESIZE_HOTSPOT_HEIGHT so resize is possible when hovering there
+    aSize.setHeight(CalcWindowSizePixel().Height() + RESIZE_HOTSPOT_HEIGHT + nTopOffset);
+
+    if (aStartSize != aSize)
+        SetSizePixel(aSize);
 
     Invalidate();
 }
@@ -687,6 +695,11 @@ void ScInputWindow::EnableButtons( bool bEnable )
 //  Invalidate();
 }
 
+void ScInputWindow::NumLinesChanged()
+{
+    mxTextWindow->NumLinesChanged();
+}
+
 void ScInputWindow::StateChanged( StateChangedType nType )
 {
     ToolBox::StateChanged( nType );
@@ -717,7 +730,7 @@ void ScInputWindow::DataChanged( const DataChangedEvent& rDCEvt )
 
 bool ScInputWindow::IsPointerAtResizePos()
 {
-    return GetOutputSizePixel().Height() - GetPointerPosPixel().Y() <= 4;
+    return GetOutputSizePixel().Height() - GetPointerPosPixel().Y() <= RESIZE_HOTSPOT_HEIGHT;
 }
 
 void ScInputWindow::MouseMove( const MouseEvent& rMEvt )
@@ -843,18 +856,11 @@ ScInputBarGroup::ScInputBarGroup(vcl::Window* pParent, ScTabViewShell* pViewSh)
     , mxTextWndGroup(new ScTextWndGroup(*this, pViewSh))
     , mxButtonUp(m_xBuilder->weld_button("up"))
     , mxButtonDown(m_xBuilder->weld_button("down"))
-    , mnVertOffset(0)
 {
     InitControlBase(m_xContainer.get());
 
-    const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
-
     SetPaintTransparent(false);
-    SetBackground(rStyleSettings.GetFaceColor());
-
-    // match to bg used in ScTextWnd::SetDrawingArea to the margin area is drawn with the
-    // same desired bg
-    mxBackground->set_background(rStyleSettings.GetWindowColor());
+    SetBackgrounds();
 
     mxButtonUp->connect_clicked(LINK(this, ScInputBarGroup, ClickHdl));
     mxButtonDown->connect_clicked(LINK(this, ScInputBarGroup, ClickHdl));
@@ -873,6 +879,30 @@ ScInputBarGroup::ScInputBarGroup(vcl::Window* pParent, ScTabViewShell* pViewSh)
     const SfxViewShell* pViewShell = SfxViewShell::Current();
     if (!comphelper::LibreOfficeKit::isActive() || !(pViewShell && pViewShell->isLOKMobilePhone()))
         mxButtonDown->show();
+
+    // tdf#154042 Use an initial height of one row so the Toolbar positions
+    // this in the same place regardless of how many rows it eventually shows
+    Size aSize(GetSizePixel().Width(), nHeight);
+    SetSizePixel(aSize);
+}
+
+void ScInputBarGroup::SetBackgrounds()
+{
+    const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
+    SetBackground(rStyleSettings.GetFaceColor());
+    // match to bg used in ScTextWnd::SetDrawingArea to the margin area is drawn with the
+    // same desired bg
+    mxBackground->set_background(rStyleSettings.GetWindowColor());
+}
+
+void ScInputBarGroup::DataChanged(const DataChangedEvent& rDCEvt)
+{
+    InterimItemWindow::DataChanged(rDCEvt);
+    if ((rDCEvt.GetType() == DataChangedEventType::SETTINGS) && (rDCEvt.GetFlags() & AllSettingsFlags::STYLE))
+    {
+        SetBackgrounds();
+        Invalidate();
+    }
 }
 
 Point ScInputBarGroup::GetCursorScreenPixelPos(bool bBelow)
@@ -998,6 +1028,30 @@ void ScInputWindow::MenuHdl(std::string_view command)
     {
         eCode = ocCount;
     }
+    else if ( command == "counta" )
+    {
+        eCode = ocCount2;
+    }
+    else if ( command == "product" )
+    {
+        eCode = ocProduct;
+    }
+    else if (command == "stdev")
+    {
+        eCode = ocStDev;
+    }
+    else if (command == "stdevp")
+    {
+        eCode = ocStDevP;
+    }
+    else if (command == "var")
+    {
+        eCode = ocVar;
+    }
+    else if (command == "varp")
+    {
+        eCode = ocVarP;
+    }
 
     AutoSum( bRangeFinder, bSubTotal, eCode );
 }
@@ -1020,16 +1074,25 @@ IMPL_LINK_NOARG(ScInputWindow, DropdownClickHdl, ToolBox *, void)
 IMPL_LINK_NOARG(ScInputBarGroup, ClickHdl, weld::Button&, void)
 {
     if (mxTextWndGroup->GetNumLines() > 1)
-    {
         mxTextWndGroup->SetNumLines(1);
-        mxButtonUp->hide();
-        mxButtonDown->show();
+    else
+        mxTextWndGroup->SetNumLines(mxTextWndGroup->GetLastNumExpandedLines());
+
+    NumLinesChanged();
+}
+
+void ScInputBarGroup::NumLinesChanged()
+{
+    if (mxTextWndGroup->GetNumLines() > 1)
+    {
+        mxButtonDown->hide();
+        mxButtonUp->show();
+        mxTextWndGroup->SetLastNumExpandedLines(mxTextWndGroup->GetNumLines());
     }
     else
     {
-        mxTextWndGroup->SetNumLines(mxTextWndGroup->GetLastNumExpandedLines());
-        mxButtonDown->hide();
-        mxButtonUp->show();
+        mxButtonUp->hide();
+        mxButtonDown->show();
     }
     TriggerToolboxLayout();
 
@@ -1044,12 +1107,6 @@ void ScInputBarGroup::TriggerToolboxLayout()
     vcl::Window *w=GetParent();
     ScInputWindow &rParent = dynamic_cast<ScInputWindow&>(*w);
     SfxViewFrame* pViewFrm = SfxViewFrame::Current();
-
-    // Capture the vertical position of this window in the toolbar, when we increase
-    // the size of the toolbar to accommodate expanded line input we need to take this
-    // into account
-    if ( !mnVertOffset )
-        mnVertOffset = rParent.GetItemPosRect( rParent.GetItemCount() - 1 ).Top();
 
     if ( !pViewFrm )
         return;
@@ -1102,7 +1159,7 @@ ScTextWndGroup::ScTextWndGroup(ScInputBarGroup& rParent, ScTabViewShell* pViewSh
 {
     mxScrollWin->connect_vadjustment_changed(LINK(this, ScTextWndGroup, Impl_ScrollHdl));
     if (comphelper::LibreOfficeKit::isActive())
-        ScInputHandler::LOKSendFormulabarUpdate(SfxViewShell::Current(), "", ESelection());
+        ScInputHandler::LOKSendFormulabarUpdate(nullptr, SfxViewShell::Current(), "", ESelection());
 }
 
 Point ScTextWndGroup::GetCursorScreenPixelPos(bool bBelow)
@@ -1149,6 +1206,11 @@ const OutputDevice& ScTextWndGroup::GetEditViewDevice() const
 tools::Long ScTextWndGroup::GetLastNumExpandedLines() const
 {
     return mxTextWnd->GetLastNumExpandedLines();
+}
+
+void ScTextWndGroup::SetLastNumExpandedLines(tools::Long nLastExpandedLines)
+{
+    mxTextWnd->SetLastNumExpandedLines(nLastExpandedLines);
 }
 
 tools::Long ScTextWndGroup::GetNumLines() const
@@ -1282,17 +1344,24 @@ const OutputDevice& ScTextWnd::GetEditViewDevice() const
 
 int ScTextWnd::GetPixelHeightForLines(tools::Long nLines)
 {
-    // add padding (for the borders of the window)
     OutputDevice& rDevice = GetDrawingArea()->get_ref_device();
     return rDevice.LogicToPixel(Size(0, nLines * rDevice.GetTextHeight())).Height() + 1;
 }
 
+tools::Long ScTextWnd::GetNumLines() const
+{
+    ScViewData& rViewData = mpViewShell->GetViewData();
+    return rViewData.GetFormulaBarLines();
+}
+
 void ScTextWnd::SetNumLines(tools::Long nLines)
 {
-    mnLines = nLines;
+    ScViewData& rViewData = mpViewShell->GetViewData();
+    rViewData.SetFormulaBarLines(nLines);
     if ( nLines > 1 )
     {
-        mnLastExpandedLines = nLines;
+        // SetFormulaBarLines sanitizes the height, so get the sanitized value
+        mnLastExpandedLines = rViewData.GetFormulaBarLines();
         Resize();
     }
 }
@@ -1508,6 +1577,10 @@ void ScTextWnd::InitEditEngine()
     m_xEditView->setEditViewCallbacks(this);
     m_xEditView->SetInsertMode(bIsInsertMode);
 
+    const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
+    Color aBgColor = rStyleSettings.GetWindowColor();
+    m_xEditView->SetBackgroundColor(aBgColor);
+
     if (pAcc)
     {
         pAcc->InitAcc(nullptr, m_xEditView.get(),
@@ -1553,7 +1626,6 @@ ScTextWnd::ScTextWnd(ScTextWndGroup& rParent, ScTabViewShell* pViewSh) :
         bInputMode   (false),
         mpViewShell(pViewSh),
         mrGroupBar(rParent),
-        mnLines(1),
         mnLastExpandedLines(INPUTWIN_MULTILINES),
         mbInvalidate(false)
 {
@@ -1706,13 +1778,13 @@ bool ScTextWnd::Command( const CommandEvent& rCEvt )
         {
             //don't call InputChanged for CommandEventId::Wheel
         }
-        else if ( nCommand == CommandEventId::Swipe )
+        else if ( nCommand == CommandEventId::GestureSwipe )
         {
-            //don't call InputChanged for CommandEventId::Swipe
+            //don't call InputChanged for CommandEventId::GestureSwipe
         }
-        else if ( nCommand == CommandEventId::LongPress )
+        else if ( nCommand == CommandEventId::GestureLongPress )
         {
-            //don't call InputChanged for CommandEventId::LongPress
+            //don't call InputChanged for CommandEventId::GestureLongPress
         }
         else if ( nCommand == CommandEventId::ModKeyChange )
         {
@@ -1753,8 +1825,10 @@ bool ScTextWnd::Command( const CommandEvent& rCEvt )
         {
             nParaStart = pParaPoint ? pParaPoint->X() : 0;
             nParaEnd = pParaPoint ? pParaPoint->Y() : 0;
-            nPosStart = aSelectionStartEnd.X();
-            nPosEnd = aSelectionStartEnd.Y();
+            nPosStart = m_xEditView->GetPosNoField(nParaStart, aSelectionStartEnd.X());
+            nPosEnd = m_xEditView->GetPosNoField(nParaEnd, aSelectionStartEnd.Y());
+
+
         }
 
         m_xEditView->SetSelection(ESelection(nParaStart, nPosStart, nParaEnd, nPosEnd));
@@ -1933,7 +2007,7 @@ void ScTextWnd::SetTextString( const OUString& rNewString )
         // Find position of the change, only paint the rest
         if (!m_xEditEngine)
         {
-            bool bPaintAll = mnLines > 1 || bIsRTL;
+            bool bPaintAll = GetNumLines() > 1 || bIsRTL;
             if (!bPaintAll)
             {
                 //  test if CTL script type is involved
@@ -1996,7 +2070,7 @@ void ScTextWnd::SetTextString( const OUString& rNewString )
     if (comphelper::LibreOfficeKit::isActive())
     {
         ESelection aSel = m_xEditView ? m_xEditView->GetSelection() : ESelection();
-        ScInputHandler::LOKSendFormulabarUpdate(SfxViewShell::Current(), rNewString, aSel);
+        ScInputHandler::LOKSendFormulabarUpdate(m_xEditView.get(), SfxViewShell::Current(), rNewString, aSel);
     }
 
     SetScrollBarRange();
@@ -2043,6 +2117,10 @@ void ScTextWnd::MakeDialogEditView()
 
     m_xEditView = std::make_unique<EditView>(m_xEditEngine.get(), nullptr);
     m_xEditView->setEditViewCallbacks(this);
+
+    const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
+    Color aBgColor = rStyleSettings.GetWindowColor();
+    m_xEditView->SetBackgroundColor(aBgColor);
 
     if (pAcc)
     {
@@ -2091,7 +2169,7 @@ void ScTextWnd::SetDrawingArea(weld::DrawingArea* pDrawingArea)
     // the input line
     m_xHelper.set(new svt::OStringTransferable(OUString()));
     rtl::Reference<TransferDataContainer> xHelper(m_xHelper);
-    SetDragDataTransferrable(xHelper, DND_ACTION_COPY);
+    SetDragDataTransferable(xHelper, DND_ACTION_COPY);
 
     OutputDevice& rDevice = pDrawingArea->get_ref_device();
     pDrawingArea->set_margin_start(gnBorderWidth);

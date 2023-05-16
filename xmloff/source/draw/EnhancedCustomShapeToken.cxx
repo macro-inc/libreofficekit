@@ -59,12 +59,14 @@ const TokenTable pTokenTableArray[] =
     { "extrusion-first-light-direction",    EAS_extrusion_first_light_direction },
     { "extrusion-second-light-direction",   EAS_extrusion_second_light_direction },
     { "extrusion-metal",                    EAS_extrusion_metal },
+    { "extrusion-metal-type",               EAS_extrusion_metal_type },
     { "shade-mode",                         EAS_shade_mode },
     { "extrusion-rotation-angle",           EAS_extrusion_rotation_angle },
     { "extrusion-rotation-center",          EAS_extrusion_rotation_center },
     { "extrusion-shininess",                EAS_extrusion_shininess },
     { "extrusion-skew",                     EAS_extrusion_skew },
     { "extrusion-specularity",              EAS_extrusion_specularity },
+    { "extrusion-specularity-loext",        EAS_extrusion_specularity_loext },
     { "projection",                         EAS_projection },
     { "extrusion-viewpoint",                EAS_extrusion_viewpoint },
     { "extrusion-origin",                   EAS_extrusion_origin },
@@ -127,6 +129,7 @@ const TokenTable pTokenTableArray[] =
     { "FirstLightDirection",                EAS_FirstLightDirection },
     { "SecondLightDirection",               EAS_SecondLightDirection },
     { "Metal",                              EAS_Metal },
+    { "MetalType",                          EAS_MetalType },
     { "ShadeMode",                          EAS_ShadeMode },
     { "RotateAngle",                        EAS_RotateAngle },
     { "RotationCenter",                     EAS_RotationCenter },
@@ -178,10 +181,10 @@ static const TypeNameHashMap& GetNameHashMap()
     return aHashMap;
 }
 
-EnhancedCustomShapeTokenEnum EASGet( const OUString& rShapeType )
+EnhancedCustomShapeTokenEnum EASGet( std::u16string_view rShapeType )
 {
     EnhancedCustomShapeTokenEnum eRetValue = EAS_NotFound;
-    int i, nLen = rShapeType.getLength();
+    size_t i, nLen = rShapeType.size();
     std::unique_ptr<char[]> pBuf(new char[ nLen + 1 ]);
     for ( i = 0; i < nLen; i++ )
         pBuf[ i ] = static_cast<char>(rShapeType[ i ]);

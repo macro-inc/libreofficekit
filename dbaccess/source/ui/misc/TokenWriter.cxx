@@ -18,7 +18,7 @@
  */
 
 #include <TokenWriter.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/stream.hxx>
 #include <osl/diagnose.h>
 #include <rtl/tencinfo.h>
@@ -48,6 +48,7 @@
 #include <svtools/htmlout.hxx>
 #include <sfx2/frmhtmlw.hxx>
 #include <svl/numuno.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <UITools.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
@@ -55,6 +56,7 @@
 #include <vcl/settings.hxx>
 #include <svtools/rtfout.hxx>
 #include <svtools/htmlcfg.hxx>
+#include <o3tl/string_view.hxx>
 #include <connectivity/formattedcolumnvalue.hxx>
 #include <memory>
 
@@ -94,11 +96,11 @@ ODatabaseImportExport::ODatabaseImportExport(const svx::ODataAccessDescriptor& _
 }
 
 // import data
-ODatabaseImportExport::ODatabaseImportExport( const ::dbtools::SharedConnection& _rxConnection,
+ODatabaseImportExport::ODatabaseImportExport( ::dbtools::SharedConnection _xConnection,
         const Reference< XNumberFormatter >& _rxNumberF, const Reference< XComponentContext >& _rM )
     :m_bBookmarkSelection( false )
     ,m_pStream(nullptr)
-    ,m_xConnection(_rxConnection)
+    ,m_xConnection(std::move(_xConnection))
     ,m_xFormatter(_rxNumberF)
     ,m_xContext(_rM)
     ,m_nCommandType(css::sdb::CommandType::TABLE)
@@ -259,9 +261,9 @@ void ODatabaseImportExport::initialize()
             {
                 m_xResultSet.set( m_xContext->getServiceManager()->createInstanceWithContext("com.sun.star.sdb.RowSet", m_xContext), UNO_QUERY );
                 Reference< XPropertySet > xProp( m_xResultSet, UNO_QUERY_THROW );
-                xProp->setPropertyValue( PROPERTY_ACTIVE_CONNECTION, makeAny( m_xConnection.getTyped() ) );
-                xProp->setPropertyValue( PROPERTY_COMMAND_TYPE, makeAny( m_nCommandType ) );
-                xProp->setPropertyValue( PROPERTY_COMMAND, makeAny( m_sName ) );
+                xProp->setPropertyValue( PROPERTY_ACTIVE_CONNECTION, Any( m_xConnection.getTyped() ) );
+                xProp->setPropertyValue( PROPERTY_COMMAND_TYPE, Any( m_nCommandType ) );
+                xProp->setPropertyValue( PROPERTY_COMMAND, Any( m_sName ) );
                 Reference< XRowSet > xRowSet( xProp, UNO_QUERY );
                 xRowSet->execute();
             }
@@ -351,7 +353,7 @@ bool ORTFImportExport::Write()
             m_pStream->WriteCharPtr( "\\f" );
             m_pStream->WriteInt32AsString(++nTok);
             m_pStream->WriteCharPtr( "\\fcharset0\\fnil " );
-            m_pStream->WriteOString( aFonts.getToken(0, ';', nIdx) );
+            m_pStream->WriteOString( o3tl::getToken(aFonts, 0, ';', nIdx) );
             m_pStream->WriteChar( ';' );
         } while (nIdx>=0);
     }
@@ -579,7 +581,7 @@ OHTMLImportExport::OHTMLImportExport(const svx::ODataAccessDescriptor& _aDataDes
 #endif
 {
     // set HTML configuration
-    m_eDestEnc = SvxHtmlOptions::GetTextEncoding();
+    m_eDestEnc = RTL_TEXTENCODING_UTF8;
     strncpy( sIndent, sIndentSource ,std::min(sizeof(sIndent),sizeof(sIndentSource)));
     sIndent[0] = 0;
 }
@@ -630,7 +632,7 @@ void OHTMLImportExport::WriteHeader()
     HTMLOutFuncs::Out_AsciiTag(*m_pStream, OOO_STRING_SVTOOLS_HTML_head).WriteCharPtr(SAL_NEWLINE_STRING).WriteCharPtr(GetIndentStr());
 
     SfxFrameHTMLWriter::Out_DocInfo( (*m_pStream), OUString(),
-        xDocProps, sIndent, osl_getThreadTextEncoding() );
+        xDocProps, sIndent );
     m_pStream->WriteCharPtr(SAL_NEWLINE_STRING).WriteCharPtr(GetIndentStr());
     IncIndent(-1);
     m_pStream->WriteCharPtr(SAL_NEWLINE_STRING).WriteCharPtr(GetIndentStr());
@@ -791,14 +793,12 @@ void OHTMLImportExport::WriteTables()
 
         // 2. and now the data
         Reference< XRowSet > xRowSet(m_xRow,UNO_QUERY);
-        sal_Int32 kk=0;
         m_xResultSet->beforeFirst(); // set back before the first row
         while(m_xResultSet->next())
         {
             IncIndent(1);
             HTMLOutFuncs::Out_AsciiTag(*m_pStream, OOO_STRING_SVTOOLS_HTML_tablerow).WriteCharPtr(SAL_NEWLINE_STRING).WriteCharPtr(GetIndentStr());
 
-            ++kk;
             for(sal_Int32 i=1;i<=aNames.getLength();++i)
             {
                 if(i == aNames.getLength())
@@ -900,7 +900,7 @@ void OHTMLImportExport::WriteCell( sal_Int32 nFormat, sal_Int32 nWidthPixel, sal
     if ( rValue.isEmpty() )
         HTMLOutFuncs::Out_AsciiTag(*m_pStream, OOO_STRING_SVTOOLS_HTML_linebreak);        // no completely empty cell
     else
-        HTMLOutFuncs::Out_String( (*m_pStream), rValue ,m_eDestEnc);
+        HTMLOutFuncs::Out_String( (*m_pStream), rValue );
 
     if ( bStrikeout )   HTMLOutFuncs::Out_AsciiTag(*m_pStream, OOO_STRING_SVTOOLS_HTML_strike, false);
     if ( bUnderline )   HTMLOutFuncs::Out_AsciiTag(*m_pStream, OOO_STRING_SVTOOLS_HTML_underline, false);

@@ -82,9 +82,11 @@ void DrawViewShell::Resize()
 {
     ViewShell::Resize();
 
-    if ( GetDocSh()->GetCreateMode() == SfxObjectCreateMode::EMBEDDED )
+    // tdf#151621 Do not set if the embedded object is opening in a new window.
+    if (GetDocSh()->GetCreateMode() == SfxObjectCreateMode::EMBEDDED
+        && GetDocSh()->IsInPlaceActive())
     {
-        SetZoomRect( GetDocSh()->GetVisArea(ASPECT_CONTENT) );
+        SetZoomRect(GetDocSh()->GetVisArea(ASPECT_CONTENT));
     }
 
     rtl::Reference< sd::SlideShow > xSlideshow( SlideShow::GetSlideShow( GetViewShellBase() ) );
@@ -410,7 +412,7 @@ void DrawViewShell::Paint(const ::tools::Rectangle& rRect, ::sd::Window* pWin)
     GetDoc()->GetDrawOutliner().SetDefaultLanguage( GetDoc()->GetLanguage( EE_CHAR_LANGUAGE ) );
 
     // Set Application Background color for usage in SdrPaintView(s)
-    mpDrawView->SetApplicationBackgroundColor( mnAppBackgroundColor );
+    mpDrawView->SetApplicationBackgroundColor( GetViewOptions().mnAppBackgroundColor );
 
     /* This is done before each text edit, so why not do it before every paint.
                 The default language is only used if the outliner only contains one
@@ -545,7 +547,9 @@ void DrawViewShell::ReadUserDataSequence ( const css::uno::Sequence < css::beans
     {
         const ::tools::Rectangle aVisArea( mpFrameView->GetVisArea() );
 
-        if ( GetDocSh()->GetCreateMode() == SfxObjectCreateMode::EMBEDDED )
+        // tdf#151621 Do not set if the embedded object is opening in a new window.
+        if (GetDocSh()->GetCreateMode() == SfxObjectCreateMode::EMBEDDED
+            && GetDocSh()->IsInPlaceActive())
         {
             GetDocSh()->SetVisArea(aVisArea);
         }

@@ -30,7 +30,7 @@
 #include <extinput.hxx>
 #include <doc.hxx>
 #include <IDocumentUndoRedo.hxx>
-#include <index.hxx>
+#include <contentindex.hxx>
 #include <ndtxt.hxx>
 #include <swundo.hxx>
 
@@ -49,13 +49,13 @@ SwExtTextInput::~SwExtTextInput()
     SwDoc& rDoc = GetDoc();
     if (rDoc.IsInDtor()) { return; /* #i58606# */ }
 
-    SwTextNode* pTNd = GetPoint()->nNode.GetNode().GetTextNode();
+    SwTextNode* pTNd = GetPoint()->GetNode().GetTextNode();
     if( !pTNd )
         return;
 
-    SwIndex& rIdx = GetPoint()->nContent;
-    sal_Int32 nSttCnt = rIdx.GetIndex();
-    sal_Int32 nEndCnt = GetMark()->nContent.GetIndex();
+    SwPosition& rPtPos = *GetPoint();
+    sal_Int32 nSttCnt = rPtPos.GetContentIndex();
+    sal_Int32 nEndCnt = GetMark()->GetContentIndex();
     if( nEndCnt == nSttCnt )
         return;
 
@@ -74,7 +74,7 @@ SwExtTextInput::~SwExtTextInput()
 
     // In order to get Undo/Redlining etc. working correctly,
     // we need to go through the Doc interface
-    rIdx = nSttCnt;
+    rPtPos.SetContent(nSttCnt);
     const OUString sText( pTNd->GetText().copy(nSttCnt, nEndCnt - nSttCnt));
     if( m_bIsOverwriteCursor && !m_sOverwriteText.isEmpty() )
     {
@@ -82,13 +82,13 @@ SwExtTextInput::~SwExtTextInput()
         const sal_Int32 nOWLen = m_sOverwriteText.getLength();
         if( nLen > nOWLen )
         {
-            rIdx += nOWLen;
-            pTNd->EraseText( rIdx, nLen - nOWLen );
-            rIdx = nSttCnt;
-            pTNd->ReplaceText( rIdx, nOWLen, m_sOverwriteText );
+            rPtPos.AdjustContent(+nOWLen);
+            pTNd->EraseText( rPtPos, nLen - nOWLen );
+            rPtPos.SetContent(nSttCnt);
+            pTNd->ReplaceText( rPtPos, nOWLen, m_sOverwriteText );
             if( m_bInsText )
             {
-                rIdx = nSttCnt;
+                rPtPos.SetContent(nSttCnt);
                 rDoc.GetIDocumentUndoRedo().StartUndo( SwUndoId::OVERWRITE, nullptr );
                 rDoc.getIDocumentContentOperations().Overwrite( *this, sText.copy( 0, nOWLen ) );
                 rDoc.getIDocumentContentOperations().InsertString( *this, sText.copy( nOWLen ) );
@@ -97,10 +97,10 @@ SwExtTextInput::~SwExtTextInput()
         }
         else
         {
-            pTNd->ReplaceText( rIdx, nLen, m_sOverwriteText.copy( 0, nLen ));
+            pTNd->ReplaceText( rPtPos, nLen, m_sOverwriteText.copy( 0, nLen ));
             if( m_bInsText )
             {
-                rIdx = nSttCnt;
+                rPtPos.SetContent(nSttCnt);
                 rDoc.getIDocumentContentOperations().Overwrite( *this, sText );
             }
         }
@@ -115,11 +115,12 @@ SwExtTextInput::~SwExtTextInput()
         sal_Int32 nLenghtOfOldString = nEndCnt - nSttCnt;
 
         if( m_bInsText )
+        {
+            rPtPos.SetContent(nSttCnt);
             rDoc.getIDocumentContentOperations().InsertString( *this, sText, SwInsertFlags::EMPTYEXPAND );
+        }
 
-        rIdx = nEndCnt;
-
-        pTNd->EraseText( rIdx, nLenghtOfOldString );
+        pTNd->EraseText( rPtPos, nLenghtOfOldString );
     }
     if (!bWasIME)
     {
@@ -141,22 +142,22 @@ SwExtTextInput::~SwExtTextInput()
     if (RES_CHRATR_LANGUAGE != nWhich && pTNd->GetLang( nSttCnt, nEndCnt-nSttCnt, nScriptType) != m_eInputLanguage)
     {
         SvxLanguageItem aLangItem( m_eInputLanguage, nWhich );
-        rIdx = nSttCnt;
-        GetMark()->nContent = nEndCnt;
+        rPtPos.SetContent(nSttCnt);
+        GetMark()->SetContent(nEndCnt);
         rDoc.getIDocumentContentOperations().InsertPoolItem(*this, aLangItem );
     }
 }
 
 void SwExtTextInput::SetInputData( const CommandExtTextInputData& rData )
 {
-    SwTextNode* pTNd = GetPoint()->nNode.GetNode().GetTextNode();
+    SwTextNode* pTNd = GetPoint()->GetNode().GetTextNode();
     if( !pTNd )
         return;
 
-    sal_Int32 nSttCnt = Start()->nContent.GetIndex();
-    sal_Int32 nEndCnt = End()->nContent.GetIndex();
+    sal_Int32 nSttCnt = Start()->GetContentIndex();
+    sal_Int32 nEndCnt = End()->GetContentIndex();
 
-    SwIndex aIdx( pTNd, nSttCnt );
+    SwContentIndex aIdx( pTNd, nSttCnt );
     const OUString& rNewStr = rData.GetText();
 
     if( m_bIsOverwriteCursor && !m_sOverwriteText.isEmpty() )
@@ -192,7 +193,7 @@ void SwExtTextInput::SetInputData( const CommandExtTextInputData& rData )
         pTNd->ReplaceText( aIdx, nReplace, rNewStr );
         if( !HasMark() )
             SetMark();
-        GetMark()->nContent = aIdx;
+        GetMark()->Assign(*aIdx.GetContentNode(), aIdx.GetIndex());
     }
     else
     {
@@ -201,13 +202,13 @@ void SwExtTextInput::SetInputData( const CommandExtTextInputData& rData )
             pTNd->EraseText( aIdx, nEndCnt - nSttCnt );
         }
 
-        // NOHINTEXPAND so we can use correct formatting in desctructor when we finish composing
+        // NOHINTEXPAND so we can use correct formatting in destructor when we finish composing
         pTNd->InsertText( rNewStr, aIdx, SwInsertFlags::NOHINTEXPAND );
         if( !HasMark() )
             SetMark();
     }
 
-    GetPoint()->nContent = nSttCnt;
+    GetPoint()->SetContent(nSttCnt);
 
     m_aAttrs.clear();
     if( rData.GetTextAttr() )
@@ -223,12 +224,12 @@ void SwExtTextInput::SetOverwriteCursor( bool bFlag )
     if (!m_bIsOverwriteCursor)
         return;
 
-    const SwTextNode *const pTNd = GetPoint()->nNode.GetNode().GetTextNode();
+    const SwTextNode *const pTNd = GetPoint()->GetNode().GetTextNode();
     if (!pTNd)
         return;
 
-    const sal_Int32 nSttCnt = GetPoint()->nContent.GetIndex();
-    const sal_Int32 nEndCnt = GetMark()->nContent.GetIndex();
+    const sal_Int32 nSttCnt = GetPoint()->GetContentIndex();
+    const sal_Int32 nEndCnt = GetMark()->GetContentIndex();
     m_sOverwriteText = pTNd->GetText().copy( std::min(nSttCnt, nEndCnt) );
     if( m_sOverwriteText.isEmpty() )
         return;
@@ -280,10 +281,10 @@ SwExtTextInput* SwDoc::GetExtTextInput( const SwNode& rNd,
         SwNodeOffset nNdIdx = rNd.GetIndex();
         SwExtTextInput* pTmp = mpExtInputRing;
         do {
-            SwNodeOffset nStartNode = pTmp->Start()->nNode.GetIndex(),
-                         nEndNode = pTmp->End()->nNode.GetIndex();
-            sal_Int32 nStartCnt = pTmp->Start()->nContent.GetIndex();
-            sal_Int32 nEndCnt = pTmp->End()->nContent.GetIndex();
+            SwNodeOffset nStartNode = pTmp->Start()->GetNodeIndex(),
+                         nEndNode = pTmp->End()->GetNodeIndex();
+            sal_Int32 nStartCnt = pTmp->Start()->GetContentIndex();
+            sal_Int32 nEndCnt = pTmp->End()->GetContentIndex();
 
             if( nStartNode <= nNdIdx && nNdIdx <= nEndNode &&
                 ( nContentPos<0 ||

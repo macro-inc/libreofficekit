@@ -17,22 +17,26 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonMarkerPrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokeArrowPrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonWavePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
 #include <basegfx/polygon/b2dlinegeometry.hxx>
 #include <com/sun/star/drawing/LineCap.hpp>
+#include <utility>
 
 using namespace com::sun::star;
 
 namespace drawinglayer::primitive2d
 {
-PolygonHairlinePrimitive2D::PolygonHairlinePrimitive2D(const basegfx::B2DPolygon& rPolygon,
+PolygonHairlinePrimitive2D::PolygonHairlinePrimitive2D(basegfx::B2DPolygon aPolygon,
                                                        const basegfx::BColor& rBColor)
-    : maPolygon(rPolygon)
+    : maPolygon(std::move(aPolygon))
     , maBColor(rBColor)
 {
 }
@@ -100,8 +104,10 @@ void PolygonMarkerPrimitive2D::create2DDecomposition(
         basegfx::utils::applyLineDashing(getB2DPolygon(), aDash, &aDashedPolyPolyA,
                                          &aDashedPolyPolyB, 2.0 * fLogicDashLength);
 
-        rContainer.push_back(new PolyPolygonHairlinePrimitive2D(aDashedPolyPolyA, getRGBColorA()));
-        rContainer.push_back(new PolyPolygonHairlinePrimitive2D(aDashedPolyPolyB, getRGBColorB()));
+        rContainer.push_back(
+            new PolyPolygonHairlinePrimitive2D(std::move(aDashedPolyPolyA), getRGBColorA()));
+        rContainer.push_back(
+            new PolyPolygonHairlinePrimitive2D(std::move(aDashedPolyPolyB), getRGBColorB()));
     }
     else
     {
@@ -109,11 +115,11 @@ void PolygonMarkerPrimitive2D::create2DDecomposition(
     }
 }
 
-PolygonMarkerPrimitive2D::PolygonMarkerPrimitive2D(const basegfx::B2DPolygon& rPolygon,
+PolygonMarkerPrimitive2D::PolygonMarkerPrimitive2D(basegfx::B2DPolygon aPolygon,
                                                    const basegfx::BColor& rRGBColorA,
                                                    const basegfx::BColor& rRGBColorB,
                                                    double fDiscreteDashLength)
-    : maPolygon(rPolygon)
+    : maPolygon(std::move(aPolygon))
     , maRGBColorA(rRGBColorA)
     , maRGBColorB(rRGBColorB)
     , mfDiscreteDashLength(fDiscreteDashLength)
@@ -164,7 +170,6 @@ void PolygonMarkerPrimitive2D::get2DDecomposition(
     Primitive2DDecompositionVisitor& rVisitor,
     const geometry::ViewInformation2D& rViewInformation) const
 {
-    std::unique_lock aGuard(m_aMutex);
     bool bNeedNewDecomposition(false);
 
     if (!getBuffered2DDecomposition().empty())
@@ -192,7 +197,6 @@ void PolygonMarkerPrimitive2D::get2DDecomposition(
     }
 
     // use parent implementation
-    aGuard.unlock();
     BufferedDecompositionPrimitive2D::get2DDecomposition(rVisitor, rViewInformation);
 }
 
@@ -255,24 +259,26 @@ void PolygonStrokePrimitive2D::create2DDecomposition(
             // put into single polyPolygon primitives to make clear that this is NOT meant
             // to be painted as a single tools::PolyPolygon (XORed as fill rule). Alternatively, a
             // melting process may be used here one day.
-            const basegfx::B2DPolyPolygon aNewPolyPolygon(aAreaPolyPolygon.getB2DPolygon(b));
+            basegfx::B2DPolyPolygon aNewPolyPolygon(aAreaPolyPolygon.getB2DPolygon(b));
             const basegfx::BColor aColor(getLineAttribute().getColor());
-            rContainer.push_back(new PolyPolygonColorPrimitive2D(aNewPolyPolygon, aColor));
+            rContainer.push_back(
+                new PolyPolygonColorPrimitive2D(std::move(aNewPolyPolygon), aColor));
         }
     }
     else
     {
-        rContainer.push_back(new PolyPolygonHairlinePrimitive2D(aHairLinePolyPolygon,
+        rContainer.push_back(new PolyPolygonHairlinePrimitive2D(std::move(aHairLinePolyPolygon),
                                                                 getLineAttribute().getColor()));
     }
 }
 
-PolygonStrokePrimitive2D::PolygonStrokePrimitive2D(
-    const basegfx::B2DPolygon& rPolygon, const attribute::LineAttribute& rLineAttribute,
-    const attribute::StrokeAttribute& rStrokeAttribute)
-    : maPolygon(rPolygon)
+PolygonStrokePrimitive2D::PolygonStrokePrimitive2D(basegfx::B2DPolygon aPolygon,
+                                                   const attribute::LineAttribute& rLineAttribute,
+                                                   attribute::StrokeAttribute aStrokeAttribute)
+    : maPolygon(std::move(aPolygon))
     , maLineAttribute(rLineAttribute)
-    , maStrokeAttribute(rStrokeAttribute)
+    , maStrokeAttribute(std::move(aStrokeAttribute))
+    , maBufferedRange()
 {
     // MM01: keep these - these are no curve-decompposers but just checks
     // simplify curve segments: moved here to not need to use it
@@ -280,10 +286,11 @@ PolygonStrokePrimitive2D::PolygonStrokePrimitive2D(
     maPolygon = basegfx::utils::simplifyCurveSegments(maPolygon);
 }
 
-PolygonStrokePrimitive2D::PolygonStrokePrimitive2D(const basegfx::B2DPolygon& rPolygon,
+PolygonStrokePrimitive2D::PolygonStrokePrimitive2D(basegfx::B2DPolygon aPolygon,
                                                    const attribute::LineAttribute& rLineAttribute)
-    : maPolygon(rPolygon)
+    : maPolygon(std::move(aPolygon))
     , maLineAttribute(rLineAttribute)
+    , maBufferedRange()
 {
     // MM01: keep these - these are no curve-decompposers but just checks
     // simplify curve segments: moved here to not need to use it
@@ -309,7 +316,11 @@ bool PolygonStrokePrimitive2D::operator==(const BasePrimitive2D& rPrimitive) con
 basegfx::B2DRange
 PolygonStrokePrimitive2D::getB2DRange(const geometry::ViewInformation2D& rViewInformation) const
 {
-    basegfx::B2DRange aRetval;
+    if (!maBufferedRange.isEmpty())
+    {
+        // use the view-independent, buffered B2DRange
+        return maBufferedRange;
+    }
 
     if (getLineAttribute().getWidth())
     {
@@ -329,6 +340,20 @@ PolygonStrokePrimitive2D::getB2DRange(const geometry::ViewInformation2D& rViewIn
             // the grow method below works perfectly for LineCap_ROUND since the grow is in
             // all directions and the rounded cap needs the same grow in all directions independent
             // from its orientation. Unfortunately this is not the case for drawing::LineCap_SQUARE
+
+            // NOTE: I thought about using [sqrt(2) * 0.5] a a factor for LineCap_SQUARE and not
+            // set bUseDecomposition. I even tried that it works. Then an auto-test failing showed
+            // not only that view-dependent stuff needs to be considered (what is done for the
+            // hairline case below), *BUT* also e.g. conversions to PNG/exports use the B2DRange
+            // of the geometry, so:
+            // - expanding by 1/2 LineWidth is OK for rounded
+            // - expanding by more (like sqrt(2) * 0.5 * LineWidth) immediately extends the size
+            //   of e.g. geometry converted to PNG, plus many similar cases that cannot be thought
+            //   of in advance.
+            // This means that converting those thought-experiment examples in (4) will and do lead
+            // to bigger e.g. Bitmap conversion(s), not avoiding but painting the free space. That
+            // could only be done by correctly and fully decomposing the geometry, including
+            // stroke, and accepting the cost...
             bUseDecomposition = true;
         }
 
@@ -336,44 +361,108 @@ PolygonStrokePrimitive2D::getB2DRange(const geometry::ViewInformation2D& rViewIn
         {
             // get correct range by using the decomposition fallback, reasons see above cases
 
-            // ofz#947 to optimize calculating the range, turn any slow dashes into a solid line
-            // when just calculating bounds
-            attribute::StrokeAttribute aOrigStrokeAttribute = maStrokeAttribute;
-            const_cast<PolygonStrokePrimitive2D*>(this)->maStrokeAttribute
-                = attribute::StrokeAttribute();
-            aRetval = BufferedDecompositionPrimitive2D::getB2DRange(rViewInformation);
-            const_cast<PolygonStrokePrimitive2D*>(this)->maStrokeAttribute = aOrigStrokeAttribute;
+            // It is not a good idea to temporarily (re)set the PolygonStrokePrimitive2D
+            // to default. While it is understandable to use the speed advantage, it is
+            // bad for quite some reasons:
+            //
+            // (1) As described in include/drawinglayer/primitive2d/baseprimitive2d.hxx
+            //     a Primitive is "noncopyable to make clear that a primitive is a read-only
+            //     instance and copying or changing values is not intended". This is the base
+            //     assumption for many decisions for Primitive handling.
+            // (2) For example, that the decomposition is *always* re-usable. It cannot change
+            //     and is correct when it already exists since the values the decomposition is
+            //     based on cannot change.
+            // (3) If this *is* done (like it was here) and the Primitive is derived from
+            //     BufferedDecompositionPrimitive2D and thus buffers it's decomposition,
+            //     the risk is that in this case the *wrong* decomposition will be used by
+            //     other PrimitiveProcessors. Maybe not by the VclPixelProcessor2D/VclProcessor2D
+            //     since it handles this primitive directly - not even sure for all cases.
+            //     Sooner or later another PrimitiveProcessor will re-use this wrong temporary
+            //     decomposition, and as an error, a non-stroked line will be painted/used.
+            // (4) The B2DRange is not strictly defined as minimal bound for the geometry,
+            //     but it should be as small/tight as possible. Making it larger risks more
+            //     area to be invalidated (repaint) and processed (all geometric stuff,l may
+            //     include future and existing exports to other formats which are or will be
+            //     implemented as PrimitiveProcessor). It is easy to imagine cases with much
+            //     too large B2DRange - a line with a pattern that would solve to a single
+            //     small start-rectangle and rest is empty, or a circle with a stroke that
+            //     makes only a quarter of it visible.
+            //
+            // The reason to do this is speed, what is a good argument. But speed should
+            // only be used if the pair of [correctness/speed] does not sacrifice the correctness
+            // over the speed.
+            // Luckily there are alternatives to solve this and to keep [correctness/speed]
+            // valid:
+            //
+            // (a) Reset the temporary decomposition after having const-casted and
+            //     changed maStrokeAttribute.
+            //     Disadvantage: More const-cast hacks, plus this temporary decomposition
+            //     will be potentially done repeatedly (every time
+            //     PolygonStrokePrimitive2D::getB2DRange is called)
+            // (b) Use a temporary, local PolygonStrokePrimitive2D here, with neutral
+            //     PolygonStrokePrimitive2D and call ::getB2DRange() at it. That way
+            //     the buffered decomposition will not be harmed.
+            //     Disadvantage: Same as (a), decomposition will be potentially done repeatedly
+            // (c) Use a temporary, local PolygonStrokePrimitive2D and buffer B2DRange
+            //     locally for this Primitive. Due to (1)/(2) this cannot change, so
+            //     when calculated once it is totally legal to use it.
+            //
+            // Thus here I would use (c): It accepts the disadvantages of (4) over speed, but
+            // avoids the errors/problems from (1-4).
+            // Additional argument for this: The hairline case below *also* uses the full
+            // B2DRange of the polygon, ignoring an evtl. stroke, so (4) applies
+            if (!getStrokeAttribute().isDefault())
+            {
+                // only do this if StrokeAttribute is used, else recursion may happen (!)
+                const rtl::Reference<primitive2d::PolygonStrokePrimitive2D>
+                    aTemporaryPrimitiveWithoutStroke(new primitive2d::PolygonStrokePrimitive2D(
+                        getB2DPolygon(), getLineAttribute()));
+                maBufferedRange
+                    = aTemporaryPrimitiveWithoutStroke
+                          ->BufferedDecompositionPrimitive2D::getB2DRange(rViewInformation);
+            }
+            else
+            {
+                // fallback to normal decompose, that result can be used for visualization
+                // later, too. Still buffer B2DRange in maBufferedRange, so it needs to be
+                // merged into one B2DRange only once
+                maBufferedRange = BufferedDecompositionPrimitive2D::getB2DRange(rViewInformation);
+            }
         }
         else
         {
             // for all other B2DLINEJOIN_* get the range from the base geometry
-            // and expand by half the line width
-            aRetval = getB2DPolygon().getB2DRange();
-            aRetval.grow(getLineAttribute().getWidth() * 0.5);
+            // and expand by half the line width.
+            maBufferedRange = getB2DPolygon().getB2DRange();
+            maBufferedRange.grow(getLineAttribute().getWidth() * 0.5);
         }
+
+        return maBufferedRange;
     }
-    else
+
+    // It is a hairline, thus the line width is view-dependent. Get range of polygon
+    // as base size.
+    // CAUTION: Since a hairline *is* view-dependent,
+    // - either use maBufferedRange, additionally remember view-dependent
+    //   factor & reset if that changes
+    // - or do not buffer for hairline -> not really needed, the range is buffered
+    //   in the B2DPolygon, no decomposition is needed and a simple grow is cheap
+    basegfx::B2DRange aHairlineRange = getB2DPolygon().getB2DRange();
+
+    if (!aHairlineRange.isEmpty())
     {
-        // this is a hairline, thus the line width is view-dependent. Get range of polygon
-        // as base size
-        aRetval = getB2DPolygon().getB2DRange();
+        // Calculate view-dependent hairline width
+        const basegfx::B2DVector aDiscreteSize(
+            rViewInformation.getInverseObjectToViewTransformation() * basegfx::B2DVector(1.0, 0.0));
+        const double fDiscreteHalfLineWidth(aDiscreteSize.getLength() * 0.5);
 
-        if (!aRetval.isEmpty())
+        if (basegfx::fTools::more(fDiscreteHalfLineWidth, 0.0))
         {
-            // Calculate view-dependent hairline width
-            const basegfx::B2DVector aDiscreteSize(
-                rViewInformation.getInverseObjectToViewTransformation()
-                * basegfx::B2DVector(1.0, 0.0));
-            const double fDiscreteHalfLineWidth(aDiscreteSize.getLength() * 0.5);
-
-            if (basegfx::fTools::more(fDiscreteHalfLineWidth, 0.0))
-            {
-                aRetval.grow(fDiscreteHalfLineWidth);
-            }
+            aHairlineRange.grow(fDiscreteHalfLineWidth);
         }
     }
 
-    return aRetval;
+    return aHairlineRange;
 }
 
 // provide unique ID
@@ -394,10 +483,10 @@ void PolygonWavePrimitive2D::create2DDecomposition(
     if (bHasWidth && bHasHeight)
     {
         // create waveline curve
-        const basegfx::B2DPolygon aWaveline(
+        basegfx::B2DPolygon aWaveline(
             basegfx::utils::createWaveline(getB2DPolygon(), getWaveWidth(), getWaveHeight()));
-        rContainer.push_back(
-            new PolygonStrokePrimitive2D(aWaveline, getLineAttribute(), getStrokeAttribute()));
+        rContainer.push_back(new PolygonStrokePrimitive2D(std::move(aWaveline), getLineAttribute(),
+                                                          getStrokeAttribute()));
     }
     else
     {
@@ -536,19 +625,19 @@ void PolygonStrokeArrowPrimitive2D::create2DDecomposition(
     }
 
     // add shaft
-    rContainer.push_back(
-        new PolygonStrokePrimitive2D(aLocalPolygon, getLineAttribute(), getStrokeAttribute()));
+    rContainer.push_back(new PolygonStrokePrimitive2D(std::move(aLocalPolygon), getLineAttribute(),
+                                                      getStrokeAttribute()));
 
     if (aArrowA.count())
     {
         rContainer.push_back(
-            new PolyPolygonColorPrimitive2D(aArrowA, getLineAttribute().getColor()));
+            new PolyPolygonColorPrimitive2D(std::move(aArrowA), getLineAttribute().getColor()));
     }
 
     if (aArrowB.count())
     {
         rContainer.push_back(
-            new PolyPolygonColorPrimitive2D(aArrowB, getLineAttribute().getColor()));
+            new PolyPolygonColorPrimitive2D(std::move(aArrowB), getLineAttribute().getColor()));
     }
 }
 

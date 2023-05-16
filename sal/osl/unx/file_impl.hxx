@@ -23,19 +23,17 @@
 #include <osl/file.h>
 #include <stddef.h>
 #include <sys/types.h>
+#include <rtl/string.hxx>
 
 struct DirectoryItem_Impl
 {
-    rtl_String *  m_strFilePath;       /* holds native file name */
+    OString       m_strFilePath;       /* holds native file name */
     sal_Int32     m_RefCount;
     unsigned char m_DType;
 
     explicit DirectoryItem_Impl(
-        rtl_String * strFilePath, unsigned char DType = 0);
+        OString strFilePath, unsigned char DType = 0);
     ~DirectoryItem_Impl();
-
-    static void * operator new(size_t n);
-    static void operator delete (void * p);
 
     void acquire(); /* @see osl_acquireDirectoryItem() */
     void release(); /* @see osl_releaseDirectoryItem() */
@@ -48,7 +46,7 @@ oslFileError openFile(
     mode_t mode);
 
 oslFileError openFilePath(
-    const char *cpFilePath,
+    const OString& filePath,
     oslFileHandle* pHandle,
     sal_uInt32 uFlags, mode_t mode );
 

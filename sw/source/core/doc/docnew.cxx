@@ -19,7 +19,6 @@
 
 #include <sal/config.h>
 
-#include <mutex>
 #include <string_view>
 
 #include <config_features.h>
@@ -32,7 +31,6 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/text/XFlatParagraphIteratorProvider.hpp>
 #include <com/sun/star/linguistic2/XProofreadingIterator.hpp>
-#include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/i18n/ScriptType.hpp>
 
 #include <comphelper/processfactory.hxx>
@@ -46,7 +44,6 @@
 #include <editeng/ulspitem.hxx>
 #include <editeng/lrspitem.hxx>
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <unotools/lingucfg.hxx>
 #include <svx/svdpage.hxx>
 #include <fmtcntnt.hxx>
@@ -196,7 +193,7 @@ static void lcl_DelFormatIndices( SwFormat const * pFormat )
     if ( rFormatContent.GetContentIdx() )
         rFormatContent.SetNewContentIdx( nullptr );
     SwFormatAnchor &rFormatAnchor = const_cast<SwFormatAnchor&>(pFormat->GetAnchor());
-    if ( rFormatAnchor.GetContentAnchor() )
+    if ( rFormatAnchor.GetAnchorNode() )
         rFormatAnchor.SetAnchor( nullptr );
 }
 
@@ -333,9 +330,9 @@ SwDoc::SwDoc()
     mpOutlineRule->SetCountPhantoms( !GetDocumentSettingManager().get(DocumentSettingId::OLD_NUMBERING) );
 
     new SwTextNode(
-            SwNodeIndex(GetUndoManager().GetUndoNodes().GetEndOfContent()),
+            GetUndoManager().GetUndoNodes().GetEndOfContent(),
             mpDfltTextFormatColl.get() );
-    new SwTextNode( SwNodeIndex( GetNodes().GetEndOfContent() ),
+    new SwTextNode( GetNodes().GetEndOfContent(),
                     getIDocumentStylePoolAccess().GetTextCollFromPool( RES_POOLCOLL_STANDARD ));
 
     maOLEModifiedIdle.SetPriority( TaskPriority::LOWEST );
@@ -401,6 +398,8 @@ SwDoc::SwDoc()
  */
 SwDoc::~SwDoc()
 {
+    mxVbaFind.clear();
+
     // nothing here should create Undo actions!
     GetIDocumentUndoRedo().DoUndo(false);
 
@@ -453,9 +452,9 @@ SwDoc::~SwDoc()
 
     // The ChapterNumbers/Numbers need to be deleted before the styles
     // or we update all the time!
-    m_pNodes->m_pOutlineNodes->clear();
+    m_pNodes->m_aOutlineNodes.clear();
     SwNodes & rUndoNodes( GetUndoManager().GetUndoNodes() );
-    rUndoNodes.m_pOutlineNodes->clear();
+    rUndoNodes.m_aOutlineNodes.clear();
 
     mpFootnoteIdxs->clear();
 
@@ -471,7 +470,10 @@ SwDoc::~SwDoc()
         SwPaM* pTmp = mpExtInputRing;
         mpExtInputRing = nullptr;
         while( pTmp->GetNext() != pTmp )
+        {
+            // coverity[deref_arg] - the SwPaM delete moves a new entry into GetNext()
             delete pTmp->GetNext();
+        }
         delete pTmp;
     }
 
@@ -682,15 +684,15 @@ void SwDoc::ClearDoc()
 
     SwNodeIndex aSttIdx( *GetNodes().GetEndOfContent().StartOfSectionNode(), 1 );
     // create the first one over and over again (without attributes/style etc.
-    SwTextNode* pFirstNd = GetNodes().MakeTextNode( aSttIdx, mpDfltTextFormatColl.get() );
+    SwTextNode* pFirstNd = GetNodes().MakeTextNode( aSttIdx.GetNode(), mpDfltTextFormatColl.get() );
 
     if( getIDocumentLayoutAccess().GetCurrentViewShell() )
     {
         // set the layout to the dummy pagedesc
         pFirstNd->SetAttr( SwFormatPageDesc( pDummyPgDsc ));
 
-        SwPosition aPos( *pFirstNd, SwIndex( pFirstNd ));
-        SwPaM const tmpPaM(aSttIdx, SwNodeIndex(GetNodes().GetEndOfContent()));
+        SwPosition aPos( *pFirstNd );
+        SwPaM const tmpPaM(aSttIdx.GetNode(), GetNodes().GetEndOfContent());
         ::PaMCorrAbs(tmpPaM, aPos);
     }
 
@@ -1116,7 +1118,7 @@ SwNodeIndex SwDoc::AppendDoc(const SwDoc& rSource, sal_uInt16 const nStartPageNu
                 // Collect the marks starting or ending at this text node.
                 o3tl::sorted_vector<sw::mark::IMark*> aSeenMarks;
                 IDocumentMarkAccess* pMarkAccess = getIDocumentMarkAccess();
-                for (const SwIndex* pIndex = pTextNode->GetFirstIndex(); pIndex; pIndex = pIndex->GetNext())
+                for (const SwContentIndex* pIndex = pTextNode->GetFirstIndex(); pIndex; pIndex = pIndex->GetNext())
                 {
                     sw::mark::IMark* pMark = const_cast<sw::mark::IMark*>(pIndex->GetMark());
                     if (!pMark)
@@ -1133,7 +1135,7 @@ SwNodeIndex SwDoc::AppendDoc(const SwDoc& rSource, sal_uInt16 const nStartPageNu
             if ( !bDeletePrevious )
             {
                 SAL_INFO( "sw.pageframe", "(Flush pagebreak AKA EndAllAction" );
-                assert(pTargetShell->GetCursor()->GetPoint()->nNode.GetNode().GetTextNode()->GetSwAttrSet().HasItem(RES_PAGEDESC));
+                assert(pTargetShell->GetCursor()->GetPoint()->GetNode().GetTextNode()->GetSwAttrSet().HasItem(RES_PAGEDESC));
                 pTargetShell->EndAllAction();
                 SAL_INFO( "sw.pageframe",  "Flush changes AKA EndAllAction)" );
                 pTargetShell->StartAllAction();
@@ -1148,15 +1150,14 @@ SwNodeIndex SwDoc::AppendDoc(const SwDoc& rSource, sal_uInt16 const nStartPageNu
     SwNodeIndex aFixupIdx( GetNodes().GetEndOfContent(), -1 );
 
     // append at the end of document / content
-    SwNodeIndex aTargetIdx( GetNodes().GetEndOfContent() );
-    SwPaM aInsertPam( aTargetIdx );
+    SwPaM aInsertPam( GetNodes().GetEndOfContent() );
 
 #ifdef DBG_UTIL
-    SAL_INFO( "sw.docappend", "Pam-Nd: " << aCpyPam.GetNode().GetIndex() - aCpyPam.GetNode( false ).GetIndex() + 1
-                              << " (0x" << std::hex << static_cast<int>(aCpyPam.GetNode( false ).GetNodeType()) << std::dec
-                              << " " << aCpyPam.GetNode( false ).GetIndex()
-                              << " - 0x" << std::hex << static_cast<int>(aCpyPam.GetNode().GetNodeType()) << std::dec
-                              << " " << aCpyPam.GetNode().GetIndex() << ")" );
+    SAL_INFO( "sw.docappend", "Pam-Nd: " << aCpyPam.GetPointNode().GetIndex() - aCpyPam.GetMarkNode().GetIndex() + 1
+                              << " (0x" << std::hex << static_cast<int>(aCpyPam.GetMarkNode().GetNodeType()) << std::dec
+                              << " " << aCpyPam.GetMarkNode().GetIndex()
+                              << " - 0x" << std::hex << static_cast<int>(aCpyPam.GetPointNode().GetNodeType()) << std::dec
+                              << " " << aCpyPam.GetPointNode().GetIndex() << ")" );
 #endif
 
     GetIDocumentUndoRedo().StartUndo( SwUndoId::INSGLOSSARY, nullptr );
@@ -1174,7 +1175,7 @@ SwNodeIndex SwDoc::AppendDoc(const SwDoc& rSource, sal_uInt16 const nStartPageNu
         SwPosition& rInsPos = *aInsertPam.GetPoint();
 
         {
-            SwNodeIndex aIndexBefore(rInsPos.nNode);
+            SwNodeIndex aIndexBefore(rInsPos.GetNode());
 
             aIndexBefore--;
 #ifdef DBG_UTIL
@@ -1187,16 +1188,15 @@ SwNodeIndex SwDoc::AppendDoc(const SwDoc& rSource, sal_uInt16 const nStartPageNu
 #endif
 
             ++aIndexBefore;
-            SwPaM aPaM(SwPosition(aIndexBefore),
-                       SwPosition(rInsPos.nNode));
+            SwPaM aPaM(aIndexBefore.GetNode(), rInsPos.GetNode());
 
             aPaM.GetDoc().MakeUniqueNumRules(aPaM);
 
             // Update the rsid of each pasted text node
             SwNodes &rDestNodes = GetNodes();
-            SwNodeOffset const nEndIdx = aPaM.End()->nNode.GetIndex();
+            SwNodeOffset const nEndIdx = aPaM.End()->GetNodeIndex();
 
-            for (SwNodeOffset nIdx = aPaM.Start()->nNode.GetIndex();
+            for (SwNodeOffset nIdx = aPaM.Start()->GetNodeIndex();
                     nIdx <= nEndIdx; ++nIdx)
             {
                 SwTextNode *const pTextNode = rDestNodes[nIdx]->GetTextNode();

@@ -17,18 +17,12 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_DBACCESS_SOURCE_INC_APITOOLS_HXX
-#define INCLUDED_DBACCESS_SOURCE_INC_APITOOLS_HXX
+#pragma once
 
 #include <sal/config.h>
 
-#include <com/sun/star/beans/PropertyAttribute.hpp>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <cppuhelper/component.hxx>
 #include <osl/mutex.hxx>
-#include <osl/diagnose.h>
-#include <comphelper/sequence.hxx>
-#include <strings.hxx>
 
 // OSubComponent - a component which holds a hard ref to its parent
 //                 and is been hold itself (by the parent) with a weak ref
@@ -54,7 +48,5 @@ public:
         { return static_cast<css::uno::XWeak *>(const_cast<OSubComponent *>(this)); }
 
 };
-
-#endif // INCLUDED_DBACCESS_SOURCE_INC_APITOOLS_HXX
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

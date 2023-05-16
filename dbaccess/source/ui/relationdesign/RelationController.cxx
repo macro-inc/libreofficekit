@@ -44,7 +44,7 @@
 #include <RTableConnectionData.hxx>
 #include <RelationTableView.hxx>
 #include <RelationDesignView.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/thread.hxx>
 #include <osl/mutex.hxx>
 
@@ -138,7 +138,7 @@ void ORelationController::Execute(sal_uInt16 _nId, const Sequence< PropertyValue
                         {
                             ::comphelper::NamedValueCollection aWindowsData;
                             saveTableWindows( aWindowsData );
-                            getDataSource()->setPropertyValue( PROPERTY_LAYOUTINFORMATION, makeAny( aWindowsData.getPropertyValues() ) );
+                            getDataSource()->setPropertyValue( PROPERTY_LAYOUTINFORMATION, Any( aWindowsData.getPropertyValues() ) );
                             setModified(false);
                         }
                     }

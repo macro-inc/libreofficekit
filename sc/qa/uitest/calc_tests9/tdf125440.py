@@ -1,8 +1,11 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
 
 from uitest.framework import UITestCase
 from libreoffice.uno.propertyvalue import mkPropertyValues
@@ -14,7 +17,7 @@ class Tdf1254400(UITestCase):
    def test_tdf125440(self):
         # In order to simulate copy&paste from external source,
         # import the text in Writer, copy it and paste it in Calc
-        with self.ui_test.load_file(get_url_for_data_file("tdf125440.odt")) as writer_doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf125440.odt")):
 
             self.xUITest.executeCommand(".uno:SelectAll")
             self.xUITest.executeCommand(".uno:Copy")
@@ -35,3 +38,4 @@ class Tdf1254400(UITestCase):
             self.assertEqual("", get_cell_by_position(calc_document, 0, 2, 0).getString())
             self.assertEqual("50", get_cell_by_position(calc_document, 0, 3, 0).getString())
 
+# vim: set shiftwidth=4 softtabstop=4 expandtab:

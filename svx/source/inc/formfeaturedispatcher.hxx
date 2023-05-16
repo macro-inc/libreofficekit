@@ -24,7 +24,7 @@
 #include <com/sun/star/form/runtime/XFormOperations.hpp>
 
 #include <cppuhelper/implbase.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 
 
 namespace svx
@@ -52,7 +52,7 @@ namespace svx
             @see dispose
         */
         OSingleFeatureDispatcher(
-            const css::util::URL& _rFeatureURL,
+            css::util::URL _aFeatureURL,
             const sal_Int16 _nFormFeature,
             const css::uno::Reference< css::form::runtime::XFormOperations >& _rxFormOperations,
             ::osl::Mutex& _rMutex
@@ -92,7 +92,7 @@ namespace svx
         void    getUnoState( css::frame::FeatureStateEvent& /* [out] */ _rState ) const;
 
         ::osl::Mutex&                       m_rMutex;
-        ::comphelper::OInterfaceContainerHelper2   m_aStatusListeners;
+        ::comphelper::OInterfaceContainerHelper3<css::frame::XStatusListener>  m_aStatusListeners;
         css::uno::Reference< css::form::runtime::XFormOperations >
                                             m_xFormOperations;
         const css::util::URL                m_aFeatureURL;

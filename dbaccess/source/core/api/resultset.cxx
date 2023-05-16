@@ -20,14 +20,15 @@
 #include "resultset.hxx"
 #include <sal/log.hxx>
 #include <stringconstants.hxx>
-#include <apitools.hxx>
+#include <strings.hxx>
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/sdbc/ResultSetType.hpp>
 #include <com/sun/star/sdbc/SQLException.hpp>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/queryinterface.hxx>
 #include <cppuhelper/typeprovider.hxx>
 #include <comphelper/types.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include "datacolumn.hxx"
 #include <connectivity/dbexception.hxx>
 #include <connectivity/dbtools.hxx>
@@ -185,17 +186,17 @@ Reference< XPropertySetInfo > OResultSet::getPropertySetInfo()
 // comphelper::OPropertyArrayUsageHelper
 ::cppu::IPropertyArrayHelper* OResultSet::createArrayHelper( ) const
 {
-    css::uno::Sequence< css::beans::Property> aDescriptor(6);
-    css::beans::Property* pDesc = aDescriptor.getArray();
-    sal_Int32 nPos = 0;
-    pDesc[nPos++] = css::beans::Property(PROPERTY_CURSORNAME, PROPERTY_ID_CURSORNAME, cppu::UnoType<OUString>::get(), css::beans::PropertyAttribute::READONLY);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_FETCHDIRECTION, PROPERTY_ID_FETCHDIRECTION, cppu::UnoType<sal_Int32>::get(), 0);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_FETCHSIZE, PROPERTY_ID_FETCHSIZE, cppu::UnoType<sal_Int32>::get(), 0);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_ISBOOKMARKABLE, PROPERTY_ID_ISBOOKMARKABLE, cppu::UnoType<bool>::get(), css::beans::PropertyAttribute::READONLY);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_RESULTSETCONCURRENCY, PROPERTY_ID_RESULTSETCONCURRENCY, cppu::UnoType<sal_Int32>::get(), css::beans::PropertyAttribute::READONLY);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_RESULTSETTYPE, PROPERTY_ID_RESULTSETTYPE, cppu::UnoType<sal_Int32>::get(), css::beans::PropertyAttribute::READONLY);
-    OSL_ENSURE(nPos == aDescriptor.getLength(), "forgot to adjust the count ?");
-    return new ::cppu::OPropertyArrayHelper(aDescriptor);
+    return new ::cppu::OPropertyArrayHelper
+    {
+        {
+            { PROPERTY_CURSORNAME, PROPERTY_ID_CURSORNAME, cppu::UnoType<OUString>::get(), css::beans::PropertyAttribute::READONLY },
+            { PROPERTY_FETCHDIRECTION, PROPERTY_ID_FETCHDIRECTION, cppu::UnoType<sal_Int32>::get(), 0 },
+            { PROPERTY_FETCHSIZE, PROPERTY_ID_FETCHSIZE, cppu::UnoType<sal_Int32>::get(), 0 },
+            { PROPERTY_ISBOOKMARKABLE, PROPERTY_ID_ISBOOKMARKABLE, cppu::UnoType<bool>::get(), css::beans::PropertyAttribute::READONLY },
+            { PROPERTY_RESULTSETCONCURRENCY, PROPERTY_ID_RESULTSETCONCURRENCY, cppu::UnoType<sal_Int32>::get(), css::beans::PropertyAttribute::READONLY },
+            { PROPERTY_RESULTSETTYPE, PROPERTY_ID_RESULTSETTYPE, cppu::UnoType<sal_Int32>::get(), css::beans::PropertyAttribute::READONLY }
+        }
+    };
 }
 
 // cppu::OPropertySetHelper

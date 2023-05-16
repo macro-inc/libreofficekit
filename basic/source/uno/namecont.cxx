@@ -25,11 +25,14 @@
 #include <com/sun/star/embed/ElementModes.hpp>
 #include <com/sun/star/embed/XTransactedObject.hpp>
 #include <com/sun/star/io/IOException.hpp>
+#include <com/sun/star/lang/NoSupportException.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/ucb/ContentCreationException.hpp>
 #include <com/sun/star/xml/sax/SAXException.hpp>
+#include <utility>
 #include <vcl/svapp.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/mutex.hxx>
 #include <vcl/errinf.hxx>
 #include <rtl/ustring.hxx>
@@ -41,7 +44,7 @@
 
 #include <namecont.hxx>
 #include <basic/basicmanagerrepository.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <unotools/pathoptions.hxx>
 #include <svtools/sfxecode.hxx>
@@ -287,7 +290,7 @@ void SAL_CALL NameContainer::addContainerListener( const Reference< XContainerLi
     {
         throw RuntimeException("addContainerListener called with null xListener",static_cast< cppu::OWeakObject * >(this));
     }
-    maContainerListeners.addInterface( Reference<XInterface>(xListener, UNO_QUERY) );
+    maContainerListeners.addInterface( xListener );
 }
 
 void SAL_CALL NameContainer::removeContainerListener( const Reference< XContainerListener >& xListener )
@@ -296,7 +299,7 @@ void SAL_CALL NameContainer::removeContainerListener( const Reference< XContaine
     {
         throw RuntimeException("removeContainerListener called with null xListener",static_cast< cppu::OWeakObject * >(this));
     }
-    maContainerListeners.removeInterface( Reference<XInterface>(xListener, UNO_QUERY) );
+    maContainerListeners.removeInterface( xListener );
 }
 
 // Methods XChangesNotifier
@@ -306,7 +309,7 @@ void SAL_CALL NameContainer::addChangesListener( const Reference< XChangesListen
     {
         throw RuntimeException("addChangesListener called with null xListener",static_cast< cppu::OWeakObject * >(this));
     }
-    maChangesListeners.addInterface( Reference<XInterface>(xListener, UNO_QUERY) );
+    maChangesListeners.addInterface( xListener );
 }
 
 void SAL_CALL NameContainer::removeChangesListener( const Reference< XChangesListener >& xListener )
@@ -315,7 +318,7 @@ void SAL_CALL NameContainer::removeChangesListener( const Reference< XChangesLis
     {
         throw RuntimeException("removeChangesListener called with null xListener",static_cast< cppu::OWeakObject * >(this));
     }
-    maChangesListeners.removeInterface( Reference<XInterface>(xListener, UNO_QUERY) );
+    maChangesListeners.removeInterface( xListener );
 }
 
 
@@ -338,23 +341,13 @@ void ModifiableHelper::setModified( bool _bModified )
 }
 
 
-VBAScriptListenerContainer::VBAScriptListenerContainer( ::osl::Mutex& rMutex ) :
-    VBAScriptListenerContainer_BASE( rMutex )
-{
-}
-
-bool VBAScriptListenerContainer::implTypedNotify( const Reference< vba::XVBAScriptListener >& rxListener, const vba::VBAScriptEvent& rEvent )
-{
-    rxListener->notifyVBAScriptEvent( rEvent );
-    return true;    // notify all other listeners too
-}
-
 // Ctor
 SfxLibraryContainer::SfxLibraryContainer()
     : SfxLibraryContainer_BASE( m_aMutex )
     , maVBAScriptListeners( m_aMutex )
     , mnRunningVBAScripts( 0 )
     , mbVBACompat( false )
+    , meVBATextEncoding( RTL_TEXTENCODING_DONTKNOW )
     , maModifiable( *this, m_aMutex )
     , maNameContainer( new NameContainer(cppu::UnoType<XNameAccess>::get()) )
     , mbOldInfoFormat( false )
@@ -596,10 +589,10 @@ void SfxLibraryContainer::init_Impl( const OUString& rInitialDocumentURL,
     uno::Reference< embed::XStorage > xStorage = rxInitialStorage;
 
     maInitialDocumentURL = rInitialDocumentURL;
-    maInfoFileName = OUString::createFromAscii( getInfoFileName() );
-    maOldInfoFileName = OUString::createFromAscii( getOldInfoFileName() );
-    maLibElementFileExtension = OUString::createFromAscii( getLibElementFileExtension() );
-    maLibrariesDir = OUString::createFromAscii( getLibrariesDir() );
+    maInfoFileName = getInfoFileName();
+    maOldInfoFileName = getOldInfoFileName();
+    maLibElementFileExtension = getLibElementFileExtension();
+    maLibrariesDir = getLibrariesDir();
 
     meInitMode = DEFAULT;
     INetURLObject aInitUrlInetObj( maInitialDocumentURL );
@@ -656,8 +649,6 @@ void SfxLibraryContainer::init_Impl( const OUString& rInitialDocumentURL,
         // Default paths
         maLibraryPath = SvtPathOptions().GetBasicPath();
     }
-
-    Reference< XParser > xParser = xml::sax::Parser::create(mxContext);
 
     uno::Reference< io::XInputStream > xInput;
 
@@ -742,11 +733,11 @@ void SfxLibraryContainer::init_Impl( const OUString& rInitialDocumentURL,
             {
                 if( nPass == 1 )
                 {
-                    pLibInfoInetObj.reset(new INetURLObject( maLibraryPath.getToken(0, ';') ));
+                    pLibInfoInetObj.reset(new INetURLObject( o3tl::getToken(maLibraryPath, 0, ';') ));
                 }
                 else
                 {
-                    pLibInfoInetObj.reset(new INetURLObject( maLibraryPath.getToken(1, ';') ));
+                    pLibInfoInetObj.reset(new INetURLObject( o3tl::getToken(maLibraryPath, 1, ';') ));
                 }
                 pLibInfoInetObj->insertName( maInfoFileName, false, INetURLObject::LAST_SEGMENT, INetURLObject::EncodeMechanism::All );
                 pLibInfoInetObj->setExtension( u"xlc" );
@@ -766,7 +757,7 @@ void SfxLibraryContainer::init_Impl( const OUString& rInitialDocumentURL,
             // Old variant?
             if( !xInput.is() && nPass == 0 )
             {
-                INetURLObject aLibInfoInetObj( maLibraryPath.getToken(1, ';') );
+                INetURLObject aLibInfoInetObj( o3tl::getToken(maLibraryPath, 1, ';') );
                 aLibInfoInetObj.insertName( maOldInfoFileName, false, INetURLObject::LAST_SEGMENT, INetURLObject::EncodeMechanism::All );
                 aLibInfoInetObj.setExtension( u"xli" );
                 aFileName = aLibInfoInetObj.GetMainURL( INetURLObject::DecodeMechanism::NONE );
@@ -792,6 +783,7 @@ void SfxLibraryContainer::init_Impl( const OUString& rInitialDocumentURL,
             // start parsing
             auto pLibArray = std::make_unique<::xmlscript::LibDescriptorArray> ( );
 
+            Reference< XParser > xParser = xml::sax::Parser::create(mxContext);
             try
             {
                 xParser->setDocumentHandler( ::xmlscript::importLibraryContainer( pLibArray.get() ) );
@@ -839,7 +831,7 @@ void SfxLibraryContainer::init_Impl( const OUString& rInitialDocumentURL,
                     else if( rLib.bLink )
                     {
                         // Check "share" path
-                        INetURLObject aShareInetObj( maLibraryPath.getToken(0, ';') );
+                        INetURLObject aShareInetObj( o3tl::getToken(maLibraryPath, 0, ';') );
                         aShareInetObj.insertName( rLib.aName, true, INetURLObject::LAST_SEGMENT,
                                                   INetURLObject::EncodeMechanism::All );
                         OUString aShareLibDirPath = aShareInetObj.GetMainURL( INetURLObject::DecodeMechanism::NONE );
@@ -981,7 +973,11 @@ void SfxLibraryContainer::init_Impl( const OUString& rInitialDocumentURL,
     if( meInitMode != DEFAULT )
         return;
 
-    INetURLObject aUserBasicInetObj( maLibraryPath.getToken(1, ';') );
+    // tdf#121740 speed up loading documents with lots of embedded documents by avoid the UCB work of updating non-existent VBA libraries
+    if (rInitialDocumentURL.isEmpty())
+        return;
+
+    INetURLObject aUserBasicInetObj( o3tl::getToken(maLibraryPath, 1, ';') );
     OUString aStandardStr("Standard");
 
     INetURLObject aPrevUserBasicInetObj_1( aUserBasicInetObj );
@@ -1329,7 +1325,7 @@ OUString SfxLibraryContainer::createAppLibraryFolder( SfxLibrary* pLib, std::u16
     OUString aLibDirPath = pLib->maStorageURL;
     if( aLibDirPath.isEmpty() )
     {
-        INetURLObject aInetObj( maLibraryPath.getToken(1, ';') );
+        INetURLObject aInetObj( o3tl::getToken(maLibraryPath, 1, ';') );
         aInetObj.insertName( aName, true, INetURLObject::LAST_SEGMENT, INetURLObject::EncodeMechanism::All );
         checkStorageURL( aInetObj.GetMainURL( INetURLObject::DecodeMechanism::NONE ), pLib->maLibInfoFileURL,
                          pLib->maStorageURL, pLib->maUnexpandedStorageURL );
@@ -1356,14 +1352,14 @@ void SfxLibraryContainer::implStoreLibrary( SfxLibrary* pLib,
 {
     Reference< XSimpleFileAccess3 > xDummySFA;
     Reference< XInteractionHandler > xDummyHandler;
-    implStoreLibrary( pLib, aName, xStorage, OUString(), xDummySFA, xDummyHandler );
+    implStoreLibrary( pLib, aName, xStorage, u"", xDummySFA, xDummyHandler );
 }
 
 // New variant for library export
 void SfxLibraryContainer::implStoreLibrary( SfxLibrary* pLib,
                                             std::u16string_view aName,
                                             const uno::Reference< embed::XStorage >& xStorage,
-                                            const OUString& aTargetURL,
+                                            std::u16string_view aTargetURL,
                                             const Reference< XSimpleFileAccess3 >& rToUseSFI,
                                             const Reference< XInteractionHandler >& xHandler )
 {
@@ -1424,7 +1420,7 @@ void SfxLibraryContainer::implStoreLibrary( SfxLibrary* pLib,
     else
     {
         // Export?
-        bool bExport = !aTargetURL.isEmpty();
+        bool bExport = !aTargetURL.empty();
         try
         {
             Reference< XSimpleFileAccess3 > xSFI = mxSFI;
@@ -1508,14 +1504,14 @@ void SfxLibraryContainer::implStoreLibraryIndexFile( SfxLibrary* pLib,
                                                      const uno::Reference< embed::XStorage >& xStorage )
 {
     Reference< XSimpleFileAccess3 > xDummySFA;
-    implStoreLibraryIndexFile( pLib, rLib, xStorage, OUString(), xDummySFA );
+    implStoreLibraryIndexFile( pLib, rLib, xStorage, u"", xDummySFA );
 }
 
 // New variant for library export
 void SfxLibraryContainer::implStoreLibraryIndexFile( SfxLibrary* pLib,
                                                      const ::xmlscript::LibDescriptor& rLib,
                                                      const uno::Reference< embed::XStorage >& xStorage,
-                                                     const OUString& aTargetURL,
+                                                     std::u16string_view aTargetURL,
                                                      const Reference< XSimpleFileAccess3 >& rToUseSFI )
 {
     // Create sax writer
@@ -1557,7 +1553,7 @@ void SfxLibraryContainer::implStoreLibraryIndexFile( SfxLibrary* pLib,
     else
     {
         // Export?
-        bool bExport = !aTargetURL.isEmpty();
+        bool bExport = !aTargetURL.empty();
         Reference< XSimpleFileAccess3 > xSFI = mxSFI;
         if( rToUseSFI.is() )
         {
@@ -2062,7 +2058,7 @@ void SfxLibraryContainer::storeLibraries_Impl( const uno::Reference< embed::XSto
     else
     {
         // Create Output stream
-        INetURLObject aLibInfoInetObj( maLibraryPath.getToken(1, ';') );
+        INetURLObject aLibInfoInetObj( o3tl::getToken(maLibraryPath, 1, ';') );
         aLibInfoInetObj.insertName( maInfoFileName, false, INetURLObject::LAST_SEGMENT, INetURLObject::EncodeMechanism::All );
         aLibInfoInetObj.setExtension( u"xlc" );
         OUString aLibInfoPath( aLibInfoInetObj.GetMainURL( INetURLObject::DecodeMechanism::NONE ) );
@@ -2253,7 +2249,7 @@ void SAL_CALL SfxLibraryContainer::removeLibrary( const OUString& Name )
     catch(const Exception& ) {}
 
     // Delete folder if empty
-    INetURLObject aInetObj( maLibraryPath.getToken(1, ';') );
+    INetURLObject aInetObj( o3tl::getToken(maLibraryPath, 1, ';') );
     aInetObj.insertName( Name, true, INetURLObject::LAST_SEGMENT,
                          INetURLObject::EncodeMechanism::All );
     OUString aLibDirPath = aInetObj.GetMainURL( INetURLObject::DecodeMechanism::NONE );
@@ -2510,7 +2506,7 @@ void SAL_CALL SfxLibraryContainer::renameLibrary( const OUString& Name, const OU
 
         OUString aLibDirPath = pImplLib->maStorageURL;
 
-        INetURLObject aDestInetObj( maLibraryPath.getToken(1, ';'));
+        INetURLObject aDestInetObj( o3tl::getToken(maLibraryPath, 1, ';'));
         aDestInetObj.insertName( NewName, true, INetURLObject::LAST_SEGMENT,
                                  INetURLObject::EncodeMechanism::All );
         OUString aDestDirPath = aDestInetObj.GetMainURL( INetURLObject::DecodeMechanism::NONE );
@@ -2675,7 +2671,7 @@ void SAL_CALL SfxLibraryContainer::disposing()
 {
     Reference< XModel > xModel = mxOwnerDocument;
     EventObject aEvent( xModel );
-    maVBAScriptListeners.disposing( aEvent );
+    maVBAScriptListeners.disposeAndClear( aEvent );
     stopAllComponentListening();
     mxOwnerDocument.clear();
 }
@@ -2850,12 +2846,12 @@ sal_Int32 SAL_CALL SfxLibraryContainer::getRunningVBAScripts()
 
 void SAL_CALL SfxLibraryContainer::addVBAScriptListener( const Reference< vba::XVBAScriptListener >& rxListener )
 {
-    maVBAScriptListeners.addTypedListener( rxListener );
+    maVBAScriptListeners.addInterface( rxListener );
 }
 
 void SAL_CALL SfxLibraryContainer::removeVBAScriptListener( const Reference< vba::XVBAScriptListener >& rxListener )
 {
-    maVBAScriptListeners.removeTypedListener( rxListener );
+    maVBAScriptListeners.removeInterface( rxListener );
 }
 
 void SAL_CALL SfxLibraryContainer::broadcastVBAScriptEvent( sal_Int32 nIdentifier, const OUString& rModuleName )
@@ -2875,7 +2871,52 @@ void SAL_CALL SfxLibraryContainer::broadcastVBAScriptEvent( sal_Int32 nIdentifie
 
     Reference< XModel > xModel = mxOwnerDocument;  // weak-ref -> ref
     vba::VBAScriptEvent aEvent( Reference<XInterface>(xModel, UNO_QUERY), nIdentifier, rModuleName );
-    maVBAScriptListeners.notify( aEvent );
+    maVBAScriptListeners.notifyEach( &css::script::vba::XVBAScriptListener::notifyVBAScriptEvent, aEvent );
+}
+
+// Methods XPropertySet
+css::uno::Reference<css::beans::XPropertySetInfo> SAL_CALL SfxLibraryContainer::getPropertySetInfo()
+{
+    return uno::Reference<beans::XPropertySetInfo>();
+}
+
+void SAL_CALL SfxLibraryContainer::setPropertyValue(const OUString& aPropertyName,
+                                                    const uno::Any& aValue)
+{
+    if (aPropertyName != sVBATextEncodingPropName)
+        throw UnknownPropertyException(aPropertyName, static_cast<uno::XWeak*>(this));
+    aValue >>= meVBATextEncoding;
+}
+
+css::uno::Any SAL_CALL SfxLibraryContainer::getPropertyValue(const OUString& aPropertyName)
+{
+    if (aPropertyName == sVBATextEncodingPropName)
+        return uno::Any(meVBATextEncoding);
+    throw UnknownPropertyException(aPropertyName, static_cast<uno::XWeak*>(this));
+}
+
+void SAL_CALL SfxLibraryContainer::addPropertyChangeListener(
+    const OUString& /* aPropertyName */, const Reference<XPropertyChangeListener>& /* xListener */)
+{
+    throw NoSupportException();
+}
+
+void SAL_CALL SfxLibraryContainer::removePropertyChangeListener(
+    const OUString& /* aPropertyName */, const Reference<XPropertyChangeListener>& /* aListener */)
+{
+    throw NoSupportException();
+}
+
+void SAL_CALL SfxLibraryContainer::addVetoableChangeListener(
+    const OUString& /* PropertyName */, const Reference<XVetoableChangeListener>& /* aListener */)
+{
+    throw NoSupportException();
+}
+
+void SAL_CALL SfxLibraryContainer::removeVetoableChangeListener(
+    const OUString& /* PropertyName */, const Reference<XVetoableChangeListener>& /* aListener */)
+{
+    throw NoSupportException();
 }
 
 // Methods XServiceInfo
@@ -2910,7 +2951,7 @@ SfxLibrary::SfxLibrary( ModifiableHelper& _rModifiable, const Type& aType,
 
 SfxLibrary::SfxLibrary( ModifiableHelper& _rModifiable, const Type& aType,
     const Reference< XSimpleFileAccess3 >& xSFI,
-    const OUString& aLibInfoFileURL, const OUString& aStorageURL, bool ReadOnly )
+    OUString aLibInfoFileURL, OUString aStorageURL, bool ReadOnly )
         : OComponentHelper( m_aMutex )
         , mxSFI( xSFI )
         , mrModifiable( _rModifiable )
@@ -2918,8 +2959,8 @@ SfxLibrary::SfxLibrary( ModifiableHelper& _rModifiable, const Type& aType,
         , mbLoaded( false )
         , mbIsModified( true )
         , mbInitialised( false )
-        , maLibInfoFileURL( aLibInfoFileURL )
-        , maStorageURL( aStorageURL )
+        , maLibInfoFileURL(std::move( aLibInfoFileURL ))
+        , maStorageURL(std::move( aStorageURL ))
         , mbLink( true )
         , mbReadOnly( false )
         , mbReadOnlyLink( ReadOnly )

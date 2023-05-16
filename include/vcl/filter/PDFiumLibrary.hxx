@@ -34,6 +34,7 @@
 #include <vcl/pdf/PDFFindFlags.hxx>
 #include <vcl/pdf/PDFErrorType.hxx>
 #include <vcl/pdf/PDFFormFieldType.hxx>
+#include <vcl/pdf/PDFAnnotAActionType.hxx>
 
 class SvMemoryStream;
 
@@ -103,9 +104,13 @@ public:
     virtual std::vector<basegfx::B2DPoint> getAttachmentPoints(size_t nIndex) = 0;
     virtual std::vector<basegfx::B2DPoint> getLineGeometry() = 0;
     virtual PDFFormFieldType getFormFieldType(PDFiumDocument* pDoc) = 0;
-    virtual float getFormFontSize(PDFiumDocument* pDoc) = 0;
+    virtual float getFontSize(PDFiumDocument* pDoc) = 0;
     virtual OUString getFormFieldAlternateName(PDFiumDocument* pDoc) = 0;
     virtual int getFormFieldFlags(PDFiumDocument* pDoc) = 0;
+    virtual OUString getFormAdditionalActionJavaScript(PDFiumDocument* pDoc,
+                                                       PDFAnnotAActionType eEvent)
+        = 0;
+    virtual OUString getFormFieldValue(PDFiumDocument* pDoc) = 0;
 };
 
 class PDFiumTextPage;
@@ -195,6 +200,8 @@ public:
     virtual bool hasTransparency() = 0;
 
     virtual bool hasLinks() = 0;
+
+    virtual void onAfterLoadPage(PDFiumDocument* pDoc) = 0;
 };
 
 /// Represents one digital signature, as exposed by PDFium.
@@ -235,7 +242,7 @@ struct VCL_DLLPUBLIC PDFiumLibrary final
 
 // Tools
 
-VCL_DLLPUBLIC OUString convertPdfDateToISO8601(OUString const& rInput);
+VCL_DLLPUBLIC OUString convertPdfDateToISO8601(std::u16string_view rInput);
 
 } // namespace vcl::pdf
 

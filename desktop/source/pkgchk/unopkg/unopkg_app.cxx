@@ -24,6 +24,8 @@
 #include <dp_identifier.hxx>
 #include <tools/extendapplicationenvironment.hxx>
 #include <rtl/bootstrap.hxx>
+#include <rtl/textenc.h>
+#include <rtl/ustring.hxx>
 #include <osl/process.h>
 #include <osl/conditn.hxx>
 #include <unotools/tempfile.hxx>
@@ -48,6 +50,8 @@
 #if defined(UNX)
   #include <unistd.h>
 #endif
+#include <iostream>
+#include <utility>
 #include <vector>
 
 
@@ -61,7 +65,7 @@ namespace {
 struct ExtensionName
 {
     OUString m_str;
-    explicit ExtensionName( OUString const & str ) : m_str( str ) {}
+    explicit ExtensionName( OUString str ) : m_str(std::move( str )) {}
     bool operator () ( Reference<deployment::XPackage> const & e ) const
     {
         return m_str == dp_misc::getIdentifier(e)
@@ -107,7 +111,7 @@ u"\n"
 "     <context>\n"
 "\n"
 "To learn more about the Extension Manager and extensions, see:\n"
-"http://wiki.openoffice.org/wiki/Documentation/DevGuide/Extensions/Extensions\n\n";
+"https://wiki.documentfoundation.org/Documentation/DevGuide/Extensions\n\n";
 
 
 const OptionInfo s_option_infos [] = {
@@ -123,6 +127,21 @@ const OptionInfo s_option_infos [] = {
 
     { nullptr, 0, '\0', false }
 };
+
+void logFatal(
+    comphelper::EventLogger const * logger, sal_Int32 level, OUString const & message,
+    OUString const & argument)
+{
+    if (logger == nullptr) {
+        // Best effort; potentially loses data due to conversion failures (stray surrogate halves)
+        // and embedded null characters:
+        std::cerr
+            << OUStringToOString(message.replaceFirst("$1$", argument), RTL_TEXTENCODING_UTF8)
+            << '\n';
+    } else {
+        logger->log(level, message, argument);
+    }
+}
 
 class DialogClosedListenerImpl :
     public ::cppu::WeakImplHelper< ui::dialogs::XDialogClosedListener >
@@ -197,7 +216,7 @@ extern "C" int unopkg_main()
     Reference<XLogHandler> xFileHandler;
     Reference<XLogHandler> xConsoleHandler;
     std::unique_ptr<comphelper::EventLogger> logger;
-    std::unique_ptr<utl::TempFile> pUserProfileTempDir;
+    std::unique_ptr<utl::TempFileNamed> pUserProfileTempDir;
 
     OptionInfo const * info_shared = getOptionInfo(
         s_option_infos, "shared" );
@@ -271,7 +290,7 @@ extern "C" int unopkg_main()
                     if (cmdArg[ 0 ] == '-')
                     {
                         // is option:
-                        dp_misc::writeConsoleError(OUStringConcatenation(
+                        dp_misc::writeConsoleError(Concat2View(
                                  "\nERROR: unexpected option " +
                                  cmdArg +
                                  "!\n       Use " APP_NAME " " +
@@ -295,7 +314,7 @@ extern "C" int unopkg_main()
         // tdf#129917 Use temp user profile when installing shared extensions
         if (option_shared)
         {
-            pUserProfileTempDir.reset(new utl::TempFile(nullptr, true));
+            pUserProfileTempDir.reset(new utl::TempFileNamed(nullptr, true));
             pUserProfileTempDir->EnableKillingFile();
         }
 
@@ -406,7 +425,7 @@ extern "C" int unopkg_main()
                 {
                     beans::NamedValue nvSuppress(
                         "SUPPRESS_LICENSE", option_suppressLicense ?
-                        makeAny(OUString("1")):makeAny(OUString("0")));
+                        Any(OUString("1")):Any(OUString("0")));
                     xExtensionManager->addExtension(
                             cmdPackage, Sequence<beans::NamedValue>(&nvSuppress, 1),
                             repository, Reference<task::XAbortChannel>(), xCmdEnv);
@@ -478,7 +497,7 @@ extern "C" int unopkg_main()
                       vec_packages.size(), false);
 
                 dp_misc::writeConsole(
-                    OUStringConcatenation("All deployed " + repository + " extensions:\n\n"));
+                    Concat2View("All deployed " + repository + " extensions:\n\n"));
             }
             else
             {
@@ -597,32 +616,33 @@ extern "C" int unopkg_main()
     }
     catch (const ucb::CommandFailedException &e)
     {
-        logger->log(LogLevel::SEVERE, "Exception occurred: $1$", e.Message);
+        logFatal(logger.get(), LogLevel::SEVERE, "Exception occurred: $1$", e.Message);
     }
     catch (const ucb::CommandAbortedException &)
     {
-        logger->log(LogLevel::SEVERE, "$1$ aborted.", APP_NAME);
+        logFatal(logger.get(), LogLevel::SEVERE, "$1$ aborted.", APP_NAME);
         bShowFailedMsg = false;
     }
     catch (const deployment::DeploymentException & exc)
     {
-        logger->log(LogLevel::SEVERE, "Exception occurred: $1$", exc.Message);
-        logger->log(LogLevel::INFO, "    Cause: $1$", comphelper::anyToString(exc.Cause));
+        logFatal(logger.get(), LogLevel::SEVERE, "Exception occurred: $1$", exc.Message);
+        logFatal(
+            logger.get(), LogLevel::INFO, "    Cause: $1$", comphelper::anyToString(exc.Cause));
     }
     catch (const LockFileException & e)
     {
         // No logger since it requires UNO which we don't have here
-        dp_misc::writeConsoleError(OUStringConcatenation(e.Message + "\n"));
+        dp_misc::writeConsoleError(Concat2View(e.Message + "\n"));
         bShowFailedMsg = false;
     }
     catch (const css::uno::Exception & e ) {
         Any exc( ::cppu::getCaughtException() );
 
-        logger->log(LogLevel::SEVERE, "Exception occurred: $1$", e.Message);
-        logger->log(LogLevel::INFO, "    Cause: $1$", comphelper::anyToString(exc));
+        logFatal(logger.get(), LogLevel::SEVERE, "Exception occurred: $1$", e.Message);
+        logFatal(logger.get(), LogLevel::INFO, "    Cause: $1$", comphelper::anyToString(exc));
     }
     if (bShowFailedMsg)
-        logger->log(LogLevel::SEVERE, "$1$ failed.", APP_NAME);
+        logFatal(logger.get(), LogLevel::SEVERE, "$1$ failed.", APP_NAME);
     dp_misc::disposeBridges(xLocalComponentContext);
     if (xLocalComponentContext.is()) {
         css::uno::Reference<css::lang::XComponent>(

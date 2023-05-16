@@ -73,6 +73,7 @@
 #include <com/sun/star/util/XCloseable.hpp>
 #include <com/sun/star/util/XModifiable.hpp>
 
+#include <utility>
 #include <vcl/window.hxx>
 #include <vcl/wrkwin.hxx>
 #include <vcl/syswin.hxx>
@@ -84,7 +85,7 @@
 #include <comphelper/configurationhelper.hxx>
 #include <rtl/bootstrap.hxx>
 #include <sal/log.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <vcl/svapp.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <comphelper/profilezone.hxx>
@@ -130,8 +131,8 @@ class LoadEnvListener : public ::cppu::WeakImplHelper< css::frame::XLoadEventLis
 
 }
 
-LoadEnv::LoadEnv(const css::uno::Reference< css::uno::XComponentContext >& xContext)
-    : m_xContext(xContext)
+LoadEnv::LoadEnv(css::uno::Reference< css::uno::XComponentContext >  xContext)
+    : m_xContext(std::move(xContext))
     , m_nSearchFlags(0)
     , m_eFeature(LoadEnvFeatures::NONE)
     , m_eContentType(E_UNSUPPORTED_CONTENT)
@@ -160,9 +161,8 @@ css::uno::Reference< css::lang::XComponent > LoadEnv::loadComponentFromURL(const
         LoadEnv aEnv(xContext);
 
         LoadEnvFeatures loadEnvFeatures = LoadEnvFeatures::WorkWithUI;
-        comphelper::NamedValueCollection aDescriptor( lArgs );
         // tdf#118238 Only disable UI interaction when loading as hidden
-        if (aDescriptor.get("Hidden") == uno::Any(true) || Application::IsHeadlessModeEnabled())
+        if (comphelper::NamedValueCollection::get(lArgs, u"Hidden") == uno::Any(true) || Application::IsHeadlessModeEnabled())
             loadEnvFeatures = LoadEnvFeatures::NONE;
 
         aEnv.startLoading(sURL,
@@ -322,7 +322,16 @@ void LoadEnv::initializeUIDefaults( const css::uno::Reference< css::uno::XCompon
         nUpdateMode = css::document::UpdateDocMode::ACCORDING_TO_CONFIG;
         try
         {
-            xInteractionHandler.set( css::task::InteractionHandler::createWithParent( i_rxContext, nullptr ), css::uno::UNO_QUERY_THROW );
+            // tdf#154308 At least for the case the document is launched from the StartCenter, put that StartCenter as the
+            // parent for any dialogs that may appear during typedetection (once load starts a permanent frame will be set
+            // anyway and used as dialog parent, which will be this one if the startcenter was running)
+            css::uno::Reference<css::frame::XFramesSupplier> xSupplier = css::frame::Desktop::create(i_rxContext);
+            FrameListAnalyzer aTasksAnalyzer(xSupplier, css::uno::Reference<css::frame::XFrame>(), FrameAnalyzerFlags::BackingComponent);
+            css::uno::Reference<css::awt::XWindow> xDialogParent(aTasksAnalyzer.m_xBackingComponent ?
+                                                                 aTasksAnalyzer.m_xBackingComponent->getContainerWindow() :
+                                                                 nullptr);
+
+            xInteractionHandler.set( css::task::InteractionHandler::createWithParent(i_rxContext, xDialogParent), css::uno::UNO_QUERY_THROW );
         }
         catch(const css::uno::RuntimeException&) {throw;}
         catch(const css::uno::Exception&       ) {      }
@@ -632,7 +641,7 @@ LoadEnv::EContentType LoadEnv::classifyContent(const OUString&                  
     css::uno::Sequence< OUString > lTypesReg { sType };
     css::uno::Sequence< css::beans::NamedValue >           lQuery
     {
-        css::beans::NamedValue(PROP_TYPES, makeAny(lTypesReg))
+        css::beans::NamedValue(PROP_TYPES, css::uno::Any(lTypesReg))
     };
 
     xLoaderFactory = css::frame::FrameLoaderFactory::create(xContext);
@@ -681,7 +690,7 @@ bool queryOrcusTypeAndFilter(const uno::Sequence<beans::PropertyValue>& rDescrip
         }
     }
 
-    if (aURL.isEmpty() || aURL.copy(0,8).equalsIgnoreAsciiCase("private:"))
+    if (aURL.isEmpty() || o3tl::equalsIgnoreAsciiCase(aURL.subView(0,8), u"private:"))
         return false;
 
     // TODO : Type must be set to be generic_Text (or any other type that
@@ -689,8 +698,7 @@ bool queryOrcusTypeAndFilter(const uno::Sequence<beans::PropertyValue>& rDescrip
     // hack.
 
     // depending on the experimental mode
-    uno::Reference< uno::XComponentContext > xContext = comphelper::getProcessComponentContext();
-    if (!xContext.is() || !officecfg::Office::Common::Misc::ExperimentalMode::get(xContext))
+    if (!officecfg::Office::Common::Misc::ExperimentalMode::get())
     {
         return false;
     }
@@ -875,7 +883,7 @@ bool LoadEnv::impl_handleContent()
     // query
     css::uno::Sequence< OUString > lTypeReg { sType };
 
-    css::uno::Sequence< css::beans::NamedValue > lQuery { { PROP_TYPES, css::uno::makeAny(lTypeReg) } };
+    css::uno::Sequence< css::beans::NamedValue > lQuery { { PROP_TYPES, css::uno::Any(lTypeReg) } };
 
     css::uno::Reference< css::container::XEnumeration > xSet = xLoaderFactory->createSubSetEnumerationByProperties(lQuery);
     while(xSet->hasMoreElements())
@@ -922,7 +930,7 @@ bool LoadEnv::impl_furtherDocsAllowed()
 
     try
     {
-        std::optional<sal_Int32> x(officecfg::Office::Common::Misc::MaxOpenDocuments::get(xContext));
+        std::optional<sal_Int32> x(officecfg::Office::Common::Misc::MaxOpenDocuments::get());
 
         // NIL means: count of allowed documents = infinite !
         //     => return true
@@ -988,7 +996,7 @@ bool LoadEnv::impl_filterHasInteractiveDialog() const
     if (m_aURL.Arguments == "Interactive")
        return true;
 
-    // unless (tdf#116277) its the labels/business cards slave frame
+    // unless (tdf#116277) it's the labels/business cards slave frame
     if (m_aURL.Arguments.indexOf("slot=") != -1)
         return true;
 
@@ -1128,7 +1136,10 @@ bool LoadEnv::impl_loadContent()
             xHandler->initialize(aArguments);
             //show the frame as early as possible to make it the parent of any message dialogs
             if (!impl_filterHasInteractiveDialog())
-                impl_makeFrameWindowVisible(xWindow, false);
+            {
+                impl_makeFrameWindowVisible(xWindow, shouldFocusAndToFront());
+                m_bFocusedAndToFront = true; // no need to ask shouldFocusAndToFront second time
+            }
         }
     }
 
@@ -1160,7 +1171,7 @@ bool LoadEnv::impl_loadContent()
         {
             // Set the URL on the frame itself, for the duration of the load, when it has no
             // controller.
-            xTargetFrameProps->setPropertyValue("URL", uno::makeAny(sURL));
+            xTargetFrameProps->setPropertyValue("URL", uno::Any(sURL));
         }
         bool bResult = xSyncLoader->load(lDescriptor, xTargetFrame);
         // react for the result here, so the outside waiting
@@ -1213,7 +1224,7 @@ css::uno::Reference< css::uno::XInterface > LoadEnv::impl_searchLoader()
 
     css::uno::Sequence< OUString > lTypesReg { sType };
 
-    css::uno::Sequence< css::beans::NamedValue > lQuery { { PROP_TYPES, css::uno::makeAny(lTypesReg) } };
+    css::uno::Sequence< css::beans::NamedValue > lQuery { { PROP_TYPES, css::uno::Any(lTypesReg) } };
 
     css::uno::Reference< css::container::XEnumeration > xSet = xLoaderFactory->createSubSetEnumerationByProperties(lQuery);
     while(xSet->hasMoreElements())
@@ -1417,9 +1428,6 @@ css::uno::Reference< css::frame::XFrame > LoadEnv::impl_searchAlreadyLoaded()
         // if an optional jumpmark is given too.
         if (!m_aURL.Mark.isEmpty())
             impl_jumpToMark(xResult, m_aURL);
-
-        // bring it to front and make sure it's visible...
-        impl_makeFrameWindowVisible(xResult->getContainerWindow(), true);
     }
 
     return xResult;
@@ -1457,8 +1465,6 @@ css::uno::Reference< css::frame::XFrame > LoadEnv::impl_searchRecycleTarget()
     {
         if (!impl_isFrameAlreadyUsedForLoading(aTasksAnalyzer.m_xBackingComponent))
         {
-            // bring it to front...
-            impl_makeFrameWindowVisible(aTasksAnalyzer.m_xBackingComponent->getContainerWindow(), true);
             m_bReactivateControllerOnError = true;
             return aTasksAnalyzer.m_xBackingComponent;
         }
@@ -1571,9 +1577,6 @@ css::uno::Reference< css::frame::XFrame > LoadEnv::impl_searchRecycleTarget()
     }
     // <- SAFE ..................................
 
-    // bring it to front ...
-    impl_makeFrameWindowVisible(xTask->getContainerWindow(), true);
-
     return xTask;
 }
 
@@ -1605,7 +1608,7 @@ void LoadEnv::impl_reactForLoadingState()
         {
             // show frame ... if it's not still visible ...
             // But do nothing if it's already visible!
-            impl_makeFrameWindowVisible(xWindow, false);
+            impl_makeFrameWindowVisible(xWindow, !m_bFocusedAndToFront && shouldFocusAndToFront());
         }
 
         // Note: Only if an existing property "FrameName" is given by this media descriptor,
@@ -1692,33 +1695,26 @@ void LoadEnv::impl_reactForLoadingState()
     // <- SAFE ----------------------------------
 }
 
+bool LoadEnv::shouldFocusAndToFront() const
+{
+    bool const preview(
+        m_lMediaDescriptor.getUnpackedValueOrDefault(utl::MediaDescriptor::PROP_PREVIEW, false));
+    return !preview
+           && officecfg::Office::Common::View::NewDocumentHandling::ForceFocusAndToFront::get();
+}
+
 void LoadEnv::impl_makeFrameWindowVisible(const css::uno::Reference< css::awt::XWindow >& xWindow      ,
                                                 bool bForceToFront)
 {
-    // SAFE -> ----------------------------------
-    osl::ClearableMutexGuard aReadLock(m_mutex);
-    css::uno::Reference< css::uno::XComponentContext > xContext = m_xContext;
-    aReadLock.clear();
-    // <- SAFE ----------------------------------
-
     SolarMutexGuard aSolarGuard;
     VclPtr<vcl::Window> pWindow = VCLUnoHelper::GetWindow(xWindow);
     if ( !pWindow )
         return;
 
-    bool const preview( m_lMediaDescriptor.getUnpackedValueOrDefault(
-            utl::MediaDescriptor::PROP_PREVIEW, false) );
-
-    bool bForceFrontAndFocus(false);
-    if ( !preview )
-    {
-        bForceFrontAndFocus = officecfg::Office::Common::View::NewDocumentHandling::ForceFocusAndToFront::get(xContext);
-    }
-
-    if( pWindow->IsVisible() && (bForceFrontAndFocus || bForceToFront) )
+    if (pWindow->IsVisible() && bForceToFront)
         pWindow->ToTop( ToTopFlags::RestoreWhenMin | ToTopFlags::ForegroundTask );
     else
-        pWindow->Show(true, (bForceFrontAndFocus || bForceToFront) ? ShowFlags::ForegroundTask : ShowFlags::NONE );
+        pWindow->Show(true, bForceToFront ? ShowFlags::ForegroundTask : ShowFlags::NONE);
 }
 
 void LoadEnv::impl_applyPersistentWindowState(const css::uno::Reference< css::awt::XWindow >& xWindow)
@@ -1782,7 +1778,7 @@ void LoadEnv::impl_applyPersistentWindowState(const css::uno::Reference< css::aw
         OUString                 sModule = lProps.getUnpackedValueOrDefault(FILTER_PROPNAME_ASCII_DOCUMENTSERVICE, OUString());
 
         // get access to the configuration of this office module
-        css::uno::Reference< css::container::XNameAccess > xModuleCfg(officecfg::Setup::Office::Factories::get(xContext));
+        css::uno::Reference< css::container::XNameAccess > xModuleCfg(officecfg::Setup::Office::Factories::get());
 
         // read window state from the configuration
         // and apply it on the window.

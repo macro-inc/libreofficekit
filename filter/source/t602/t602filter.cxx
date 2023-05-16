@@ -20,8 +20,6 @@
 #include "t602filter.hxx"
 #include <strings.hrc>
 
-#include <stdio.h>
-
 #include <cppuhelper/factory.hxx>
 #include <cppuhelper/bootstrap.hxx>
 #include <cppuhelper/supportsservice.hxx>
@@ -35,8 +33,8 @@
 #include <osl/diagnose.h>
 #include <rtl/ref.hxx>
 #include <rtl/character.hxx>
-#include <unotools/resmgr.hxx>
 #include <unotools/streamwrap.hxx>
+#include <utility>
 
 using namespace ::cppu;
 using namespace ::osl;
@@ -131,14 +129,14 @@ namespace T602ImportFilter {
 
 static inistruct ini;
 
-T602ImportFilter::T602ImportFilter(const css::uno::Reference<css::uno::XComponentContext > &r )
-    : mxContext(r)
+T602ImportFilter::T602ImportFilter(css::uno::Reference<css::uno::XComponentContext > x )
+    : mxContext(std::move(x))
     , node(tnode::START)
 {
 }
 
-T602ImportFilter::T602ImportFilter(css::uno::Reference<css::io::XInputStream> const & xInputStream)
-    : mxInputStream(xInputStream)
+T602ImportFilter::T602ImportFilter(css::uno::Reference<css::io::XInputStream> xInputStream)
+    : mxInputStream(std::move(xInputStream))
     , node(tnode::START)
 {
 }
@@ -210,10 +208,8 @@ void T602ImportFilter::inschr(unsigned char ch)
                 inschrdef(' ');
             pst.wasfdash = false;
         } else {
-            char s[20];
-            sprintf(s,"%i",pst.wasspace);
             if (mpAttrList)
-                mpAttrList->AddAttribute("text:c",OUString::createFromAscii(s));
+                mpAttrList->AddAttribute("text:c",OUString::number(pst.wasspace));
             Start_("text:s");
             End_("text:s");
         }
@@ -249,9 +245,8 @@ bool T602ImportFilter::importImpl( const Sequence< css::beans::PropertyValue >& 
     Reference < XImporter > xImporter(mxHandler, UNO_QUERY);
     xImporter->setTargetDocument(mxDoc);
 
-    char fs[32], fs2[32];
-    sprintf(fs, "%ipt", inistruct::fontsize);
-    sprintf(fs2,"%ipt", 2*inistruct::fontsize);
+    auto const fs = OUString(OUString::number(inistruct::fontsize) + "pt");
+    auto const fs2 = OUString(OUString::number(2*inistruct::fontsize) + "pt");
 
     mpAttrList = new SvXMLAttributeList;
 
@@ -293,7 +288,7 @@ bool T602ImportFilter::importImpl( const Sequence< css::beans::PropertyValue >& 
     mpAttrList->AddAttribute("style:parent-style-name","Standard");
     Start_("style:style");
     mpAttrList->AddAttribute("style:font-name","Courier New");
-    mpAttrList->AddAttribute("fo:font-size",OUString::createFromAscii(fs));
+    mpAttrList->AddAttribute("fo:font-size",fs);
     Start_("style:properties");
     End_("style:properties");
     End_("style:style");
@@ -304,7 +299,7 @@ bool T602ImportFilter::importImpl( const Sequence< css::beans::PropertyValue >& 
     mpAttrList->AddAttribute("style:parent-style-name","Standard");
     Start_("style:style");
     mpAttrList->AddAttribute("style:font-name","Courier New");
-    mpAttrList->AddAttribute("fo:font-size",OUString::createFromAscii(fs));
+    mpAttrList->AddAttribute("fo:font-size",fs);
     mpAttrList->AddAttribute("fo:break-before","page");
     Start_("style:properties");
     End_("style:properties");
@@ -350,7 +345,7 @@ bool T602ImportFilter::importImpl( const Sequence< css::beans::PropertyValue >& 
     mpAttrList->AddAttribute("style:name","T5");
     mpAttrList->AddAttribute("style:family","text");
     Start_("style:style");
-    mpAttrList->AddAttribute("fo:font-size",OUString::createFromAscii(fs2));
+    mpAttrList->AddAttribute("fo:font-size",fs2);
     mpAttrList->AddAttribute("fo:font-weight","bold");
     mpAttrList->AddAttribute("style:text-scale","50%");
     Start_("style:properties");
@@ -361,7 +356,7 @@ bool T602ImportFilter::importImpl( const Sequence< css::beans::PropertyValue >& 
     mpAttrList->AddAttribute("style:name","T6");
     mpAttrList->AddAttribute("style:family","text");
     Start_("style:style");
-    mpAttrList->AddAttribute("fo:font-size",OUString::createFromAscii(fs2));
+    mpAttrList->AddAttribute("fo:font-size",fs2);
     mpAttrList->AddAttribute("fo:font-weight","bold");
     Start_("style:properties");
     End_("style:properties");
@@ -857,30 +852,11 @@ Sequence< OUString > SAL_CALL T602ImportFilter::getSupportedServiceNames(  )
 }
 
 T602ImportFilterDialog::T602ImportFilterDialog()
-    : maLocale(SvtSysLocale().GetUILanguageTag())
-    , maResLocale(Translate::Create("flt"))
 {
 }
 
 T602ImportFilterDialog::~T602ImportFilterDialog()
 {
-}
-
-// XLocalizable
-
-void SAL_CALL T602ImportFilterDialog::setLocale(const Locale& rLocale)
-{
-    LanguageTag aLocale(rLocale);
-    if (maLocale != aLocale)
-    {
-        maLocale = aLocale;
-        maResLocale = Translate::Create("flt", maLocale);
-    }
-}
-
-Locale SAL_CALL T602ImportFilterDialog::getLocale()
-{
-    return maLocale.getLocale(false);
 }
 
 bool T602ImportFilterDialog::OptionsDlg()
@@ -899,7 +875,7 @@ bool T602ImportFilterDialog::OptionsDlg()
     any <<= OUString(_val);\
     _prop->setPropertyValue(_nam, any);
 #define propStringFromResId_(_prop,_nam,_val) \
-    any <<= getResStr(_val);\
+    any <<= FilterResId(_val);\
     _prop->setPropertyValue(_nam, any);
 #define propGet_(_prop,_nam) \
     _prop->getPropertyValue(_nam);
@@ -952,10 +928,10 @@ bool T602ImportFilterDialog::OptionsDlg()
 
     Sequence< OUString > ous
     {
-        getResStr(T602FILTER_STR_ENCODING_AUTO),
-        getResStr(T602FILTER_STR_ENCODING_CP852),
-        getResStr(T602FILTER_STR_ENCODING_CP895),
-        getResStr(T602FILTER_STR_ENCODING_KOI8CS2)
+        FilterResId(T602FILTER_STR_ENCODING_AUTO),
+        FilterResId(T602FILTER_STR_ENCODING_CP852),
+        FilterResId(T602FILTER_STR_ENCODING_CP895),
+        FilterResId(T602FILTER_STR_ENCODING_KOI8CS2)
     };
     any <<= ous;
     xPSetCodeLB->setPropertyValue("StringItemList", any);
@@ -1075,11 +1051,6 @@ sal_Int16 SAL_CALL T602ImportFilterDialog::execute()
         return css::ui::dialogs::ExecutableDialogResults::OK;
     else
         return css::ui::dialogs::ExecutableDialogResults::CANCEL;
-}
-
-OUString T602ImportFilterDialog::getResStr(TranslateId resid)
-{
-    return Translate::get(resid, maResLocale);
 }
 
 uno::Sequence<beans::PropertyValue> SAL_CALL T602ImportFilterDialog::getPropertyValues()

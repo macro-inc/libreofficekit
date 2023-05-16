@@ -184,6 +184,7 @@ const sal_uInt16 KEYCODE_ARRAY[] = { KEY_F1,
                                      KEY_MOD1 | KEY_X,
                                      KEY_MOD1 | KEY_Y,
                                      KEY_MOD1 | KEY_Z,
+                                     KEY_MOD1 | KEY_COLON,
                                      KEY_MOD1 | KEY_SEMICOLON,
                                      KEY_MOD1 | KEY_QUOTELEFT,
                                      KEY_MOD1 | KEY_QUOTERIGHT,
@@ -268,6 +269,7 @@ const sal_uInt16 KEYCODE_ARRAY[] = { KEY_F1,
                                      KEY_SHIFT | KEY_MOD1 | KEY_X,
                                      KEY_SHIFT | KEY_MOD1 | KEY_Y,
                                      KEY_SHIFT | KEY_MOD1 | KEY_Z,
+                                     KEY_SHIFT | KEY_MOD1 | KEY_COLON,
                                      KEY_SHIFT | KEY_MOD1 | KEY_SEMICOLON,
                                      KEY_SHIFT | KEY_MOD1 | KEY_QUOTELEFT,
                                      KEY_SHIFT | KEY_MOD1 | KEY_QUOTERIGHT,
@@ -348,6 +350,7 @@ const sal_uInt16 KEYCODE_ARRAY[] = { KEY_F1,
                                      KEY_MOD2 | KEY_X,
                                      KEY_MOD2 | KEY_Y,
                                      KEY_MOD2 | KEY_Z,
+                                     KEY_MOD2 | KEY_COLON,
                                      KEY_MOD2 | KEY_SEMICOLON,
                                      KEY_MOD2 | KEY_QUOTELEFT,
                                      KEY_MOD2 | KEY_QUOTERIGHT,
@@ -426,6 +429,7 @@ const sal_uInt16 KEYCODE_ARRAY[] = { KEY_F1,
                                      KEY_SHIFT | KEY_MOD2 | KEY_X,
                                      KEY_SHIFT | KEY_MOD2 | KEY_Y,
                                      KEY_SHIFT | KEY_MOD2 | KEY_Z,
+                                     KEY_SHIFT | KEY_MOD2 | KEY_COLON,
                                      KEY_SHIFT | KEY_MOD2 | KEY_SEMICOLON,
                                      KEY_SHIFT | KEY_MOD2 | KEY_QUOTELEFT,
                                      KEY_SHIFT | KEY_MOD2 | KEY_QUOTERIGHT,
@@ -505,6 +509,7 @@ const sal_uInt16 KEYCODE_ARRAY[] = { KEY_F1,
                                      KEY_MOD1 | KEY_MOD2 | KEY_X,
                                      KEY_MOD1 | KEY_MOD2 | KEY_Y,
                                      KEY_MOD1 | KEY_MOD2 | KEY_Z,
+                                     KEY_MOD1 | KEY_MOD2 | KEY_COLON,
                                      KEY_MOD1 | KEY_MOD2 | KEY_SEMICOLON,
                                      KEY_MOD1 | KEY_MOD2 | KEY_QUOTELEFT,
                                      KEY_MOD1 | KEY_MOD2 | KEY_QUOTERIGHT,
@@ -583,6 +588,7 @@ const sal_uInt16 KEYCODE_ARRAY[] = { KEY_F1,
                                      KEY_SHIFT | KEY_MOD1 | KEY_MOD2 | KEY_X,
                                      KEY_SHIFT | KEY_MOD1 | KEY_MOD2 | KEY_Y,
                                      KEY_SHIFT | KEY_MOD1 | KEY_MOD2 | KEY_Z,
+                                     KEY_SHIFT | KEY_MOD1 | KEY_MOD2 | KEY_COLON,
                                      KEY_SHIFT | KEY_MOD1 | KEY_MOD2 | KEY_SEMICOLON,
                                      KEY_SHIFT | KEY_MOD1 | KEY_MOD2 | KEY_QUOTELEFT,
                                      KEY_SHIFT | KEY_MOD1 | KEY_MOD2 | KEY_QUOTERIGHT,
@@ -663,6 +669,7 @@ const sal_uInt16 KEYCODE_ARRAY[] = { KEY_F1,
                                      KEY_MOD3 | KEY_X,
                                      KEY_MOD3 | KEY_Y,
                                      KEY_MOD3 | KEY_Z,
+                                     KEY_MOD3 | KEY_COLON,
                                      KEY_MOD3 | KEY_SEMICOLON,
                                      KEY_MOD3 | KEY_QUOTELEFT,
                                      KEY_MOD3 | KEY_QUOTERIGHT,
@@ -747,6 +754,7 @@ const sal_uInt16 KEYCODE_ARRAY[] = { KEY_F1,
                                      KEY_SHIFT | KEY_MOD3 | KEY_X,
                                      KEY_SHIFT | KEY_MOD3 | KEY_Y,
                                      KEY_SHIFT | KEY_MOD3 | KEY_Z,
+                                     KEY_SHIFT | KEY_MOD3 | KEY_COLON,
                                      KEY_SHIFT | KEY_MOD3 | KEY_SEMICOLON,
                                      KEY_SHIFT | KEY_MOD3 | KEY_QUOTELEFT,
                                      KEY_SHIFT | KEY_MOD3 | KEY_QUOTERIGHT,
@@ -793,7 +801,7 @@ const sal_uInt16 KEYCODE_ARRAY[] = { KEY_F1,
 #endif
 };
 
-const sal_uInt16 KEYCODE_ARRAY_SIZE = SAL_N_ELEMENTS(KEYCODE_ARRAY);
+const sal_uInt16 KEYCODE_ARRAY_SIZE = std::size(KEYCODE_ARRAY);
 
 /** select the entry, which match the current key input ... excepting
     keys, which are used for the dialog itself.
@@ -805,23 +813,24 @@ IMPL_LINK(SfxAcceleratorConfigPage, KeyInputHdl, const KeyEvent&, rKey, bool)
     sal_uInt16 nMod1 = aCode1.GetModifier();
 
     // is it related to our list box ?
-    if ((nCode1 != KEY_DOWN) && (nCode1 != KEY_UP) && (nCode1 != KEY_LEFT) && (nCode1 != KEY_RIGHT)
-        && (nCode1 != KEY_PAGEUP) && (nCode1 != KEY_PAGEDOWN))
-    {
-        for (int i = 0, nCount = m_xEntriesBox->n_children(); i < nCount; ++i)
-        {
-            TAccInfo* pUserData = reinterpret_cast<TAccInfo*>(m_xEntriesBox->get_id(i).toInt64());
-            if (pUserData)
-            {
-                sal_uInt16 nCode2 = pUserData->m_aKey.GetCode();
-                sal_uInt16 nMod2 = pUserData->m_aKey.GetModifier();
+    if ((nCode1 == KEY_DOWN) || (nCode1 == KEY_UP) || (nCode1 == KEY_LEFT) || (nCode1 == KEY_RIGHT)
+        || (nCode1 == KEY_PAGEUP) || (nCode1 == KEY_PAGEDOWN))
+        // no - handle it as normal dialog input
+        return false;
 
-                if (nCode1 == nCode2 && nMod1 == nMod2)
-                {
-                    m_xEntriesBox->select(i);
-                    m_xEntriesBox->scroll_to_row(i);
-                    return true;
-                }
+    for (int i = 0, nCount = m_xEntriesBox->n_children(); i < nCount; ++i)
+    {
+        TAccInfo* pUserData = weld::fromId<TAccInfo*>(m_xEntriesBox->get_id(i));
+        if (pUserData)
+        {
+            sal_uInt16 nCode2 = pUserData->m_aKey.GetCode();
+            sal_uInt16 nMod2 = pUserData->m_aKey.GetModifier();
+
+            if (nCode1 == nCode2 && nMod1 == nMod2)
+            {
+                m_xEntriesBox->select(i);
+                m_xEntriesBox->scroll_to_row(i);
+                return true;
             }
         }
     }
@@ -837,10 +846,10 @@ SfxAcceleratorConfigPage::SfxAcceleratorConfigPage(weld::Container* pPage,
 #if HAVE_FEATURE_SCRIPTING
     , m_pMacroInfoItem()
 #endif
-    , aLoadAccelConfigStr(CuiResId(RID_SVXSTR_LOADACCELCONFIG))
-    , aSaveAccelConfigStr(CuiResId(RID_SVXSTR_SAVEACCELCONFIG))
+    , aLoadAccelConfigStr(CuiResId(RID_CUISTR_LOADACCELCONFIG))
+    , aSaveAccelConfigStr(CuiResId(RID_CUISTR_SAVEACCELCONFIG))
     , aFilterAllStr(SfxResId(STR_SFX_FILTERNAME_ALL))
-    , aFilterCfgStr(CuiResId(RID_SVXSTR_FILTERNAME_CFG))
+    , aFilterCfgStr(CuiResId(RID_CUISTR_FILTERNAME_CFG))
     , m_bStylesInfoInitialized(false)
     , m_aUpdateDataTimer("SfxAcceleratorConfigPage UpdateDataTimer")
     , m_aFillGroupIdle("SfxAcceleratorConfigPage m_aFillGroupIdle")
@@ -858,16 +867,16 @@ SfxAcceleratorConfigPage::SfxAcceleratorConfigPage(weld::Container* pPage,
     , m_xResetButton(m_xBuilder->weld_button("reset"))
 {
     Size aSize(m_xEntriesBox->get_approximate_digit_width() * 40,
-               m_xEntriesBox->get_height_rows(12));
+               m_xEntriesBox->get_height_rows(10));
     m_xEntriesBox->set_size_request(aSize.Width(), aSize.Height());
     aSize = Size(m_xEntriesBox->get_approximate_digit_width() * 19,
-                 m_xEntriesBox->get_height_rows(10));
+                 m_xEntriesBox->get_height_rows(9));
     m_xGroupLBox->set_size_request(aSize.Width(), aSize.Height());
     aSize = Size(m_xEntriesBox->get_approximate_digit_width() * 21,
-                 m_xEntriesBox->get_height_rows(10));
+                 m_xEntriesBox->get_height_rows(9));
     m_xFunctionBox->set_size_request(aSize.Width(), aSize.Height());
     aSize = Size(m_xEntriesBox->get_approximate_digit_width() * 20,
-                 m_xEntriesBox->get_height_rows(10));
+                 m_xEntriesBox->get_height_rows(9));
     m_xKeyBox->set_size_request(aSize.Width(), aSize.Height());
 
     // install handler functions
@@ -925,7 +934,7 @@ SfxAcceleratorConfigPage::~SfxAcceleratorConfigPage()
     // free memory - remove all dynamic user data
     for (int i = 0, nCount = m_xEntriesBox->n_children(); i < nCount; ++i)
     {
-        TAccInfo* pUserData = reinterpret_cast<TAccInfo*>(m_xEntriesBox->get_id(i).toInt64());
+        TAccInfo* pUserData = weld::fromId<TAccInfo*>(m_xEntriesBox->get_id(i));
         delete pUserData;
     }
 }
@@ -1010,7 +1019,7 @@ void SfxAcceleratorConfigPage::Init(const uno::Reference<ui::XAcceleratorConfigu
         if (sKey.isEmpty())
             continue;
         TAccInfo* pEntry = new TAccInfo(i1, 0 /*nListPos*/, aKey);
-        m_xEntriesBox->append(OUString::number(reinterpret_cast<sal_Int64>(pEntry)), sKey);
+        m_xEntriesBox->append(weld::toId(pEntry), sKey);
         int nPos = m_xEntriesBox->n_children() - 1;
         m_xEntriesBox->set_text(nPos, OUString(), 1);
         m_xEntriesBox->set_sensitive(nPos, true);
@@ -1034,7 +1043,7 @@ void SfxAcceleratorConfigPage::Init(const uno::Reference<ui::XAcceleratorConfigu
 
         m_xEntriesBox->set_text(nPos, sLabel, 1);
 
-        TAccInfo* pEntry = reinterpret_cast<TAccInfo*>(m_xEntriesBox->get_id(nPos).toInt64());
+        TAccInfo* pEntry = weld::fromId<TAccInfo*>(m_xEntriesBox->get_id(nPos));
         pEntry->m_bIsConfigurable = true;
 
         pEntry->m_sCommand = sCommand;
@@ -1052,7 +1061,7 @@ void SfxAcceleratorConfigPage::Init(const uno::Reference<ui::XAcceleratorConfigu
             continue;
 
         // Hardcoded function mapped so no ID possible and mark entry as not changeable
-        TAccInfo* pEntry = reinterpret_cast<TAccInfo*>(m_xEntriesBox->get_id(nPos).toInt64());
+        TAccInfo* pEntry = weld::fromId<TAccInfo*>(m_xEntriesBox->get_id(nPos));
         pEntry->m_bIsConfigurable = false;
 
         m_xEntriesBox->set_sensitive(nPos, false);
@@ -1069,7 +1078,7 @@ void SfxAcceleratorConfigPage::Apply(const uno::Reference<ui::XAcceleratorConfig
     // physical ones!
     for (int i = 0, nCount = m_xEntriesBox->n_children(); i < nCount; ++i)
     {
-        TAccInfo* pUserData = reinterpret_cast<TAccInfo*>(m_xEntriesBox->get_id(i).toInt64());
+        TAccInfo* pUserData = weld::fromId<TAccInfo*>(m_xEntriesBox->get_id(i));
         OUString sCommand;
         awt::KeyEvent aAWTKey;
 
@@ -1148,7 +1157,7 @@ IMPL_LINK_NOARG(SfxAcceleratorConfigPage, ChangeHdl, weld::Button&, void)
     if (nPos == -1)
         return;
 
-    TAccInfo* pEntry = reinterpret_cast<TAccInfo*>(m_xEntriesBox->get_id(nPos).toInt64());
+    TAccInfo* pEntry = weld::fromId<TAccInfo*>(m_xEntriesBox->get_id(nPos));
     OUString sNewCommand = m_xFunctionBox->GetCurCommand();
     OUString sLabel = m_xFunctionBox->GetCurLabel();
     if (sLabel.isEmpty())
@@ -1167,7 +1176,7 @@ IMPL_LINK_NOARG(SfxAcceleratorConfigPage, RemoveHdl, weld::Button&, void)
     if (nPos == -1)
         return;
 
-    TAccInfo* pEntry = reinterpret_cast<TAccInfo*>(m_xEntriesBox->get_id(nPos).toInt64());
+    TAccInfo* pEntry = weld::fromId<TAccInfo*>(m_xEntriesBox->get_id(nPos));
 
     // remove function name from selected entry
     m_xEntriesBox->set_text(nPos, OUString(), 1);
@@ -1180,7 +1189,7 @@ IMPL_LINK(SfxAcceleratorConfigPage, SelectHdl, weld::TreeView&, rListBox, void)
 {
     if (&rListBox == m_xEntriesBox.get())
     {
-        TAccInfo* pEntry = reinterpret_cast<TAccInfo*>(m_xEntriesBox->get_selected_id().toInt64());
+        TAccInfo* pEntry = weld::fromId<TAccInfo*>(m_xEntriesBox->get_selected_id());
 
         OUString sPossibleNewCommand = m_xFunctionBox->GetCurCommand();
 
@@ -1222,7 +1231,7 @@ IMPL_LINK(SfxAcceleratorConfigPage, SelectHdl, weld::TreeView&, rListBox, void)
         m_xChangeButton->set_sensitive(false);
 
         // #i36994 First selected can return null!
-        TAccInfo* pEntry = reinterpret_cast<TAccInfo*>(m_xEntriesBox->get_selected_id().toInt64());
+        TAccInfo* pEntry = weld::fromId<TAccInfo*>(m_xEntriesBox->get_selected_id());
         if (pEntry)
         {
             OUString sPossibleNewCommand = m_xFunctionBox->GetCurCommand();
@@ -1241,12 +1250,10 @@ IMPL_LINK(SfxAcceleratorConfigPage, SelectHdl, weld::TreeView&, rListBox, void)
             {
                 for (int i = 0, nCount = m_xEntriesBox->n_children(); i < nCount; ++i)
                 {
-                    TAccInfo* pUserData
-                        = reinterpret_cast<TAccInfo*>(m_xEntriesBox->get_id(i).toInt64());
+                    TAccInfo* pUserData = weld::fromId<TAccInfo*>(m_xEntriesBox->get_id(i));
                     if (pUserData && pUserData->m_sCommand == sPossibleNewCommand)
                     {
-                        m_xKeyBox->append(OUString::number(reinterpret_cast<sal_Int64>(pUserData)),
-                                          pUserData->m_aKey.GetName());
+                        m_xKeyBox->append(weld::toId(pUserData), pUserData->m_aKey.GetName());
                     }
                 }
             }
@@ -1256,7 +1263,7 @@ IMPL_LINK(SfxAcceleratorConfigPage, SelectHdl, weld::TreeView&, rListBox, void)
     {
         // goto selected "key" entry of the key box
         int nP2 = -1;
-        TAccInfo* pU2 = reinterpret_cast<TAccInfo*>(m_xKeyBox->get_selected_id().toInt64());
+        TAccInfo* pU2 = weld::fromId<TAccInfo*>(m_xKeyBox->get_selected_id());
         if (pU2)
             nP2 = MapKeyCodeToPos(pU2->m_aKey);
         if (nP2 != -1)
@@ -1519,10 +1526,9 @@ void SfxAcceleratorConfigPage::Reset(const SfxItemSet* rSet)
     RadioHdl(*m_xOfficeButton);
 
 #if HAVE_FEATURE_SCRIPTING
-    const SfxPoolItem* pMacroItem = nullptr;
-    if (SfxItemState::SET == rSet->GetItemState(SID_MACROINFO, true, &pMacroItem))
+    if (const SfxMacroInfoItem* pMacroItem = rSet->GetItemIfSet(SID_MACROINFO))
     {
-        m_pMacroInfoItem = &dynamic_cast<const SfxMacroInfoItem&>(*pMacroItem);
+        m_pMacroInfoItem = pMacroItem;
         m_xGroupLBox->SelectMacro(m_pMacroInfoItem);
     }
 #else
@@ -1535,7 +1541,7 @@ sal_Int32 SfxAcceleratorConfigPage::MapKeyCodeToPos(const vcl::KeyCode& aKey) co
     sal_uInt16 nCode1 = aKey.GetCode() + aKey.GetModifier();
     for (int i = 0, nCount = m_xEntriesBox->n_children(); i < nCount; ++i)
     {
-        TAccInfo* pUserData = reinterpret_cast<TAccInfo*>(m_xEntriesBox->get_id(i).toInt64());
+        TAccInfo* pUserData = weld::fromId<TAccInfo*>(m_xEntriesBox->get_id(i));
         if (pUserData)
         {
             sal_uInt16 nCode2 = pUserData->m_aKey.GetCode() + pUserData->m_aKey.GetModifier();

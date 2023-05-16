@@ -30,9 +30,8 @@
 #include <com/sun/star/sdbc/XRow.hpp>
 #include <com/sun/star/ucb/XContentAccess.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <cppuhelper/interfacecontainer.h>
-#include <comphelper/interfacecontainer2.hxx>
-#include <comphelper/multiinterfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
+#include <comphelper/multiinterfacecontainer3.hxx>
 #include <memory>
 
 
@@ -48,8 +47,10 @@ class ContentResultSetWrapper
                 , public css::sdbc::XRow
 {
 protected:
-    typedef comphelper::OMultiTypeInterfaceContainerHelperVar2<OUString>
+    typedef comphelper::OMultiTypeInterfaceContainerHelperVar3<css::beans::XPropertyChangeListener, OUString>
         PropertyChangeListenerContainer_Impl;
+    typedef comphelper::OMultiTypeInterfaceContainerHelperVar3<css::beans::XVetoableChangeListener, OUString>
+        VetoableChangeListenerContainer_Impl;
 
     //members
 
@@ -86,11 +87,11 @@ private:
     bool                m_bDisposed; ///Dispose call ready.
     bool                m_bInDispose;///In dispose call
     osl::Mutex              m_aContainerMutex;
-    std::unique_ptr<comphelper::OInterfaceContainerHelper2>
+    std::unique_ptr<comphelper::OInterfaceContainerHelper3<css::lang::XEventListener>>
                             m_pDisposeEventListeners;
     std::unique_ptr<PropertyChangeListenerContainer_Impl>
                             m_pPropertyChangeListeners;
-    std::unique_ptr<PropertyChangeListenerContainer_Impl>
+    std::unique_ptr<VetoableChangeListenerContainer_Impl>
                             m_pVetoableChangeListeners;
 
 

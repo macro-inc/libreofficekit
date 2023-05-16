@@ -7,13 +7,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
+#include <test/unoapi_test.hxx>
 
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/frame/XFrame.hpp>
 #include <com/sun/star/frame/XComponentLoader.hpp>
 #include <com/sun/star/frame/FrameSearchFlag.hpp>
+#include <com/sun/star/util/URLTransformer.hpp>
 
 #include <comphelper/propertyvalue.hxx>
 #include <salhelper/thread.hxx>
@@ -26,31 +26,14 @@ using namespace ::com::sun::star;
 namespace
 {
 /// Covers framework/source/services/ fixes.
-class Test : public test::BootstrapFixture, public unotest::MacrosTest
+class Test : public UnoApiTest
 {
-protected:
-    uno::Reference<lang::XComponent> mxComponent;
-
 public:
-    void setUp() override;
-    void tearDown() override;
-    uno::Reference<lang::XComponent>& getComponent() { return mxComponent; }
+    Test()
+        : UnoApiTest("/framework/qa/cppunit/data/")
+    {
+    }
 };
-
-void Test::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set(frame::Desktop::create(mxComponentContext));
-}
-
-void Test::tearDown()
-{
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
-}
 
 /// Invokes XFrameImpl::loadComponentFromURL() on a thread.
 class TestThread : public salhelper::Thread
@@ -105,7 +88,7 @@ CPPUNIT_TEST_FIXTURE(Test, testLoadComponentFromURL)
         SolarMutexGuard guard;
         uno::Reference<frame::XFrame> xFrame = mxDesktop->findFrame("_blank", /*nSearchFlags=*/0);
         uno::Reference<frame::XComponentLoader> xComponentLoader(xFrame, uno::UNO_QUERY);
-        xThread = new TestThread(xComponentLoader, getComponent());
+        xThread = new TestThread(xComponentLoader, mxComponent);
         xThread->launch();
         // If loadComponentFromURL() doesn't lock the solar mutex, the test will abort here.
         osl::Thread::wait(std::chrono::seconds(1));
@@ -125,6 +108,29 @@ CPPUNIT_TEST_FIXTURE(Test, testLoadComponentFromURL)
         SolarMutexReleaser releaser;
         xThread->join();
     }
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testURLTransformer_parseSmart)
+{
+    // Without the accompanying fix in place, this test would have failed with
+    // "www.example.com:" treated as scheme, "/8080/foo/" as path, "bar?q=baz"
+    // as name, and "F" as fragment.
+
+    css::util::URL aURL;
+    aURL.Complete = "www.example.com:8080/foo/bar?q=baz#F";
+    css::uno::Reference xParser(css::util::URLTransformer::create(mxComponentContext));
+    CPPUNIT_ASSERT(xParser->parseSmart(aURL, "http:"));
+    CPPUNIT_ASSERT_EQUAL(OUString("http://www.example.com:8080/foo/bar?q=baz#F"), aURL.Complete);
+    CPPUNIT_ASSERT_EQUAL(OUString("http://www.example.com:8080/foo/bar"), aURL.Main);
+    CPPUNIT_ASSERT_EQUAL(OUString("http://"), aURL.Protocol);
+    CPPUNIT_ASSERT(aURL.User.isEmpty());
+    CPPUNIT_ASSERT(aURL.Password.isEmpty());
+    CPPUNIT_ASSERT_EQUAL(OUString("www.example.com"), aURL.Server);
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(8080), aURL.Port);
+    CPPUNIT_ASSERT_EQUAL(OUString("/foo/"), aURL.Path);
+    CPPUNIT_ASSERT_EQUAL(OUString("bar"), aURL.Name);
+    CPPUNIT_ASSERT_EQUAL(OUString("q=baz"), aURL.Arguments);
+    CPPUNIT_ASSERT_EQUAL(OUString("F"), aURL.Mark);
 }
 }
 

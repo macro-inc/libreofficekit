@@ -20,28 +20,26 @@
 #ifndef INCLUDED_LINGUCOMPONENT_SOURCE_SPELLCHECK_SPELL_SSPELLIMP_HXX
 #define INCLUDED_LINGUCOMPONENT_SOURCE_SPELLCHECK_SPELL_SSPELLIMP_HXX
 
+#include <comphelper/interfacecontainer3.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <com/sun/star/lang/XServiceDisplayName.hpp>
-#include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/beans/PropertyValues.hpp>
+#include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/linguistic2/XSpellChecker.hpp>
 #include <com/sun/star/linguistic2/XLinguServiceEventBroadcaster.hpp>
 
-#include <linguistic/misc.hxx>
 #include <linguistic/lngprophelp.hxx>
 
-#include <lingutil.hxx>
 #include <memory>
+
+#include <hunspell.hxx>
 
 using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star::beans;
 using namespace ::com::sun::star::lang;
 using namespace ::com::sun::star::linguistic2;
-
-class Hunspell;
 
 class SpellChecker :
     public cppu::WeakImplHelper
@@ -68,7 +66,7 @@ class SpellChecker :
 
     Sequence< Locale >                 m_aSuppLocales;
 
-    ::comphelper::OInterfaceContainerHelper2       m_aEvtListeners;
+    ::comphelper::OInterfaceContainerHelper3<XEventListener> m_aEvtListeners;
     std::unique_ptr<linguistic::PropertyHelper_Spelling> m_pPropHelper;
     bool                                    m_bDisposing;
 

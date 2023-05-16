@@ -20,7 +20,7 @@
 #define INCLUDED_SLIDESHOW_SOURCE_INC_BASENODE_HXX
 
 #include <basegfx/vector/b2dvector.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.hxx>
 
 #include "event.hxx"
@@ -28,6 +28,7 @@
 #include "slideshowcontext.hxx"
 #include "shapesubset.hxx"
 
+#include <utility>
 #include <vector>
 
 namespace slideshow::internal {
@@ -42,9 +43,9 @@ namespace slideshow::internal {
 */
 struct NodeContext
 {
-    NodeContext( const SlideShowContext&                 rContext,
+    NodeContext( SlideShowContext                        aContext,
                  const ::basegfx::B2DVector&             rSlideSize )
-        : maContext( rContext ),
+        : maContext(std::move( aContext )),
           maSlideSize( rSlideSize ),
           mpMasterShapeSubset(),
           mnStartDelay(0.0),
@@ -82,7 +83,7 @@ class BaseNode : public AnimationNode,
 {
 public:
     BaseNode( css::uno::Reference<css::animations::XAnimationNode> const& xNode,
-              BaseContainerNodeSharedPtr const&                    pParent,
+              BaseContainerNodeSharedPtr                           pParent,
               NodeContext const&                                   rContext );
     BaseNode(const BaseNode&) = delete;
     BaseNode& operator=(const BaseNode&) = delete;

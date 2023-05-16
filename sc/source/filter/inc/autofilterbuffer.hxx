@@ -42,7 +42,7 @@ struct ApiFilterSettings
     typedef ::std::vector<css::sheet::TableFilterField3> FilterFieldVector;
 
     FilterFieldVector   maFilterFields;     /// List of UNO API filter settings.
-    OptValue< bool >    mobNeedsRegExp;     /// If set, requires regular expressions to be enabled/disabled.
+    std::optional< bool > mobNeedsRegExp;     /// If set, requires regular expressions to be enabled/disabled.
 
     explicit            ApiFilterSettings();
 
@@ -197,6 +197,7 @@ public:
     /** Returns converted UNO API filter settings representing all filter
         settings of this column. */
     ApiFilterSettings   finalizeImport();
+    bool                isButtonHidden();
 
 private:
     std::shared_ptr< FilterSettingsBase >

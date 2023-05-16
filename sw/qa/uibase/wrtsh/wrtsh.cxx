@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <swmodeltestbase.hxx>
+#include <wrtsh.hxx>
 
 #include <optional>
 
@@ -19,10 +19,10 @@
 #include <sal/types.h>
 #include <comphelper/propertyvalue.hxx>
 
+#include <swmodeltestbase.hxx>
 #include <doc.hxx>
 #include <docsh.hxx>
 #include <formatlinebreak.hxx>
-#include <wrtsh.hxx>
 #include <ndtxt.hxx>
 #include <textcontentcontrol.hxx>
 #include <fmtanchr.hxx>
@@ -37,7 +37,8 @@ class Test : public SwModelTestBase
 CPPUNIT_TEST_FIXTURE(Test, testInsertLineBreak)
 {
     // Given an empty document:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
 
     // When inserting a clearing break:
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
@@ -60,7 +61,8 @@ CPPUNIT_TEST_FIXTURE(Test, testInsertLineBreak)
 CPPUNIT_TEST_FIXTURE(Test, testGotoContentControl)
 {
     // Given a document with a content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -71,12 +73,12 @@ CPPUNIT_TEST_FIXTURE(Test, testGotoContentControl)
     uno::Reference<text::XTextContent> xContentControl(
         xMSF->createInstance("com.sun.star.text.ContentControl"), uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
-    xContentControlProps->setPropertyValue("ShowingPlaceHolder", uno::makeAny(true));
+    xContentControlProps->setPropertyValue("ShowingPlaceHolder", uno::Any(true));
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When going to that content control in placeholder mode:
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
-    SwNodeOffset nIndex = pWrtShell->GetCursor()->GetNode().GetIndex();
+    SwNodeOffset nIndex = pWrtShell->GetCursor()->GetPointNode().GetIndex();
     SwTextNode* pTextNode = pDoc->GetNodes()[nIndex]->GetTextNode();
     SwTextAttr* pAttr = pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL);
     auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
@@ -87,16 +89,17 @@ CPPUNIT_TEST_FIXTURE(Test, testGotoContentControl)
     // Then make sure that the content control is selected (without the dummy character):
     // Without the accompanying fix in place, this test would have failed, the user had to manually
     // select the placeholder text.
-    sal_Int32 nStart = pWrtShell->GetCursor()->Start()->nContent.GetIndex();
+    sal_Int32 nStart = pWrtShell->GetCursor()->Start()->GetContentIndex();
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1), nStart);
-    sal_Int32 nEnd = pWrtShell->GetCursor()->End()->nContent.GetIndex();
+    sal_Int32 nEnd = pWrtShell->GetCursor()->End()->GetContentIndex();
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(5), nEnd);
 }
 
 CPPUNIT_TEST_FIXTURE(Test, testTickCheckboxContentControl)
 {
     // Given a document with a checkbox (checked) content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -107,15 +110,15 @@ CPPUNIT_TEST_FIXTURE(Test, testTickCheckboxContentControl)
     uno::Reference<text::XTextContent> xContentControl(
         xMSF->createInstance("com.sun.star.text.ContentControl"), uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
-    xContentControlProps->setPropertyValue("Checkbox", uno::makeAny(true));
-    xContentControlProps->setPropertyValue("Checked", uno::makeAny(true));
-    xContentControlProps->setPropertyValue("CheckedState", uno::makeAny(OUString(u"☒")));
-    xContentControlProps->setPropertyValue("UncheckedState", uno::makeAny(OUString(u"☐")));
+    xContentControlProps->setPropertyValue("Checkbox", uno::Any(true));
+    xContentControlProps->setPropertyValue("Checked", uno::Any(true));
+    xContentControlProps->setPropertyValue("CheckedState", uno::Any(OUString(u"☒")));
+    xContentControlProps->setPropertyValue("UncheckedState", uno::Any(OUString(u"☐")));
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When clicking on that content control:
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPointNode().GetTextNode();
     SwTextAttr* pAttr = pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL);
     auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
     auto& rFormatContentControl
@@ -133,14 +136,15 @@ CPPUNIT_TEST_FIXTURE(Test, testTickCheckboxContentControl)
 CPPUNIT_TEST_FIXTURE(Test, testInsertContentControl)
 {
     // Given an empty document:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
 
     // When inserting a content control:
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::RICH_TEXT);
 
     // Then make sure that the matching text attribute is added to the document model:
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPointNode().GetTextNode();
     // Without the accompanying fix in place, this test would have failed, nothing happened on
     // InsertContentControl().
     CPPUNIT_ASSERT(pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL));
@@ -149,14 +153,15 @@ CPPUNIT_TEST_FIXTURE(Test, testInsertContentControl)
 CPPUNIT_TEST_FIXTURE(Test, testInsertCheckboxContentControl)
 {
     // Given an empty document:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
 
     // When inserting a content control:
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::CHECKBOX);
 
     // Then make sure that the matching text attribute is added to the document model:
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPointNode().GetTextNode();
     SwTextAttr* pAttr = pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL);
     auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
     auto& rFormatContentControl
@@ -170,7 +175,8 @@ CPPUNIT_TEST_FIXTURE(Test, testInsertCheckboxContentControl)
 CPPUNIT_TEST_FIXTURE(Test, testSelectDropdownContentControl)
 {
     // Given a document with a dropdown content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -202,7 +208,7 @@ CPPUNIT_TEST_FIXTURE(Test, testSelectDropdownContentControl)
 
     // When clicking on that content control:
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPointNode().GetTextNode();
     SwTextAttr* pAttr = pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL);
     auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
     auto& rFormatContentControl
@@ -221,14 +227,15 @@ CPPUNIT_TEST_FIXTURE(Test, testSelectDropdownContentControl)
 CPPUNIT_TEST_FIXTURE(Test, testInsertDropdownContentControl)
 {
     // Given an empty document:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
 
     // When inserting a content control:
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::DROP_DOWN_LIST);
 
     // Then make sure that the matching text attribute is added to the document model:
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPointNode().GetTextNode();
     SwTextAttr* pAttr = pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL);
     auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
     auto& rFormatContentControl
@@ -244,7 +251,8 @@ CPPUNIT_TEST_FIXTURE(Test, testInsertDropdownContentControl)
 CPPUNIT_TEST_FIXTURE(Test, testReplacePictureContentControl)
 {
     // Given a document with a picture content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -270,8 +278,8 @@ CPPUNIT_TEST_FIXTURE(Test, testReplacePictureContentControl)
     pWrtShell->EnterSelFrameMode();
     const SwFrameFormat* pFlyFormat = pWrtShell->GetFlyFrameFormat();
     const SwFormatAnchor& rFormatAnchor = pFlyFormat->GetAnchor();
-    const SwPosition* pAnchorPos = rFormatAnchor.GetContentAnchor();
-    SwTextNode* pTextNode = pAnchorPos->nNode.GetNode().GetTextNode();
+    SwNode* pAnchorNode = rFormatAnchor.GetAnchorNode();
+    SwTextNode* pTextNode = pAnchorNode->GetTextNode();
     SwTextAttr* pAttr = pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL);
     auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
     auto& rFormatContentControl
@@ -289,14 +297,15 @@ CPPUNIT_TEST_FIXTURE(Test, testReplacePictureContentControl)
 CPPUNIT_TEST_FIXTURE(Test, testInsertPictureContentControl)
 {
     // Given an empty document:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
 
     // When inserting a content control:
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::PICTURE);
 
     // Then make sure that the matching text attribute is added to the document model:
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPointNode().GetTextNode();
     SwTextAttr* pAttr = pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL);
     auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
     auto& rFormatContentControl
@@ -311,7 +320,8 @@ CPPUNIT_TEST_FIXTURE(Test, testInsertPictureContentControl)
 CPPUNIT_TEST_FIXTURE(Test, testSelectDateContentControl)
 {
     // Given a document with a date content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -329,7 +339,7 @@ CPPUNIT_TEST_FIXTURE(Test, testSelectDateContentControl)
 
     // When clicking on that content control:
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPointNode().GetTextNode();
     SwTextAttr* pAttr = pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL);
     auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
     auto& rFormatContentControl
@@ -350,14 +360,15 @@ CPPUNIT_TEST_FIXTURE(Test, testSelectDateContentControl)
 CPPUNIT_TEST_FIXTURE(Test, testInsertDateContentControl)
 {
     // Given an empty document:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
 
     // When inserting a date content control:
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::DATE);
 
     // Then make sure that the matching text attribute is added to the document model:
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPointNode().GetTextNode();
     SwTextAttr* pAttr = pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL);
     auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
     auto& rFormatContentControl
@@ -371,14 +382,15 @@ CPPUNIT_TEST_FIXTURE(Test, testInsertDateContentControl)
 CPPUNIT_TEST_FIXTURE(Test, testInsertPlainTextContentControl)
 {
     // Given an empty document:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
 
     // When inserting a plain text content control:
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::PLAIN_TEXT);
 
     // Then make sure that the matching text attribute is added to the document model:
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPointNode().GetTextNode();
     SwTextAttr* pAttr = pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL);
     auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
     auto& rFormatContentControl
@@ -387,19 +399,27 @@ CPPUNIT_TEST_FIXTURE(Test, testInsertPlainTextContentControl)
     // Without the accompanying fix in place, this test would have failed, there was no special
     // handling for plain text content controls.
     CPPUNIT_ASSERT(pContentControl->GetPlainText());
+
+    CPPUNIT_ASSERT(pContentControl->GetShowingPlaceHolder());
+    pWrtShell->GotoContentControl(rFormatContentControl);
+    CPPUNIT_ASSERT(pContentControl->GetShowingPlaceHolder());
+    pWrtShell->Insert("Foo");
+    // No longer showing placeholder text, as it has been changed
+    CPPUNIT_ASSERT(!pContentControl->GetShowingPlaceHolder());
 }
 
 CPPUNIT_TEST_FIXTURE(Test, testInsertComboBoxContentControl)
 {
     // Given an empty document:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
 
     // When inserting a combo box content control:
     dispatchCommand(mxComponent, ".uno:InsertComboBoxContentControl", {});
 
     // Then make sure that the matching text attribute is added to the document model:
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPointNode().GetTextNode();
     // Without the accompanying fix in place, this test would have failed, no content control was
     // inserted.
     SwTextAttr* pAttr = pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL);

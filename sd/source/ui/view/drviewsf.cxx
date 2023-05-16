@@ -22,6 +22,7 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <comphelper/string.hxx>
 #include <svx/svxids.hrc>
+#include <svx/sdmetitm.hxx>
 #include <svx/hlnkitem.hxx>
 #include <editeng/eeitem.hxx>
 #include <editeng/flditem.hxx>
@@ -409,6 +410,7 @@ void DrawViewShell::GetAttrState( SfxItemSet& rSet )
             case SID_ATTR_SHADOW_BLUR:
             case SID_ATTR_SHADOW_XDISTANCE:
             case SID_ATTR_SHADOW_YDISTANCE:
+            case SID_ATTR_FILL_USE_SLIDE_BACKGROUND:
             case SID_ATTR_FILL_TRANSPARENCE:
             case SID_ATTR_FILL_FLOATTRANSPARENCE:
             case SID_ATTR_LINE_STYLE:
@@ -528,9 +530,8 @@ void DrawViewShell::GetAttrState( SfxItemSet& rSet )
 
             case SID_STYLE_WATERCAN:
             {
-                std::unique_ptr<SfxPoolItem> pItem;
-                GetViewFrame()->GetBindings().QueryState(SID_STYLE_FAMILY, pItem);
-                SfxUInt16Item* pFamilyItem = dynamic_cast<SfxUInt16Item*>(pItem.get());
+                std::unique_ptr<SfxUInt16Item> pFamilyItem;
+                GetViewFrame()->GetBindings().QueryState(SID_STYLE_FAMILY, pFamilyItem);
                 if (pFamilyItem && static_cast<SfxStyleFamily>(pFamilyItem->GetValue()) == SfxStyleFamily::Pseudo)
                     rSet.Put(SfxBoolItem(nWhich,false));
                 else
@@ -543,9 +544,8 @@ void DrawViewShell::GetAttrState( SfxItemSet& rSet )
 
             case SID_STYLE_NEW:
             {
-                std::unique_ptr<SfxPoolItem> pItem;
-                GetViewFrame()->GetBindings().QueryState(SID_STYLE_FAMILY, pItem);
-                SfxUInt16Item* pFamilyItem = dynamic_cast<SfxUInt16Item*>(pItem.get());
+                std::unique_ptr<SfxUInt16Item> pFamilyItem;
+                GetViewFrame()->GetBindings().QueryState(SID_STYLE_FAMILY, pFamilyItem);
                 if (pFamilyItem && static_cast<SfxStyleFamily>(pFamilyItem->GetValue()) == SfxStyleFamily::Pseudo)
                 {
                     rSet.DisableItem(nWhich);
@@ -555,9 +555,8 @@ void DrawViewShell::GetAttrState( SfxItemSet& rSet )
 
             case SID_STYLE_DRAGHIERARCHIE:
             {
-                std::unique_ptr<SfxPoolItem> pItem;
-                GetViewFrame()->GetBindings().QueryState(SID_STYLE_FAMILY, pItem);
-                SfxUInt16Item* pFamilyItem = dynamic_cast<SfxUInt16Item*>(pItem.get());
+                std::unique_ptr<SfxUInt16Item> pFamilyItem;
+                GetViewFrame()->GetBindings().QueryState(SID_STYLE_FAMILY, pFamilyItem);
                 if (pFamilyItem && static_cast<SfxStyleFamily>(pFamilyItem->GetValue()) == SfxStyleFamily::Pseudo)
                     rSet.DisableItem(nWhich);
             }
@@ -568,9 +567,8 @@ void DrawViewShell::GetAttrState( SfxItemSet& rSet )
                 // It is not possible to create PseudoStyleSheets 'by Example';
                 // normal style sheets need a selected object for that
 
-                std::unique_ptr<SfxPoolItem> pItem;
-                GetViewFrame()->GetBindings().QueryState(SID_STYLE_FAMILY, pItem);
-                SfxUInt16Item* pFamilyItem = dynamic_cast<SfxUInt16Item*>(pItem.get());
+                std::unique_ptr<SfxUInt16Item> pFamilyItem;
+                GetViewFrame()->GetBindings().QueryState(SID_STYLE_FAMILY, pFamilyItem);
                 if (pFamilyItem)
                 {
                     if (static_cast<SfxStyleFamily>(pFamilyItem->GetValue()) == SfxStyleFamily::Pseudo)
@@ -616,7 +614,7 @@ void DrawViewShell::GetAttrState( SfxItemSet& rSet )
 
                 std::unique_ptr<SvxNumRule> pNumRule;
                 const SfxPoolItem* pTmpItem=nullptr;
-                sal_uInt16 nNumItemId = SID_ATTR_NUMBERING_RULE;
+                TypedWhichId<SvxNumBulletItem> nNumItemId = SID_ATTR_NUMBERING_RULE;
                 sal_uInt16 nActNumLvl = mpDrawView->GetSelectionLevel();
                 pTmpItem=GetNumBulletItem(aNewAttr, nNumItemId);
 
@@ -686,10 +684,10 @@ void DrawViewShell::GetAttrState( SfxItemSet& rSet )
                 const size_t nMarkCount = rMarkList.GetMarkCount();
                 for (size_t nIndex = 0; nIndex < nMarkCount; ++nIndex)
                 {
-                    SdrTextObj* pTextObj = dynamic_cast< SdrTextObj* >(rMarkList.GetMark(nIndex)->GetMarkedSdrObj());
+                    SdrTextObj* pTextObj = DynCastSdrTextObj(rMarkList.GetMark(nIndex)->GetMarkedSdrObj());
                     if (pTextObj && pTextObj->GetObjInventor() == SdrInventor::Default)
                     {
-                        if (pTextObj->GetObjIdentifier() != OBJ_OLE2)
+                        if (pTextObj->GetObjIdentifier() != SdrObjKind::OLE2)
                         {
                             bEnable = true;
                             break;
@@ -736,7 +734,7 @@ void DrawViewShell::GetAttrState( SfxItemSet& rSet )
         while( nWhich )
         {
             if (nWhich >= XATTR_LINE_FIRST && nWhich <= XATTR_LINE_LAST
-                && SfxItemState::DEFAULT == pSet->GetItemState(nWhich) )
+                && SfxItemState::DEFAULT == aNewIter.GetItemState() )
             {
                 rSet.ClearItem( nWhich );
                 rSet.DisableItem( nWhich );

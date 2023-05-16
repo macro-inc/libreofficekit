@@ -52,7 +52,7 @@
 #include <com/sun/star/sdb/XReportDocumentsSupplier.hpp>
 #include <com/sun/star/sdb/XFormDocumentsSupplier.hpp>
 #include <svtools/querydelete.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 #include <defaultobjectnamecheck.hxx>
 #include <osl/mutex.hxx>
@@ -744,11 +744,11 @@ bool OApplicationController::paste( ElementType _eType, const svx::ODataAccessDe
                         ::comphelper::copyProperties(xQuery,xNewQuery);
                     else
                     {
-                        xNewQuery->setPropertyValue(PROPERTY_COMMAND,makeAny(sCommand));
-                        xNewQuery->setPropertyValue(PROPERTY_ESCAPE_PROCESSING,makeAny(bEscapeProcessing));
+                        xNewQuery->setPropertyValue(PROPERTY_COMMAND,Any(sCommand));
+                        xNewQuery->setPropertyValue(PROPERTY_ESCAPE_PROCESSING,Any(bEscapeProcessing));
                     }
                     // insert
-                    xDestQueries->insertByName( sTargetName, makeAny(xNewQuery) );
+                    xDestQueries->insertByName( sTargetName, Any(xNewQuery) );
                     xNewQuery.set(xDestQueries->getByName( sTargetName),UNO_QUERY);
                     if ( xQuery.is() && xNewQuery.is() )
                     {
@@ -786,7 +786,7 @@ bool OApplicationController::paste( ElementType _eType, const svx::ODataAccessDe
         {
             Reference<XContent> xContent;
             _rPasteData[DataAccessDescriptorProperty::Component] >>= xContent;
-            return insertHierachyElement(_eType,_sParentFolder,Reference<XNameAccess>(xContent,UNO_QUERY).is(),xContent,_bMove);
+            return insertHierarchyElement(_eType,_sParentFolder,Reference<XNameAccess>(xContent,UNO_QUERY).is(),xContent,_bMove);
         }
     }
     catch(const SQLException&) { showError( SQLExceptionInfo( ::cppu::getCaughtException() ) ); }
@@ -852,10 +852,10 @@ IMPL_LINK_NOARG( OApplicationController, OnAsyncDrop, void*, void )
             std::vector< OUString> aList;
             sal_Int32 nIndex = 0;
             OUString sName = xContent->getIdentifier()->getContentIdentifier();
-            OUString sErase = sName.getToken(0,'/',nIndex); // we don't want to have the "private:forms" part
+            std::u16string_view sErase = o3tl::getToken(sName,0,'/',nIndex); // we don't want to have the "private:forms" part
             if ( nIndex != -1 )
             {
-                aList.push_back(sName.copy(sErase.getLength() + 1));
+                aList.push_back(sName.copy(sErase.size() + 1));
                 deleteObjects( m_aAsyncDrop.nType, aList, false );
             }
         }

@@ -25,7 +25,6 @@
 #include <com/sun/star/beans/NamedValue.hpp>
 #include <comphelper/string.hxx>
 #include <cppuhelper/implbase.hxx>
-#include <osl/diagnose.h>
 #include <sal/log.hxx>
 #include <tools/debug.hxx>
 
@@ -37,6 +36,9 @@
 #include <sfx2/dockwin.hxx>
 #include <sfx2/dispatch.hxx>
 #include <workwin.hxx>
+
+#include <sfx2/sfxsids.hrc>
+#include <o3tl/string_view.hxx>
 
 const sal_uInt16 nVersion = 2;
 
@@ -104,35 +106,35 @@ class DisposeListener : public ::cppu::WeakImplHelper< css::lang::XEventListener
 
 }
 
-bool GetPosSizeFromString( const OUString& rStr, Point& rPos, Size& rSize )
+bool GetPosSizeFromString( std::u16string_view rStr, Point& rPos, Size& rSize )
 {
     if ( comphelper::string::getTokenCount(rStr, '/') != 4 )
         return false;
 
     sal_Int32 nIdx = 0;
-    rPos.setX( rStr.getToken(0, '/', nIdx).toInt32() );
-    rPos.setY( rStr.getToken(0, '/', nIdx).toInt32() );
-    rSize.setWidth( rStr.getToken(0, '/', nIdx).toInt32() );
-    rSize.setHeight( rStr.getToken(0, '/', nIdx).toInt32() );
+    rPos.setX( o3tl::toInt32(o3tl::getToken(rStr, 0, '/', nIdx)) );
+    rPos.setY( o3tl::toInt32(o3tl::getToken(rStr, 0, '/', nIdx)) );
+    rSize.setWidth( o3tl::toInt32(o3tl::getToken(rStr, 0, '/', nIdx)) );
+    rSize.setHeight( o3tl::toInt32(o3tl::getToken(rStr, 0, '/', nIdx)) );
 
     // negative sizes are invalid
     return rSize.Width() >= 0 && rSize.Height() >= 0;
 }
 
-bool GetSplitSizeFromString( const OUString& rStr, Size& rSize )
+bool GetSplitSizeFromString( std::u16string_view rStr, Size& rSize )
 {
-    sal_Int32 nIndex = rStr.indexOf( ',' );
-    if ( nIndex != -1 )
+    size_t nIndex = rStr.find( ',' );
+    if ( nIndex != std::u16string_view::npos )
     {
-        OUString aStr = rStr.copy( nIndex+1 );
+        std::u16string_view aStr = rStr.substr( nIndex+1 );
 
         sal_Int32 nCount = comphelper::string::getTokenCount(aStr, ';');
         if ( nCount != 2 )
             return false;
 
         sal_Int32 nIdx{ 0 };
-        rSize.setWidth( aStr.getToken(0, ';', nIdx ).toInt32() );
-        rSize.setHeight( aStr.getToken(0, ';', nIdx ).toInt32() );
+        rSize.setWidth( o3tl::toInt32(o3tl::getToken(aStr, 0, ';', nIdx )) );
+        rSize.setHeight( o3tl::toInt32(o3tl::getToken(aStr, 0, ';', nIdx )) );
 
         // negative sizes are invalid
         return rSize.Width() >= 0 && rSize.Height() >= 0;
@@ -209,12 +211,11 @@ std::unique_ptr<SfxChildWindow> SfxChildWindow::CreateChildWindow( sal_uInt16 nI
         pFact = pApp->GetChildWinFactoryById(nId);
         if ( pFact )
         {
-            SfxChildWinInfo& rFactInfo = pFact->aInfo;
             if ( rInfo.bVisible )
             {
                 if ( pBindings )
                     pBindings->ENTERREGISTRATIONS();
-                SfxChildWinInfo aInfo = rFactInfo;
+                SfxChildWinInfo aInfo = rInfo;
                 Application::SetSystemWindowMode( SystemWindowFlags::NOAUTOMODE );
                 pChild = pFact->pCtor( pParent, nId, pBindings, &aInfo );
                 Application::SetSystemWindowMode( nOldMode );
@@ -231,12 +232,11 @@ std::unique_ptr<SfxChildWindow> SfxChildWindow::CreateChildWindow( sal_uInt16 nI
         pFact = pMod->GetChildWinFactoryById(nId);
         if ( pFact )
         {
-            SfxChildWinInfo& rFactInfo = pFact->aInfo;
             if ( rInfo.bVisible )
             {
                 if ( pBindings )
                     pBindings->ENTERREGISTRATIONS();
-                SfxChildWinInfo aInfo = rFactInfo;
+                SfxChildWinInfo aInfo = rInfo;
                 Application::SetSystemWindowMode( SystemWindowFlags::NOAUTOMODE );
                 pChild = pFact->pCtor( pParent, nId, pBindings, &aInfo );
                 Application::SetSystemWindowMode( nOldMode );
@@ -289,7 +289,7 @@ void SfxChildWindow::SaveStatus(const SfxChildWinInfo& rInfo)
     aWinOpt.SetWindowState(OStringToOUString(rInfo.aWinState, RTL_TEXTENCODING_UTF8));
 
     css::uno::Sequence < css::beans::NamedValue > aSeq
-        { { "Data", css::uno::makeAny(aWinData) } };
+        { { "Data", css::uno::Any(aWinData) } };
     aWinOpt.SetUserData( aSeq );
 
     // ... but save status at runtime!
@@ -309,9 +309,9 @@ SfxChildWinInfo SfxChildWindow::GetInfo() const
         weld::Dialog* pDialog = xController->getDialog();
         aInfo.aPos  = pDialog->get_position();
         aInfo.aSize = pDialog->get_size();
-        WindowStateMask nMask = WindowStateMask::Pos | WindowStateMask::State;
+        vcl::WindowDataMask nMask = vcl::WindowDataMask::Pos | vcl::WindowDataMask::State;
         if (pDialog->get_resizable())
-            nMask |= WindowStateMask::Width | WindowStateMask::Height;
+            nMask |= vcl::WindowDataMask::Size;
         aInfo.aWinState = pDialog->get_window_state(nMask);
     }
     else if (pWindow)
@@ -320,9 +320,9 @@ SfxChildWinInfo SfxChildWindow::GetInfo() const
         aInfo.aSize = pWindow->GetSizePixel();
         if ( pWindow->IsSystemWindow() )
         {
-            WindowStateMask nMask = WindowStateMask::Pos | WindowStateMask::State;
+            vcl::WindowDataMask nMask = vcl::WindowDataMask::Pos | vcl::WindowDataMask::State;
             if ( pWindow->GetStyle() & WB_SIZEABLE )
-                nMask |= WindowStateMask::Width | WindowStateMask::Height;
+                nMask |= vcl::WindowDataMask::Size;
             aInfo.aWinState = static_cast<SystemWindow*>(pWindow.get())->GetWindowState( nMask );
         }
         else if (DockingWindow* pDockingWindow = dynamic_cast<DockingWindow*>(pWindow.get()))
@@ -352,14 +352,14 @@ void SfxChildWindow::InitializeChildWinFactory_Impl(sal_uInt16 nId, SfxChildWinI
 {
     // load configuration
 
-    std::unique_ptr<SvtViewOptions> xWinOpt;
+    std::optional<SvtViewOptions> xWinOpt;
     // first see if a module specific id exists
     if (rInfo.aModule.getLength())
-        xWinOpt.reset(new SvtViewOptions(EViewType::Window, rInfo.aModule + "/" + OUString::number(nId)));
+        xWinOpt.emplace(EViewType::Window, rInfo.aModule + "/" + OUString::number(nId));
 
     // if not then try the generic id
     if (!xWinOpt || !xWinOpt->Exists())
-        xWinOpt.reset(new SvtViewOptions(EViewType::Window, OUString::number(nId)));
+        xWinOpt.emplace(EViewType::Window, OUString::number(nId));
 
     if (xWinOpt->Exists() && xWinOpt->HasVisible() )
         rInfo.bVisible  = xWinOpt->IsVisible(); // set state from configuration. Can be overwritten by UserData, see below
@@ -387,7 +387,7 @@ void SfxChildWindow::InitializeChildWinFactory_Impl(sal_uInt16 nId, SfxChildWinI
     // Read version
     char cToken = ',';
     sal_Int32 nPos = aWinData.indexOf( cToken );
-    sal_uInt16 nActVersion = static_cast<sal_uInt16>(aWinData.copy( 0, nPos + 1 ).toInt32());
+    sal_uInt16 nActVersion = static_cast<sal_uInt16>(o3tl::toInt32(aWinData.subView( 0, nPos + 1 )));
     if ( nActVersion != nVersion )
         return;
 
@@ -404,12 +404,12 @@ void SfxChildWindow::InitializeChildWinFactory_Impl(sal_uInt16 nId, SfxChildWinI
     if ( nNextPos != -1 )
     {
         // there is extra information
-        rInfo.nFlags = static_cast<SfxChildWindowFlags>(static_cast<sal_uInt16>(aWinData.copy( nPos+1, nNextPos - nPos - 1 ).toInt32()));
+        rInfo.nFlags = static_cast<SfxChildWindowFlags>(static_cast<sal_uInt16>(o3tl::toInt32(aWinData.subView( nPos+1, nNextPos - nPos - 1 ))));
         aWinData = aWinData.replaceAt( nPos, nNextPos-nPos+1, u"" );
         rInfo.aExtraString = aWinData;
     }
     else
-        rInfo.nFlags = static_cast<SfxChildWindowFlags>(static_cast<sal_uInt16>(aWinData.copy( nPos+1 ).toInt32()));
+        rInfo.nFlags = static_cast<SfxChildWindowFlags>(static_cast<sal_uInt16>(o3tl::toInt32(aWinData.subView( nPos+1 ))));
 }
 
 bool ParentIsFloatingWindow(const vcl::Window *pParent)
@@ -511,7 +511,7 @@ void SfxChildWindow::SetVisible_Impl( bool bVis )
 void SfxChildWindow::Hide()
 {
     if (xController)
-        xController->EndDialog();
+        xController->EndDialog(nCloseResponseToJustHide);
     else
         pWindow->Hide();
 }
@@ -523,7 +523,11 @@ void SfxChildWindow::Show( ShowFlags nFlags )
         if (!xController->getDialog()->get_visible())
         {
             weld::DialogController::runAsync(xController,
-                [this](sal_Int32 /*nResult*/){ xController->Close(); });
+                [this](sal_Int32 nResult) {
+                    if (nResult == nCloseResponseToJustHide)
+                        return;
+                    xController->Close();
+                });
         }
     }
     else

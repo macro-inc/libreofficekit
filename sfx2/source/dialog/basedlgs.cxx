@@ -142,11 +142,11 @@ SfxModelessDialogController::~SfxModelessDialogController()
         m_pBindings->SetActiveFrame(nullptr);
 }
 
-void SfxDialogController::EndDialog()
+void SfxDialogController::EndDialog(int nResponse)
 {
     if (!m_xDialog->get_visible())
         return;
-    response(RET_CLOSE);
+    response(nResponse);
 }
 
 bool SfxModelessDialogController::IsClosing() const
@@ -154,7 +154,7 @@ bool SfxModelessDialogController::IsClosing() const
     return m_xImpl->bClosing;
 }
 
-void SfxModelessDialogController::EndDialog()
+void SfxModelessDialogController::EndDialog(int nResponse)
 {
     if (m_xImpl->bClosing)
         return;
@@ -163,7 +163,7 @@ void SfxModelessDialogController::EndDialog()
     // stack frame.
     auto aHoldSelf = shared_from_this();
     m_xImpl->bClosing = true;
-    SfxDialogController::EndDialog();
+    SfxDialogController::EndDialog(nResponse);
     if (!m_xImpl)
         return;
     m_xImpl->bClosing = false;
@@ -173,9 +173,9 @@ void SfxModelessDialogController::ChildWinDispose()
 {
     if (m_xImpl->pMgr)
     {
-        WindowStateMask nMask = WindowStateMask::Pos | WindowStateMask::State;
+        vcl::WindowDataMask nMask = vcl::WindowDataMask::Pos | vcl::WindowDataMask::State;
         if (m_xDialog->get_resizable())
-            nMask |= WindowStateMask::Width | WindowStateMask::Height;
+            nMask |= vcl::WindowDataMask::Size;
         m_xImpl->aWinState = m_xDialog->get_window_state(nMask);
         GetBindings().GetWorkWindow_Impl()->ConfigChild_Impl( SfxChildIdentifier::DOCKINGWINDOW, SfxDockingConfig::ALIGNDOCKINGWINDOW, m_xImpl->pMgr->GetType() );
     }
@@ -227,6 +227,17 @@ SfxSingleTabDialogController::SfxSingleTabDialogController(weld::Widget *pParent
     : SfxOkDialogController(pParent, rUIXMLDescription, rID)
     , m_pInputSet(pSet)
     , m_xContainer(m_xDialog->weld_content_area())
+    , m_xOKBtn(m_xBuilder->weld_button("ok"))
+    , m_xHelpBtn(m_xBuilder->weld_button("help"))
+{
+    m_xOKBtn->connect_clicked(LINK(this, SfxSingleTabDialogController, OKHdl_Impl));
+}
+
+SfxSingleTabDialogController::SfxSingleTabDialogController(weld::Widget *pParent, const SfxItemSet* pSet,
+    const OString& rContainerId, const OUString& rUIXMLDescription, const OString& rID)
+    : SfxOkDialogController(pParent, rUIXMLDescription, rID)
+    , m_pInputSet(pSet)
+    , m_xContainer(m_xBuilder->weld_container(rContainerId))
     , m_xOKBtn(m_xBuilder->weld_button("ok"))
     , m_xHelpBtn(m_xBuilder->weld_button("help"))
 {
@@ -312,7 +323,7 @@ IMPL_LINK_NOARG(SfxSingleTabDialogController, OKHdl_Impl, weld::Button&, void)
         OUString sConfigId = OStringToOUString(m_xSfxPage->GetConfigId(),
             RTL_TEXTENCODING_UTF8);
         SvtViewOptions aPageOpt(EViewType::TabPage, sConfigId);
-        aPageOpt.SetUserItem( USERITEM_NAME, makeAny( sData ) );
+        aPageOpt.SetUserItem( USERITEM_NAME, Any( sData ) );
         m_xDialog->response(RET_OK);
     }
     else

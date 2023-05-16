@@ -90,6 +90,9 @@ enum class DocumentSettingId
     // tdf#112443 disable off-page content positioning
     DISABLE_OFF_PAGE_POSITIONING,
     EMPTY_DB_FIELD_HIDES_PARA,
+    // tdf#129448: Auto first-line indent should not be effected by line space
+    AUTO_FIRST_LINE_INDENT_DISREGARD_LINE_SPACE,
+    HYPHENATE_URLS, ///< tdf#152952
     // COMPATIBILITY FLAGS END
     BROWSE_MODE,
     HTML_MODE,
@@ -117,6 +120,14 @@ enum class DocumentSettingId
     // footnoteContainer default position is the page end instead of the column end
     // only if "evenly distributed" is set, and "collected at the end" is not set
     FOOTNOTE_IN_COLUMN_TO_PAGEEND,
+    // AsChar anchored flys wrapped differently in ooxml than normally so in case of
+    // docx enable this flag. For details see ticket tdf#100680.
+    WRAP_AS_CHAR_FLYS_LIKE_IN_OOXML,
+    // Should we display follow by symbol for numbered paragraph if numbering exists, but "None"?
+    NO_NUMBERING_SHOW_FOLLOWBY,
+    // drop cap punctuation: smaller dashes, bullet, asterisks, quotation marks etc.
+    // by extending the rounding box of the glyph to the baseline
+    DROP_CAP_PUNCTUATION
 };
 
 /** Provides access to settings of a document

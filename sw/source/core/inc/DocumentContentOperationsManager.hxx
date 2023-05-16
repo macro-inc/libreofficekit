@@ -44,15 +44,11 @@ public:
 
     bool DelFullPara(SwPaM&) override;
 
-    // Add optional parameter <bForceJoinNext>, default value <false>
-    // Needed for hiding of deletion redlines
-    bool DeleteAndJoin( SwPaM&,
-        SwDeleteFlags flags = SwDeleteFlags::Default,
-        const bool bForceJoinNext = false ) override;
+    bool DeleteAndJoin(SwPaM&, SwDeleteFlags flags = SwDeleteFlags::Default) override;
 
     bool MoveRange(SwPaM&, SwPosition&, SwMoveFlags) override;
 
-    bool MoveNodeRange(SwNodeRange&, SwNodeIndex&, SwMoveFlags) override;
+    bool MoveNodeRange(SwNodeRange&, SwNode&, SwMoveFlags) override;
 
     void MoveAndJoin(SwPaM&, SwPosition&) override;
 
@@ -100,6 +96,7 @@ public:
         SwRootFrame const* pLayout = nullptr) override;
 
     void RemoveLeadingWhiteSpace(const SwPosition & rPos ) override;
+    void RemoveLeadingWhiteSpace(SwPaM& rPaM) override;
 
 
     //Non-Interface methods
@@ -107,7 +104,7 @@ public:
     void DeleteDummyChar(SwPosition const& rPos, sal_Unicode cDummy);
 
     void CopyWithFlyInFly( const SwNodeRange& rRg,
-                            const SwNodeIndex& rInsPos,
+                            SwNode& rInsPos,
                             const std::pair<const SwPaM&, const SwPosition&> * pCopiedPaM = nullptr,
                             bool bMakeNewFrames = true,
                             bool bDelRedlines = true,
@@ -115,7 +112,7 @@ public:
                             SwCopyFlags flags = SwCopyFlags::Default) const;
     void CopyFlyInFlyImpl(  const SwNodeRange& rRg,
                             SwPaM const*const pCopiedPaM,
-                            const SwNodeIndex& rStartIdx,
+                            SwNode& rStartIdx,
                             const bool bCopyFlyAtFly = false,
                             SwCopyFlags flags = SwCopyFlags::Default) const;
 
@@ -164,9 +161,9 @@ private:
 
     bool m_bIME = false;
 
-    bool DeleteAndJoinImpl(SwPaM&, SwDeleteFlags, const bool);
-    bool DeleteAndJoinWithRedlineImpl(SwPaM&, SwDeleteFlags, const bool unused = false);
-    bool DeleteRangeImpl(SwPaM&, SwDeleteFlags, const bool unused = false);
+    bool DeleteAndJoinImpl(SwPaM &, SwDeleteFlags);
+    bool DeleteAndJoinWithRedlineImpl(SwPaM &, SwDeleteFlags);
+    bool DeleteRangeImpl(SwPaM &, SwDeleteFlags);
     bool DeleteRangeImplImpl(SwPaM &, SwDeleteFlags);
     bool ReplaceRangeImpl(SwPaM&, OUString const&, const bool);
     SwFlyFrameFormat* InsNoTextNode( const SwPosition&rPos, SwNoTextNode*,
@@ -185,7 +182,8 @@ private:
 };
 
 
-void CopyBookmarks(const SwPaM& rPam, const SwPosition& rTarget);
+void CopyBookmarks(const SwPaM& rPam, const SwPosition& rTarget,
+                   SwCopyFlags flags = SwCopyFlags::Default);
 
 void CalcBreaks(std::vector<std::pair<SwNodeOffset, sal_Int32>> & rBreaks,
         SwPaM const & rPam, bool const isOnlyFieldmarks = false);

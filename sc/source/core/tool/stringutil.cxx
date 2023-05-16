@@ -191,9 +191,8 @@ bool ScStringUtil::parseSimpleNumber(
 
     rtl_math_ConversionStatus eStatus = rtl_math_ConversionStatus_Ok;
     sal_Int32 nParseEnd = 0;
-    OUString aString( aBuf.makeStringAndClear());
-    rVal = ::rtl::math::stringToDouble( aString, dsep, gsep, &eStatus, &nParseEnd);
-    if (eStatus != rtl_math_ConversionStatus_Ok || nParseEnd < aString.getLength())
+    rVal = ::rtl::math::stringToDouble( aBuf, dsep, gsep, &eStatus, &nParseEnd);
+    if (eStatus != rtl_math_ConversionStatus_Ok || nParseEnd < aBuf.getLength())
         // Not a valid number or not entire string consumed.
         return false;
 
@@ -337,9 +336,8 @@ bool ScStringUtil::parseSimpleNumber(
 
     rtl_math_ConversionStatus eStatus = rtl_math_ConversionStatus_Ok;
     sal_Int32 nParseEnd = 0;
-    OString aString( aBuf.makeStringAndClear());
-    rVal = ::rtl::math::stringToDouble( aString, dsep, gsep, &eStatus, &nParseEnd);
-    if (eStatus != rtl_math_ConversionStatus_Ok || nParseEnd < aString.getLength())
+    rVal = ::rtl::math::stringToDouble( aBuf, dsep, gsep, &eStatus, &nParseEnd);
+    if (eStatus != rtl_math_ConversionStatus_Ok || nParseEnd < aBuf.getLength())
         // Not a valid number or not entire string consumed.
         return false;
 
@@ -421,15 +419,9 @@ OUString ScStringUtil::GetQuotedToken(const OUString &rIn, sal_Int32 nToken, con
     }
 }
 
-bool ScStringUtil::isMultiline( const OUString& rStr )
+bool ScStringUtil::isMultiline( std::u16string_view rStr )
 {
-    if (rStr.indexOf('\n') != -1)
-        return true;
-
-    if (rStr.indexOf('\r') != -1)
-        return true;
-
-    return false;
+    return rStr.find_first_of(u"\n\r") != std::u16string_view::npos;
 }
 
 ScInputStringType ScStringUtil::parseInputString(

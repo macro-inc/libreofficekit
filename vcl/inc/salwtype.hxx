@@ -25,16 +25,21 @@
 #include <rtl/ustring.hxx>
 #include <tools/solar.h>
 #include <tools/long.hxx>
-#include <vcl/GestureEvent.hxx>
+#include <vcl/GestureEventPan.hxx>
+#include <vcl/GestureEventZoom.hxx>
+#include <vcl/GestureEventRotate.hxx>
 
 class LogicalFontInstance;
 class SalGraphics;
 class SalFrame;
 class SalObject;
-namespace vcl { class Window; }
+namespace vcl
+{
+    class Window;
+    enum class WindowState;
+}
 enum class InputContextFlags;
 enum class WindowStateMask;
-enum class WindowStateState;
 enum class ExtTextInputAttr;
 enum class ModKeyFlags;
 
@@ -84,10 +89,12 @@ enum class SalEvent {
     SurroundingTextSelectionChange,
     StartReconversion,
     QueryCharPosition,
-    Swipe,
-    LongPress,
+    GestureSwipe,
+    GestureLongPress,
     ExternalGesture,
-    Gesture,
+    GesturePan,
+    GestureZoom,
+    GestureRotate,
 };
 
 struct SalAbstractMouseEvent
@@ -231,27 +238,13 @@ enum class SalObjEvent {
     ToTop              = 3
 };
 
-struct SalFrameState
-{
-    tools::Long            mnX;
-    tools::Long            mnY;
-    tools::Long            mnWidth;
-    tools::Long            mnHeight;
-    tools::Long            mnMaximizedX;
-    tools::Long            mnMaximizedY;
-    tools::Long            mnMaximizedWidth;
-    tools::Long            mnMaximizedHeight;
-    WindowStateMask  mnMask;
-    WindowStateState mnState;
-};
-
 struct SalInputContext
 {
     rtl::Reference<LogicalFontInstance> mpFont;
     InputContextFlags      mnOptions;
 };
 
-struct SalSwipeEvent
+struct SalGestureSwipeEvent
 {
     double mnVelocityX;
     double mnVelocityY;
@@ -259,7 +252,7 @@ struct SalSwipeEvent
     tools::Long mnY;
 };
 
-struct SalLongPressEvent
+struct SalGestureLongPressEvent
 {
     tools::Long mnX;
     tools::Long mnY;
@@ -267,11 +260,27 @@ struct SalLongPressEvent
 
 struct SalGestureEvent
 {
-    GestureEventType meEventType;
+    GestureEventPanType meEventType;
     PanningOrientation meOrientation;
     double mfOffset;
     tools::Long mnX;
     tools::Long mnY;
+};
+
+struct SalGestureZoomEvent
+{
+    GestureEventZoomType meEventType = GestureEventZoomType::Begin;
+    tools::Long mnX = 0;
+    tools::Long mnY = 0;
+    double mfScaleDelta = 0;
+};
+
+struct SalGestureRotateEvent
+{
+    GestureEventRotateType meEventType = GestureEventRotateType::Begin;
+    tools::Long mnX = 0;
+    tools::Long mnY = 0;
+    double mfAngleDelta = 0;
 };
 
 typedef void (*SALTIMERPROC)();

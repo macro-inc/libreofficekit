@@ -19,8 +19,6 @@
 
 #include <sal/config.h>
 
-#include <utility>
-
 #include <scitems.hxx>
 
 #include <comphelper/string.hxx>
@@ -137,7 +135,7 @@ SfxItemInfo const  aItemInfos[] =
     { 0,                            true },    // ATTR_MERGE
     { 0,                            true },    // ATTR_MERGE_FLAG
     { SID_ATTR_NUMBERFORMAT_VALUE,  true },    // ATTR_VALUE_FORMAT
-    { ATTR_LANGUAGE_FORMAT,         true },    // ATTR_LANGUAGE_FORMAT from 329, is combined with SID_ATTR_NUMBERFORMAT_VALUE in the dialog
+    { 0,                            true },    // ATTR_LANGUAGE_FORMAT from 329, is combined with SID_ATTR_NUMBERFORMAT_VALUE in the dialog
     { SID_ATTR_BRUSH,               true },    // ATTR_BACKGROUND
     { SID_SCATTR_PROTECTION,        true },    // ATTR_PROTECTION
     { SID_ATTR_BORDER_OUTER,        true },    // ATTR_BORDER
@@ -158,27 +156,27 @@ SfxItemInfo const  aItemInfos[] =
     { SID_ATTR_PAGE_DYNAMIC,        true },    // ATTR_PAGE_DYNAMIC
     { SID_ATTR_PAGE_SHARED,         true },    // ATTR_PAGE_SHARED
     { SID_ATTR_PAGE_SHARED_FIRST,   true },    // ATTR_PAGE_SHARED_FIRST
-    { SID_SCATTR_PAGE_NOTES,        true },    // ATTR_PAGE_NOTES
-    { SID_SCATTR_PAGE_GRID,         true },    // ATTR_PAGE_GRID
-    { SID_SCATTR_PAGE_HEADERS,      true },    // ATTR_PAGE_HEADERS
-    { SID_SCATTR_PAGE_CHARTS,       true },    // ATTR_PAGE_CHARTS
-    { SID_SCATTR_PAGE_OBJECTS,      true },    // ATTR_PAGE_OBJECTS
-    { SID_SCATTR_PAGE_DRAWINGS,     true },    // ATTR_PAGE_DRAWINGS
-    { SID_SCATTR_PAGE_TOPDOWN,      true },    // ATTR_PAGE_TOPDOWN
-    { SID_SCATTR_PAGE_SCALE,        true },    // ATTR_PAGE_SCALE
-    { SID_SCATTR_PAGE_SCALETOPAGES, true },    // ATTR_PAGE_SCALETOPAGES
-    { SID_SCATTR_PAGE_FIRSTPAGENO,  true },    // ATTR_PAGE_FIRSTPAGENO
-    { SID_SCATTR_PAGE_HEADERLEFT,   true },    // ATTR_PAGE_HEADERLEFT
-    { SID_SCATTR_PAGE_FOOTERLEFT,   true },    // ATTR_PAGE_FOOTERLEFT
-    { SID_SCATTR_PAGE_HEADERRIGHT,  true },    // ATTR_PAGE_HEADERRIGHT
-    { SID_SCATTR_PAGE_FOOTERRIGHT,  true },    // ATTR_PAGE_FOOTERRIGHT
-    { SID_SCATTR_PAGE_HEADERFIRST,  true },    // ATTR_PAGE_HEADERFIRST
-    { SID_SCATTR_PAGE_FOOTERFIRST,  true },    // ATTR_PAGE_FOOTERFIRST
+    { 0,                            true },    // ATTR_PAGE_NOTES aka. SID_SCATTR_PAGE_NOTES
+    { 0,                            true },    // ATTR_PAGE_GRID aka. SID_SCATTR_PAGE_GRID
+    { 0,                            true },    // ATTR_PAGE_HEADERS aka. SID_SCATTR_PAGE_HEADERS
+    { 0,                            true },    // ATTR_PAGE_CHARTS aka. SID_SCATTR_PAGE_CHARTS
+    { 0,                            true },    // ATTR_PAGE_OBJECTS aka. SID_SCATTR_PAGE_OBJECTS
+    { 0,                            true },    // ATTR_PAGE_DRAWINGS aka. SID_SCATTR_PAGE_DRAWINGS
+    { 0,                            true },    // ATTR_PAGE_TOPDOWN aka. SID_SCATTR_PAGE_TOPDOWN
+    { 0,                            true },    // ATTR_PAGE_SCALE aka SID_SCATTR_PAGE_SCALE
+    { 0,                            true },    // ATTR_PAGE_SCALETOPAGES aka SID_SCATTR_PAGE_SCALETOPAGES
+    { 0,                            true },    // ATTR_PAGE_FIRSTPAGENO aka SID_SCATTR_PAGE_FIRSTPAGENO
+    { 0,                            true },    // ATTR_PAGE_HEADERLEFT aka SID_SCATTR_PAGE_HEADERLEFT
+    { 0,                            true },    // ATTR_PAGE_FOOTERLEFT aka SID_SCATTR_PAGE_FOOTERLEFT
+    { 0,                            true },    // ATTR_PAGE_HEADERRIGHT aka SID_SCATTR_PAGE_HEADERRIGHT
+    { 0,                            true },    // ATTR_PAGE_FOOTERRIGHT aka. SID_SCATTR_PAGE_FOOTERRIGHT
+    { 0,                            true },    // ATTR_PAGE_HEADERFIRST aka. SID_SCATTR_PAGE_HEADERFIRST
+    { 0,                            true },    // ATTR_PAGE_FOOTERFIRST aka. SID_SCATTR_PAGE_FOOTERFIRST`
     { SID_ATTR_PAGE_HEADERSET,      true },    // ATTR_PAGE_HEADERSET
     { SID_ATTR_PAGE_FOOTERSET,      true },    // ATTR_PAGE_FOOTERSET
-    { SID_SCATTR_PAGE_FORMULAS,     true },    // ATTR_PAGE_FORMULAS
-    { SID_SCATTR_PAGE_NULLVALS,     true },    // ATTR_PAGE_NULLVALS
-    { SID_SCATTR_PAGE_SCALETO,      true },    // ATTR_PAGE_SCALETO
+    { 0,                            true },    // ATTR_PAGE_FORMULAS aka. SID_SCATTR_PAGE_FORMULAS
+    { 0,                            true },    // ATTR_PAGE_NULLVALS aka. SID_SCATTR_PAGE_NULLVALS
+    { 0,                            true },    // ATTR_PAGE_SCALETO aka. SID_SCATTR_PAGE_SCALETO
     { 0,                            true }     // ATTR_HIDDEN
 };
 static_assert(
@@ -401,17 +399,16 @@ static bool lcl_HFPresentation
 )
 {
     const SfxItemSet& rSet = static_cast<const SfxSetItem&>(rItem).GetItemSet();
-    const SfxPoolItem* pItem;
 
-    if ( SfxItemState::SET == rSet.GetItemState(ATTR_PAGE_ON,false,&pItem) )
+    if ( const SfxBoolItem* pItem = rSet.GetItemIfSet(ATTR_PAGE_ON,false) )
     {
-        if( !static_cast<const SfxBoolItem*>(pItem)->GetValue() )
+        if( !pItem->GetValue() )
             return false;
     }
 
     SfxItemIter aIter( rSet );
 
-    for (pItem = aIter.GetCurItem(); pItem; pItem = aIter.NextItem())
+    for (const SfxPoolItem* pItem = aIter.GetCurItem(); pItem; pItem = aIter.NextItem())
     {
         sal_uInt16 nWhich = pItem->Which();
 

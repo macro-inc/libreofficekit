@@ -18,11 +18,11 @@
  */
 #include <com/sun/star/accessibility/AccessibleRole.hpp>
 #include <com/sun/star/accessibility/IllegalAccessibleComponentStateException.hpp>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <comphelper/accessibleeventnotifier.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <toolkit/helper/convert.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <osl/mutex.hxx>
 #include <tools/gen.hxx>
@@ -40,11 +40,11 @@ using namespace ::com::sun::star::accessibility;
 //=====  internal  ============================================================
 
 SvtRulerAccessible::SvtRulerAccessible(
-    const uno::Reference< XAccessible >& rxParent, Ruler& rRepr, const OUString& rName ) :
+    uno::Reference< XAccessible > xParent, Ruler& rRepr, OUString aName ) :
 
     SvtRulerAccessible_Base( m_aMutex ),
-    msName( rName ),
-    mxParent( rxParent ),
+    msName(std::move( aName )),
+    mxParent(std::move( xParent )),
     mpRepr( &rRepr ),
     mnClientId( 0 )
 {
@@ -122,7 +122,7 @@ bool SvtRulerAccessible::isVisible()
 }
 
 //=====  XAccessibleContext  ==================================================
-sal_Int32 SAL_CALL SvtRulerAccessible::getAccessibleChildCount()
+sal_Int64 SAL_CALL SvtRulerAccessible::getAccessibleChildCount()
 {
     ::osl::MutexGuard   aGuard( m_aMutex );
 
@@ -131,7 +131,7 @@ sal_Int32 SAL_CALL SvtRulerAccessible::getAccessibleChildCount()
     return 0;
 }
 
-uno::Reference< XAccessible > SAL_CALL SvtRulerAccessible::getAccessibleChild( sal_Int32 )
+uno::Reference< XAccessible > SAL_CALL SvtRulerAccessible::getAccessibleChild( sal_Int64 )
 {
     uno::Reference< XAccessible >   xChild ;
 
@@ -143,7 +143,7 @@ uno::Reference< XAccessible > SAL_CALL SvtRulerAccessible::getAccessibleParent()
     return mxParent;
 }
 
-sal_Int32 SAL_CALL SvtRulerAccessible::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL SvtRulerAccessible::getAccessibleIndexInParent()
 {
     ::osl::MutexGuard   aGuard( m_aMutex );
     //  Use a simple but slow solution for now.  Optimize later.
@@ -154,8 +154,8 @@ sal_Int32 SAL_CALL SvtRulerAccessible::getAccessibleIndexInParent()
         uno::Reference< XAccessibleContext >        xParentContext( mxParent->getAccessibleContext() );
         if( xParentContext.is() )
         {
-            sal_Int32                       nChildCount = xParentContext->getAccessibleChildCount();
-            for( sal_Int32 i = 0 ; i < nChildCount ; ++i )
+            sal_Int64 nChildCount = xParentContext->getAccessibleChildCount();
+            for( sal_Int64 i = 0 ; i < nChildCount ; ++i )
             {
                 uno::Reference< XAccessible >   xChild( xParentContext->getAccessibleChild( i ) );
                 if( xChild.get() == static_cast<XAccessible*>(this) )
@@ -194,34 +194,27 @@ uno::Reference< XAccessibleRelationSet > SAL_CALL SvtRulerAccessible::getAccessi
 }
 
 
-uno::Reference< XAccessibleStateSet > SAL_CALL SvtRulerAccessible::getAccessibleStateSet()
+sal_Int64 SAL_CALL SvtRulerAccessible::getAccessibleStateSet()
 {
     ::osl::MutexGuard                       aGuard( m_aMutex );
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSetHelper = new utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if( IsAlive() )
     {
-        pStateSetHelper->AddState( AccessibleStateType::ENABLED );
+        nStateSet |= AccessibleStateType::ENABLED;
 
-        pStateSetHelper->AddState( AccessibleStateType::SHOWING );
+        nStateSet |= AccessibleStateType::SHOWING;
 
         if( isVisible() )
-            pStateSetHelper->AddState( AccessibleStateType::VISIBLE );
+            nStateSet |= AccessibleStateType::VISIBLE;
 
         if ( mpRepr->GetStyle() & WB_HORZ )
-            pStateSetHelper->AddState( AccessibleStateType::HORIZONTAL );
+            nStateSet |= AccessibleStateType::HORIZONTAL;
         else
-            pStateSetHelper->AddState( AccessibleStateType::VERTICAL );
-
-        if(pStateSetHelper->contains(AccessibleStateType::FOCUSABLE))
-        {
-            pStateSetHelper->RemoveState( AccessibleStateType::FOCUSABLE );
-        }
-
+            nStateSet |= AccessibleStateType::VERTICAL;
     }
 
-
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 lang::Locale SAL_CALL SvtRulerAccessible::getLocale()

@@ -29,11 +29,13 @@
 
 using namespace ::com::sun::star::uno;
 
+namespace
+{
 class MockServerThread : public ::osl::Thread
 {
 public:
-    MockServerThread() :
-        m_aSocketAddr("localhost", 2022)
+    MockServerThread()
+        : m_aSocketAddr("localhost", 2022)
     {
     }
 
@@ -47,15 +49,13 @@ public:
         sal_Int32 nReadBytes;
         Sequence<sal_Int8> aBuffer(512);
         sal_Int32 nTcpNoDelay = sal_Int32(true);
-        m_aStreamSocket.setOption(osl_Socket_OptionTcpNoDelay, &nTcpNoDelay,
-                                  sizeof(nTcpNoDelay), osl_Socket_LevelTcp);
+        m_aStreamSocket.setOption(osl_Socket_OptionTcpNoDelay, &nTcpNoDelay, sizeof(nTcpNoDelay),
+                                  osl_Socket_LevelTcp);
 
-        nReadBytes = m_aStreamSocket.recv(aBuffer.getArray(),
-                                          aBuffer.getLength());
+        nReadBytes = m_aStreamSocket.recv(aBuffer.getArray(), aBuffer.getLength());
         if (nReadBytes)
         {
-            std::string aText(reinterpret_cast<const char*>(aBuffer.getConstArray()),
-                              nReadBytes);
+            std::string aText(reinterpret_cast<const char*>(aBuffer.getConstArray()), nReadBytes);
 
             if (aText.find("POST /api/check") == std::string::npos)
             {
@@ -69,23 +69,21 @@ public:
             {
                 ResponseOK();
             }
-
         }
     }
 
     void ResponseOK()
     {
-        OStringBuffer aResponse;
-
-        aResponse.append("HTTP/1.1 200 OK\r\n");
-        aResponse.append("Server: MockServer\r\n");
-        aResponse.append("Cache-Control: no-cache\r\n");
-        aResponse.append("Content-Type: application/json\r\n");
-
-        aResponse.append("\r\n");
-        aResponse.append("{\"check-positions\":[{\"offset\":15,\"length\":6,\"errorcode\":4711,\"type\":\"orth\","
-                         "\"severity\":1,\"proposals\":[\"Entwurf\",\"Entw\u00fcrfe\"]},"
-                         "{\"offset\":22,\"length\":3,\"errorcode\":8221,\"type\":\"orth\",\"severity\":1}]}");
+        OString aResponse(
+            "HTTP/1.1 200 OK\r\n"
+            "Server: MockServer\r\n"
+            "Cache-Control: no-cache\r\n"
+            "Content-Type: application/json\r\n"
+            "\r\n"
+            "{\"check-positions\":[{\"offset\":15,\"length\":6,\"errorcode\":4711,\"type\":"
+            "\"orth\","
+            "\"severity\":1,\"proposals\":[\"Entwurf\",\"Entw\u00fcrfe\"]},"
+            "{\"offset\":22,\"length\":3,\"errorcode\":8221,\"type\":\"orth\",\"severity\":1}]}");
 
         m_aStreamSocket.write(aResponse.getStr(), aResponse.getLength());
         m_aStreamSocket.close();
@@ -93,11 +91,9 @@ public:
 
     void NotFound()
     {
-        OStringBuffer aResponse;
-
-        aResponse.append("HTTP/1.1 404 Not Found\r\n");
-        aResponse.append("Connection: Closed\r\n");
-        aResponse.append("\r\n");
+        OString aResponse("HTTP/1.1 404 Not Found\r\n"
+                          "Connection: Closed\r\n"
+                          "\r\n");
 
         m_aStreamSocket.write(aResponse.getStr(), aResponse.getLength());
         m_aStreamSocket.close();
@@ -121,10 +117,12 @@ private:
     ::osl::AcceptorSocket m_aAcceptorSocket;
     ::osl::StreamSocket m_aStreamSocket;
 };
+}
 
 MockServerThread aMockServer;
 
-class TestRestProtocol: public test::BootstrapFixtureBase {
+class TestRestProtocol : public test::BootstrapFixtureBase
+{
 public:
     virtual void setUp() override;
     virtual void tearDown() override;
@@ -135,7 +133,6 @@ private:
     CPPUNIT_TEST_SUITE_END();
 
     void testProofreading();
-
 };
 
 void TestRestProtocol::testProofreading()
@@ -151,17 +148,12 @@ void TestRestProtocol::testProofreading()
     rLanguageOpts.setRestProtocol("duden");
     CPPUNIT_ASSERT_EQUAL(OUString("duden"), rLanguageOpts.getRestProtocol());
 
-    Reference<::com::sun::star::linguistic2::XProofreader> xProofreader (
+    Reference<::com::sun::star::linguistic2::XProofreader> xProofreader(
         m_xSFactory->createInstance("com.sun.star.linguistic2.Proofreader"), UNO_QUERY);
     CPPUNIT_ASSERT(xProofreader.is());
 
-    com::sun::star::linguistic2::ProofreadingResult aResult =
-        xProofreader->doProofreading(OUString("id"),
-                                     OUString("ths is a tst"),
-                                     aLocale,
-                                     0,
-                                     0,
-                                     aProperties);
+    com::sun::star::linguistic2::ProofreadingResult aResult
+        = xProofreader->doProofreading("id", "ths is a tst", aLocale, 0, 0, aProperties);
 
     CPPUNIT_ASSERT_EQUAL(2, aResult.aErrors.getLength());
 }

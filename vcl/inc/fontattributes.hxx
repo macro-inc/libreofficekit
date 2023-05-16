@@ -42,9 +42,8 @@ public:
     FontItalic          GetItalic() const                           { return meItalic; }
     FontPitch           GetPitch() const                            { return mePitch; }
     FontWidth           GetWidthType() const                        { return meWidthType; }
-    rtl_TextEncoding    GetCharSet() const                          { return meCharSet; }
 
-    bool                IsSymbolFont() const                        { return mbSymbolFlag; }
+    bool                IsMicrosoftSymbolEncoded() const            { return mbMicrosoftSymbolEncoded; }
 
     void                SetFamilyName(const OUString& sFamilyName)  { maFamilyName = sFamilyName; }
     void                SetStyleName( const OUString& sStyleName)   { maStyleName = sStyleName; }
@@ -55,7 +54,7 @@ public:
     void                SetWeight(const FontWeight eWeight )        { meWeight = eWeight; }
     void                SetWidthType(const FontWidth eWidthType)    { meWidthType = eWidthType; }
 
-    void                SetSymbolFlag(const bool );
+    void                SetMicrosoftSymbolEncoded(const bool );
 
     bool                CompareDeviceIndependentFontAttributes(const FontAttributes& rOther) const;
 
@@ -66,7 +65,7 @@ public:
 
     void                SetQuality( int nQuality )                  { mnQuality = nQuality; }
     void                IncreaseQualityBy( int nQualityAmount )     { mnQuality += nQualityAmount; }
-    void                AddMapName( OUString const& );
+    void                AddMapName( std::u16string_view );
 
 private:
     // device independent variables
@@ -77,8 +76,7 @@ private:
     FontPitch           mePitch;                    // Pitch Type
     FontWidth           meWidthType;                // Width Type
     FontItalic          meItalic;                   // Slant Type
-    rtl_TextEncoding    meCharSet;                  // RTL_TEXTENCODING_SYMBOL or RTL_TEXTENCODING_UNICODE
-    bool                mbSymbolFlag;               // Is font a symbol?
+    bool                mbMicrosoftSymbolEncoded;   // Is font microsoft symbol encoded?
 
     // device dependent variables
     OUString            maMapNames;                 // List of family name aliases separated with ';'
@@ -86,33 +84,19 @@ private:
 
 };
 
-inline void FontAttributes::SetSymbolFlag( const bool bSymbolFlag )
+inline void FontAttributes::SetMicrosoftSymbolEncoded(const bool bMicrosoftSymbolEncoded)
 {
-    mbSymbolFlag = bSymbolFlag;
-    if ( bSymbolFlag )
-    {
-        meCharSet = RTL_TEXTENCODING_SYMBOL;
-    }
-    else
-    {
-        // if the symbol flag is unset, but it was a symbol font before then
-        // until the character set encoding is set via SetCharSet then we
-        // can't know what the characterset is!
-        if ( meCharSet == RTL_TEXTENCODING_SYMBOL )
-        {
-            meCharSet = RTL_TEXTENCODING_DONTKNOW;
-        }
-    }
+    mbMicrosoftSymbolEncoded = bMicrosoftSymbolEncoded;
 }
 
-inline void FontAttributes::AddMapName( OUString const & aMapName )
+inline void FontAttributes::AddMapName( std::u16string_view aMapName )
 {
     if( maMapNames.getLength() > 0 )
     {
         maMapNames += ";";
     }
 
-    if (aMapName.getLength() == 0)
+    if (aMapName.size() == 0)
     {
         SAL_WARN("vcl.fonts", "New map name is empty");
         return;

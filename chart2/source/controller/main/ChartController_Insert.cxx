@@ -28,11 +28,12 @@
 #include <dlg_InsertDataTable.hxx>
 #include <dlg_ObjectProperties.hxx>
 
-#include <ChartModel.hxx>
-#include <ChartModelHelper.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <TitleHelper.hxx>
+#include <DataSeries.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
 #include <chartview/DrawModelWrapper.hxx>
 #include <chartview/ChartSfxItemIds.hxx>
 #include <NumberFormatterWrapper.hxx>
@@ -50,17 +51,17 @@
 #include <ErrorBarItemConverter.hxx>
 #include <DataSeriesHelper.hxx>
 #include <ObjectNameProvider.hxx>
+#include <Legend.hxx>
 #include <LegendHelper.hxx>
 #include <DataTable.hxx>
+#include <RegressionCurveModel.hxx>
 
 #include <com/sun/star/chart2/XRegressionCurve.hpp>
-#include <com/sun/star/chart2/XRegressionCurveContainer.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/chart/ErrorBarStyle.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <svx/ActionDescriptionProvider.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/svapp.hxx>
 
 using namespace ::com::sun::star;
@@ -71,14 +72,12 @@ using ::com::sun::star::uno::Sequence;
 namespace
 {
 
-void lcl_InsertMeanValueLine( const uno::Reference< chart2::XDataSeries > & xSeries )
+void lcl_InsertMeanValueLine( const rtl::Reference< ::chart::DataSeries > & xSeries )
 {
-    uno::Reference< chart2::XRegressionCurveContainer > xRegCurveCnt(
-        xSeries, uno::UNO_QUERY );
-    if( xRegCurveCnt.is())
+    if( xSeries.is())
     {
         ::chart::RegressionCurveHelper::addMeanValueLine(
-            xRegCurveCnt, uno::Reference< beans::XPropertySet >( xSeries, uno::UNO_QUERY ));
+            xSeries, xSeries);
     }
 }
 
@@ -97,7 +96,7 @@ void ChartController::executeDispatch_InsertAxes()
     try
     {
         InsertAxisOrGridDialogData aDialogInput;
-        uno::Reference< XDiagram > xDiagram = ChartModelHelper::findDiagram(getModel());
+        rtl::Reference< Diagram > xDiagram = getFirstDiagram();
         AxisHelper::getAxisOrGridExistence( aDialogInput.aExistenceList, xDiagram );
         AxisHelper::getAxisOrGridPossibilities( aDialogInput.aPossibilityList, xDiagram );
 
@@ -106,7 +105,7 @@ void ChartController::executeDispatch_InsertAxes()
         if (aDlg.run() == RET_OK)
         {
             // lock controllers till end of block
-            ControllerLockGuardUNO aCLGuard( getModel() );
+            ControllerLockGuardUNO aCLGuard( getChartModel() );
 
             InsertAxisOrGridDialogData aDialogOutput;
             aDlg.getResult(aDialogOutput);
@@ -135,7 +134,7 @@ void ChartController::executeDispatch_InsertGrid()
     try
     {
         InsertAxisOrGridDialogData aDialogInput;
-        uno::Reference< XDiagram > xDiagram = ChartModelHelper::findDiagram(getModel());
+        rtl::Reference< Diagram > xDiagram = getFirstDiagram();
         AxisHelper::getAxisOrGridExistence( aDialogInput.aExistenceList, xDiagram, false );
         AxisHelper::getAxisOrGridPossibilities( aDialogInput.aPossibilityList, xDiagram, false );
 
@@ -144,7 +143,7 @@ void ChartController::executeDispatch_InsertGrid()
         if (aDlg.run() == RET_OK)
         {
             // lock controllers till end of block
-            ControllerLockGuardUNO aCLGuard( getModel() );
+            ControllerLockGuardUNO aCLGuard( getChartModel() );
             InsertAxisOrGridDialogData aDialogOutput;
             aDlg.getResult( aDialogOutput );
             bool bChanged = AxisHelper::changeVisibilityOfGrids( xDiagram
@@ -162,10 +161,11 @@ void ChartController::executeDispatch_InsertGrid()
 void ChartController::executeDispatch_OpenInsertDataTableDialog()
 {
     SolarMutexGuard aGuard;
+
     auto aUndoDescription = ActionDescriptionProvider::createDescription(ActionDescriptionProvider::ActionType::Insert, SchResId(STR_DATA_TABLE));
     UndoGuard aUndoGuard(aUndoDescription, m_xUndoManager);
 
-    uno::Reference<chart2::XDiagram> xDiagram = ChartModelHelper::findDiagram(getModel());
+    rtl::Reference<Diagram> xDiagram = getFirstDiagram();
 
     InsertDataTableDialog aDialog(GetChartFrame());
     {
@@ -235,13 +235,14 @@ void ChartController::executeDispatch_OpenInsertDataTableDialog()
     }
 }
 
+/** Create and insert a data table to the chart */
 void ChartController::executeDispatch_InsertDataTable()
 {
-    SolarMutexGuard aGuard;
     auto aUndoDescription = ActionDescriptionProvider::createDescription(ActionDescriptionProvider::ActionType::Insert, SchResId(STR_DATA_TABLE));
     UndoGuard aUndoGuard(aUndoDescription, m_xUndoManager);
 
-    uno::Reference<chart2::XDiagram> xDiagram = ChartModelHelper::findDiagram(getModel());
+
+    rtl::Reference<Diagram> xDiagram = getFirstDiagram();
     auto xDataTable = xDiagram->getDataTable();
     if (!xDataTable.is())
     {
@@ -254,15 +255,17 @@ void ChartController::executeDispatch_InsertDataTable()
     }
 }
 
+/** Delete a data table from the chart */
 void ChartController::executeDispatch_DeleteDataTable()
 {
-    SolarMutexGuard aGuard;
     auto aUndoDescription = ActionDescriptionProvider::createDescription(ActionDescriptionProvider::ActionType::Delete, SchResId(STR_DATA_TABLE));
     UndoGuard aUndoGuard(aUndoDescription, m_xUndoManager);
-    uno::Reference<chart2::XDiagram> xDiagram = ChartModelHelper::findDiagram(getModel());
+
+    rtl::Reference<Diagram> xDiagram = getFirstDiagram();
     auto xDataTable = xDiagram->getDataTable();
     if (xDataTable.is())
     {
+        // insert a empty data table reference
         xDiagram->setDataTable(uno::Reference<chart2::XDataTable>());
         aUndoGuard.commit();
     }
@@ -278,17 +281,17 @@ void ChartController::executeDispatch_InsertTitles()
     try
     {
         TitleDialogData aDialogInput;
-        aDialogInput.readFromModel( getModel() );
+        aDialogInput.readFromModel( getChartModel() );
 
         SolarMutexGuard aGuard;
         SchTitleDlg aDlg(GetChartFrame(), aDialogInput);
         if (aDlg.run() == RET_OK)
         {
             // lock controllers till end of block
-            ControllerLockGuardUNO aCLGuard( getModel() );
+            ControllerLockGuardUNO aCLGuard( getChartModel() );
             TitleDialogData aDialogOutput(impl_createReferenceSizeProvider());
             aDlg.getResult(aDialogOutput);
-            bool bChanged = aDialogOutput.writeDifferenceToModel( getModel(), m_xCC, &aDialogInput );
+            bool bChanged = aDialogOutput.writeDifferenceToModel( getChartModel(), m_xCC, &aDialogInput );
             if( bChanged )
                 aUndoGuard.commit();
         }
@@ -306,8 +309,7 @@ void ChartController::executeDispatch_DeleteLegend()
             ActionDescriptionProvider::ActionType::Delete, SchResId( STR_OBJECT_LEGEND )),
         m_xUndoManager );
 
-    ChartModel& rModel = dynamic_cast<ChartModel&>(*getModel());
-    LegendHelper::hideLegend(rModel);
+    LegendHelper::hideLegend(*getChartModel());
     aUndoGuard.commit();
 }
 
@@ -318,8 +320,7 @@ void ChartController::executeDispatch_InsertLegend()
             ActionDescriptionProvider::ActionType::Insert, SchResId( STR_OBJECT_LEGEND )),
         m_xUndoManager );
 
-    ChartModel& rModel = dynamic_cast<ChartModel&>(*getModel());
-    LegendHelper::showLegend(rModel, m_xCC);
+    LegendHelper::showLegend(*getChartModel(), m_xCC);
     aUndoGuard.commit();
 }
 
@@ -335,12 +336,12 @@ void ChartController::executeDispatch_OpenLegendDialog()
         //prepare and open dialog
         SolarMutexGuard aGuard;
         SchLegendDlg aDlg(GetChartFrame(), m_xCC);
-        aDlg.init( getModel() );
+        aDlg.init( getChartModel() );
         if (aDlg.run() == RET_OK)
         {
             // lock controllers till end of block
-            ControllerLockGuardUNO aCLGuard( getModel() );
-            aDlg.writeToModel( getModel() );
+            ControllerLockGuardUNO aCLGuard( getChartModel() );
+            aDlg.writeToModel( getChartModel() );
             aUndoGuard.commit();
         }
     }
@@ -358,8 +359,8 @@ void ChartController::executeDispatch_InsertMenu_DataLabels()
         m_xUndoManager );
 
     //if a series is selected insert labels for that series only:
-    uno::Reference< chart2::XDataSeries > xSeries =
-        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getModel());
+    rtl::Reference< DataSeries > xSeries =
+        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getChartModel());
     if( xSeries.is() )
     {
         // add labels
@@ -378,10 +379,10 @@ void ChartController::executeDispatch_InsertMenu_DataLabels()
     try
     {
         wrapper::AllDataLabelItemConverter aItemConverter(
-            getModel(),
+            getChartModel(),
             m_pDrawModelWrapper->GetItemPool(),
             m_pDrawModelWrapper->getSdrModel(),
-            uno::Reference< lang::XMultiServiceFactory >( getModel(), uno::UNO_QUERY ));
+            getChartModel() );
         SfxItemSet aItemSet = aItemConverter.CreateEmptyItemSet();
         aItemConverter.FillItemSet( aItemSet );
 
@@ -389,8 +390,7 @@ void ChartController::executeDispatch_InsertMenu_DataLabels()
         SolarMutexGuard aGuard;
 
         //get number formatter
-        uno::Reference< util::XNumberFormatsSupplier > xNumberFormatsSupplier( getModel(), uno::UNO_QUERY );
-        NumberFormatterWrapper aNumberFormatterWrapper( xNumberFormatsSupplier );
+        NumberFormatterWrapper aNumberFormatterWrapper( getChartModel() );
         SvNumberFormatter* pNumberFormatter = aNumberFormatterWrapper.getSvNumberFormatter();
 
         DataLabelsDialog aDlg(GetChartFrame(), aItemSet, pNumberFormatter);
@@ -400,7 +400,7 @@ void ChartController::executeDispatch_InsertMenu_DataLabels()
             SfxItemSet aOutItemSet = aItemConverter.CreateEmptyItemSet();
             aDlg.FillItemSet(aOutItemSet);
             // lock controllers till end of block
-            ControllerLockGuardUNO aCLGuard( getModel() );
+            ControllerLockGuardUNO aCLGuard( getChartModel() );
             bool bChanged = aItemConverter.ApplyItemSet( aOutItemSet );//model should be changed now
             if( bChanged )
                 aUndoGuard.commit();
@@ -419,7 +419,7 @@ void ChartController::executeDispatch_InsertMeanValue()
             ActionDescriptionProvider::ActionType::Insert, SchResId( STR_OBJECT_AVERAGE_LINE )),
         m_xUndoManager );
     lcl_InsertMeanValueLine( ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(),
-                                                                    getModel() ) );
+                                                                    getChartModel() ) );
     aUndoGuard.commit();
 }
 
@@ -430,8 +430,8 @@ void ChartController::executeDispatch_InsertMenu_MeanValues()
             ActionDescriptionProvider::ActionType::Insert, SchResId( STR_OBJECT_AVERAGE_LINE )),
         m_xUndoManager );
 
-    uno::Reference< chart2::XDataSeries > xSeries =
-        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getModel() );
+    rtl::Reference< DataSeries > xSeries =
+        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getChartModel() );
     if( xSeries.is() )
     {
         //if a series is selected insert mean value only for that series:
@@ -439,8 +439,8 @@ void ChartController::executeDispatch_InsertMenu_MeanValues()
     }
     else
     {
-        std::vector< uno::Reference< chart2::XDataSeries > > aSeries(
-            DiagramHelper::getDataSeriesFromDiagram( ChartModelHelper::findDiagram( getModel() )));
+        std::vector< rtl::Reference< DataSeries > > aSeries =
+            DiagramHelper::getDataSeriesFromDiagram( getFirstDiagram());
 
         for( const auto& xSrs : aSeries )
             lcl_InsertMeanValueLine( xSrs );
@@ -452,8 +452,8 @@ void ChartController::executeDispatch_InsertMenu_Trendlines()
 {
     OUString aCID = m_aSelection.getSelectedCID();
 
-    uno::Reference< chart2::XDataSeries > xSeries =
-        ObjectIdentifier::getDataSeriesForCID( aCID, getModel() );
+    rtl::Reference< DataSeries > xSeries =
+        ObjectIdentifier::getDataSeriesForCID( aCID, getChartModel() );
 
     if( !xSeries.is() )
         return;
@@ -463,8 +463,8 @@ void ChartController::executeDispatch_InsertMenu_Trendlines()
 
 void ChartController::executeDispatch_InsertTrendline()
 {
-    uno::Reference< chart2::XRegressionCurveContainer > xRegressionCurveContainer(
-        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getModel()), uno::UNO_QUERY );
+    rtl::Reference< DataSeries > xRegressionCurveContainer =
+        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getChartModel());
 
     if( !xRegressionCurveContainer.is() )
         return;
@@ -474,20 +474,18 @@ void ChartController::executeDispatch_InsertTrendline()
             ActionDescriptionProvider::ActionType::Insert, SchResId( STR_OBJECT_CURVE )),
         m_xUndoManager );
 
-    uno::Reference< chart2::XRegressionCurve > xCurve =
+    rtl::Reference< RegressionCurveModel > xCurve =
         RegressionCurveHelper::addRegressionCurve(
             SvxChartRegress::Linear,
             xRegressionCurveContainer );
 
-    uno::Reference< beans::XPropertySet > xProperties( xCurve, uno::UNO_QUERY );
-
-    if( !xProperties.is())
+    if( !xCurve.is())
         return;
 
     wrapper::RegressionCurveItemConverter aItemConverter(
-        xProperties, xRegressionCurveContainer, m_pDrawModelWrapper->getSdrModel().GetItemPool(),
+        xCurve, xRegressionCurveContainer, m_pDrawModelWrapper->getSdrModel().GetItemPool(),
         m_pDrawModelWrapper->getSdrModel(),
-        uno::Reference< lang::XMultiServiceFactory >( getModel(), uno::UNO_QUERY ));
+        getChartModel() );
 
     // open dialog
     SfxItemSet aItemSet = aItemConverter.CreateEmptyItemSet();
@@ -496,14 +494,13 @@ void ChartController::executeDispatch_InsertTrendline()
         ObjectIdentifier::createDataCurveCID(
             ObjectIdentifier::getSeriesParticleFromCID( m_aSelection.getSelectedCID()),
             RegressionCurveHelper::getRegressionCurveIndex( xRegressionCurveContainer, xCurve ), false ));
-    aDialogParameter.init( getModel() );
+    aDialogParameter.init( getChartModel() );
     ViewElementListProvider aViewElementListProvider( m_pDrawModelWrapper.get());
     SolarMutexGuard aGuard;
     SchAttribTabDlg aDialog(
         GetChartFrame(), &aItemSet, &aDialogParameter,
         &aViewElementListProvider,
-        uno::Reference< util::XNumberFormatsSupplier >(
-                getModel(), uno::UNO_QUERY ) );
+        getChartModel() );
 
     // note: when a user pressed "OK" but didn't change any settings in the
     // dialog, the SfxTabDialog returns "Cancel"
@@ -512,7 +509,7 @@ void ChartController::executeDispatch_InsertTrendline()
         const SfxItemSet* pOutItemSet = aDialog.GetOutputItemSet();
         if( pOutItemSet )
         {
-            ControllerLockGuardUNO aCLGuard( getModel() );
+            ControllerLockGuardUNO aCLGuard( getChartModel() );
             aItemConverter.ApplyItemSet( *pOutItemSet );
         }
         aUndoGuard.commit();
@@ -524,8 +521,8 @@ void ChartController::executeDispatch_InsertErrorBars( bool bYError )
     ObjectType objType = bYError ? OBJECTTYPE_DATA_ERRORS_Y : OBJECTTYPE_DATA_ERRORS_X;
 
     //if a series is selected insert error bars for that series only:
-    uno::Reference< chart2::XDataSeries > xSeries =
-        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getModel() );
+    rtl::Reference< DataSeries > xSeries =
+        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getChartModel() );
 
     if( xSeries.is())
     {
@@ -543,9 +540,9 @@ void ChartController::executeDispatch_InsertErrorBars( bool bYError )
 
         // get an appropriate item converter
         wrapper::ErrorBarItemConverter aItemConverter(
-            getModel(), xErrorBarProp, m_pDrawModelWrapper->getSdrModel().GetItemPool(),
+            getChartModel(), xErrorBarProp, m_pDrawModelWrapper->getSdrModel().GetItemPool(),
             m_pDrawModelWrapper->getSdrModel(),
-            uno::Reference< lang::XMultiServiceFactory >( getModel(), uno::UNO_QUERY ));
+            getChartModel() );
 
         // open dialog
         SfxItemSet aItemSet = aItemConverter.CreateEmptyItemSet();
@@ -554,16 +551,15 @@ void ChartController::executeDispatch_InsertErrorBars( bool bYError )
         ObjectPropertiesDialogParameter aDialogParameter(
             ObjectIdentifier::createClassifiedIdentifierWithParent(
                 objType, u"", m_aSelection.getSelectedCID()));
-        aDialogParameter.init( getModel() );
+        aDialogParameter.init( getChartModel() );
         ViewElementListProvider aViewElementListProvider( m_pDrawModelWrapper.get());
         SolarMutexGuard aGuard;
         SchAttribTabDlg aDlg(
                 GetChartFrame(), &aItemSet, &aDialogParameter,
                 &aViewElementListProvider,
-                uno::Reference< util::XNumberFormatsSupplier >(
-                        getModel(), uno::UNO_QUERY ) );
+                getChartModel() );
         aDlg.SetAxisMinorStepWidthForErrorBarDecimals(
-            InsertErrorBarsDialog::getAxisMinorStepWidthForErrorBarDecimals( getModel(),
+            InsertErrorBarsDialog::getAxisMinorStepWidthForErrorBarDecimals( getChartModel(),
                                                                              m_xChartView, m_aSelection.getSelectedCID()));
 
         // note: when a user pressed "OK" but didn't change any settings in the
@@ -573,7 +569,7 @@ void ChartController::executeDispatch_InsertErrorBars( bool bYError )
             const SfxItemSet* pOutItemSet = aDlg.GetOutputItemSet();
             if( pOutItemSet )
             {
-                ControllerLockGuardUNO aCLGuard( getModel() );
+                ControllerLockGuardUNO aCLGuard( getChartModel() );
                 aItemConverter.ApplyItemSet( *pOutItemSet );
             }
             aUndoGuard.commit();
@@ -591,7 +587,7 @@ void ChartController::executeDispatch_InsertErrorBars( bool bYError )
         try
         {
             wrapper::AllSeriesStatisticsConverter aItemConverter(
-                getModel(), m_pDrawModelWrapper->GetItemPool() );
+                getChartModel(), m_pDrawModelWrapper->GetItemPool() );
             SfxItemSet aItemSet = aItemConverter.CreateEmptyItemSet();
             aItemConverter.FillItemSet( aItemSet );
 
@@ -599,11 +595,11 @@ void ChartController::executeDispatch_InsertErrorBars( bool bYError )
             SolarMutexGuard aGuard;
             InsertErrorBarsDialog aDlg(
                 GetChartFrame(), aItemSet,
-                uno::Reference< chart2::XChartDocument >( getModel(), uno::UNO_QUERY ),
+                getChartModel(),
                 bYError ? ErrorBarResources::ERROR_BAR_Y : ErrorBarResources::ERROR_BAR_X);
 
             aDlg.SetAxisMinorStepWidthForErrorBarDecimals(
-                InsertErrorBarsDialog::getAxisMinorStepWidthForErrorBarDecimals( getModel(), m_xChartView, OUString() ) );
+                InsertErrorBarsDialog::getAxisMinorStepWidthForErrorBarDecimals( getChartModel(), m_xChartView, u"" ) );
 
             if (aDlg.run() == RET_OK)
             {
@@ -611,7 +607,7 @@ void ChartController::executeDispatch_InsertErrorBars( bool bYError )
                 aDlg.FillItemSet( aOutItemSet );
 
                 // lock controllers till end of block
-                ControllerLockGuardUNO aCLGuard( getModel() );
+                ControllerLockGuardUNO aCLGuard( getChartModel() );
                 bool bChanged = aItemConverter.ApplyItemSet( aOutItemSet );//model should be changed now
                 if( bChanged )
                     aUndoGuard.commit();
@@ -627,11 +623,11 @@ void ChartController::executeDispatch_InsertErrorBars( bool bYError )
 void ChartController::executeDispatch_InsertTrendlineEquation( bool bInsertR2 )
 {
     uno::Reference< chart2::XRegressionCurve > xRegCurve(
-        ObjectIdentifier::getObjectPropertySet( m_aSelection.getSelectedCID(), getModel() ), uno::UNO_QUERY );
+        ObjectIdentifier::getObjectPropertySet( m_aSelection.getSelectedCID(), getChartModel() ), uno::UNO_QUERY );
     if( !xRegCurve.is() )
     {
-        uno::Reference< chart2::XRegressionCurveContainer > xRegCurveCnt(
-            ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getModel() ), uno::UNO_QUERY );
+        rtl::Reference< DataSeries > xRegCurveCnt =
+            ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getChartModel() );
         xRegCurve.set( RegressionCurveHelper::getFirstCurveNotMeanValueLine( xRegCurveCnt ) );
     }
     if( !xRegCurve.is())
@@ -655,7 +651,7 @@ void ChartController::executeDispatch_InsertTrendlineEquation( bool bInsertR2 )
 void ChartController::executeDispatch_InsertR2Value()
 {
     uno::Reference< beans::XPropertySet > xEqProp =
-        ObjectIdentifier::getObjectPropertySet( m_aSelection.getSelectedCID(), getModel() );
+        ObjectIdentifier::getObjectPropertySet( m_aSelection.getSelectedCID(), getChartModel() );
     if( xEqProp.is())
     {
         UndoGuard aUndoGuard(
@@ -670,7 +666,7 @@ void ChartController::executeDispatch_InsertR2Value()
 void ChartController::executeDispatch_DeleteR2Value()
 {
     uno::Reference< beans::XPropertySet > xEqProp =
-        ObjectIdentifier::getObjectPropertySet( m_aSelection.getSelectedCID(), getModel() );
+        ObjectIdentifier::getObjectPropertySet( m_aSelection.getSelectedCID(), getChartModel() );
     if( xEqProp.is())
     {
         UndoGuard aUndoGuard(
@@ -684,8 +680,8 @@ void ChartController::executeDispatch_DeleteR2Value()
 
 void ChartController::executeDispatch_DeleteMeanValue()
 {
-    uno::Reference< chart2::XRegressionCurveContainer > xRegCurveCnt(
-        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getModel() ), uno::UNO_QUERY );
+    rtl::Reference< DataSeries > xRegCurveCnt =
+        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getChartModel() );
     if( xRegCurveCnt.is())
     {
         UndoGuard aUndoGuard(
@@ -699,8 +695,8 @@ void ChartController::executeDispatch_DeleteMeanValue()
 
 void ChartController::executeDispatch_DeleteTrendline()
 {
-    uno::Reference< chart2::XRegressionCurveContainer > xRegCurveCnt(
-        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getModel() ), uno::UNO_QUERY );
+    rtl::Reference< DataSeries > xRegCurveCnt =
+        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getChartModel() );
     if( xRegCurveCnt.is())
     {
         UndoGuard aUndoGuard(
@@ -714,8 +710,8 @@ void ChartController::executeDispatch_DeleteTrendline()
 
 void ChartController::executeDispatch_DeleteTrendlineEquation()
 {
-    uno::Reference< chart2::XRegressionCurveContainer > xRegCurveCnt(
-        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getModel() ), uno::UNO_QUERY );
+    rtl::Reference< DataSeries > xRegCurveCnt =
+        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getChartModel() );
     if( xRegCurveCnt.is())
     {
         UndoGuard aUndoGuard(
@@ -729,8 +725,8 @@ void ChartController::executeDispatch_DeleteTrendlineEquation()
 
 void ChartController::executeDispatch_DeleteErrorBars( bool bYError )
 {
-    uno::Reference< chart2::XDataSeries > xDataSeries(
-        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getModel() ));
+    rtl::Reference< DataSeries > xDataSeries =
+        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getChartModel() );
     if( xDataSeries.is())
     {
         UndoGuard aUndoGuard(
@@ -744,8 +740,8 @@ void ChartController::executeDispatch_DeleteErrorBars( bool bYError )
 
 void ChartController::executeDispatch_InsertDataLabels()
 {
-    uno::Reference< chart2::XDataSeries > xSeries =
-        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getModel() );
+    rtl::Reference< DataSeries > xSeries =
+        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getChartModel() );
     if( xSeries.is() )
     {
         UndoGuard aUndoGuard( ActionDescriptionProvider::createDescription( ActionDescriptionProvider::ActionType::Insert,
@@ -761,14 +757,14 @@ void ChartController::executeDispatch_InsertDataLabel()
     UndoGuard aUndoGuard( ActionDescriptionProvider::createDescription( ActionDescriptionProvider::ActionType::Insert,
         SchResId( STR_OBJECT_LABEL )),
         m_xUndoManager );
-    DataSeriesHelper::insertDataLabelToPoint( ObjectIdentifier::getObjectPropertySet( m_aSelection.getSelectedCID(), getModel() ) );
+    DataSeriesHelper::insertDataLabelToPoint( ObjectIdentifier::getObjectPropertySet( m_aSelection.getSelectedCID(), getChartModel() ) );
     aUndoGuard.commit();
 }
 
 void ChartController::executeDispatch_DeleteDataLabels()
 {
-    uno::Reference< chart2::XDataSeries > xSeries =
-        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getModel() );
+    rtl::Reference< DataSeries > xSeries =
+        ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getChartModel() );
     if( xSeries.is() )
     {
         UndoGuard aUndoGuard( ActionDescriptionProvider::createDescription( ActionDescriptionProvider::ActionType::Delete,
@@ -784,7 +780,7 @@ void ChartController::executeDispatch_DeleteDataLabel()
     UndoGuard aUndoGuard( ActionDescriptionProvider::createDescription( ActionDescriptionProvider::ActionType::Delete,
         SchResId( STR_OBJECT_LABEL )),
         m_xUndoManager );
-    DataSeriesHelper::deleteDataLabelsFromPoint( ObjectIdentifier::getObjectPropertySet( m_aSelection.getSelectedCID(), getModel() ) );
+    DataSeriesHelper::deleteDataLabelsFromPoint( ObjectIdentifier::getObjectPropertySet( m_aSelection.getSelectedCID(), getChartModel() ) );
     aUndoGuard.commit();
 }
 
@@ -793,7 +789,7 @@ void ChartController::executeDispatch_ResetAllDataPoints()
     UndoGuard aUndoGuard( ActionDescriptionProvider::createDescription( ActionDescriptionProvider::ActionType::Format,
         SchResId( STR_OBJECT_DATAPOINTS )),
         m_xUndoManager );
-    uno::Reference< chart2::XDataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getModel() );
+    rtl::Reference< DataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getChartModel() );
     if( xSeries.is() )
         xSeries->resetAllDataPoints();
     aUndoGuard.commit();
@@ -803,7 +799,7 @@ void ChartController::executeDispatch_ResetDataPoint()
     UndoGuard aUndoGuard( ActionDescriptionProvider::createDescription( ActionDescriptionProvider::ActionType::Format,
         SchResId( STR_OBJECT_DATAPOINT )),
         m_xUndoManager );
-    uno::Reference< chart2::XDataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getModel() );
+    rtl::Reference< DataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( m_aSelection.getSelectedCID(), getChartModel() );
     if( xSeries.is() )
     {
         sal_Int32 nPointIndex = ObjectIdentifier::getIndexFromParticleOrCID( m_aSelection.getSelectedCID() );
@@ -823,11 +819,11 @@ void ChartController::executeDispatch_InsertAxisTitle()
                 ActionDescriptionProvider::ActionType::Insert, SchResId( STR_OBJECT_TITLE )),
             m_xUndoManager );
 
-            Reference< XAxis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getModel() );
+            rtl::Reference< Axis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getChartModel() );
             sal_Int32 nDimensionIndex = -1;
             sal_Int32 nCooSysIndex = -1;
             sal_Int32 nAxisIndex = -1;
-            AxisHelper::getIndicesForAxis( xAxis, ChartModelHelper::findDiagram(getModel()), nCooSysIndex, nDimensionIndex, nAxisIndex );
+            AxisHelper::getIndicesForAxis( xAxis, getFirstDiagram(), nCooSysIndex, nDimensionIndex, nAxisIndex );
 
             TitleHelper::eTitleType eTitleType = TitleHelper::X_AXIS_TITLE;
             if( nDimensionIndex==0 )
@@ -838,7 +834,7 @@ void ChartController::executeDispatch_InsertAxisTitle()
                 eTitleType = TitleHelper::Z_AXIS_TITLE;
 
             std::unique_ptr< ReferenceSizeProvider > apRefSizeProvider( impl_createReferenceSizeProvider());
-            xTitle = TitleHelper::createTitle( eTitleType, ObjectNameProvider::getTitleNameByType(eTitleType), getModel(), m_xCC, apRefSizeProvider.get() );
+            xTitle = TitleHelper::createTitle( eTitleType, ObjectNameProvider::getTitleNameByType(eTitleType), getChartModel(), m_xCC, apRefSizeProvider.get() );
             aUndoGuard.commit();
         }
     }
@@ -857,7 +853,7 @@ void ChartController::executeDispatch_InsertAxis()
 
     try
     {
-        Reference< XAxis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getModel() );
+        rtl::Reference< Axis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getChartModel() );
         if( xAxis.is() )
         {
             AxisHelper::makeAxisVisible( xAxis );
@@ -879,7 +875,7 @@ void ChartController::executeDispatch_DeleteAxis()
 
     try
     {
-        Reference< XAxis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getModel() );
+        rtl::Reference< Axis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getChartModel() );
         if( xAxis.is() )
         {
             AxisHelper::makeAxisInvisible( xAxis );
@@ -901,7 +897,7 @@ void ChartController::executeDispatch_InsertMajorGrid()
 
     try
     {
-        Reference< XAxis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getModel() );
+        rtl::Reference< Axis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getChartModel() );
         if( xAxis.is() )
         {
             AxisHelper::makeGridVisible( xAxis->getGridProperties() );
@@ -923,7 +919,7 @@ void ChartController::executeDispatch_DeleteMajorGrid()
 
     try
     {
-        Reference< XAxis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getModel() );
+        rtl::Reference< Axis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getChartModel() );
         if( xAxis.is() )
         {
             AxisHelper::makeGridInvisible( xAxis->getGridProperties() );
@@ -945,7 +941,7 @@ void ChartController::executeDispatch_InsertMinorGrid()
 
     try
     {
-        Reference< XAxis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getModel() );
+        rtl::Reference< Axis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getChartModel() );
         if( xAxis.is() )
         {
             const Sequence< Reference< beans::XPropertySet > > aSubGrids( xAxis->getSubGridProperties() );
@@ -969,7 +965,7 @@ void ChartController::executeDispatch_DeleteMinorGrid()
 
     try
     {
-        Reference< XAxis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getModel() );
+        rtl::Reference< Axis > xAxis = ObjectIdentifier::getAxisForCID( m_aSelection.getSelectedCID(), getChartModel() );
         if( xAxis.is() )
         {
             const Sequence< Reference< beans::XPropertySet > > aSubGrids( xAxis->getSubGridProperties() );

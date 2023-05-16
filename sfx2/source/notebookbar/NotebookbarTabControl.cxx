@@ -222,7 +222,7 @@ void NotebookbarTabControl::KeyInput( const KeyEvent& rKEvt )
 
 bool NotebookbarTabControl::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT )
+    if ( rNEvt.GetType() == NotifyEventType::KEYINPUT )
     {
         const vcl::KeyCode& rKey = rNEvt.GetKeyEvent()->GetKeyCode();
         sal_uInt16 nCode = rKey.GetCode();
@@ -332,8 +332,8 @@ IMPL_LINK(NotebookbarTabControl, OpenNotebookbarPopupMenu, NotebookBar*, pNotebo
         return;
 
     Sequence<Any> aArgs {
-        makeAny(comphelper::makePropertyValue("Value", OUString("notebookbar"))),
-        makeAny(comphelper::makePropertyValue("Frame", m_xFrame)) };
+        Any(comphelper::makePropertyValue("Value", OUString("notebookbar"))),
+        Any(comphelper::makePropertyValue("Frame", m_xFrame)) };
 
     Reference<XComponentContext> xContext = comphelper::getProcessComponentContext();
     Reference<XPopupMenuController> xPopupController(

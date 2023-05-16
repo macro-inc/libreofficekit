@@ -21,6 +21,8 @@
 
 #include <rtl/ref.hxx>
 #include <ucbhelper/resultset.hxx>
+#include <mutex>
+#include <utility>
 #include <vector>
 #include "hierarchydata.hxx"
 
@@ -42,13 +44,13 @@ public:
                     sal_Int32 nOpenMode );
     virtual ~HierarchyResultSetDataSupplier() override;
 
-    virtual OUString queryContentIdentifierString( sal_uInt32 nIndex ) override;
+    virtual OUString queryContentIdentifierString( sal_uInt32 nIndex ) final override;
     virtual css::uno::Reference< css::ucb::XContentIdentifier >
     queryContentIdentifier( sal_uInt32 nIndex ) override;
     virtual css::uno::Reference< css::ucb::XContent >
     queryContent( sal_uInt32 nIndex ) override;
 
-    virtual bool getResult( sal_uInt32 nIndex ) override;
+    virtual bool getResult( sal_uInt32 nIndex ) final override;
 
     virtual sal_uInt32 totalCount() override;
     virtual sal_uInt32 currentCount() override;
@@ -62,6 +64,9 @@ public:
 
     virtual void validate() override;
 private:
+    OUString queryContentIdentifierStringImpl( std::unique_lock<std::mutex>&, sal_uInt32 nIndex );
+    bool getResultImpl( std::unique_lock<std::mutex>&, sal_uInt32 nIndex );
+
     struct ResultListEntry
     {
         OUString                             aId;
@@ -70,10 +75,10 @@ private:
         css::uno::Reference< css::sdbc::XRow >              xRow;
         HierarchyEntryData                        aData;
 
-        explicit ResultListEntry( const HierarchyEntryData& rEntry ) : aData( rEntry ) {}
+        explicit ResultListEntry( HierarchyEntryData aEntry ) : aData(std::move( aEntry )) {}
     };
     typedef std::vector< std::unique_ptr<ResultListEntry> > ResultList;
-    osl::Mutex                                      m_aMutex;
+    std::mutex                                      m_aMutex;
     ResultList                                      m_aResults;
     rtl::Reference< HierarchyContent >              m_xContent;
     css::uno::Reference< css::uno::XComponentContext > m_xContext;

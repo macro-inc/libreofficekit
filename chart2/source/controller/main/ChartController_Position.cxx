@@ -19,7 +19,6 @@
 
 #include <ChartController.hxx>
 
-#include <ChartWindow.hxx>
 #include <DrawViewWrapper.hxx>
 #include <PositionAndSizeHelper.hxx>
 #include <ChartModel.hxx>
@@ -36,7 +35,7 @@
 #include <svx/rectenum.hxx>
 #include <svl/intitem.hxx>
 #include <svx/svxdlg.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/svapp.hxx>
 #include <memory>
 
@@ -54,19 +53,18 @@ static void lcl_getPositionAndSizeFromItemSet( const SfxItemSet& rItemSet, awt::
 
     RectPoint eRP = RectPoint::LT;
 
-    const SfxPoolItem* pPoolItem=nullptr;
     //read position
-    if (rItemSet.GetItemState(SID_ATTR_TRANSFORM_POS_X,true,&pPoolItem)==SfxItemState::SET)
-        nPosX= static_cast<const SfxInt32Item*>(pPoolItem)->GetValue();
-    if (rItemSet.GetItemState(SID_ATTR_TRANSFORM_POS_Y,true,&pPoolItem)==SfxItemState::SET)
-        nPosY=static_cast<const SfxInt32Item*>(pPoolItem)->GetValue();
+    if (const SfxInt32Item* pPosXItem = rItemSet.GetItemIfSet(SID_ATTR_TRANSFORM_POS_X))
+        nPosX = pPosXItem->GetValue();
+    if (const SfxInt32Item* pPosYItem = rItemSet.GetItemIfSet(SID_ATTR_TRANSFORM_POS_Y))
+        nPosY = pPosYItem->GetValue();
     //read size
-    if (rItemSet.GetItemState(SID_ATTR_TRANSFORM_WIDTH,true,&pPoolItem)==SfxItemState::SET)
-        nSizX=static_cast<const SfxUInt32Item*>(pPoolItem)->GetValue();
-    if (rItemSet.GetItemState(SID_ATTR_TRANSFORM_HEIGHT,true,&pPoolItem)==SfxItemState::SET)
-        nSizY=static_cast<const SfxUInt32Item*>(pPoolItem)->GetValue();
-    if (rItemSet.GetItemState(SID_ATTR_TRANSFORM_SIZE_POINT,true,&pPoolItem)==SfxItemState::SET)
-        eRP=static_cast<RectPoint>(static_cast<const SfxUInt16Item*>(pPoolItem)->GetValue());
+    if (const SfxUInt32Item* pWidthItem = rItemSet.GetItemIfSet(SID_ATTR_TRANSFORM_WIDTH))
+        nSizX = pWidthItem->GetValue();
+    if (const SfxUInt32Item* pHeightItem = rItemSet.GetItemIfSet(SID_ATTR_TRANSFORM_HEIGHT))
+        nSizY = pHeightItem->GetValue();
+    if (const SfxUInt16Item* pSizeItem = rItemSet.GetItemIfSet(SID_ATTR_TRANSFORM_SIZE_POINT))
+        eRP=static_cast<RectPoint>(pSizeItem->GetValue());
 
     switch( eRP )
     {
@@ -150,26 +148,21 @@ void ChartController::executeDispatch_PositionAndSize(const ::css::uno::Sequence
             if (!pPool)
                 return;
 
-            sal_uInt16 nWhich;
             for (const auto& aProp: *pArgs)
             {
                 sal_Int32 nValue = 0;
                 aProp.Value >>= nValue;
                 if (aProp.Name == "TransformPosX") {
-                    nWhich = pPool->GetWhich(SID_ATTR_TRANSFORM_POS_X);
-                    aItemSet.Put(SfxInt32Item(nWhich, nValue));
+                    aItemSet.Put(SfxInt32Item(SID_ATTR_TRANSFORM_POS_X, nValue));
                 }
                 else if (aProp.Name == "TransformPosY") {
-                    nWhich = pPool->GetWhich(SID_ATTR_TRANSFORM_POS_Y);
-                    aItemSet.Put(SfxInt32Item(nWhich, nValue));
+                    aItemSet.Put(SfxInt32Item(SID_ATTR_TRANSFORM_POS_Y, nValue));
                 }
                 else if (aProp.Name == "TransformWidth") {
-                    nWhich = pPool->GetWhich(SID_ATTR_TRANSFORM_WIDTH);
-                    aItemSet.Put(SfxUInt32Item(nWhich, static_cast<sal_uInt32>(nValue)));
+                    aItemSet.Put(SfxUInt32Item(SID_ATTR_TRANSFORM_WIDTH, static_cast<sal_uInt32>(nValue)));
                 }
                 else if (aProp.Name == "TransformHeight") {
-                    nWhich = pPool->GetWhich(SID_ATTR_TRANSFORM_HEIGHT);
-                    aItemSet.Put(SfxUInt32Item(nWhich, static_cast<sal_uInt32>(nValue)));
+                    aItemSet.Put(SfxUInt32Item(SID_ATTR_TRANSFORM_HEIGHT, static_cast<sal_uInt32>(nValue)));
                 }
             }
         }
@@ -183,17 +176,16 @@ void ChartController::executeDispatch_PositionAndSize(const ::css::uno::Sequence
 
             awt::Rectangle aNewObjectRect;
             lcl_getPositionAndSizeFromItemSet( aItemSet, aNewObjectRect, ToSize(aOldObjectRect) );
-            awt::Size aPageSize( ChartModelHelper::getPageSize( getModel() ) );
+            awt::Size aPageSize( ChartModelHelper::getPageSize( getChartModel() ) );
             awt::Rectangle aPageRect( 0,0,aPageSize.Width,aPageSize.Height );
 
             bool bChanged = false;
             if ( eObjectType == OBJECTTYPE_LEGEND )
             {
-                ChartModel& rModel = dynamic_cast<ChartModel&>(*getModel());
-                bChanged = DiagramHelper::switchDiagramPositioningToExcludingPositioning(rModel, false , true);
+                bChanged = DiagramHelper::switchDiagramPositioningToExcludingPositioning(*getChartModel(), false , true);
             }
 
-            bool bMoved = PositionAndSizeHelper::moveObject( m_aSelection.getSelectedCID(), getModel()
+            bool bMoved = PositionAndSizeHelper::moveObject( m_aSelection.getSelectedCID(), getChartModel()
                         , aNewObjectRect, aOldObjectRect, aPageRect );
             if( bMoved || bChanged )
                 aUndoGuard.commit();

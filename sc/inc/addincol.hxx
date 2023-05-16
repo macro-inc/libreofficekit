@@ -32,6 +32,7 @@
 #include "types.hxx"
 
 #include <string_view>
+#include <utility>
 #include <vector>
 #include <unordered_map>
 
@@ -42,6 +43,7 @@ namespace com::sun::star::uno { class XInterface; }
 class SfxObjectShell;
 class ScUnoAddInFuncData;
 class ScFuncDesc;
+class LanguageTag;
 class ScDocument;
 
 typedef std::unordered_map< OUString, const ScUnoAddInFuncData* > ScAddInHashMap;
@@ -79,14 +81,15 @@ public:
         OUString    maLocale;
         OUString    maName;
 
-                    LocalizedName( const OUString& rLocale, const OUString& rName )
-                        : maLocale( rLocale), maName( rName) { }
+                    LocalizedName( OUString aLocale, OUString aName )
+                        : maLocale(std::move(aLocale)), maName(std::move(aName)) { }
     };
 private:
     OUString            aOriginalName;      ///< kept in formula
     OUString            aLocalName;         ///< for display
     OUString            aUpperName;         ///< for entering formulas
     OUString            aUpperLocal;        ///< for entering formulas
+    OUString            aUpperEnglish;      ///< for Function Wizard and tooltips
     OUString            aDescription;
     css::uno::Reference< css::reflection::XIdlMethod> xFunction;
     css::uno::Any       aObject;
@@ -101,10 +104,10 @@ private:
 
 public:
                 ScUnoAddInFuncData( const OUString& rNam, const OUString& rLoc,
-                                    const OUString& rDesc,
-                                    sal_uInt16 nCat, const OString&,
-                                    const css::uno::Reference< css::reflection::XIdlMethod>& rFunc,
-                                    const css::uno::Any& rO,
+                                    OUString aDesc,
+                                    sal_uInt16 nCat, OString ,
+                                    css::uno::Reference< css::reflection::XIdlMethod> aFunc,
+                                    css::uno::Any aO,
                                     tools::Long nAC, const ScAddInArgDesc* pAD,
                                     tools::Long nCP );
                 ~ScUnoAddInFuncData();
@@ -113,6 +116,7 @@ public:
     const OUString&  GetLocalName() const        { return aLocalName; }
     const OUString&  GetUpperName() const        { return aUpperName; }
     const OUString&  GetUpperLocal() const       { return aUpperLocal; }
+    const OUString&  GetUpperEnglish() const     { return aUpperEnglish; }
     const css::uno::Reference< css::reflection::XIdlMethod>&   GetFunction() const
                                                         { return xFunction; }
     const css::uno::Any& GetObject() const   { return aObject; }
@@ -124,13 +128,17 @@ public:
     const OString&          GetHelpId() const           { return sHelpId; }
 
     const ::std::vector< LocalizedName >&  GetCompNames() const;
-    bool                    GetExcelName( LanguageType eDestLang, OUString& rRetExcelName ) const;
+    bool                    GetExcelName( const LanguageTag& rDestLang, OUString& rRetExcelName,
+                                          bool bFallbackToAny = true ) const;
 
     void    SetFunction( const css::uno::Reference< css::reflection::XIdlMethod>& rNewFunc,
                          const css::uno::Any& rNewObj );
     void    SetArguments( tools::Long nNewCount, const ScAddInArgDesc* pNewDescs );
     void    SetCallerPos( tools::Long nNewPos );
     void    SetCompNames( ::std::vector< LocalizedName >&& rNew );
+
+    /// Takes care of handling an empty name *after* upper local name was set.
+    void    SetEnglishName( const OUString& rEnglishName );
 };
 
 class SC_DLLPUBLIC ScUnoAddInCollection
@@ -141,6 +149,7 @@ private:
     std::unique_ptr<ScAddInHashMap>       pExactHashMap;      ///< exact internal name
     std::unique_ptr<ScAddInHashMap>       pNameHashMap;       ///< internal name upper
     std::unique_ptr<ScAddInHashMap>       pLocalHashMap;      ///< localized name upper
+    std::unique_ptr<ScAddInHashMap>       pEnglishHashMap;    ///< English name upper
     bool                    bInitialized;
 
     void        Initialize();
@@ -173,9 +182,10 @@ public:
     void                LocalizeString( OUString& rName );    ///< modify rName - input: exact name
 
     tools::Long                GetFuncCount();
-    bool                FillFunctionDesc( tools::Long nFunc, ScFuncDesc& rDesc );
+    bool                FillFunctionDesc( tools::Long nFunc, ScFuncDesc& rDesc, bool bEnglishFunctionNames );
 
-    static bool         FillFunctionDescFromData( const ScUnoAddInFuncData& rFuncData, ScFuncDesc& rDesc );
+    static bool         FillFunctionDescFromData( const ScUnoAddInFuncData& rFuncData, ScFuncDesc& rDesc,
+                                                  bool bEnglishFunctionNames );
                   /// leave rRetExcelName unchanged, if no matching name is found
     bool                GetExcelName( const OUString& rCalcName, LanguageType eDestLang, OUString& rRetExcelName );
                   /// leave rRetCalcName unchanged, if no matching name is found

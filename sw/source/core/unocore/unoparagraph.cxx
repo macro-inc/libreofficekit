@@ -19,13 +19,14 @@
 
 #include <unoparagraph.hxx>
 
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <cmdid.h>
+#include <fmtautofmt.hxx>
 #include <unomid.h>
 #include <unoparaframeenum.hxx>
 #include <unotext.hxx>
@@ -37,7 +38,8 @@
 #include <unocrsrhelper.hxx>
 #include <doc.hxx>
 #include <ndtxt.hxx>
-#include <osl/mutex.hxx>
+#include <algorithm>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <docsh.hxx>
 #include <swunohelper.hxx>
@@ -51,6 +53,7 @@
 #include <com/sun/star/text/TextContentAnchorType.hpp>
 
 #include <com/sun/star/drawing/BitmapMode.hpp>
+#include <comphelper/propertyvalue.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <editeng/unoipset.hxx>
 #include <svl/listener.hxx>
@@ -80,12 +83,12 @@ SwParaSelection::SwParaSelection(SwCursor & rCursor)
         m_rCursor.DeleteMark();
     }
     // is it at the start?
-    if (m_rCursor.GetPoint()->nContent != 0)
+    if (m_rCursor.GetPoint()->GetContentIndex() != 0)
     {
         m_rCursor.MovePara(GoCurrPara, fnParaStart);
     }
     // or at the end already?
-    if (m_rCursor.GetPoint()->nContent != m_rCursor.GetContentNode()->Len())
+    if (m_rCursor.GetPoint()->GetContentIndex() != m_rCursor.GetPointContentNode()->Len())
     {
         m_rCursor.SetMark();
         m_rCursor.MovePara(GoCurrPara, fnParaEnd);
@@ -94,7 +97,7 @@ SwParaSelection::SwParaSelection(SwCursor & rCursor)
 
 SwParaSelection::~SwParaSelection()
 {
-    if (m_rCursor.GetPoint()->nContent != 0)
+    if (m_rCursor.GetPoint()->GetContentIndex() != 0)
     {
         m_rCursor.DeleteMark();
         m_rCursor.MovePara(GoCurrPara, fnParaStart);
@@ -112,13 +115,11 @@ static beans::PropertyState lcl_SwXParagraph_getPropertyState(
 class SwXParagraph::Impl
     : public SvtListener
 {
-private:
-    ::osl::Mutex m_Mutex; // just for OInterfaceContainerHelper2
-
 public:
     SwXParagraph& m_rThis;
-    uno::WeakReference<uno::XInterface> m_wThis;
-    ::comphelper::OInterfaceContainerHelper2 m_EventListeners;
+    unotools::WeakReference<SwXParagraph> m_wThis;
+    std::mutex m_Mutex; // just for OInterfaceContainerHelper4
+    ::comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_EventListeners;
     SfxItemPropertySet const& m_rPropSet;
     bool m_bIsDescriptor;
     sal_Int32 m_nSelectionStartPos;
@@ -128,15 +129,14 @@ public:
     SwTextNode* m_pTextNode;
 
     Impl(SwXParagraph& rThis,
-            SwTextNode* const pTextNode = nullptr, uno::Reference<text::XText> const& xParent = nullptr,
+            SwTextNode* const pTextNode = nullptr, uno::Reference<text::XText> xParent = nullptr,
             const sal_Int32 nSelStart = -1, const sal_Int32 nSelEnd = -1)
         : m_rThis(rThis)
-        , m_EventListeners(m_Mutex)
         , m_rPropSet(*aSwMapProvider.GetPropertySet(PROPERTY_MAP_PARAGRAPH))
         , m_bIsDescriptor(nullptr == pTextNode)
         , m_nSelectionStartPos(nSelStart)
         , m_nSelectionEndPos(nSelEnd)
-        , m_xParentText(xParent)
+        , m_xParentText(std::move(xParent))
         , m_pTextNode(pTextNode)
     {
         m_pTextNode && StartListening(m_pTextNode->GetNotifier());
@@ -192,13 +192,24 @@ void SwXParagraph::Impl::Notify(const SfxHint& rHint)
     if(rHint.GetId() == SfxHintId::Dying)
     {
         m_pTextNode = nullptr;
-        uno::Reference<uno::XInterface> const xThis(m_wThis);
-        if (!xThis.is())
-        {   // fdo#72695: if UNO object is already dead, don't revive it with event
-            return;
+        std::unique_lock aGuard(m_Mutex);
+        if (m_EventListeners.getLength(aGuard) != 0)
+        {
+            // fdo#72695: if UNO object is already dead, don't revive it with event
+            // The specific pattern we are guarding against is this:
+            // [1] Thread1 takes the SolarMutex
+            // [2] Thread2 decrements the SwXParagraph reference count, and calls the
+            //     SwXParagraph destructor, which tries to take the SolarMutex, and blocks
+            // [3] Thread1 destroys a SwTextNode, which calls this Notify event, which results
+            //     in a double-free if we construct the xThis object.
+            uno::Reference<uno::XInterface> const xThis(m_wThis);
+            if (!xThis.is())
+            {   // fdo#72695: if UNO object is already dead, don't revive it with event
+                return;
+            }
+            lang::EventObject const ev(xThis);
+            m_EventListeners.disposeAndClear(aGuard, ev);
         }
-        lang::EventObject const ev(xThis);
-        m_EventListeners.disposeAndClear(ev);
     }
 }
 
@@ -230,17 +241,17 @@ bool SwXParagraph::IsDescriptor() const
     return m_pImpl->IsDescriptor();
 }
 
-uno::Reference<text::XTextContent>
+rtl::Reference<SwXParagraph>
 SwXParagraph::CreateXParagraph(SwDoc & rDoc, SwTextNode *const pTextNode,
         uno::Reference< text::XText> const& i_xParent,
         const sal_Int32 nSelStart, const sal_Int32 nSelEnd)
 {
     // re-use existing SwXParagraph
     // #i105557#: do not iterate over the registered clients: race condition
-    uno::Reference<text::XTextContent> xParagraph;
+    rtl::Reference<SwXParagraph> xParagraph;
     if (pTextNode && (-1 == nSelStart) && (-1 == nSelEnd))
     {   // only use cache if no selection!
-        xParagraph.set(pTextNode->GetXParagraph());
+        xParagraph = pTextNode->GetXParagraph();
     }
     if (xParagraph.is())
     {
@@ -265,7 +276,7 @@ SwXParagraph::CreateXParagraph(SwDoc & rDoc, SwTextNode *const pTextNode,
         pTextNode->SetXParagraph(xParagraph);
     }
     // need a permanent Reference to initialize m_wThis
-    pXPara->m_pImpl->m_wThis = xParagraph;
+    pXPara->m_pImpl->m_wThis = xParagraph.get();
     return xParagraph;
 }
 
@@ -278,10 +289,10 @@ bool SwXParagraph::SelectPaM(SwPaM & rPaM)
         return false;
     }
 
-    *rPaM.GetPoint() = SwPosition( *pTextNode );
+    rPaM.GetPoint()->Assign( *pTextNode );
     // set selection to the whole paragraph
     rPaM.SetMark();
-    rPaM.GetMark()->nContent = pTextNode->GetText().getLength();
+    rPaM.GetMark()->SetContent( pTextNode->GetText().getLength() );
     return true;
 }
 
@@ -334,7 +345,7 @@ SwXParagraph::attachToText(SwXText & rParent, SwTextNode & rTextNode)
     m_pImpl->m_bIsDescriptor = false;
     m_pImpl->EndListeningAll();
     m_pImpl->StartListening(rTextNode.GetNotifier());
-    rTextNode.SetXParagraph(uno::Reference<text::XTextContent>(this));
+    rTextNode.SetXParagraph(this);
     m_pImpl->m_xParentText = &rParent;
     if (!m_pImpl->m_sText.isEmpty())
     {
@@ -359,10 +370,7 @@ SwXParagraph::setPropertyValue(const OUString& rPropertyName,
         const uno::Any& rValue)
 {
     SolarMutexGuard aGuard;
-    uno::Sequence<OUString> aPropertyNames { rPropertyName };
-    uno::Sequence<uno::Any> aValues(1);
-    aValues.getArray()[0] = rValue;
-    m_pImpl->SetPropertyValues_Impl( aPropertyNames, aValues );
+    m_pImpl->SetPropertyValues_Impl( { rPropertyName }, { rValue } );
 }
 
 uno::Any
@@ -383,32 +391,25 @@ void SwXParagraph::Impl::SetPropertyValues_Impl(
 
     SwPosition aPos( rTextNode );
     SwCursor aCursor( aPos, nullptr );
-    const OUString* pPropertyNames = rPropertyNames.getConstArray();
-    const uno::Any* pValues = rValues.getConstArray();
-    const SfxItemPropertyMap &rMap = m_rPropSet.getPropertyMap();
     SwParaSelection aParaSel( aCursor );
 
     uno::Sequence< beans::PropertyValue > aValues( rPropertyNames.getLength() );
-    auto aValuesRange = asNonConstRange(aValues);
-    for (sal_Int32 nProp = 0; nProp < rPropertyNames.getLength(); nProp++)
-    {
-        SfxItemPropertyMapEntry const*const pEntry =
-            rMap.getByName( pPropertyNames[nProp] );
-        if (!pEntry)
+    std::transform(
+        rPropertyNames.begin(), rPropertyNames.end(), rValues.begin(), aValues.getArray(),
+        [&rMap = m_rPropSet.getPropertyMap(), this](const OUString& name, const uno::Any& value)
         {
-            throw beans::UnknownPropertyException(
-                "Unknown property: " + pPropertyNames[nProp],
-                static_cast< cppu::OWeakObject * >(&m_rThis));
-        }
-        if (pEntry->nFlags & beans::PropertyAttribute::READONLY)
-        {
-            throw beans::PropertyVetoException(
-                "Property is read-only: " + pPropertyNames[nProp],
-                static_cast< cppu::OWeakObject * >(&m_rThis));
-        }
-        aValuesRange[nProp].Name = pPropertyNames[nProp];
-        aValuesRange[nProp].Value = pValues[nProp];
-    }
+            if (SfxItemPropertyMapEntry const* const pEntry = rMap.getByName(name); !pEntry)
+            {
+                throw beans::UnknownPropertyException("Unknown property: " + name,
+                                                      static_cast<cppu::OWeakObject*>(&m_rThis));
+            }
+            else if (pEntry->nFlags & beans::PropertyAttribute::READONLY)
+            {
+                throw beans::PropertyVetoException("Property is read-only: " + name,
+                                                   static_cast<cppu::OWeakObject*>(&m_rThis));
+            }
+            return comphelper::makePropertyValue(name, value);
+        });
     SwUnoCursorHelper::SetPropertyValues(aCursor, m_rPropSet, aValues);
 }
 
@@ -416,6 +417,10 @@ void SAL_CALL SwXParagraph::setPropertyValues(
     const uno::Sequence< OUString >& rPropertyNames,
     const uno::Sequence< uno::Any >& rValues )
 {
+    if (rPropertyNames.getLength() != rValues.getLength())
+        throw lang::IllegalArgumentException("lengths do not match",
+                                             static_cast<cppu::OWeakObject*>(this), -1);
+
     SolarMutexGuard aGuard;
 
     // workaround for bad designed API
@@ -528,14 +533,27 @@ uno::Sequence< uno::Any > SwXParagraph::Impl::GetPropertyValues_Impl(
     SwTextNode & rTextNode(GetTextNodeOrThrow());
 
     uno::Sequence< uno::Any > aValues(rPropertyNames.getLength());
-    SwPosition aPos( rTextNode );
-    SwPaM aPam( aPos );
+    SwPaM aPam( rTextNode );
     uno::Any* pValues = aValues.getArray();
     const OUString* pPropertyNames = rPropertyNames.getConstArray();
     const SfxItemPropertyMap &rMap = m_rPropSet.getPropertyMap();
     const SwAttrSet& rAttrSet( rTextNode.GetSwAttrSet() );
     for (sal_Int32 nProp = 0; nProp < rPropertyNames.getLength(); nProp++)
     {
+        if (pPropertyNames[nProp] == "ParaMarkerAutoStyleSpan")
+        {
+            // A hack to tunnel the fake text span to ODF export
+            // see XMLTextParagraphExport::exportParagraph
+            if (rTextNode.GetAttr(RES_PARATR_LIST_AUTOFMT).GetStyleHandle())
+            {
+                SwUnoCursor aEndCursor(*aPam.GetMark());
+                css::uno::Reference<css::beans::XPropertySet> xFakeSpan(
+                    new SwXTextPortion(&aEndCursor, {}, PORTION_LIST_AUTOFMT));
+                pValues[nProp] <<= xFakeSpan;
+            }
+            continue;
+        }
+
         SfxItemPropertyMapEntry const*const pEntry =
             rMap.getByName( pPropertyNames[nProp] );
         if (!pEntry)
@@ -622,7 +640,7 @@ SwXParagraph::setPropertyValuesTolerant(
 
     SwTextNode & rTextNode(m_pImpl->GetTextNodeOrThrow());
 
-    //SwNode& rTextNode = pUnoCursor->GetPoint()->nNode.GetNode();
+    //SwNode& rTextNode = pUnoCursor->GetPoint()->GetNode();
     //const SwAttrSet& rAttrSet = static_cast<SwTextNode&>(rTextNode).GetSwAttrSet();
     //sal_uInt16 nAttrCount = rAttrSet.Count();
 
@@ -784,8 +802,7 @@ SwXParagraph::Impl::GetPropertyValuesTolerant_Impl(
                     if (! ::sw::GetDefaultTextContentValue(
                                 aValue, rProp, pEntry->nWID ) )
                     {
-                        SwPosition aPos( rTextNode );
-                        SwPaM aPam( aPos );
+                        SwPaM aPam( rTextNode );
                         // handle properties that are not part of the attribute
                         // and thus only pretended to be paragraph attributes
                         beans::PropertyState eTemp;
@@ -842,11 +859,11 @@ bool ::sw::GetDefaultTextContentValue(
 {
     if(!nWID)
     {
-        if(rPropertyName == u"" UNO_NAME_ANCHOR_TYPE)
+        if(rPropertyName == UNO_NAME_ANCHOR_TYPE)
             nWID = FN_UNO_ANCHOR_TYPE;
-        else if(rPropertyName == u"" UNO_NAME_ANCHOR_TYPES)
+        else if(rPropertyName == UNO_NAME_ANCHOR_TYPES)
             nWID = FN_UNO_ANCHOR_TYPES;
-        else if(rPropertyName == u"" UNO_NAME_TEXT_WRAP)
+        else if(rPropertyName == UNO_NAME_TEXT_WRAP)
             nWID = FN_UNO_TEXT_WRAP;
         else
             return false;
@@ -923,6 +940,16 @@ static beans::PropertyState lcl_SwXParagraph_getPropertyState(
         {
             // if numbering is set, return it; else do nothing
             SwUnoCursorHelper::getNumberingProperty(aPam,eRet,nullptr);
+            bDone = true;
+            break;
+        }
+        case FN_UNO_LIST_ID:
+        {
+            SwNumRule* pNumRule = rTextNode.GetNumRule();
+            if (pNumRule && pNumRule->HasContinueList())
+            {
+                eRet = beans::PropertyState_DIRECT_VALUE;
+            }
             bDone = true;
             break;
         }
@@ -1193,7 +1220,6 @@ SwXParagraph::getPropertyDefault(const OUString& rPropertyName)
 void SAL_CALL
 SwXParagraph::attach(const uno::Reference< text::XTextRange > & /*xTextRange*/)
 {
-    SolarMutexGuard aGuard;
     // SwXParagraph will only created in order to be inserted by
     // 'insertTextContentBefore' or 'insertTextContentAfter' therefore
     // they cannot be attached
@@ -1226,7 +1252,8 @@ void SAL_CALL SwXParagraph::dispose()
         SwCursor aCursor( SwPosition( *pTextNode ), nullptr );
         pTextNode->GetDoc().getIDocumentContentOperations().DelFullPara(aCursor);
         lang::EventObject const ev(static_cast< ::cppu::OWeakObject&>(*this));
-        m_pImpl->m_EventListeners.disposeAndClear(ev);
+        std::unique_lock aGuard2(m_pImpl->m_Mutex);
+        m_pImpl->m_EventListeners.disposeAndClear(aGuard2, ev);
     }
 }
 
@@ -1234,14 +1261,16 @@ void SAL_CALL SwXParagraph::addEventListener(
         const uno::Reference< lang::XEventListener > & xListener)
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.addInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.addInterface(aGuard, xListener);
 }
 
 void SAL_CALL SwXParagraph::removeEventListener(
         const uno::Reference< lang::XEventListener > & xListener)
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.removeInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.removeInterface(aGuard, xListener);
 }
 
 uno::Reference< container::XEnumeration >  SAL_CALL
@@ -1251,12 +1280,24 @@ SwXParagraph::createEnumeration()
 
     SwTextNode & rTextNode(m_pImpl->GetTextNodeOrThrow());
 
-    SwPosition aPos( rTextNode );
-    SwPaM aPam ( aPos );
+    SwPaM aPam ( rTextNode );
     const uno::Reference< container::XEnumeration > xRef =
         new SwXTextPortionEnumeration(aPam, m_pImpl->m_xParentText,
             m_pImpl->m_nSelectionStartPos, m_pImpl->m_nSelectionEndPos);
     return xRef;
+}
+
+ /// tries to return less data, but may return more than just text fields
+rtl::Reference< SwXTextPortionEnumeration >
+SwXParagraph::createTextFieldsEnumeration()
+{
+    SolarMutexGuard aGuard;
+
+    SwTextNode & rTextNode(m_pImpl->GetTextNodeOrThrow());
+    SwPaM aPam ( rTextNode );
+
+    return new SwXTextPortionEnumeration(aPam, m_pImpl->m_xParentText,
+            m_pImpl->m_nSelectionStartPos, m_pImpl->m_nSelectionEndPos, /*bOnlyTextFields*/true);
 }
 
 uno::Type SAL_CALL SwXParagraph::getElementType()
@@ -1378,8 +1419,7 @@ SwXParagraph::createContentEnumeration(const OUString& rServiceName)
 
     SwTextNode & rTextNode(m_pImpl->GetTextNodeOrThrow());
 
-    SwPosition aPos( rTextNode );
-    SwPaM aPam( aPos );
+    SwPaM aPam( rTextNode );
     uno::Reference< container::XEnumeration > xRet =
         SwXParaFrameEnumeration::Create(aPam, PARAFRAME_PORTION_PARAGRAPH);
     return xRet;

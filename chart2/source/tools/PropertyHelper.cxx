@@ -22,8 +22,10 @@
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <comphelper/sequence.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/string_view.hxx>
 
+#include <utility>
 #include <vector>
 #include <algorithm>
 #include <iterator>
@@ -37,8 +39,8 @@ namespace
 {
 struct lcl_EqualsElement
 {
-    explicit lcl_EqualsElement( const Any & rValue, const Reference< container::XNameAccess > & xAccess )
-            : m_aValue( rValue ), m_xAccess( xAccess )
+    explicit lcl_EqualsElement( Any  rValue, const Reference< container::XNameAccess > & xAccess )
+            : m_aValue(std::move( rValue )), m_xAccess( xAccess )
     {
         OSL_ASSERT( m_xAccess.is());
     }
@@ -63,13 +65,13 @@ private:
 
 struct lcl_StringMatches
 {
-    explicit lcl_StringMatches( const OUString & rCmpStr ) :
-            m_aCmpStr( rCmpStr )
+    explicit lcl_StringMatches( OUString aCmpStr ) :
+            m_aCmpStr(std::move( aCmpStr ))
     {}
 
-    bool operator() ( const OUString & rStr )
+    bool operator() ( std::u16string_view rStr )
     {
-        return rStr.match( m_aCmpStr );
+        return o3tl::starts_with( rStr, m_aCmpStr );
     }
 
 private:
@@ -81,11 +83,11 @@ struct lcl_OUStringRestToInt32
     explicit lcl_OUStringRestToInt32( sal_Int32 nPrefixLength ) :
             m_nPrefixLength( nPrefixLength )
     {}
-    sal_Int32 operator() ( const OUString & rStr )
+    sal_Int32 operator() ( std::u16string_view rStr )
     {
-        if( m_nPrefixLength > rStr.getLength() )
+        if( m_nPrefixLength > static_cast<sal_Int32>(rStr.size()) )
             return 0;
-        return rStr.copy( m_nPrefixLength ).toInt32();
+        return o3tl::toInt32(rStr.substr( m_nPrefixLength ));
     }
 private:
     sal_Int32 m_nPrefixLength;
@@ -118,49 +120,47 @@ OUString lcl_addNamedPropertyUniqueNameToTable(
     try
     {
         Reference< container::XNameAccess > xNameAccess( xNameContainer, uno::UNO_QUERY_THROW );
-        auto aNames( comphelper::sequenceToContainer<std::vector< OUString >>( xNameAccess->getElementNames()));
-        std::vector< OUString >::const_iterator aIt(
-            std::find_if( aNames.begin(), aNames.end(), lcl_EqualsElement( rValue, xNameAccess )));
+        const uno::Sequence<OUString> aElementNames = xNameAccess->getElementNames();
+        auto it = std::find_if( aElementNames.begin(), aElementNames.end(), lcl_EqualsElement( rValue, xNameAccess ));
+
+        // element found => return name
+        if( it != aElementNames.end())
+            return *it;
 
         // element not found in container
-        if( aIt == aNames.end())
+        OUString aUniqueName;
+
+        // check if preferred name is already used
+        if( !rPreferredName.isEmpty())
         {
-            OUString aUniqueName;
-
-            // check if preferred name is already used
-            if( !rPreferredName.isEmpty())
-            {
-                aIt = std::find( aNames.begin(), aNames.end(), rPreferredName );
-                if( aIt == aNames.end())
-                    aUniqueName = rPreferredName;
-            }
-
-            if( aUniqueName.isEmpty())
-            {
-                // create a unique id using the prefix plus a number
-                std::vector< sal_Int32 > aNumbers;
-                std::vector< OUString >::iterator aNonConstIt(
-                    std::partition( aNames.begin(), aNames.end(), lcl_StringMatches( rPrefix )));
-                std::transform( aNames.begin(), aNonConstIt,
-                                  back_inserter( aNumbers ),
-                                  lcl_OUStringRestToInt32( rPrefix.getLength() ));
-                std::vector< sal_Int32 >::const_iterator aMaxIt(
-                    std::max_element( aNumbers.begin(), aNumbers.end()));
-
-                sal_Int32 nIndex = 1;
-                if( aMaxIt != aNumbers.end())
-                    nIndex = (*aMaxIt) + 1;
-
-                aUniqueName = rPrefix + OUString::number( nIndex );
-            }
-
-            OSL_ASSERT( !aUniqueName.isEmpty());
-            xNameContainer->insertByName( aUniqueName, rValue );
-            return aUniqueName;
+            auto aIt = std::find( aElementNames.begin(), aElementNames.end(), rPreferredName );
+            if( aIt == aElementNames.end())
+                aUniqueName = rPreferredName;
         }
-        else
-            // element found => return name
-            return *aIt;
+
+        if( aUniqueName.isEmpty())
+        {
+            auto aNames( comphelper::sequenceToContainer<std::vector< OUString >>( aElementNames ));
+            // create a unique id using the prefix plus a number
+            std::vector< sal_Int32 > aNumbers;
+            std::vector< OUString >::iterator aNonConstIt(
+                std::partition( aNames.begin(), aNames.end(), lcl_StringMatches( rPrefix )));
+            std::transform( aNames.begin(), aNonConstIt,
+                              back_inserter( aNumbers ),
+                              lcl_OUStringRestToInt32( rPrefix.getLength() ));
+            std::vector< sal_Int32 >::const_iterator aMaxIt(
+                std::max_element( aNumbers.begin(), aNumbers.end()));
+
+            sal_Int32 nIndex = 1;
+            if( aMaxIt != aNumbers.end())
+                nIndex = (*aMaxIt) + 1;
+
+            aUniqueName = rPrefix + OUString::number( nIndex );
+        }
+
+        OSL_ASSERT( !aUniqueName.isEmpty());
+        xNameContainer->insertByName( aUniqueName, rValue );
+        return aUniqueName;
     }
     catch( const uno::Exception & )
     {

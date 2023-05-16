@@ -62,19 +62,19 @@ void SAL_CALL MovingAverageRegressionCurveCalculator::recalculateRegression(
         case MovingAverageType::Central:
         {
 
-            calculateValuesCentral(aValues);
+            calculateValuesCentral(std::move(aValues));
             break;
         }
 
         case MovingAverageType::AveragedAbscissa:
         {
-            calculateValues(aValues, true);
+            calculateValues(std::move(aValues), true);
             break;
         }
         case MovingAverageType::Prior:
         default:
         {
-            calculateValues(aValues, false);
+            calculateValues(std::move(aValues), false);
             break;
         }
     }
@@ -84,6 +84,8 @@ void MovingAverageRegressionCurveCalculator::calculateValuesCentral(
     RegressionCalculationHelper::tDoubleVectorPair aValues)
 {
     const size_t aSize = aValues.first.size();
+    if (aSize == 0)
+        return;
     for (size_t i = mPeriod - 1; i < aSize; ++i)
     {
         double yAvg = 0.0;

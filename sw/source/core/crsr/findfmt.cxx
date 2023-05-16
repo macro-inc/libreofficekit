@@ -32,24 +32,25 @@ bool FindFormatImpl(SwPaM & rSearchPam,
 {
     bool bFound = false;
     const bool bSrchForward = &fnMove == &fnMoveForward;
-    std::unique_ptr<SwPaM> pPam(MakeRegion( fnMove, rRegion ));
+    std::optional<SwPaM> oPam;
+    MakeRegion( fnMove, rRegion, oPam );
 
     // if at beginning/end then move it out of the node
     if( bSrchForward
-        ? pPam->GetPoint()->nContent.GetIndex() == pPam->GetContentNode()->Len()
-        : !pPam->GetPoint()->nContent.GetIndex() )
+        ? oPam->GetPoint()->GetContentIndex() == oPam->GetPointContentNode()->Len()
+        : !oPam->GetPoint()->GetContentIndex() )
     {
-        if( !(*fnMove.fnNds)( &pPam->GetPoint()->nNode, false ))
+        if( !(*fnMove.fnPos)( oPam->GetPoint(), false ))
         {
             return false;
         }
-        SwContentNode *pNd = pPam->GetPoint()->nNode.GetNode().GetContentNode();
-        pPam->GetPoint()->nContent.Assign( pNd, bSrchForward ? 0 : pNd->Len() );
+        SwContentNode *pNd = oPam->GetPoint()->GetNode().GetContentNode();
+        oPam->GetPoint()->SetContent( bSrchForward ? 0 : pNd->Len() );
     }
 
     bool bFirst = true;
     SwContentNode* pNode;
-    while (nullptr != (pNode = ::GetNode(*pPam, bFirst, fnMove, bInReadOnly, pLayout)))
+    while (nullptr != (pNode = ::GetNode(*oPam, bFirst, fnMove, bInReadOnly, pLayout)))
     {
         SwTextFrame const*const pFrame(pLayout && pNode->IsTextNode()
             ? static_cast<SwTextFrame const*>(pNode->getLayoutFrame(pLayout))
@@ -68,17 +69,17 @@ bool FindFormatImpl(SwPaM & rSearchPam,
             // always: incl. start and incl. end
             if (pFrame)
             {
-                *rSearchPam.GetPoint() = *pPam->GetPoint();
+                *rSearchPam.GetPoint() = *oPam->GetPoint();
                 rSearchPam.SetMark();
                 *rSearchPam.GetMark() = pFrame->MapViewToModelPos(
                     TextFrameIndex(bSrchForward ? pFrame->GetText().getLength() : 0));
             }
             else
             {
-                *rSearchPam.GetPoint() = *pPam->GetPoint();
+                *rSearchPam.GetPoint() = *oPam->GetPoint();
                 rSearchPam.SetMark();
-                pNode->MakeEndIndex( &rSearchPam.GetPoint()->nContent );
-                rSearchPam.GetMark()->nContent = 0;
+                rSearchPam.GetPoint()->SetContent(pNode->Len());
+                rSearchPam.GetMark()->SetContent(0);
             }
 
             // if backward search, switch point and mark

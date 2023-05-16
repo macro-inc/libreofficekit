@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -49,7 +51,7 @@ class tdf137802(UITestCase):
 
             # Delete the second paragraph. Shape 2 is anchored to this paragraph
             # so it should be deleted
-            # tdf#137587 fly is no longer deleted by backspace so explictly select
+            # tdf#137587 fly is no longer deleted by backspace so explicitly select
             xWriterEdit.executeAction("TYPE", mkPropertyValues({"KEYCODE": "SHIFT+LEFT"}))
             xWriterEdit.executeAction("TYPE", mkPropertyValues({"KEYCODE": "BACKSPACE"}))
 

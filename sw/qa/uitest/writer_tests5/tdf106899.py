@@ -10,7 +10,6 @@
 import org.libreoffice.unotest
 from uitest.framework import UITestCase
 from uitest.uihelper.common import get_url_for_data_file
-import time
 
 class tdf106899(UITestCase):
 
@@ -18,7 +17,6 @@ class tdf106899(UITestCase):
         # Copy concordance file containing an utf8 index entry
         org.libreoffice.unotest.makeCopyFromTDOC("tdf106899.sdi")
         with self.ui_test.load_file(get_url_for_data_file("tdf106899.odt")) as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
 
             # Update the alphabetical index and check if it contains the utf8 index entry
             xDocumentIndexes = document.DocumentIndexes
@@ -38,7 +36,7 @@ class tdf106899(UITestCase):
             xCursor.gotoRange(xDocumentIndex.getAnchor().getEnd(), False)
             xCursor.gotoStartOfParagraph(True)
 
-            # Without the fix in place the index does not contain the ut8 index entry
+            # Without the fix in place the index does not contain the utf8 index entry
             self.assertEqual("Nguyễn Khánh" in xCursor.getString(), True)
 
 # vim: set shiftwidth=4 softtabstop=4 expandtab:

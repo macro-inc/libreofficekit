@@ -1,3 +1,6 @@
+# -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
+#
+# This file is part of the LibreOffice project.
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,6 +10,7 @@
 import re
 from uitest.framework import UITestCase
 from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
+from uitest.uihelper.common import type_text
 
 from libreoffice.linguistic.linguservice import get_spellchecker
 from com.sun.star.lang import Locale
@@ -93,6 +97,23 @@ frog, dogg, catt"""
             output_text = document.Text.getString().replace('\r\n', '\n')
             self.assertTrue(re.match(self.TDF46852_REGEX, output_text))
 
+    def test_tdf136855(self):
+        supported_locale = self.is_supported_locale("en", "US")
+        if not supported_locale:
+            self.skipTest("no dictionary support for en_US available")
+
+        with self.ui_test.load_file(get_url_for_data_file("tdf136855.odt")) as writer_doc:
+
+            with self.ui_test.execute_modeless_dialog_through_command(".uno:SpellingAndGrammarDialog", close_button="close") as xDialog:
+
+                xChangeBtn = xDialog.getChild('change')
+                for i in range(6):
+                    # Without the fix in place, this test would have crashed here
+                    xChangeBtn.executeAction("CLICK", ())
+
+            output_text = writer_doc.Text.getString().replace('\n', '').replace('\r', '')
+            self.assertTrue(output_text.startswith("xx xx xx xxxxxxxxxxix xxxxxxxxxxxxxxviii"))
+
     def test_tdf66043(self):
         supported_locale = self.is_supported_locale("en", "US")
         if not supported_locale:
@@ -118,3 +139,111 @@ frog, dogg, catt"""
             # correctly without the redline containing a deleted "o"
             self.assertEqual(output_text, 'goood baaadbaaed eeend')
 
+    def test_DoNotCheckURL(self):
+        supported_locale = self.is_supported_locale("en", "US")
+        if not supported_locale:
+            self.skipTest("no dictionary support for en_US available")
+
+        with self.ui_test.create_doc_in_start_center("writer") as document:
+            cursor = document.getCurrentController().getViewCursor()
+            # Inserted text must be en_US, so make sure to set language in current location
+            cursor.CharLocale = Locale("en", "US", "")
+
+            xMainWindow = self.xUITest.getTopFocusWindow()
+            xEdit = xMainWindow.getChild("writer_edit")
+
+            # URL is recognized during typing
+            type_text(xEdit, "baaad http://www.baaad.org baaad baaad")
+
+            with self.ui_test.execute_modeless_dialog_through_command(".uno:SpellingAndGrammarDialog", close_button="close") as xDialog:
+                checkgrammar = xDialog.getChild('checkgrammar')
+                if get_state_as_dict(checkgrammar)['Selected'] == 'true':
+                    checkgrammar.executeAction('CLICK', ())
+                self.assertTrue(get_state_as_dict(checkgrammar)['Selected'] == 'false')
+
+                change = xDialog.getChild('change')
+                change.executeAction("CLICK", ())
+                change.executeAction("CLICK", ())
+
+            output_text = document.Text.getString()
+            # This was "Baaed HTTP://www.baaad.org baaad baaad" (spelling URLs)
+            self.assertEqual("Baaed http://www.baaad.org baaed baaad", output_text)
+
+    def test_tdf45949(self):
+        supported_locale = self.is_supported_locale("en", "US")
+        if not supported_locale:
+            self.skipTest("no dictionary support for en_US available")
+
+        with self.ui_test.create_doc_in_start_center("writer") as document:
+            cursor = document.getCurrentController().getViewCursor()
+            # Inserted text must be en_US, so make sure to set language in current location
+            cursor.CharLocale = Locale("en", "US", "")
+
+            xMainWindow = self.xUITest.getTopFocusWindow()
+            xEdit = xMainWindow.getChild("writer_edit")
+
+            # URL is recognized during typing
+            type_text(xEdit, "baaad http://www.baaad.org baaad")
+
+            # add spaces before and after the word "baaad" within the URL
+            cursor.goLeft(10, False)
+            type_text(xEdit, " ")
+            cursor.goLeft(6, False)
+            type_text(xEdit, " ")
+
+            with self.ui_test.execute_modeless_dialog_through_command(".uno:SpellingAndGrammarDialog", close_button="close") as xDialog:
+                checkgrammar = xDialog.getChild('checkgrammar')
+                if get_state_as_dict(checkgrammar)['Selected'] == 'true':
+                    checkgrammar.executeAction('CLICK', ())
+                self.assertTrue(get_state_as_dict(checkgrammar)['Selected'] == 'false')
+
+                change = xDialog.getChild('change')
+                change.executeAction("CLICK", ())
+                change.executeAction("CLICK", ())
+
+            output_text = document.Text.getString()
+            # This was "Baaed HTTP://www. baaad .org baaed" (skipped non-URL words of hypertext)
+            self.assertEqual("Baaed http://www. baaed .org baaad", output_text)
+
+    def test_tdf65535(self):
+        supported_locale = self.is_supported_locale("en", "US")
+        if not supported_locale:
+            self.skipTest("no dictionary support for en_US available")
+
+        with self.ui_test.load_file(get_url_for_data_file("tdf65535.fodt")) as document:
+            cursor = document.getCurrentController().getViewCursor()
+            # Inserted text must be en_US, so make sure to set language in current location
+            cursor.CharLocale = Locale("en", "US", "")
+
+            xMainWindow = self.xUITest.getTopFocusWindow()
+            xEdit = xMainWindow.getChild("writer_edit")
+
+            # type a bad word after the word with comment
+            cursor.goRight(5, False)
+            type_text(xEdit, " baad")
+            cursor.goLeft(10, False)
+
+            # fix the first word using the spelling dialog
+            with self.ui_test.execute_modeless_dialog_through_command(".uno:SpellingAndGrammarDialog", close_button="close") as xDialog:
+                checkgrammar = xDialog.getChild('checkgrammar')
+                if get_state_as_dict(checkgrammar)['Selected'] == 'true':
+                    checkgrammar.executeAction('CLICK', ())
+                self.assertTrue(get_state_as_dict(checkgrammar)['Selected'] == 'false')
+
+                change = xDialog.getChild('change')
+                change.executeAction("CLICK", ())
+
+            output_text = document.Text.getString()
+            self.assertEqual("Bad baad", output_text)
+
+            # check the original comment
+            has_comment = False
+            textfields = document.getTextFields()
+            for textfield in textfields:
+                if textfield.supportsService("com.sun.star.text.TextField.Annotation"):
+                    has_comment = True
+
+            # This was False (lost comment)
+            self.assertEqual(True, has_comment)
+
+# vim: set shiftwidth=4 softtabstop=4 expandtab:

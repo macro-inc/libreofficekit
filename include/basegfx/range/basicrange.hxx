@@ -29,8 +29,8 @@ namespace basegfx
     template< typename T, typename Traits > class BasicRange
     {
     protected:
-        T       mnMinimum;
-        T       mnMaximum;
+        T mnMinimum;
+        T mnMaximum;
 
     public:
         typedef T       ValueType;
@@ -225,23 +225,23 @@ namespace basegfx
 
         void grow(T nValue)
         {
-            if(!isEmpty())
+            if(isEmpty())
+                return;
+
+            bool bLessThanZero(nValue < 0);
+
+            if(nValue > 0 || bLessThanZero)
             {
-                bool bLessThanZero(nValue < 0);
+                mnMinimum -= nValue;
+                mnMaximum += nValue;
 
-                if(nValue > 0 || bLessThanZero)
+                if(bLessThanZero)
                 {
-                    mnMinimum -= nValue;
-                    mnMaximum += nValue;
-
-                    if(bLessThanZero)
+                    // test if range did collapse
+                    if(mnMinimum > mnMaximum)
                     {
-                        // test if range did collapse
-                        if(mnMinimum > mnMaximum)
-                        {
-                            // if yes, collapse to center
-                            mnMinimum = mnMaximum = (mnMinimum + mnMaximum) / 2;
-                        }
+                        // if yes, collapse to center
+                        mnMinimum = mnMaximum = (mnMinimum + mnMaximum) / 2;
                     }
                 }
             }
@@ -269,6 +269,10 @@ namespace basegfx
             }
         }
 
+#if defined _MSC_VER && defined(_M_ARM64)
+#pragma warning(push)
+#pragma warning(disable: 4723) /* ignore: warning for C4723 on windows arm64 build */
+#endif
         typename Traits::DifferenceType getRange() const
         {
             if(isEmpty())
@@ -280,23 +284,26 @@ namespace basegfx
                 return (mnMaximum - mnMinimum);
             }
         }
+#if defined _MSC_VER && defined(_M_ARM64)
+#pragma warning( pop )
+#endif
     };
 
     // some pre-fabricated traits
     struct DoubleTraits
     {
-        static double minVal() { return DBL_MIN; };
-        static double maxVal() { return DBL_MAX; };
-        static double neutral() { return 0.0; };
+        static constexpr double minVal() { return DBL_MIN; };
+        static constexpr double maxVal() { return DBL_MAX; };
+        static constexpr double neutral() { return 0.0; };
 
         typedef double DifferenceType;
     };
 
     struct Int32Traits
     {
-        static sal_Int32 minVal() { return SAL_MIN_INT32; };
-        static sal_Int32 maxVal() { return SAL_MAX_INT32; };
-        static sal_Int32 neutral() { return 0; };
+        static constexpr sal_Int32 minVal() { return SAL_MIN_INT32; };
+        static constexpr sal_Int32 maxVal() { return SAL_MAX_INT32; };
+        static constexpr sal_Int32 neutral() { return 0; };
 
         typedef sal_Int64 DifferenceType;
     };

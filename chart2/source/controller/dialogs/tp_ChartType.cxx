@@ -19,26 +19,29 @@
 
 #include "tp_ChartType.hxx"
 #include <ChartResourceGroups.hxx>
+#include <ChartTypeManager.hxx>
 #include <strings.hrc>
 #include <ResId.hxx>
 #include <ChartModelHelper.hxx>
+#include <ChartModel.hxx>
+#include <ChartTypeTemplate.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
 #include <unonames.hxx>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 
 #include <svtools/valueset.hxx>
 
+#include <utility>
 #include <vcl/weld.hxx>
 #include <vcl/outdev.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace chart
 {
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
 
-ChartTypeTabPage::ChartTypeTabPage(weld::Container* pPage, weld::DialogController* pController, const uno::Reference< XChartDocument >& xChartModel,
+ChartTypeTabPage::ChartTypeTabPage(weld::Container* pPage, weld::DialogController* pController, rtl::Reference<::chart::ChartModel> xChartModel,
                                    bool bShowDescription)
     : OWizardPage(pPage, pController, "modules/schart/ui/tp_ChartType.ui", "tp_ChartType")
     , m_pDim3DLookResourceGroup( new Dim3DLookResourceGroup(m_xBuilder.get()) )
@@ -46,7 +49,7 @@ ChartTypeTabPage::ChartTypeTabPage(weld::Container* pPage, weld::DialogControlle
     , m_pSplineResourceGroup( new SplineResourceGroup(m_xBuilder.get(), pController->getDialog()) )
     , m_pGeometryResourceGroup( new GeometryResourceGroup(m_xBuilder.get()) )
     , m_pSortByXValuesResourceGroup( new SortByXValuesResourceGroup(m_xBuilder.get()) )
-    , m_xChartModel( xChartModel )
+    , m_xChartModel(std::move( xChartModel ))
     , m_aChartTypeDialogControllerList(0)
     , m_pCurrentMainType(nullptr)
     , m_nChangingCalls(0)
@@ -79,7 +82,7 @@ ChartTypeTabPage::ChartTypeTabPage(weld::Container* pPage, weld::DialogControlle
     m_xSubTypeList->SetLineCount(1);
 
     bool bEnableComplexChartTypes = true;
-    uno::Reference< beans::XPropertySet > xProps( m_xChartModel, uno::UNO_QUERY );
+    uno::Reference< beans::XPropertySet > xProps( static_cast<cppu::OWeakObject*>(m_xChartModel.get()), uno::UNO_QUERY );
     if ( xProps.is() )
     {
         try
@@ -177,7 +180,7 @@ void ChartTypeTabPage::stateChanged()
     commitToModel( aParameter );
 
     //detect the new ThreeDLookScheme
-    uno::Reference<XDiagram> xDiagram = ChartModelHelper::findDiagram(m_xChartModel);
+    rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram(m_xChartModel);
     // tdf#124295 - select always a 3D scheme
     if (ThreeDLookScheme aThreeDLookScheme = ThreeDHelper::detectScheme(xDiagram);
         aThreeDLookScheme != ThreeDLookScheme::ThreeDLookScheme_Unknown)
@@ -185,8 +188,7 @@ void ChartTypeTabPage::stateChanged()
 
     try
     {
-        uno::Reference<beans::XPropertySet> xPropSet(xDiagram, uno::UNO_QUERY_THROW);
-        xPropSet->getPropertyValue(CHART_UNONAME_SORT_BY_XVALUES) >>= aParameter.bSortByXValues;
+        xDiagram->getPropertyValue(CHART_UNONAME_SORT_BY_XVALUES) >>= aParameter.bSortByXValues;
     }
     catch ( const uno::Exception& )
     {
@@ -248,11 +250,10 @@ void ChartTypeTabPage::selectMainType()
         && aParameter.eThreeDLookScheme != ThreeDLookScheme::ThreeDLookScheme_Realistic)
         aParameter.eThreeDLookScheme = ThreeDLookScheme::ThreeDLookScheme_Realistic;
 
-    uno::Reference<XDiagram> xDiagram = ChartModelHelper::findDiagram(m_xChartModel);
+    rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram(m_xChartModel);
     try
     {
-        uno::Reference<beans::XPropertySet> xPropSet(xDiagram, uno::UNO_QUERY_THROW);
-        xPropSet->getPropertyValue(CHART_UNONAME_SORT_BY_XVALUES) >>= aParameter.bSortByXValues;
+        xDiagram->getPropertyValue(CHART_UNONAME_SORT_BY_XVALUES) >>= aParameter.bSortByXValues;
     }
     catch ( const uno::Exception& )
     {
@@ -260,7 +261,7 @@ void ChartTypeTabPage::selectMainType()
     }
 
     fillAllControls( aParameter );
-    uno::Reference< beans::XPropertySet > xTemplateProps( getCurrentTemplate(), uno::UNO_QUERY );
+    uno::Reference< beans::XPropertySet > xTemplateProps( static_cast<cppu::OWeakObject*>(getCurrentTemplate().get()), uno::UNO_QUERY );
     m_pCurrentMainType->fillExtraControls(m_xChartModel,xTemplateProps);
 }
 
@@ -302,11 +303,11 @@ void ChartTypeTabPage::initializePage()
 {
     if( !m_xChartModel.is() )
         return;
-    uno::Reference< lang::XMultiServiceFactory > xTemplateManager( m_xChartModel->getChartTypeManager(), uno::UNO_QUERY );
-    uno::Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( m_xChartModel ) );
+    rtl::Reference< ::chart::ChartTypeManager > xChartTypeManager = m_xChartModel->getTypeManager();
+    rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram( m_xChartModel );
     DiagramHelper::tTemplateWithServiceName aTemplate =
-        DiagramHelper::getTemplateForDiagram( xDiagram, xTemplateManager );
-    OUString aServiceName( aTemplate.second );
+        DiagramHelper::getTemplateForDiagram( xDiagram, xChartTypeManager );
+    OUString aServiceName( aTemplate.sServiceName );
 
     bool bFound = false;
 
@@ -319,7 +320,7 @@ void ChartTypeTabPage::initializePage()
 
             m_xMainTypeList->select(nM);
             showAllControls(*elem);
-            uno::Reference< beans::XPropertySet > xTemplateProps( aTemplate.first, uno::UNO_QUERY );
+            uno::Reference< beans::XPropertySet > xTemplateProps( static_cast<cppu::OWeakObject*>(aTemplate.xChartTypeTemplate.get()), uno::UNO_QUERY );
             ChartTypeParameter aParameter = elem->getChartTypeParameterForService( aServiceName, xTemplateProps );
             m_pCurrentMainType = getSelectedMainType();
 
@@ -331,8 +332,7 @@ void ChartTypeTabPage::initializePage()
 
             try
             {
-                uno::Reference<beans::XPropertySet> xPropSet(xDiagram, uno::UNO_QUERY_THROW);
-                xPropSet->getPropertyValue(CHART_UNONAME_SORT_BY_XVALUES) >>= aParameter.bSortByXValues;
+                xDiagram->getPropertyValue(CHART_UNONAME_SORT_BY_XVALUES) >>= aParameter.bSortByXValues;
             }
             catch (const uno::Exception&)
             {
@@ -364,14 +364,14 @@ bool ChartTypeTabPage::commitPage( ::vcl::WizardTypes::CommitPageReason /*eReaso
     return true; // return false if this page should not be left
 }
 
-uno::Reference< XChartTypeTemplate > ChartTypeTabPage::getCurrentTemplate() const
+rtl::Reference< ChartTypeTemplate > ChartTypeTabPage::getCurrentTemplate() const
 {
     if( m_pCurrentMainType && m_xChartModel.is() )
     {
         ChartTypeParameter aParameter( getCurrentParamter() );
         m_pCurrentMainType->adjustParameterToSubType( aParameter );
-        uno::Reference< lang::XMultiServiceFactory > xTemplateManager( m_xChartModel->getChartTypeManager(), uno::UNO_QUERY );
-        return m_pCurrentMainType->getCurrentTemplate( aParameter, xTemplateManager );
+        rtl::Reference< ::chart::ChartTypeManager > xChartTypeManager = m_xChartModel->getTypeManager();
+        return m_pCurrentMainType->getCurrentTemplate( aParameter, xChartTypeManager );
     }
     return nullptr;
 }

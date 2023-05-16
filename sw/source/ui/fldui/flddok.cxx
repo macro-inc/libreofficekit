@@ -26,6 +26,7 @@
 #include <wrtsh.hxx>
 #include <svl/numformat.hxx>
 #include <svl/zformat.hxx>
+#include <o3tl/string_view.hxx>
 
 #define USER_DATA_VERSION_1 "1"
 #define USER_DATA_VERSION USER_DATA_VERSION_1
@@ -33,8 +34,8 @@
 SwFieldDokPage::SwFieldDokPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet *const pCoreSet)
     : SwFieldPage(pPage, pController, "modules/swriter/ui/flddocumentpage.ui",
                   "FieldDocumentPage", pCoreSet)
-    , nOldSel(0)
-    , nOldFormat(0)
+    , m_nOldSel(0)
+    , m_nOldFormat(0)
     , m_xTypeLB(m_xBuilder->weld_tree_view("type"))
     , m_xSelection(m_xBuilder->weld_widget("selectframe"))
     , m_xSelectionLB(m_xBuilder->weld_tree_view("select"))
@@ -68,6 +69,13 @@ SwFieldDokPage::SwFieldDokPage(weld::Container* pPage, weld::DialogController* p
     m_xDateOffsetED->set_range(INT_MIN, INT_MAX);
     //enable 'active' language selection
     m_xNumFormatLB->SetShowLanguageControl(true);
+
+    // uitests
+    m_xTypeLB->set_buildable_name(m_xTypeLB->get_buildable_name() + "-doc");
+    m_xValueED->set_buildable_name(m_xValueED->get_buildable_name() + "-doc");
+    m_xNumFormatLB->set_buildable_name(m_xNumFormatLB->get_buildable_name() + "-doc");
+    m_xSelectionLB->set_buildable_name(m_xSelectionLB->get_buildable_name() + "-doc");
+    m_xFormatLB->set_buildable_name(m_xFormatLB->get_buildable_name() + "-doc");
 }
 
 SwFieldDokPage::~SwFieldDokPage()
@@ -146,9 +154,9 @@ void SwFieldDokPage::Reset(const SfxItemSet* )
     {
         const OUString sUserData = GetUserData();
         sal_Int32 nIdx{ 0 };
-        if (sUserData.getToken(0, ';', nIdx).equalsIgnoreAsciiCase(USER_DATA_VERSION_1))
+        if (o3tl::equalsIgnoreAsciiCase(o3tl::getToken(sUserData, 0, ';', nIdx), u"" USER_DATA_VERSION_1))
         {
-            const sal_uInt16 nVal = static_cast< sal_uInt16 >(sUserData.getToken(0, ';', nIdx).toInt32());
+            const sal_uInt16 nVal = static_cast< sal_uInt16 >(o3tl::toInt32(o3tl::getToken(sUserData, 0, ';', nIdx)));
             if(nVal != USHRT_MAX)
             {
                 for (int i = 0, nEntryCount = m_xTypeLB->n_children(); i < nEntryCount; i++)
@@ -166,8 +174,8 @@ void SwFieldDokPage::Reset(const SfxItemSet* )
 
     if (IsFieldEdit())
     {
-        nOldSel = m_xSelectionLB->get_selected_index();
-        nOldFormat = GetCurField()->GetFormat();
+        m_nOldSel = m_xSelectionLB->get_selected_index();
+        m_nOldFormat = GetCurField()->GetFormat();
         m_xFixedCB->save_state();
         m_xValueED->save_value();
         m_xLevelED->save_value();
@@ -598,8 +606,8 @@ bool SwFieldDokPage::FillItemSet(SfxItemSet* )
     }
 
     if (!IsFieldEdit() ||
-        nOldSel != m_xSelectionLB->get_selected_index() ||
-        nOldFormat != nFormat ||
+        m_nOldSel != m_xSelectionLB->get_selected_index() ||
+        m_nOldFormat != nFormat ||
         m_xFixedCB->get_state_changed_from_saved() ||
         m_xValueED->get_value_changed_from_saved() ||
         m_xLevelED->get_value_changed_from_saved() ||

@@ -25,6 +25,7 @@
 #include <limits>
 #include <vector>
 #include <memory>
+#include <optional>
 
 #include "bparr.hxx"
 #include "ndtyp.hxx"
@@ -106,7 +107,7 @@ class SW_DLLPUBLIC SwNodes final
            *m_pEndOfAutotext, *m_pEndOfRedlines;
     std::unique_ptr<SwNode> m_pEndOfContent;
 
-    mutable std::unique_ptr<SwOutlineNodes> m_pOutlineNodes;        ///< Array of all outline nodes.
+    mutable SwOutlineNodes m_aOutlineNodes;        ///< Array of all outline nodes.
 
     bool m_bInNodesDel : 1;           /**< In Case of recursive calling.
                                            Do not update Num/Outline. */
@@ -121,7 +122,7 @@ class SW_DLLPUBLIC SwNodes final
 
     void UpdateOutlineIdx( const SwNode& );   ///< Update all OutlineNodes starting from Node.
 
-    void CopyNodes( const SwNodeRange&, const SwNodeIndex&,
+    void CopyNodes( const SwNodeRange&, SwNode& rPos,
                     bool bNewFrames, bool bTableInsDummyNode = false ) const;
     void DelDummyNodes( const SwNodeRange& rRg );
 
@@ -144,6 +145,8 @@ public:
         ForEach( SwNodeOffset(0), Count(), fnForEach, pArgs );
     }
     void ForEach( SwNodeOffset nStt, SwNodeOffset nEnd, FnForEach_SwNodes fnForEach, void* pArgs );
+    void ForEach( SwNode& rStart, SwNode& rEnd,
+                    FnForEach_SwNodes fnForEach, void* pArgs );
     void ForEach( const SwNodeIndex& rStart, const SwNodeIndex& rEnd,
                     FnForEach_SwNodes fnForEach, void* pArgs );
 
@@ -165,14 +168,15 @@ public:
        Implementation in doc.hxx (because one needs to know Doc for it) ! */
     bool IsDocNodes() const;
 
-    static sal_uInt16 GetSectionLevel(const SwNodeIndex &rIndex);
+    static sal_uInt16 GetSectionLevel(const SwNode &rIndex);
     void Delete(const SwNodeIndex &rPos, SwNodeOffset nNodes = SwNodeOffset(1));
+    void Delete(const SwNode& rPos, SwNodeOffset nNodes = SwNodeOffset(1));
 
-    bool MoveNodes( const SwNodeRange&, SwNodes& rNodes, const SwNodeIndex&,
+    bool MoveNodes( const SwNodeRange&, SwNodes& rNodes, SwNode& rPos,
                 bool bNewFrames = true );
     void MoveRange( SwPaM&, SwPosition&, SwNodes& rNodes );
 
-    void Copy_( const SwNodeRange& rRg, const SwNodeIndex& rInsPos,
+    void Copy_( const SwNodeRange& rRg, SwNode& rInsPos,
                 bool bNewFrames = true ) const
         {   CopyNodes( rRg, rInsPos, bNewFrames ); }
 
@@ -183,51 +187,57 @@ public:
     static void GoEndOfSection(SwNodeIndex *);
 
     SwContentNode* GoNext(SwNodeIndex *) const;
+    SwContentNode* GoNext(SwPosition *) const;
     static SwContentNode* GoPrevious(SwNodeIndex *);
+    static SwContentNode* GoPrevious(SwPosition *);
 
     /** Go to next content-node that is not protected or hidden
        (Both set FALSE ==> GoNext/GoPrevious!!!). */
     SwContentNode* GoNextSection( SwNodeIndex *, bool bSkipHidden  = true,
                                            bool bSkipProtect = true ) const;
+    SwContentNode* GoNextSection( SwPosition *, bool bSkipHidden  = true,
+                                           bool bSkipProtect = true ) const;
     static SwContentNode* GoPrevSection( SwNodeIndex *, bool bSkipHidden  = true,
+                                           bool bSkipProtect = true );
+    static SwContentNode* GoPrevSection( SwPosition *, bool bSkipHidden  = true,
                                            bool bSkipProtect = true );
 
     /** Create an empty section of Start- and EndNote. It may be called
        only if a new section with content is to be created,
        e.g. at filters/Undo/... */
-    static SwStartNode* MakeEmptySection( const SwNodeIndex& rIdx,
+    static SwStartNode* MakeEmptySection( SwNode& rWhere,
                                     SwStartNodeType = SwNormalStartNode );
 
     /// Implementations of "Make...Node" are in the given .cxx-files.
-    SwTextNode *MakeTextNode( const SwNodeIndex & rWhere,
+    SwTextNode *MakeTextNode( SwNode& rWhere,
                             SwTextFormatColl *pColl,
                             bool bNewFrames = true); ///< in ndtxt.cxx
-    SwStartNode* MakeTextSection( const SwNodeIndex & rWhere,
+    SwStartNode* MakeTextSection( const SwNode & rWhere,
                             SwStartNodeType eSttNdTyp,
                             SwTextFormatColl *pColl );
 
-    static SwGrfNode *MakeGrfNode( const SwNodeIndex & rWhere,
+    static SwGrfNode *MakeGrfNode( SwNode& rWhere,
                             const OUString& rGrfName,
                             const OUString& rFltName,
                             const Graphic* pGraphic,
                             SwGrfFormatColl *pColl,
                             SwAttrSet const * pAutoAttr = nullptr );    ///< in ndgrf.cxx
 
-    static SwGrfNode *MakeGrfNode( const SwNodeIndex & rWhere,
+    static SwGrfNode *MakeGrfNode( SwNode & rWhere,
                             const GraphicObject& rGrfObj,
                             SwGrfFormatColl *pColl ); ///< in ndgrf.cxx
 
-    SwOLENode *MakeOLENode( const SwNodeIndex & rWhere,
+    SwOLENode *MakeOLENode( SwNode& rWhere,
                             const svt::EmbeddedObjectRef&,
                             SwGrfFormatColl *pColl ); ///< in ndole.cxx
-    SwOLENode *MakeOLENode( const SwNodeIndex & rWhere,
+    SwOLENode *MakeOLENode( SwNode& rWhere,
                             const OUString &rName,
                             sal_Int64 nAspect,
                             SwGrfFormatColl *pColl,
                             SwAttrSet const * pAutoAttr ); ///< in ndole.cxx
 
     /// Array of all OutlineNodes.
-    const SwOutlineNodes& GetOutLineNds() const { return *m_pOutlineNodes;}
+    const SwOutlineNodes& GetOutLineNds() const { return m_aOutlineNodes;}
 
     /// Update all Nodes - Rule/Format-Change.
     void UpdateOutlineNode(SwNode & rNd);
@@ -240,7 +250,7 @@ public:
        adjust in pContentTextColl or pHeadlineTextColl this adjust item
        overrides the item in pAttrSet. */
 
-    static SwTableNode* InsertTable( const SwNodeIndex& rNdIdx,
+    static SwTableNode* InsertTable( SwNode& rNd,
                         sal_uInt16 nBoxes, SwTextFormatColl* pContentTextColl,
                         sal_uInt16 nLines, sal_uInt16 nRepeat,
                         SwTextFormatColl* pHeadlineTextColl,
@@ -254,7 +264,8 @@ public:
                                 SwTextFormatColl* pTextColl,
                                 SwUndoTextToTable* pUndo );
 
-    std::unique_ptr<SwNodeRange> ExpandRangeForTableBox(const SwNodeRange & rRange);
+    void ExpandRangeForTableBox(const SwNodeRange & rRange,
+                                std::optional<SwNodeRange>& rExpandedRange);
 
     /// create a table from a vector of NodeRanges - API support
     SwTableNode* TextToTable( const TableRanges_t& rTableNodes,
@@ -282,18 +293,17 @@ public:
        tables is calculated from the Maximum of the boxes, provided
        SSize is set "absolute" (LONG_MAX).
        (Momentarily this is needed only for the RTF-parser.) */
-    SwTableNode* SplitTable( const SwNodeIndex& rPos, bool bAfter = true,
+    SwTableNode* SplitTable( SwNode& rPos, bool bAfter = true,
                                 bool bCalcNewSize = false );
     /// Two Tables that are following one another are merged.
-    bool MergeTable( const SwNodeIndex& rPos, bool bWithPrev = true,
-                    sal_uInt16 nMode = 0 );
+    bool MergeTable( SwNode& rPos, bool bWithPrev = true );
 
     /// Insert a new SwSection.
-    SwSectionNode* InsertTextSection(SwNodeIndex const& rNdIdx,
+    SwSectionNode* InsertTextSection(SwNode& rNd,
                                 SwSectionFormat& rSectionFormat,
                                 SwSectionData const&,
                                 SwTOXBase const*const pTOXBase,
-                                SwNodeIndex const*const pEnd,
+                                SwNode const * pEndNd,
                                 bool const bInsAtStart = true,
                                 bool const bCreateFrames = true);
 
@@ -302,10 +312,10 @@ public:
     const   SwDoc& GetDoc() const   { return m_rMyDoc; }
 
     /** Search previous / next content node or table node with frames.
-     Search is started backward with the one before rFrameIdx and
+     Search is started backward with the one before rFrameNd and
      forward after pEnd.
-     If no valid node is found, return 0. rFrameIdx points to the node with frames. **/
-    SwNode* FindPrvNxtFrameNode( SwNodeIndex& rFrameIdx,
+     If no valid node is found, return nullptr. **/
+    SwNode* FindPrvNxtFrameNode( const SwNode& rFrameNd,
                                 const SwNode* pEnd,
                                 SwRootFrame const* pLayout = nullptr) const;
 

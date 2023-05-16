@@ -22,7 +22,6 @@
 #include <standard/vclxaccessibleedit.hxx>
 #include <standard/vclxaccessiblelist.hxx>
 
-#include <unotools/accessiblestatesethelper.hxx>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/accessibility/AccessibleEventId.hpp>
 #include <com/sun/star/accessibility/AccessibleRole.hpp>
@@ -261,7 +260,7 @@ Reference< XAccessibleContext > SAL_CALL VCLXAccessibleBox::getAccessibleContext
 
 //=====  XAccessibleContext  ==================================================
 
-sal_Int32 VCLXAccessibleBox::getAccessibleChildCount()
+sal_Int64 VCLXAccessibleBox::getAccessibleChildCount()
 {
     SolarMutexGuard aSolarGuard;
     ::osl::Guard< ::osl::Mutex > aGuard( GetMutex() );
@@ -269,12 +268,12 @@ sal_Int32 VCLXAccessibleBox::getAccessibleChildCount()
     return implGetAccessibleChildCount();
 }
 
-sal_Int32 VCLXAccessibleBox::implGetAccessibleChildCount()
+sal_Int64 VCLXAccessibleBox::implGetAccessibleChildCount()
 {
     // Usually a box has a text field and a list of items as its children.
     // Non drop down list boxes have no text field.  Additionally check
     // whether the object is valid.
-    sal_Int32 nCount = 0;
+    sal_Int64 nCount = 0;
     if (IsValid())
         nCount += (m_bHasTextChild?1:0) + (m_bHasListChild?1:0);
     else
@@ -289,7 +288,7 @@ sal_Int32 VCLXAccessibleBox::implGetAccessibleChildCount()
     return nCount;
 }
 
-Reference<XAccessible> SAL_CALL VCLXAccessibleBox::getAccessibleChild (sal_Int32 i)
+Reference<XAccessible> SAL_CALL VCLXAccessibleBox::getAccessibleChild (sal_Int64 i)
 {
     SolarMutexGuard aSolarGuard;
     ::osl::Guard< ::osl::Mutex > aGuard( GetMutex() );
@@ -451,7 +450,7 @@ Any VCLXAccessibleBox::getCurrentValue( )
         {
             if(pList->getSelectedAccessibleChildCount()>0)
             {
-                Reference<XAccessibleContext> xName (pList->getSelectedAccessibleChild(sal_Int32(0)), UNO_QUERY);
+                Reference<XAccessibleContext> xName (pList->getSelectedAccessibleChild(sal_Int64(0)), UNO_QUERY);
                 if(xName.is())
                 {
                     aAny <<= xName->getAccessibleName();
@@ -492,7 +491,7 @@ Any VCLXAccessibleBox::getMinimumIncrement(  )
 }
 
 // Set the INDETERMINATE state when there is no selected item for combobox
-void VCLXAccessibleBox::FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet )
+void VCLXAccessibleBox::FillAccessibleStateSet( sal_Int64& rStateSet )
 {
     VCLXAccessibleComponent::FillAccessibleStateSet(rStateSet);
     if (m_aBoxType == COMBOBOX )
@@ -508,7 +507,7 @@ void VCLXAccessibleBox::FillAccessibleStateSet( utl::AccessibleStateSetHelper& r
             nEntryCount = pComboBox->GetEntryCount();
         }
         if ( sText.isEmpty() && nEntryCount > 0 )
-            rStateSet.AddState(AccessibleStateType::INDETERMINATE);
+            rStateSet |= AccessibleStateType::INDETERMINATE;
     }
     else if (m_aBoxType == LISTBOX && m_bIsDropDownBox)
     {
@@ -517,7 +516,7 @@ void VCLXAccessibleBox::FillAccessibleStateSet( utl::AccessibleStateSetHelper& r
         {
             sal_Int32 nSelectedEntryCount = pListBox->GetSelectedEntryCount();
             if ( nSelectedEntryCount == 0)
-                rStateSet.AddState(AccessibleStateType::INDETERMINATE);
+                rStateSet |= AccessibleStateType::INDETERMINATE;
         }
     }
 }

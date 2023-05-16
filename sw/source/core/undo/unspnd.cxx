@@ -30,18 +30,20 @@
 #include <rolbck.hxx>
 #include <redline.hxx>
 #include <docary.hxx>
+#include <fmtpdsc.hxx>
 #include <IShellCursorSupplier.hxx>
 #include <osl/diagnose.h>
+#include <editeng/formatbreakitem.hxx>
 
 // SPLITNODE
 
 SwUndoSplitNode::SwUndoSplitNode( SwDoc& rDoc, const SwPosition& rPos,
                                     bool bChkTable )
-    : SwUndo( SwUndoId::SPLITNODE, &rDoc ), m_nNode( rPos.nNode.GetIndex() ),
-        m_nContent( rPos.nContent.GetIndex() ),
+    : SwUndo( SwUndoId::SPLITNODE, &rDoc ), m_nNode( rPos.GetNodeIndex() ),
+        m_nContent( rPos.GetContentIndex() ),
         m_bTableFlag( false ), m_bCheckTableStart( bChkTable )
 {
-    SwTextNode *const pTextNd = rPos.nNode.GetNode().GetTextNode();
+    SwTextNode *const pTextNd = rPos.GetNode().GetTextNode();
     OSL_ENSURE( pTextNd, "only for TextNode" );
     if( pTextNd->GetpSwpHints() )
     {
@@ -77,8 +79,8 @@ void SwUndoSplitNode::UndoImpl(::sw::UndoRedoContext & rContext)
     if( m_bTableFlag )
     {
         // than a TextNode was added directly before the current table
-        SwNodeIndex& rIdx = rPam.GetPoint()->nNode;
-        rIdx = m_nNode;
+        SwPosition& rPos = *rPam.GetPoint();
+        rPos.Assign(m_nNode);
         SwTextNode* pTNd;
         SwNode* pCurrNd = pDoc->GetNodes()[ m_nNode + 1 ];
         SwTableNode* pTableNd = pCurrNd->FindTableNode();
@@ -90,19 +92,15 @@ void SwUndoSplitNode::UndoImpl(::sw::UndoRedoContext & rContext)
             const SfxItemSet* pNdSet = pTNd->GetpSwAttrSet();
             if( pNdSet )
             {
-                const SfxPoolItem *pItem;
-                if( SfxItemState::SET == pNdSet->GetItemState( RES_PAGEDESC, false,
-                    &pItem ) )
+                if( const SwFormatPageDesc* pItem = pNdSet->GetItemIfSet( RES_PAGEDESC, false ) )
                     pTableFormat->SetFormatAttr( *pItem );
 
-                if( SfxItemState::SET == pNdSet->GetItemState( RES_BREAK, false,
-                     &pItem ) )
+                if( const SvxFormatBreakItem* pItem = pNdSet->GetItemIfSet( RES_BREAK, false ) )
                     pTableFormat->SetFormatAttr( *pItem );
             }
 
             // than delete it again
             SwNodeIndex aDelNd( *pTableNd, -1 );
-            rPam.GetPoint()->nContent.Assign( static_cast<SwContentNode*>(pCurrNd), 0 );
             RemoveIdxRel( aDelNd.GetIndex(), *rPam.GetPoint() );
             pDoc->GetNodes().Delete( aDelNd );
         }
@@ -112,15 +110,12 @@ void SwUndoSplitNode::UndoImpl(::sw::UndoRedoContext & rContext)
         SwTextNode * pTNd = pDoc->GetNodes()[ m_nNode ]->GetTextNode();
         if( pTNd )
         {
-            rPam.GetPoint()->nNode = *pTNd;
-            rPam.GetPoint()->nContent.Assign(pTNd, pTNd->GetText().getLength());
+            rPam.GetPoint()->Assign(*pTNd, pTNd->GetText().getLength());
 
             if( IDocumentRedlineAccess::IsRedlineOn( GetRedlineFlags() ))
             {
                 rPam.SetMark();
-                ++rPam.GetMark()->nNode;
-                rPam.GetMark()->nContent.Assign( rPam.GetMark()->
-                                    nNode.GetNode().GetContentNode(), 0 );
+                rPam.GetMark()->Adjust(SwNodeOffset(1));
                 pDoc->getIDocumentRedlineAccess().DeleteRedline( rPam, true, RedlineType::Any );
                 rPam.DeleteMark();
             }
@@ -130,9 +125,9 @@ void SwUndoSplitNode::UndoImpl(::sw::UndoRedoContext & rContext)
             pTNd->JoinNext();
             if (m_pHistory)
             {
-                rPam.GetPoint()->nContent = 0;
+                rPam.GetPoint()->SetContent(0);
                 rPam.SetMark();
-                rPam.GetPoint()->nContent = pTNd->GetText().getLength();
+                rPam.GetPoint()->SetContent(pTNd->GetText().getLength());
 
                 pDoc->RstTextAttrs( rPam, true );
                 m_pHistory->TmpRollback( pDoc, 0, false );
@@ -144,20 +139,19 @@ void SwUndoSplitNode::UndoImpl(::sw::UndoRedoContext & rContext)
 
     // also set the cursor onto undo section
     rPam.DeleteMark();
-    rPam.GetPoint()->nNode = m_nNode;
-    rPam.GetPoint()->nContent.Assign( rPam.GetContentNode(), m_nContent );
+    rPam.GetPoint()->Assign( m_nNode, m_nContent );
 }
 
 void SwUndoSplitNode::RedoImpl(::sw::UndoRedoContext & rContext)
 {
     SwCursor & rPam( rContext.GetCursorSupplier().CreateNewShellCursor() );
-    rPam.GetPoint()->nNode = m_nNode;
-    SwTextNode * pTNd = rPam.GetNode().GetTextNode();
+    rPam.GetPoint()->Assign(m_nNode);
+    SwTextNode * pTNd = rPam.GetPointNode().GetTextNode();
     OSL_ENSURE(pTNd, "SwUndoSplitNode::RedoImpl(): SwTextNode expected");
     if (!pTNd)
         return;
 
-    rPam.GetPoint()->nContent.Assign( pTNd, m_nContent );
+    rPam.GetPoint()->SetContent( m_nContent );
 
     SwDoc& rDoc = rPam.GetDoc();
     rDoc.getIDocumentContentOperations().SplitNode( *rPam.GetPoint(), m_bCheckTableStart );

@@ -28,10 +28,12 @@
 #include <com/sun/star/awt/XDevice.hpp>
 #include <com/sun/star/document/IndexedPropertyValues.hpp>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
+#include <com/sun/star/util/XTheme.hpp>
 
 #include <com/sun/star/embed/Aspects.hpp>
 
 #include <officecfg/Office/Common.hxx>
+#include <comphelper/indexedpropertyvalues.hxx>
 #include <comphelper/lok.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/sequence.hxx>
@@ -43,6 +45,7 @@
 #include <sal/log.hxx>
 #include <editeng/unofield.hxx>
 #include <notifydocumentevent.hxx>
+#include <tpaction.hxx>
 #include <unomodel.hxx>
 #include "unopool.hxx"
 #include <sfx2/lokhelper.hxx>
@@ -53,6 +56,7 @@
 #include <editeng/UnoForbiddenCharsTable.hxx>
 #include <svx/svdoutl.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <o3tl/unit_conversion.hxx>
 #include <svx/UnoNamespaceMap.hxx>
 #include <svx/svdlayer.hxx>
@@ -72,7 +76,6 @@
 #include <editeng/unonrule.hxx>
 #include <editeng/eeitem.hxx>
 #include <unotools/datetime.hxx>
-#include <unotools/saveopt.hxx>
 #include <xmloff/autolayout.hxx>
 
 // Support creation of GraphicStorageHandler and EmbeddedObjectResolver
@@ -121,18 +124,41 @@
 #include <drawinglayer/primitive2d/structuretagprimitive2d.hxx>
 
 #include <sfx2/lokcomponenthelpers.hxx>
+#include <sfx2/LokControlHandler.hxx>
 #include <tools/gen.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/json_writer.hxx>
 #include <tools/UnitConversion.hxx>
 #include <svx/ColorSets.hxx>
+#include <docmodel/theme/Theme.hxx>
 
 #include <app.hrc>
 
 using namespace ::cppu;
 using namespace ::com::sun::star;
 using namespace ::sd;
+
+TranslateId SdTPAction::GetClickActionSdResId( presentation::ClickAction eCA )
+{
+    switch( eCA )
+    {
+        case presentation::ClickAction_NONE:             return STR_CLICK_ACTION_NONE;
+        case presentation::ClickAction_PREVPAGE:         return STR_CLICK_ACTION_PREVPAGE;
+        case presentation::ClickAction_NEXTPAGE:         return STR_CLICK_ACTION_NEXTPAGE;
+        case presentation::ClickAction_FIRSTPAGE:        return STR_CLICK_ACTION_FIRSTPAGE;
+        case presentation::ClickAction_LASTPAGE:         return STR_CLICK_ACTION_LASTPAGE;
+        case presentation::ClickAction_BOOKMARK:         return STR_CLICK_ACTION_BOOKMARK;
+        case presentation::ClickAction_DOCUMENT:         return STR_CLICK_ACTION_DOCUMENT;
+        case presentation::ClickAction_PROGRAM:          return STR_CLICK_ACTION_PROGRAM;
+        case presentation::ClickAction_MACRO:            return STR_CLICK_ACTION_MACRO;
+        case presentation::ClickAction_SOUND:            return STR_CLICK_ACTION_SOUND;
+        case presentation::ClickAction_VERB:             return STR_CLICK_ACTION_VERB;
+        case presentation::ClickAction_STOPPRESENTATION: return STR_CLICK_ACTION_STOPPRESENTATION;
+        default: OSL_FAIL( "No StringResource for ClickAction available!" );
+    }
+    return {};
+}
 
 namespace {
 
@@ -222,8 +248,7 @@ static const SvxItemPropertySet* ImplGetDrawModelPropertySet()
         { sUNO_Prop_HasValidSignatures,   WID_MODEL_HASVALIDSIGNATURES, ::cppu::UnoType<sal_Bool>::get(),                      beans::PropertyAttribute::READONLY, 0},
         { u"Fonts",                        WID_MODEL_FONTS,              cppu::UnoType<uno::Sequence<uno::Any>>::get(),                     beans::PropertyAttribute::READONLY, 0},
         { sUNO_Prop_InteropGrabBag,       WID_MODEL_INTEROPGRABBAG,     cppu::UnoType<uno::Sequence< beans::PropertyValue >>::get(),       0, 0},
-        { sUNO_Prop_Theme,                WID_MODEL_THEME,              cppu::UnoType<uno::Sequence< beans::PropertyValue >>::get(),       0, 0},
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { sUNO_Prop_Theme,                WID_MODEL_THEME,              cppu::UnoType<util::XTheme>::get(),       0, 0},
     };
     static SvxItemPropertySet aDrawModelPropertySet_Impl( aDrawModelPropertyMap_Impl, SdrObject::GetGlobalDrawObjectItemPool() );
     return &aDrawModelPropertySet_Impl;
@@ -612,7 +637,7 @@ uno::Reference < container::XIndexAccess > SAL_CALL SdXImpressDocument::getViewD
 
         if( !rList.empty() )
         {
-            xRet = document::IndexedPropertyValues::create( ::comphelper::getProcessComponentContext() );
+            xRet = new comphelper::IndexedPropertyValuesContainer();
 
             uno::Reference < container::XIndexContainer > xCont( xRet, uno::UNO_QUERY );
             DBG_ASSERT( xCont.is(), "SdXImpressDocument::getViewData() failed for OLE object" );
@@ -624,7 +649,7 @@ uno::Reference < container::XIndexAccess > SAL_CALL SdXImpressDocument::getViewD
 
                     uno::Sequence< beans::PropertyValue > aSeq;
                     pFrameView->WriteUserDataSequence( aSeq );
-                    xCont->insertByIndex( i, uno::makeAny( aSeq ) );
+                    xCont->insertByIndex( i, uno::Any( aSeq ) );
                 }
             }
         }
@@ -957,78 +982,78 @@ css::uno::Reference<css::uno::XInterface> SdXImpressDocument::create(
 
     if( aServiceSpecifier.startsWith( "com.sun.star.presentation.") )
     {
-        const OUString aType( aServiceSpecifier.copy(26) );
+        const std::u16string_view aType( aServiceSpecifier.subView(26) );
         rtl::Reference<SvxShape> pShape;
 
-        sal_uInt16 nType = OBJ_TEXT;
+        SdrObjKind nType = SdrObjKind::Text;
         // create a shape wrapper
-        if( aType.startsWith( "TitleTextShape" ) )
+        if( o3tl::starts_with(aType, u"TitleTextShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aType.startsWith( "OutlinerShape" ) )
+        else if( o3tl::starts_with(aType, u"OutlinerShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aType.startsWith( "SubtitleShape" ) )
+        else if( o3tl::starts_with(aType, u"SubtitleShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aType.startsWith( "GraphicObjectShape" ) )
+        else if( o3tl::starts_with(aType, u"GraphicObjectShape" ) )
         {
-            nType = OBJ_GRAF;
+            nType = SdrObjKind::Graphic;
         }
-        else if( aType.startsWith( "PageShape" ) )
+        else if( o3tl::starts_with(aType, u"PageShape" ) )
         {
-            nType = OBJ_PAGE;
+            nType = SdrObjKind::Page;
         }
-        else if( aType.startsWith( "OLE2Shape" ) )
+        else if( o3tl::starts_with(aType, u"OLE2Shape" ) )
         {
-            nType = OBJ_OLE2;
+            nType = SdrObjKind::OLE2;
         }
-        else if( aType.startsWith( "ChartShape" ) )
+        else if( o3tl::starts_with(aType, u"ChartShape" ) )
         {
-            nType = OBJ_OLE2;
+            nType = SdrObjKind::OLE2;
         }
-        else if( aType.startsWith( "CalcShape" ) )
+        else if( o3tl::starts_with(aType, u"CalcShape" ) )
         {
-            nType = OBJ_OLE2;
+            nType = SdrObjKind::OLE2;
         }
-        else if( aType.startsWith( "TableShape" ) )
+        else if( o3tl::starts_with(aType, u"TableShape" ) )
         {
-            nType = OBJ_TABLE;
+            nType = SdrObjKind::Table;
         }
-        else if( aType.startsWith( "OrgChartShape" ) )
+        else if( o3tl::starts_with(aType, u"OrgChartShape" ) )
         {
-            nType = OBJ_OLE2;
+            nType = SdrObjKind::OLE2;
         }
-        else if( aType.startsWith( "NotesShape" ) )
+        else if( o3tl::starts_with(aType, u"NotesShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aType.startsWith( "HandoutShape" ) )
+        else if( o3tl::starts_with(aType, u"HandoutShape" ) )
         {
-            nType = OBJ_PAGE;
+            nType = SdrObjKind::Page;
         }
-        else if( aType.startsWith( "FooterShape" ) )
+        else if( o3tl::starts_with(aType, u"FooterShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aType.startsWith( "HeaderShape" ) )
+        else if( o3tl::starts_with(aType, u"HeaderShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aType.startsWith( "SlideNumberShape" ) )
+        else if( o3tl::starts_with(aType, u"SlideNumberShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aType.startsWith( "DateTimeShape" ) )
+        else if( o3tl::starts_with(aType, u"DateTimeShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aType.startsWith( "MediaShape" ) )
+        else if( o3tl::starts_with(aType, u"MediaShape" ) )
         {
-            nType = OBJ_MEDIA;
+            nType = SdrObjKind::Media;
         }
         else
         {
@@ -1046,7 +1071,7 @@ css::uno::Reference<css::uno::XInterface> SdXImpressDocument::create(
     }
     else if ( aServiceSpecifier == "com.sun.star.drawing.TableShape" )
     {
-        rtl::Reference<SvxShape> pShape = CreateSvxShapeByTypeAndInventor( OBJ_TABLE, SdrInventor::Default, referer );
+        rtl::Reference<SvxShape> pShape = CreateSvxShapeByTypeAndInventor( SdrObjKind::Table, SdrInventor::Default, referer );
         if( pShape && !mbClipBoard )
             pShape->SetShapeType(aServiceSpecifier);
 
@@ -1259,8 +1284,8 @@ void SAL_CALL SdXImpressDocument::setPropertyValue( const OUString& aPropertyNam
         case WID_MODEL_THEME:
             {
                 SdrModel& rModel = getSdrModelFromUnoModel();
-                std::unique_ptr<svx::Theme> pTheme = svx::Theme::FromAny(aValue);
-                rModel.SetTheme(std::move(pTheme));
+                std::shared_ptr<model::Theme> pTheme = model::Theme::FromAny(aValue);
+                rModel.setTheme(pTheme);
             }
             break;
         default:
@@ -1298,7 +1323,7 @@ uno::Any SAL_CALL SdXImpressDocument::getPropertyValue( const OUString& Property
                     break;
 
                 const ::tools::Rectangle& aRect = pEmbeddedObj->GetVisArea();
-                awt::Rectangle aVisArea( aRect.Left(), aRect.Top(), aRect.getWidth(), aRect.getHeight() );
+                awt::Rectangle aVisArea( aRect.Left(), aRect.Top(), aRect.getOpenWidth(), aRect.getOpenHeight() );
                 aAny <<= aVisArea;
             }
             break;
@@ -1386,7 +1411,7 @@ uno::Any SAL_CALL SdXImpressDocument::getPropertyValue( const OUString& Property
         case WID_MODEL_THEME:
             {
                 SdrModel& rModel = getSdrModelFromUnoModel();
-                svx::Theme* pTheme = rModel.GetTheme();
+                auto const& pTheme = rModel.getTheme();
                 if (pTheme)
                 {
                     pTheme->ToAny(aAny);
@@ -1432,7 +1457,7 @@ uno::Reference< container::XNameAccess > SAL_CALL SdXImpressDocument::getStyleFa
     if( nullptr == mpDoc )
         throw lang::DisposedException();
 
-    uno::Reference< container::XNameAccess > xStyles( dynamic_cast< container::XNameAccess* >( mpDoc->GetStyleSheetPool()) );
+    uno::Reference< container::XNameAccess > xStyles( static_cast< OWeakObject* >( mpDoc->GetStyleSheetPool() ), css::uno::UNO_QUERY );
     return xStyles;
 }
 
@@ -1512,29 +1537,26 @@ class ImplRenderPaintProc : public sdr::contact::ViewObjectContactRedirector
 {
     const SdrLayerAdmin&    rLayerAdmin;
     SdrPageView*            pSdrPageView;
-    vcl::PDFExtOutDevData*  pPDFExtOutDevData;
-
-    vcl::PDFWriter::StructElement ImplBegStructureTag( const SdrObject& rObject );
 
 public:
     bool IsVisible  ( const SdrObject* pObj ) const;
     bool IsPrintable( const SdrObject* pObj ) const;
 
-    ImplRenderPaintProc( const SdrLayerAdmin& rLA, SdrPageView* pView, vcl::PDFExtOutDevData* pData );
+    ImplRenderPaintProc(const SdrLayerAdmin& rLA, SdrPageView* pView);
 
     // all default implementations just call the same methods at the original. To do something
     // different, override the method and at least do what the method does.
-    virtual drawinglayer::primitive2d::Primitive2DContainer createRedirectedPrimitive2DSequence(
+    virtual void createRedirectedPrimitive2DSequence(
         const sdr::contact::ViewObjectContact& rOriginal,
-        const sdr::contact::DisplayInfo& rDisplayInfo) override;
+        const sdr::contact::DisplayInfo& rDisplayInfo,
+        drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) override;
 };
 
 }
 
-ImplRenderPaintProc::ImplRenderPaintProc( const SdrLayerAdmin& rLA, SdrPageView* pView, vcl::PDFExtOutDevData* pData )
-:   rLayerAdmin         ( rLA ),
-    pSdrPageView        ( pView ),
-    pPDFExtOutDevData   ( pData )
+ImplRenderPaintProc::ImplRenderPaintProc(const SdrLayerAdmin& rLA, SdrPageView *const pView)
+    : rLayerAdmin(rLA)
+    , pSdrPageView(pView)
 {
 }
 
@@ -1623,11 +1645,22 @@ static void ImplPDFExportShapeInteraction( const uno::Reference< drawing::XShape
             // Handle linked videos.
             if (xShape->getShapeType() == "com.sun.star.drawing.MediaShape" || xShape->getShapeType() == "com.sun.star.presentation.MediaShape")
             {
+                OUString title;
+                xShapePropSet->getPropertyValue("Title") >>= title;
+                OUString description;
+                xShapePropSet->getPropertyValue("Description") >>= description;
+                OUString const altText(title.isEmpty()
+                    ? description
+                    : description.isEmpty()
+                        ? title
+                        : OUString::Concat(title) + OUString::Concat("\n") + OUString::Concat(description));
+
                 OUString aMediaURL;
                 xShapePropSet->getPropertyValue("MediaURL") >>= aMediaURL;
                 if (!aMediaURL.isEmpty())
                 {
-                    sal_Int32 nScreenId = rPDFExtOutDevData.CreateScreen(aLinkRect, rPDFExtOutDevData.GetCurrentPageNumber());
+                    SdrObject const*const pSdrObj(SdrObject::getSdrObjectFromXShape(xShape));
+                    sal_Int32 nScreenId = rPDFExtOutDevData.CreateScreen(aLinkRect, altText, rPDFExtOutDevData.GetCurrentPageNumber(), pSdrObj);
                     if (aMediaURL.startsWith("vnd.sun.star.Package:"))
                     {
                         OUString aTempFileURL;
@@ -1643,20 +1676,21 @@ static void ImplPDFExportShapeInteraction( const uno::Reference< drawing::XShape
             uno::Any aAny( xShapePropSet->getPropertyValue( "OnClick" ) );
             if ( aAny >>= eCa )
             {
+                OUString const actionName(SdResId(SdTPAction::GetClickActionSdResId(eCa)));
                 switch ( eCa )
                 {
                     case presentation::ClickAction_LASTPAGE :
                     {
                         sal_Int32 nCount = rDoc.GetSdPageCount( PageKind::Standard );
                         sal_Int32 nDestId = rPDFExtOutDevData.CreateDest( aPageRect, nCount - 1, vcl::PDFWriter::DestAreaType::FitRectangle );
-                        sal_Int32 nLinkId = rPDFExtOutDevData.CreateLink( aLinkRect );
+                        sal_Int32 nLinkId = rPDFExtOutDevData.CreateLink(aLinkRect, actionName);
                         rPDFExtOutDevData.SetLinkDest( nLinkId, nDestId );
                     }
                     break;
                     case presentation::ClickAction_FIRSTPAGE :
                     {
                         sal_Int32 nDestId = rPDFExtOutDevData.CreateDest( aPageRect, 0, vcl::PDFWriter::DestAreaType::FitRectangle );
-                        sal_Int32 nLinkId = rPDFExtOutDevData.CreateLink( aLinkRect );
+                        sal_Int32 nLinkId = rPDFExtOutDevData.CreateLink(aLinkRect, actionName);
                         rPDFExtOutDevData.SetLinkDest( nLinkId, nDestId );
                     }
                     break;
@@ -1666,7 +1700,7 @@ static void ImplPDFExportShapeInteraction( const uno::Reference< drawing::XShape
                         if ( nDestPage )
                             nDestPage--;
                         sal_Int32 nDestId = rPDFExtOutDevData.CreateDest( aPageRect, nDestPage, vcl::PDFWriter::DestAreaType::FitRectangle );
-                        sal_Int32 nLinkId = rPDFExtOutDevData.CreateLink( aLinkRect );
+                        sal_Int32 nLinkId = rPDFExtOutDevData.CreateLink(aLinkRect, actionName);
                         rPDFExtOutDevData.SetLinkDest( nLinkId, nDestId );
                     }
                     break;
@@ -1677,7 +1711,7 @@ static void ImplPDFExportShapeInteraction( const uno::Reference< drawing::XShape
                         if ( nDestPage > nLastPage )
                             nDestPage = nLastPage;
                         sal_Int32 nDestId = rPDFExtOutDevData.CreateDest( aPageRect, nDestPage, vcl::PDFWriter::DestAreaType::FitRectangle );
-                        sal_Int32 nLinkId = rPDFExtOutDevData.CreateLink( aLinkRect );
+                        sal_Int32 nLinkId = rPDFExtOutDevData.CreateLink(aLinkRect, actionName);
                         rPDFExtOutDevData.SetLinkDest( nLinkId, nDestId );
                     }
                     break;
@@ -1695,7 +1729,7 @@ static void ImplPDFExportShapeInteraction( const uno::Reference< drawing::XShape
                                 case presentation::ClickAction_DOCUMENT :
                                 case presentation::ClickAction_PROGRAM :
                                 {
-                                    sal_Int32 nLinkId = rPDFExtOutDevData.CreateLink( aLinkRect );
+                                    sal_Int32 nLinkId = rPDFExtOutDevData.CreateLink(aLinkRect, actionName);
                                     rPDFExtOutDevData.SetLinkURL( nLinkId, aBookmark );
                                 }
                                 break;
@@ -1705,7 +1739,7 @@ static void ImplPDFExportShapeInteraction( const uno::Reference< drawing::XShape
                                     if ( nPage != -1 )
                                     {
                                         sal_Int32 nDestId = rPDFExtOutDevData.CreateDest( aPageRect, nPage, vcl::PDFWriter::DestAreaType::FitRectangle );
-                                        sal_Int32 nLinkId = rPDFExtOutDevData.CreateLink( aLinkRect );
+                                        sal_Int32 nLinkId = rPDFExtOutDevData.CreateLink(aLinkRect, actionName);
                                         rPDFExtOutDevData.SetLinkDest( nLinkId, nDestId );
                                     }
                                 }
@@ -1731,82 +1765,27 @@ static void ImplPDFExportShapeInteraction( const uno::Reference< drawing::XShape
     }
 }
 
-vcl::PDFWriter::StructElement ImplRenderPaintProc::ImplBegStructureTag( const SdrObject& rObject )
-{
-    vcl::PDFWriter::StructElement eElement(vcl::PDFWriter::NonStructElement);
-
-    if ( pPDFExtOutDevData && pPDFExtOutDevData->GetIsExportTaggedPDF() )
-    {
-        SdrInventor nInventor   = rObject.GetObjInventor();
-        sal_uInt16  nIdentifier = rObject.GetObjIdentifier();
-        bool        bIsTextObj  = dynamic_cast< const SdrTextObj *>( &rObject ) !=  nullptr;
-
-        if ( nInventor == SdrInventor::Default )
-        {
-            if ( nIdentifier == OBJ_GRUP )
-                eElement = vcl::PDFWriter::Section;
-            else if ( nIdentifier == OBJ_TITLETEXT )
-                eElement = vcl::PDFWriter::Heading;
-            else if ( nIdentifier == OBJ_OUTLINETEXT )
-                eElement = vcl::PDFWriter::Division;
-            else if ( !bIsTextObj || !static_cast<const SdrTextObj&>(rObject).HasText() )
-                eElement = vcl::PDFWriter::Figure;
-        }
-    }
-
-    return eElement;
-}
-
-drawinglayer::primitive2d::Primitive2DContainer ImplRenderPaintProc::createRedirectedPrimitive2DSequence(
+void ImplRenderPaintProc::createRedirectedPrimitive2DSequence(
     const sdr::contact::ViewObjectContact& rOriginal,
-    const sdr::contact::DisplayInfo& rDisplayInfo)
+    const sdr::contact::DisplayInfo& rDisplayInfo,
+    drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor)
 {
     SdrObject* pObject = rOriginal.GetViewContact().TryToGetSdrObject();
-
-    if(pObject)
-    {
-        drawinglayer::primitive2d::Primitive2DContainer xRetval;
-
-        if(pObject->getSdrPageFromSdrObject())
-        {
-            if(pObject->getSdrPageFromSdrObject()->checkVisibility(rOriginal, rDisplayInfo, false))
-            {
-                if(IsVisible(pObject) && IsPrintable(pObject))
-                {
-                    const vcl::PDFWriter::StructElement eElement(ImplBegStructureTag( *pObject ));
-                    const bool bTagUsed(vcl::PDFWriter::NonStructElement != eElement);
-
-                    xRetval = sdr::contact::ViewObjectContactRedirector::createRedirectedPrimitive2DSequence(rOriginal, rDisplayInfo);
-
-                    if(!xRetval.empty() && bTagUsed)
-                    {
-                        // embed Primitive2DSequence in a structure tag element for
-                        // exactly this purpose (StructureTagPrimitive2D)
-
-                        const SdrPage* pSdrPage(pObject->getSdrPageFromSdrObject());
-                        const bool bBackground(nullptr != pSdrPage && pSdrPage->IsMasterPage());
-                        const bool bImage(pObject->GetObjIdentifier() == OBJ_GRAF);
-
-                        drawinglayer::primitive2d::Primitive2DReference xReference(
-                            new drawinglayer::primitive2d::StructureTagPrimitive2D(
-                                eElement,
-                                bBackground,
-                                bImage,
-                                std::move(xRetval)));
-
-                        xRetval = drawinglayer::primitive2d::Primitive2DContainer { xReference };
-                    }
-                }
-            }
-        }
-
-        return xRetval;
-    }
-    else
+    if(!pObject)
     {
         // not an object, maybe a page
-        return sdr::contact::ViewObjectContactRedirector::createRedirectedPrimitive2DSequence(rOriginal, rDisplayInfo);
+        sdr::contact::ViewObjectContactRedirector::createRedirectedPrimitive2DSequence(rOriginal, rDisplayInfo, rVisitor);
+        return;
     }
+    SdrPage* pSdrPage(pObject->getSdrPageFromSdrObject());
+    if(!pSdrPage)
+        return;
+    if(!pSdrPage->checkVisibility(rOriginal, rDisplayInfo, false))
+        return;
+    if(!IsVisible(pObject) || !IsPrintable(pObject))
+        return;
+
+    sdr::contact::ViewObjectContactRedirector::createRedirectedPrimitive2DSequence(rOriginal, rDisplayInfo, rVisitor);
 }
 
 bool ImplRenderPaintProc::IsVisible( const SdrObject* pObj ) const
@@ -1902,6 +1881,12 @@ void SAL_CALL SdXImpressDocument::render( sal_Int32 nRenderer, const uno::Any& r
         !(pPDFExtOutDevData && pPDFExtOutDevData->GetIsExportHiddenSlides()) )
         return;
 
+    if (pPDFExtOutDevData)
+    {
+        css::lang::Locale const docLocale(Application::GetSettings().GetLanguageTag().getLocale());
+        pPDFExtOutDevData->SetDocumentLocale(docLocale);
+    }
+
     ::sd::ClientView aView( mpDocShell, pOut );
     ::tools::Rectangle aVisArea( Point(), mpDoc->GetSdPage( static_cast<sal_uInt16>(nPageNumber) - 1, ePageKind )->GetSize() );
     vcl::Region                       aRegion( aVisArea );
@@ -1940,7 +1925,7 @@ void SAL_CALL SdXImpressDocument::render( sal_Int32 nRenderer, const uno::Any& r
         }
 
         ImplRenderPaintProc aImplRenderPaintProc( mpDoc->GetLayerAdmin(),
-            pPV, pPDFExtOutDevData );
+            pPV);
 
         // background color for outliner :o
         SdPage* pPage = pPV ? static_cast<SdPage*>(pPV->GetPage()) : nullptr;
@@ -1961,8 +1946,8 @@ void SAL_CALL SdXImpressDocument::render( sal_Int32 nRenderer, const uno::Any& r
             // hint value if screen display. Only then the AutoColor mechanisms shall be applied
             rOutl.SetBackgroundColor( pPage->GetPageBackgroundColor( pPV, bScreenDisplay ) );
         }
-        aView.SdrPaintView::CompleteRedraw( pOut, aRegion, &aImplRenderPaintProc );
 
+        // produce link annots for media shapes before painting them
         if ( pPDFExtOutDevData && pPage )
         {
             try
@@ -2109,7 +2094,18 @@ void SAL_CALL SdXImpressDocument::render( sal_Int32 nRenderer, const uno::Any& r
                         }
                     }
                 }
+            }
+            catch (const uno::Exception&)
+            {
+            }
+        }
 
+        aView.SdrPaintView::CompleteRedraw(pOut, aRegion, &aImplRenderPaintProc);
+
+        if (pPDFExtOutDevData && pPage)
+        {
+            try
+            {
                 Size        aPageSize( mpDoc->GetSdPage( 0, PageKind::Standard )->GetSize() );
                 Point aPoint( 0, 0 );
                 ::tools::Rectangle   aPageRect( aPoint, aPageSize );
@@ -2173,7 +2169,7 @@ void SAL_CALL SdXImpressDocument::render( sal_Int32 nRenderer, const uno::Any& r
             SdrPageView* pPV = nullptr;
 
             ImplRenderPaintProc  aImplRenderPaintProc( mpDoc->GetLayerAdmin(),
-                                pOldSdView ? pOldSdView->GetSdrPageView() : nullptr, pPDFExtOutDevData );
+                            pOldSdView ? pOldSdView->GetSdrPageView() : nullptr);
 
             for( sal_uInt32 i = 0, nCount = xShapes->getCount(); i < nCount; i++ )
             {
@@ -2220,6 +2216,9 @@ void SdXImpressDocument::paintTile( VirtualDevice& rDevice,
     if (!pViewSh)
         return;
 
+    // we need to skip tile invalidation for controls on rendering
+    comphelper::LibreOfficeKit::setTiledPainting(true);
+
     // Setup drawing layer to work properly. Since we use a custom VirtualDevice
     // for the drawing, SdrPaintView::BeginCompleteRedraw() will call FindPaintWindow()
     // unsuccessfully and use a temporary window that doesn't keep state. So patch
@@ -2233,6 +2232,7 @@ void SdXImpressDocument::paintTile( VirtualDevice& rDevice,
     {
         if(SdrPageView* pSdrPageView = pDrawView->GetSdrPageView())
         {
+            pSdrPageView->SetApplicationDocumentColor(pViewSh->GetViewOptions().mnDocBackgroundColor);
             patchedPageWindow = pSdrPageView->FindPageWindow(*getDocWindow()->GetOutDev());
             temporaryPaintWindow.reset(new SdrPaintWindow(*pDrawView, rDevice));
             if (patchedPageWindow)
@@ -2288,6 +2288,32 @@ void SdXImpressDocument::paintTile( VirtualDevice& rDevice,
 
     if(patchedPageWindow != nullptr)
         patchedPageWindow->unpatchPaintWindow(previousPaintWindow);
+
+    // Draw Form controls
+    SdrView* pDrawView = pViewSh->GetDrawView();
+    SdrPageView* pPageView = pDrawView->GetSdrPageView();
+    SdrPage* pPage = pPageView->GetPage();
+    ::sd::Window* pActiveWin = pViewSh->GetActiveWindow();
+    ::tools::Rectangle aTileRect(Point(nTilePosX, nTilePosY), Size(nTileWidth, nTileHeight));
+    Size aOutputSize(nOutputWidth, nOutputHeight);
+    LokControlHandler::paintControlTile(pPage, pDrawView, *pActiveWin, rDevice, aOutputSize, aTileRect);
+
+    comphelper::LibreOfficeKit::setTiledPainting(false);
+}
+
+OString SdXImpressDocument::getViewRenderState()
+{
+    OStringBuffer aState;
+    DrawViewShell* pView = GetViewShell();
+    if (pView)
+    {
+        const SdViewOptions& pVOpt = pView->GetViewOptions();
+        aState.append(';');
+
+        OString aThemeName = OUStringToOString(pVOpt.msColorSchemeName, RTL_TEXTENCODING_UTF8);
+        aState.append(aThemeName);
+    }
+    return aState.makeStringAndClear();
 }
 
 void SdXImpressDocument::selectPart(int nPart, int nSelect)
@@ -2400,9 +2426,8 @@ bool SdXImpressDocument::isMasterViewMode()
 
     if (pViewSh->GetDispatcher())
     {
-        const SfxPoolItem* xItem = nullptr;
-        pViewSh->GetDispatcher()->QueryState(SID_SLIDE_MASTER_MODE, xItem);
-        const SfxBoolItem* isMasterViewMode = dynamic_cast<const SfxBoolItem*>(xItem);
+        const SfxBoolItem* isMasterViewMode = nullptr;
+        pViewSh->GetDispatcher()->QueryState(SID_SLIDE_MASTER_MODE, isMasterViewMode);
         if (isMasterViewMode && isMasterViewMode->GetValue())
             return true;
     }
@@ -2505,7 +2530,7 @@ void SdXImpressDocument::getPostIts(::tools::JsonWriter& rJsonWriter)
             geometry::RealPoint2D const & rPoint = xAnnotation->getPosition();
             geometry::RealSize2D const & rSize = xAnnotation->getSize();
             ::tools::Rectangle aRectangle(Point(rPoint.X * 100.0, rPoint.Y * 100.0), Size(rSize.Width * 100.0, rSize.Height * 100.0));
-            aRectangle = OutputDevice::LogicToLogic(aRectangle, MapMode(MapUnit::Map100thMM), MapMode(MapUnit::MapTwip));
+            aRectangle = o3tl::toTwips(aRectangle, o3tl::Length::mm100);
             OString sRectangle = aRectangle.toString();
             rJsonWriter.put("rectangle", sRectangle.getStr());
         }
@@ -2590,8 +2615,17 @@ void SdXImpressDocument::postMouseEvent(int nType, int nX, int nY, int nCount, i
             pViewShell->GetViewShell(), nType, nX, nY, nCount, nButtons, nModifier, fScale, fScale))
         return;
 
-    const Point aPos(Point(convertTwipToMm100(nX), convertTwipToMm100(nY)));
-    LokMouseEventData aMouseEventData(nType, aPos, nCount, MouseEventModifiers::SIMPLECLICK,
+    // try to forward mouse event to control
+    const Point aPointTwip(nX, nY);
+    const Point aPointHMM = o3tl::convert(aPointTwip, o3tl::Length::twip, o3tl::Length::mm100);
+    SdrView* pDrawView = pViewShell->GetDrawView();
+    SdrPageView* pPageView = pDrawView->GetSdrPageView();
+    SdrPage* pPage = pPageView->GetPage();
+    ::sd::Window* pActiveWin = pViewShell->GetActiveWindow();
+    if (LokControlHandler::postMouseEvent(pPage, pDrawView, *pActiveWin, nType, aPointHMM, nCount, nButtons, nModifier))
+            return;
+
+    LokMouseEventData aMouseEventData(nType, aPointHMM, nCount, MouseEventModifiers::SIMPLECLICK,
                                       nButtons, nModifier);
     SfxLokHelper::postMouseEventAsync(pViewShell->GetActiveWindow(), aMouseEventData);
 }
@@ -2634,7 +2668,7 @@ uno::Reference<datatransfer::XTransferable> SdXImpressDocument::getSelection()
     if (!pViewShell)
         return uno::Reference<datatransfer::XTransferable>();
 
-    return pViewShell->GetSelectionTransferrable();
+    return pViewShell->GetSelectionTransferable();
 }
 
 void SdXImpressDocument::setGraphicSelection(int nType, int nX, int nY)
@@ -3213,7 +3247,7 @@ uno::Reference< drawing::XDrawPage > SAL_CALL SdMasterPagesAccess::insertNewByIn
             bUnique = std::find(aPageNames.begin(), aPageNames.end(), aPrefix) == aPageNames.end();
         }
 
-        OUString aLayoutName = aPrefix + SD_LT_SEPARATOR STR_LAYOUT_OUTLINE;
+        OUString aLayoutName = aPrefix + SD_LT_SEPARATOR + STR_LAYOUT_OUTLINE;
 
         // create styles
         static_cast<SdStyleSheetPool*>(pDoc->GetStyleSheetPool())->CreateLayoutStyleSheets( aPrefix );

@@ -38,12 +38,6 @@ namespace com::sun::star::uno { class XComponentContext; }
 
 namespace {
 
-comphelper::detail::ConfigurationWrapper& GetTheConfigurationWrapper(const css::uno::Reference< css::uno::XComponentContext >& xContext)
-{
-    static comphelper::detail::ConfigurationWrapper WRAPPER(xContext);
-    return WRAPPER;
-}
-
 OUString getDefaultLocale(
     css::uno::Reference< css::uno::XComponentContext > const & context)
 {
@@ -67,10 +61,9 @@ OUString extendLocalizedPath(std::u16string_view path, OUString const & locale) 
 }
 
 std::shared_ptr< comphelper::ConfigurationChanges >
-comphelper::ConfigurationChanges::create(
-    css::uno::Reference< css::uno::XComponentContext > const & context)
+comphelper::ConfigurationChanges::create()
 {
-    return GetTheConfigurationWrapper(context).createChanges();
+    return detail::ConfigurationWrapper::get().createChanges();
 }
 
 comphelper::ConfigurationChanges::~ConfigurationChanges() {}
@@ -107,16 +100,15 @@ comphelper::ConfigurationChanges::getSet(OUString const & path) const
 }
 
 comphelper::detail::ConfigurationWrapper const &
-comphelper::detail::ConfigurationWrapper::get(
-    css::uno::Reference< css::uno::XComponentContext > const & context)
+comphelper::detail::ConfigurationWrapper::get()
 {
-    return GetTheConfigurationWrapper(context);
+    static comphelper::detail::ConfigurationWrapper WRAPPER;
+    return WRAPPER;
 }
 
-comphelper::detail::ConfigurationWrapper::ConfigurationWrapper(
-    css::uno::Reference< css::uno::XComponentContext > const & context):
-    context_(context),
-    access_(css::configuration::ReadWriteAccess::create(context, "*"))
+comphelper::detail::ConfigurationWrapper::ConfigurationWrapper():
+    context_(comphelper::getProcessComponentContext()),
+    access_(css::configuration::ReadWriteAccess::create(context_, "*"))
 {}
 
 comphelper::detail::ConfigurationWrapper::~ConfigurationWrapper() {}
@@ -130,7 +122,7 @@ bool comphelper::detail::ConfigurationWrapper::isReadOnly(OUString const & path)
         != 0;
 }
 
-css::uno::Any comphelper::detail::ConfigurationWrapper::getPropertyValue(OUString const& path) const
+css::uno::Any comphelper::detail::ConfigurationWrapper::getPropertyValue(std::u16string_view path) const
 {
     // Cache the configuration access, since some of the keys are used in hot code.
     // Note that this cache is only used by the officecfg:: auto-generated code, using it for anything
@@ -138,10 +130,10 @@ css::uno::Any comphelper::detail::ConfigurationWrapper::getPropertyValue(OUStrin
     static std::mutex gMutex;
     static std::map<OUString, css::uno::Reference< css::container::XNameAccess >> gAccessMap;
 
-    sal_Int32 idx = path.lastIndexOf("/");
+    sal_Int32 idx = path.rfind('/');
     assert(idx!=-1);
-    OUString parentPath = path.copy(0, idx);
-    OUString childName = path.copy(idx+1);
+    OUString parentPath(path.substr(0, idx));
+    OUString childName(path.substr(idx+1));
 
     std::scoped_lock aGuard(gMutex);
 

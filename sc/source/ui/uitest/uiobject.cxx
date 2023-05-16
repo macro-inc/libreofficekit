@@ -18,7 +18,6 @@
 #include <dbfunc.hxx>
 #include <tabvwsh.hxx>
 #include <drwlayer.hxx>
-#include <navipi.hxx>
 #include <sfx2/sidebar/Sidebar.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/dispatch.hxx>
@@ -36,19 +35,19 @@
 
 namespace {
 
-ScAddress get_address_from_string(const ScDocument& rDoc, const OUString& rStr)
+ScAddress get_address_from_string(const ScDocument& rDoc, std::u16string_view aStr)
 {
     ScAddress aAddr;
     sal_Int32 nOffset = 0;
-    ScRangeStringConverter::GetAddressFromString(aAddr, rStr, rDoc, formula::FormulaGrammar::CONV_OOO, nOffset);
+    ScRangeStringConverter::GetAddressFromString(aAddr, aStr, rDoc, formula::FormulaGrammar::CONV_OOO, nOffset);
     return aAddr;
 }
 
-ScRange get_range_from_string(const ScDocument& rDoc, const OUString& rStr)
+ScRange get_range_from_string(const ScDocument& rDoc, std::u16string_view aStr)
 {
     ScRange aRange;
     sal_Int32 nOffset = 0;
-    ScRangeStringConverter::GetRangeFromString(aRange, rStr, rDoc, formula::FormulaGrammar::CONV_OOO, nOffset);
+    ScRangeStringConverter::GetRangeFromString(aRange, aStr, rDoc, formula::FormulaGrammar::CONV_OOO, nOffset);
 
     return aRange;
 }
@@ -165,7 +164,15 @@ void ScGridWinUIObject::execute(const OUString& rAction,
             sal_Int32 nTab = rStr.toUInt32();
             ScTabView* pTabView = mxGridWindow->getViewData().GetView();
             if (pTabView)
-                pTabView->SetTabNo(nTab);
+            {
+                ScDocument& rDoc = mxGridWindow->getViewData().GetDocument();
+                if( nTab < rDoc.GetTableCount() )
+                    pTabView->SetTabNo(nTab);
+                else
+                {
+                    SAL_WARN("sc.uitest", "incorrect table number");
+                }
+            }
         }
         else if (rParameters.find("OBJECT") != rParameters.end())
         {
@@ -199,8 +206,8 @@ void ScGridWinUIObject::execute(const OUString& rAction,
         {
             SdrMark* pMark = rMarkList.GetMark(0);
             SdrObject* pObj = pMark->GetMarkedSdrObj();
-            sal_uInt16 nSdrObjKind = pObj->GetObjIdentifier();
-            if (nSdrObjKind == OBJ_OLE2)
+            SdrObjKind nSdrObjKind = pObj->GetObjIdentifier();
+            if (nSdrObjKind == SdrObjKind::OLE2)
             {
                 ScTabViewShell* pViewShell = getViewShell();
                 pViewShell->ActivateObject(static_cast<SdrOle2Obj*>(pObj), css::embed::EmbedVerbs::MS_OLEVERB_PRIMARY);
@@ -365,7 +372,7 @@ std::set<OUString> collect_charts(VclPtr<ScGridWindow> const & xGridWindow)
     SdrObject* pObject = aIter.Next();
     while (pObject)
     {
-        if (pObject->GetObjIdentifier() == OBJ_OLE2)
+        if (pObject->GetObjIdentifier() == SdrObjKind::OLE2)
         {
             aRet.insert(static_cast<SdrOle2Obj*>(pObject)->GetPersistName());
         }

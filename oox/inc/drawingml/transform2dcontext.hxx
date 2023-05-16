@@ -20,6 +20,8 @@
 #ifndef INCLUDED_OOX_DRAWINGML_TRANSFORM2DCONTEXT_HXX
 #define INCLUDED_OOX_DRAWINGML_TRANSFORM2DCONTEXT_HXX
 
+#include <optional>
+
 #include <oox/core/contexthandler2.hxx>
 
 namespace oox::drawingml {
@@ -31,12 +33,15 @@ class Transform2DContext final : public ::oox::core::ContextHandler2
 {
 public:
     Transform2DContext( ::oox::core::ContextHandler2Helper const & rParent,
-                        const ::oox::AttributeList& rAttributes, Shape& rShape, bool btxXfrm = false ) noexcept;
+                        const ::oox::AttributeList& rAttributes, Shape& rShape, bool btxXfrm = false );
     virtual ::oox::core::ContextHandlerRef onCreateContext( ::sal_Int32 Element, const ::oox::AttributeList& rAttribs ) override;
 
 private:
     Shape&              mrShape;
     bool                mbtxXfrm;
+    std::optional<sal_Int32> mno_txXfrmRot;
+    std::optional<sal_Int32> mno_txXfrmOffX;
+    std::optional<sal_Int32> mno_txXfrmOffY;
 };
 
 } // namespace oox::drawingml

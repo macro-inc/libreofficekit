@@ -22,6 +22,7 @@
 
 #include <o3tl/sorted_vector.hxx>
 #include <o3tl/typed_flags_set.hxx>
+#include <o3tl/string_view.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <tools/time.hxx>
 #include <tools/date.hxx>
@@ -32,6 +33,7 @@
 #include <map>
 #include <memory>
 #include <string_view>
+#include <utility>
 
 class CharClass;
 class SfxPoolItem;
@@ -44,9 +46,9 @@ namespace tools { template <typename T> class SvRef; }
 
 struct CompareSvStringsISortDtor
 {
-    bool operator()( OUString const& lhs, std::u16string_view rhs ) const
+    bool operator()( std::u16string_view lhs, std::u16string_view rhs ) const
     {
-        return lhs.compareToIgnoreAsciiCase( rhs ) < 0;
+        return o3tl::compareToIgnoreAsciiCase( lhs, rhs ) < 0;
     }
 };
 
@@ -98,7 +100,6 @@ enum class ACQuotes
 class EDITENG_DLLPUBLIC SvxAutoCorrDoc
 {
 public:
-    SvxAutoCorrDoc() {}
     virtual ~SvxAutoCorrDoc();
 
     virtual bool Delete( sal_Int32 nStt, sal_Int32 nEnd ) = 0;
@@ -143,8 +144,8 @@ class EDITENG_DLLPUBLIC SvxAutocorrWord
     OUString sShort, sLong;
     bool bIsTxtOnly;                // Is pure ASCII - Text
 public:
-    SvxAutocorrWord( const OUString& rS, const OUString& rL, bool bFlag = true )
-        : sShort( rS ), sLong( rL ), bIsTxtOnly( bFlag )
+    SvxAutocorrWord( OUString aS, OUString aL, bool bFlag = true )
+        : sShort(std::move( aS )), sLong(std::move( aL )), bIsTxtOnly( bFlag )
     {}
 
     const OUString& GetShort() const                  { return sShort; }
@@ -161,7 +162,7 @@ class EDITENG_DLLPUBLIC SvxAutocorrWordList
     const SvxAutocorrWordList& operator= ( const SvxAutocorrWordList& ) = delete;
 
     const SvxAutocorrWord* WordMatches(const SvxAutocorrWord *pFnd,
-                                       const OUString &rTxt,
+                                       std::u16string_view rTxt,
                                        sal_Int32 &rStt,
                                        sal_Int32 nEndPos) const;
 public:
@@ -178,7 +179,7 @@ public:
     typedef std::vector<SvxAutocorrWord> AutocorrWordSetType;
     const AutocorrWordSetType & getSortedContent() const;
 
-    const SvxAutocorrWord* SearchWordsInList(const OUString& rTxt, sal_Int32& rStt, sal_Int32 nEndPos) const;
+    const SvxAutocorrWord* SearchWordsInList(std::u16string_view rTxt, sal_Int32& rStt, sal_Int32 nEndPos) const;
 };
 
 class EDITENG_DLLPUBLIC SvxAutoCorrectLanguageLists
@@ -210,8 +211,8 @@ class EDITENG_DLLPUBLIC SvxAutoCorrectLanguageLists
 
 public:
     SvxAutoCorrectLanguageLists( SvxAutoCorrect& rParent,
-            const OUString& rShareAutoCorrectFile,
-            const OUString& rUserAutoCorrectFile);
+            OUString aShareAutoCorrectFile,
+            OUString aUserAutoCorrectFile);
     ~SvxAutoCorrectLanguageLists();
 
     // Load, Set, Get - the replacement list
@@ -251,7 +252,7 @@ class EDITENG_DLLPUBLIC SvxAutoCorrect
     SvxSwAutoFormatFlags aSwFlags;     // StarWriter AutoFormat Flags
 
     // all languages in a table
-    std::map<LanguageTag, std::unique_ptr<SvxAutoCorrectLanguageLists>> m_aLangTable;
+    std::map<LanguageTag, SvxAutoCorrectLanguageLists> m_aLangTable;
     std::map<LanguageTag, sal_Int64> aLastFileTable;
     std::unique_ptr<CharClass> pCharClass;
 
@@ -285,8 +286,8 @@ public:
 
     virtual void refreshBlockList( const css::uno::Reference < css::embed::XStorage >& rStg);
 
-    SvxAutoCorrect( const OUString& rShareAutocorrFile,
-                    const OUString& rUserAutocorrFile );
+    SvxAutoCorrect( OUString aShareAutocorrFile,
+                    OUString aUserAutocorrFile );
     SvxAutoCorrect( const SvxAutoCorrect& );
     virtual ~SvxAutoCorrect();
 
@@ -312,7 +313,7 @@ public:
     // 3 and 9 characters long, that is a chunk of text starting with a whitespace or with a word's
     // first character, and ending at the current cursor position or empty string if no such string
     // exists
-    static std::vector<OUString> GetChunkForAutoText(const OUString& rTxt, sal_Int32 nPos);
+    static std::vector<OUString> GetChunkForAutoText(std::u16string_view rTxt, sal_Int32 nPos);
 
     // Search for the words in the replacement table.
     // rText - check in this text the words of the list
@@ -320,7 +321,7 @@ public:
     // nEnd - to check position - as of this item forward
     // rLang - Input: in which language is searched
     //         Output: in which "language list" was it found
-    const SvxAutocorrWord* SearchWordsInList( const OUString& rTxt,
+    const SvxAutocorrWord* SearchWordsInList( std::u16string_view rTxt,
                                     sal_Int32& rStt, sal_Int32 nEndPos,
                                     SvxAutoCorrDoc& rDoc,
                                     LanguageTag& rLang );
@@ -406,10 +407,10 @@ public:
     bool FnChgOrdinalNumber( SvxAutoCorrDoc&, const OUString&,
                                 sal_Int32 nSttPos, sal_Int32 nEndPos,
                                 LanguageType eLang );
-    bool FnChgToEnEmDash( SvxAutoCorrDoc&, const OUString&,
+    bool FnChgToEnEmDash( SvxAutoCorrDoc&, std::u16string_view,
                                 sal_Int32 nSttPos, sal_Int32 nEndPos,
                                 LanguageType eLang );
-    bool FnAddNonBrkSpace( SvxAutoCorrDoc&, const OUString&,
+    bool FnAddNonBrkSpace( SvxAutoCorrDoc&, std::u16string_view,
                                 sal_Int32 nEndPos,
                                 LanguageType eLang, bool& io_bNbspRunNext );
     bool FnSetINetAttr( SvxAutoCorrDoc&, const OUString&,

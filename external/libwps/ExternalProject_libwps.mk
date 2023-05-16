@@ -21,20 +21,12 @@ $(eval $(call gb_ExternalProject_use_externals,libwps,\
 
 libwps_CPPFLAGS+=$(gb_COMPILERDEFS_STDLIB_DEBUG)
 
-libwps_CXXFLAGS=$(gb_CXXFLAGS) $(if $(ENABLE_OPTIMIZED),$(gb_COMPILEROPTFLAGS),$(gb_COMPILERNOOPTFLAGS))
+libwps_CXXFLAGS=$(gb_CXXFLAGS) $(call gb_ExternalProject_get_build_flags,libwps)
 
-libwps_LDFLAGS=
+libwps_LDFLAGS=$(call gb_ExternalProject_get_link_flags,libwps)
 ifeq ($(OS),LINUX)
 ifeq ($(SYSTEM_REVENGE),)
 libwps_LDFLAGS+=-Wl,-z,origin -Wl,-rpath,\$$$$ORIGIN
-endif
-endif
-
-ifeq ($(ENABLE_GDB_INDEX),TRUE)
-libwps_LDFLAGS+=-Wl,--gdb-index
-libwps_CXXFLAGS+=-ggnu-pubnames
-ifneq ($(USE_LD),)
-libwps_LDFLAGS += $(USE_LD)
 endif
 endif
 
@@ -58,7 +50,7 @@ $(call gb_ExternalProject_get_state_target,libwps,build) :
 			$(if $(libwps_CXXFLAGS),CXXFLAGS='$(libwps_CXXFLAGS)') \
 			$(if $(libwps_CPPFLAGS),CPPFLAGS='$(libwps_CPPFLAGS)') \
 			$(if $(libwps_LDFLAGS),LDFLAGS='$(libwps_LDFLAGS)') \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
+			$(gb_CONFIGURE_PLATFORMS) \
 			$(if $(filter MACOSX,$(OS)),--prefix=/@.__________________________________________________OOO) \
 		&& $(MAKE) \
 		$(if $(filter MACOSX,$(OS)),\

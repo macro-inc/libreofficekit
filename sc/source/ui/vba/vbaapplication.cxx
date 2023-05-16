@@ -65,7 +65,7 @@
 #include <sfx2/app.hxx>
 #include <vcl/svapp.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <basic/sbx.hxx>
 #include <basic/sbstar.hxx>
@@ -73,6 +73,7 @@
 #include <basic/sbmeth.hxx>
 #include <basic/sberrors.hxx>
 #include <comphelper/sequence.hxx>
+#include <cppu/unotype.hxx>
 
 #include <convuno.hxx>
 #include <cellsuno.hxx>
@@ -300,23 +301,23 @@ ScVbaApplication::getSelection()
             // TODO Oval with text box
             if( ScVbaShape::getAutoShapeType( xShape ) == office::MsoAutoShapeType::msoShapeOval )
             {
-                return uno::makeAny( uno::Reference< msforms::XOval >(new ScVbaOvalShape( mxContext, xShape, xShapes, xModel ) ) );
+                return uno::Any( uno::Reference< msforms::XOval >(new ScVbaOvalShape( mxContext, xShape, xShapes, xModel ) ) );
             }
 
 
             uno::Reference< lang::XServiceInfo > xShapeServiceInfo( xShape, uno::UNO_QUERY_THROW );
             if ( xShapeServiceInfo->supportsService("com.sun.star.drawing.Text")  )
             {
-                    return uno::makeAny( uno::Reference< msforms::XTextBoxShape >(
+                    return uno::Any( uno::Reference< msforms::XTextBoxShape >(
                                 new ScVbaTextBoxShape( mxContext, xShape, xShapes, xModel ) ) );
             }
         }
         else if ( nType == office::MsoShapeType::msoLine )
         {
-            return uno::makeAny( uno::Reference< msforms::XLine >( new ScVbaLineShape(
+            return uno::Any( uno::Reference< msforms::XLine >( new ScVbaLineShape(
                             mxContext, xShape, xShapes, xModel ) ) );
         }
-        return uno::makeAny( uno::Reference< msforms::XShape >(new ScVbaShape( this, mxContext, xShape, xShapes, xModel, ScVbaShape::getType( xShape ) ) ) );
+        return uno::Any( uno::Reference< msforms::XShape >(new ScVbaShape( this, mxContext, xShape, xShapes, xModel, ScVbaShape::getType( xShape ) ) ) );
     }
     else if( xServiceInfo->supportsService("com.sun.star.sheet.SheetCellRange") ||
              xServiceInfo->supportsService("com.sun.star.sheet.SheetCellRanges") )
@@ -326,10 +327,10 @@ ScVbaApplication::getSelection()
         {
             uno::Reference< sheet::XSheetCellRangeContainer > xRanges( aSelection, ::uno::UNO_QUERY);
             if ( xRanges.is() )
-                return uno::makeAny( uno::Reference< excel::XRange >( new ScVbaRange( excel::getUnoSheetModuleObj( xRanges ), mxContext, xRanges ) ) );
+                return uno::Any( uno::Reference< excel::XRange >( new ScVbaRange( excel::getUnoSheetModuleObj( xRanges ), mxContext, xRanges ) ) );
 
         }
-        return uno::makeAny( uno::Reference< excel::XRange >(new ScVbaRange( excel::getUnoSheetModuleObj( xRange ), mxContext, xRange ) ) );
+        return uno::Any( uno::Reference< excel::XRange >(new ScVbaRange( excel::getUnoSheetModuleObj( xRange ), mxContext, xRange ) ) );
     }
     else
     {
@@ -358,7 +359,7 @@ uno::Any SAL_CALL
 ScVbaApplication::GetOpenFilename(const uno::Any& /*aFileFilter*/, const uno::Any& /*aFilterIndex*/, const uno::Any& aTitle, const uno::Any& /*aButtonText*/, const uno::Any& aMultiSelect)
 {
     // TODO - take all parameters into account
-    auto xDialog = uno::Reference<excel::XFileDialog> (new ScVbaFileDialog( this, mxContext, office::MsoFileDialogType::msoFileDialogFilePicker));
+    uno::Reference<excel::XFileDialog> xDialog(new ScVbaFileDialog(this, mxContext, office::MsoFileDialogType::msoFileDialogFilePicker));
     xDialog->setTitle(aTitle);
     xDialog->setAllowMultiSelect(aMultiSelect);
 
@@ -368,11 +369,16 @@ ScVbaApplication::GetOpenFilename(const uno::Any& /*aFileFilter*/, const uno::An
     if (xDialog->Show() == 0)
     {
         // return FALSE when canceled
-        return uno::makeAny(false);
+        return uno::Any(false);
     }
 
     uno::Reference<excel::XFileDialogSelectedItems> xItems = xDialog->getSelectedItems();
     auto* pItems = dynamic_cast<ScVbaFileDialogSelectedItems*>(xItems.get());
+
+    // Check, if the implementation of XFileDialogSelectedItems is what we expect
+    if (!pItems)
+        throw uno::RuntimeException("Unexpected XFileDialogSelectedItems implementation");
+
     auto const & rItemVector = pItems->getItems();
 
     if (!bMultiSelect) // only 1 selection allowed - return path
@@ -380,12 +386,12 @@ ScVbaApplication::GetOpenFilename(const uno::Any& /*aFileFilter*/, const uno::An
         OUString aPath;
         if (!rItemVector.empty())
             aPath = rItemVector.at(0);
-        return uno::makeAny(aPath);
+        return uno::Any(aPath);
     }
     else
     {
         // convert to sequence
-        return uno::makeAny(comphelper::containerToSequence(rItemVector));
+        return uno::Any(comphelper::containerToSequence(rItemVector));
     }
 }
 
@@ -435,7 +441,7 @@ ScVbaApplication::Worksheets( const uno::Any& aIndex )
 uno::Any SAL_CALL
 ScVbaApplication::WorksheetFunction( )
 {
-    return uno::makeAny( uno::Reference< script::XInvocation >( new ScVbaWSFunction( this, mxContext ) ) );
+    return uno::Any( uno::Reference< script::XInvocation >( new ScVbaWSFunction( this, mxContext ) ) );
 }
 
 uno::Any SAL_CALL
@@ -485,7 +491,7 @@ ScVbaApplication::setCutCopyMode( const uno::Any& /* _cutcopymode */ )
 uno::Any SAL_CALL
 ScVbaApplication::getStatusBar()
 {
-    return uno::makeAny( !getDisplayStatusBar() );
+    return uno::Any( !getDisplayStatusBar() );
 }
 
 css::uno::Any SAL_CALL ScVbaApplication::getWindowState()
@@ -585,7 +591,7 @@ uno::Any SAL_CALL
 ScVbaApplication::Range( const uno::Any& Cell1, const uno::Any& Cell2 )
 {
     uno::Reference< excel::XRange > xVbRange = ScVbaRange::ApplicationRange( mxContext, Cell1, Cell2 );
-    return uno::makeAny( xVbRange );
+    return uno::Any( xVbRange );
 }
 
 uno::Any SAL_CALL
@@ -676,10 +682,10 @@ ScVbaApplication::GoTo( const uno::Any& Reference, const uno::Any& Scroll )
                 ScSplitPos eWhich = pShell->GetViewData().GetActivePart();
                 sal_Int32 nValueX = pShell->GetViewData().GetPosX(WhichH(eWhich));
                 sal_Int32 nValueY = pShell->GetViewData().GetPosY(WhichV(eWhich));
-                xWindow->SmallScroll( uno::makeAny( static_cast<sal_Int16>(xVbaSheetRange->getRow() - 1) ),
-                         uno::makeAny( static_cast<sal_Int16>(nValueY) ),
-                         uno::makeAny( static_cast<sal_Int16>(xVbaSheetRange->getColumn() - 1)  ),
-                         uno::makeAny( static_cast<sal_Int16>(nValueX) ) );
+                xWindow->SmallScroll( uno::Any( static_cast<sal_Int16>(xVbaSheetRange->getRow() - 1) ),
+                         uno::Any( static_cast<sal_Int16>(nValueY) ),
+                         uno::Any( static_cast<sal_Int16>(xVbaSheetRange->getColumn() - 1)  ),
+                         uno::Any( static_cast<sal_Int16>(nValueX) ) );
                 gridWindow->GrabFocus();
             }
             else
@@ -716,10 +722,10 @@ ScVbaApplication::GoTo( const uno::Any& Reference, const uno::Any& Scroll )
                 ScSplitPos eWhich = pShell->GetViewData().GetActivePart();
                 sal_Int32 nValueX = pShell->GetViewData().GetPosX(WhichH(eWhich));
                 sal_Int32 nValueY = pShell->GetViewData().GetPosY(WhichV(eWhich));
-                xWindow->SmallScroll( uno::makeAny( static_cast<sal_Int16>(xVbaRange->getRow() - 1) ),
-                         uno::makeAny( static_cast<sal_Int16>(nValueY) ),
-                         uno::makeAny( static_cast<sal_Int16>(xVbaRange->getColumn() - 1)  ),
-                         uno::makeAny( static_cast<sal_Int16>(nValueX) ) );
+                xWindow->SmallScroll( uno::Any( static_cast<sal_Int16>(xVbaRange->getRow() - 1) ),
+                         uno::Any( static_cast<sal_Int16>(nValueY) ),
+                         uno::Any( static_cast<sal_Int16>(xVbaRange->getColumn() - 1)  ),
+                         uno::Any( static_cast<sal_Int16>(nValueX) ) );
                 gridWindow->GrabFocus();
             }
             else
@@ -877,8 +883,8 @@ ScVbaApplication::setDisplayScrollBars( sal_Bool bSet )
     // use uno here as it does all he repainting etc. magic
     uno::Reference< sheet::XSpreadsheetView > xView( getCurrentDocument()->getCurrentController(), uno::UNO_QUERY_THROW );
     uno::Reference< beans::XPropertySet > xProps( xView, uno::UNO_QUERY );
-    xProps->setPropertyValue("HasVerticalScrollBar", uno::makeAny( bSet ) );
-    xProps->setPropertyValue("HasHorizontalScrollBar", uno::makeAny( bSet ) );
+    xProps->setPropertyValue("HasVerticalScrollBar", uno::Any( bSet ) );
+    xProps->setPropertyValue("HasHorizontalScrollBar", uno::Any( bSet ) );
 }
 
 sal_Bool SAL_CALL
@@ -1067,11 +1073,11 @@ void lclAddToListOfScRange( ListOfScRange& rList, const uno::Any& rArg )
 bool lclTryJoin( ScRange& r1, const ScRange& r2 )
 {
     // 1) r2 is completely inside r1
-    if( r1.In( r2 ) )
+    if( r1.Contains( r2 ) )
         return true;
 
     // 2) r1 is completely inside r2
-    if( r2.In( r1 ) )
+    if( r2.Contains( r1 ) )
     {
         r1 = r2;
         return true;
@@ -1358,9 +1364,8 @@ ScVbaApplication::getDisplayFormulaBar()
         reqList.Put( sfxFormBar );
 
         pViewShell->GetState( reqList );
-        const SfxPoolItem *pItem=nullptr;
-        if ( reqList.GetItemState( FID_TOGGLEINPUTLINE, false, &pItem ) == SfxItemState::SET )
-            bRes = static_cast<const SfxBoolItem*>(pItem)->GetValue();
+        if ( const SfxBoolItem *pItem = reqList.GetItemIfSet( FID_TOGGLEINPUTLINE, false ) )
+            bRes = pItem->GetValue();
     }
     return bRes;
 }
@@ -1488,7 +1493,7 @@ TypeAndIID SAL_CALL
 ScVbaApplication::GetConnectionPoint()
 {
     TypeAndIID aResult =
-        { excel::XApplicationOutgoing::static_type(),
+        { cppu::UnoType<excel::XApplicationOutgoing>::get(),
           "{82154427-0FBF-11D4-8313-005004526AB4}"
         };
 

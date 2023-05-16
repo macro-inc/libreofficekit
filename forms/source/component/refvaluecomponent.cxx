@@ -21,7 +21,10 @@
 #include <property.hxx>
 
 #include <comphelper/property.hxx>
-#include <tools/diagnose_ex.h>
+#include <tools/debug.hxx>
+#include <comphelper/diagnose_ex.hxx>
+
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 
 #include <vector>
 
@@ -148,7 +151,7 @@ namespace frm
 
     Any OReferenceValueComponent::getDefaultForReset() const
     {
-        return makeAny( static_cast<sal_Int16>(m_eDefaultChecked) );
+        return Any( static_cast<sal_Int16>(m_eDefaultChecked) );
     }
 
 
@@ -209,7 +212,7 @@ namespace frm
             OSL_FAIL( "OReferenceValueComponent::translateExternalValueToControlValue: unexpected value type!" );
         }
 
-        return makeAny( nState );
+        return Any( nState );
     }
 
 

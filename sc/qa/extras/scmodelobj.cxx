@@ -40,10 +40,8 @@ class ScModelObj : public UnoApiTest,
 {
 public:
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     virtual uno::Reference<uno::XInterface> init() override;
-    virtual uno::Reference<uno::XInterface> getXMSF() override;
     virtual uno::Sequence<uno::Reference<table::XCell>> getXCells() override;
 
     ScModelObj();
@@ -74,7 +72,6 @@ public:
     CPPUNIT_TEST_SUITE_END();
 
 private:
-    uno::Reference<lang::XComponent> mxComponent;
     uno::Sequence<uno::Reference<table::XCell>> m_xCells;
 };
 
@@ -102,23 +99,13 @@ uno::Reference<uno::XInterface> ScModelObj::init()
     return xModel;
 }
 
-uno::Reference<uno::XInterface> ScModelObj::getXMSF() { return getMultiServiceFactory(); }
-
 uno::Sequence<uno::Reference<table::XCell>> ScModelObj::getXCells() { return m_xCells; }
 
 void ScModelObj::setUp()
 {
     UnoApiTest::setUp();
     // create a calc document
-    OUString aFileURL;
-    createFileURL(u"ScModelObj.ods", aFileURL);
-    mxComponent = loadFromDesktop(aFileURL, "com.sun.star.sheet.SpreadsheetDocument");
-}
-
-void ScModelObj::tearDown()
-{
-    closeDocument(mxComponent);
-    UnoApiTest::tearDown();
+    loadFromURL(u"ScModelObj.ods");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScModelObj);

@@ -270,9 +270,6 @@
         <prop oor:name="OrderIndex" oor:type="xs:int">
           <value>600</value>
         </prop>
-        <prop oor:name="IsExperimental" oor:type="xs:boolean">
-          <value>true</value>
-        </prop>
       </node>
 
       <node oor:name="SwDesignDeck" oor:op="replace">
@@ -306,7 +303,7 @@
           <value>ElementsDeck</value>
         </prop>
         <prop oor:name="IconURL" oor:type="xs:string">
-          <value>private:graphicrepository/sfx2/res/symphony/sidebar-gallery-large.png</value>
+          <value>private:graphicrepository/sfx2/res/symphony/sidebar-elements-large.png</value>
         </prop>
         <prop oor:name="ContextList">
           <value oor:separator=";">
@@ -1565,7 +1562,7 @@
           <value>true</value>
         </prop>
         <prop oor:name="ShowForReadOnlyDocument" oor:type="xs:boolean">
-          <value>false</value>
+          <value>true</value>
         </prop>
         <prop oor:name="Id" oor:type="xs:string">
           <value>SwManageChangesPanel</value>

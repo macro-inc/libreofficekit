@@ -67,17 +67,20 @@ $(eval $(call gb_Library_use_custom_headers,sd,\
 $(eval $(call gb_Library_use_sdk_api,sd))
 
 $(eval $(call gb_Library_use_libraries,sd,\
-	$(call gb_Helper_optional,AVMEDIA,avmedia) \
+	avmedia \
 	basegfx \
 	canvastools \
 	comphelper \
 	cppcanvas \
 	cppu \
 	cppuhelper \
+	docmodel \
+	drawinglayercore \
 	drawinglayer \
 	editeng \
 	i18nlangtag \
 	i18nutil \
+	icg \
 	msfilter \
 	oox \
 	sal \
@@ -125,7 +128,24 @@ $(eval $(call gb_Library_use_system_win32_libs,sd,\
 ))
 endif
 
-$(eval $(call gb_Library_set_componentfile,sd,sd/util/sd))
+$(eval $(call gb_Library_set_componentfile,sd,sd/util/sd,services))
+
+ifneq ($(ENABLE_WASM_STRIP_ACCESSIBILITY),TRUE)
+$(eval $(call gb_Library_add_exception_objects,sd,\
+	sd/source/ui/accessibility/AccessibleDocumentViewBase \
+	sd/source/ui/accessibility/AccessibleDrawDocumentView \
+	sd/source/ui/accessibility/AccessibleOutlineEditSource \
+	sd/source/ui/accessibility/AccessibleOutlineView \
+	sd/source/ui/accessibility/AccessiblePageShape \
+	sd/source/ui/accessibility/AccessiblePresentationGraphicShape \
+	sd/source/ui/accessibility/AccessiblePresentationOLEShape \
+	sd/source/ui/accessibility/AccessiblePresentationShape \
+	sd/source/ui/accessibility/AccessibleSlideSorterObject \
+	sd/source/ui/accessibility/AccessibleSlideSorterView \
+	sd/source/ui/accessibility/AccessibleViewForwarder \
+	sd/source/ui/accessibility/SdShapeTypes \
+))
+endif
 
 $(eval $(call gb_Library_add_exception_objects,sd,\
 	sd/source/core/CustomAnimationCloner \
@@ -159,6 +179,22 @@ $(eval $(call gb_Library_add_exception_objects,sd,\
 	sd/source/core/undo/undoobjects \
 	sd/source/core/undoanim \
 	sd/source/filter/cgm/sdcgmfilter \
+    sd/source/filter/eppt/eppt \
+    sd/source/filter/eppt/epptso \
+    sd/source/filter/eppt/escherex \
+    sd/source/filter/eppt/pptexanimations \
+    sd/source/filter/eppt/pptexsoundcollection \
+    sd/source/filter/eppt/pptx-epptbase \
+    sd/source/filter/eppt/pptx-epptooxml \
+    sd/source/filter/eppt/pptx-animations \
+    sd/source/filter/eppt/pptx-grouptable \
+    sd/source/filter/eppt/pptx-stylesheet \
+    sd/source/filter/eppt/pptx-text \
+    sd/source/filter/ppt/ppt97animations \
+    sd/source/filter/ppt/pptatom \
+    sd/source/filter/ppt/pptin \
+    sd/source/filter/ppt/pptinanimations \
+    sd/source/filter/ppt/propread \
 	sd/source/filter/grf/sdgrffilter \
 	sd/source/filter/html/HtmlOptionsDialog \
 	sd/source/filter/html/buttonset \
@@ -170,18 +206,6 @@ $(eval $(call gb_Library_add_exception_objects,sd,\
 	sd/source/filter/xml/sdtransform \
 	sd/source/filter/xml/sdxmlwrp \
 	sd/source/helper/simplereferencecomponent \
-	sd/source/ui/accessibility/AccessibleDocumentViewBase \
-	sd/source/ui/accessibility/AccessibleDrawDocumentView \
-	sd/source/ui/accessibility/AccessibleOutlineEditSource \
-	sd/source/ui/accessibility/AccessibleOutlineView \
-	sd/source/ui/accessibility/AccessiblePageShape \
-	sd/source/ui/accessibility/AccessiblePresentationGraphicShape \
-	sd/source/ui/accessibility/AccessiblePresentationOLEShape \
-	sd/source/ui/accessibility/AccessiblePresentationShape \
-	sd/source/ui/accessibility/AccessibleSlideSorterObject \
-	sd/source/ui/accessibility/AccessibleSlideSorterView \
-	sd/source/ui/accessibility/AccessibleViewForwarder \
-	sd/source/ui/accessibility/SdShapeTypes \
 	sd/source/ui/animations/CustomAnimationDialog \
 	sd/source/ui/animations/CustomAnimationList \
 	sd/source/ui/animations/CustomAnimationPane \
@@ -206,7 +230,6 @@ $(eval $(call gb_Library_add_exception_objects,sd,\
 	sd/source/ui/dlg/LayerTabBar \
 	sd/source/ui/dlg/NavigatorChildWindow \
 	sd/source/ui/dlg/PaneChildWindows \
-	sd/source/ui/dlg/PaneDockingWindow \
 	sd/source/ui/dlg/PaneShells \
 	sd/source/ui/dlg/SpellDialogChildWindow \
 	sd/source/ui/dlg/TemplateScanner \
@@ -220,6 +243,7 @@ $(eval $(call gb_Library_add_exception_objects,sd,\
 	sd/source/ui/dlg/navigatr \
 	sd/source/ui/dlg/sdabstdlg \
 	sd/source/ui/dlg/sdtreelb \
+	sd/source/ui/dlg/titledockwin \
 	sd/source/ui/dlg/unchss \
 	sd/source/ui/docshell/docshel2 \
 	sd/source/ui/docshell/docshel3 \

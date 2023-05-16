@@ -35,28 +35,28 @@
 #include "ww8par.hxx"
 
 WW8Glossary::WW8Glossary(tools::SvRef<SotStorageStream> &refStrm, sal_uInt8 nVersion, SotStorage *pStg)
-    : rStrm(refStrm)
-    , xStg(pStg)
-    , nStrings(0)
+    : m_rStrm(refStrm)
+    , m_xStg(pStg)
+    , m_nStrings(0)
 {
     refStrm->SetEndian(SvStreamEndian::LITTLE);
     WW8Fib aWwFib(*refStrm, nVersion);
 
     if (aWwFib.m_nFibBack >= 0x6A)   //Word97
     {
-        xTableStream = pStg->OpenSotStream(
+        m_xTableStream = pStg->OpenSotStream(
             aWwFib.m_fWhichTableStm ? OUString(SL::a1Table) : OUString(SL::a0Table),
             StreamMode::STD_READ);
 
-        if (xTableStream.is() && ERRCODE_NONE == xTableStream->GetError())
+        if (m_xTableStream.is() && ERRCODE_NONE == m_xTableStream->GetError())
         {
-            xTableStream->SetEndian(SvStreamEndian::LITTLE);
-            xGlossary = std::make_shared<WW8GlossaryFib>(*refStrm, nVersion, aWwFib);
+            m_xTableStream->SetEndian(SvStreamEndian::LITTLE);
+            m_xGlossary = std::make_shared<WW8GlossaryFib>(*refStrm, nVersion, aWwFib);
         }
     }
 }
 
-bool WW8Glossary::HasBareGraphicEnd(SwDoc *pDoc,SwNodeIndex const &rIdx)
+bool WW8Glossary::HasBareGraphicEnd(SwDoc *pDoc, SwNode const &rIdx)
 {
     bool bRet=false;
     for( sal_uInt16 nCnt = pDoc->GetSpzFrameFormats()->size(); nCnt; )
@@ -66,11 +66,11 @@ bool WW8Glossary::HasBareGraphicEnd(SwDoc *pDoc,SwNodeIndex const &rIdx)
             RES_DRAWFRMFMT != pFrameFormat->Which() )
                 continue;
         const SwFormatAnchor& rAnchor = pFrameFormat->GetAnchor();
-        SwPosition const*const pAPos = rAnchor.GetContentAnchor();
-        if (pAPos &&
+        SwNode const*const pAnchorNode = rAnchor.GetAnchorNode();
+        if (pAnchorNode &&
             ((RndStdIds::FLY_AT_PARA == rAnchor.GetAnchorId()) ||
              (RndStdIds::FLY_AT_CHAR == rAnchor.GetAnchorId())) &&
-            rIdx == pAPos->nNode.GetIndex() )
+            rIdx == *pAnchorNode )
         {
             bRet=true;
             break;
@@ -115,29 +115,28 @@ bool WW8Glossary::MakeEntries(SwDoc *pD, SwTextBlocks &rBlocks,
         do {
             SwPaM aPam( aStart );
             {
-                SwNodeIndex& rIdx = aPam.GetPoint()->nNode;
-                ++rIdx;
-                pCNd = rIdx.GetNode().GetTextNode();
+                SwPosition& rPos = *aPam.GetPoint();
+                rPos.Adjust(SwNodeOffset(1));
+                pCNd = rPos.GetNode().GetTextNode();
                 if( nullptr == pCNd )
                 {
-                    pCNd = pD->GetNodes().MakeTextNode( rIdx, pColl );
-                    rIdx = *pCNd;
+                    pCNd = pD->GetNodes().MakeTextNode( rPos.GetNode(), pColl );
+                    rPos.Assign(*pCNd);
                 }
             }
-            aPam.GetPoint()->nContent.Assign( pCNd, 0 );
             aPam.SetMark();
             {
-                SwNodeIndex& rIdx = aPam.GetPoint()->nNode;
-                rIdx = aStart.GetNode().EndOfSectionIndex() - 1;
-                if(( nullptr == ( pCNd = rIdx.GetNode().GetContentNode() ) )
-                        || HasBareGraphicEnd(pD,rIdx))
+                SwPosition& rPos = *aPam.GetPoint();
+                rPos.Assign(aStart.GetNode().EndOfSectionIndex() - 1);
+                if(( nullptr == ( pCNd = rPos.GetNode().GetContentNode() ) )
+                        || HasBareGraphicEnd(pD,rPos.GetNode()))
                 {
-                    ++rIdx;
-                    pCNd = pD->GetNodes().MakeTextNode( rIdx, pColl );
-                    rIdx = *pCNd;
+                    rPos.Adjust(SwNodeOffset(1));
+                    pCNd = pD->GetNodes().MakeTextNode( rPos.GetNode(), pColl );
+                    rPos.Assign(*pCNd);
                 }
             }
-            aPam.GetPoint()->nContent.Assign( pCNd, pCNd->Len() );
+            aPam.GetPoint()->SetContent( pCNd->Len() );
 
             // now we have the right selection for one entry.  Copy this to
             // the defined TextBlock, but only if it is not an autocorrection
@@ -169,7 +168,7 @@ bool WW8Glossary::MakeEntries(SwDoc *pD, SwTextBlocks &rBlocks,
                     SwNodeIndex aIdx( pGlDoc->GetNodes().GetEndOfContent(),
                         -1 );
                     pCNd = aIdx.GetNode().GetContentNode();
-                    SwPosition aPos(aIdx, SwIndex(pCNd, pCNd ? pCNd->Len() : 0));
+                    SwPosition aPos(aIdx, pCNd, pCNd ? pCNd->Len() : 0);
                     pD->getIDocumentContentOperations().CopyRange(aPam, aPos, SwCopyFlags::CheckPosInFly);
                     rBlocks.PutDoc();
                 }
@@ -191,22 +190,22 @@ bool WW8Glossary::MakeEntries(SwDoc *pD, SwTextBlocks &rBlocks,
 bool WW8Glossary::Load( SwTextBlocks &rBlocks, bool bSaveRelFile )
 {
     bool bRet=false;
-    if (xGlossary && xGlossary->IsGlossaryFib() && rBlocks.StartPutMuchBlockEntries())
+    if (m_xGlossary && m_xGlossary->IsGlossaryFib() && rBlocks.StartPutMuchBlockEntries())
     {
         //read the names of the autotext entries
         std::vector<OUString> aStrings;
         std::vector<ww::bytes> aData;
 
         rtl_TextEncoding eStructCharSet =
-            WW8Fib::GetFIBCharset(xGlossary->m_chseTables, xGlossary->m_lid);
+            WW8Fib::GetFIBCharset(m_xGlossary->m_chseTables, m_xGlossary->m_lid);
 
-        WW8ReadSTTBF(true, *xTableStream, xGlossary->m_fcSttbfglsy,
-            xGlossary->m_lcbSttbfglsy, 0, eStructCharSet, aStrings, &aData );
+        WW8ReadSTTBF(true, *m_xTableStream, m_xGlossary->m_fcSttbfglsy,
+            m_xGlossary->m_lcbSttbfglsy, 0, eStructCharSet, aStrings, &aData );
 
-        rStrm->Seek(0);
+        m_rStrm->Seek(0);
 
-        nStrings = static_cast< sal_uInt16 >(aStrings.size());
-        if ( 0 != nStrings )
+        m_nStrings = static_cast< sal_uInt16 >(aStrings.size());
+        if ( 0 != m_nStrings )
         {
             SfxObjectShellLock xDocSh(new SwDocShell(SfxObjectCreateMode::INTERNAL));
             if (xDocSh->DoInitNew())
@@ -221,10 +220,8 @@ bool WW8Glossary::Load( SwTextBlocks &rBlocks, bool bSaveRelFile )
                     pD->GetNodes().GoNext( &aIdx );
                 }
                 SwPaM aPamo( aIdx );
-                aPamo.GetPoint()->nContent.Assign(aIdx.GetNode().GetContentNode(),
-                    0);
                 std::unique_ptr<SwWW8ImplReader> xRdr(new SwWW8ImplReader(
-                    xGlossary->m_nVersion, xStg.get(), rStrm.get(), *pD, rBlocks.GetBaseURL(),
+                    m_xGlossary->m_nVersion, m_xStg.get(), m_rStrm.get(), *pD, rBlocks.GetBaseURL(),
                     true, false, *aPamo.GetPoint()));
                 xRdr->LoadDoc(this);
                 bRet = MakeEntries(pD, rBlocks, bSaveRelFile, aStrings, aData);

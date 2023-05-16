@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <libxml/xmlwriter.h>
 
 #include <svtools/embedhlp.hxx>
 #include <vcl/graphicfilter.hxx>
@@ -50,10 +51,12 @@
 #include <com/sun/star/embed/XStateChangeListener.hpp>
 #include <com/sun/star/embed/XLinkageSupport.hpp>
 #include <com/sun/star/chart2/XDefaultSizeTransmitter.hpp>
+#include <embeddedobj/embeddedupdate.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <vcl/svapp.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/debug.hxx>
+#include <sfx2/xmldump.hxx>
 #include <memory>
 
 using namespace com::sun::star;
@@ -238,7 +241,7 @@ struct EmbeddedObjectRef_Impl
     OUString                                    aPersistName;
     OUString                                    aMediaType;
     comphelper::EmbeddedObjectContainer*        pContainer;
-    std::unique_ptr<Graphic>                    pGraphic;
+    std::optional<Graphic>                      oGraphic;
     sal_Int64                                   nViewAspect;
     bool                                        bIsLocked:1;
     bool                                        bNeedUpdate:1;
@@ -272,8 +275,36 @@ struct EmbeddedObjectRef_Impl
         mnGraphicVersion(0),
         aDefaultSizeForChart_In_100TH_MM(r.aDefaultSizeForChart_In_100TH_MM)
     {
-        if (r.pGraphic && !r.bNeedUpdate)
-            pGraphic.reset( new Graphic(*r.pGraphic) );
+        if (r.oGraphic && !r.bNeedUpdate)
+            oGraphic.emplace(*r.oGraphic);
+    }
+
+    void dumpAsXml(xmlTextWriterPtr pWriter) const
+    {
+        (void)xmlTextWriterStartElement(pWriter, BAD_CAST("EmbeddedObjectRef_Impl"));
+        (void)xmlTextWriterWriteFormatAttribute(pWriter, BAD_CAST("ptr"), "%p", this);
+
+        (void)xmlTextWriterStartElement(pWriter, BAD_CAST("mxObj"));
+        (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("symbol"),
+                                          BAD_CAST(typeid(*mxObj).name()));
+        auto pComponent = dynamic_cast<sfx2::XmlDump*>(mxObj->getComponent().get());
+        if (pComponent)
+        {
+            pComponent->dumpAsXml(pWriter);
+        }
+        (void)xmlTextWriterEndElement(pWriter);
+
+        (void)xmlTextWriterStartElement(pWriter, BAD_CAST("pGraphic"));
+        (void)xmlTextWriterWriteFormatAttribute(pWriter, BAD_CAST("ptr"), "%p", oGraphic ? &*oGraphic : nullptr);
+        if (oGraphic)
+        {
+            (void)xmlTextWriterWriteAttribute(
+                pWriter, BAD_CAST("is-none"),
+                BAD_CAST(OString::boolean(oGraphic->IsNone()).getStr()));
+        }
+        (void)xmlTextWriterEndElement(pWriter);
+
+        (void)xmlTextWriterEndElement(pWriter);
     }
 };
 
@@ -376,8 +407,8 @@ void EmbeddedObjectRef::AssignToContainer( comphelper::EmbeddedObjectContainer* 
     mpImpl->pContainer = pContainer;
     mpImpl->aPersistName = rPersistName;
 
-    if ( mpImpl->pGraphic && !mpImpl->bNeedUpdate && pContainer )
-        SetGraphicToContainer( *mpImpl->pGraphic, *pContainer, mpImpl->aPersistName, OUString() );
+    if ( mpImpl->oGraphic && !mpImpl->bNeedUpdate && pContainer )
+        SetGraphicToContainer( *mpImpl->oGraphic, *pContainer, mpImpl->aPersistName, OUString() );
 }
 
 comphelper::EmbeddedObjectContainer* EmbeddedObjectRef::GetContainer() const
@@ -410,7 +441,7 @@ void EmbeddedObjectRef::SetIsProtectedHdl(const Link<LinkParamNone*, bool>& rPro
     mpImpl->m_aIsProtectedHdl = rProtectedHdl;
 }
 
-Link<LinkParamNone*, bool> EmbeddedObjectRef::GetIsProtectedHdl() const
+const Link<LinkParamNone*, bool> & EmbeddedObjectRef::GetIsProtectedHdl() const
 {
     return mpImpl->m_aIsProtectedHdl;
 }
@@ -421,17 +452,17 @@ void EmbeddedObjectRef::GetReplacement( bool bUpdate )
 
     if ( bUpdate )
     {
-        if (mpImpl->pGraphic)
-            aOldGraphic = *mpImpl->pGraphic;
+        if (mpImpl->oGraphic)
+            aOldGraphic = *mpImpl->oGraphic;
 
-        mpImpl->pGraphic.reset();
+        mpImpl->oGraphic.reset();
         mpImpl->aMediaType.clear();
-        mpImpl->pGraphic.reset( new Graphic );
+        mpImpl->oGraphic.emplace();
         mpImpl->mnGraphicVersion++;
     }
-    else if ( !mpImpl->pGraphic )
+    else if ( !mpImpl->oGraphic )
     {
-        mpImpl->pGraphic.reset( new Graphic );
+        mpImpl->oGraphic.emplace();
         mpImpl->mnGraphicVersion++;
     }
     else
@@ -441,23 +472,32 @@ void EmbeddedObjectRef::GetReplacement( bool bUpdate )
     }
 
     std::unique_ptr<SvStream> pGraphicStream(GetGraphicStream( bUpdate ));
+    if (!pGraphicStream && aOldGraphic.IsNone())
+    {
+        // We have no old graphic, tried to get an updated one, but that failed. Try to get an old
+        // graphic instead of having no graphic at all.
+        pGraphicStream = GetGraphicStream(false);
+        SAL_WARN("svtools.misc",
+                 "EmbeddedObjectRef::GetReplacement: failed to get updated graphic stream");
+    }
+
     if ( pGraphicStream )
     {
         GraphicFilter& rGF = GraphicFilter::GetGraphicFilter();
-        if( mpImpl->pGraphic )
-            rGF.ImportGraphic( *mpImpl->pGraphic, OUString(), *pGraphicStream );
+        if( mpImpl->oGraphic )
+            rGF.ImportGraphic( *mpImpl->oGraphic, u"", *pGraphicStream );
         mpImpl->mnGraphicVersion++;
     }
 
-    // note that UpdateReplacementOnDemand which resets mpImpl->pGraphic to null may have been called
+    // note that UpdateReplacementOnDemand which resets mpImpl->oGraphic to null may have been called
     // e.g. when exporting ooo58458-1.odt to doc
-    if (bUpdate && (!mpImpl->pGraphic || mpImpl->pGraphic->IsNone()) && !aOldGraphic.IsNone())
+    if (bUpdate && (!mpImpl->oGraphic || mpImpl->oGraphic->IsNone()) && !aOldGraphic.IsNone())
     {
         // We used to have an old graphic, tried to update and the update
         // failed. Go back to the old graphic instead of having no graphic at
         // all.
-        mpImpl->pGraphic.reset(new Graphic(aOldGraphic));
-        SAL_WARN("svtools.misc", "EmbeddedObjectRef::GetReplacement: update failed");
+        mpImpl->oGraphic.emplace(aOldGraphic);
+        SAL_WARN("svtools.misc", "EmbeddedObjectRef::GetReplacement: failed to update graphic");
     }
 }
 
@@ -468,7 +508,7 @@ const Graphic* EmbeddedObjectRef::GetGraphic() const
         if ( mpImpl->bNeedUpdate )
             // bNeedUpdate will be set to false while retrieving new replacement
             const_cast < EmbeddedObjectRef* >(this)->GetReplacement(true);
-        else if ( !mpImpl->pGraphic )
+        else if ( !mpImpl->oGraphic )
             const_cast < EmbeddedObjectRef* >(this)->GetReplacement(false);
     }
     catch( const uno::Exception& )
@@ -476,7 +516,7 @@ const Graphic* EmbeddedObjectRef::GetGraphic() const
         DBG_UNHANDLED_EXCEPTION("svtools.misc", "Something went wrong on getting the graphic");
     }
 
-    return mpImpl->pGraphic.get();
+    return mpImpl->oGraphic ? &*mpImpl->oGraphic : nullptr;
 }
 
 Size EmbeddedObjectRef::GetSize( MapMode const * pTargetMapMode ) const
@@ -543,7 +583,7 @@ Size EmbeddedObjectRef::GetSize( MapMode const * pTargetMapMode ) const
 void EmbeddedObjectRef::SetGraphicStream( const uno::Reference< io::XInputStream >& xInGrStream,
                                             const OUString& rMediaType )
 {
-    mpImpl->pGraphic.reset( new Graphic );
+    mpImpl->oGraphic.emplace();
     mpImpl->aMediaType = rMediaType;
     mpImpl->mnGraphicVersion++;
 
@@ -552,7 +592,7 @@ void EmbeddedObjectRef::SetGraphicStream( const uno::Reference< io::XInputStream
     if ( pGraphicStream )
     {
         GraphicFilter& rGF = GraphicFilter::GetGraphicFilter();
-        rGF.ImportGraphic( *mpImpl->pGraphic, "", *pGraphicStream );
+        rGF.ImportGraphic( *mpImpl->oGraphic, u"", *pGraphicStream );
         mpImpl->mnGraphicVersion++;
 
         if ( mpImpl->pContainer )
@@ -570,7 +610,7 @@ void EmbeddedObjectRef::SetGraphicStream( const uno::Reference< io::XInputStream
 
 void EmbeddedObjectRef::SetGraphic( const Graphic& rGraphic, const OUString& rMediaType )
 {
-    mpImpl->pGraphic.reset( new Graphic( rGraphic ) );
+    mpImpl->oGraphic.emplace( rGraphic );
     mpImpl->aMediaType = rMediaType;
     mpImpl->mnGraphicVersion++;
 
@@ -592,7 +632,7 @@ std::unique_ptr<SvStream> EmbeddedObjectRef::GetGraphicStream( bool bUpdate ) co
         if ( xStream.is() )
         {
             const sal_Int32 nConstBufferSize = 32000;
-            std::unique_ptr<SvStream> pStream(new SvMemoryStream( 32000, 32000 ));
+            std::unique_ptr<SvMemoryStream> pStream(new SvMemoryStream( 32000, 32000 ));
             try
             {
                 sal_Int32 nRead=0;
@@ -604,6 +644,7 @@ std::unique_ptr<SvStream> EmbeddedObjectRef::GetGraphicStream( bool bUpdate ) co
                 }
                 while ( nRead == nConstBufferSize );
                 pStream->Seek(0);
+                pStream->MakeReadOnly();
                 return pStream;
             }
             catch (const uno::Exception&)
@@ -639,7 +680,40 @@ std::unique_ptr<SvStream> EmbeddedObjectRef::GetGraphicStream( bool bUpdate ) co
             if(xStream.is())
             {
                 if (mpImpl->pContainer)
-                    mpImpl->pContainer->InsertGraphicStream(xStream,mpImpl->aPersistName,mpImpl->aMediaType);
+                {
+                    bool bInsertGraphicStream = true;
+                    uno::Reference<io::XSeekable> xSeekable(xStream, uno::UNO_QUERY);
+                    std::optional<sal_Int64> oPosition;
+                    if (xSeekable.is())
+                    {
+                        oPosition = xSeekable->getPosition();
+                    }
+                    if (bUpdate)
+                    {
+                        std::unique_ptr<SvStream> pResult = utl::UcbStreamHelper::CreateStream(xStream);
+                        if (pResult)
+                        {
+                            GraphicFilter& rGF = GraphicFilter::GetGraphicFilter();
+                            Graphic aGraphic;
+                            rGF.ImportGraphic(aGraphic, u"", *pResult);
+                            if (aGraphic.IsNone())
+                            {
+                                // The graphic is not something we can understand, don't overwrite a
+                                // potentially working previous graphic.
+                                SAL_WARN("svtools.misc", "EmbeddedObjectRef::GetGraphicStream: failed to parse xStream");
+                                bInsertGraphicStream = false;
+                            }
+                        }
+                    }
+                    if (xSeekable.is() && oPosition.has_value())
+                    {
+                        xSeekable->seek(*oPosition);
+                    }
+                    if (bInsertGraphicStream)
+                    {
+                        mpImpl->pContainer->InsertGraphicStream(xStream,mpImpl->aPersistName,mpImpl->aMediaType);
+                    }
+                }
 
                 std::unique_ptr<SvStream> pResult = ::utl::UcbStreamHelper::CreateStream( xStream );
                 if (pResult && bUpdate)
@@ -839,7 +913,7 @@ bool EmbeddedObjectRef::IsChart(const css::uno::Reference < css::embed::XEmbedde
         || SvGlobalName(SO3_SCH_CLASSID_60) == aObjClsId;
 }
 
-void EmbeddedObjectRef::UpdateReplacement()
+void EmbeddedObjectRef::UpdateReplacement( bool bUpdateOle )
 {
     if (mpImpl->bUpdating)
     {
@@ -847,13 +921,23 @@ void EmbeddedObjectRef::UpdateReplacement()
         return;
     }
     mpImpl->bUpdating = true;
+    UpdateOleObject( bUpdateOle );
     GetReplacement(true);
+    UpdateOleObject( false );
     mpImpl->bUpdating = false;
 }
 
+void EmbeddedObjectRef::UpdateOleObject( bool bUpdateOle )
+{
+    embed::EmbeddedUpdate* pObj = dynamic_cast<embed::EmbeddedUpdate*> (GetObject().get());
+    if( pObj )
+        pObj->SetOleState( bUpdateOle );
+}
+
+
 void EmbeddedObjectRef::UpdateReplacementOnDemand()
 {
-    mpImpl->pGraphic.reset();
+    mpImpl->oGraphic.reset();
     mpImpl->bNeedUpdate = true;
     mpImpl->mnGraphicVersion++;
 
@@ -991,6 +1075,16 @@ void EmbeddedObjectRef::SetDefaultSizeForChart( const Size& rSizeIn_100TH_MM )
     DBG_ASSERT( xSizeTransmitter.is(), "Object does not support XDefaultSizeTransmitter -> will cause #i103460#!" );
     if( xSizeTransmitter.is() )
         xSizeTransmitter->setDefaultSize( mpImpl->aDefaultSizeForChart_In_100TH_MM );
+}
+
+void EmbeddedObjectRef::dumpAsXml(xmlTextWriterPtr pWriter) const
+{
+    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("EmbeddedObjectRef"));
+    (void)xmlTextWriterWriteFormatAttribute(pWriter, BAD_CAST("ptr"), "%p", this);
+
+    mpImpl->dumpAsXml(pWriter);
+
+    (void)xmlTextWriterEndElement(pWriter);
 }
 
 } // namespace svt

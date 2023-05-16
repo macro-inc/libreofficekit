@@ -39,12 +39,14 @@
 #include <osl/process.h>
 #include <rtl/bootstrap.hxx>
 #include <rtl/uri.hxx>
+#include <rtl/strbuf.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/stream.hxx>
 #include <tools/urlobj.hxx>
 #include <implimagetree.hxx>
 
+#include <utility>
 #include <vcl/bitmapex.hxx>
 #include <vcl/dibtools.hxx>
 #include <vcl/settings.hxx>
@@ -53,8 +55,8 @@
 #include <IconThemeScanner.hxx>
 #include <vcl/filter/PngImageReader.hxx>
 #include <vcl/outdev.hxx>
-#include <vcl/pngwrite.hxx>
-
+#include <vcl/filter/PngImageWriter.hxx>
+#include <o3tl/string_view.hxx>
 #include <bitmap/BitmapLightenFilter.hxx>
 
 using namespace css;
@@ -73,8 +75,9 @@ bool ImageRequestParameters::convertToDarkTheme()
 sal_Int32 ImageRequestParameters::scalePercentage()
 {
     sal_Int32 aScalePercentage = 100;
-    if (!(meFlags & ImageLoadFlags::IgnoreScalingFactor))
-        aScalePercentage = Application::GetDefaultDevice()->GetDPIScalePercentage();
+    OutputDevice* pDevice = Application::GetDefaultDevice();
+    if (!(meFlags & ImageLoadFlags::IgnoreScalingFactor) && pDevice != nullptr)
+        aScalePercentage = pDevice->GetDPIScalePercentage();
     else if (mnScalePercentage > 0)
         aScalePercentage = mnScalePercentage;
     return aScalePercentage;
@@ -83,17 +86,18 @@ sal_Int32 ImageRequestParameters::scalePercentage()
 namespace
 {
 
-OUString convertLcTo32Path(OUString const & rPath)
+OUString convertLcTo32Path(std::u16string_view rPath)
 {
     OUString aResult;
-    if (rPath.lastIndexOf('/') != -1)
+    size_t nSlashPos = rPath.rfind('/');
+    if (nSlashPos != std::u16string_view::npos)
     {
-        sal_Int32 nCopyFrom = rPath.lastIndexOf('/') + 1;
-        OUString sFile = rPath.copy(nCopyFrom);
-        OUString sDir = rPath.copy(0, rPath.lastIndexOf('/'));
-        if (!sFile.isEmpty() && sFile.startsWith("lc_"))
+        sal_Int32 nCopyFrom = nSlashPos + 1;
+        std::u16string_view sFile = rPath.substr(nCopyFrom);
+        std::u16string_view sDir = rPath.substr(0, nSlashPos);
+        if (!sFile.empty() && o3tl::starts_with(sFile, u"lc_"))
         {
-            aResult = sDir + "/32/" + sFile.subView(3);
+            aResult = OUString::Concat(sDir) + "/32/" + sFile.substr(3);
         }
     }
     return aResult;
@@ -106,10 +110,14 @@ OUString createPath(std::u16string_view name, sal_Int32 pos, std::u16string_view
 
 OUString getIconCacheUrl(std::u16string_view sVariant, ImageRequestParameters const & rParameters)
 {
-    OUString sUrl = "${$BRAND_BASE_DIR/" LIBO_ETC_FOLDER "/" SAL_CONFIGFILE("bootstrap") ":UserInstallation}/cache/"
-        + rParameters.msStyle + "/" + sVariant + "/" + rParameters.msName;
-    rtl::Bootstrap::expandMacros(sUrl);
-    return sUrl;
+    // the macro expansion can be expensive in bulk, so cache that
+    static OUString CACHE_DIR = []()
+    {
+        OUString sDir = "${$BRAND_BASE_DIR/" LIBO_ETC_FOLDER "/" SAL_CONFIGFILE("bootstrap") ":UserInstallation}/cache/";
+        rtl::Bootstrap::expandMacros(sDir);
+        return sDir;
+    }();
+    return CACHE_DIR + rParameters.msStyle + "/" + sVariant + "/" + rParameters.msName;
 }
 
 OUString createIconCacheUrl(
@@ -128,10 +136,10 @@ bool urlExists(OUString const & sUrl)
     return osl::FileBase::E_None == eRC;
 }
 
-OUString getNameNoExtension(OUString const & sName)
+OUString getNameNoExtension(std::u16string_view sName)
 {
-    sal_Int32 nDotPosition = sName.lastIndexOf('.');
-    return sName.copy(0, nDotPosition);
+    size_t nDotPosition = sName.rfind('.');
+    return OUString(sName.substr(0, nDotPosition));
 }
 
 std::shared_ptr<SvMemoryStream> wrapStream(uno::Reference<io::XInputStream> const & rInputStream)
@@ -268,7 +276,7 @@ OUString ImplImageTree::getImageUrl(OUString const & rName, OUString const & rSt
     return OUString();
 }
 
-std::shared_ptr<SvMemoryStream> ImplImageTree::getImageStream(OUString const & rName, OUString const & rStyle, OUString const & rLang)
+uno::Reference<io::XInputStream> ImplImageTree::getImageXInputStream(OUString const & rName, OUString const & rStyle, OUString const & rLang)
 {
     OUString aStyle(rStyle);
 
@@ -293,7 +301,7 @@ std::shared_ptr<SvMemoryStream> ImplImageTree::getImageStream(OUString const & r
                         bool ok = rNameAccess->getByName(rPath) >>= aStream;
                         assert(ok);
                         (void)ok; // prevent unused warning in release build
-                        return wrapStream(aStream);
+                        return aStream;
                     }
                 }
             }
@@ -305,6 +313,14 @@ std::shared_ptr<SvMemoryStream> ImplImageTree::getImageStream(OUString const & r
 
         aStyle = fallbackStyle(aStyle);
     }
+    return nullptr;
+}
+
+std::shared_ptr<SvMemoryStream> ImplImageTree::getImageStream(OUString const & rName, OUString const & rStyle, OUString const & rLang)
+{
+    uno::Reference<io::XInputStream> xStream = getImageXInputStream(rName, rStyle, rLang);
+    if (xStream)
+        return wrapStream(xStream);
     return std::shared_ptr<SvMemoryStream>();
 }
 
@@ -374,11 +390,11 @@ bool loadDiskCachedVersion(std::u16string_view sVariant, ImageRequestParameters&
 void cacheBitmapToDisk(std::u16string_view sVariant, ImageRequestParameters const & rParameters)
 {
     OUString sUrl(createIconCacheUrl(sVariant, rParameters));
-    vcl::PNGWriter aWriter(rParameters.mrBitmap);
     try
     {
         SvFileStream aStream(sUrl, StreamMode::WRITE);
-        aWriter.Write(aStream);
+        vcl::PngImageWriter aWriter(aStream);
+        aWriter.write(rParameters.mrBitmap);
         aStream.Close();
     }
     catch (...)
@@ -488,7 +504,7 @@ void ImplImageTree::createStyle()
             INetURLObject aUrl(path);
             OSL_ASSERT(!aUrl.HasError());
 
-            bool ok = aUrl.Append(OUStringConcatenation("images_" + maCurrentStyle), INetURLObject::EncodeMechanism::All);
+            bool ok = aUrl.Append(Concat2View("images_" + maCurrentStyle), INetURLObject::EncodeMechanism::All);
             OSL_ASSERT(ok);
             sThemeUrl = aUrl.GetMainURL(INetURLObject::DecodeMechanism::NONE) + ".zip";
             if (urlExists(sThemeUrl))
@@ -583,7 +599,7 @@ void ImplImageTree::loadImageLinks()
 
 void ImplImageTree::parseLinkFile(std::shared_ptr<SvStream> const & xStream)
 {
-    OString aLine;
+    OStringBuffer aLine;
     OUString aLink, aOriginal;
     int nLineNo = 0;
     while (xStream->ReadLine(aLine))
@@ -593,8 +609,8 @@ void ImplImageTree::parseLinkFile(std::shared_ptr<SvStream> const & xStream)
             continue;
 
         sal_Int32 nIndex = 0;
-        aLink = OStringToOUString(aLine.getToken(0, ' ', nIndex), RTL_TEXTENCODING_UTF8);
-        aOriginal = OStringToOUString(aLine.getToken(0, ' ', nIndex), RTL_TEXTENCODING_UTF8);
+        aLink = OStringToOUString(o3tl::getToken(aLine, 0, ' ', nIndex), RTL_TEXTENCODING_UTF8);
+        aOriginal = OStringToOUString(o3tl::getToken(aLine, 0, ' ', nIndex), RTL_TEXTENCODING_UTF8);
 
         // skip comments, or incomplete entries
         if (aLink.isEmpty() || aLink[0] == '#' || aOriginal.isEmpty())
@@ -641,8 +657,8 @@ class FolderFileAccess : public ::cppu::WeakImplHelper<css::container::XNameAcce
 public:
     uno::Reference< uno::XComponentContext > mxContext;
     OUString maURL;
-    FolderFileAccess(uno::Reference< uno::XComponentContext > const & context, OUString const & url)
-        : mxContext(context), maURL(url) {}
+    FolderFileAccess(uno::Reference< uno::XComponentContext > context, OUString url)
+        : mxContext(std::move(context)), maURL(std::move(url)) {}
     // XElementAccess
     virtual css::uno::Type SAL_CALL getElementType() override { return cppu::UnoType<io::XInputStream>::get(); }
     virtual sal_Bool SAL_CALL hasElements() override { return true; }

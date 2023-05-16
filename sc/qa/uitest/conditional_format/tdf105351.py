@@ -1,18 +1,19 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 from uitest.framework import UITestCase
-from uitest.uihelper.common import get_state_as_dict
-from uitest.uihelper.common import select_pos
-from uitest.uihelper.common import select_by_text
 from uitest.uihelper.calc import enter_text_to_cell
-from libreoffice.calc.document import get_cell_by_position
+from uitest.uihelper.common import get_state_as_dict, select_by_text
+
 from libreoffice.uno.propertyvalue import mkPropertyValues
-from uitest.debug import sleep
-#Bug 105351 - FORMATTING: Unable to change Data Bar conditional formatting
+
+
+# Bug 105351 - FORMATTING: Unable to change Data Bar conditional formatting
 class tdf105351(UITestCase):
     def test_tdf105351_cond_format_data_bar(self):
         with self.ui_test.create_doc_in_start_center("calc"):

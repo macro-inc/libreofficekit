@@ -52,11 +52,13 @@ namespace sdr::overlay
                     const Point& rOriginNew = getOutputDevice().GetMapMode().GetOrigin();
                     const bool bScrolled(rOriginOld != rOriginNew);
 
+
                     if(bScrolled)
                     {
-                        // get pixel bounds
-                        const Point aOriginOldPixel(mpBufferDevice->LogicToPixel(rOriginOld));
-                        const Point aOriginNewPixel(mpBufferDevice->LogicToPixel(rOriginNew));
+                        // get pixel bounds (tdf#149322 do subtraction in logic units before converting result back to pixel)
+                        const Point aLogicOriginDiff(rOriginNew - rOriginOld);
+                        const Size aPixelOriginDiff(mpBufferDevice->LogicToPixel(Size(aLogicOriginDiff.X(), aLogicOriginDiff.Y())));
+                        const Point aDestinationOffsetPixel(aPixelOriginDiff.Width(), aPixelOriginDiff.Height());
                         const Size aOutputSizePixel(mpBufferDevice->GetOutputSizePixel());
 
                         // remember and switch off MapMode
@@ -64,7 +66,6 @@ namespace sdr::overlay
                         mpBufferDevice->EnableMapMode(false);
 
                         // scroll internally buffered stuff
-                        const Point aDestinationOffsetPixel(aOriginNewPixel - aOriginOldPixel);
                         mpBufferDevice->DrawOutDev(
                             aDestinationOffsetPixel, aOutputSizePixel, // destination
                             Point(), aOutputSizePixel); // source
@@ -412,7 +413,7 @@ namespace sdr::overlay
             basegfx::B2DRange aDiscreteRange(rRange);
             aDiscreteRange.transform(getOutputDevice().GetViewTransformation());
 
-            if(SvtOptionsDrawinglayer::IsAntiAliasing())
+            if(getCurrentViewInformation2D().getUseAntiAliasing())
             {
                 // assume AA needs one pixel more and invalidate one pixel more
                 const double fDiscreteOne(getDiscreteOne());

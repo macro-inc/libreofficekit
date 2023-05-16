@@ -24,9 +24,15 @@
 
 #include <fontsubset.hxx>
 
+#include <comphelper/flagguard.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/sprintf.hxx>
+#include <rtl/math.hxx>
+#include <rtl/strbuf.hxx>
+#include <rtl/string.hxx>
 #include <strhelper.hxx>
 #include <sal/log.hxx>
+#include <tools/stream.hxx>
 
 typedef sal_uInt8 U8;
 typedef sal_uInt16 U16;
@@ -35,105 +41,497 @@ typedef sal_Int64 S64;
 typedef double RealType;
 typedef RealType ValType;
 
-static const char* pStringIds[] = {
-/*0*/   ".notdef",      "space",            "exclam",           "quotedbl",
-    "numbersign",       "dollar",           "percent",          "ampersand",
-    "quoteright",       "parenleft",        "parenright",       "asterisk",
-    "plus",             "comma",            "hyphen",           "period",
-/*16*/  "slash",        "zero",             "one",              "two",
-    "three",            "four",             "five",             "six",
-    "seven",            "eight",            "nine",             "colon",
-    "semicolon",        "less",             "equal",            "greater",
-/*32*/  "question",     "at",               "A",                "B",
-    "C",                "D",                "E",                "F",
-    "G",                "H",                "I",                "J",
-    "K",                "L",                "M",                "N",
-/*48*/  "O",            "P",                "Q",                "R",
-    "S",                "T",                "U",                "V",
-    "W",                "X",                "Y",                "Z",
-    "bracketleft",      "backslash",        "bracketright",     "asciicircum",
-/*64*/  "underscore",   "quoteleft",        "a",                "b",
-    "c",                "d",                "e",                "f",
-    "g",                "h",                "i",                "j",
-    "k",                "l",                "m",                "n",
-/*80*/  "o",            "p",                "q",                "r",
-    "s",                "t",                "u",                "v",
-    "w",                "x",                "y",                "z",
-    "braceleft",        "bar",              "braceright",       "asciitilde",
-/*96*/  "exclamdown",   "cent",             "sterlin",          "fraction",
-    "yen",              "florin",           "section",          "currency",
-    "quotesingle",      "quotedblleft",     "guillemotleft",    "guilsinglleft",
-    "guilsinglright",   "fi",               "fl",               "endash",
-/*112*/ "dagger",       "daggerdbl",        "periodcentered",   "paragraph",
-    "bullet",           "quotesinglbase",   "quotedblbase",     "quotedblright",
-    "guillemotright",   "ellipsis",         "perthousand",      "questiondown",
-    "grave",            "acute",            "circumflex",       "tilde",
-/*128*/ "macron",       "breve",            "dotaccent",        "dieresis",
-    "ring",             "cedilla",          "hungarumlaut",     "ogonek",
-    "caron",            "emdash",           "AE",               "ordfeminine",
-    "Lslash",           "Oslash",           "OE",               "ordmasculine",
-/*144*/ "ae",           "dotlessi",         "lslash",           "oslash",
-    "oe",               "germandbls",       "onesuperior",      "logicalnot",
-    "mu",               "trademark",        "Eth",              "onehalf",
-    "plusminus",        "Thorn",            "onequarter",       "divide",
-/*160*/ "brokenbar",    "degree",           "thorn",            "threequarters",
-    "twosuperior",      "registered",       "minus",            "eth",
-    "multiply",         "threesuperior",    "copyright",        "Aacute",
-    "Acircumflex",      "Adieresis",        "Agrave",           "Aring",
-/*176*/ "Atilde",       "Ccedilla",         "Eacute",           "Ecircumflex",
-    "Edieresis",        "Egrave",           "Iacute",           "Icircumflex",
-    "Idieresis",        "Igrave",           "Ntilde",           "Oacute",
-    "Ocircumflex",      "Odieresis",        "Ograve",           "Otilde",
-/*192*/ "Scaron",       "Uacute",           "Ucircumflex",      "Udieresis",
-    "Ugrave",           "Yacute",           "Ydieresis",        "Zcaron",
-    "aacute",           "acircumflex",      "adieresis",        "agrave",
-    "aring",            "atilde",           "ccedilla",         "eacute",
-/*208*/ "ecircumflex",  "edieresis",        "egrave",           "iacute",
-    "icircumflex",      "idieresis",        "igrave",           "ntilde",
-    "oacute",           "ocircumflex",      "odieresis",        "ograve",
-    "otilde",           "scaron",           "uacute",           "ucircumflex",
-/*224*/ "udieresis",    "ugrave",           "yacute",           "ydieresis",
-    "zcaron",           "exclamsmall",      "Hungarumlautsmall","dollaroldstyle",
-    "dollarsuperior",   "ampersandsmall",   "Acutesmall",       "parenleftsuperior",
-    "parenrightsuperior","twodotenleader",  "onedotenleader",   "zerooldstyle",
-/*240*/ "oneoldstyle",  "twooldstyle",      "threeoldstyle",    "fouroldstyle",
-    "fiveoldstyle",     "sixoldstyle",      "sevenoldstyle",    "eightoldstyle",
-    "nineoldstile",     "commasuperior",    "threequartersemdash","periodsuperior",
-    "questionsmall",    "asuperior",        "bsuperior",        "centsuperior",
-/*256*/ "dsuperior",    "esuperior",        "isuperior",        "lsuperior",
-    "msuperior",        "nsuperior",        "osuperior",        "rsuperior",
-    "ssuperior",        "tsuperior",        "ff",               "ffi",
-    "ffl",              "parenleftinferior","parenrightinferior","Circumflexsmall",
-/*272*/ "hyphensuperior","Gravesmall",      "Asmall",           "Bsmall",
-    "Csmall",           "Dsmall",           "Esmall",           "Fsmall",
-    "Gsmall",           "Hsmall",           "Ismall",           "Jsmall",
-    "Ksmall",           "Lsmall",           "Msmall",           "Nsmall",
-/*288*/ "Osmall",       "Psmall",           "Qsmall",           "Rsmall",
-    "Ssmall",           "Tsmall",           "Usmall",           "Vsmall",
-    "Wsmall",           "Xsmall",           "Ysmall",           "Zsmall",
-    "colonmonetary",    "onefitted",        "rupia",            "Tildesmall",
-/*304*/ "exclamdownsmall","centoldstyle",   "Lslashsmall",      "Scaronsmall",
-    "Zcaronsmall",      "Dieresissmall",    "Brevesmall",       "Caronsmall",
-    "Dotaccentsmall",   "Macronsmall",      "figuredash",       "hypheninferior",
-    "Ogoneksmall",      "Ringsmall",        "Cedillasmall",     "questiondownsmall",
-/*320*/ "oneeight",     "threeeights",      "fiveeights",       "seveneights",
-    "onethird",         "twothirds",        "zerosuperior",     "foursuperior",
-    "fivesuperior",     "sixsuperior",      "sevensuperior",    "eightsuperior",
-    "ninesuperior",     "zeroinferior",     "oneinferior",      "twoinferior",
-/*336*/ "threeinferior","fourinferior",     "fiveinferior",     "sixinferior",
-    "seveninferior",    "eightinferior",    "nineinferior",     "centinferior",
-    "dollarinferior",   "periodinferior",   "commainferior",    "Agravesmall",
-    "Aacutesmall",      "Acircumflexsmall", "Atildesmall",      "Adieresissmall",
-/*352*/ "Aringsmall",   "AEsmall",          "Ccedillasmall",    "Egravesmall",
-    "Eacutesmall",      "Ecircumflexsmall", "Edieresissmall",   "Igravesmall",
-    "Iacutesmall",      "Icircumflexsmall", "Idieresissmall",   "Ethsmall",
-    "Ntildesmall",      "Ogravesmall",      "Oacutesmall",      "Ocircumflexsmall",
-/*368*/ "Otildesmall",  "Odieressissmall",  "OEsmall",          "Oslashsmall",
-    "Ugravesmall",      "Uacutesmall",      "Ucircumflexsmall", "Udieresissmall",
-    "Yacutesmall",      "Thornsmall",       "Ydieresissmall",   "001.000",
-    "001.001",          "001.002",          "001.003",          "Black",
-/*384*/ "Bold",         "Book",             "Light",            "Medium",
-    "Regular",          "Roman",            "Semibold"
+constexpr OStringLiteral tok_notdef = ".notdef";
+constexpr OStringLiteral tok_space = "space";
+constexpr OStringLiteral tok_exclam = "exclam";
+constexpr OStringLiteral tok_quotedbl = "quotedbl";
+constexpr OStringLiteral tok_numbersign = "numbersign";
+constexpr OStringLiteral tok_dollar = "dollar";
+constexpr OStringLiteral tok_percent = "percent";
+constexpr OStringLiteral tok_ampersand = "ampersand";
+constexpr OStringLiteral tok_quoteright = "quoteright";
+constexpr OStringLiteral tok_parenleft = "parenleft";
+constexpr OStringLiteral tok_parenright = "parenright";
+constexpr OStringLiteral tok_asterisk = "asterisk";
+constexpr OStringLiteral tok_plus = "plus";
+constexpr OStringLiteral tok_comma = "comma";
+constexpr OStringLiteral tok_hyphen = "hyphen";
+constexpr OStringLiteral tok_period = "period";
+constexpr OStringLiteral tok_slash = "slash";
+constexpr OStringLiteral tok_zero = "zero";
+constexpr OStringLiteral tok_one = "one";
+constexpr OStringLiteral tok_two = "two";
+constexpr OStringLiteral tok_three = "three";
+constexpr OStringLiteral tok_four = "four";
+constexpr OStringLiteral tok_five = "five";
+constexpr OStringLiteral tok_six = "six";
+constexpr OStringLiteral tok_seven = "seven";
+constexpr OStringLiteral tok_eight = "eight";
+constexpr OStringLiteral tok_nine = "nine";
+constexpr OStringLiteral tok_colon = "colon";
+constexpr OStringLiteral tok_semicolon = "semicolon";
+constexpr OStringLiteral tok_less = "less";
+constexpr OStringLiteral tok_equal = "equal";
+constexpr OStringLiteral tok_greater = "greater";
+constexpr OStringLiteral tok_question = "question";
+constexpr OStringLiteral tok_at = "at";
+constexpr OStringLiteral tok_A = "A";
+constexpr OStringLiteral tok_B = "B";
+constexpr OStringLiteral tok_C = "C";
+constexpr OStringLiteral tok_D = "D";
+constexpr OStringLiteral tok_E = "E";
+constexpr OStringLiteral tok_F = "F";
+constexpr OStringLiteral tok_G = "G";
+constexpr OStringLiteral tok_H = "H";
+constexpr OStringLiteral tok_I = "I";
+constexpr OStringLiteral tok_J = "J";
+constexpr OStringLiteral tok_K = "K";
+constexpr OStringLiteral tok_L = "L";
+constexpr OStringLiteral tok_M = "M";
+constexpr OStringLiteral tok_N = "N";
+constexpr OStringLiteral tok_O = "O";
+constexpr OStringLiteral tok_P = "P";
+constexpr OStringLiteral tok_Q = "Q";
+constexpr OStringLiteral tok_R = "R";
+constexpr OStringLiteral tok_S = "S";
+constexpr OStringLiteral tok_T = "T";
+constexpr OStringLiteral tok_U = "U";
+constexpr OStringLiteral tok_V = "V";
+constexpr OStringLiteral tok_W = "W";
+constexpr OStringLiteral tok_X = "X";
+constexpr OStringLiteral tok_Y = "Y";
+constexpr OStringLiteral tok_Z = "Z";
+constexpr OStringLiteral tok_bracketleft = "bracketleft";
+constexpr OStringLiteral tok_backslash = "backslash";
+constexpr OStringLiteral tok_bracketright = "bracketright";
+constexpr OStringLiteral tok_asciicircum = "asciicircum";
+constexpr OStringLiteral tok_underscore = "underscore";
+constexpr OStringLiteral tok_quoteleft = "quoteleft";
+constexpr OStringLiteral tok_a = "a";
+constexpr OStringLiteral tok_b = "b";
+constexpr OStringLiteral tok_c = "c";
+constexpr OStringLiteral tok_d = "d";
+constexpr OStringLiteral tok_e = "e";
+constexpr OStringLiteral tok_f = "f";
+constexpr OStringLiteral tok_g = "g";
+constexpr OStringLiteral tok_h = "h";
+constexpr OStringLiteral tok_i = "i";
+constexpr OStringLiteral tok_j = "j";
+constexpr OStringLiteral tok_k = "k";
+constexpr OStringLiteral tok_l = "l";
+constexpr OStringLiteral tok_m = "m";
+constexpr OStringLiteral tok_n = "n";
+constexpr OStringLiteral tok_o = "o";
+constexpr OStringLiteral tok_p = "p";
+constexpr OStringLiteral tok_q = "q";
+constexpr OStringLiteral tok_r = "r";
+constexpr OStringLiteral tok_s = "s";
+constexpr OStringLiteral tok_t = "t";
+constexpr OStringLiteral tok_u = "u";
+constexpr OStringLiteral tok_v = "v";
+constexpr OStringLiteral tok_w = "w";
+constexpr OStringLiteral tok_x = "x";
+constexpr OStringLiteral tok_y = "y";
+constexpr OStringLiteral tok_z = "z";
+constexpr OStringLiteral tok_braceleft = "braceleft";
+constexpr OStringLiteral tok_bar = "bar";
+constexpr OStringLiteral tok_braceright = "braceright";
+constexpr OStringLiteral tok_asciitilde = "asciitilde";
+constexpr OStringLiteral tok_exclamdown = "exclamdown";
+constexpr OStringLiteral tok_cent = "cent";
+constexpr OStringLiteral tok_sterlin = "sterlin";
+constexpr OStringLiteral tok_fraction = "fraction";
+constexpr OStringLiteral tok_yen = "yen";
+constexpr OStringLiteral tok_florin = "florin";
+constexpr OStringLiteral tok_section = "section";
+constexpr OStringLiteral tok_currency = "currency";
+constexpr OStringLiteral tok_quotesingle = "quotesingle";
+constexpr OStringLiteral tok_quotedblleft = "quotedblleft";
+constexpr OStringLiteral tok_guillemotleft = "guillemotleft";
+constexpr OStringLiteral tok_guilsinglleft = "guilsinglleft";
+constexpr OStringLiteral tok_guilsinglright = "guilsinglright";
+constexpr OStringLiteral tok_fi = "fi";
+constexpr OStringLiteral tok_fl = "fl";
+constexpr OStringLiteral tok_endash = "endash";
+constexpr OStringLiteral tok_dagger = "dagger";
+constexpr OStringLiteral tok_daggerdbl = "daggerdbl";
+constexpr OStringLiteral tok_periodcentered = "periodcentered";
+constexpr OStringLiteral tok_paragraph = "paragraph";
+constexpr OStringLiteral tok_bullet = "bullet";
+constexpr OStringLiteral tok_quotesinglbase = "quotesinglbase";
+constexpr OStringLiteral tok_quotedblbase = "quotedblbase";
+constexpr OStringLiteral tok_quotedblright = "quotedblright";
+constexpr OStringLiteral tok_guillemotright = "guillemotright";
+constexpr OStringLiteral tok_ellipsis = "ellipsis";
+constexpr OStringLiteral tok_perthousand = "perthousand";
+constexpr OStringLiteral tok_questiondown = "questiondown";
+constexpr OStringLiteral tok_grave = "grave";
+constexpr OStringLiteral tok_acute = "acute";
+constexpr OStringLiteral tok_circumflex = "circumflex";
+constexpr OStringLiteral tok_tilde = "tilde";
+constexpr OStringLiteral tok_macron = "macron";
+constexpr OStringLiteral tok_breve = "breve";
+constexpr OStringLiteral tok_dotaccent = "dotaccent";
+constexpr OStringLiteral tok_dieresis = "dieresis";
+constexpr OStringLiteral tok_ring = "ring";
+constexpr OStringLiteral tok_cedilla = "cedilla";
+constexpr OStringLiteral tok_hungarumlaut = "hungarumlaut";
+constexpr OStringLiteral tok_ogonek = "ogonek";
+constexpr OStringLiteral tok_caron = "caron";
+constexpr OStringLiteral tok_emdash = "emdash";
+constexpr OStringLiteral tok_AE = "AE";
+constexpr OStringLiteral tok_ordfeminine = "ordfeminine";
+constexpr OStringLiteral tok_Lslash = "Lslash";
+constexpr OStringLiteral tok_Oslash = "Oslash";
+constexpr OStringLiteral tok_OE = "OE";
+constexpr OStringLiteral tok_ordmasculine = "ordmasculine";
+constexpr OStringLiteral tok_ae = "ae";
+constexpr OStringLiteral tok_dotlessi = "dotlessi";
+constexpr OStringLiteral tok_lslash = "lslash";
+constexpr OStringLiteral tok_oslash = "oslash";
+constexpr OStringLiteral tok_oe = "oe";
+constexpr OStringLiteral tok_germandbls = "germandbls";
+constexpr OStringLiteral tok_onesuperior = "onesuperior";
+constexpr OStringLiteral tok_logicalnot = "logicalnot";
+constexpr OStringLiteral tok_mu = "mu";
+constexpr OStringLiteral tok_trademark = "trademark";
+constexpr OStringLiteral tok_Eth = "Eth";
+constexpr OStringLiteral tok_onehalf = "onehalf";
+constexpr OStringLiteral tok_plusminus = "plusminus";
+constexpr OStringLiteral tok_Thorn = "Thorn";
+constexpr OStringLiteral tok_onequarter = "onequarter";
+constexpr OStringLiteral tok_divide = "divide";
+constexpr OStringLiteral tok_brokenbar = "brokenbar";
+constexpr OStringLiteral tok_degree = "degree";
+constexpr OStringLiteral tok_thorn = "thorn";
+constexpr OStringLiteral tok_threequarters = "threequarters";
+constexpr OStringLiteral tok_twosuperior = "twosuperior";
+constexpr OStringLiteral tok_registered = "registered";
+constexpr OStringLiteral tok_minus = "minus";
+constexpr OStringLiteral tok_eth = "eth";
+constexpr OStringLiteral tok_multiply = "multiply";
+constexpr OStringLiteral tok_threesuperior = "threesuperior";
+constexpr OStringLiteral tok_copyright = "copyright";
+constexpr OStringLiteral tok_Aacute = "Aacute";
+constexpr OStringLiteral tok_Acircumflex = "Acircumflex";
+constexpr OStringLiteral tok_Adieresis = "Adieresis";
+constexpr OStringLiteral tok_Agrave = "Agrave";
+constexpr OStringLiteral tok_Aring = "Aring";
+constexpr OStringLiteral tok_Atilde = "Atilde";
+constexpr OStringLiteral tok_Ccedilla = "Ccedilla";
+constexpr OStringLiteral tok_Eacute = "Eacute";
+constexpr OStringLiteral tok_Ecircumflex = "Ecircumflex";
+constexpr OStringLiteral tok_Edieresis = "Edieresis";
+constexpr OStringLiteral tok_Egrave = "Egrave";
+constexpr OStringLiteral tok_Iacute = "Iacute";
+constexpr OStringLiteral tok_Icircumflex = "Icircumflex";
+constexpr OStringLiteral tok_Idieresis = "Idieresis";
+constexpr OStringLiteral tok_Igrave = "Igrave";
+constexpr OStringLiteral tok_Ntilde = "Ntilde";
+constexpr OStringLiteral tok_Oacute = "Oacute";
+constexpr OStringLiteral tok_Ocircumflex = "Ocircumflex";
+constexpr OStringLiteral tok_Odieresis = "Odieresis";
+constexpr OStringLiteral tok_Ograve = "Ograve";
+constexpr OStringLiteral tok_Otilde = "Otilde";
+constexpr OStringLiteral tok_Scaron = "Scaron";
+constexpr OStringLiteral tok_Uacute = "Uacute";
+constexpr OStringLiteral tok_Ucircumflex = "Ucircumflex";
+constexpr OStringLiteral tok_Udieresis = "Udieresis";
+constexpr OStringLiteral tok_Ugrave = "Ugrave";
+constexpr OStringLiteral tok_Yacute = "Yacute";
+constexpr OStringLiteral tok_Ydieresis = "Ydieresis";
+constexpr OStringLiteral tok_Zcaron = "Zcaron";
+constexpr OStringLiteral tok_aacute = "aacute";
+constexpr OStringLiteral tok_acircumflex = "acircumflex";
+constexpr OStringLiteral tok_adieresis = "adieresis";
+constexpr OStringLiteral tok_agrave = "agrave";
+constexpr OStringLiteral tok_aring = "aring";
+constexpr OStringLiteral tok_atilde = "atilde";
+constexpr OStringLiteral tok_ccedilla = "ccedilla";
+constexpr OStringLiteral tok_eacute = "eacute";
+constexpr OStringLiteral tok_ecircumflex = "ecircumflex";
+constexpr OStringLiteral tok_edieresis = "edieresis";
+constexpr OStringLiteral tok_egrave = "egrave";
+constexpr OStringLiteral tok_iacute = "iacute";
+constexpr OStringLiteral tok_icircumflex = "icircumflex";
+constexpr OStringLiteral tok_idieresis = "idieresis";
+constexpr OStringLiteral tok_igrave = "igrave";
+constexpr OStringLiteral tok_ntilde = "ntilde";
+constexpr OStringLiteral tok_oacute = "oacute";
+constexpr OStringLiteral tok_ocircumflex = "ocircumflex";
+constexpr OStringLiteral tok_odieresis = "odieresis";
+constexpr OStringLiteral tok_ograve = "ograve";
+constexpr OStringLiteral tok_otilde = "otilde";
+constexpr OStringLiteral tok_scaron = "scaron";
+constexpr OStringLiteral tok_uacute = "uacute";
+constexpr OStringLiteral tok_ucircumflex = "ucircumflex";
+constexpr OStringLiteral tok_udieresis = "udieresis";
+constexpr OStringLiteral tok_ugrave = "ugrave";
+constexpr OStringLiteral tok_yacute = "yacute";
+constexpr OStringLiteral tok_ydieresis = "ydieresis";
+constexpr OStringLiteral tok_zcaron = "zcaron";
+constexpr OStringLiteral tok_exclamsmall = "exclamsmall";
+constexpr OStringLiteral tok_Hungarumlautsmall = "Hungarumlautsmall";
+constexpr OStringLiteral tok_dollaroldstyle = "dollaroldstyle";
+constexpr OStringLiteral tok_dollarsuperior = "dollarsuperior";
+constexpr OStringLiteral tok_ampersandsmall = "ampersandsmall";
+constexpr OStringLiteral tok_Acutesmall = "Acutesmall";
+constexpr OStringLiteral tok_parenleftsuperior = "parenleftsuperior";
+constexpr OStringLiteral tok_parenrightsuperior = "parenrightsuperior";
+constexpr OStringLiteral tok_twodotenleader = "twodotenleader";
+constexpr OStringLiteral tok_onedotenleader = "onedotenleader";
+constexpr OStringLiteral tok_zerooldstyle = "zerooldstyle";
+constexpr OStringLiteral tok_oneoldstyle = "oneoldstyle";
+constexpr OStringLiteral tok_twooldstyle = "twooldstyle";
+constexpr OStringLiteral tok_threeoldstyle = "threeoldstyle";
+constexpr OStringLiteral tok_fouroldstyle = "fouroldstyle";
+constexpr OStringLiteral tok_fiveoldstyle = "fiveoldstyle";
+constexpr OStringLiteral tok_sixoldstyle = "sixoldstyle";
+constexpr OStringLiteral tok_sevenoldstyle = "sevenoldstyle";
+constexpr OStringLiteral tok_eightoldstyle = "eightoldstyle";
+constexpr OStringLiteral tok_nineoldstile = "nineoldstile";
+constexpr OStringLiteral tok_commasuperior = "commasuperior";
+constexpr OStringLiteral tok_threequartersemdash = "threequartersemdash";
+constexpr OStringLiteral tok_periodsuperior = "periodsuperior";
+constexpr OStringLiteral tok_questionsmall = "questionsmall";
+constexpr OStringLiteral tok_asuperior = "asuperior";
+constexpr OStringLiteral tok_bsuperior = "bsuperior";
+constexpr OStringLiteral tok_centsuperior = "centsuperior";
+constexpr OStringLiteral tok_dsuperior = "dsuperior";
+constexpr OStringLiteral tok_esuperior = "esuperior";
+constexpr OStringLiteral tok_isuperior = "isuperior";
+constexpr OStringLiteral tok_lsuperior = "lsuperior";
+constexpr OStringLiteral tok_msuperior = "msuperior";
+constexpr OStringLiteral tok_nsuperior = "nsuperior";
+constexpr OStringLiteral tok_osuperior = "osuperior";
+constexpr OStringLiteral tok_rsuperior = "rsuperior";
+constexpr OStringLiteral tok_ssuperior = "ssuperior";
+constexpr OStringLiteral tok_tsuperior = "tsuperior";
+constexpr OStringLiteral tok_ff = "ff";
+constexpr OStringLiteral tok_ffi = "ffi";
+constexpr OStringLiteral tok_ffl = "ffl";
+constexpr OStringLiteral tok_parenleftinferior = "parenleftinferior";
+constexpr OStringLiteral tok_parenrightinferior = "parenrightinferior";
+constexpr OStringLiteral tok_Circumflexsmall = "Circumflexsmall";
+constexpr OStringLiteral tok_hyphensuperior = "hyphensuperior";
+constexpr OStringLiteral tok_Gravesmall = "Gravesmall";
+constexpr OStringLiteral tok_Asmall = "Asmall";
+constexpr OStringLiteral tok_Bsmall = "Bsmall";
+constexpr OStringLiteral tok_Csmall = "Csmall";
+constexpr OStringLiteral tok_Dsmall = "Dsmall";
+constexpr OStringLiteral tok_Esmall = "Esmall";
+constexpr OStringLiteral tok_Fsmall = "Fsmall";
+constexpr OStringLiteral tok_Gsmall = "Gsmall";
+constexpr OStringLiteral tok_Hsmall = "Hsmall";
+constexpr OStringLiteral tok_Ismall = "Ismall";
+constexpr OStringLiteral tok_Jsmall = "Jsmall";
+constexpr OStringLiteral tok_Ksmall = "Ksmall";
+constexpr OStringLiteral tok_Lsmall = "Lsmall";
+constexpr OStringLiteral tok_Msmall = "Msmall";
+constexpr OStringLiteral tok_Nsmall = "Nsmall";
+constexpr OStringLiteral tok_Osmall = "Osmall";
+constexpr OStringLiteral tok_Psmall = "Psmall";
+constexpr OStringLiteral tok_Qsmall = "Qsmall";
+constexpr OStringLiteral tok_Rsmall = "Rsmall";
+constexpr OStringLiteral tok_Ssmall = "Ssmall";
+constexpr OStringLiteral tok_Tsmall = "Tsmall";
+constexpr OStringLiteral tok_Usmall = "Usmall";
+constexpr OStringLiteral tok_Vsmall = "Vsmall";
+constexpr OStringLiteral tok_Wsmall = "Wsmall";
+constexpr OStringLiteral tok_Xsmall = "Xsmall";
+constexpr OStringLiteral tok_Ysmall = "Ysmall";
+constexpr OStringLiteral tok_Zsmall = "Zsmall";
+constexpr OStringLiteral tok_colonmonetary = "colonmonetary";
+constexpr OStringLiteral tok_onefitted = "onefitted";
+constexpr OStringLiteral tok_rupia = "rupia";
+constexpr OStringLiteral tok_Tildesmall = "Tildesmall";
+constexpr OStringLiteral tok_exclamdownsmall = "exclamdownsmall";
+constexpr OStringLiteral tok_centoldstyle = "centoldstyle";
+constexpr OStringLiteral tok_Lslashsmall = "Lslashsmall";
+constexpr OStringLiteral tok_Scaronsmall = "Scaronsmall";
+constexpr OStringLiteral tok_Zcaronsmall = "Zcaronsmall";
+constexpr OStringLiteral tok_Dieresissmall = "Dieresissmall";
+constexpr OStringLiteral tok_Brevesmall = "Brevesmall";
+constexpr OStringLiteral tok_Caronsmall = "Caronsmall";
+constexpr OStringLiteral tok_Dotaccentsmall = "Dotaccentsmall";
+constexpr OStringLiteral tok_Macronsmall = "Macronsmall";
+constexpr OStringLiteral tok_figuredash = "figuredash";
+constexpr OStringLiteral tok_hypheninferior = "hypheninferior";
+constexpr OStringLiteral tok_Ogoneksmall = "Ogoneksmall";
+constexpr OStringLiteral tok_Ringsmall = "Ringsmall";
+constexpr OStringLiteral tok_Cedillasmall = "Cedillasmall";
+constexpr OStringLiteral tok_questiondownsmall = "questiondownsmall";
+constexpr OStringLiteral tok_oneeight = "oneeight";
+constexpr OStringLiteral tok_threeeights = "threeeights";
+constexpr OStringLiteral tok_fiveeights = "fiveeights";
+constexpr OStringLiteral tok_seveneights = "seveneights";
+constexpr OStringLiteral tok_onethird = "onethird";
+constexpr OStringLiteral tok_twothirds = "twothirds";
+constexpr OStringLiteral tok_zerosuperior = "zerosuperior";
+constexpr OStringLiteral tok_foursuperior = "foursuperior";
+constexpr OStringLiteral tok_fivesuperior = "fivesuperior";
+constexpr OStringLiteral tok_sixsuperior = "sixsuperior";
+constexpr OStringLiteral tok_sevensuperior = "sevensuperior";
+constexpr OStringLiteral tok_eightsuperior = "eightsuperior";
+constexpr OStringLiteral tok_ninesuperior = "ninesuperior";
+constexpr OStringLiteral tok_zeroinferior = "zeroinferior";
+constexpr OStringLiteral tok_oneinferior = "oneinferior";
+constexpr OStringLiteral tok_twoinferior = "twoinferior";
+constexpr OStringLiteral tok_threeinferior = "threeinferior";
+constexpr OStringLiteral tok_fourinferior = "fourinferior";
+constexpr OStringLiteral tok_fiveinferior = "fiveinferior";
+constexpr OStringLiteral tok_sixinferior = "sixinferior";
+constexpr OStringLiteral tok_seveninferior = "seveninferior";
+constexpr OStringLiteral tok_eightinferior = "eightinferior";
+constexpr OStringLiteral tok_nineinferior = "nineinferior";
+constexpr OStringLiteral tok_centinferior = "centinferior";
+constexpr OStringLiteral tok_dollarinferior = "dollarinferior";
+constexpr OStringLiteral tok_periodinferior = "periodinferior";
+constexpr OStringLiteral tok_commainferior = "commainferior";
+constexpr OStringLiteral tok_Agravesmall = "Agravesmall";
+constexpr OStringLiteral tok_Aacutesmall = "Aacutesmall";
+constexpr OStringLiteral tok_Acircumflexsmall = "Acircumflexsmall";
+constexpr OStringLiteral tok_Atildesmall = "Atildesmall";
+constexpr OStringLiteral tok_Adieresissmall = "Adieresissmall";
+constexpr OStringLiteral tok_Aringsmall = "Aringsmall";
+constexpr OStringLiteral tok_AEsmall = "AEsmall";
+constexpr OStringLiteral tok_Ccedillasmall = "Ccedillasmall";
+constexpr OStringLiteral tok_Egravesmall = "Egravesmall";
+constexpr OStringLiteral tok_Eacutesmall = "Eacutesmall";
+constexpr OStringLiteral tok_Ecircumflexsmall = "Ecircumflexsmall";
+constexpr OStringLiteral tok_Edieresissmall = "Edieresissmall";
+constexpr OStringLiteral tok_Igravesmall = "Igravesmall";
+constexpr OStringLiteral tok_Iacutesmall = "Iacutesmall";
+constexpr OStringLiteral tok_Icircumflexsmall = "Icircumflexsmall";
+constexpr OStringLiteral tok_Idieresissmall = "Idieresissmall";
+constexpr OStringLiteral tok_Ethsmall = "Ethsmall";
+constexpr OStringLiteral tok_Ntildesmall = "Ntildesmall";
+constexpr OStringLiteral tok_Ogravesmall = "Ogravesmall";
+constexpr OStringLiteral tok_Oacutesmall = "Oacutesmall";
+constexpr OStringLiteral tok_Ocircumflexsmall = "Ocircumflexsmall";
+constexpr OStringLiteral tok_Otildesmall = "Otildesmall";
+constexpr OStringLiteral tok_Odieressissmall = "Odieressissmall";
+constexpr OStringLiteral tok_OEsmall = "OEsmall";
+constexpr OStringLiteral tok_Oslashsmall = "Oslashsmall";
+constexpr OStringLiteral tok_Ugravesmall = "Ugravesmall";
+constexpr OStringLiteral tok_Uacutesmall = "Uacutesmall";
+constexpr OStringLiteral tok_Ucircumflexsmall = "Ucircumflexsmall";
+constexpr OStringLiteral tok_Udieresissmall = "Udieresissmall";
+constexpr OStringLiteral tok_Yacutesmall = "Yacutesmall";
+constexpr OStringLiteral tok_Thornsmall = "Thornsmall";
+constexpr OStringLiteral tok_Ydieresissmall = "Ydieresissmall";
+constexpr OStringLiteral tok_001_000 = "001.000";
+constexpr OStringLiteral tok_001_001 = "001.001";
+constexpr OStringLiteral tok_001_002 = "001.002";
+constexpr OStringLiteral tok_001_003 = "001.003";
+constexpr OStringLiteral tok_Black = "Black";
+constexpr OStringLiteral tok_Bold = "Bold";
+constexpr OStringLiteral tok_Book = "Book";
+constexpr OStringLiteral tok_Light = "Light";
+constexpr OStringLiteral tok_Medium = "Medium";
+constexpr OStringLiteral tok_Regular = "Regular";
+constexpr OStringLiteral tok_Roman = "Roman";
+constexpr OStringLiteral tok_Semibold = "Semibold";
+
+static rtl::OStringConstExpr pStringIds[] = {
+/*0*/   tok_notdef,       tok_space,            tok_exclam,           tok_quotedbl,
+    tok_numbersign,       tok_dollar,           tok_percent,          tok_ampersand,
+    tok_quoteright,       tok_parenleft,        tok_parenright,       tok_asterisk,
+    tok_plus,             tok_comma,            tok_hyphen,           tok_period,
+/*16*/  tok_slash,        tok_zero,             tok_one,              tok_two,
+    tok_three,            tok_four,             tok_five,             tok_six,
+    tok_seven,            tok_eight,            tok_nine,             tok_colon,
+    tok_semicolon,        tok_less,             tok_equal,            tok_greater,
+/*32*/  tok_question,     tok_at,               tok_A,                tok_B,
+    tok_C,                tok_D,                tok_E,                tok_F,
+    tok_G,                tok_H,                tok_I,                tok_J,
+    tok_K,                tok_L,                tok_M,                tok_N,
+/*48*/  tok_O,            tok_P,                tok_Q,                tok_R,
+    tok_S,                tok_T,                tok_U,                tok_V,
+    tok_W,                tok_X,                tok_Y,                tok_Z,
+    tok_bracketleft,      tok_backslash,        tok_bracketright,     tok_asciicircum,
+/*64*/  tok_underscore,   tok_quoteleft,        tok_a,                tok_b,
+    tok_c,                tok_d,                tok_e,                tok_f,
+    tok_g,                tok_h,                tok_i,                tok_j,
+    tok_k,                tok_l,                tok_m,                tok_n,
+/*80*/  tok_o,            tok_p,                tok_q,                tok_r,
+    tok_s,                tok_t,                tok_u,                tok_v,
+    tok_w,                tok_x,                tok_y,                tok_z,
+    tok_braceleft,        tok_bar,              tok_braceright,       tok_asciitilde,
+/*96*/  tok_exclamdown,   tok_cent,             tok_sterlin,          tok_fraction,
+    tok_yen,              tok_florin,           tok_section,          tok_currency,
+    tok_quotesingle,      tok_quotedblleft,     tok_guillemotleft,    tok_guilsinglleft,
+    tok_guilsinglright,   tok_fi,               tok_fl,               tok_endash,
+/*112*/ tok_dagger,       tok_daggerdbl,        tok_periodcentered,   tok_paragraph,
+    tok_bullet,           tok_quotesinglbase,   tok_quotedblbase,     tok_quotedblright,
+    tok_guillemotright,   tok_ellipsis,         tok_perthousand,      tok_questiondown,
+    tok_grave,            tok_acute,            tok_circumflex,       tok_tilde,
+/*128*/ tok_macron,       tok_breve,            tok_dotaccent,        tok_dieresis,
+    tok_ring,             tok_cedilla,          tok_hungarumlaut,     tok_ogonek,
+    tok_caron,            tok_emdash,           tok_AE,               tok_ordfeminine,
+    tok_Lslash,           tok_Oslash,           tok_OE,               tok_ordmasculine,
+/*144*/ tok_ae,           tok_dotlessi,         tok_lslash,           tok_oslash,
+    tok_oe,               tok_germandbls,       tok_onesuperior,      tok_logicalnot,
+    tok_mu,               tok_trademark,        tok_Eth,              tok_onehalf,
+    tok_plusminus,        tok_Thorn,            tok_onequarter,       tok_divide,
+/*160*/ tok_brokenbar,    tok_degree,           tok_thorn,            tok_threequarters,
+    tok_twosuperior,      tok_registered,       tok_minus,            tok_eth,
+    tok_multiply,         tok_threesuperior,    tok_copyright,        tok_Aacute,
+    tok_Acircumflex,      tok_Adieresis,        tok_Agrave,           tok_Aring,
+/*176*/ tok_Atilde,       tok_Ccedilla,         tok_Eacute,           tok_Ecircumflex,
+    tok_Edieresis,        tok_Egrave,           tok_Iacute,           tok_Icircumflex,
+    tok_Idieresis,        tok_Igrave,           tok_Ntilde,           tok_Oacute,
+    tok_Ocircumflex,      tok_Odieresis,        tok_Ograve,           tok_Otilde,
+/*192*/ tok_Scaron,       tok_Uacute,           tok_Ucircumflex,      tok_Udieresis,
+    tok_Ugrave,           tok_Yacute,           tok_Ydieresis,        tok_Zcaron,
+    tok_aacute,           tok_acircumflex,      tok_adieresis,        tok_agrave,
+    tok_aring,            tok_atilde,           tok_ccedilla,         tok_eacute,
+/*208*/ tok_ecircumflex,  tok_edieresis,        tok_egrave,           tok_iacute,
+    tok_icircumflex,      tok_idieresis,        tok_igrave,           tok_ntilde,
+    tok_oacute,           tok_ocircumflex,      tok_odieresis,        tok_ograve,
+    tok_otilde,           tok_scaron,           tok_uacute,           tok_ucircumflex,
+/*224*/ tok_udieresis,    tok_ugrave,           tok_yacute,           tok_ydieresis,
+    tok_zcaron,           tok_exclamsmall,      tok_Hungarumlautsmall,tok_dollaroldstyle,
+    tok_dollarsuperior,   tok_ampersandsmall,   tok_Acutesmall,       tok_parenleftsuperior,
+    tok_parenrightsuperior,tok_twodotenleader,  tok_onedotenleader,   tok_zerooldstyle,
+/*240*/ tok_oneoldstyle,  tok_twooldstyle,      tok_threeoldstyle,    tok_fouroldstyle,
+    tok_fiveoldstyle,     tok_sixoldstyle,      tok_sevenoldstyle,    tok_eightoldstyle,
+    tok_nineoldstile,     tok_commasuperior,    tok_threequartersemdash,tok_periodsuperior,
+    tok_questionsmall,    tok_asuperior,        tok_bsuperior,        tok_centsuperior,
+/*256*/ tok_dsuperior,    tok_esuperior,        tok_isuperior,        tok_lsuperior,
+    tok_msuperior,        tok_nsuperior,        tok_osuperior,        tok_rsuperior,
+    tok_ssuperior,        tok_tsuperior,        tok_ff,               tok_ffi,
+    tok_ffl,              tok_parenleftinferior,tok_parenrightinferior,tok_Circumflexsmall,
+/*272*/ tok_hyphensuperior,tok_Gravesmall,      tok_Asmall,           tok_Bsmall,
+    tok_Csmall,           tok_Dsmall,           tok_Esmall,           tok_Fsmall,
+    tok_Gsmall,           tok_Hsmall,           tok_Ismall,           tok_Jsmall,
+    tok_Ksmall,           tok_Lsmall,           tok_Msmall,           tok_Nsmall,
+/*288*/ tok_Osmall,       tok_Psmall,           tok_Qsmall,           tok_Rsmall,
+    tok_Ssmall,           tok_Tsmall,           tok_Usmall,           tok_Vsmall,
+    tok_Wsmall,           tok_Xsmall,           tok_Ysmall,           tok_Zsmall,
+    tok_colonmonetary,    tok_onefitted,        tok_rupia,            tok_Tildesmall,
+/*304*/ tok_exclamdownsmall,tok_centoldstyle,   tok_Lslashsmall,      tok_Scaronsmall,
+    tok_Zcaronsmall,      tok_Dieresissmall,    tok_Brevesmall,       tok_Caronsmall,
+    tok_Dotaccentsmall,   tok_Macronsmall,      tok_figuredash,       tok_hypheninferior,
+    tok_Ogoneksmall,      tok_Ringsmall,        tok_Cedillasmall,     tok_questiondownsmall,
+/*320*/ tok_oneeight,     tok_threeeights,      tok_fiveeights,       tok_seveneights,
+    tok_onethird,         tok_twothirds,        tok_zerosuperior,     tok_foursuperior,
+    tok_fivesuperior,     tok_sixsuperior,      tok_sevensuperior,    tok_eightsuperior,
+    tok_ninesuperior,     tok_zeroinferior,     tok_oneinferior,      tok_twoinferior,
+/*336*/ tok_threeinferior,tok_fourinferior,     tok_fiveinferior,     tok_sixinferior,
+    tok_seveninferior,    tok_eightinferior,    tok_nineinferior,     tok_centinferior,
+    tok_dollarinferior,   tok_periodinferior,   tok_commainferior,    tok_Agravesmall,
+    tok_Aacutesmall,      tok_Acircumflexsmall, tok_Atildesmall,      tok_Adieresissmall,
+/*352*/ tok_Aringsmall,   tok_AEsmall,          tok_Ccedillasmall,    tok_Egravesmall,
+    tok_Eacutesmall,      tok_Ecircumflexsmall, tok_Edieresissmall,   tok_Igravesmall,
+    tok_Iacutesmall,      tok_Icircumflexsmall, tok_Idieresissmall,   tok_Ethsmall,
+    tok_Ntildesmall,      tok_Ogravesmall,      tok_Oacutesmall,      tok_Ocircumflexsmall,
+/*368*/ tok_Otildesmall,  tok_Odieressissmall,  tok_OEsmall,          tok_Oslashsmall,
+    tok_Ugravesmall,      tok_Uacutesmall,      tok_Ucircumflexsmall, tok_Udieresissmall,
+    tok_Yacutesmall,      tok_Thornsmall,       tok_Ydieresissmall,   tok_001_000,
+    tok_001_001,          tok_001_002,          tok_001_003,          tok_Black,
+/*384*/ tok_Bold,         tok_Book,             tok_Light,            tok_Medium,
+    tok_Regular,          tok_Roman,            tok_Semibold
 };
 
 // TOP DICT keywords (also covers PRIV DICT keywords)
@@ -160,6 +558,55 @@ static const char* pDictEscs[] = {
     nullptr,                   nullptr,               "rROS",             "nCIDFontVersion",
     "nCIDFontRevision",     "nCIDFontType",     "nCIDCount",        "nUIDBase",
     "nFDArray",             "nFDSelect",        "sFontName"
+};
+
+static const char* pStandardEncoding[] = {
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", "space", "exclam", "quotedbl",
+    "numbersign", "dollar", "percent", "ampersand",
+    "quoteright", "parenleft", "parenright", "asterisk", "plus",
+    "comma", "hyphen", "period", "slash", "zero", "one", "two",
+    "three", "four", "five", "six", "seven", "eight", "nine",
+    "colon", "semicolon", "less", "equal", "greater",
+    "question", "at", "A", "B", "C", "D", "E", "F", "G", "H",
+    "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+    "U", "V", "W", "X", "Y", "Z", "bracketleft", "backslash",
+    "bracketright", "asciicircum", "underscore", "quoteleft",
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
+    "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x",
+    "y", "z", "braceleft", "bar", "braceright", "asciitilde",
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", "exclamdown",
+    "cent", "sterling", "fraction", "yen", "florin", "section",
+    "currency", "quotesingle", "quotedblleft", "guillemotleft",
+    "guilsinglleft", "guilsinglright", "fi", "fl", ".notdef",
+    "endash", "dagger", "daggerdbl", "periodcentered",
+    ".notdef", "paragraph", "bullet", "quotesinglbase",
+    "quotedblbase", "quotedblright", "guillemotright",
+    "ellipsis", "perthousand", ".notdef", "questiondown",
+    ".notdef", "grave", "acute", "circumflex", "tilde",
+    "macron", "breve", "dotaccent", "dieresis", ".notdef",
+    "ring", "cedilla", ".notdef", "hungarumlaut", "ogonek",
+    "caron", "emdash", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", ".notdef",
+    ".notdef", ".notdef", ".notdef", "AE", ".notdef",
+    "ordfeminine", ".notdef", ".notdef", ".notdef", ".notdef",
+    "Lslash", "Oslash", "OE", "ordmasculine", ".notdef",
+    ".notdef", ".notdef", ".notdef", ".notdef", "ae", ".notdef",
+    ".notdef", ".notdef", "dotlessi", ".notdef", ".notdef",
+    "lslash", "oslash", "oe", "germandbls", ".notdef",
+    ".notdef", ".notdef", ".notdef"
 };
 
 namespace {
@@ -261,6 +708,16 @@ struct CffLocal
     bool        mbForceBold;
 };
 
+const int MAX_T1OPS_SIZE = 81920; // TODO: use dynamic value
+
+struct CharString
+{
+    int nLen;
+    U8 aOps[MAX_T1OPS_SIZE];
+    int nCffGlyphId;
+};
+
+
 class CffSubsetterContext
 :   private CffGlobal
 {
@@ -274,9 +731,11 @@ public:
     bool    initialCffRead();
     void    emitAsType1( class Type1Emitter&,
                 const sal_GlyphId* pGlyphIds, const U8* pEncoding,
-                sal_Int32* pGlyphWidths, int nGlyphCount, FontSubsetInfo& );
+                int nGlyphCount, FontSubsetInfo& );
 
 private:
+    void    convertCharStrings(const sal_GlyphId* pGlyphIds, int nGlyphCount,
+                std::vector<CharString>& rCharStrings);
     int     convert2Type1Ops( CffLocal*, const U8* pType2Ops, int nType2Len, U8* pType1Ops);
     void    convertOneTypeOp();
     void    convertOneTypeEsc();
@@ -302,10 +761,11 @@ private:
 
     void        readDictOp();
     RealType    readRealVal();
-    const char* getString( int nStringID);
+    OString     getString( int nStringID);
     int         getFDSelect( int nGlyphIndex) const;
     int         getGlyphSID( int nGlyphIndex) const;
-    const char* getGlyphName( int nGlyphIndex);
+    OString     getGlyphName( int nGlyphIndex);
+    bool        getBaseAccent(ValType aBase, ValType aAccent, int* nBase, int* nAccent);
 
     void    read2push();
     void    writeType1Val( ValType);
@@ -342,6 +802,9 @@ private:
     ValType mnHintStack[ NMAXHINTS];
 
     ValType maCharWidth;
+
+    bool    mbDoSeac;
+    std::vector<sal_GlyphId> maExtraGlyphIds;
 };
 
 }
@@ -362,6 +825,7 @@ CffSubsetterContext::CffSubsetterContext( const U8* pBasePtr, int nBaseLen)
     , mnHorzHintSize(0)
     , mnHintStack{}
     , maCharWidth(-1)
+    , mbDoSeac(true)
 {
 //  setCharStringType( 1);
     // TODO: new CffLocal[ mnFDAryCount];
@@ -582,7 +1046,30 @@ void CffSubsetterContext::writeType1Val( ValType aVal)
 {
     U8* pOut = mpWritePtr;
 
-    int nInt = static_cast<int>(aVal);
+    // tdf#126242
+    // Type2 has 16.16 fixed numbers, but Type1 does not. To represent values
+    // with fractions we multiply it by a factor then use “div” operator to
+    // divide it back and keep the fractions.
+    // Code Adapted from:
+    // https://github.com/fontforge/fontforge/blob/f152f12e567ea5bd737a2907c318ae26cfaabd08/fontforge/splinesave.c#L378
+    int nDiv = 0;
+    aVal = rint(aVal * 1024) / 1024;
+    if (aVal != floor(aVal))
+    {
+        if (aVal == rint(aVal * 64) / 64)
+            nDiv = 64;
+        else
+            nDiv = 1024;
+        aVal *= nDiv;
+    }
+
+    int nInt = static_cast<int>(rint(aVal));
+    if (nDiv && floor(nInt) / nDiv == floor(nInt / nDiv))
+    {
+        nInt = rint(nInt / nDiv);
+        nDiv = 0;
+    }
+
     if( (nInt >= -107) && (nInt <= +107)) {
         *(pOut++) = static_cast<U8>(nInt + 139);    // -107..+107
     } else if( (nInt >= -1131) && (nInt <= +1131)) {
@@ -602,6 +1089,12 @@ void CffSubsetterContext::writeType1Val( ValType aVal)
     }
 
     mpWritePtr = pOut;
+
+    if (nDiv)
+    {
+        writeType1Val(nDiv);
+        writeTypeEsc(TYPE1OP::DIV);
+    }
 }
 
 inline void CffSubsetterContext::writeTypeOp( int nTypeOp)
@@ -859,6 +1352,27 @@ void CffSubsetterContext::convertOneTypeOp()
         clear();
         break;
     case TYPE2OP::ENDCHAR:
+        if (size() >= 4 && mbDoSeac)
+        {
+            // Deprecated seac-like use of endchar (Adobe Technical Note #5177,
+            // Appendix C).
+            auto achar = popVal();
+            auto bchar = popVal();
+            auto ady = popVal();
+            auto adx = popVal();
+            int nBase = {}, nAccent = {};
+            if (getBaseAccent(bchar, achar, &nBase, &nAccent))
+            {
+                maExtraGlyphIds.push_back(nBase);
+                maExtraGlyphIds.push_back(nAccent);
+                writeType1Val(0); // TODO accent sb
+                writeType1Val(adx);
+                writeType1Val(ady);
+                writeType1Val(bchar);
+                writeType1Val(achar);
+                writeTypeEsc(TYPE1OP::SEAC);
+            }
+        }
         if( mbNeedClose)
             writeTypeOp( TYPE1OP::CLOSEPATH);
         else
@@ -1076,8 +1590,6 @@ void CffSubsetterContext::callType2Subr( bool bGlobal, int nSubrNumber)
     mpReadPtr = pOldReadPtr;
     mpReadEnd = pOldReadEnd;
 }
-
-const int MAX_T1OPS_SIZE = 81920; // TODO: use dynamic value
 
 int CffSubsetterContext::convert2Type1Ops( CffLocal* pCffLocal, const U8* const pT2Ops, int nT2Len, U8* const pT1Ops)
 {
@@ -1418,7 +1930,7 @@ bool CffSubsetterContext::initialCffRead()
 }
 
 // get a cstring from a StringID
-const char* CffSubsetterContext::getString( int nStringID)
+OString CffSubsetterContext::getString( int nStringID)
 {
     // get a standard string if possible
     const static int nStdStrings = SAL_N_ELEMENTS(pStringIds);
@@ -1426,27 +1938,20 @@ const char* CffSubsetterContext::getString( int nStringID)
         return pStringIds[ nStringID];
 
     // else get the string from the StringIndex table
-    const U8* pReadPtr = mpReadPtr;
-    const U8* pReadEnd = mpReadEnd;
+    comphelper::ValueRestorationGuard pReadPtr(mpReadPtr);
+    comphelper::ValueRestorationGuard pReadEnd(mpReadEnd);
     nStringID -= nStdStrings;
     int nLen = seekIndexData( mnStringIdxBase, nStringID);
     // assert( nLen >= 0);
     // TODO: just return the undecorated name
-    // TODO: get rid of static char buffer
-    static char aNameBuf[ 2560];
     if( nLen < 0) {
-        sprintf( aNameBuf, "name[%d].notfound!", nStringID);
+        return "name[" + OString::number(nStringID) + "].notfound!";
     } else {
-        const int nMaxLen = sizeof(aNameBuf) - 1;
+        const int nMaxLen = 2560 - 1;
         if( nLen >= nMaxLen)
-            nLen = nMaxLen;
-        for( int i = 0; i < nLen; ++i)
-            aNameBuf[i] = *(mpReadPtr++);
-        aNameBuf[ nLen] = '\0';
+            nLen = nMaxLen; // TODO: still needed?
+        return OString(reinterpret_cast<char const *>(mpReadPtr), nLen);
     }
-    mpReadPtr = pReadPtr;
-    mpReadEnd = pReadEnd;
-    return aNameBuf;
 }
 
 // access a CID's FDSelect table
@@ -1541,39 +2046,60 @@ int CffSubsetterContext::getGlyphSID( int nGlyphIndex) const
 }
 
 // NOTE: the result becomes invalid with the next call to this method
-const char* CffSubsetterContext::getGlyphName( int nGlyphIndex)
+OString CffSubsetterContext::getGlyphName( int nGlyphIndex)
 {
     // the first glyph is always the .notdef glyph
-    const char* pGlyphName = ".notdef";
     if( nGlyphIndex == 0)
-        return pGlyphName;
-
-    // prepare a result buffer
-    // TODO: get rid of static buffer
-    static char aDefaultGlyphName[64];
-    pGlyphName = aDefaultGlyphName;
+        return tok_notdef;
 
     // get the glyph specific name
     const int nSID = getGlyphSID( nGlyphIndex);
     if( nSID < 0)           // default glyph name
-        sprintf( aDefaultGlyphName, "gly%03d", nGlyphIndex);
-    else if( mbCIDFont)     // default glyph name in CIDs
-         sprintf( aDefaultGlyphName, "cid%03d", nSID);
-    else {                  // glyph name from string table
-        const char* pSidName = getString( nSID);
-        // check validity of glyph name
-        if( pSidName) {
-            const char* p = pSidName;
-            while( (*p >= '0') && (*p <= 'z')) ++p;
-            if( (p >= pSidName+1) && (*p == '\0'))
-                pGlyphName = pSidName;
-        }
-        // if needed invent a fallback name
-        if( pGlyphName != pSidName)
-             sprintf( aDefaultGlyphName, "bad%03d", nSID);
+    {
+        char aDefaultGlyphName[64];
+        o3tl::sprintf( aDefaultGlyphName, "gly%03d", nGlyphIndex);
+        return aDefaultGlyphName;
     }
+    else if( mbCIDFont)     // default glyph name in CIDs
+    {
+         char aDefaultGlyphName[64];
+         o3tl::sprintf( aDefaultGlyphName, "cid%03d", nSID);
+         return aDefaultGlyphName;
+    }
+    else {                  // glyph name from string table
+        auto const pSidName = getString( nSID);
+        // check validity of glyph name
+        const char* p = pSidName.getStr();
+        while( (*p >= '0') && (*p <= 'z')) ++p;
+        if( (p >= pSidName.getStr()+1) && (*p == '\0'))
+            return pSidName;
+        // if needed invent a fallback name
+        char aDefaultGlyphName[64];
+        o3tl::sprintf( aDefaultGlyphName, "bad%03d", nSID);
+        return aDefaultGlyphName;
+    }
+}
 
-    return pGlyphName;
+bool CffSubsetterContext::getBaseAccent(ValType aBase, ValType aAccent, int* nBase, int* nAccent)
+{
+    bool bBase = false, bAccent = false;
+    for (int i = 0; i < mnCharStrCount; i++)
+    {
+        OString pGlyphName = getGlyphName(i);
+        if (pGlyphName == pStandardEncoding[int(aBase)])
+        {
+            *nBase = i;
+            bBase = true;
+        }
+        if (pGlyphName == pStandardEncoding[int(aAccent)])
+        {
+            *nAccent = i;
+            bAccent = true;
+        }
+        if (bBase && bAccent)
+            return true;
+    }
+    return false;
 }
 
 namespace {
@@ -1581,7 +2107,7 @@ namespace {
 class Type1Emitter
 {
 public:
-    explicit    Type1Emitter( FILE* pOutFile, bool bPfbSubset);
+    explicit    Type1Emitter( SvStream* pOutFile, bool bPfbSubset);
     ~Type1Emitter();
     void        setSubsetName( const char* );
 
@@ -1593,11 +2119,10 @@ public:
     void        updateLen( int nTellPos, size_t nLength);
     void        emitValVector( const char* pLineHead, const char* pLineTail, const std::vector<ValType>&);
 private:
-    FILE*       mpFileOut;
-    char        maBuffer[MAX_T1OPS_SIZE];   // TODO: dynamic allocation
+    SvStream*   mpFileOut;
     unsigned    mnEECryptR;
 public:
-    char*       mpPtr;
+    OStringBuffer maBuffer;
 
     char        maSubsetName[256];
     bool        mbPfbSubset;
@@ -1606,11 +2131,9 @@ public:
 
 }
 
-Type1Emitter::Type1Emitter( FILE* pOutFile, bool bPfbSubset)
+Type1Emitter::Type1Emitter( SvStream* pOutFile, bool bPfbSubset)
 :   mpFileOut( pOutFile)
-,   maBuffer{}
 ,   mnEECryptR( 55665)  // default eexec seed, TODO: mnEECryptSeed
-,   mpPtr( maBuffer)
 ,   mbPfbSubset( bPfbSubset)
 ,   mnHexLineCol( 0)
 {
@@ -1634,7 +2157,7 @@ void Type1Emitter::setSubsetName( const char* pSubsetName)
 
 int Type1Emitter::tellPos() const
 {
-    int nTellPos = ftell( mpFileOut);
+    int nTellPos = mpFileOut->Tell();
     return nTellPos;
 }
 
@@ -1646,37 +2169,36 @@ void Type1Emitter::updateLen( int nTellPos, size_t nLength)
     cData[1] = static_cast<U8>(nLength >>  8);
     cData[2] = static_cast<U8>(nLength >> 16);
     cData[3] = static_cast<U8>(nLength >> 24);
-    const tools::Long nCurrPos = ftell(mpFileOut);
+    const tools::Long nCurrPos = mpFileOut->Tell();
     if (nCurrPos < 0)
         return;
-    if (fseek( mpFileOut, nTellPos, SEEK_SET) != 0)
+    if (mpFileOut->Seek(nTellPos) != static_cast<sal_uInt64>(nTellPos))
         return;
-    fwrite(cData, 1, sizeof(cData), mpFileOut);
-    (void)fseek(mpFileOut, nCurrPos, SEEK_SET);
+    mpFileOut->WriteBytes(cData, sizeof(cData));
+    mpFileOut->Seek(nCurrPos);
 }
 
 inline size_t Type1Emitter::emitRawData(const char* pData, size_t nLength) const
 {
-    return fwrite( pData, 1, nLength, mpFileOut);
+    return mpFileOut->WriteBytes( pData, nLength );
 }
 
 inline void Type1Emitter::emitAllRaw()
 {
     // writeout raw data
-    assert( (mpPtr - maBuffer) < int(sizeof(maBuffer)));
-    emitRawData( maBuffer, mpPtr - maBuffer);
+    emitRawData( maBuffer.getStr(), maBuffer.getLength());
     // reset the raw buffer
-    mpPtr = maBuffer;
+    maBuffer.setLength(0);
 }
 
 inline void Type1Emitter::emitAllHex()
 {
-    assert( (mpPtr - maBuffer) < int(sizeof(maBuffer)));
-    for( const char* p = maBuffer; p < mpPtr;) {
+    auto const end = maBuffer.getStr() + maBuffer.getLength();
+    for( const char* p = maBuffer.getStr(); p < end;) {
         // convert binary chunk to hex
         char aHexBuf[0x4000];
         char* pOut = aHexBuf;
-        while( (p < mpPtr) && (pOut < aHexBuf+sizeof(aHexBuf)-4)) {
+        while( (p < end) && (pOut < aHexBuf+sizeof(aHexBuf)-4)) {
             // convert each byte to hex
             char cNibble = (static_cast<unsigned char>(*p) >> 4) & 0x0F;
             cNibble += (cNibble < 10) ? '0' : 'A'-10;
@@ -1692,15 +2214,15 @@ inline void Type1Emitter::emitAllHex()
         emitRawData( aHexBuf, pOut-aHexBuf);
     }
     // reset the raw buffer
-    mpPtr = maBuffer;
+    maBuffer.setLength(0);
 }
 
 void Type1Emitter::emitAllCrypted()
 {
     // apply t1crypt
-    for( char* p = maBuffer; p < mpPtr; ++p) {
-        *p ^= (mnEECryptR >> 8);
-        mnEECryptR = (*reinterpret_cast<U8*>(p) + mnEECryptR) * 52845 + 22719;
+    for( sal_Int32 i = 0; i < maBuffer.getLength(); ++i) {
+        maBuffer[i] ^= (mnEECryptR >> 8);
+        mnEECryptR = (static_cast<U8>(maBuffer[i]) + mnEECryptR) * 52845 + 22719;
     }
 
     // emit the t1crypt result
@@ -1711,12 +2233,10 @@ void Type1Emitter::emitAllCrypted()
 }
 
 // #i110387# quick-and-dirty double->ascii conversion
-// needed because sprintf/ecvt/etc. alone are too localized (LC_NUMERIC)
 // also strip off trailing zeros in fraction while we are at it
-static int dbl2str( char* pOut, double fVal)
+static OString dbl2str( double fVal)
 {
-    const int nLen = psp::getValueOfDouble( pOut, fVal, 6);
-    return nLen;
+    return rtl::math::doubleToString(fVal, rtl_math_StringFormat_G, 6, '.', true);
 }
 
 void Type1Emitter::emitValVector( const char* pLineHead, const char* pLineTail,
@@ -1727,25 +2247,65 @@ void Type1Emitter::emitValVector( const char* pLineHead, const char* pLineTail,
         return;
 
     // emit the line head
-    mpPtr += sprintf( mpPtr, "%s", pLineHead);
+    maBuffer.append( pLineHead);
     // emit the vector values
     std::vector<ValType>::value_type aVal = 0;
     for( std::vector<ValType>::const_iterator it = rVector.begin();;) {
         aVal = *it;
         if( ++it == rVector.end() )
             break;
-        mpPtr += dbl2str( mpPtr, aVal);
-        *(mpPtr++) = ' ';
+        maBuffer.append(dbl2str( aVal));
+        maBuffer.append(' ');
     }
     // emit the last value
-    mpPtr += dbl2str( mpPtr, aVal);
+    maBuffer.append(dbl2str( aVal));
     // emit the line tail
-    mpPtr += sprintf( mpPtr, "%s", pLineTail);
+    maBuffer.append( pLineTail);
+}
+
+void CffSubsetterContext::convertCharStrings(const sal_GlyphId* pGlyphIds, int nGlyphCount,
+                                             std::vector<CharString>& rCharStrings)
+{
+    // If we are doing extra glyphs used for seac operator, check for already
+    // converted glyphs.
+    bool bCheckDuplicates = !rCharStrings.empty();
+    rCharStrings.reserve(rCharStrings.size() + nGlyphCount);
+    for (int i = 0; i < nGlyphCount; ++i)
+    {
+        const int nCffGlyphId = pGlyphIds[i];
+        assert((nCffGlyphId >= 0) && (nCffGlyphId < mnCharStrCount));
+
+        if (!bCheckDuplicates)
+        {
+            const auto& it
+                = std::find_if(rCharStrings.begin(), rCharStrings.end(),
+                               [&](const CharString& c) { return c.nCffGlyphId == nCffGlyphId; });
+            if (it != rCharStrings.end())
+                continue;
+        }
+
+        // get privdict context matching to the glyph
+        const int nFDSelect = getFDSelect(nCffGlyphId);
+        if (nFDSelect < 0)
+            continue;
+        mpCffLocal = &maCffLocal[nFDSelect];
+
+        // convert the Type2op charstring to its Type1op counterpart
+        const int nT2Len = seekIndexData(mnCharStrBase, nCffGlyphId);
+        assert(nT2Len > 0);
+
+        CharString aCharString;
+        const int nT1Len = convert2Type1Ops(mpCffLocal, mpReadPtr, nT2Len, aCharString.aOps);
+        aCharString.nLen = nT1Len;
+        aCharString.nCffGlyphId = nCffGlyphId;
+
+        rCharStrings.push_back(aCharString);
+    }
 }
 
 void CffSubsetterContext::emitAsType1( Type1Emitter& rEmitter,
     const sal_GlyphId* pReqGlyphIds, const U8* pReqEncoding,
-    sal_Int32* pGlyphWidths, int nGlyphCount, FontSubsetInfo& rFSInfo)
+    int nGlyphCount, FontSubsetInfo& rFSInfo)
 {
     // prepare some fontdirectory details
     static const int nUniqueIdBase = 4100000; // using private-interchange UniqueIds
@@ -1756,11 +2316,13 @@ void CffSubsetterContext::emitAsType1( Type1Emitter& rEmitter,
     if( !*pFontName ) {
         if( mnFontNameSID) {
             // get the fontname directly if available
-            strncpy( pFontName, getString( mnFontNameSID), sizeof(rEmitter.maSubsetName) - 1);
+            strncpy(
+                pFontName, getString( mnFontNameSID).getStr(), sizeof(rEmitter.maSubsetName) - 1);
             pFontName[sizeof(rEmitter.maSubsetName) - 1] = 0;
         } else if( mnFullNameSID) {
             // approximate fontname as fullname-whitespace
-            const char* pI = getString( mnFullNameSID);
+            auto const str = getString( mnFullNameSID);
+            const char* pI = str.getStr();
             char* pO = pFontName;
             const char* pLimit = pFontName + sizeof(rEmitter.maSubsetName) - 1;
             while( pO < pLimit) {
@@ -1779,49 +2341,61 @@ void CffSubsetterContext::emitAsType1( Type1Emitter& rEmitter,
     const char* pFullName = pFontName;
     const char* pFamilyName = pFontName;
 
-    char*& pOut = rEmitter.mpPtr; // convenience reference, TODO: cleanup
-
     // create a PFB+Type1 header
     if( rEmitter.mbPfbSubset ) {
         static const char aPfbHeader[] = "\x80\x01\x00\x00\x00\x00";
         rEmitter.emitRawData( aPfbHeader, sizeof(aPfbHeader)-1);
     }
 
-    pOut += sprintf( pOut, "%%!FontType1-1.0: %s 001.003\n", rEmitter.maSubsetName);
+    rEmitter.maBuffer.append(
+        "%!FontType1-1.0: " + OString::Concat(rEmitter.maSubsetName) + " 001.003\n");
     // emit TOPDICT
-    pOut += sprintf( pOut,
+    rEmitter.maBuffer.append(
         "11 dict begin\n"   // TODO: dynamic entry count for TOPDICT
         "/FontType 1 def\n"
         "/PaintType 0 def\n");
-    pOut += sprintf( pOut, "/FontName /%s def\n", rEmitter.maSubsetName);
-    pOut += sprintf( pOut, "/UniqueID %d def\n", nUniqueId);
+    rEmitter.maBuffer.append( "/FontName /" + OString::Concat(rEmitter.maSubsetName) + " def\n");
+    rEmitter.maBuffer.append( "/UniqueID " + OString::number(nUniqueId) + " def\n");
     // emit FontMatrix
     if( maFontMatrix.size() == 6)
         rEmitter.emitValVector( "/FontMatrix [", "]readonly def\n", maFontMatrix);
     else // emit default FontMatrix if needed
-        pOut += sprintf( pOut, "/FontMatrix [0.001 0 0 0.001 0 0]readonly def\n");
-    // emit FontBBox
-    if( maFontBBox.size() == 4)
-        rEmitter.emitValVector( "/FontBBox {", "}readonly def\n", maFontBBox);
-    else // emit default FontBBox if needed
-        pOut += sprintf( pOut, "/FontBBox {0 0 999 999}readonly def\n");
-    // emit FONTINFO into TOPDICT
-    pOut += sprintf( pOut,
-        "/FontInfo 2 dict dup begin\n"  // TODO: check fontinfo entry count
-        " /FullName (%s) readonly def\n"
-        " /FamilyName (%s) readonly def\n"
-        "end readonly def\n",
-            pFullName, pFamilyName);
+        rEmitter.maBuffer.append( "/FontMatrix [0.001 0 0 0.001 0 0]readonly def\n");
 
-    pOut += sprintf( pOut,
+    // emit FontBBox
+    ValType fXFactor = 1.0;
+    ValType fYFactor = 1.0;
+    if( maFontMatrix.size() >= 4) {
+        fXFactor = 1000.0F * maFontMatrix[0];
+        fYFactor = 1000.0F * maFontMatrix[3];
+    }
+
+    auto aFontBBox = maFontBBox;
+    if (rFSInfo.m_bFilled)
+        aFontBBox = {
+            rFSInfo.m_aFontBBox.Left() / fXFactor, rFSInfo.m_aFontBBox.Top() / fYFactor,
+            rFSInfo.m_aFontBBox.Right() / fXFactor, (rFSInfo.m_aFontBBox.Bottom() + 1) / fYFactor
+        };
+    else if (aFontBBox.size() != 4)
+        aFontBBox = { 0, 0, 999, 999 }; // emit default FontBBox if needed
+    rEmitter.emitValVector( "/FontBBox {", "}readonly def\n", aFontBBox);
+    // emit FONTINFO into TOPDICT
+    rEmitter.maBuffer.append(
+        "/FontInfo 2 dict dup begin\n"  // TODO: check fontinfo entry count
+        " /FullName (" + OString::Concat(pFullName) + ") readonly def\n"
+        " /FamilyName (" + pFamilyName + ") readonly def\n"
+        "end readonly def\n");
+
+    rEmitter.maBuffer.append(
         "/Encoding 256 array\n"
         "0 1 255 {1 index exch /.notdef put} for\n");
     for( int i = 1; (i < nGlyphCount) && (i < 256); ++i) {
-        const char* pGlyphName = getGlyphName( pReqGlyphIds[i]);
-        pOut += sprintf( pOut, "dup %d /%s put\n", pReqEncoding[i], pGlyphName);
+        OString pGlyphName = getGlyphName( pReqGlyphIds[i]);
+        rEmitter.maBuffer.append(
+            "dup " + OString::number(pReqEncoding[i]) + " /" + pGlyphName + " put\n");
     }
-    pOut += sprintf( pOut, "readonly def\n");
-    pOut += sprintf( pOut,
+    rEmitter.maBuffer.append( "readonly def\n");
+    rEmitter.maBuffer.append(
         // TODO: more topdict entries
         "currentdict end\n"
         "currentfile eexec\n");
@@ -1859,73 +2433,73 @@ void CffSubsetterContext::emitAsType1( Type1Emitter& rEmitter,
     nPrivEntryCount += int(mpCffLocal->mnLangGroup == 1);
     nPrivEntryCount += int(mpCffLocal->mbForceBold);
     // emit the privdict header
-    pOut += sprintf( pOut,
+    rEmitter.maBuffer.append(
         "\110\104\125 "
-        "dup\n/Private %d dict dup begin\n"
+        "dup\n/Private " + OString::number(nPrivEntryCount) + " dict dup begin\n"
         "/RD{string currentfile exch readstring pop}executeonly def\n"
         "/ND{noaccess def}executeonly def\n"
         "/NP{noaccess put}executeonly def\n"
         "/MinFeature{16 16}ND\n"
-        "/password 5839 def\n",     // TODO: mnRDCryptSeed?
-            nPrivEntryCount);
+        "/password 5839 def\n");    // TODO: mnRDCryptSeed?
 
     // emit blue hint related privdict entries
     if( !mpCffLocal->maBlueValues.empty())
         rEmitter.emitValVector( "/BlueValues [", "]ND\n", mpCffLocal->maBlueValues);
     else
-        pOut += sprintf( pOut, "/BlueValues []ND\n"); // default to empty BlueValues
+        rEmitter.maBuffer.append( "/BlueValues []ND\n"); // default to empty BlueValues
     rEmitter.emitValVector( "/OtherBlues [", "]ND\n", mpCffLocal->maOtherBlues);
     rEmitter.emitValVector( "/FamilyBlues [", "]ND\n", mpCffLocal->maFamilyBlues);
     rEmitter.emitValVector( "/FamilyOtherBlues [", "]ND\n", mpCffLocal->maFamilyOtherBlues);
 
     if( mpCffLocal->mfBlueScale) {
-        pOut += sprintf( pOut, "/BlueScale ");
-        pOut += dbl2str( pOut, mpCffLocal->mfBlueScale);
-        pOut += sprintf( pOut, " def\n");
+        rEmitter.maBuffer.append( "/BlueScale ");
+        rEmitter.maBuffer.append(dbl2str( mpCffLocal->mfBlueScale));
+        rEmitter.maBuffer.append( " def\n");
     }
     if( mpCffLocal->mfBlueShift) {  // default BlueShift==7
-        pOut += sprintf( pOut, "/BlueShift ");
-        pOut += dbl2str( pOut, mpCffLocal->mfBlueShift);
-        pOut += sprintf( pOut, " def\n");
+        rEmitter.maBuffer.append( "/BlueShift ");
+        rEmitter.maBuffer.append(dbl2str( mpCffLocal->mfBlueShift));
+        rEmitter.maBuffer.append( " def\n");
     }
     if( mpCffLocal->mfBlueFuzz) {       // default BlueFuzz==1
-        pOut += sprintf( pOut, "/BlueFuzz ");
-        pOut += dbl2str( pOut, mpCffLocal->mfBlueFuzz);
-        pOut += sprintf( pOut, " def\n");
+        rEmitter.maBuffer.append( "/BlueFuzz ");
+        rEmitter.maBuffer.append(dbl2str( mpCffLocal->mfBlueFuzz));
+        rEmitter.maBuffer.append( " def\n");
     }
 
     // emit stem hint related privdict entries
     if( mpCffLocal->maStemStdHW) {
-        pOut += sprintf( pOut, "/StdHW [");
-        pOut += dbl2str( pOut, mpCffLocal->maStemStdHW);
-        pOut += sprintf( pOut, "] def\n");
+        rEmitter.maBuffer.append( "/StdHW [");
+        rEmitter.maBuffer.append(dbl2str( mpCffLocal->maStemStdHW));
+        rEmitter.maBuffer.append( "] def\n");
     }
     if( mpCffLocal->maStemStdVW) {
-        pOut += sprintf( pOut, "/StdVW [");
-        pOut += dbl2str( pOut, mpCffLocal->maStemStdVW);
-        pOut += sprintf( pOut, "] def\n");
+        rEmitter.maBuffer.append( "/StdVW [");
+        rEmitter.maBuffer.append(dbl2str( mpCffLocal->maStemStdVW));
+        rEmitter.maBuffer.append( "] def\n");
     }
     rEmitter.emitValVector( "/StemSnapH [", "]ND\n", mpCffLocal->maStemSnapH);
     rEmitter.emitValVector( "/StemSnapV [", "]ND\n", mpCffLocal->maStemSnapV);
 
     // emit other hints
     if( mpCffLocal->mbForceBold)
-        pOut += sprintf( pOut, "/ForceBold true def\n");
+        rEmitter.maBuffer.append( "/ForceBold true def\n");
     if( mpCffLocal->mnLangGroup != 0)
-        pOut += sprintf( pOut, "/LanguageGroup %d def\n", mpCffLocal->mnLangGroup);
+        rEmitter.maBuffer.append(
+            "/LanguageGroup " + OString::number(mpCffLocal->mnLangGroup) + " def\n");
     if( mpCffLocal->mnLangGroup == 1) // compatibility with ancient printers
-        pOut += sprintf( pOut, "/RndStemUp false def\n");
+        rEmitter.maBuffer.append( "/RndStemUp false def\n");
     if( mpCffLocal->mfExpFactor) {
-        pOut += sprintf( pOut, "/ExpansionFactor ");
-        pOut += dbl2str( pOut, mpCffLocal->mfExpFactor);
-        pOut += sprintf( pOut, " def\n");
+        rEmitter.maBuffer.append( "/ExpansionFactor ");
+        rEmitter.maBuffer.append(dbl2str( mpCffLocal->mfExpFactor));
+        rEmitter.maBuffer.append( " def\n");
     }
 
     // emit remaining privdict entries
-    pOut += sprintf( pOut, "/UniqueID %d def\n", nUniqueId);
+    rEmitter.maBuffer.append( "/UniqueID " + OString::number(nUniqueId) + " def\n");
     // TODO?: more privdict entries?
 
-    static const char aOtherSubrs[] =
+    rEmitter.maBuffer.append(
         "/OtherSubrs\n"
         "% Dummy code for faking flex hints\n"
         "[ {} {} {} {systemdict /internaldict known not {pop 3}\n"
@@ -1935,63 +2509,54 @@ void CffSubsetterContext::emitAsType1( Type1Emitter& rEmitter,
         "{dup /strtlck known\n"
         "{/strtlck get exec}\n"
         "{pop 3}\nifelse}\nifelse}\nifelse\n} executeonly\n"
-        "] ND\n";
-    memcpy( pOut, aOtherSubrs, sizeof(aOtherSubrs)-1);
-    pOut += sizeof(aOtherSubrs)-1;
+        "] ND\n");
 
     // emit used GlobalSubr charstrings
     // these are the just the default subrs
     // TODO: do we need them as the flex hints are resolved differently?
-    static const char aSubrs[] =
+    rEmitter.maBuffer.append(
         "/Subrs 5 array\n"
         "dup 0 15 RD \x5F\x3D\x6B\xAC\x3C\xBD\x74\x3D\x3E\x17\xA0\x86\x58\x08\x85 NP\n"
         "dup 1 9 RD \x5F\x3D\x6B\xD8\xA6\xB5\x68\xB6\xA2 NP\n"
         "dup 2 9 RD \x5F\x3D\x6B\xAC\x39\x46\xB9\x43\xF9 NP\n"
         "dup 3 5 RD \x5F\x3D\x6B\xAC\xB9 NP\n"
         "dup 4 12 RD \x5F\x3D\x6B\xAC\x3E\x5D\x48\x54\x62\x76\x39\x03 NP\n"
-        "ND\n";
-    memcpy( pOut, aSubrs, sizeof(aSubrs)-1);
-    pOut += sizeof(aSubrs)-1;
+        "ND\n");
 
     // TODO: emit more GlobalSubr charstrings?
     // TODO: emit used LocalSubr charstrings?
 
     // emit the CharStrings for the requested glyphs
-    pOut += sprintf( pOut,
-        "2 index /CharStrings %d dict dup begin\n", nGlyphCount);
+    std::vector<CharString> aCharStrings;
+    mbDoSeac = true;
+    convertCharStrings(pReqGlyphIds, nGlyphCount, aCharStrings);
+
+    // The previous convertCharStrings might collect extra glyphs used in seac
+    // operator, convert them as well
+    if (!maExtraGlyphIds.empty())
+    {
+        mbDoSeac = false;
+        convertCharStrings(maExtraGlyphIds.data(), maExtraGlyphIds.size(), aCharStrings);
+    }
+    rEmitter.maBuffer.append(
+        "2 index /CharStrings " + OString::number(aCharStrings.size()) + " dict dup begin\n");
     rEmitter.emitAllCrypted();
-    for( int i = 0; i < nGlyphCount; ++i) {
-        const int nCffGlyphId = pReqGlyphIds[i];
-        assert( (nCffGlyphId >= 0) && (nCffGlyphId < mnCharStrCount));
-        // get privdict context matching to the glyph
-        const int nFDSelect = getFDSelect( nCffGlyphId);
-        if( nFDSelect < 0)
-            continue;
-        mpCffLocal = &maCffLocal[ nFDSelect];
-        // convert the Type2op charstring to its Type1op counterpart
-        const int nT2Len = seekIndexData( mnCharStrBase, nCffGlyphId);
-        assert( nT2Len > 0);
-        U8 aType1Ops[ MAX_T1OPS_SIZE]; // TODO: dynamic allocation
-        const int nT1Len = convert2Type1Ops( mpCffLocal, mpReadPtr, nT2Len, aType1Ops);
+    for (const auto& rCharString : aCharStrings)
+    {
         // get the glyph name
-        const char* pGlyphName = getGlyphName( nCffGlyphId);
+        OString pGlyphName = getGlyphName(rCharString.nCffGlyphId);
         // emit the encrypted Type1op charstring
-        pOut += sprintf( pOut, "/%s %d RD ", pGlyphName, nT1Len);
-        memcpy( pOut, aType1Ops, nT1Len);
-        pOut += nT1Len;
-        pOut += sprintf( pOut, " ND\n");
+        rEmitter.maBuffer.append(
+            "/" + pGlyphName + " " + OString::number(rCharString.nLen) + " RD ");
+        rEmitter.maBuffer.append(
+            reinterpret_cast<char const *>(rCharString.aOps), rCharString.nLen);
+        rEmitter.maBuffer.append( " ND\n");
         rEmitter.emitAllCrypted();
         // provide individual glyphwidths if requested
-        if( pGlyphWidths ) {
-            ValType aCharWidth = maCharWidth;
-            if( maFontMatrix.size() >= 4)
-                aCharWidth *= 1000.0F * maFontMatrix[0];
-            pGlyphWidths[i] = static_cast<sal_Int32>(aCharWidth);
-        }
     }
-    pOut += sprintf( pOut, "end end\nreadonly put\nput\n");
-    pOut += sprintf( pOut, "dup/FontName get exch definefont pop\n");
-    pOut += sprintf( pOut, "mark currentfile closefile\n");
+    rEmitter.maBuffer.append( "end end\nreadonly put\nput\n");
+    rEmitter.maBuffer.append( "dup/FontName get exch definefont pop\n");
+    rEmitter.maBuffer.append( "mark currentfile closefile\n");
     rEmitter.emitAllCrypted();
 
     // mark stop of eexec encryption
@@ -2020,27 +2585,26 @@ void CffSubsetterContext::emitAsType1( Type1Emitter& rEmitter,
     // provide details to the subset requesters, TODO: move into own method?
     // note: Top and Bottom are flipped between Type1 and VCL
     // note: the rest of VCL expects the details below to be scaled like for an emUnits==1000 font
-    ValType fXFactor = 1.0;
-    ValType fYFactor = 1.0;
-    if( maFontMatrix.size() >= 4) {
-        fXFactor = 1000.0F * maFontMatrix[0];
-        fYFactor = 1000.0F * maFontMatrix[3];
-    }
-    rFSInfo.m_aFontBBox = tools::Rectangle( Point( static_cast<sal_Int32>(maFontBBox[0] * fXFactor),
-                                        static_cast<sal_Int32>(maFontBBox[1] * fYFactor) ),
-                                    Point( static_cast<sal_Int32>(maFontBBox[2] * fXFactor),
-                                        static_cast<sal_Int32>(maFontBBox[3] * fYFactor) ) );
+
+    rFSInfo.m_nFontType = rEmitter.mbPfbSubset ? FontType::TYPE1_PFB : FontType::TYPE1_PFA;
+
+    if (rFSInfo.m_bFilled)
+        return;
+
+    rFSInfo.m_aFontBBox = { Point(static_cast<sal_Int32>(aFontBBox[0] * fXFactor),
+                                  static_cast<sal_Int32>(aFontBBox[1] * fYFactor)),
+                            Point(static_cast<sal_Int32>(aFontBBox[2] * fXFactor),
+                                  static_cast<sal_Int32>(aFontBBox[3] * fYFactor)) };
     // PDF-Spec says the values below mean the ink bounds!
     // TODO: use better approximations for these ink bounds
     rFSInfo.m_nAscent  = +rFSInfo.m_aFontBBox.Bottom(); // for capital letters
     rFSInfo.m_nDescent = -rFSInfo.m_aFontBBox.Top();    // for all letters
     rFSInfo.m_nCapHeight = rFSInfo.m_nAscent;           // for top-flat capital letters
 
-    rFSInfo.m_nFontType = rEmitter.mbPfbSubset ? FontType::TYPE1_PFB : FontType::TYPE1_PFA;
     rFSInfo.m_aPSName   = OUString( rEmitter.maSubsetName, strlen(rEmitter.maSubsetName), RTL_TEXTENCODING_UTF8 );
 }
 
-bool FontSubsetInfo::CreateFontSubsetFromCff( sal_Int32* pOutGlyphWidths )
+bool FontSubsetInfo::CreateFontSubsetFromCff()
 {
     CffSubsetterContext aCff( mpInFontBytes, mnInByteLength);
     bool bRC = aCff.initialCffRead();
@@ -2054,7 +2618,7 @@ bool FontSubsetInfo::CreateFontSubsetFromCff( sal_Int32* pOutGlyphWidths )
     aType1Emitter.setSubsetName( mpReqFontName);
     aCff.emitAsType1( aType1Emitter,
         mpReqGlyphIds, mpReqEncodedIds,
-        pOutGlyphWidths, mnReqGlyphCount, *this);
+        mnReqGlyphCount, *this);
     return true;
 }
 

@@ -9,8 +9,11 @@
 
 #pragma once
 
-#include <memory>
+#include <optional>
+#include <vector>
 
+#include <editeng/editeng.hxx>
+#include <editeng/svxfont.hxx>
 #include <sfx2/objsh.hxx>
 #include <sfx2/StylePreviewRenderer.hxx>
 #include <rtl/ustring.hxx>
@@ -19,20 +22,40 @@
 
 class OutputDevice;
 class SfxStyleSheetBase;
-class SvxFont;
+
+using namespace css;
 
 namespace svx
 {
 class CommonStylePreviewRenderer final : public sfx2::StylePreviewRenderer
 {
-    std::unique_ptr<SvxFont> m_pFont;
+    std::optional<SvxFont> m_oFont;
+    std::optional<SvxFont> m_oCJKFont;
+    std::optional<SvxFont> m_oCTLFont;
     Color maFontColor;
     Color maHighlightColor;
     Color maBackgroundColor;
-    Size maPixelSize;
+    tools::Long mnHeight;
+    tools::Long mnBaseLine;
     OUString maStyleName;
+    OUString maScriptText;
+    struct ScriptInfo
+    {
+        tools::Long textWidth;
+        SvtScriptType scriptType;
+        sal_Int32 changePos;
+        ScriptInfo(SvtScriptType scrptType, sal_Int32 position)
+            : textWidth(0)
+            , scriptType(scrptType)
+            , changePos(position)
+        {
+        }
+    };
+    std::vector<ScriptInfo> maScriptChanges;
 
-    Size getRenderSize() const;
+    bool SetFontSize(const SfxItemSet& rSet, sal_uInt16 nSlot, SvxFont& rFont);
+    void CalcRenderSize();
+    void CheckScript();
 
 public:
     CommonStylePreviewRenderer(const SfxObjectShell& rShell, OutputDevice& rOutputDev,

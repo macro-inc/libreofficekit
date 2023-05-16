@@ -17,8 +17,9 @@
 
 #include "clang/AST/Attr.h"
 
+#include "config_clang.h"
+
 #include "plugin.hxx"
-#include "compat.hxx"
 
 /**
  Find methods that are only called from inside their own class, and are only called from one spot.
@@ -64,6 +65,8 @@ public:
 
     virtual void run() override
     {
+        handler.enableTreeWideAnalysisMode();
+
         TraverseDecl(compiler.getASTContext().getTranslationUnitDecl());
 
         // dump all our output in one write call - this is to try and limit IO "crosstalk" between multiple processes
@@ -114,10 +117,6 @@ MyFuncInfo ExpandableMethods::niceName(const FunctionDecl* functionDecl)
 {
     if (functionDecl->getInstantiatedFromMemberFunction())
         functionDecl = functionDecl->getInstantiatedFromMemberFunction();
-#if CLANG_VERSION < 90000
-    else if (functionDecl->getClassScopeSpecializationPattern())
-        functionDecl = functionDecl->getClassScopeSpecializationPattern();
-#endif
     else if (functionDecl->getTemplateInstantiationPattern())
         functionDecl = functionDecl->getTemplateInstantiationPattern();
 
@@ -270,7 +269,7 @@ void ExpandableMethods::functionTouchedFromExpr( const FunctionDecl* calleeFunct
         return;
     }
 
-    calledFromSet.emplace(toString(compat::getBeginLoc(expr)), niceName(canonicalFunctionDecl));
+    calledFromSet.emplace(toString(expr->getBeginLoc()), niceName(canonicalFunctionDecl));
 
     if (const UnaryOperator* unaryOp = dyn_cast_or_null<UnaryOperator>(getParentStmt(expr))) {
         if (unaryOp->getOpcode() == UO_AddrOf) {

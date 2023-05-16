@@ -20,9 +20,10 @@
 #include <SelectionHelper.hxx>
 #include <ObjectIdentifier.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
 #include <ChartModelHelper.hxx>
+#include <ChartModel.hxx>
 
-#include <com/sun/star/frame/XModel.hpp>
 #include <svx/svdpage.hxx>
 #include <svx/svditer.hxx>
 #include <svx/obj3d.hxx>
@@ -303,7 +304,7 @@ bool Selection::isResizeableObjectSelected() const
     }
 }
 
-bool Selection::isRotateableObjectSelected( const uno::Reference< frame::XModel >& xChartModel ) const
+bool Selection::isRotateableObjectSelected( const rtl::Reference<::chart::ChartModel>& xChartModel ) const
 {
     return SelectionHelper::isRotateableObject( m_aSelectedOID.getObjectCID(), xChartModel );
 }
@@ -441,8 +442,8 @@ OUString SelectionHelper::getHitObjectCID(
     // \\- solar mutex
 }
 
-bool SelectionHelper::isRotateableObject( const OUString& rCID
-                    , const uno::Reference< frame::XModel >& xChartModel )
+bool SelectionHelper::isRotateableObject( std::u16string_view rCID
+                    , const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
     if( !ObjectIdentifier::isRotateableObject( rCID ) )
         return false;
@@ -464,7 +465,7 @@ SelectionHelper::~SelectionHelper()
 bool SelectionHelper::getFrameDragSingles()
 {
     //true == green == surrounding handles
-    return dynamic_cast<const E3dObject*>( m_pSelectedObj) == nullptr;
+    return DynCastE3dObject( m_pSelectedObj) == nullptr;
 }
 
 SdrObject* SelectionHelper::getMarkHandlesObject( SdrObject* pObj )
@@ -531,7 +532,7 @@ E3dScene* SelectionHelper::getSceneToRotate( SdrObject* pObj )
 
     if(pObj)
     {
-        pRotateable = dynamic_cast<E3dObject*>(pObj);
+        pRotateable = DynCastE3dObject(pObj);
         if( !pRotateable )
         {
             SolarMutexGuard aSolarGuard;
@@ -541,8 +542,7 @@ E3dScene* SelectionHelper::getSceneToRotate( SdrObject* pObj )
                 SdrObjListIter aIterator(pSubList, SdrIterMode::DeepWithGroups);
                 while( aIterator.IsMore() && !pRotateable )
                 {
-                    SdrObject* pSubObj = aIterator.Next();
-                    pRotateable = dynamic_cast<E3dObject*>(pSubObj);
+                    pRotateable = DynCastE3dObject(aIterator.Next());
                 }
             }
         }

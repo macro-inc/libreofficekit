@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -14,8 +16,7 @@ class tdf78133(UITestCase):
 
     def test_tdf78133_options_app_colors(self):
 
-        with self.ui_test.create_doc_in_start_center("writer") as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
+        with self.ui_test.create_doc_in_start_center("writer"):
             #New text document
             #open option, go to App colors
             with self.ui_test.execute_dialog_through_command(".uno:OptionsTreeDialog") as xDialog:

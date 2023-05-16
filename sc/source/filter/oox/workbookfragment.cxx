@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <utility>
 #include <workbookfragment.hxx>
 
 #include <oox/core/filterbase.hxx>
@@ -223,12 +224,12 @@ class WorkerThread : public comphelper::ThreadTask
 public:
     WorkerThread( const std::shared_ptr<comphelper::ThreadTaskTag> & pTag,
                   WorkbookFragment& rWorkbookHandler,
-                  const rtl::Reference<FragmentHandler>& xHandler,
+                  rtl::Reference<FragmentHandler> xHandler,
                   sal_Int32 &rSheetsLeft ) :
         comphelper::ThreadTask( pTag ),
         mrSheetsLeft( rSheetsLeft ),
         mrWorkbookHandler( rWorkbookHandler ),
-        mxHandler( xHandler )
+        mxHandler(std::move( xHandler ))
     {
     }
 
@@ -263,9 +264,9 @@ class ProgressBarTimer : private Timer
         double mfPosition;
         ISegmentProgressBarRef mxWrapped;
     public:
-        explicit ProgressWrapper(const ISegmentProgressBarRef &xRef)
+        explicit ProgressWrapper(ISegmentProgressBarRef xRef)
             : mfPosition(0.0)
-            , mxWrapped(xRef)
+            , mxWrapped(std::move(xRef))
         {
         }
 
@@ -348,8 +349,17 @@ void WorkbookFragment::finalizeImport()
 
     // read the theme substream
     OUString aThemeFragmentPath = getFragmentPathFromFirstTypeFromOfficeDoc( u"theme" );
+    auto& rOoxTheme = getTheme();
+
+    auto pTheme = rOoxTheme.oox::drawingml::Theme::getTheme(); // needed full name here because a conflict with WorkbookHelper and Theme in ThemeBuffer
+    if (!pTheme)
+    {
+        pTheme = std::make_shared<model::Theme>();
+        rOoxTheme.setTheme(pTheme);
+    }
+
     if( !aThemeFragmentPath.isEmpty() )
-        importOoxFragment( new ThemeFragmentHandler( getFilter(), aThemeFragmentPath, getTheme() ) );
+        importOoxFragment(new ThemeFragmentHandler(getFilter(), aThemeFragmentPath, rOoxTheme, *pTheme));
     xGlobalSegment->setPosition( 0.25 );
 
     // read the styles substream (requires finalized theme buffer)
@@ -476,6 +486,10 @@ void WorkbookFragment::finalizeImport()
     // load all worksheets
     importSheetFragments(*this, aSheetFragments);
 
+    // assumes getTables().finalizeImport ( which creates the DatabaseRanges )
+    // has been called already
+    getTables().applyAutoFilters();
+
     sal_Int16 nActiveSheet = getViewSettings().getActiveCalcSheet();
     getWorksheets().finalizeImport( nActiveSheet );
 
@@ -544,9 +558,8 @@ void WorkbookFragment::recalcFormulaCells()
     // Recalculate formula cells.
     ScDocument& rDoc = getScDocument();
     ScDocShell& rDocSh = getDocShell(rDoc);
-    Reference< XComponentContext > xContext = comphelper::getProcessComponentContext();
     ScRecalcOptions nRecalcMode =
-        static_cast<ScRecalcOptions>(officecfg::Office::Calc::Formula::Load::OOXMLRecalcMode::get(xContext));
+        static_cast<ScRecalcOptions>(officecfg::Office::Calc::Formula::Load::OOXMLRecalcMode::get());
     bool bHardRecalc = false;
     if (nRecalcMode == RECALC_ASK)
     {

@@ -33,7 +33,7 @@
 #include <rtl/ustring.hxx>
 #include "xformsapi.hxx"
 #include <comphelper/namedvaluecollection.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using std::pair;
 using com::sun::star::uno::Reference;
@@ -136,8 +136,7 @@ void applyXFormsSettings( const Reference< XNameAccess >& _rXForms, const Sequen
     if ( !_rXForms.is() )
         return;
 
-    ::comphelper::NamedValueCollection aSettings( _rSettings );
-    Reference< XNameAccess > xModelSettings( aSettings.get( "XFormModels" ), UNO_QUERY );
+    Reference< XNameAccess > xModelSettings( ::comphelper::NamedValueCollection::get( _rSettings, u"XFormModels" ), UNO_QUERY );
     if ( !xModelSettings.is() )
     {
         OSL_FAIL( "applyXFormsSettings: wrong type for the XFormModels settings!" );

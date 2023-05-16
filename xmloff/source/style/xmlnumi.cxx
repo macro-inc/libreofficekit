@@ -39,7 +39,7 @@
 #include <o3tl/temporary.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/propertyvalue.hxx>
 
@@ -980,7 +980,7 @@ void SvxXMLListStyleContext::CreateAndInsertLate( bool bOverwrite )
         }
 
         if ( xPropSetInfo->hasPropertyByName( "Hidden" ) )
-            xPropSet->setPropertyValue( "Hidden", uno::makeAny( IsHidden( ) ) );
+            xPropSet->setPropertyValue( "Hidden", uno::Any( IsHidden( ) ) );
 
         if( rName != GetName() )
             GetImport().AddStyleDisplayName( XmlStyleFamily::TEXT_LIST,

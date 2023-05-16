@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <osl/file.hxx>
@@ -150,7 +151,7 @@ OUString showDirection(
 }
 
 struct EqualsAnnotation {
-    explicit EqualsAnnotation(OUString const & name): name_(name) {}
+    explicit EqualsAnnotation(OUString name): name_(std::move(name)) {}
 
     bool operator ()(unoidl::AnnotatedReference const & ref)
     { return ref.name == name_; }
@@ -174,7 +175,7 @@ void checkMap(
         OUString name(prefix + id);
         if (entA->getSort() == unoidl::Entity::SORT_MODULE) {
             checkMap(
-                providerB, OUStringConcatenation(name + "."),
+                providerB, Concat2View(name + "."),
                 (static_cast<unoidl::ModuleEntity *>(entA.get())
                  ->createCursor()),
                 ignoreUnpublished);
@@ -886,10 +887,10 @@ void checkMap(
     }
 }
 
-bool valid(OUString const & identifier) {
-    for (sal_Int32 i = 0;; ++i) {
-        i = identifier.indexOf('_', i);
-        if (i == -1) {
+bool valid(std::u16string_view identifier) {
+    for (size_t i = 0;; ++i) {
+        i = identifier.find('_', i);
+        if (i == std::u16string_view::npos) {
             return true;
         }
         if (!rtl::isAsciiUpperCase(identifier[0]) || identifier[i - 1] == '_') {
@@ -920,7 +921,7 @@ void checkIds(
         switch (entB->getSort()) {
         case unoidl::Entity::SORT_MODULE:
             checkIds(
-                providerA, OUStringConcatenation(name + "."),
+                providerA, Concat2View(name + "."),
                 (static_cast<unoidl::ModuleEntity *>(entB.get())
                  ->createCursor()));
             break;

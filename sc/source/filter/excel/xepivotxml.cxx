@@ -24,6 +24,7 @@
 #include <o3tl/safeint.hxx>
 #include <oox/export/utils.hxx>
 #include <oox/token/namespaces.hxx>
+#include <sal/log.hxx>
 #include <sax/tools/converter.hxx>
 #include <sax/fastattribs.hxx>
 #include <svl/numformat.hxx>
@@ -779,6 +780,7 @@ void XclExpXmlPivotTables::SavePivotTableXml( XclExpXmlStream& rStrm, const ScDP
     // appearance in each axis.
     const ScDPSaveData::DimsType& rDims = rSaveData.GetDimensions();
     bool bTabularMode = false;
+    bool bCompactMode = true;
     for (const auto & i : rDims)
     {
         const ScDPSaveDimension& rDim = *i;
@@ -823,7 +825,11 @@ void XclExpXmlPivotTables::SavePivotTableXml( XclExpXmlStream& rStrm, const ScDP
                 ;
         }
         if(rDim.GetLayoutInfo())
-            bTabularMode |= (rDim.GetLayoutInfo()->LayoutMode == sheet::DataPilotFieldLayoutMode::TABULAR_LAYOUT);
+        {
+            const auto eLayoutMode = rDim.GetLayoutInfo()->LayoutMode;
+            bTabularMode |= (eLayoutMode == sheet::DataPilotFieldLayoutMode::TABULAR_LAYOUT);
+            bCompactMode &= (eLayoutMode == sheet::DataPilotFieldLayoutMode::COMPACT_LAYOUT);
+        }
     }
 
     sax_fastparser::FSHelperPtr& pPivotStrm = rStrm.GetCurrentStream();
@@ -838,13 +844,14 @@ void XclExpXmlPivotTables::SavePivotTableXml( XclExpXmlStream& rStrm, const ScDP
         XML_applyAlignmentFormats, ToPsz10(false),
         XML_applyWidthHeightFormats, ToPsz10(false),
         XML_dataCaption, "Values",
+        XML_showDrill, ToPsz10(rSaveData.GetExpandCollapse()),
         XML_useAutoFormatting, ToPsz10(false),
         XML_itemPrintTitles, ToPsz10(true),
         XML_indent, ToPsz10(false),
         XML_outline, ToPsz10(!bTabularMode),
         XML_outlineData, ToPsz10(!bTabularMode),
-        XML_compact, ToPsz10(false),
-        XML_compactData, ToPsz10(false));
+        XML_compact, ToPsz10(bCompactMode),
+        XML_compactData, ToPsz10(bCompactMode));
 
     // NB: Excel's range does not include page field area (if any).
     ScRange aOutRange = rDPObj.GetOutputRangeByType(sheet::DataPilotOutputRangeType::TABLE);
@@ -897,8 +904,13 @@ void XclExpXmlPivotTables::SavePivotTableXml( XclExpXmlStream& rStrm, const ScDP
         }
 
         bool bDimInTabularMode = false;
+        bool bDimInCompactMode = false;
         if(pDim->GetLayoutInfo())
-            bDimInTabularMode = (pDim->GetLayoutInfo()->LayoutMode == sheet::DataPilotFieldLayoutMode::TABULAR_LAYOUT);
+        {
+            const auto eLayoutMode = pDim->GetLayoutInfo()->LayoutMode;
+            bDimInTabularMode = (eLayoutMode == sheet::DataPilotFieldLayoutMode::TABULAR_LAYOUT);
+            bDimInCompactMode = (eLayoutMode == sheet::DataPilotFieldLayoutMode::COMPACT_LAYOUT);
+        }
 
         sheet::DataPilotFieldOrientation eOrient = pDim->GetOrientation();
 
@@ -913,9 +925,13 @@ void XclExpXmlPivotTables::SavePivotTableXml( XclExpXmlStream& rStrm, const ScDP
             }
             else
             {
-                pPivotStrm->singleElement(XML_pivotField,
-                    XML_compact, ToPsz10(false),
-                    XML_showAll, ToPsz10(false));
+                if (bDimInCompactMode)
+                    pPivotStrm->singleElement(XML_pivotField,
+                        XML_showAll, ToPsz10(false));
+                else
+                    pPivotStrm->singleElement(XML_pivotField,
+                        XML_compact, ToPsz10(false),
+                        XML_showAll, ToPsz10(false));
             }
             continue;
         }
@@ -932,10 +948,15 @@ void XclExpXmlPivotTables::SavePivotTableXml( XclExpXmlStream& rStrm, const ScDP
             }
             else
             {
-                pPivotStrm->singleElement(XML_pivotField,
-                    XML_dataField, ToPsz10(true),
-                    XML_compact, ToPsz10(false),
-                    XML_showAll, ToPsz10(false));
+                if (bDimInCompactMode)
+                    pPivotStrm->singleElement(XML_pivotField,
+                        XML_dataField, ToPsz10(true),
+                        XML_showAll, ToPsz10(false));
+                else
+                    pPivotStrm->singleElement(XML_pivotField,
+                        XML_dataField, ToPsz10(true),
+                        XML_compact, ToPsz10(false),
+                        XML_showAll, ToPsz10(false));
             }
             continue;
         }
@@ -1005,7 +1026,10 @@ void XclExpXmlPivotTables::SavePivotTableXml( XclExpXmlStream& rStrm, const ScDP
         pAttList->add(XML_axis, toOOXMLAxisType(eOrient));
         if (bAppearsInData)
             pAttList->add(XML_dataField, ToPsz10(true));
-        pAttList->add(XML_compact, ToPsz10(false));
+
+        if (!bDimInCompactMode)
+            pAttList->add(XML_compact, ToPsz10(false));
+
         pAttList->add(XML_showAll, ToPsz10(false));
 
         tools::Long nSubTotalCount = pDim->GetSubTotalsCount();
@@ -1117,7 +1141,7 @@ void XclExpXmlPivotTables::SavePivotTableXml( XclExpXmlStream& rStrm, const ScDP
         for (const auto& rDataField : aDataFields)
         {
             tools::Long nDimIdx = rDataField.mnPos;
-            assert(aCachedDims[nDimIdx]); // the loop above should have screened for NULL's.
+            assert(nDimIdx == -2 || aCachedDims[nDimIdx]); // the loop above should have screened for NULL's, skip check for -2 "data field"
             const ScDPSaveDimension& rDim = *rDataField.mpDim;
             std::optional<OUString> pName = rDim.GetLayoutName();
             // tdf#124651: despite being optional in CT_DataField according to ECMA-376 Part 1,

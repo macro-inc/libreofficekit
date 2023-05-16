@@ -20,12 +20,14 @@
 #include <config_java.h>
 #include <dsntypes.hxx>
 #include <unotools/confignode.hxx>
+#include <o3tl/safeint.hxx>
 #include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <tools/wldcrd.hxx>
 #include <osl/file.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <comphelper/string.hxx>
+#include <utility>
 
 namespace dbaccess
 {
@@ -37,13 +39,13 @@ namespace dbaccess
 
     namespace
     {
-        void lcl_extractHostAndPort(const OUString& _sUrl,OUString& _sHostname,sal_Int32& _nPortNumber)
+        void lcl_extractHostAndPort(std::u16string_view _sUrl, OUString& _sHostname, sal_Int32& _nPortNumber)
         {
             if ( comphelper::string::getTokenCount(_sUrl, ':') >= 2 )
             {
                 sal_Int32 nPos {0};
-                _sHostname   = _sUrl.getToken(0, ':', nPos);
-                _nPortNumber = _sUrl.getToken(0, ':', nPos).toInt32();
+                _sHostname   = o3tl::getToken(_sUrl, 0, ':', nPos);
+                _nPortNumber = o3tl::toInt32(o3tl::getToken(_sUrl, 0, ':', nPos));
             }
         }
     }
@@ -85,7 +87,7 @@ OUString ODsnTypeCollection::cutPrefix(std::u16string_view _sURL) const
     OUString sOldPattern;
 
     // on Windows or with gen rendering, the urls may begin with an ~
-    const OUString& sCleanURL = comphelper::string::stripStart(_sURL, '~');
+    std::u16string_view sCleanURL = comphelper::string::stripStart(_sURL, '~');
 
     for (auto const& dsnPrefix : m_aDsnPrefixes)
     {
@@ -96,8 +98,8 @@ OUString ODsnTypeCollection::cutPrefix(std::u16string_view _sURL) const
             //   foo*
             // that is, the very concept of "prefix" applies.
             OUString prefix(comphelper::string::stripEnd(dsnPrefix, '*'));
-            OSL_ENSURE(prefix.getLength() <= sCleanURL.getLength(), "How can A match B when A shorter than B?");
-            sRet = sCleanURL.copy(prefix.getLength());
+            OSL_ENSURE(o3tl::make_unsigned(prefix.getLength()) <= sCleanURL.size(), "How can A match B when A shorter than B?");
+            sRet = sCleanURL.substr(prefix.getLength());
             sOldPattern = dsnPrefix;
         }
     }
@@ -105,7 +107,7 @@ OUString ODsnTypeCollection::cutPrefix(std::u16string_view _sURL) const
     return sRet;
 }
 
-OUString ODsnTypeCollection::getPrefix(const OUString& _sURL) const
+OUString ODsnTypeCollection::getPrefix(std::u16string_view _sURL) const
 {
     OUString sRet;
     OUString sOldPattern;
@@ -118,7 +120,7 @@ OUString ODsnTypeCollection::getPrefix(const OUString& _sURL) const
             //   foo*
             // that is, the very concept of "prefix" applies.
             sRet = comphelper::string::stripEnd(dsnPrefix, '*');
-            OSL_ENSURE(sRet.getLength() <= _sURL.getLength(), "How can A match B when A shorter than B?");
+            OSL_ENSURE(sRet.getLength() <= static_cast<sal_Int32>(_sURL.size()), "How can A match B when A shorter than B?");
             sOldPattern = dsnPrefix;
         }
     }
@@ -349,8 +351,8 @@ DATASOURCE_TYPE ODsnTypeCollection::determineType(std::u16string_view _rDsn) con
         const DATASOURCE_TYPE   eType;
         const bool              bMatchComplete;
 
-        KnownPrefix( const OUString &_s, const DATASOURCE_TYPE _t, const bool _m )
-            :sPrefix( _s )
+        KnownPrefix( OUString _s, const DATASOURCE_TYPE _t, const bool _m )
+            :sPrefix(std::move( _s ))
             ,eType ( _t )
             ,bMatchComplete( _m )
         {

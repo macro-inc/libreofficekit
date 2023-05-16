@@ -9,7 +9,7 @@
 
 $(eval $(call gb_Library_Library,PresentationMinimizer))
 
-$(eval $(call gb_Library_set_componentfile,PresentationMinimizer,sdext/source/minimizer/minimizer))
+$(eval $(call gb_Library_set_componentfile,PresentationMinimizer,sdext/source/minimizer/minimizer,services))
 
 $(eval $(call gb_Library_set_precompiled_header,PresentationMinimizer,sdext/inc/pch/precompiled_PresentationMinimizer))
 
@@ -53,7 +53,6 @@ $(eval $(call gb_Library_add_exception_objects,PresentationMinimizer,\
     sdext/source/minimizer/pppoptimizer \
     sdext/source/minimizer/pppoptimizerdialog \
     sdext/source/minimizer/pppoptimizertoken \
-    sdext/source/minimizer/unodialog \
 ))
 
 # vim:set noet sw=4 ts=4:

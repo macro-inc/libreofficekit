@@ -26,21 +26,22 @@
 #include <com/sun/star/xml/input/XRoot.hpp>
 #include <com/sun/star/xml/sax/SAXException.hpp>
 #include <rtl/ref.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <vector>
 
 namespace xmlscript
 {
-inline sal_Int32 toInt32( OUString const & rStr )
+inline sal_Int32 toInt32( std::u16string_view rStr )
 {
     sal_Int32 nVal;
-    if (rStr.getLength() > 2 && rStr[ 0 ] == '0' && rStr[ 1 ] == 'x')
+    if (rStr.size() > 2 && rStr[ 0 ] == '0' && rStr[ 1 ] == 'x')
     {
-        nVal = rStr.copy( 2 ).toUInt32( 16 );
+        nVal = o3tl::toUInt32(rStr.substr( 2 ),  16);
     }
     else
     {
-        nVal = rStr.toInt32();
+        nVal = o3tl::toInt32(rStr);
     }
     return nVal;
 }
@@ -152,7 +153,7 @@ private:
 
 public:
     LibElementBase(
-        OUString const & rLocalName,
+        OUString aLocalName,
         css::uno::Reference< css::xml::input::XAttributes > const & xAttributes,
         LibElementBase * pParent, LibraryImport * pImport );
     virtual ~LibElementBase() override;

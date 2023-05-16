@@ -22,6 +22,7 @@
 #include <servicenames_charttypes.hxx>
 #include <AxisIndexDefines.hxx>
 #include <AxisHelper.hxx>
+#include <Axis.hxx>
 
 #include <cppuhelper/supportsservice.hxx>
 #include <com/sun/star/chart2/AxisType.hpp>
@@ -47,18 +48,18 @@ NetChartType_Base::NetChartType_Base( const NetChartType_Base & rOther ) :
 NetChartType_Base::~NetChartType_Base()
 {}
 
-Reference< XCoordinateSystem > SAL_CALL
-    NetChartType_Base::createCoordinateSystem( ::sal_Int32 DimensionCount )
+rtl::Reference< ::chart::BaseCoordinateSystem >
+    NetChartType_Base::createCoordinateSystem2( sal_Int32 DimensionCount )
 {
     if( DimensionCount != 2 )
         throw lang::IllegalArgumentException(
             "NetChart must be two-dimensional",
             static_cast< ::cppu::OWeakObject* >( this ), 0 );
 
-    Reference< XCoordinateSystem > xResult(
-        new PolarCoordinateSystem( DimensionCount ));
+    rtl::Reference< PolarCoordinateSystem > xResult =
+        new PolarCoordinateSystem( DimensionCount );
 
-    Reference< XAxis > xAxis( xResult->getAxisByDimension( 0, MAIN_AXIS_INDEX ) );
+    rtl::Reference< Axis > xAxis = xResult->getAxisByDimension2( 0, MAIN_AXIS_INDEX );
     if( xAxis.is() )
     {
         ScaleData aScaleData = xAxis->getScaleData();
@@ -68,7 +69,7 @@ Reference< XCoordinateSystem > SAL_CALL
         xAxis->setScaleData( aScaleData );
     }
 
-    xAxis = xResult->getAxisByDimension( 1, MAIN_AXIS_INDEX );
+    xAxis = xResult->getAxisByDimension2( 1, MAIN_AXIS_INDEX );
     if( xAxis.is() )
     {
         ScaleData aScaleData = xAxis->getScaleData();
@@ -81,53 +82,39 @@ Reference< XCoordinateSystem > SAL_CALL
 }
 
 // ____ OPropertySet ____
-uno::Any NetChartType_Base::GetDefaultValue( sal_Int32 /*nHandle*/ ) const
+void NetChartType_Base::GetDefaultValue( sal_Int32 /*nHandle*/, uno::Any& rAny ) const
 {
-    return uno::Any();
+    rAny.clear();
 }
 
 namespace
 {
 
-struct StaticNetChartTypeInfoHelper_Initializer
+::cppu::OPropertyArrayHelper& StaticNetChartTypeInfoHelper()
 {
-    ::cppu::OPropertyArrayHelper* operator()()
-    {
-        static ::cppu::OPropertyArrayHelper aPropHelper(Sequence< beans::Property >{});
-        return &aPropHelper;
-    }
-};
+    static ::cppu::OPropertyArrayHelper aPropHelper(Sequence< beans::Property >{});
+    return aPropHelper;
+}
 
-struct StaticNetChartTypeInfoHelper : public rtl::StaticAggregate< ::cppu::OPropertyArrayHelper, StaticNetChartTypeInfoHelper_Initializer >
+uno::Reference< beans::XPropertySetInfo >& StaticNetChartTypeInfo()
 {
-};
-
-struct StaticNetChartTypeInfo_Initializer
-{
-    uno::Reference< beans::XPropertySetInfo >* operator()()
-    {
-        static uno::Reference< beans::XPropertySetInfo > xPropertySetInfo(
-            ::cppu::OPropertySetHelper::createPropertySetInfo(*StaticNetChartTypeInfoHelper::get() ) );
-        return &xPropertySetInfo;
-    }
-};
-
-struct StaticNetChartTypeInfo : public rtl::StaticAggregate< uno::Reference< beans::XPropertySetInfo >, StaticNetChartTypeInfo_Initializer >
-{
-};
+    static uno::Reference< beans::XPropertySetInfo > xPropertySetInfo(
+        ::cppu::OPropertySetHelper::createPropertySetInfo(StaticNetChartTypeInfoHelper() ) );
+    return xPropertySetInfo;
+}
 
 }
 
 // ____ OPropertySet ____
 ::cppu::IPropertyArrayHelper & SAL_CALL NetChartType_Base::getInfoHelper()
 {
-    return *StaticNetChartTypeInfoHelper::get();
+    return StaticNetChartTypeInfoHelper();
 }
 
 // ____ XPropertySet ____
 uno::Reference< beans::XPropertySetInfo > SAL_CALL NetChartType_Base::getPropertySetInfo()
 {
-    return *StaticNetChartTypeInfo::get();
+    return StaticNetChartTypeInfo();
 }
 
 NetChartType::NetChartType()
@@ -145,6 +132,11 @@ NetChartType::~NetChartType()
 uno::Reference< util::XCloneable > SAL_CALL NetChartType::createClone()
 {
     return uno::Reference< util::XCloneable >( new NetChartType( *this ));
+}
+
+rtl::Reference< ChartType > NetChartType::cloneChartType() const
+{
+    return new NetChartType( *this );
 }
 
 // ____ XChartType ____

@@ -43,7 +43,7 @@
 #include <sfx2/filedlghelper.hxx>
 #include <osl/file.hxx>
 #include <unotools/tempfile.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/debug.hxx>
 #include <tools/urlobj.hxx>
 #include <comphelper/processfactory.hxx>
@@ -199,7 +199,7 @@ void XMLFilterTestDialog::test( const filter_info_impl& rFilterInfo )
     m_xDialog->run();
 }
 
-static OUString getFileNameFromURL( OUString const & rURL )
+static OUString getFileNameFromURL( std::u16string_view rURL )
 {
     INetURLObject aURL( rURL );
     OUString aName( aURL.getName(INetURLObject::LAST_SEGMENT, true, INetURLObject::DecodeMechanism::WithCharset) );
@@ -418,15 +418,14 @@ void XMLFilterTestDialog::doExport( const Reference< XComponent >& xComp )
         Reference< XStorable > xStorable( xComp, UNO_QUERY );
         if( xStorable.is() )
         {
-            OUString const ext(".xml");
-            utl::TempFile aTempFile(OUString(), true, &ext);
+            utl::TempFileNamed aTempFile(u"", true, u".xml");
             OUString aTempFileURL( aTempFile.GetURL() );
 
             const application_info_impl* pAppInfo = getApplicationInfo( m_xFilterInfo->maExportService );
             if( pAppInfo )
             {
                 File aOutputFile( aTempFileURL );
-                /* File::RC rc = */ aOutputFile.open( osl_File_OpenFlag_Write );
+                (void)aOutputFile.open( osl_File_OpenFlag_Write );
 
                 // create xslt exporter
                 Reference< XOutputStream > xIS( new comphelper::OSLOutputStreamWrapper( aOutputFile ) );
@@ -578,15 +577,14 @@ void XMLFilterTestDialog::import( const OUString& rURL )
 
         if( m_xCBXDisplaySource->get_active() )
         {
-            OUString const ext(".xml");
-            TempFile aTempFile(OUString(), true, &ext);
+            TempFileNamed aTempFile(u"", true, u".xml");
             OUString aTempFileURL( aTempFile.GetURL() );
 
             Reference< XImportFilter > xImporter( mxContext->getServiceManager()->createInstanceWithContext( "com.sun.star.documentconversion.XSLTFilter", mxContext ), UNO_QUERY );
             if( xImporter.is() )
             {
                 osl::File aInputFile( rURL );
-                aInputFile.open( osl_File_OpenFlag_Read );
+                (void)aInputFile.open( osl_File_OpenFlag_Read );
 
                 Reference< XInputStream > xIS( new comphelper::OSLInputStreamWrapper( aInputFile ) );
 
@@ -599,7 +597,7 @@ void XMLFilterTestDialog::import( const OUString& rURL )
                 Reference< XWriter > xWriter = Writer::create( mxContext );
 
                 File aOutputFile( aTempFileURL );
-                aOutputFile.open( osl_File_OpenFlag_Write );
+                (void)aOutputFile.open( osl_File_OpenFlag_Write );
 
                 Reference< XOutputStream > xOS( new OSLOutputStreamWrapper( aOutputFile ) );
                 xWriter->setOutputStream( xOS );

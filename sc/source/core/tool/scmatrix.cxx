@@ -35,11 +35,13 @@
 #include <osl/diagnose.h>
 
 #include <memory>
+#include <mutex>
+#include <utility>
 #include <vector>
 #include <limits>
 
 #include <mdds/multi_type_matrix.hpp>
-#include <mdds/multi_type_vector_types.hpp>
+#include <mdds/multi_type_vector/types.hpp>
 
 #if DEBUG_MATRIX
 #include <iostream>
@@ -238,7 +240,7 @@ public:
 
     ScMatrixImpl( size_t nC, size_t nR, const std::vector<double>& rInitVals );
 
-    ~ScMatrixImpl() COVERITY_NOEXCEPT_FALSE;
+    ~ScMatrixImpl();
 
     void Clear();
     void Resize(SCSIZE nC, SCSIZE nR);
@@ -334,6 +336,16 @@ public:
     void MatConcat(SCSIZE nMaxCol, SCSIZE nMaxRow, const ScMatrixRef& xMat1, const ScMatrixRef& xMat2,
             SvNumberFormatter& rFormatter, svl::SharedStringPool& rPool);
 
+    void ExecuteBinaryOp(SCSIZE nMaxCol, SCSIZE nMaxRow, const ScMatrix& rInputMat1, const ScMatrix& rInputMat2,
+            ScInterpreter* pInterpreter, ScMatrix::CalculateOpFunction op);
+    bool IsValueOrEmpty( const MatrixImplType::const_position_type & rPos ) const;
+    double GetDouble( const MatrixImplType::const_position_type & rPos) const;
+    FormulaError GetErrorIfNotString( const MatrixImplType::const_position_type & rPos ) const;
+    bool IsValue( const MatrixImplType::const_position_type & rPos ) const;
+    FormulaError GetError(const MatrixImplType::const_position_type & rPos) const;
+    bool IsStringOrEmpty(const MatrixImplType::const_position_type & rPos) const;
+    svl::SharedString GetString(const MatrixImplType::const_position_type& rPos) const;
+
 #if DEBUG_MATRIX
     void Dump() const;
 #endif
@@ -342,8 +354,8 @@ private:
     void CalcPosition(SCSIZE nIndex, SCSIZE& rC, SCSIZE& rR) const;
 };
 
-static bool bElementsMaxFetched;
-static size_t nElementsMax;
+static std::once_flag bElementsMaxFetched;
+static std::atomic<size_t> nElementsMax;
 
 /** The maximum number of elements a matrix or the pool may have at runtime.
 
@@ -390,15 +402,15 @@ ScMatrixImpl::ScMatrixImpl( size_t nC, size_t nR, const std::vector<double>& rIn
     nElementsMax -= GetElementCount();
 }
 
-ScMatrixImpl::~ScMatrixImpl() COVERITY_NOEXCEPT_FALSE
+ScMatrixImpl::~ScMatrixImpl()
 {
     nElementsMax += GetElementCount();
-    Clear();
+    suppress_fun_call_w_exception(Clear());
 }
 
 void ScMatrixImpl::Clear()
 {
-    maMat.clear();
+    suppress_fun_call_w_exception(maMat.clear());
     maMatFlag.clear();
 }
 
@@ -643,27 +655,32 @@ svl::SharedString ScMatrixImpl::GetString(SCSIZE nC, SCSIZE nR) const
 {
     if (ValidColRowOrReplicated( nC, nR ))
     {
-        double fErr = 0.0;
-        MatrixImplType::const_position_type aPos = maMat.position(nR, nC);
-        switch (maMat.get_type(aPos))
-        {
-            case mdds::mtm::element_string:
-                return maMat.get_string(aPos);
-            case mdds::mtm::element_empty:
-                return svl::SharedString::getEmptyString();
-            case mdds::mtm::element_numeric:
-            case mdds::mtm::element_boolean:
-                fErr = maMat.get_numeric(aPos);
-                [[fallthrough]];
-            default:
-                OSL_FAIL("ScMatrixImpl::GetString: access error, no string");
-        }
-        SetErrorAtInterpreter(GetDoubleErrorValue(fErr));
+        return GetString(maMat.position(nR, nC));
     }
     else
     {
         OSL_FAIL("ScMatrixImpl::GetString: dimension error");
     }
+    return svl::SharedString::getEmptyString();
+}
+
+svl::SharedString ScMatrixImpl::GetString(const MatrixImplType::const_position_type& rPos) const
+{
+    double fErr = 0.0;
+    switch (maMat.get_type(rPos))
+    {
+        case mdds::mtm::element_string:
+            return maMat.get_string(rPos);
+        case mdds::mtm::element_empty:
+            return svl::SharedString::getEmptyString();
+        case mdds::mtm::element_numeric:
+        case mdds::mtm::element_boolean:
+            fErr = maMat.get_numeric(rPos);
+            [[fallthrough]];
+        default:
+            OSL_FAIL("ScMatrixImpl::GetString: access error, no string");
+    }
+    SetErrorAtInterpreter(GetDoubleErrorValue(fErr));
     return svl::SharedString::getEmptyString();
 }
 
@@ -1315,7 +1332,7 @@ class WalkAndMatchElements
 
 public:
     WalkAndMatchElements(Type aMatchValue, const MatrixImplType::size_pair_type& aSize, size_t nCol1, size_t nCol2) :
-        maMatchValue(aMatchValue),
+        maMatchValue(std::move(aMatchValue)),
         mnStartIndex( nCol1 * aSize.row ),
         mnStopIndex( (nCol2 + 1) * aSize.row ),
         mnResult(ResultNotSet),
@@ -2209,8 +2226,8 @@ private:
 
 public:
 
-    wrapped_iterator(typename T::const_iterator const & it_, U const & aOp):
-        it(it_),
+    wrapped_iterator(typename T::const_iterator  it_, U const & aOp):
+        it(std::move(it_)),
         val(value_type()),
         maOp(aOp)
     {
@@ -2274,9 +2291,9 @@ private:
     typename T::const_iterator m_itEnd;
     U maOp;
 public:
-    MatrixIteratorWrapper(typename T::const_iterator const & itBegin, typename T::const_iterator const & itEnd, U const & aOp):
-        m_itBegin(itBegin),
-        m_itEnd(itEnd),
+    MatrixIteratorWrapper(typename T::const_iterator itBegin, typename T::const_iterator itEnd, U const & aOp):
+        m_itBegin(std::move(itBegin)),
+        m_itEnd(std::move(itEnd)),
         maOp(aOp)
     {
     }
@@ -2409,17 +2426,17 @@ namespace {
 struct ElementBlock
 {
     ElementBlock(size_t nRowSize,
-            ScMatrix::DoubleOpFunction const & aDoubleFunc,
-            ScMatrix::BoolOpFunction const & aBoolFunc,
-            ScMatrix::StringOpFunction const & aStringFunc,
-            ScMatrix::EmptyOpFunction const & aEmptyFunc):
+            ScMatrix::DoubleOpFunction aDoubleFunc,
+            ScMatrix::BoolOpFunction aBoolFunc,
+            ScMatrix::StringOpFunction aStringFunc,
+            ScMatrix::EmptyOpFunction aEmptyFunc):
         mnRowSize(nRowSize),
         mnRowPos(0),
         mnColPos(0),
-        maDoubleFunc(aDoubleFunc),
-        maBoolFunc(aBoolFunc),
-        maStringFunc(aStringFunc),
-        maEmptyFunc(aEmptyFunc)
+        maDoubleFunc(std::move(aDoubleFunc)),
+        maBoolFunc(std::move(aBoolFunc)),
+        maStringFunc(std::move(aStringFunc)),
+        maEmptyFunc(std::move(aEmptyFunc))
     {
     }
 
@@ -2684,7 +2701,7 @@ void ScMatrixImpl::MatConcat(SCSIZE nMaxCol, SCSIZE nMaxRow, const ScMatrixRef& 
         xMat1->ExecuteOperation(
                 std::pair<size_t, size_t>(0, 0),
                 std::pair<size_t, size_t>(nMaxRow - 1, nMaxCol - 1),
-                aDoubleFunc, aBoolFunc, aStringFunc, aEmptyFunc);
+                std::move(aDoubleFunc), std::move(aBoolFunc), std::move(aStringFunc), std::move(aEmptyFunc));
 
     std::vector<svl::SharedString> aSharedString(nMaxCol*nMaxRow);
 
@@ -2749,7 +2766,7 @@ void ScMatrixImpl::MatConcat(SCSIZE nMaxCol, SCSIZE nMaxRow, const ScMatrixRef& 
         xMat2->ExecuteOperation(
                 std::pair<size_t, size_t>(0, 0),
                 std::pair<size_t, size_t>(nMaxRow - 1, nMaxCol - 1),
-                aDoubleFunc2, aBoolFunc2, aStringFunc2, aEmptyFunc2);
+                std::move(aDoubleFunc2), std::move(aBoolFunc2), std::move(aStringFunc2), std::move(aEmptyFunc2));
 
     aString.clear();
 
@@ -2787,6 +2804,185 @@ void ScMatrixImpl::MatConcat(SCSIZE nMaxCol, SCSIZE nMaxRow, const ScMatrixRef& 
     }
 }
 
+bool ScMatrixImpl::IsValueOrEmpty( const MatrixImplType::const_position_type & rPos ) const
+{
+    switch (maMat.get_type(rPos))
+    {
+        case mdds::mtm::element_boolean:
+        case mdds::mtm::element_numeric:
+        case mdds::mtm::element_empty:
+            return true;
+        default:
+            ;
+    }
+    return false;
+}
+
+double ScMatrixImpl::GetDouble(const MatrixImplType::const_position_type & rPos) const
+{
+    double fVal = maMat.get_numeric(rPos);
+    if ( pErrorInterpreter )
+    {
+        FormulaError nError = GetDoubleErrorValue(fVal);
+        if ( nError != FormulaError::NONE )
+            SetErrorAtInterpreter( nError);
+    }
+    return fVal;
+}
+
+FormulaError ScMatrixImpl::GetErrorIfNotString( const MatrixImplType::const_position_type & rPos ) const
+{ return IsValue(rPos) ? GetError(rPos) : FormulaError::NONE; }
+
+bool ScMatrixImpl::IsValue( const MatrixImplType::const_position_type & rPos ) const
+{
+    switch (maMat.get_type(rPos))
+    {
+        case mdds::mtm::element_boolean:
+        case mdds::mtm::element_numeric:
+            return true;
+        default:
+            ;
+    }
+    return false;
+}
+
+FormulaError ScMatrixImpl::GetError(const MatrixImplType::const_position_type & rPos) const
+{
+    double fVal = maMat.get_numeric(rPos);
+    return GetDoubleErrorValue(fVal);
+}
+
+bool ScMatrixImpl::IsStringOrEmpty(const MatrixImplType::const_position_type & rPos) const
+{
+    switch (maMat.get_type(rPos))
+    {
+        case mdds::mtm::element_empty:
+        case mdds::mtm::element_string:
+            return true;
+        default:
+            ;
+    }
+    return false;
+}
+
+void ScMatrixImpl::ExecuteBinaryOp(SCSIZE nMaxCol, SCSIZE nMaxRow, const ScMatrix& rInputMat1, const ScMatrix& rInputMat2,
+    ScInterpreter* pInterpreter, ScMatrix::CalculateOpFunction Op)
+{
+    // Check output matrix size, otherwise output iterator logic will be wrong.
+    assert(maMat.size().row == nMaxRow && maMat.size().column == nMaxCol
+        && "the caller code should have sized the output matrix to the passed dimensions");
+    auto & rMatImpl1 = *rInputMat1.pImpl;
+    auto & rMatImpl2 = *rInputMat2.pImpl;
+    // Check if we can do fast-path, where we have no replication or mis-matched matrix sizes.
+    if (rMatImpl1.maMat.size() == rMatImpl2.maMat.size()
+        && rMatImpl1.maMat.size() == maMat.size())
+    {
+        MatrixImplType::position_type aOutPos = maMat.position(0, 0);
+        MatrixImplType::const_position_type aPos1 = rMatImpl1.maMat.position(0, 0);
+        MatrixImplType::const_position_type aPos2 = rMatImpl2.maMat.position(0, 0);
+        for (SCSIZE i = 0; i < nMaxCol; i++)
+        {
+            for (SCSIZE j = 0; j < nMaxRow; j++)
+            {
+                bool bVal1 = rMatImpl1.IsValueOrEmpty(aPos1);
+                bool bVal2 = rMatImpl2.IsValueOrEmpty(aPos2);
+                FormulaError nErr;
+                if (bVal1 && bVal2)
+                {
+                    double d = Op(rMatImpl1.GetDouble(aPos1), rMatImpl2.GetDouble(aPos2));
+                    aOutPos = maMat.set(aOutPos, d);
+                }
+                else if (((nErr = rMatImpl1.GetErrorIfNotString(aPos1)) != FormulaError::NONE) ||
+                         ((nErr = rMatImpl2.GetErrorIfNotString(aPos2)) != FormulaError::NONE))
+                {
+                    aOutPos = maMat.set(aOutPos, CreateDoubleError(nErr));
+                }
+                else if ((!bVal1 && rMatImpl1.IsStringOrEmpty(aPos1)) ||
+                         (!bVal2 && rMatImpl2.IsStringOrEmpty(aPos2)))
+                {
+                    FormulaError nError1 = FormulaError::NONE;
+                    SvNumFormatType nFmt1 = SvNumFormatType::ALL;
+                    double fVal1 = (bVal1 ? rMatImpl1.GetDouble(aPos1) :
+                            pInterpreter->ConvertStringToValue( rMatImpl1.GetString(aPos1).getString(), nError1, nFmt1));
+
+                    FormulaError nError2 = FormulaError::NONE;
+                    SvNumFormatType nFmt2 = SvNumFormatType::ALL;
+                    double fVal2 = (bVal2 ? rMatImpl2.GetDouble(aPos2) :
+                            pInterpreter->ConvertStringToValue( rMatImpl2.GetString(aPos2).getString(), nError2, nFmt2));
+
+                    if (nError1 != FormulaError::NONE)
+                        aOutPos = maMat.set(aOutPos, CreateDoubleError(nError1));
+                    else if (nError2 != FormulaError::NONE)
+                        aOutPos = maMat.set(aOutPos, CreateDoubleError(nError2));
+                    else
+                    {
+                        double d = Op( fVal1, fVal2);
+                        aOutPos = maMat.set(aOutPos, d);
+                    }
+                }
+                else
+                    aOutPos = maMat.set(aOutPos, CreateDoubleError(FormulaError::NoValue));
+                aPos1 = MatrixImplType::next_position(aPos1);
+                aPos2 = MatrixImplType::next_position(aPos2);
+                aOutPos = MatrixImplType::next_position(aOutPos);
+            }
+        }
+    }
+    else
+    {
+        // Noting that this block is very hard to optimise to use iterators, because various dodgy
+        // array function usage relies on the semantics of some of the methods we call here.
+        // (see unit test testDubiousArrayFormulasFODS).
+        // These methods are inconsistent in their usage of ValidColRowReplicated() vs. ValidColRowOrReplicated()
+        // which leads to some very odd results.
+        MatrixImplType::position_type aOutPos = maMat.position(0, 0);
+        for (SCSIZE i = 0; i < nMaxCol; i++)
+        {
+            for (SCSIZE j = 0; j < nMaxRow; j++)
+            {
+                bool bVal1 = rInputMat1.IsValueOrEmpty(i,j);
+                bool bVal2 = rInputMat2.IsValueOrEmpty(i,j);
+                FormulaError nErr;
+                if (bVal1 && bVal2)
+                {
+                    double d = Op(rInputMat1.GetDouble(i,j), rInputMat2.GetDouble(i,j));
+                    aOutPos = maMat.set(aOutPos, d);
+                }
+                else if (((nErr = rInputMat1.GetErrorIfNotString(i,j)) != FormulaError::NONE) ||
+                         ((nErr = rInputMat2.GetErrorIfNotString(i,j)) != FormulaError::NONE))
+                {
+                    aOutPos = maMat.set(aOutPos, CreateDoubleError(nErr));
+                }
+                else if ((!bVal1 && rInputMat1.IsStringOrEmpty(i,j)) || (!bVal2 && rInputMat2.IsStringOrEmpty(i,j)))
+                {
+                    FormulaError nError1 = FormulaError::NONE;
+                    SvNumFormatType nFmt1 = SvNumFormatType::ALL;
+                    double fVal1 = (bVal1 ? rInputMat1.GetDouble(i,j) :
+                            pInterpreter->ConvertStringToValue( rInputMat1.GetString(i,j).getString(), nError1, nFmt1));
+
+                    FormulaError nError2 = FormulaError::NONE;
+                    SvNumFormatType nFmt2 = SvNumFormatType::ALL;
+                    double fVal2 = (bVal2 ? rInputMat2.GetDouble(i,j) :
+                            pInterpreter->ConvertStringToValue( rInputMat2.GetString(i,j).getString(), nError2, nFmt2));
+
+                    if (nError1 != FormulaError::NONE)
+                        aOutPos = maMat.set(aOutPos, CreateDoubleError(nError1));
+                    else if (nError2 != FormulaError::NONE)
+                        aOutPos = maMat.set(aOutPos, CreateDoubleError(nError2));
+                    else
+                    {
+                        double d = Op( fVal1, fVal2);
+                        aOutPos = maMat.set(aOutPos, d);
+                    }
+                }
+                else
+                    aOutPos = maMat.set(aOutPos, CreateDoubleError(FormulaError::NoValue));
+                aOutPos = MatrixImplType::next_position(aOutPos);
+            }
+        }
+    }
+}
+
 void ScMatrix::IncRef() const
 {
     ++nRefCnt;
@@ -2812,30 +3008,30 @@ bool ScMatrix::IsSizeAllocatable( SCSIZE nC, SCSIZE nR )
     if (!nC || !nR)
         return true;
 
-    if (!bElementsMaxFetched)
-    {
-        const char* pEnv = std::getenv("SC_MAX_MATRIX_ELEMENTS");
-        if (pEnv)
+    std::call_once(bElementsMaxFetched,
+        []()
         {
-            // Environment specifies the overall elements pool.
-            nElementsMax = std::atoi(pEnv);
-        }
-        else
-        {
-            // GetElementsMax() uses an (~arbitrary) elements limit.
-            // The actual allocation depends on the types of individual matrix
-            // elements and is averaged for type double.
+            const char* pEnv = std::getenv("SC_MAX_MATRIX_ELEMENTS");
+            if (pEnv)
+            {
+                // Environment specifies the overall elements pool.
+                nElementsMax = std::atoi(pEnv);
+            }
+            else
+            {
+                // GetElementsMax() uses an (~arbitrary) elements limit.
+                // The actual allocation depends on the types of individual matrix
+                // elements and is averaged for type double.
 #if SAL_TYPES_SIZEOFPOINTER < 8
-            // Assume 1GB memory could be consumed by matrices.
-            constexpr size_t nMemMax = 0x40000000;
+                // Assume 1GB memory could be consumed by matrices.
+                constexpr size_t nMemMax = 0x40000000;
 #else
-            // Assume 6GB memory could be consumed by matrices.
-            constexpr size_t nMemMax = 0x180000000;
+                // Assume 6GB memory could be consumed by matrices.
+                constexpr size_t nMemMax = 0x180000000;
 #endif
-            nElementsMax = GetElementsMax( nMemMax);
-        }
-        bElementsMaxFetched = true;
-    }
+                nElementsMax = GetElementsMax( nMemMax);
+            }
+        });
 
     if (nC > (nElementsMax / nR))
     {
@@ -3417,4 +3613,9 @@ void ScMatrix::MatConcat(SCSIZE nMaxCol, SCSIZE nMaxRow,
     pImpl->MatConcat(nMaxCol, nMaxRow, xMat1, xMat2, rFormatter, rPool);
 }
 
+void ScMatrix::ExecuteBinaryOp(SCSIZE nMaxCol, SCSIZE nMaxRow, const ScMatrix& rInputMat1, const ScMatrix& rInputMat2,
+            ScInterpreter* pInterpreter, CalculateOpFunction op)
+{
+    pImpl->ExecuteBinaryOp(nMaxCol, nMaxRow, rInputMat1, rInputMat2, pInterpreter, op);
+}
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -21,14 +21,12 @@
 #define INCLUDED_PACKAGE_SOURCE_XSTOR_OCOMPINSTREAM_HXX
 
 #include <com/sun/star/io/XInputStream.hpp>
-#include <com/sun/star/io/XStream.hpp>
-#include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/embed/XExtendedStorageStream.hpp>
 #include <com/sun/star/embed/XRelationshipAccess.hpp>
 #include <cppuhelper/implbase.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <comphelper/refcountedmutex.hxx>
 #include <rtl/ref.hxx>
 #include <memory>
@@ -45,18 +43,18 @@ protected:
     OWriteStream_Impl* m_pImpl;
     rtl::Reference<comphelper::RefCountedMutex> m_xMutex;
     css::uno::Reference < css::io::XInputStream > m_xStream;
-    std::unique_ptr<::comphelper::OInterfaceContainerHelper2> m_pInterfaceContainer;
+    std::unique_ptr<::comphelper::OInterfaceContainerHelper3<css::lang::XEventListener>> m_pInterfaceContainer;
     css::uno::Sequence < css::beans::PropertyValue > m_aProperties;
     bool m_bDisposed;
     sal_Int32 m_nStorageType;
 
 public:
     OInputCompStream( OWriteStream_Impl& pImpl,
-                      css::uno::Reference< css::io::XInputStream > const & xStream,
+                      css::uno::Reference< css::io::XInputStream > xStream,
                       const css::uno::Sequence< css::beans::PropertyValue >& aProps,
                       sal_Int32 nStorageType );
 
-    OInputCompStream( css::uno::Reference< css::io::XInputStream > const & xStream,
+    OInputCompStream( css::uno::Reference< css::io::XInputStream > xStream,
                       const css::uno::Sequence< css::beans::PropertyValue >& aProps,
                       sal_Int32 nStorageType );
 

@@ -267,7 +267,7 @@ bool CopyFile(  const INetURLObject& rSrcURL, const INetURLObject& rDstURL )
         ::ucbhelper::Content aDestPath( rDstURL.GetMainURL( INetURLObject::DecodeMechanism::NONE ), uno::Reference< ucb::XCommandEnvironment >(), comphelper::getProcessComponentContext() );
 
         aDestPath.executeCommand( "transfer",
-                                  uno::makeAny( ucb::TransferInfo( false, rSrcURL.GetMainURL( INetURLObject::DecodeMechanism::NONE ),
+                                  uno::Any( ucb::TransferInfo( false, rSrcURL.GetMainURL( INetURLObject::DecodeMechanism::NONE ),
                                                 rDstURL.GetLastName(), ucb::NameClash::OVERWRITE ) ) );
         bRet = true;
     }
@@ -293,7 +293,7 @@ bool KillFile( const INetURLObject& rURL )
         try
         {
             ::ucbhelper::Content aCnt( rURL.GetMainURL( INetURLObject::DecodeMechanism::NONE ), uno::Reference< ucb::XCommandEnvironment >(), comphelper::getProcessComponentContext() );
-            aCnt.executeCommand( "delete", uno::makeAny( true ) );
+            aCnt.executeCommand( "delete", uno::Any( true ) );
         }
         catch( const ucb::ContentCreationException& )
         {
@@ -391,7 +391,7 @@ void GalleryTransferable::InitData( bool bLazy )
                     Graphic aGraphic;
 
                     if (mpTheme && mpTheme->GetGraphic(mnObjectPos, aGraphic))
-                        mpGraphicObject.reset(new GraphicObject( aGraphic ));
+                        mpGraphicObject.reset(new GraphicObject( std::move(aGraphic) ));
                 }
 
                 if( !mxModelStream.is() )
@@ -428,7 +428,7 @@ void GalleryTransferable::InitData( bool bLazy )
                 Graphic aGraphic;
 
                 if (mpTheme && mpTheme->GetGraphic(mnObjectPos, aGraphic))
-                    mpGraphicObject.reset(new GraphicObject( aGraphic ));
+                    mpGraphicObject.reset(new GraphicObject( std::move(aGraphic) ));
             }
         }
         break;

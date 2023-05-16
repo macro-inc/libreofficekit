@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -18,7 +20,6 @@ class WriterInsertEnvelope(UITestCase):
             with self.ui_test.execute_dialog_through_command(".uno:InsertEnvelope", close_button="user") as xDialog:
                 xAddrTxt= xDialog.getChild("addredit")
                 xSenderTxt = xDialog.getChild("senderedit")
-                xSenderCheckBox = xDialog.getChild("sender")
 
                 xAddrTxt.executeAction("SELECT", mkPropertyValues({"FROM": "1", "TO": "200"}))
                 xAddrTxt.executeAction("TYPE", mkPropertyValues({"KEYCODE":"CTRL+A"}))

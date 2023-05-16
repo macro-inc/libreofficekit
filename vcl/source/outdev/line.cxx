@@ -22,6 +22,7 @@
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
 #include <basegfx/polygon/b2dlinegeometry.hxx>
 #include <tools/debug.hxx>
+#include <unotools/configmgr.hxx>
 
 #include <vcl/lineinfo.hxx>
 #include <vcl/metaact.hxx>
@@ -232,23 +233,7 @@ void OutputDevice::drawLine( basegfx::B2DPolyPolygon aLinePolyPolygon, const Lin
 
     if(bDashUsed && aLinePolyPolygon.count())
     {
-        ::std::vector< double > fDotDashArray;
-        const double fDashLen(rInfo.GetDashLen());
-        const double fDotLen(rInfo.GetDotLen());
-        const double fDistance(rInfo.GetDistance());
-
-        for(sal_uInt16 a(0); a < rInfo.GetDashCount(); a++)
-        {
-            fDotDashArray.push_back(fDashLen);
-            fDotDashArray.push_back(fDistance);
-        }
-
-        for(sal_uInt16 b(0); b < rInfo.GetDotCount(); b++)
-        {
-            fDotDashArray.push_back(fDotLen);
-            fDotDashArray.push_back(fDistance);
-        }
-
+        ::std::vector< double > fDotDashArray = rInfo.GetDotDashArray();
         const double fAccumulated(::std::accumulate(fDotDashArray.begin(), fDotDashArray.end(), 0.0));
 
         if(fAccumulated > 0.0)
@@ -280,7 +265,8 @@ void OutputDevice::drawLine( basegfx::B2DPolyPolygon aLinePolyPolygon, const Lin
             // but one that is at least as good as ImplSubdivideBezier was.
             // There, Polygon::AdaptiveSubdivide was used with default parameter
             // 1.0 as quality index.
-            aLinePolyPolygon = basegfx::utils::adaptiveSubdivideByDistance(aLinePolyPolygon, 1.0);
+            static int nRecurseLimit = utl::ConfigManager::IsFuzzing() ? 10 : 30;
+            aLinePolyPolygon = basegfx::utils::adaptiveSubdivideByDistance(aLinePolyPolygon, 1.0, nRecurseLimit);
         }
 
         for(auto const& rPolygon : std::as_const(aLinePolyPolygon))
@@ -350,6 +336,22 @@ void OutputDevice::drawLine( basegfx::B2DPolyPolygon aLinePolyPolygon, const Lin
                 aFillPolyPolygon,
                 0.0,
                 *this);
+        }
+
+        if(!bDone)
+        {
+            static const bool bFuzzing = utl::ConfigManager::IsFuzzing();
+            if (bFuzzing)
+            {
+                const basegfx::B2DRange aRange(basegfx::utils::getRange(aFillPolyPolygon));
+                if (aRange.getMaxX() - aRange.getMinX() > 0x10000000
+                    || aRange.getMaxY() - aRange.getMinY() > 0x10000000)
+                {
+                    SAL_WARN("vcl.gdi", "drawLine, skipping suspicious range of: "
+                                            << aRange << " for fuzzing performance");
+                    bDone = true;
+                }
+            }
         }
 
         if(!bDone)

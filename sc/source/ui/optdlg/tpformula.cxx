@@ -76,8 +76,7 @@ ScTpFormulaOptions::ScTpFormulaOptions(weld::Container* pPage, weld::DialogContr
     OUString aSep = ScGlobal::getLocaleData().getNumDecimalSep();
     mnDecSep = aSep.isEmpty() ? u'.' : aSep[0];
 
-    maSavedDocOptions = static_cast<const ScTpCalcItem&>(rCoreAttrs.Get(
-            GetWhich(SID_SCDOCOPTIONS))).GetDocOptions();
+    maSavedDocOptions = rCoreAttrs.Get(SID_SCDOCOPTIONS).GetDocOptions();
 }
 
 ScTpFormulaOptions::~ScTpFormulaOptions()
@@ -131,13 +130,13 @@ void ScTpFormulaOptions::LaunchCustomCalcSettings()
     }
 }
 
-bool ScTpFormulaOptions::IsValidSeparator(const OUString& rSep, bool bArray) const
+bool ScTpFormulaOptions::IsValidSeparator(std::u16string_view aSep, bool bArray) const
 {
-    if (rSep.getLength() != 1)
+    if (aSep.size() != 1)
         // Must be one-character long.
         return false;
 
-    const sal_Unicode c = rSep[0];
+    const sal_Unicode c = aSep[0];
 
     if (c == mnDecSep)
         // decimal separator is not allowed.
@@ -315,7 +314,7 @@ bool ScTpFormulaOptions::FillItemSet(SfxItemSet* rCoreSet)
         aOpt.SetODFRecalcOptions(eODFRecalc);
         aOpt.SetWriteCalcConfig( maCurrentDocOptions.IsWriteCalcConfig());
 
-        rCoreSet->Put( ScTpFormulaItem( aOpt ) );
+        rCoreSet->Put( ScTpFormulaItem( std::move(aOpt) ) );
         rCoreSet->Put( ScTpCalcItem( SID_SCDOCOPTIONS, maCurrentDocOptions ) );
 
         bRet = true;
@@ -326,10 +325,8 @@ bool ScTpFormulaOptions::FillItemSet(SfxItemSet* rCoreSet)
 void ScTpFormulaOptions::Reset(const SfxItemSet* rCoreSet)
 {
     ScFormulaOptions aOpt;
-    const SfxPoolItem* pItem = nullptr;
-
-    if(SfxItemState::SET == rCoreSet->GetItemState(SID_SCFORMULAOPTIONS, false , &pItem))
-        aOpt = static_cast<const ScTpFormulaItem*>(pItem)->GetFormulaOptions();
+    if(const ScTpFormulaItem* pItem = rCoreSet->GetItemIfSet(SID_SCFORMULAOPTIONS, false))
+        aOpt = pItem->GetFormulaOptions();
 
     // formula grammar.
     ::formula::FormulaGrammar::Grammar eGram = aOpt.GetFormulaSyntax();

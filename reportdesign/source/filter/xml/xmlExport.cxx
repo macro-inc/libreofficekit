@@ -44,6 +44,7 @@
 #include <vcl/svapp.hxx>
 #include <osl/diagnose.h>
 #include <tools/color.hxx>
+#include <o3tl/string_view.hxx>
 
 #define DEFAULT_LINE_WIDTH 2
 
@@ -657,7 +658,8 @@ void ORptExport::exportReportComponentAutoStyles(const Reference<XSection>& _xPr
             rtl::Reference< XMLShapeExport > xShapeExport = GetShapeExport();
             xShapeExport->seekShapes(_xProp);
             SolarMutexGuard aGuard;
-            xShapeExport->collectShapeAutoStyles(xShape);
+            css::uno::Sequence<OUString> aAutoStylePropNames = GetAutoStylePool()->GetPropertyNames();
+            xShapeExport->collectShapeAutoStyles(xShape, aAutoStylePropNames);
         }
         else
         {
@@ -1038,12 +1040,7 @@ void ORptExport::exportGroup(const Reference<XReportDefinition>& _xReportDefinit
             OUString sExpression  = sField;
             if ( !sExpression.isEmpty() )
             {
-                sal_Int32 nIndex = sExpression.indexOf('"');
-                while ( nIndex > -1 )
-                {
-                    sExpression = sExpression.replaceAt(nIndex, 1, u"\"\"");
-                    nIndex = sExpression.indexOf('"',nIndex+2);
-                }
+                sExpression = sExpression.replaceAll(u"\"", u"\"\"");
 
                 TGroupFunctionMap::const_iterator aGroupFind = m_aGroupFunctionMap.find(xGroup);
                 if ( aGroupFind != m_aGroupFunctionMap.end() )
@@ -1165,7 +1162,7 @@ void ORptExport::exportAutoStyle(XPropertySet* _xProp,const Reference<XFormatted
             aProps.emplace_back(PROPERTY_BORDERLEFT);
         }
 
-        xBorderProp->setPropertyValue(sBorderProp,uno::makeAny(aValue));
+        xBorderProp->setPropertyValue(sBorderProp,uno::Any(aValue));
 
         aValue.Color = aValue.OuterLineWidth = aValue.LineWidth = 0;
         aValue.LineStyle = table::BorderLineStyle::NONE;
@@ -1192,7 +1189,7 @@ void ORptExport::exportAutoStyle(XPropertySet* _xProp,const Reference<XFormatted
             {
                 sal_Int32 nStyleMapIndex = m_xCellStylesExportPropertySetMapper->getPropertySetMapper()->FindEntryIndex( CTF_RPT_NUMBERFORMAT );
                 addDataStyle(nNumberFormat);
-                XMLPropertyState aNumberStyleState( nStyleMapIndex, uno::makeAny( getDataStyleName(nNumberFormat) ) );
+                XMLPropertyState aNumberStyleState( nStyleMapIndex, uno::Any( getDataStyleName(nNumberFormat) ) );
                 auto const iter(::std::find_if(
                     aPropertyStates.begin(), aPropertyStates.end(),
                     [nStyleMapIndex] (XMLPropertyState const& rItem)
@@ -1351,7 +1348,7 @@ void ORptExport::exportParagraph(const Reference< XReportControlModel >& _xRepor
     if ( Reference<XFormattedField>(_xReportElement,uno::UNO_QUERY).is() )
     {
         OUString sFieldData = _xReportElement->getDataField();
-        static const char s_sPageNumber[] = "PageNumber()";
+        static const sal_Unicode s_sPageNumber[] = u"PageNumber()";
         static const char s_sReportPrefix[] = "rpt:";
         sFieldData = sFieldData.copy(strlen(s_sReportPrefix));
         sal_Int32 nPageNumberIndex = sFieldData.indexOf(s_sPageNumber);
@@ -1360,9 +1357,9 @@ void ORptExport::exportParagraph(const Reference< XReportControlModel >& _xRepor
             sal_Int32 nIndex = 0;
             do
             {
-                OUString sToken = sFieldData.getToken( 0, '&', nIndex );
-                sToken = sToken.trim();
-                if ( !sToken.isEmpty() )
+                std::u16string_view sToken = o3tl::getToken(sFieldData, 0, '&', nIndex );
+                sToken = o3tl::trim(sToken);
+                if ( !sToken.empty() )
                 {
                     if ( sToken == s_sPageNumber )
                     {
@@ -1370,7 +1367,7 @@ void ORptExport::exportParagraph(const Reference< XReportControlModel >& _xRepor
                         SvXMLElementExport aPageNumber(*this,XML_NAMESPACE_TEXT, XML_PAGE_NUMBER, false, false);
                         Characters("1");
                     }
-                    else if ( sToken == "PageCount()" )
+                    else if ( sToken == u"PageCount()" )
                     {
                         SvXMLElementExport aPageNumber(*this,XML_NAMESPACE_TEXT, XML_PAGE_COUNT, false, false);
                         Characters("1");
@@ -1378,11 +1375,11 @@ void ORptExport::exportParagraph(const Reference< XReportControlModel >& _xRepor
                     else
                     {
 
-                        if ( sToken.startsWith("\"") && sToken.endsWith("\"") )
-                            sToken = sToken.copy(1,sToken.getLength()-2);
+                        if ( o3tl::starts_with(sToken, u"\"") && o3tl::ends_with(sToken, u"\"") )
+                            sToken = sToken.substr(1, sToken.size() - 2);
 
                         bool bPrevCharIsSpace = false;
-                        GetTextParagraphExport()->exportCharacterData(sToken, bPrevCharIsSpace);
+                        GetTextParagraphExport()->exportCharacterData(OUString(sToken), bPrevCharIsSpace);
                     }
                 }
             }

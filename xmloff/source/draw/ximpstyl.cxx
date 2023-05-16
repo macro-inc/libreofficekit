@@ -18,6 +18,7 @@
  */
 
 #include "ximpstyl.hxx"
+#include <utility>
 #include <xmloff/maptype.hxx>
 #include <xmloff/XMLDrawingPageStyleContext.hxx>
 #include <xmloff/XMLShapeStyleContext.hxx>
@@ -29,7 +30,7 @@
 #include <xmlsdtypes.hxx>
 #include <tools/debug.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/style/XStyle.hpp>
 #include <com/sun/star/lang/XSingleServiceFactory.hpp>
@@ -51,6 +52,7 @@
 #include "layerimp.hxx"
 #include <xmloff/XMLGraphicsDefaultStyle.hxx>
 #include <XMLNumberStylesImport.hxx>
+#include <XMLThemeContext.hxx>
 #include <unotools/configmgr.hxx>
 #include <xmloff/xmlerror.hxx>
 #include <xmloff/table/XMLTableImport.hxx>
@@ -81,48 +83,7 @@ public:
         ::std::vector< XMLPropertyState > &rProperties,
         const XMLPropertyState& rProp ) override;
 };
-
-/// Imports <loext:theme>.
-class XMLThemeContext : public SvXMLImportContext
-{
-    uno::Reference<beans::XPropertySet> m_xMasterPage;
-    comphelper::SequenceAsHashMap m_aTheme;
-
-public:
-    XMLThemeContext(SvXMLImport& rImport,
-                    const uno::Reference<xml::sax::XFastAttributeList>& xAttrList,
-                    const uno::Reference<beans::XPropertySet>& xMasterPage);
-    ~XMLThemeContext();
-
-    uno::Reference<xml::sax::XFastContextHandler> SAL_CALL createFastChildContext(
-        sal_Int32 nElement, const uno::Reference<xml::sax::XFastAttributeList>& xAttribs) override;
-};
-
-/// Imports <loext:color-table> inside <loext:theme>.
-class XMLColorTableContext : public SvXMLImportContext
-{
-    comphelper::SequenceAsHashMap& m_rTheme;
-    std::vector<util::Color> m_aColorScheme;
-
-public:
-    XMLColorTableContext(SvXMLImport& rImport,
-                         const uno::Reference<xml::sax::XFastAttributeList>& xAttrList,
-                         comphelper::SequenceAsHashMap& rTheme);
-    ~XMLColorTableContext();
-
-    uno::Reference<xml::sax::XFastContextHandler> SAL_CALL createFastChildContext(
-        sal_Int32 nElement, const uno::Reference<xml::sax::XFastAttributeList>& xAttribs) override;
-};
-
-/// Imports <loext:color> inside <loext:color-table>.
-class XMLColorContext : public SvXMLImportContext
-{
-public:
-    XMLColorContext(SvXMLImport& rImport,
-                    const uno::Reference<xml::sax::XFastAttributeList>& xAttrList,
-                    std::vector<util::Color>& rColorScheme);
-};
-}
+} // end anonymous namespace
 
 SdXMLDrawingPagePropertySetContext::SdXMLDrawingPagePropertySetContext(
                  SvXMLImport& rImport, sal_Int32 nElement,
@@ -877,8 +838,7 @@ css::uno::Reference< css::xml::sax::XFastContextHandler > SdXMLMasterPageContext
         {
             if (GetSdImport().IsImpress())
             {
-                uno::Reference<beans::XPropertySet> xMasterPage(GetLocalShapesContext(),
-                                                                uno::UNO_QUERY);
+                uno::Reference<drawing::XDrawPage> xMasterPage(GetLocalShapesContext(), uno::UNO_QUERY);
                 return new XMLThemeContext(GetSdImport(), xAttrList, xMasterPage);
             }
             break;
@@ -1084,7 +1044,7 @@ void SdXMLStylesContext::endFastElement(sal_Int32 )
             uno::Reference< beans::XPropertySetInfo > xInfoSetInfo( xInfoSet->getPropertySetInfo() );
 
             if( xInfoSetInfo->hasPropertyByName("PageLayouts") )
-                xInfoSet->setPropertyValue("PageLayouts", uno::makeAny( getPageLayouts() ) );
+                xInfoSet->setPropertyValue("PageLayouts", uno::Any( getPageLayouts() ) );
         }
 
     }
@@ -1125,7 +1085,7 @@ void SdXMLStylesContext::ImpSetGraphicStyles() const
     {
         uno::Reference< container::XNameAccess > xGraphicPageStyles( GetSdImport().GetLocalDocStyleFamilies()->getByName("graphics"), uno::UNO_QUERY_THROW );
 
-        ImpSetGraphicStyles(xGraphicPageStyles, XmlStyleFamily::SD_GRAPHICS_ID, OUString());
+        ImpSetGraphicStyles(xGraphicPageStyles, XmlStyleFamily::SD_GRAPHICS_ID, u"");
     }
     catch( uno::Exception& )
     {
@@ -1139,7 +1099,7 @@ void SdXMLStylesContext::ImpSetCellStyles() const
     {
         uno::Reference< container::XNameAccess > xGraphicPageStyles( GetSdImport().GetLocalDocStyleFamilies()->getByName("cell"), uno::UNO_QUERY_THROW );
 
-        ImpSetGraphicStyles(xGraphicPageStyles, XmlStyleFamily::TABLE_CELL, OUString());
+        ImpSetGraphicStyles(xGraphicPageStyles, XmlStyleFamily::TABLE_CELL, u"");
     }
     catch( uno::Exception& )
     {
@@ -1181,9 +1141,9 @@ static bool canSkipReset(std::u16string_view rName, const XMLPropStyleContext* p
 
 // help function used by ImpSetGraphicStyles() and ImpSetMasterPageStyles()
 
-void SdXMLStylesContext::ImpSetGraphicStyles( uno::Reference< container::XNameAccess > const & xPageStyles,  XmlStyleFamily nFamily,  const OUString& rPrefix) const
+void SdXMLStylesContext::ImpSetGraphicStyles( uno::Reference< container::XNameAccess > const & xPageStyles,  XmlStyleFamily nFamily, std::u16string_view rPrefix) const
 {
-    sal_Int32 nPrefLen(rPrefix.getLength());
+    sal_Int32 nPrefLen(rPrefix.size());
 
     sal_uInt32 a;
 
@@ -1347,7 +1307,7 @@ uno::Reference< container::XNameAccess > SdXMLStylesContext::getPageLayouts() co
         const SvXMLStyleContext* pStyle = GetStyle(a);
         if (const SdXMLPresentationPageLayoutContext* pContext = dynamic_cast<const SdXMLPresentationPageLayoutContext*>(pStyle))
         {
-            xLayouts->insertByName(pStyle->GetName(), uno::makeAny(static_cast<sal_Int32>(pContext->GetTypeId())));
+            xLayouts->insertByName(pStyle->GetName(), uno::Any(static_cast<sal_Int32>(pContext->GetTypeId())));
         }
     }
 
@@ -1484,97 +1444,6 @@ void SdXMLHeaderFooterDeclContext::endFastElement(sal_Int32 nToken)
 void SdXMLHeaderFooterDeclContext::characters( const OUString& rChars )
 {
     maStrText += rChars;
-}
-
-XMLThemeContext::XMLThemeContext(SvXMLImport& rImport,
-                                 const uno::Reference<xml::sax::XFastAttributeList>& xAttrList,
-                                 const uno::Reference<beans::XPropertySet>& xMasterPage)
-    : SvXMLImportContext(rImport)
-    , m_xMasterPage(xMasterPage)
-{
-    for (const auto& rAttribute : sax_fastparser::castToFastAttributeList(xAttrList))
-    {
-        switch (rAttribute.getToken())
-        {
-            case XML_ELEMENT(LO_EXT, XML_NAME):
-            {
-                m_aTheme["Name"] <<= rAttribute.toString();
-                break;
-            }
-        }
-    }
-}
-
-XMLThemeContext::~XMLThemeContext()
-{
-    uno::Any aTheme = uno::makeAny(m_aTheme.getAsConstPropertyValueList());
-    m_xMasterPage->setPropertyValue("Theme", aTheme);
-}
-
-uno::Reference<xml::sax::XFastContextHandler> SAL_CALL XMLThemeContext::createFastChildContext(
-    sal_Int32 nElement, const uno::Reference<xml::sax::XFastAttributeList>& xAttribs)
-{
-    if (nElement == XML_ELEMENT(LO_EXT, XML_COLOR_TABLE))
-    {
-        return new XMLColorTableContext(GetImport(), xAttribs, m_aTheme);
-    }
-
-    return nullptr;
-}
-
-XMLColorTableContext::XMLColorTableContext(
-    SvXMLImport& rImport, const uno::Reference<xml::sax::XFastAttributeList>& xAttrList,
-    comphelper::SequenceAsHashMap& rTheme)
-    : SvXMLImportContext(rImport)
-    , m_rTheme(rTheme)
-{
-    for (const auto& rAttribute : sax_fastparser::castToFastAttributeList(xAttrList))
-    {
-        switch (rAttribute.getToken())
-        {
-            case XML_ELEMENT(LO_EXT, XML_NAME):
-            {
-                m_rTheme["ColorSchemeName"] <<= rAttribute.toString();
-                break;
-            }
-        }
-    }
-}
-
-XMLColorTableContext::~XMLColorTableContext()
-{
-    m_rTheme["ColorScheme"] <<= comphelper::containerToSequence(m_aColorScheme);
-}
-
-uno::Reference<xml::sax::XFastContextHandler> SAL_CALL XMLColorTableContext::createFastChildContext(
-    sal_Int32 nElement, const uno::Reference<xml::sax::XFastAttributeList>& xAttribs)
-{
-    if (nElement == XML_ELEMENT(LO_EXT, XML_COLOR))
-    {
-        return new XMLColorContext(GetImport(), xAttribs, m_aColorScheme);
-    }
-
-    return nullptr;
-}
-
-XMLColorContext::XMLColorContext(SvXMLImport& rImport,
-                                 const uno::Reference<xml::sax::XFastAttributeList>& xAttrList,
-                                 std::vector<util::Color>& rColorScheme)
-    : SvXMLImportContext(rImport)
-{
-    for (const auto& rAttribute : sax_fastparser::castToFastAttributeList(xAttrList))
-    {
-        switch (rAttribute.getToken())
-        {
-            case XML_ELEMENT(LO_EXT, XML_COLOR):
-            {
-                util::Color nColor;
-                sax::Converter::convertColor(nColor, rAttribute.toView());
-                rColorScheme.push_back(nColor);
-                break;
-            }
-        }
-    }
 }
 
 namespace xmloff {

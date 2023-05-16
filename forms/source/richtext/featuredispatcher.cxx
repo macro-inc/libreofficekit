@@ -19,7 +19,9 @@
 
 #include "featuredispatcher.hxx"
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+
+#include <utility>
 
 
 namespace frm
@@ -31,8 +33,8 @@ namespace frm
     using namespace ::com::sun::star::lang;
     using namespace ::com::sun::star::util;
 
-    ORichTextFeatureDispatcher::ORichTextFeatureDispatcher( EditView& _rView, const URL&  _rURL )
-        :m_aFeatureURL( _rURL )
+    ORichTextFeatureDispatcher::ORichTextFeatureDispatcher( EditView& _rView, URL _aURL )
+        :m_aFeatureURL(std::move( _aURL ))
         ,m_aStatusListeners( m_aMutex )
         ,m_pEditView( &_rView )
         ,m_bDisposed( false )
@@ -109,9 +111,9 @@ namespace frm
     void ORichTextFeatureDispatcher::invalidateFeatureState_Broadcast()
     {
         FeatureStateEvent aEvent( buildStatusEvent() );
-        ::comphelper::OInterfaceIteratorHelper2 aIter( getStatusListeners() );
+        ::comphelper::OInterfaceIteratorHelper3 aIter( getStatusListeners() );
         while ( aIter.hasMoreElements() )
-            doNotify( static_cast< XStatusListener* >( aIter.next() ), aEvent );
+            doNotify( aIter.next(), aEvent );
     }
 
 

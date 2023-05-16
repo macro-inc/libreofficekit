@@ -79,12 +79,11 @@ private:
 
 public:
     LwpSdwGroupLoaderV0102(SvStream* pStream, LwpGraphicObject* pGraphicObj);
-    ~LwpSdwGroupLoaderV0102();
 
 public:
     void BeginDrawObjects(std::vector<rtl::Reference<XFFrame>>* pDrawObjVector);
-    XFDrawGroup* CreateDrawGroupObject();
-    XFFrame* CreateDrawObject();
+    rtl::Reference<XFDrawGroup> CreateDrawGroupObject();
+    rtl::Reference<XFFrame> CreateDrawObject();
 };
 
 #endif // INCLUDED_LOTUSWORDPRO_SOURCE_FILTER_LWPSDWGROUPLOADERV0102_HXX

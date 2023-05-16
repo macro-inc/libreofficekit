@@ -76,12 +76,19 @@ class AquaSalInstance : public SalInstance, public SalUserEventList
 public:
     virtual void TriggerUserEventProcessing() override;
 
+    NSButtonCell*                           mpButtonCell;
+    NSButtonCell*                           mpCheckCell;
+    NSButtonCell*                           mpRadioCell;
+    NSTextFieldCell*                        mpTextFieldCell;
+    NSComboBoxCell*                         mpComboBoxCell;
+    NSPopUpButtonCell*                      mpPopUpButtonCell;
+    NSStepperCell*                          mpStepperCell;
+    NSButtonCell*                           mpListNodeCell;
     OUString                                maDefaultPrinter;
     oslThreadIdentifier                     maMainThread;
     int                                     mnActivePrintJobs;
     osl::Mutex                              maUserEventListMutex;
     osl::Condition                          maWaitingYieldCond;
-    bool                                    mbIsLiveResize;
     bool                                    mbNoYieldLock;
     bool                                    mbTimerProcessed;
 
@@ -128,8 +135,8 @@ public:
     // dtrans implementation
     virtual css::uno::Reference< css::uno::XInterface > CreateClipboard(
             const css::uno::Sequence< css::uno::Any >& i_rArguments ) override;
-    virtual css::uno::Reference< css::uno::XInterface > CreateDragSource() override;
-    virtual css::uno::Reference< css::uno::XInterface > CreateDropTarget() override;
+    virtual css::uno::Reference<css::uno::XInterface> ImplCreateDragSource(const SystemEnvData*) override;
+    virtual css::uno::Reference<css::uno::XInterface> ImplCreateDropTarget(const SystemEnvData*) override;
 
     static void handleAppDefinedEvent( NSEvent* pEvent );
 

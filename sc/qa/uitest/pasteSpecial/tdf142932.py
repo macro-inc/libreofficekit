@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -9,6 +11,7 @@ from uitest.uihelper.common import get_url_for_data_file
 from libreoffice.calc.document import get_cell_by_position
 from libreoffice.uno.propertyvalue import mkPropertyValues
 from uitest.uihelper.common import get_state_as_dict
+from libreoffice.calc.paste_special import reset_default_values
 
 class tdf142932(UITestCase):
 
@@ -27,16 +30,13 @@ class tdf142932(UITestCase):
             with self.ui_test.execute_dialog_through_command(".uno:Insert") as xDialog:
                 xAfter = xDialog.getChild('after')
                 xAfter.executeAction("CLICK", tuple())
-                pass
 
             self.assertEqual(get_state_as_dict(gridwin)["SelectedTable"], "1")
 
             with self.ui_test.execute_dialog_through_command(".uno:PasteSpecial") as xDialog:
-                xText = xDialog.getChild("text")
-                xComments = xDialog.getChild("comments")
+                reset_default_values(self, xDialog)
+
                 xSkipEmpty = xDialog.getChild("skip_empty")
-                self.assertEqual('true', get_state_as_dict(xText)['Selected'])
-                self.assertEqual('false', get_state_as_dict(xComments)['Selected'])
                 xSkipEmpty.executeAction("CLICK", tuple())
                 self.assertEqual('true', get_state_as_dict(xSkipEmpty)['Selected'])
 

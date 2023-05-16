@@ -23,12 +23,10 @@
 #include <comphelper/uno3.hxx>
 #include <com/sun/star/container/XChild.hpp>
 #include <com/sun/star/util/XCloneable.hpp>
-#include <com/sun/star/util/XModifyBroadcaster.hpp>
-#include <com/sun/star/util/XModifyListener.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 
 #include <OPropertySet.hxx>
-#include <MutexContainer.hxx>
+#include <ModifyListenerHelper.hxx>
 
 namespace chart
 {
@@ -45,7 +43,6 @@ typedef ::cppu::WeakImplHelper<
 }
 
 class DataPoint final :
-        public MutexContainer,
         public impl::DataPoint_Base,
         public ::property::OPropertySet
 {
@@ -64,7 +61,7 @@ private:
     explicit DataPoint( const DataPoint & rOther );
 
     // ____ OPropertySet ____
-    virtual css::uno::Any GetDefaultValue( sal_Int32 nHandle ) const override;
+    virtual void GetDefaultValue( sal_Int32 nHandle, css::uno::Any& rAny ) const override;
     virtual ::cppu::IPropertyArrayHelper & SAL_CALL getInfoHelper() override;
     virtual void SAL_CALL setFastPropertyValue_NoBroadcast
         ( sal_Int32 nHandle,
@@ -103,7 +100,7 @@ private:
 
     css::uno::WeakReference< css::beans::XPropertySet >   m_xParentProperties;
 
-    css::uno::Reference< css::util::XModifyListener > m_xModifyEventForwarder;
+    rtl::Reference<ModifyEventForwarder> m_xModifyEventForwarder;
     bool m_bNoParentPropAllowed;
 };
 

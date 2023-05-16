@@ -79,8 +79,8 @@ using namespace ::com::sun::star::container;
         aAny <<= Reference< xint >(this)
 
 SvxShapeGroup::SvxShapeGroup(SdrObject* pObj, SvxDrawPage* pDrawPage)
-    : SvxShape(pObj, getSvxMapProvider().GetMap(SVXMAP_GROUP), getSvxMapProvider().GetPropertySet(SVXMAP_GROUP, SdrObject::GetGlobalDrawObjectItemPool()))
-    , mxPage(pDrawPage)
+    : SvxShapeGroupAnyD(pObj, getSvxMapProvider().GetMap(SVXMAP_GROUP), getSvxMapProvider().GetPropertySet(SVXMAP_GROUP, SdrObject::GetGlobalDrawObjectItemPool()))
+    , mxWeakPage(pDrawPage)
 {
 }
 
@@ -91,7 +91,7 @@ SvxShapeGroup::~SvxShapeGroup() noexcept
 void SvxShapeGroup::Create( SdrObject* pNewObj, SvxDrawPage* pNewPage )
 {
     SvxShape::Create( pNewObj, pNewPage );
-    mxPage = pNewPage;
+    mxWeakPage = pNewPage;
 }
 
 
@@ -169,27 +169,42 @@ void SAL_CALL SvxShapeGroup::leaveGroup(  )
 
 void SvxShapeGroup::addUnoShape( const uno::Reference< drawing::XShape >& xShape, size_t nPos )
 {
-    if (!HasSdrObject() || !mxPage.is())
-    {
-        OSL_FAIL("could not add XShape to group shape!");
-        return;
-    }
-
     SvxShape* pShape = comphelper::getFromUnoTunnel<SvxShape>( xShape );
     if (!pShape)
     {
         OSL_FAIL("could not add XShape to group shape!");
         return;
     }
+    addShape(*pShape, nPos);
+}
 
-    SdrObject* pSdrShape = pShape->GetSdrObject();
+void SvxShapeGroup::addShape( SvxShape& rShape )
+{
+    addShape(rShape, SAL_MAX_SIZE);
+}
+
+void SvxShapeGroup::addShape( SvxShape& rShape, size_t nPos )
+{
+    SdrObject* pSdrObject = GetSdrObject();
+    if (!pSdrObject)
+    {
+        return;
+    }
+    rtl::Reference<SvxDrawPage> xPage = mxWeakPage.get();
+    if (!xPage)
+    {
+        OSL_FAIL("could not add XShape to group shape!");
+        return;
+    }
+
+    rtl::Reference<SdrObject> pSdrShape = rShape.GetSdrObject();
     if( pSdrShape == nullptr )
-        pSdrShape = mxPage->CreateSdrObject_( xShape );
+        pSdrShape = xPage->CreateSdrObject_( &rShape );
 
     if( pSdrShape->IsInserted() )
         pSdrShape->getParentSdrObjListFromSdrObject()->RemoveObject( pSdrShape->GetOrdNum() );
 
-    GetSdrObject()->GetSubList()->InsertObject(pSdrShape, nPos);
+    pSdrObject->GetSubList()->InsertObject(pSdrShape.get(), nPos);
     // TTTT Was created using mpModel in CreateSdrObject_ above
     // TTTT may be good to add an assertion here for the future
     // pSdrShape->SetModel(GetSdrObject()->GetModel());
@@ -205,9 +220,9 @@ void SvxShapeGroup::addUnoShape( const uno::Reference< drawing::XShape >& xShape
     // Establish connection between new SdrObject and its wrapper before
     // inserting the new shape into the group.  There a new wrapper
     // would be created when this connection would not already exist.
-    pShape->Create( pSdrShape, mxPage.get() );
+    rShape.Create( pSdrShape.get(), xPage.get() );
 
-    GetSdrObject()->getSdrModelFromSdrObject().SetChanged();
+    pSdrObject->getSdrModelFromSdrObject().SetChanged();
 }
 
 // XShapes
@@ -255,8 +270,7 @@ void SAL_CALL SvxShapeGroup::remove( const uno::Reference< drawing::XShape >& xS
             }
         }
 
-        SdrObject* pObject = rList.NbcRemoveObject( nObjNum );
-        SdrObject::Free( pObject );
+        rList.NbcRemoveObject( nObjNum );
     }
     else
     {
@@ -313,7 +327,7 @@ uno::Any SAL_CALL SvxShapeGroup::getByIndex( sal_Int32 Index )
         throw lang::IndexOutOfBoundsException();
 
     Reference< drawing::XShape > xShape( pDestObj->getUnoShape(), uno::UNO_QUERY );
-    return uno::makeAny( xShape );
+    return uno::Any( xShape );
 }
 
 // css::container::XElementAccess
@@ -457,7 +471,7 @@ void SAL_CALL SvxShapeConnector::disconnectEnd( const uno::Reference< drawing::X
 SvxShapeControl::SvxShapeControl(SdrObject* pObj)
     : SvxShapeText( pObj, getSvxMapProvider().GetMap(SVXMAP_CONTROL), getSvxMapProvider().GetPropertySet(SVXMAP_CONTROL, SdrObject::GetGlobalDrawObjectItemPool()) )
 {
-    setShapeKind( OBJ_UNO );
+    setShapeKind( SdrObjKind::UNO );
 }
 
 
@@ -555,63 +569,58 @@ void SAL_CALL SvxShapeControl::setControl( const Reference< awt::XControlModel >
 
 struct
 {
-    const char* mpAPIName;
-    sal_uInt16  mnAPINameLen;
-
-    const char* mpFormName;
-    sal_uInt16  mnFormNameLen;
+    OUString msAPIName;
+    OUString msFormName;
 }
 const SvxShapeControlPropertyMapping[] =
 {
     // Warning: The first entry must be FontSlant because the any needs to be converted
-    { RTL_CONSTASCII_STRINGPARAM(UNO_NAME_EDIT_CHAR_POSTURE), RTL_CONSTASCII_STRINGPARAM("FontSlant")  }, //  const sal_Int16 => css::awt::FontSlant
-    { RTL_CONSTASCII_STRINGPARAM(UNO_NAME_EDIT_CHAR_FONTNAME), RTL_CONSTASCII_STRINGPARAM("FontName") },
-    { RTL_CONSTASCII_STRINGPARAM(UNO_NAME_EDIT_CHAR_FONTSTYLENAME), RTL_CONSTASCII_STRINGPARAM("FontStyleName") },
-    { RTL_CONSTASCII_STRINGPARAM(UNO_NAME_EDIT_CHAR_FONTFAMILY), RTL_CONSTASCII_STRINGPARAM("FontFamily") },
-    { RTL_CONSTASCII_STRINGPARAM(UNO_NAME_EDIT_CHAR_FONTCHARSET), RTL_CONSTASCII_STRINGPARAM("FontCharset") },
-    { RTL_CONSTASCII_STRINGPARAM(UNO_NAME_EDIT_CHAR_HEIGHT), RTL_CONSTASCII_STRINGPARAM("FontHeight") },
-    { RTL_CONSTASCII_STRINGPARAM(UNO_NAME_EDIT_CHAR_FONTPITCH), RTL_CONSTASCII_STRINGPARAM("FontPitch" ) },
-    { RTL_CONSTASCII_STRINGPARAM(UNO_NAME_EDIT_CHAR_WEIGHT), RTL_CONSTASCII_STRINGPARAM("FontWeight" ) },
-    { RTL_CONSTASCII_STRINGPARAM(UNO_NAME_EDIT_CHAR_UNDERLINE), RTL_CONSTASCII_STRINGPARAM("FontUnderline") },
-    { RTL_CONSTASCII_STRINGPARAM(UNO_NAME_EDIT_CHAR_STRIKEOUT), RTL_CONSTASCII_STRINGPARAM("FontStrikeout") },
-    { RTL_CONSTASCII_STRINGPARAM("CharKerning"), RTL_CONSTASCII_STRINGPARAM("FontKerning") },
-    { RTL_CONSTASCII_STRINGPARAM("CharWordMode"), RTL_CONSTASCII_STRINGPARAM("FontWordLineMode" ) },
-    { RTL_CONSTASCII_STRINGPARAM(UNO_NAME_EDIT_CHAR_COLOR),   RTL_CONSTASCII_STRINGPARAM("TextColor") },
-    { RTL_CONSTASCII_STRINGPARAM("CharBackColor"), RTL_CONSTASCII_STRINGPARAM("CharBackColor") },
-    { RTL_CONSTASCII_STRINGPARAM("CharBackTransparent"), RTL_CONSTASCII_STRINGPARAM("CharBackTransparent") },
-    { RTL_CONSTASCII_STRINGPARAM(UNO_NAME_TEXT_CHAINNEXTNAME), RTL_CONSTASCII_STRINGPARAM(UNO_NAME_TEXT_CHAINNEXTNAME) },
-    { RTL_CONSTASCII_STRINGPARAM("CharRelief"),   RTL_CONSTASCII_STRINGPARAM("FontRelief") },
-    { RTL_CONSTASCII_STRINGPARAM("CharUnderlineColor"),   RTL_CONSTASCII_STRINGPARAM("TextLineColor") },
-    { RTL_CONSTASCII_STRINGPARAM(UNO_NAME_EDIT_PARA_ADJUST), RTL_CONSTASCII_STRINGPARAM("Align") },
-    { RTL_CONSTASCII_STRINGPARAM("TextVerticalAdjust"), RTL_CONSTASCII_STRINGPARAM("VerticalAlign") },
-    { RTL_CONSTASCII_STRINGPARAM("ControlBackground"), RTL_CONSTASCII_STRINGPARAM("BackgroundColor") },
-    { RTL_CONSTASCII_STRINGPARAM("ControlSymbolColor"), RTL_CONSTASCII_STRINGPARAM("SymbolColor") },
-    { RTL_CONSTASCII_STRINGPARAM("ControlBorder"), RTL_CONSTASCII_STRINGPARAM("Border") },
-    { RTL_CONSTASCII_STRINGPARAM("ControlBorderColor"), RTL_CONSTASCII_STRINGPARAM("BorderColor") },
-    { RTL_CONSTASCII_STRINGPARAM("ControlTextEmphasis"),  RTL_CONSTASCII_STRINGPARAM("FontEmphasisMark") },
-    { RTL_CONSTASCII_STRINGPARAM("ImageScaleMode"),  RTL_CONSTASCII_STRINGPARAM("ScaleMode") },
-    { RTL_CONSTASCII_STRINGPARAM("ControlWritingMode"), RTL_CONSTASCII_STRINGPARAM("WritingMode") },
+    { UNO_NAME_EDIT_CHAR_POSTURE, "FontSlant"  }, //  const sal_Int16 => css::awt::FontSlant
+    { UNO_NAME_EDIT_CHAR_FONTNAME, "FontName" },
+    { UNO_NAME_EDIT_CHAR_FONTSTYLENAME, "FontStyleName" },
+    { UNO_NAME_EDIT_CHAR_FONTFAMILY, "FontFamily" },
+    { UNO_NAME_EDIT_CHAR_FONTCHARSET, "FontCharset" },
+    { UNO_NAME_EDIT_CHAR_HEIGHT, "FontHeight" },
+    { UNO_NAME_EDIT_CHAR_FONTPITCH, "FontPitch" },
+    { UNO_NAME_EDIT_CHAR_WEIGHT, "FontWeight" },
+    { UNO_NAME_EDIT_CHAR_UNDERLINE, "FontUnderline" },
+    { UNO_NAME_EDIT_CHAR_STRIKEOUT, "FontStrikeout" },
+    { "CharKerning", "FontKerning" },
+    { "CharWordMode", "FontWordLineMode" },
+    { UNO_NAME_EDIT_CHAR_COLOR,   "TextColor" },
+    { "CharBackColor", "CharBackColor" },
+    { "CharBackTransparent", "CharBackTransparent" },
+    { UNO_NAME_TEXT_CHAINNEXTNAME, UNO_NAME_TEXT_CHAINNEXTNAME },
+    { "CharRelief",   "FontRelief" },
+    { "CharUnderlineColor",   "TextLineColor" },
+    { UNO_NAME_EDIT_PARA_ADJUST, "Align" },
+    { "TextVerticalAdjust", "VerticalAlign" },
+    { "ControlBackground", "BackgroundColor" },
+    { "ControlSymbolColor", "SymbolColor" },
+    { "ControlBorder", "Border" },
+    { "ControlBorderColor", "BorderColor" },
+    { "ControlTextEmphasis",  "FontEmphasisMark" },
+    { "ImageScaleMode",  "ScaleMode" },
+    { "ControlWritingMode", "WritingMode" },
     //added for exporting OCX control
-    { RTL_CONSTASCII_STRINGPARAM("ControlTypeinMSO"), RTL_CONSTASCII_STRINGPARAM("ControlTypeinMSO") },
-    { RTL_CONSTASCII_STRINGPARAM("ObjIDinMSO"), RTL_CONSTASCII_STRINGPARAM("ObjIDinMSO") },
-    { RTL_CONSTASCII_STRINGPARAM("CharCaseMap"), RTL_CONSTASCII_STRINGPARAM("CharCaseMap") },
-    { RTL_CONSTASCII_STRINGPARAM("CharColorTheme"), RTL_CONSTASCII_STRINGPARAM("CharColorTheme") },
-    { RTL_CONSTASCII_STRINGPARAM("CharColorTintOrShade"), RTL_CONSTASCII_STRINGPARAM("CharColorTintOrShade") },
-    { nullptr,0, nullptr, 0 }
+    { "ControlTypeinMSO", "ControlTypeinMSO" },
+    { "ObjIDinMSO", "ObjIDinMSO" },
+    { "CharCaseMap", "CharCaseMap" },
+    { "CharColorTheme", "CharColorTheme" },
+    { "CharColorTintOrShade", "CharColorTintOrShade" },
+    { UNO_NAME_EDIT_CHAR_COLOR_THEME_REFERENCE, "CharColorThemeReference" },
 };
 
 namespace
 {
     bool lcl_convertPropertyName( const OUString& rApiName, OUString& rInternalName )
     {
-        sal_uInt16 i = 0;
-        while( SvxShapeControlPropertyMapping[i].mpAPIName )
+        for( const auto & rEntry : SvxShapeControlPropertyMapping )
         {
-            if( rApiName.reverseCompareToAsciiL( SvxShapeControlPropertyMapping[i].mpAPIName, SvxShapeControlPropertyMapping[i].mnAPINameLen ) == 0 )
+            if( rApiName.reverseCompareTo( rEntry.msAPIName ) == 0 )
             {
-                rInternalName = OUString( SvxShapeControlPropertyMapping[i].mpFormName, SvxShapeControlPropertyMapping[i].mnFormNameLen, RTL_TEXTENCODING_ASCII_US );
+                rInternalName = rEntry.msFormName;
             }
-            ++i;
         }
         return !rInternalName.isEmpty();
     }
@@ -1122,14 +1131,12 @@ drawing::PolygonKind SvxShapePolyPolygon::GetPolygonKind() const
     {
         switch(GetSdrObject()->GetObjIdentifier())
         {
-            case OBJ_POLY:      aRetval = drawing::PolygonKind_POLY; break;
-            case OBJ_PLIN:      aRetval = drawing::PolygonKind_PLIN; break;
-            case OBJ_SPLNLINE:
-            case OBJ_PATHLINE:  aRetval = drawing::PolygonKind_PATHLINE; break;
-            case OBJ_SPLNFILL:
-            case OBJ_PATHFILL:  aRetval = drawing::PolygonKind_PATHFILL; break;
-            case OBJ_FREELINE:  aRetval = drawing::PolygonKind_FREELINE; break;
-            case OBJ_FREEFILL:  aRetval = drawing::PolygonKind_FREEFILL; break;
+            case SdrObjKind::Polygon:      aRetval = drawing::PolygonKind_POLY; break;
+            case SdrObjKind::PolyLine:      aRetval = drawing::PolygonKind_PLIN; break;
+            case SdrObjKind::PathLine:  aRetval = drawing::PolygonKind_PATHLINE; break;
+            case SdrObjKind::PathFill:  aRetval = drawing::PolygonKind_PATHFILL; break;
+            case SdrObjKind::FreehandLine:  aRetval = drawing::PolygonKind_FREELINE; break;
+            case SdrObjKind::FreehandFill:  aRetval = drawing::PolygonKind_FREEFILL; break;
             default: break;
         }
     }
@@ -1784,5 +1791,12 @@ void SvxCustomShape::createCustomShapeDefaults( const OUString& rValueType )
 
     static_cast<SdrObjCustomShape*>(GetSdrObject())->MergeDefaultAttributes( &rValueType );
 }
+
+SvxShapeGroupAnyD::SvxShapeGroupAnyD( SdrObject* pObject, o3tl::span<const SfxItemPropertyMapEntry> pEntries, const SvxItemPropertySet* pPropertySet )
+    : SvxShape(pObject, pEntries, pPropertySet)
+{}
+
+SvxShapeGroupAnyD::~SvxShapeGroupAnyD() noexcept
+{}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

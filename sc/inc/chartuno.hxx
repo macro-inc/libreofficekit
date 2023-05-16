@@ -20,6 +20,7 @@
 #pragma once
 
 #include "rangelst.hxx"
+#include <rtl/ref.hxx>
 #include <svl/lstner.hxx>
 #include <comphelper/proparrhlp.hxx>
 #include <comphelper/propertycontainer.hxx>
@@ -121,7 +122,7 @@ private:
     virtual ::cppu::IPropertyArrayHelper* createArrayHelper() const override;
 
 public:
-                            ScChartObj(ScDocShell* pDocSh, SCTAB nT, const OUString& rN);
+                            ScChartObj(ScDocShell* pDocSh, SCTAB nT, OUString aN);
     virtual                 ~ScChartObj() override;
 
     virtual void            Notify( SfxBroadcaster& rBC, const SfxHint& rHint ) override;

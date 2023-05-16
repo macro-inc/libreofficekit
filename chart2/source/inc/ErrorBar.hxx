@@ -18,7 +18,7 @@
  */
 #pragma once
 
-#include "MutexContainer.hxx"
+#include <cppuhelper/basemutex.hxx>
 #include "charttoolsdllapi.hxx"
 
 #include <cppuhelper/implbase.hxx>
@@ -35,7 +35,7 @@
 #include <com/sun/star/util/XCloneable.hpp>
 #include <com/sun/star/util/Color.hpp>
 #include <com/sun/star/util/XModifyListener.hpp>
-#include <com/sun/star/util/XModifyBroadcaster.hpp>
+#include "ModifyListenerHelper.hxx"
 
 
 #include <vector>
@@ -58,7 +58,7 @@ typedef ::cppu::WeakImplHelper<
 }
 
 class ErrorBar final :
-        public MutexContainer,
+        public cppu::BaseMutex,
         public impl::ErrorBar_Base
 {
 private:
@@ -132,7 +132,7 @@ private:
             css::chart2::data::XLabeledDataSequence > > tDataSequenceContainer;
     tDataSequenceContainer m_aDataSequences;
 
-    css::uno::Reference< css::util::XModifyListener > m_xModifyEventForwarder;
+    rtl::Reference<ModifyEventForwarder> m_xModifyEventForwarder;
 };
 
 } //  namespace chart

@@ -25,10 +25,12 @@
 #include <string_view>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 #include <osl/mutex.hxx>
 #include <rtl/ustring.hxx>
 #include <rtl/strbuf.hxx>
+#include <o3tl/string_view.hxx>
 #include <com/sun/star/uno/Sequence.hxx>
 #include <com/sun/star/container/XHierarchicalNameAccess.hpp>
 #include <com/sun/star/lang/XMultiComponentFactory.hpp>
@@ -61,14 +63,14 @@ namespace chelp {
 
     public:
 
-        StaticModuleInformation( const OUString& aTitle,
-                                 const OUString& aStartId,
-                                 const OUString& aProgramSwitch,
-                                 const OUString& aOrder )
-            : m_aStartId( aStartId ),
-              m_aProgramSwitch( aProgramSwitch ),
-              m_aTitle( aTitle ),
-              m_nOrder( aOrder.toInt32() )
+        StaticModuleInformation( OUString aTitle,
+                                 OUString aStartId,
+                                 OUString aProgramSwitch,
+                                 std::u16string_view aOrder )
+            : m_aStartId(std::move( aStartId )),
+              m_aProgramSwitch(std::move( aProgramSwitch )),
+              m_aTitle(std::move( aTitle )),
+              m_nOrder( o3tl::toInt32(aOrder) )
         {
         }
 
@@ -91,8 +93,8 @@ namespace chelp {
 
             KeywordElement( Databases const * pDatabases,
                             helpdatafileproxy::Hdf* pHdf,
-                            OUString const & key,
-                            OUString const & ids );
+                            OUString  key,
+                            std::u16string_view ids );
 
         private:
 
@@ -101,7 +103,7 @@ namespace chelp {
             css::uno::Sequence< OUString > listAnchor;
             css::uno::Sequence< OUString > listTitle;
 
-            void init( Databases const *pDatabases,helpdatafileproxy::Hdf* pHdf,const OUString& ids );
+            void init( Databases const *pDatabases,helpdatafileproxy::Hdf* pHdf, std::u16string_view ids );
         };
 
         explicit KeywordInfo( const std::vector< KeywordElement >& aVector );
@@ -192,7 +194,7 @@ namespace chelp {
          */
 
         css::uno::Reference< css::container::XHierarchicalNameAccess >
-        jarFile( const OUString& jar,
+        jarFile( std::u16string_view jar,
                  const OUString& Language );
 
         css::uno::Reference< css::container::XHierarchicalNameAccess >
@@ -305,9 +307,9 @@ namespace chelp {
 
     public:
         ExtensionIteratorBase( css::uno::Reference< css::uno::XComponentContext > const & xContext,
-            Databases& rDatabases, const OUString& aInitialModule, const OUString& aLanguage );
-        ExtensionIteratorBase( Databases& rDatabases, const OUString& aInitialModule,
-            const OUString& aLanguage );
+            Databases& rDatabases, OUString aInitialModule, OUString aLanguage );
+        ExtensionIteratorBase( Databases& rDatabases, OUString  aInitialModule,
+            OUString  aLanguage );
         void init();
 
     private:
@@ -422,7 +424,7 @@ namespace chelp {
         {}
 
         OUString nextIndexFolder( bool& o_rbExtension, bool& o_rbTemporary );
-        void deleteTempIndexFolder( const OUString& aIndexFolder );
+        void deleteTempIndexFolder( std::u16string_view aIndexFolder );
 
     private:
         OUString implGetIndexFolderFromPackage( bool& o_rbTemporary,

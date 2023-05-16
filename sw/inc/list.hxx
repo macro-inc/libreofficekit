@@ -20,22 +20,26 @@
 #ifndef INCLUDED_SW_INC_LIST_HXX
 #define INCLUDED_SW_INC_LIST_HXX
 
-#include <o3tl/deleter.hxx>
 #include <rtl/ustring.hxx>
 #include "SwNodeNum.hxx"
 #include "pam.hxx"
 #include <memory>
 
-#include "swdllapi.h"
-
 class SwDoc;
 class SwNumRule;
 class SwNodes;
 
+enum class SwListRedlineType
+{
+    SHOW,
+    HIDDEN,
+    ORIGTEXT,
+};
+
 class SwList
 {
     public:
-        SwList( const OUString& sListId,
+        SwList( OUString sListId,
                 SwNumRule& rDefaultListStyle,
                 const SwNodes& rNodes );
         ~SwList() COVERITY_NOEXCEPT_FALSE;
@@ -47,7 +51,7 @@ class SwList
         void SetDefaultListStyleName(OUString const&);
 
         void InsertListItem(SwNodeNum& rNodeNum,
-                            bool isHiddenRedlines,
+                            SwListRedlineType eRedlines,
                             const int nLevel,
                             const SwDoc& rDoc);
         static void RemoveListItem(SwNodeNum& rNodeNum, const SwDoc& rDoc);
@@ -87,10 +91,20 @@ class SwList
             /// the previous node on the same level.
             /// The nodes of pRootRLHidden are a subset of the nodes of pRoot.
             std::unique_ptr<SwNodeNum> pRootRLHidden;
+            /// Tree that is missing those nodes that are merged or hidden
+            /// by insert redlines; this is only used if there is a layout
+            /// that has IsHideRedlines() disabled, and the numbering of the
+            /// original text is also shown.
+            /// A third tree is needed because not only are the numbers in
+            /// the nodes different, the structure of the tree may be different
+            /// The nodes of pRootOrigText are a subset of the nodes of pRoot.
+            std::unique_ptr<SwNodeNum> pRootOrigText;
             /// top-level SwNodes section
             std::unique_ptr<SwPaM> pSection;
-            tListTreeForRange(std::unique_ptr<SwNodeNum> p1, std::unique_ptr<SwNodeNum> p2, std::unique_ptr<SwPaM> p3)
-                : pRoot(std::move(p1)), pRootRLHidden(std::move(p2)), pSection(std::move(p3)) {}
+            tListTreeForRange(std::unique_ptr<SwNodeNum> p1, std::unique_ptr<SwNodeNum> p2,
+                                                std::unique_ptr<SwNodeNum> p3, std::unique_ptr<SwPaM> p4)
+                : pRoot(std::move(p1)), pRootRLHidden(std::move(p2)),
+                                                pRootOrigText(std::move(p3)), pSection(std::move(p4)) {}
         };
         std::vector<tListTreeForRange> maListTrees;
 

@@ -60,7 +60,7 @@ private:
 
 public:
 
-    static css::uno::Reference<css::beans::XPropertySet>
+    static rtl::Reference<SwXFieldMaster>
         CreateXFieldMaster(SwDoc * pDoc, SwFieldType * pType,
                 SwFieldIds nResId = SwFieldIds::Unknown);
 
@@ -120,6 +120,10 @@ typedef ::cppu::WeakImplHelper
 ,   css::util::XUpdatable
 > SwXTextField_Base;
 
+/**
+ * UNO wrapper around an SwFormatField, i.e. a Writer field that the user creates via Insert ->
+ * Field.
+ */
 class SwXTextField final
     : public SwXTextField_Base
 {
@@ -141,7 +145,7 @@ public:
     static void TransmuteLeadToInputField(SwSetExpField & rField);
 
     /// @return an SwXTextField, either an already existing one or a new one
-    static css::uno::Reference< css::text::XTextField>
+    static rtl::Reference<SwXTextField>
         CreateXTextField(SwDoc * pDoc, SwFormatField const* pFormat,
                 SwServiceType nServiceId = SwServiceType::Invalid);
 

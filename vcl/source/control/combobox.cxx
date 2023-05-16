@@ -34,6 +34,7 @@
 #include <listbox.hxx>
 #include <comphelper/lok.hxx>
 #include <tools/json_writer.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace {
 
@@ -94,14 +95,14 @@ struct ComboBox::Impl
 };
 
 
-static void lcl_GetSelectedEntries( ::std::set< sal_Int32 >& rSelectedPos, const OUString& rText, sal_Unicode cTokenSep, const ImplEntryList& rEntryList )
+static void lcl_GetSelectedEntries( ::std::set< sal_Int32 >& rSelectedPos, std::u16string_view rText, sal_Unicode cTokenSep, const ImplEntryList& rEntryList )
 {
-    if (rText.isEmpty())
+    if (rText.empty())
         return;
 
     sal_Int32 nIdx{0};
     do {
-        const sal_Int32 nPos = rEntryList.FindEntry(comphelper::string::strip(rText.getToken(0, cTokenSep, nIdx), ' '));
+        const sal_Int32 nPos = rEntryList.FindEntry(comphelper::string::strip(o3tl::getToken(rText, 0, cTokenSep, nIdx), ' '));
         if ( nPos != LISTBOX_ENTRY_NOTFOUND )
             rSelectedPos.insert( nPos );
     } while (nIdx>=0);
@@ -370,8 +371,8 @@ IMPL_LINK_NOARG(ComboBox::Impl, ImplSelectHdl, LinkParamNone*, void)
             while ( nIndex >= 0 )
             {
                 sal_Int32  nPrevIndex = nIndex;
-                OUString   aToken = aText.getToken( 0, m_cMultiSep, nIndex );
-                sal_Int32  nTokenLen = aToken.getLength();
+                std::u16string_view aToken = o3tl::getToken(aText, 0, m_cMultiSep, nIndex );
+                sal_Int32  nTokenLen = aToken.size();
                 aToken = comphelper::string::strip(aToken, ' ');
                 sal_Int32 nP = m_pImplLB->GetEntryList().FindEntry( aToken );
                 if ((nP != LISTBOX_ENTRY_NOTFOUND) && (!m_pImplLB->GetEntryList().IsEntryPosSelected(nP)))
@@ -715,7 +716,7 @@ void ComboBox::DataChanged( const DataChangedEvent& rDCEvt )
 bool ComboBox::EventNotify( NotifyEvent& rNEvt )
 {
     bool bDone = false;
-    if ((rNEvt.GetType() == MouseNotifyEvent::KEYINPUT)
+    if ((rNEvt.GetType() == NotifyEventType::KEYINPUT)
         && (rNEvt.GetWindow() == m_pImpl->m_pSubEdit)
         && !IsReadOnly())
     {
@@ -767,14 +768,14 @@ bool ComboBox::EventNotify( NotifyEvent& rNEvt )
             break;
         }
     }
-    else if ((rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS) && m_pImpl->m_pFloatWin)
+    else if ((rNEvt.GetType() == NotifyEventType::LOSEFOCUS) && m_pImpl->m_pFloatWin)
     {
         if (m_pImpl->m_pFloatWin->HasChildPathFocus())
             m_pImpl->m_pSubEdit->GrabFocus();
         else if (m_pImpl->m_pFloatWin->IsInPopupMode() && !HasChildPathFocus(true))
             m_pImpl->m_pFloatWin->EndPopupMode();
     }
-    else if( (rNEvt.GetType() == MouseNotifyEvent::COMMAND) &&
+    else if( (rNEvt.GetType() == NotifyEventType::COMMAND) &&
              (rNEvt.GetCommandEvent()->GetCommand() == CommandEventId::Wheel) &&
              (rNEvt.GetWindow() == m_pImpl->m_pSubEdit) )
     {
@@ -792,7 +793,7 @@ bool ComboBox::EventNotify( NotifyEvent& rNEvt )
             bDone = false;  // don't eat this event, let the default handling happen (i.e. scroll the context)
         }
     }
-    else if ((rNEvt.GetType() == MouseNotifyEvent::MOUSEBUTTONDOWN)
+    else if ((rNEvt.GetType() == NotifyEventType::MOUSEBUTTONDOWN)
             && (rNEvt.GetWindow() == GetMainWindow()))
     {
         m_pImpl->m_pSubEdit->GrabFocus();
@@ -1011,7 +1012,7 @@ tools::Long ComboBox::getMaxWidthScrollBarAndDownButton() const
     if ( GetNativeControlRegion(ControlType::Combobox, ControlPart::ButtonDown,
         aArea, ControlState::NONE, aControlValue, aBound, aContent) )
     {
-        nButtonDownWidth = aContent.getWidth();
+        nButtonDownWidth = aContent.getOpenWidth();
     }
 
     tools::Long nScrollBarWidth = GetSettings().GetStyleSettings().GetScrollBarSize();
@@ -1285,7 +1286,7 @@ void ComboBox::AddSeparator( sal_Int32 n )
     m_pImpl->m_pImplLB->AddSeparator( n );
 }
 
-void ComboBox::SetMRUEntries( const OUString& rEntries )
+void ComboBox::SetMRUEntries( std::u16string_view rEntries )
 {
     m_pImpl->m_pImplLB->SetMRUEntries( rEntries, ';' );
 }
@@ -1404,6 +1405,40 @@ void ComboBox::SetBorderStyle( WindowBorderStyle nBorderStyle )
     }
 }
 
+void ComboBox::SetHighlightColor( const Color& rColor )
+{
+    AllSettings aSettings(GetSettings());
+    StyleSettings aStyle(aSettings.GetStyleSettings());
+    aStyle.SetHighlightColor(rColor);
+    aSettings.SetStyleSettings(aStyle);
+    SetSettings(aSettings);
+
+    AllSettings aSettingsSubEdit(m_pImpl->m_pSubEdit->GetSettings());
+    StyleSettings aStyleSubEdit(aSettingsSubEdit.GetStyleSettings());
+    aStyleSubEdit.SetHighlightColor(rColor);
+    aSettingsSubEdit.SetStyleSettings(aStyleSubEdit);
+    m_pImpl->m_pSubEdit->SetSettings(aSettings);
+
+    m_pImpl->m_pImplLB->SetHighlightColor(rColor);
+}
+
+void ComboBox::SetHighlightTextColor( const Color& rColor )
+{
+    AllSettings aSettings(GetSettings());
+    StyleSettings aStyle(aSettings.GetStyleSettings());
+    aStyle.SetHighlightTextColor(rColor);
+    aSettings.SetStyleSettings(aStyle);
+    SetSettings(aSettings);
+
+    AllSettings aSettingsSubEdit(m_pImpl->m_pSubEdit->GetSettings());
+    StyleSettings aStyleSubEdit(aSettingsSubEdit.GetStyleSettings());
+    aStyleSubEdit.SetHighlightTextColor(rColor);
+    aSettingsSubEdit.SetStyleSettings(aStyleSubEdit);
+    m_pImpl->m_pSubEdit->SetSettings(aSettings);
+
+    m_pImpl->m_pImplLB->SetHighlightTextColor(rColor);
+}
+
 ImplListBoxWindow* ComboBox::GetMainWindow() const
 {
     return m_pImpl->m_pImplLB->GetMainWindow();
@@ -1467,7 +1502,7 @@ ComboBoxBounds ComboBox::Impl::calcComboBoxDropDownComponentBounds(
         aContent.Move(-aPoint.X(), -aPoint.Y());
 
         aBounds.aButtonPos = Point(aContent.Left(), nTop);
-        aBounds.aButtonSize = Size(aContent.getWidth(), (nBottom-nTop));
+        aBounds.aButtonSize = Size(aContent.getOpenWidth(), (nBottom-nTop));
 
         // adjust the size of the edit field
         if (m_rThis.GetNativeControlRegion(ControlType::Combobox, ControlPart::SubEdit,
@@ -1483,7 +1518,7 @@ ComboBoxBounds ComboBox::Impl::calcComboBoxDropDownComponentBounds(
         else
         {
             // use the themes drop down size for the button
-            aBounds.aSubEditSize = Size(rOutSz.Width() - aContent.getWidth(), rOutSz.Height());
+            aBounds.aSubEditSize = Size(rOutSz.Width() - aContent.getOpenWidth(), rOutSz.Height());
         }
     }
     else

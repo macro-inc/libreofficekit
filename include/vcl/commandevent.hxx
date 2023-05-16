@@ -27,7 +27,9 @@
 #include <vcl/keycodes.hxx>
 #include <o3tl/typed_flags_set.hxx>
 #include <rtl/ustring.hxx>
-#include <vcl/GestureEvent.hxx>
+#include <vcl/GestureEventPan.hxx>
+#include <vcl/GestureEventZoom.hxx>
+#include <vcl/GestureEventRotate.hxx>
 
 class CommandExtTextInputData;
 class CommandWheelData;
@@ -36,26 +38,29 @@ class CommandModKeyData;
 class CommandDialogData;
 class CommandMediaData;
 class CommandSelectionChangeData;
-class CommandSwipeData;
-class CommandLongPressData;
-class CommandGestureData;
+class CommandGestureSwipeData;
+class CommandGestureLongPressData;
+class CommandGesturePanData;
+class CommandGestureZoomData;
+class CommandGestureRotateData;
 
 enum class CommandEventId;
 
 enum class ExtTextInputAttr {
     NONE                  = 0x0000,
-    GrayWaveline          = 0x0100,
-    Underline             = 0x0200,
-    BoldUnderline         = 0x0400,
-    DottedUnderline       = 0x0800,
-    DashDotUnderline      = 0x1000,
-    Highlight             = 0x2000,
-    RedText               = 0x4000,
-    HalfToneText          = 0x8000
+    GrayWaveline          = 0x0010,
+    Underline             = 0x0020,
+    BoldUnderline         = 0x0040,
+    DottedUnderline       = 0x0080,
+    DashDotUnderline      = 0x0100,
+    DoubleUnderline       = 0x0200,
+    Highlight             = 0x0400,
+    RedText               = 0x0800,
+    HalfToneText          = 0x1000
 };
 namespace o3tl
 {
-    template<> struct typed_flags<ExtTextInputAttr> : is_typed_flags<ExtTextInputAttr, 0xff00> {};
+    template<> struct typed_flags<ExtTextInputAttr> : is_typed_flags<ExtTextInputAttr, 0x1ff0> {};
 }
 
 #define EXTTEXTINPUT_CURSOR_INVISIBLE           (sal_uInt16(0x0001))
@@ -87,9 +92,11 @@ public:
     const CommandDialogData*            GetDialogData() const;
           CommandMediaData*             GetMediaData() const;
     const CommandSelectionChangeData*   GetSelectionChangeData() const;
-    const CommandSwipeData*             GetSwipeData() const;
-    const CommandLongPressData*         GetLongPressData() const;
-    const CommandGestureData*           GetGestureData() const;
+    const CommandGestureSwipeData*      GetGestureSwipeData() const;
+    const CommandGestureLongPressData*  GetLongPressData() const;
+    const CommandGesturePanData*        GetGesturePanData() const;
+    const CommandGestureZoomData*       GetGestureZoomData() const;
+    const CommandGestureRotateData*     GetGestureRotateData() const;
 };
 
 class VCL_DLLPUBLIC CommandExtTextInputData
@@ -102,7 +109,7 @@ private:
     bool                mbOnlyCursor;
 
 public:
-                        CommandExtTextInputData( const OUString& rText,
+                        CommandExtTextInputData( OUString aText,
                                                  const ExtTextInputAttr* pTextAttr,
                                                  sal_Int32 nCursorPos,
                                                  sal_uInt16 nCursorFlags,
@@ -269,15 +276,15 @@ public:
     sal_uLong          GetEnd() const { return mnEnd; }
 };
 
-class VCL_DLLPUBLIC CommandSwipeData
+class VCL_DLLPUBLIC CommandGestureSwipeData
 {
     double mnVelocityX;
 public:
-    CommandSwipeData()
+    CommandGestureSwipeData()
         : mnVelocityX(0)
     {
     }
-    CommandSwipeData(double nVelocityX)
+    CommandGestureSwipeData(double nVelocityX)
         : mnVelocityX(nVelocityX)
     {
     }
@@ -285,17 +292,17 @@ public:
 };
 
 
-class VCL_DLLPUBLIC CommandLongPressData
+class VCL_DLLPUBLIC CommandGestureLongPressData
 {
     double mnX;
     double mnY;
 public:
-    CommandLongPressData()
+    CommandGestureLongPressData()
         : mnX(0)
         , mnY(0)
     {
     }
-    CommandLongPressData(double nX, double nY)
+    CommandGestureLongPressData(double nX, double nY)
         : mnX(nX)
         , mnY(nY)
     {
@@ -304,21 +311,55 @@ public:
     double getY() const { return mnY; }
 };
 
-class VCL_DLLPUBLIC CommandGestureData
+class VCL_DLLPUBLIC CommandGesturePanData
 {
 public:
     double const mfX;
     double const mfY;
     double const mfOffset;
-    GestureEventType const meEventType;
+    GestureEventPanType const meEventType;
     PanningOrientation const meOrientation;
 
-    CommandGestureData(double fX, double fY, GestureEventType eEventType, double fOffset, PanningOrientation eOrientation)
+    CommandGesturePanData(double fX, double fY, GestureEventPanType eEventType, double fOffset,
+                          PanningOrientation eOrientation)
         : mfX(fX)
         , mfY(fY)
         , mfOffset(fOffset)
         , meEventType(eEventType)
         , meOrientation(eOrientation)
+    {}
+};
+
+class VCL_DLLPUBLIC CommandGestureZoomData
+{
+public:
+    const double mfX = 0;
+    const double mfY = 0;
+    const GestureEventZoomType meEventType = GestureEventZoomType::Begin;
+    const double mfScaleDelta = 0;
+
+    CommandGestureZoomData(double fX, double fY, GestureEventZoomType eEventType, double fScale)
+        : mfX(fX)
+        , mfY(fY)
+        , meEventType(eEventType)
+        , mfScaleDelta(fScale)
+    {}
+};
+
+class VCL_DLLPUBLIC CommandGestureRotateData
+{
+public:
+    const double mfX = 0;
+    const double mfY = 0;
+    const GestureEventRotateType meEventType = GestureEventRotateType::Begin;
+    const double mfAngleDelta = 0;
+
+    CommandGestureRotateData(double fX, double fY, GestureEventRotateType eEventType,
+                             double fAngleDelta)
+        : mfX(fX)
+        , mfY(fY)
+        , meEventType(eEventType)
+        , mfAngleDelta(fAngleDelta)
     {}
 };
 
@@ -343,9 +384,11 @@ enum class CommandEventId
     SelectionChange         = 18,
     PrepareReconversion     = 19,
     QueryCharPosition       = 20,
-    Swipe                   = 21,
-    LongPress               = 22,
-    Gesture                 = 23,
+    GestureSwipe            = 21,
+    GestureLongPress        = 22,
+    GesturePan              = 23,
+    GestureZoom             = 24,
+    GestureRotate           = 25,
 };
 
 #endif // INCLUDED_VCL_COMMANDEVENT_HXX

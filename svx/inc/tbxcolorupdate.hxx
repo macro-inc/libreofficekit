@@ -24,6 +24,7 @@
 #include <vcl/vclenum.hxx>
 #include <vcl/vclptr.hxx>
 #include <vcl/toolbox.hxx>
+#include <vcl/toolboxid.hxx>
 #include <svx/Palette.hxx>
 #include <com/sun/star/drawing/LineStyle.hpp>
 #include <com/sun/star/frame/FeatureStateEvent.hpp>
@@ -50,9 +51,9 @@ namespace svx
     class ToolboxButtonColorUpdaterBase
     {
     public:
-        ToolboxButtonColorUpdaterBase(bool bWideButton, const OUString& rCommandLabel,
-                                      const OUString& rCommandURL,
-                                      const css::uno::Reference<css::frame::XFrame>& rFrame);
+        ToolboxButtonColorUpdaterBase(bool bWideButton, OUString aCommandLabel,
+                                      OUString aCommandURL,
+                                      css::uno::Reference<css::frame::XFrame> xFrame);
 
         virtual ~ToolboxButtonColorUpdaterBase();
 
@@ -82,6 +83,8 @@ namespace svx
         virtual OUString GetQuickHelpText() const = 0;
         virtual void SetImage(VirtualDevice* pVirDev) = 0;
         virtual VclPtr<VirtualDevice> CreateVirtualDevice() const = 0;
+        // true -> use Device to Record to Metafile, false -> Render to Device
+        virtual bool RecordVirtualDevice() const = 0;
         virtual vcl::ImageType GetImageSize() const = 0;
         virtual Size GetItemSize(const Size& rImageSize) const = 0;
     };
@@ -102,6 +105,10 @@ namespace svx
         virtual OUString GetQuickHelpText() const override;
         virtual void SetImage(VirtualDevice* pVirDev) override;
         virtual VclPtr<VirtualDevice> CreateVirtualDevice() const override;
+        virtual bool RecordVirtualDevice() const  override
+        {
+            return true;
+        }
         virtual vcl::ImageType GetImageSize() const override;
         virtual Size GetItemSize(const Size& rImageSize) const override;
     };
@@ -120,6 +127,10 @@ namespace svx
         virtual OUString GetQuickHelpText() const override;
         virtual void SetImage(VirtualDevice* pVirDev) override;
         virtual VclPtr<VirtualDevice> CreateVirtualDevice() const override;
+        virtual bool RecordVirtualDevice() const  override
+        {
+            return false;
+        }
         virtual vcl::ImageType GetImageSize() const override;
         virtual Size GetItemSize(const Size& rImageSize) const override;
     };

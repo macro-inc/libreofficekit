@@ -12,9 +12,9 @@
 
 #include <vcl/dllapi.h>
 
+#include <skia/gdiimpl.hxx>
 #include <unx/salgdi.h>
 #include <unx/x11/x11gdiimpl.h>
-#include <skia/gdiimpl.hxx>
 
 class VCL_PLUGIN_PUBLIC X11SkiaSalGraphicsImpl final : public SkiaSalGraphicsImpl,
                                                        public X11GraphicsImpl

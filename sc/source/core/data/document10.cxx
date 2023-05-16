@@ -246,7 +246,7 @@ void ScDocument::SwapNonEmpty( sc::TableValues& rValues )
     aEndCxt.purgeEmptyBroadcasters();
 }
 
-void ScDocument::PreprocessAllRangeNamesUpdate( const std::map<OUString, std::unique_ptr<ScRangeName>>& rRangeMap )
+void ScDocument::PreprocessAllRangeNamesUpdate( const std::map<OUString, ScRangeName>& rRangeMap )
 {
     // Update all existing names with new names.
     // The prerequisites are that the name dialog preserves ScRangeData index
@@ -266,9 +266,7 @@ void ScDocument::PreprocessAllRangeNamesUpdate( const std::map<OUString, std::un
         if (itNewTab == rRangeMap.end())
             continue;
 
-        const ScRangeName* pNewRangeNames = itNewTab->second.get();
-        if (!pNewRangeNames)
-            continue;
+        const ScRangeName& rNewRangeNames = itNewTab->second;
 
         for (const auto& rEntry : *pOldRangeNames)
         {
@@ -276,7 +274,7 @@ void ScDocument::PreprocessAllRangeNamesUpdate( const std::map<OUString, std::un
             if (!pOldData)
                 continue;
 
-            const ScRangeData* pNewData = pNewRangeNames->findByIndex( pOldData->GetIndex());
+            const ScRangeData* pNewData = rNewRangeNames.findByIndex( pOldData->GetIndex());
             if (pNewData)
                 pOldData->SetNewName( pNewData->GetName());
         }
@@ -394,7 +392,7 @@ void ScDocument::DelayFormulaGrouping( bool delay )
 
 void ScDocument::AddDelayedFormulaGroupingCell( const ScFormulaCell* cell )
 {
-    if( !pDelayedFormulaGrouping->In( cell->aPos ))
+    if( !pDelayedFormulaGrouping->Contains( cell->aPos ))
         pDelayedFormulaGrouping->ExtendTo( cell->aPos );
 }
 
@@ -444,6 +442,19 @@ bool ScDocument::CanDelayStartListeningFormulaCells( ScColumn* column, SCROW row
         it->second.second = std::max( it->second.second, row2 );
     }
     return true;
+}
+
+void ScDocument::EnableDelayDeletingBroadcasters( bool set )
+{
+    if( bDelayedDeletingBroadcasters == set )
+        return;
+    bDelayedDeletingBroadcasters = set;
+    if( !bDelayedDeletingBroadcasters )
+    {
+        for (auto& rxTab : maTabs)
+            if (rxTab)
+                rxTab->DeleteEmptyBroadcasters();
+    }
 }
 
 bool ScDocument::HasFormulaCell( const ScRange& rRange ) const

@@ -235,13 +235,10 @@ OString PDFObjectCopier::copyExternalResources(filter::PDFObjectElement& rPage,
         auto pReference = dynamic_cast<filter::PDFReferenceElement*>(rItem.second);
         if (!pReference)
         {
-            if (pKindObject)
+            if (pKindObject && dynamic_cast<filter::PDFDictionaryElement*>(rItem.second))
             {
-                if (auto* pDict = dynamic_cast<filter::PDFDictionaryElement*>(rItem.second))
-                {
-                    bHasDictValue = true;
-                    break;
-                }
+                bHasDictValue = true;
+                break;
             }
 
             continue;
@@ -259,8 +256,7 @@ OString PDFObjectCopier::copyExternalResources(filter::PDFObjectElement& rPage,
     if (bHasDictValue && pKindObject)
     {
         sal_Int32 nObject = copyExternalResource(rDocBuffer, *pKindObject, rCopiedResources);
-        OStringBuffer sRet("/" + rKind + " " + OString::number(nObject) + " 0 R");
-        return sRet.makeStringAndClear();
+        return "/" + rKind + " " + OString::number(nObject) + " 0 R";
     }
 
     // Build the dictionary entry string.

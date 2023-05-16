@@ -10,70 +10,44 @@
 #include "helper/debughelper.hxx"
 #include "helper/qahelper.hxx"
 
-#include <sal/config.h>
-#include <test/bootstrapfixture.hxx>
-
 #include <svl/asiancfg.hxx>
-#include <svl/gridprinter.hxx>
 
-#include <scdll.hxx>
 #include <simpleformulacalc.hxx>
-#include <formulaopt.hxx>
 #include <stringutil.hxx>
 #include <scmatrix.hxx>
-#include <drwlayer.hxx>
 #include <scitems.hxx>
 #include <reffind.hxx>
-#include <markdata.hxx>
 #include <clipparam.hxx>
-#include <refundo.hxx>
 #include <undoblk.hxx>
 #include <undotab.hxx>
-#include <queryentry.hxx>
-#include <postit.hxx>
 #include <attrib.hxx>
 #include <dbdata.hxx>
 #include <reftokenhelper.hxx>
 #include <userdat.hxx>
-#include <clipcontext.hxx>
 #include <refdata.hxx>
 
-#include <docsh.hxx>
 #include <docfunc.hxx>
 #include <funcdesc.hxx>
 
-#include <calcconfig.hxx>
 #include <columniterator.hxx>
-#include <types.hxx>
-#include <tokenarray.hxx>
 #include <scopetools.hxx>
 #include <dociter.hxx>
-#include <queryparam.hxx>
 #include <edittextiterator.hxx>
 #include <editutil.hxx>
-#include <cellform.hxx>
 #include <asciiopt.hxx>
 #include <impex.hxx>
-#include <docoptio.hxx>
-#include <patattr.hxx>
 #include <docpool.hxx>
 #include <globalnames.hxx>
-#include <inputopt.hxx>
 #include <columnspanset.hxx>
 
 #include <editable.hxx>
-#include <bcaslot.hxx>
-#include <sharedformula.hxx>
 #include <table.hxx>
 #include <tabprotection.hxx>
-#include <scmod.hxx>
 #include <undomanager.hxx>
 
 #include <formula/IFunctionDescription.hxx>
 
-#include <basegfx/polygon/b2dpolygon.hxx>
 #include <editeng/borderline.hxx>
-#include <editeng/boxitem.hxx>
 #include <editeng/brushitem.hxx>
 #include <editeng/eeitem.hxx>
 #include <editeng/wghtitem.hxx>
@@ -87,34 +61,31 @@
 #include <svl/numformat.hxx>
 #include <svl/srchitem.hxx>
 #include <svl/sharedstringpool.hxx>
-#include <tools/UnitConversion.hxx>
 #include <unotools/collatorwrapper.hxx>
 
-#include <sfx2/docfile.hxx>
 #include <sfx2/sfxsids.hrc>
-
-#include <iostream>
-#include <limits>
-#include <memory>
-#include <vector>
 
 class ScUndoPaste;
 class ScUndoCut;
 
-class Test : public test::BootstrapFixture
+namespace {
+
+struct HoriIterCheck
+{
+    SCCOL nCol;
+    SCROW nRow;
+    const char* pVal;
+};
+
+}
+
+class Test : public ScUcalcTestBase
 {
 public:
-    Test();
-
     void checkPrecisionAsShown(OUString& rCode, double fValue, double fExpectedRoundVal);
 
     /** Get a separate new ScDocShell with ScDocument that suits unit test needs. */
     void getNewDocShell(ScDocShellRef& rDocShellRef);
-    /** Close such new ScDocShell. */
-    void closeDocShell(ScDocShellRef& rDocShellRef);
-
-    virtual void setUp() override;
-    virtual void tearDown() override;
 
     void testCollator();
     void testSharedStringPool();
@@ -123,7 +94,11 @@ public:
     void testMarkData();
     void testInput();
     void testColumnIterator();
+    void testTdf66613();
+    void testTdf113027();
     void testTdf90698();
+    void testTdf114406();
+    void testTdf93951();
     void testTdf134490();
     void testTdf135249();
     void testDocStatistics();
@@ -221,6 +196,7 @@ public:
     void testSetBackgroundColor();
     void testRenameTable();
 
+    void testTdf149665();
     void testTdf64001();
     void testAutoFill();
     void testAutoFillSimple();
@@ -270,7 +246,11 @@ public:
     CPPUNIT_TEST(testMarkData);
     CPPUNIT_TEST(testInput);
     CPPUNIT_TEST(testColumnIterator);
+    CPPUNIT_TEST(testTdf66613);
+    CPPUNIT_TEST(testTdf113027);
     CPPUNIT_TEST(testTdf90698);
+    CPPUNIT_TEST(testTdf114406);
+    CPPUNIT_TEST(testTdf93951);
     CPPUNIT_TEST(testTdf134490);
     CPPUNIT_TEST(testTdf135249);
     CPPUNIT_TEST(testDocStatistics);
@@ -325,6 +305,7 @@ public:
     CPPUNIT_TEST(testJumpToPrecedentsDependents);
     CPPUNIT_TEST(testSetBackgroundColor);
     CPPUNIT_TEST(testRenameTable);
+    CPPUNIT_TEST(testTdf149665);
     CPPUNIT_TEST(testTdf64001);
     CPPUNIT_TEST(testAutoFill);
     CPPUNIT_TEST(testAutoFillSimple);
@@ -359,13 +340,9 @@ public:
     CPPUNIT_TEST_SUITE_END();
 
 private:
-    ScDocShellRef m_xDocShell;
-    ScDocument* m_pDoc;
+    bool checkHorizontalIterator(ScDocument& rDoc, const std::vector<std::vector<const char*>>& rData,
+            const HoriIterCheck* pChecks, size_t nCheckCount);
 };
-
-Test::Test()
-{
-}
 
 void Test::getNewDocShell( ScDocShellRef& rDocShellRef )
 {
@@ -374,30 +351,7 @@ void Test::getNewDocShell( ScDocShellRef& rDocShellRef )
         SfxModelFlags::DISABLE_EMBEDDED_SCRIPTS |
         SfxModelFlags::DISABLE_DOCUMENT_RECOVERY);
 
-    rDocShellRef->SetIsInUcalc();
     rDocShellRef->DoInitUnitTest();
-}
-
-void Test::closeDocShell( ScDocShellRef& rDocShellRef )
-{
-    rDocShellRef->DoClose();
-    rDocShellRef.clear();
-}
-
-void Test::setUp()
-{
-    BootstrapFixture::setUp();
-
-    ScDLL::Init();
-
-    getNewDocShell(m_xDocShell);
-    m_pDoc = &m_xDocShell->GetDocument();
-}
-
-void Test::tearDown()
-{
-    closeDocShell(m_xDocShell);
-    BootstrapFixture::tearDown();
 }
 
 void Test::testCollator()
@@ -656,8 +610,8 @@ void Test::testInput()
     CPPUNIT_ASSERT_MESSAGE("String number should have the first apostrophe stripped.", bTest);
     m_pDoc->SetString(0, 0, 0, "'apple'");
     test = m_pDoc->GetString(0, 0, 0);
-    bTest = test == "'apple'";
-    CPPUNIT_ASSERT_MESSAGE("Text content should have retained the first apostrophe.", bTest);
+    bTest = test == "apple'";
+    CPPUNIT_ASSERT_MESSAGE("Text content should have the first apostrophe stripped.", bTest);
 
     // Customized string handling policy.
     ScSetStringParam aParam;
@@ -686,6 +640,95 @@ void Test::testColumnIterator() // tdf#118620
     m_pDoc->DeleteTab(0);
 }
 
+void Test::testTdf66613()
+{
+    // Create different print ranges and col/row repetitions for two tabs
+    const SCTAB nFirstTab = 0;
+    CPPUNIT_ASSERT(m_pDoc->InsertTab(nFirstTab, "FirstPrintRange"));
+    ScRange aFirstPrintRange(0, 0, nFirstTab, 2, 2, nFirstTab);
+    m_pDoc->AddPrintRange(nFirstTab, aFirstPrintRange);
+    ScRange aFirstRepeatColRange(0, 0, nFirstTab, 0, 0, nFirstTab);
+    m_pDoc->SetRepeatColRange(nFirstTab, aFirstRepeatColRange);
+    ScRange aFirstRepeatRowRange(1, 1, nFirstTab, 1, 1, nFirstTab);
+    m_pDoc->SetRepeatRowRange(nFirstTab, aFirstRepeatRowRange);
+
+    const SCTAB nSecondTab = 1;
+    CPPUNIT_ASSERT(m_pDoc->InsertTab(nSecondTab, "SecondPrintRange"));
+    ScRange aSecondPrintRange(0, 0, nSecondTab, 3, 3, nSecondTab);
+    m_pDoc->AddPrintRange(nSecondTab, aSecondPrintRange);
+    ScRange aSecondRepeatColRange(1, 1, nSecondTab, 1, 1, nSecondTab);
+    m_pDoc->SetRepeatColRange(nSecondTab, aSecondRepeatColRange);
+    ScRange aSecondRepeatRowRange(2, 2, nSecondTab, 2, 2, nSecondTab);
+    m_pDoc->SetRepeatRowRange(nSecondTab, aSecondRepeatRowRange);
+
+    // Transfer generated tabs to a new document with different order
+    ScDocument aScDocument;
+    aScDocument.TransferTab(*m_pDoc, nSecondTab, nFirstTab);
+    aScDocument.TransferTab(*m_pDoc, nFirstTab, nSecondTab);
+
+    // Check the number of print ranges in both documents
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_uInt16>(1), m_pDoc->GetPrintRangeCount(nFirstTab));
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_uInt16>(1), m_pDoc->GetPrintRangeCount(nSecondTab));
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_uInt16>(1), aScDocument.GetPrintRangeCount(nFirstTab));
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_uInt16>(1), aScDocument.GetPrintRangeCount(nSecondTab));
+
+    // Check the print ranges and col/row repetitions in both documents
+    CPPUNIT_ASSERT_EQUAL(aFirstPrintRange, *m_pDoc->GetPrintRange(nFirstTab, 0));
+    CPPUNIT_ASSERT_EQUAL(aFirstRepeatColRange, *m_pDoc->GetRepeatColRange(nFirstTab));
+    CPPUNIT_ASSERT_EQUAL(aFirstRepeatRowRange, *m_pDoc->GetRepeatRowRange(nFirstTab));
+    CPPUNIT_ASSERT_EQUAL(aSecondPrintRange, *m_pDoc->GetPrintRange(nSecondTab, 0));
+    CPPUNIT_ASSERT_EQUAL(aSecondRepeatColRange, *m_pDoc->GetRepeatColRange(nSecondTab));
+    CPPUNIT_ASSERT_EQUAL(aSecondRepeatRowRange, *m_pDoc->GetRepeatRowRange(nSecondTab));
+
+    // Tabs have to be adjusted since the order of the tabs is inverted in the new document
+    std::vector<ScRange*> aScRanges
+        = { &aFirstPrintRange,  &aFirstRepeatColRange,  &aFirstRepeatRowRange,
+            &aSecondPrintRange, &aSecondRepeatColRange, &aSecondRepeatRowRange };
+    for (size_t i = 0; i < aScRanges.size(); i++)
+    {
+        const SCTAB nTab = i >= 3 ? nFirstTab : nSecondTab;
+        aScRanges[i]->aStart.SetTab(nTab);
+        aScRanges[i]->aEnd.SetTab(nTab);
+    }
+
+    // Without the fix in place, no print ranges and col/row repetitions would be present
+    CPPUNIT_ASSERT_EQUAL(aFirstPrintRange, *aScDocument.GetPrintRange(nSecondTab, 0));
+    CPPUNIT_ASSERT_EQUAL(aFirstRepeatColRange, *aScDocument.GetRepeatColRange(nSecondTab));
+    CPPUNIT_ASSERT_EQUAL(aFirstRepeatRowRange, *aScDocument.GetRepeatRowRange(nSecondTab));
+    CPPUNIT_ASSERT_EQUAL(aSecondPrintRange, *aScDocument.GetPrintRange(nFirstTab, 0));
+    CPPUNIT_ASSERT_EQUAL(aSecondRepeatColRange, *aScDocument.GetRepeatColRange(nFirstTab));
+    CPPUNIT_ASSERT_EQUAL(aSecondRepeatRowRange, *aScDocument.GetRepeatRowRange(nFirstTab));
+
+    m_pDoc->DeleteTab(nFirstTab);
+    m_pDoc->DeleteTab(nSecondTab);
+}
+
+void Test::testTdf113027()
+{
+    // Insert some sheets including a whitespace in their name and switch the grammar to R1C1
+    CPPUNIT_ASSERT(m_pDoc->InsertTab(0, "Sheet 1"));
+    CPPUNIT_ASSERT(m_pDoc->InsertTab(1, "Sheet 2"));
+    FormulaGrammarSwitch aFGSwitch(m_pDoc, formula::FormulaGrammar::GRAM_ENGLISH_XL_R1C1);
+
+    // Add a formula containing a remote reference, i.e., to another sheet
+    const ScAddress aScAddress(0, 0, 0);
+    const OUString aFormula = "='Sheet 2'!RC";
+    m_pDoc->SetString(aScAddress, aFormula);
+
+    // Switch from relative to absolute cell reference
+    ScRefFinder aFinder(aFormula, aScAddress, *m_pDoc, m_pDoc->GetAddressConvention());
+    aFinder.ToggleRel(0, aFormula.getLength());
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: ='Sheet 2'!R1C1
+    // - Actual  : ='Sheet 2'!RC
+    // i.e. the cell reference was not changed from relative to absolute
+    CPPUNIT_ASSERT_EQUAL(OUString("='Sheet 2'!R1C1"), aFinder.GetText());
+
+    m_pDoc->DeleteTab(0);
+    m_pDoc->DeleteTab(1);
+}
+
 void Test::testTdf90698()
 {
     CPPUNIT_ASSERT(m_pDoc->InsertTab (0, "Test"));
@@ -696,6 +739,38 @@ void Test::testTdf90698()
     // - Actual  : =(1~2)
     OUString aFormula = m_pDoc->GetFormula(0,0,0);
     CPPUNIT_ASSERT_EQUAL(OUString("=(1;2)"), aFormula);
+
+    m_pDoc->DeleteTab(0);
+}
+
+void Test::testTdf114406()
+{
+    CPPUNIT_ASSERT(m_pDoc->InsertTab (0, "Test"));
+    m_pDoc->SetString(ScAddress(0,0,0), "5");
+    m_pDoc->SetString(ScAddress(1,0,0), "=A1/100%");
+
+    // Without the fix in place, this would have failed with
+    // - Expected: =A1/100%
+    // - Actual  : =A1/1
+    OUString aFormula = m_pDoc->GetFormula(1,0,0);
+    CPPUNIT_ASSERT_EQUAL(OUString("=A1/100%"), aFormula);
+
+    CPPUNIT_ASSERT_EQUAL(5.0, m_pDoc->GetValue(ScAddress(1,0,0)));
+
+    m_pDoc->DeleteTab(0);
+}
+
+void Test::testTdf93951()
+{
+    CPPUNIT_ASSERT(m_pDoc->InsertTab (0, "Test"));
+    m_pDoc->SetString(ScAddress(0,0,0), u"=2*§*2");
+
+    OUString aFormula = m_pDoc->GetFormula(0,0,0);
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: =2*§*2
+    // - Actual  : =2*
+    CPPUNIT_ASSERT_EQUAL(OUString(u"=2*§*2"), aFormula);
 
     m_pDoc->DeleteTab(0);
 }
@@ -1122,21 +1197,13 @@ void Test::testCopyToDocument()
             m_pDoc->GetNote(ScAddress(0, 0, 0))->GetText(), pDestDoc->GetNote(ScAddress(0, 0, 0))->GetText());
 
     pDestDoc->DeleteTab(0);
-    closeDocShell(xDocSh2);
+    xDocSh2->DoClose();
+    xDocSh2.clear();
 
     m_pDoc->DeleteTab(0);
 }
 
-namespace {
-
-struct HoriIterCheck
-{
-    SCCOL nCol;
-    SCROW nRow;
-    const char* pVal;
-};
-
-bool checkHorizontalIterator(ScDocument& rDoc, const std::vector<std::vector<const char*>>& rData, const HoriIterCheck* pChecks, size_t nCheckCount)
+bool Test::checkHorizontalIterator(ScDocument& rDoc, const std::vector<std::vector<const char*>>& rData, const HoriIterCheck* pChecks, size_t nCheckCount)
 {
     ScAddress aPos(0,0,0);
     insertRangeData(&rDoc, aPos, rData);
@@ -1175,8 +1242,6 @@ bool checkHorizontalIterator(ScDocument& rDoc, const std::vector<std::vector<con
     }
 
     return true;
-}
-
 }
 
 void Test::testHorizontalIterator()
@@ -1334,6 +1399,8 @@ void Test::testValueIterator()
     aOpt.SetCalcAsShown(true);
     m_pDoc->SetDocOptions(aOpt);
 
+    ScInterpreterContext aContext(*m_pDoc, m_pDoc->GetFormatTable());
+
     // Purely horizontal data layout with numeric data.
     for (SCCOL i = 1; i <= 3; ++i)
         m_pDoc->SetValue(ScAddress(i,2,0), i);
@@ -1341,7 +1408,7 @@ void Test::testValueIterator()
     {
         const double aChecks[] = { 1.0, 2.0, 3.0 };
         size_t const nCheckLen = SAL_N_ELEMENTS(aChecks);
-        ScValueIterator aIter(*m_pDoc, ScRange(1,2,0,3,2,0));
+        ScValueIterator aIter(aContext, ScRange(1,2,0,3,2,0));
         bool bHas = false;
         size_t nCheckPos = 0;
         double fVal;
@@ -1475,34 +1542,35 @@ void Test::testIteratorsDefPattern()
 
     CPPUNIT_ASSERT_EQUAL(SCCOL(102 + 1), m_pDoc->GetAllocatedColumnsCount(0));
     const ScPatternAttr* pattern = m_pDoc->GetPattern(100, 0, 0);
-    CPPUNIT_ASSERT(pattern != m_pDoc->GetDefPattern());
-    CPPUNIT_ASSERT(m_pDoc->GetPattern(102, 0, 0) == pattern);
-    CPPUNIT_ASSERT(m_pDoc->GetPattern(101, 0, 0) == m_pDoc->GetDefPattern());
-    CPPUNIT_ASSERT(m_pDoc->GetPattern(103, 0, 0) == m_pDoc->GetDefPattern());
+    const ScPatternAttr* defPattern = m_pDoc->GetDefPattern();
+    CPPUNIT_ASSERT(pattern != defPattern);
+    CPPUNIT_ASSERT_EQUAL(pattern, m_pDoc->GetPattern(102, 0, 0));
+    CPPUNIT_ASSERT_EQUAL(defPattern, m_pDoc->GetPattern(101, 0, 0));
+    CPPUNIT_ASSERT_EQUAL(defPattern, m_pDoc->GetPattern(103, 0, 0));
 
     // Test iterators.
     ScDocAttrIterator docit( *m_pDoc, 0, firstCol, 0, lastCol, 0 );
     SCCOL col1, col2;
     SCROW row1, row2;
-    CPPUNIT_ASSERT( docit.GetNext( col1, row1, row2 ) == pattern);
-    CPPUNIT_ASSERT( docit.GetNext( col1, row1, row2 ) == m_pDoc->GetDefPattern());
-    CPPUNIT_ASSERT( docit.GetNext( col1, row1, row2 ) == pattern);
-    CPPUNIT_ASSERT( docit.GetNext( col1, row1, row2 ) == m_pDoc->GetDefPattern());
-    CPPUNIT_ASSERT( docit.GetNext( col1, row1, row2 ) == nullptr );
+    CPPUNIT_ASSERT_EQUAL(pattern, docit.GetNext( col1, row1, row2 ));
+    CPPUNIT_ASSERT_EQUAL(defPattern, docit.GetNext( col1, row1, row2 ));
+    CPPUNIT_ASSERT_EQUAL(pattern, docit.GetNext( col1, row1, row2 ));
+    CPPUNIT_ASSERT_EQUAL(defPattern, docit.GetNext( col1, row1, row2 ));
+    CPPUNIT_ASSERT(docit.GetNext( col1, row1, row2 ) == nullptr );
 
     ScAttrRectIterator rectit( *m_pDoc, 0, firstCol, 0, lastCol, 0 );
-    CPPUNIT_ASSERT( rectit.GetNext( col1, col2, row1, row2 ) == pattern);
-    CPPUNIT_ASSERT( rectit.GetNext( col1, col2, row1, row2 ) == m_pDoc->GetDefPattern());
-    CPPUNIT_ASSERT( rectit.GetNext( col1, col2, row1, row2 ) == pattern);
-    CPPUNIT_ASSERT( rectit.GetNext( col1, col2, row1, row2 ) == m_pDoc->GetDefPattern());
-    CPPUNIT_ASSERT( rectit.GetNext( col1, col2, row1, row2 ) == nullptr );
+    CPPUNIT_ASSERT_EQUAL(pattern, rectit.GetNext( col1, col2, row1, row2 ));
+    CPPUNIT_ASSERT_EQUAL(defPattern, rectit.GetNext( col1, col2, row1, row2 ));
+    CPPUNIT_ASSERT_EQUAL(pattern, rectit.GetNext( col1, col2, row1, row2 ));
+    CPPUNIT_ASSERT_EQUAL(defPattern, rectit.GetNext( col1, col2, row1, row2 ));
+    CPPUNIT_ASSERT(rectit.GetNext( col1, col2, row1, row2 ) == nullptr );
 
     ScHorizontalAttrIterator horit( *m_pDoc, 0, firstCol, 0, lastCol, 0 );
-    CPPUNIT_ASSERT( horit.GetNext( col1, col2, row1 ) == pattern);
-    CPPUNIT_ASSERT( horit.GetNext( col1, col2, row1 ) == m_pDoc->GetDefPattern());
-    CPPUNIT_ASSERT( horit.GetNext( col1, col2, row1 ) == pattern);
-    CPPUNIT_ASSERT( horit.GetNext( col1, col2, row1 ) == m_pDoc->GetDefPattern());
-    CPPUNIT_ASSERT( horit.GetNext( col1, col2, row1 ) == nullptr );
+    CPPUNIT_ASSERT_EQUAL(pattern, horit.GetNext( col1, col2, row1 ));
+    CPPUNIT_ASSERT_EQUAL(defPattern, horit.GetNext( col1, col2, row1 ));
+    CPPUNIT_ASSERT_EQUAL(pattern, horit.GetNext( col1, col2, row1 ));
+    CPPUNIT_ASSERT_EQUAL(defPattern, horit.GetNext( col1, col2, row1 ));
+    CPPUNIT_ASSERT(horit.GetNext( col1, col2, row1 ) == nullptr );
 
     m_pDoc->DeleteTab(0);
 }
@@ -2588,8 +2656,8 @@ void Test::testDataArea()
     m_pDoc->InsertTab(0, "Data");
 
     // Totally empty sheet should be rightfully considered empty in all accounts.
-    CPPUNIT_ASSERT_MESSAGE("Sheet is expected to be empty.", m_pDoc->IsPrintEmpty(0, 0, 0, 100, 100));
-    CPPUNIT_ASSERT_MESSAGE("Sheet is expected to be empty.", m_pDoc->IsBlockEmpty(0, 0, 0, 100, 100));
+    CPPUNIT_ASSERT_MESSAGE("Sheet is expected to be empty.", m_pDoc->IsPrintEmpty(0, 0, 100, 100, 0));
+    CPPUNIT_ASSERT_MESSAGE("Sheet is expected to be empty.", m_pDoc->IsBlockEmpty(0, 0, 100, 100, 0));
 
     // Now, set borders in some cells...
     ::editeng::SvxBorderLine aLine(nullptr, 50, SvxBorderLineStyle::SOLID);
@@ -2605,12 +2673,12 @@ void Test::testDataArea()
     CPPUNIT_ASSERT_MESSAGE("Empty sheet with borders should be printable.",
                            !m_pDoc->IsPrintEmpty(0, 0, 0, 100, 100));
     CPPUNIT_ASSERT_MESSAGE("But it should still be considered empty in all the other cases.",
-                           m_pDoc->IsBlockEmpty(0, 0, 0, 100, 100));
+                           m_pDoc->IsBlockEmpty(0, 0, 100, 100, 0));
 
     // Adding a real cell content should turn the block non-empty.
     m_pDoc->SetString(0, 0, 0, "Some text");
     CPPUNIT_ASSERT_MESSAGE("Now the block should not be empty with a real cell content.",
-                           !m_pDoc->IsBlockEmpty(0, 0, 0, 100, 100));
+                           !m_pDoc->IsBlockEmpty(0, 0, 100, 100, 0));
 
     // TODO: Add more tests for normal data area calculation.
 
@@ -3191,8 +3259,8 @@ void Test::testGraphicsInGroup()
     {
         //Add a square
         tools::Rectangle aOrigRect(2,2,100,100);
-        SdrRectObj *pObj = new SdrRectObj(*pDrawLayer, aOrigRect);
-        pPage->InsertObject(pObj);
+        rtl::Reference<SdrRectObj> pObj = new SdrRectObj(*pDrawLayer, aOrigRect);
+        pPage->InsertObject(pObj.get());
         const tools::Rectangle &rNewRect = pObj->GetLogicRect();
         CPPUNIT_ASSERT_EQUAL_MESSAGE("must have equal position and size",
                                const_cast<const tools::Rectangle &>(aOrigRect), rNewRect);
@@ -3230,8 +3298,8 @@ void Test::testGraphicsInGroup()
     {
         // Add a circle.
         tools::Rectangle aOrigRect(10,10,210,210); // 200 x 200
-        SdrCircObj* pObj = new SdrCircObj(*pDrawLayer, SdrCircKind::Full, aOrigRect);
-        pPage->InsertObject(pObj);
+        rtl::Reference<SdrCircObj> pObj = new SdrCircObj(*pDrawLayer, SdrCircKind::Full, aOrigRect);
+        pPage->InsertObject(pObj.get());
         const tools::Rectangle& rNewRect = pObj->GetLogicRect();
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Position and size of the circle shouldn't change when inserted into the page.",
                                const_cast<const tools::Rectangle &>(aOrigRect), rNewRect);
@@ -3262,9 +3330,9 @@ void Test::testGraphicsInGroup()
         tools::Rectangle aOrigRect(10,200,110,300); // 100 x 100
         aTempPoly.append(basegfx::B2DPoint(aStartPos.X(), aStartPos.Y()));
         aTempPoly.append(basegfx::B2DPoint(aEndPos.X(), aEndPos.Y()));
-        SdrPathObj* pObj = new SdrPathObj(*pDrawLayer, OBJ_LINE, basegfx::B2DPolyPolygon(aTempPoly));
+        rtl::Reference<SdrPathObj> pObj = new SdrPathObj(*pDrawLayer, SdrObjKind::Line, basegfx::B2DPolyPolygon(aTempPoly));
         pObj->NbcSetLogicRect(aOrigRect);
-        pPage->InsertObject(pObj);
+        pPage->InsertObject(pObj.get());
         const tools::Rectangle& rNewRect = pObj->GetLogicRect();
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Size differ.",
                                const_cast<const tools::Rectangle &>(aOrigRect), rNewRect);
@@ -3305,13 +3373,13 @@ void Test::testGraphicsOnSheetMove()
 
     // Insert an object.
     tools::Rectangle aObjRect(2,2,100,100);
-    SdrObject* pObj = new SdrRectObj(*pDrawLayer, aObjRect);
-    pPage->InsertObject(pObj);
+    rtl::Reference<SdrObject> pObj = new SdrRectObj(*pDrawLayer, aObjRect);
+    pPage->InsertObject(pObj.get());
     ScDrawLayer::SetCellAnchoredFromPosition(*pObj, *m_pDoc, 0, false);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("There should be one object on the 1st sheet.", static_cast<size_t>(1), pPage->GetObjCount());
 
-    const ScDrawObjData* pData = ScDrawLayer::GetObjData(pObj);
+    const ScDrawObjData* pData = ScDrawLayer::GetObjData(pObj.get());
     CPPUNIT_ASSERT_MESSAGE("Object meta-data doesn't exist.", pData);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong sheet ID in cell anchor data!", SCTAB(0), pData->maStart.Tab());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong sheet ID in cell anchor data!", SCTAB(0), pData->maEnd.Tab());
@@ -3367,7 +3435,7 @@ void Test::testGraphicsOnSheetMove()
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Copied sheet should have one object.", size_t(1), pPage->GetObjCount());
     pObj = pPage->GetObj(0);
     CPPUNIT_ASSERT_MESSAGE("Failed to get drawing object.", pObj);
-    pData = ScDrawLayer::GetObjData(pObj);
+    pData = ScDrawLayer::GetObjData(pObj.get());
     CPPUNIT_ASSERT_MESSAGE("Failed to get drawing object meta-data.", pData);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong sheet ID in cell anchor data!", SCTAB(2), pData->maStart.Tab());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong sheet ID in cell anchor data!", SCTAB(2), pData->maEnd.Tab());
@@ -4124,7 +4192,7 @@ void Test::testMergedCells()
     //test merge and unmerge
     //TODO: an undo/redo test for this would be a good idea
     m_pDoc->InsertTab(0, "Sheet1");
-    m_pDoc->DoMerge(0, 1, 1, 3, 3, false);
+    m_pDoc->DoMerge(1, 1, 3, 3, 0, false);
     SCCOL nEndCol = 1;
     SCROW nEndRow = 1;
     m_pDoc->ExtendMerge( 1, 1, nEndCol, nEndRow, 0);
@@ -4330,11 +4398,11 @@ void Test::testSearchCells()
     CPPUNIT_ASSERT_MESSAGE("Search And Replace should succeed", bSuccess);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("There should be exactly 3 matching cells.", size_t(3), aMatchedRanges.size());
     ScAddress aHit(0,0,0);
-    CPPUNIT_ASSERT_MESSAGE("A1 should be inside the matched range.", aMatchedRanges.In(aHit));
+    CPPUNIT_ASSERT_MESSAGE("A1 should be inside the matched range.", aMatchedRanges.Contains(aHit));
     aHit.SetRow(2);
-    CPPUNIT_ASSERT_MESSAGE("A3 should be inside the matched range.", aMatchedRanges.In(aHit));
+    CPPUNIT_ASSERT_MESSAGE("A3 should be inside the matched range.", aMatchedRanges.Contains(aHit));
     aHit.SetRow(4);
-    CPPUNIT_ASSERT_MESSAGE("A5 should be inside the matched range.", aMatchedRanges.In(aHit));
+    CPPUNIT_ASSERT_MESSAGE("A5 should be inside the matched range.", aMatchedRanges.Contains(aHit));
 
     m_pDoc->DeleteTab(0);
 }
@@ -4450,6 +4518,20 @@ void Test::testJumpToPrecedentsDependents()
         CPPUNIT_ASSERT_MESSAGE("C1:C2 should be the only dependent of A1.",
                                hasRange(m_pDoc, aRefTokens, ScRange(2, 0, 0, 2, 1, 0), aA1));
     }
+
+    m_pDoc->DeleteTab(0);
+}
+
+void Test::testTdf149665()
+{
+    m_pDoc->InsertTab(0, "Test");
+
+    m_pDoc->SetString(0, 0, 0, "''1");
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: '1
+    // - Actual  : ''1
+    CPPUNIT_ASSERT_EQUAL( OUString("'1"), m_pDoc->GetString( 0, 0, 0 ) );
 
     m_pDoc->DeleteTab(0);
 }
@@ -4695,6 +4777,31 @@ void Test::testAutoFill()
     // - Actual  : 6.00000000000001
     CPPUNIT_ASSERT_EQUAL( OUString("6"), m_pDoc->GetString( 0, 50, 0 ) );
 
+    // Clear column A for a new test.
+    clearRange(m_pDoc, ScRange(0,0,0,0,m_pDoc->MaxRow(),0));
+    m_pDoc->SetRowHidden(0, m_pDoc->MaxRow(), 0, false); // Show all rows.
+
+    m_pDoc->SetString( 0, 0, 0, "2022-10-01 00:00:00.000" );
+    m_pDoc->SetString( 0, 1, 0, "2022-10-01 01:00:00.000" );
+    m_pDoc->Fill( 0, 0, 0, 1, nullptr, aMarkData, 25, FILL_TO_BOTTOM, FILL_AUTO );
+
+    // tdf#151460: Without the fix in place, this test would have failed with
+    // - Expected: 2022-10-01 20:00:00.000
+    // - Actual  : 2022-10-01 19:59:59.999
+    CPPUNIT_ASSERT_EQUAL( OUString("2022-10-01 20:00:00.000"), m_pDoc->GetString( 0, 20, 0 ) );
+
+    // Clear column A for a new test.
+    clearRange(m_pDoc, ScRange(0,0,0,0,m_pDoc->MaxRow(),0));
+    m_pDoc->SetRowHidden(0, m_pDoc->MaxRow(), 0, false); // Show all rows.
+
+    m_pDoc->SetString( 0, 0, 0, "1st" );
+
+    m_pDoc->Fill( 0, 0, 0, 0, nullptr, aMarkData, 5, FILL_TO_BOTTOM, FILL_AUTO );
+
+    CPPUNIT_ASSERT_EQUAL( OUString("1st"), m_pDoc->GetString( 0, 0, 0 ) );
+    CPPUNIT_ASSERT_EQUAL( OUString("2nd"), m_pDoc->GetString( 0, 1, 0 ) );
+    CPPUNIT_ASSERT_EQUAL( OUString("3rd"), m_pDoc->GetString( 0, 2, 0 ) );
+
     m_pDoc->DeleteTab(0);
 }
 
@@ -4882,7 +4989,7 @@ void Test::testShiftCells()
     m_pDoc->InsertCol(3, 0, 3, 0, 3, 1);
     OUString aStr = m_pDoc->GetString(5, 3, 0);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("We should have a string cell here.", aTestVal, aStr);
-    CPPUNIT_ASSERT_MESSAGE("D5 is supposed to be blank.", m_pDoc->IsBlockEmpty(0, 3, 4, 3, 4));
+    CPPUNIT_ASSERT_MESSAGE("D5 is supposed to be blank.", m_pDoc->IsBlockEmpty(3, 4, 3, 4, 0));
 
     CPPUNIT_ASSERT_MESSAGE("there should be NO note", !m_pDoc->HasNote(4, 3, 0));
     CPPUNIT_ASSERT_MESSAGE("there should be a note", m_pDoc->HasNote(5, 3, 0));
@@ -4891,7 +4998,7 @@ void Test::testShiftCells()
     m_pDoc->DeleteCol(3, 0, 3, 0, 3, 1);
     aStr = m_pDoc->GetString(4, 3, 0);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("We should have a string cell here.", aTestVal, aStr);
-    CPPUNIT_ASSERT_MESSAGE("E5 is supposed to be blank.", m_pDoc->IsBlockEmpty(0, 4, 4, 4, 4));
+    CPPUNIT_ASSERT_MESSAGE("E5 is supposed to be blank.", m_pDoc->IsBlockEmpty(4, 4, 4, 4, 0));
 
     CPPUNIT_ASSERT_MESSAGE("there should be NO note", !m_pDoc->HasNote(5, 3, 0));
     CPPUNIT_ASSERT_MESSAGE("there should be a note", m_pDoc->HasNote(4, 3, 0));
@@ -4995,10 +5102,8 @@ void Test::testNoteDeleteRow()
     CPPUNIT_ASSERT_MESSAGE("there should be a note", m_pDoc->HasNote(1, 1, 0));
 
     // test with IsBlockEmpty
-    bool bIgnoreNotes = true;
-    CPPUNIT_ASSERT_MESSAGE("The Block should be detected as empty (no Notes)", m_pDoc->IsBlockEmpty(0, 0, 0, 100, 100, bIgnoreNotes));
-    bIgnoreNotes = false;
-    CPPUNIT_ASSERT_MESSAGE("The Block should NOT be detected as empty", !m_pDoc->IsBlockEmpty(0, 0, 0, 100, 100, bIgnoreNotes));
+    CPPUNIT_ASSERT_MESSAGE("The Block should be detected as empty (no Notes)", m_pDoc->IsEmptyData(0, 0, 100, 100, 0));
+    CPPUNIT_ASSERT_MESSAGE("The Block should NOT be detected as empty", !m_pDoc->IsBlockEmpty(0, 0, 100, 100, 0));
 
     m_pDoc->DeleteRow(0, 0, m_pDoc->MaxCol(), 0, 1, 1);
 
@@ -5216,7 +5321,8 @@ void Test::testNoteLifeCycle()
         aClipDoc2.ClosingClipboardSource();
 
         pDoc2->DeleteTab(0);
-        closeDocShell(xDocSh2);
+        xDocSh2->DoClose();
+        xDocSh2.clear();
 
         pasteFromClip( m_pDoc, aPosB5, &aClipDoc2); // should not crash... tdf#104967
         ScPostIt* pNoteB5 = m_pDoc->GetNote(aPosB5);
@@ -5442,8 +5548,8 @@ void Test::testAnchoredRotatedShape()
         tools::Rectangle aRect( 4000, 5000, 10000, 7000 );
 
         tools::Rectangle aRotRect( 6000, 3000, 8000, 9000 );
-        SdrRectObj *pObj = new SdrRectObj(*pDrawLayer, aRect);
-        pPage->InsertObject(pObj);
+        rtl::Reference<SdrRectObj> pObj = new SdrRectObj(*pDrawLayer, aRect);
+        pPage->InsertObject(pObj.get());
         Point aRef1(pObj->GetSnapRect().Center());
         Degree100 nAngle = 9000_deg100; //90 deg.
         double nSin = 1.0; // sin(90 deg)
@@ -5453,13 +5559,13 @@ void Test::testAnchoredRotatedShape()
         ScDrawLayer::SetCellAnchoredFromPosition(*pObj, *m_pDoc, 0, true);
 
         tools::Rectangle aSnap = pObj->GetSnapRect();
-        CPPUNIT_ASSERT_EQUAL( true, testEqualsWithTolerance( aRotRect.GetHeight(), aSnap.GetHeight(), TOLERANCE ) );
-        CPPUNIT_ASSERT_EQUAL( true, testEqualsWithTolerance( aRotRect.GetWidth(), aSnap.GetWidth(), TOLERANCE ) );
-        CPPUNIT_ASSERT_EQUAL( true, testEqualsWithTolerance( aRotRect.Left(), aSnap.Left(), TOLERANCE ) );
-        CPPUNIT_ASSERT_EQUAL( true, testEqualsWithTolerance( aRotRect.Top(), aSnap.Top(), TOLERANCE ) );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( aRotRect.GetHeight(), aSnap.GetHeight(), TOLERANCE );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( aRotRect.GetWidth(), aSnap.GetWidth(), TOLERANCE );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( aRotRect.Left(), aSnap.Left(), TOLERANCE );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( aRotRect.Top(), aSnap.Top(), TOLERANCE );
 
         ScDrawObjData aAnchor;
-        ScDrawObjData* pData = ScDrawLayer::GetObjData( pObj );
+        ScDrawObjData* pData = ScDrawLayer::GetObjData( pObj.get() );
         CPPUNIT_ASSERT_MESSAGE("Failed to get drawing object meta-data.", pData);
 
         aAnchor.maStart = pData->maStart;
@@ -5480,8 +5586,8 @@ void Test::testAnchoredRotatedShape()
         aSnap = pObj->GetSnapRect();
 
         // ensure that width and height have been adjusted accordingly
-        CPPUNIT_ASSERT_EQUAL( true, testEqualsWithTolerance( aRotRect.GetHeight(), aSnap.GetHeight(), TOLERANCE ) );
-        CPPUNIT_ASSERT_EQUAL( true, testEqualsWithTolerance( aRotRect.GetWidth(), aSnap.GetWidth(), TOLERANCE ) );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( aRotRect.GetHeight(), aSnap.GetHeight(), TOLERANCE );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( aRotRect.GetWidth(), aSnap.GetWidth(), TOLERANCE );
 
         // ensure that anchor start and end addresses haven't changed
         CPPUNIT_ASSERT_EQUAL( aAnchor.maStart.Row(), pData->maStart.Row() ); // start row 0
@@ -6081,13 +6187,13 @@ void Test::testColumnFindEditCells()
     m_pDoc->SetValue(ScAddress(0,2,0), 1.0);
     ScRefCellValue aCell;
     aCell.assign(*m_pDoc, ScAddress(0,0,0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("This should be a string cell.", CELLTYPE_STRING, aCell.meType);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("This should be a string cell.", CELLTYPE_STRING, aCell.getType());
     aCell.assign(*m_pDoc, ScAddress(0,1,0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("This should be an empty cell.", CELLTYPE_NONE, aCell.meType);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("This should be an empty cell.", CELLTYPE_NONE, aCell.getType());
     aCell.assign(*m_pDoc, ScAddress(0,2,0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("This should be a numeric cell.", CELLTYPE_VALUE, aCell.meType);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("This should be a numeric cell.", CELLTYPE_VALUE, aCell.getType());
     aCell.assign(*m_pDoc, ScAddress(0,3,0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("This should be an empty cell.", CELLTYPE_NONE, aCell.meType);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("This should be an empty cell.", CELLTYPE_NONE, aCell.getType());
 
     aRange.aStart.SetRow(1);
     aRange.aEnd.SetRow(1);
@@ -6406,19 +6512,19 @@ void Test::testUndoDataAnchor()
 
     // Insert an object.
     tools::Rectangle aObjRect(2,1000,100,1100);
-    SdrObject* pObj = new SdrRectObj(*pDrawLayer, aObjRect);
-    pPage->InsertObject(pObj);
+    rtl::Reference<SdrObject> pObj = new SdrRectObj(*pDrawLayer, aObjRect);
+    pPage->InsertObject(pObj.get());
     ScDrawLayer::SetCellAnchoredFromPosition(*pObj, *m_pDoc, 0, false);
 
     // Get anchor data
-    ScDrawObjData* pData = ScDrawLayer::GetObjData(pObj);
+    ScDrawObjData* pData = ScDrawLayer::GetObjData(pObj.get());
     CPPUNIT_ASSERT_MESSAGE("Failed to retrieve user data for this object.", pData);
 
     ScAddress aOldStart = pData->maStart;
     ScAddress aOldEnd   = pData->maEnd;
 
     // Get non rotated anchor data
-    ScDrawObjData* pNData = ScDrawLayer::GetNonRotatedObjData( pObj );
+    ScDrawObjData* pNData = ScDrawLayer::GetNonRotatedObjData( pObj.get() );
     CPPUNIT_ASSERT_MESSAGE("Failed to retrieve non rotated user data for this object.", pNData);
 
     ScAddress aNOldStart = pNData->maStart;
@@ -6433,14 +6539,14 @@ void Test::testUndoDataAnchor()
     aMark.SelectOneTable(0);
     rFunc.InsertCells(ScRange( 0, aOldStart.Row() - 1, 0, m_pDoc->MaxCol(), aOldStart.Row(), 0 ), &aMark, INS_INSROWS_BEFORE, true, true);
 
-    pData = ScDrawLayer::GetObjData(pObj);
+    pData = ScDrawLayer::GetObjData(pObj.get());
     CPPUNIT_ASSERT_MESSAGE("Failed to retrieve user data for this object.", pData);
 
     ScAddress aNewStart = pData->maStart;
     ScAddress aNewEnd   = pData->maEnd;
 
     // Get non rotated anchor data
-    pNData = ScDrawLayer::GetNonRotatedObjData( pObj );
+    pNData = ScDrawLayer::GetNonRotatedObjData( pObj.get() );
     CPPUNIT_ASSERT_MESSAGE("Failed to retrieve non rotated user data for this object.", pNData);
 
     ScAddress aNNewStart = pNData->maStart;
@@ -6461,11 +6567,11 @@ void Test::testUndoDataAnchor()
     CPPUNIT_ASSERT_EQUAL_MESSAGE( "Failed to check state SCA_CELL.", SCA_CELL, oldType);
 
     // Get anchor data
-    pData = ScDrawLayer::GetObjData(pObj);
+    pData = ScDrawLayer::GetObjData(pObj.get());
     CPPUNIT_ASSERT_MESSAGE("Failed to retrieve user data for this object.", pData);
 
     // Get non rotated anchor data
-    pNData = ScDrawLayer::GetNonRotatedObjData( pObj );
+    pNData = ScDrawLayer::GetNonRotatedObjData( pObj.get() );
     CPPUNIT_ASSERT_MESSAGE("Failed to retrieve non rotated user data for this object.", pNData);
 
     // Check if data has moved to new rows
@@ -6478,11 +6584,11 @@ void Test::testUndoDataAnchor()
     pUndoMgr->Redo();
 
     // Get anchor data
-    pData = ScDrawLayer::GetObjData(pObj);
+    pData = ScDrawLayer::GetObjData(pObj.get());
     CPPUNIT_ASSERT_MESSAGE("Failed to retrieve user data for this object.", pData);
 
     // Get non rotated anchor data
-    pNData = ScDrawLayer::GetNonRotatedObjData( pObj );
+    pNData = ScDrawLayer::GetNonRotatedObjData( pObj.get() );
     CPPUNIT_ASSERT_MESSAGE("Failed to retrieve non rotated user data for this object.", pNData);
 
     // Check if data has moved to new rows

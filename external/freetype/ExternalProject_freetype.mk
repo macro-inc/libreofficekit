@@ -19,13 +19,17 @@ $(call gb_ExternalProject_get_state_target,freetype,build) :
 		$(gb_RUN_CONFIGURE) ./configure \
 			--disable-shared \
 			--with-pic \
-			--without-zlib \
+			--with-zlib \
 			--without-brotli \
 			--without-bzip2 \
 			--without-harfbuzz \
 			--prefix=$(call gb_UnpackedTarball_get_dir,freetype/instdir) \
-			--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) \
-			CFLAGS="$(CFLAGS) $(if $(debug),-g) $(gb_VISIBILITY_FLAGS)" \
+			$(gb_CONFIGURE_PLATFORMS) \
+			CFLAGS="$(CFLAGS) \
+				$(call gb_ExternalProject_get_build_flags,freetype) \
+				$(call gb_ExternalProject_get_link_flags,freetype) \
+				$(gb_VISIBILITY_FLAGS) \
+				$(gb_EMSCRIPTEN_CPPFLAGS)" \
 		&& $(MAKE) install \
 		&& touch $@	)
 	$(call gb_Trace_EndRange,freetype,EXTERNAL)

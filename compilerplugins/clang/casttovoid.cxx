@@ -15,7 +15,6 @@
 #include "clang/AST/Attr.h"
 
 #include "check.hxx"
-#include "compat.hxx"
 #include "plugin.hxx"
 
 namespace {
@@ -201,6 +200,9 @@ public:
         }
         auto const var = dyn_cast<VarDecl>(expr->getDecl());
         if (var == nullptr) {
+            return true;
+        }
+        if (var->getType().isVolatileQualified()) {
             return true;
         }
         auto & usage = vars_[var->getCanonicalDecl()];
@@ -464,7 +466,7 @@ private:
             return nullptr;
         }
         if (compiler.getSourceManager().isMacroBodyExpansion(
-                compat::getBeginLoc(expr)))
+                expr->getBeginLoc()))
         {
             return nullptr;
         }
@@ -507,11 +509,14 @@ private:
         if (var == nullptr) {
             return;
         }
+        if (var->getType().isVolatileQualified()) {
+            return;
+        }
         auto & usage = vars_[var->getCanonicalDecl()];
         if (usage.firstConsumption != nullptr) {
             return;
         }
-        auto const loc = compat::getBeginLoc(dre);
+        auto const loc = dre->getBeginLoc();
         if (compiler.getSourceManager().isMacroArgExpansion(loc)
             && (Lexer::getImmediateMacroNameForDiagnostics(
                     loc, compiler.getSourceManager(), compiler.getLangOpts())

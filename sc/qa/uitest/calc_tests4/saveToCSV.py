@@ -1,17 +1,21 @@
+# -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
+#
+# This file is part of the LibreOffice project.
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
+import os.path
+from tempfile import TemporaryDirectory
+
 from uitest.framework import UITestCase
 from uitest.uihelper.calc import enter_text_to_cell
-from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
+from uitest.uihelper.common import get_state_as_dict
 from uitest.uihelper.common import select_by_text
 from libreoffice.uno.propertyvalue import mkPropertyValues
-from org.libreoffice.unotest import systemPathToFileUrl
-from tempfile import TemporaryDirectory
-import os.path
+
 
 class saveToCSV(UITestCase):
 
@@ -55,6 +59,8 @@ class saveToCSV(UITestCase):
                             self.assertEqual("true", get_state_as_dict(xAsShown)['Selected'])
 
                             xFormulas.executeAction("CLICK", tuple())
+
+            self.ui_test.wait_until_file_is_available(xFilePath)
 
             with open(xFilePath, "r") as f:
                 lines = f.readlines()

@@ -32,7 +32,6 @@
 #include <svtools/parrtf.hxx>
 
 const int MAX_STRING_LEN = 1024;
-const int MAX_TOKEN_LEN = 128;
 
 #define RTF_ISDIGIT( c ) rtl::isAsciiDigit(c)
 #define RTF_ISALPHA( c ) rtl::isAsciiAlpha(c)
@@ -101,12 +100,10 @@ int SvRTFParser::GetNextToken_()
                     {
                         aToken = "\\";
                         {
-                            OUStringBuffer aStrBuffer( MAX_TOKEN_LEN );
                             do {
-                                aStrBuffer.appendUtf32(nNextCh);
+                                aToken.appendUtf32(nNextCh);
                                 nNextCh = GetNextChar();
                             } while( RTF_ISALPHA( nNextCh ) );
-                            aToken += aStrBuffer;
                         }
 
                         // minus before numeric parameters
@@ -125,7 +122,7 @@ int SvRTFParser::GetNextToken_()
                                 aNumber.append(static_cast<sal_Unicode>(nNextCh));
                                 nNextCh = GetNextChar();
                             } while( RTF_ISDIGIT( nNextCh ) );
-                            nTokenValue = aNumber.toString().toInt32();
+                            nTokenValue = OUString::unacquired(aNumber).toInt32();
                             if( bNegValue )
                                 nTokenValue = -nTokenValue;
                             bTokenHasValue=true;
@@ -157,7 +154,7 @@ int SvRTFParser::GetNextToken_()
                                     aParserStates.top().nUCharOverread = nUCharOverread;
                                 }
                             }
-                            aToken.clear(); // #i47831# erase token to prevent the token from being treated as text
+                            aToken.setLength( 0 ); // #i47831# erase token to prevent the token from being treated as text
                             // read next token
                             nRet = 0;
                             break;
@@ -171,7 +168,7 @@ int SvRTFParser::GetNextToken_()
                             {
                                 nNextToken = GetNextToken_();
                             }
-                            while (nNextToken != '{' && nNextToken != sal_Unicode(EOF));
+                            while (nNextToken != '{' && nNextToken != sal_Unicode(EOF) && IsParserWorking());
 
                             SkipGroup();
                             GetNextToken_();  // overread the last bracket
@@ -183,7 +180,7 @@ int SvRTFParser::GetNextToken_()
                             if( !bRTF_InTextRead )
                             {
                                 nRet = RTF_TEXTTOKEN;
-                                aToken = OUString( static_cast<sal_Unicode>(nTokenValue) );
+                                aToken = OUStringChar( static_cast<sal_Unicode>(nTokenValue) );
 
                                 // overread the next n "RTF" characters. This
                                 // can be also \{, \}, \'88
@@ -345,7 +342,10 @@ void SvRTFParser::ScanText()
                                 if (next>0xFF) // fix for #i43933# and #i35653#
                                 {
                                     if (!aByteString.isEmpty())
-                                        aStrBuffer.append( OStringToOUString(aByteString.makeStringAndClear(), GetSrcEncoding()) );
+                                    {
+                                        aStrBuffer.append( OStringToOUString(aByteString, GetSrcEncoding()) );
+                                        aByteString.setLength(0);
+                                    }
                                     aStrBuffer.append(static_cast<sal_Unicode>(next));
 
                                     continue;
@@ -386,7 +386,10 @@ void SvRTFParser::ScanText()
                         bNextCh = false;
 
                         if (!aByteString.isEmpty())
-                            aStrBuffer.append( OStringToOUString(aByteString.makeStringAndClear(), GetSrcEncoding()) );
+                        {
+                            aStrBuffer.append( OStringToOUString(aByteString, GetSrcEncoding()) );
+                            aByteString.setLength(0);
+                        }
                     }
                     break;
                 case '\\':
@@ -415,7 +418,7 @@ void SvRTFParser::ScanText()
                         {
                             bRTF_InTextRead = true;
 
-                            OUString sSave( aToken );
+                            OUString sSave( aToken ); // GetNextToken_() overwrites this
                             nNextCh = '\\';
                             int nToken = GetNextToken_();
                             DBG_ASSERT( RTF_U == nToken, "still not a UNI-Code character" );
@@ -502,7 +505,7 @@ void SvRTFParser::ScanText()
                     if (sal_Unicode(EOF) == (nNextCh = GetNextChar()))
                     {
                         if (!aStrBuffer.isEmpty())
-                            aToken += aStrBuffer;
+                            aToken.append( aStrBuffer );
                         return;
                     }
                 } while
@@ -519,7 +522,7 @@ void SvRTFParser::ScanText()
     }
 
     if (!aStrBuffer.isEmpty())
-        aToken += aStrBuffer;
+        aToken.append( aStrBuffer );
 }
 
 

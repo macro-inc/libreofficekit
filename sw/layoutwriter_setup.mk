@@ -26,10 +26,12 @@ $(eval $(call gb_CppunitTest_use_libraries,sw_layoutwriter$(1), \
     comphelper \
     cppu \
     cppuhelper \
+    docmodel \
     editeng \
     msword \
     sal \
     sfx \
+    subsequenttest \
     svl \
     svt \
     svxcore \
@@ -75,10 +77,15 @@ $(eval $(call gb_CppunitTest_use_configuration,sw_layoutwriter$(1)))
 
 $(eval $(call gb_CppunitTest_use_uiconfigs,sw_layoutwriter$(1), \
     modules/swriter \
+    sfx \
+    svt \
 ))
 
 $(call gb_CppunitTest_get_target,sw_layoutwriter$(1)): \
     $(call gb_Library_get_target,textconv_dict)
+
+# assert if font/glyph fallback occurs
+$(eval $(call gb_CppunitTest_set_non_application_font_use,sw_layoutwriter$(1),abort))
 
 $(eval $(call gb_CppunitTest_use_more_fonts,sw_layoutwriter$(1)))
 

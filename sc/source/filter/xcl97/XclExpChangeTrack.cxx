@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <sot/storage.hxx>
 #include <XclExpChangeTrack.hxx>
+#include <utility>
 #include <xeformula.hxx>
 #include <xehelper.hxx>
 #include <xltools.hxx>
@@ -47,7 +48,7 @@ static OString lcl_DateTimeToOString( const DateTime& rDateTime )
             rDateTime.GetYear(), rDateTime.GetMonth(), rDateTime.GetDay(),
             rDateTime.GetHour(), rDateTime.GetMin(), rDateTime.GetSec(),
             rDateTime.GetNanoSec() );
-    return OString(sBuf);
+    return sBuf;
 }
 
 // local functions
@@ -391,9 +392,9 @@ void XclExpXmlChTrHeaders::SaveXml( XclExpXmlStream& rStrm )
 }
 
 XclExpXmlChTrHeader::XclExpXmlChTrHeader(
-    const OUString& rUserName, const DateTime& rDateTime, const sal_uInt8* pGUID,
+    OUString aUserName, const DateTime& rDateTime, const sal_uInt8* pGUID,
     sal_Int32 nLogNumber, const XclExpChTrTabIdBuffer& rBuf ) :
-    maUserName(rUserName), maDateTime(rDateTime), mnLogNumber(nLogNumber),
+    maUserName(std::move(aUserName)), maDateTime(rDateTime), mnLogNumber(nLogNumber),
     mnMinAction(0), mnMaxAction(0)
 {
     memcpy(maGUID, pGUID, 16);
@@ -843,11 +844,11 @@ void XclExpChTrCellContent::GetCellData(
         return;
     }
 
-    switch (rScCell.meType)
+    switch (rScCell.getType())
     {
         case CELLTYPE_VALUE:
         {
-            rpData->fValue = rScCell.mfValue;
+            rpData->fValue = rScCell.getDouble();
             if( XclTools::GetRKFromDouble( rpData->nRKValue, rpData->fValue ) )
             {
                 rpData->nType = EXC_CHTR_TYPE_RK;
@@ -868,20 +869,20 @@ void XclExpChTrCellContent::GetCellData(
         case CELLTYPE_EDIT:
         {
             OUString sCellStr;
-            if (rScCell.meType == CELLTYPE_STRING)
+            if (rScCell.getType() == CELLTYPE_STRING)
             {
-                sCellStr = rScCell.mpString->getString();
+                sCellStr = rScCell.getSharedString()->getString();
                 rpData->mpFormattedString = XclExpStringHelper::CreateCellString(
                     rRoot, sCellStr, nullptr);
             }
             else
             {
                 XclExpHyperlinkHelper aLinkHelper( rRoot, aPosition );
-                if (rScCell.mpEditText)
+                if (rScCell.getEditText())
                 {
-                    sCellStr = ScEditUtil::GetString(*rScCell.mpEditText, &GetDoc());
+                    sCellStr = ScEditUtil::GetString(*rScCell.getEditText(), &GetDoc());
                     rpData->mpFormattedString = XclExpStringHelper::CreateCellString(
-                        rRoot, *rScCell.mpEditText, nullptr, aLinkHelper);
+                        rRoot, *rScCell.getEditText(), nullptr, aLinkHelper);
                 }
                 else
                 {
@@ -898,7 +899,7 @@ void XclExpChTrCellContent::GetCellData(
         break;
         case CELLTYPE_FORMULA:
         {
-            const ScFormulaCell* pFmlCell = rScCell.mpFormula;
+            const ScFormulaCell* pFmlCell = rScCell.getFormula();
             rpData->mpFormulaCell = pFmlCell;
 
             const ScTokenArray* pTokenArray = pFmlCell->GetCode();
@@ -1424,7 +1425,6 @@ XclExpChangeTrack::XclExpChangeTrack( const XclExpRoot& rRoot ) :
         OUString sLastUsername;
         DateTime aLastDateTime( DateTime::EMPTY );
         sal_uInt32 nIndex = 1;
-        sal_Int32 nLogNumber = 1;
         sal_uInt8 aGUID[ 16 ]; // GUID for action info records
         bool bValidGUID = false;
         while( !aActionStack.empty() )
@@ -1440,7 +1440,6 @@ XclExpChangeTrack::XclExpChangeTrack( const XclExpRoot& rRoot ) :
                 sLastUsername = pAction->GetUsername();
                 aLastDateTime = pAction->GetDateTime();
 
-                nLogNumber++;
                 maRecList.push_back( std::unique_ptr<ExcRecord>(new XclExpChTrInfo(sLastUsername, aLastDateTime, aGUID)) );
                 maRecList.push_back(  std::unique_ptr<ExcRecord>(new XclExpChTrTabId(pAction->GetTabIdBuffer())) );
                 pHeader->SetGUID( aGUID );

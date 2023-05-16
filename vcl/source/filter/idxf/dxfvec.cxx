@@ -72,8 +72,8 @@ DXFTransform::DXFTransform(double fScaleX, double fScaleY, double fScaleZ,
     aMZ(0.0, 0.0, fScaleZ),
     aMP(rShift)
 {
-    aMX.fx=cos(3.14159265359/180.0*fRotAngle);
-    aMX.fy=sin(3.14159265359/180.0*fRotAngle);
+    aMX.fx=cos(basegfx::deg2rad(fRotAngle));
+    aMX.fy=sin(basegfx::deg2rad(fRotAngle));
     aMY.fx=-aMX.fy;
     aMY.fy=aMX.fx;
     aMX*=fScaleX;
@@ -196,8 +196,8 @@ LineInfo DXFTransform::Transform(const DXFLineInfo& aDXFLineInfo) const
 {
     double fex,fey,scale;
 
-    fex=sqrt(aMX.fx*aMX.fx + aMX.fy*aMX.fy);
-    fey=sqrt(aMY.fx*aMY.fx + aMY.fy*aMY.fy);
+    fex=std::hypot(aMX.fx, aMX.fy);
+    fey=std::hypot(aMY.fx, aMY.fy);
     scale = (fex+fey)/2.0;
 
     LineInfo aLineInfo;
@@ -221,7 +221,7 @@ LineInfo DXFTransform::Transform(const DXFLineInfo& aDXFLineInfo) const
 
 double DXFTransform::CalcRotAngle() const
 {
-    return atan2(aMX.fy,aMX.fx)/3.14159265359*180.0;
+    return basegfx::rad2deg(atan2(aMX.fy,aMX.fx));
 }
 
 bool DXFTransform::Mirror() const

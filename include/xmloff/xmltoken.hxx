@@ -287,6 +287,7 @@ namespace xmloff::token {
         XML_AUTHOR_NAME,
         XML_AUTO,
         XML_AUTO_COMPLETE,
+        XML_AUTO_CREATE_NEW_FRAME,
         XML_AUTO_GROW_HEIGHT,
         XML_AUTO_GROW_WIDTH,
         XML_AUTO_RELOAD,
@@ -1052,6 +1053,9 @@ namespace xmloff::token {
         XML_HYPHENATION_PUSH_CHAR_COUNT,
         XML_HYPHENATION_REMAIN_CHAR_COUNT,
         XML_HYPHENATION_NO_CAPS,
+        XML_HYPHENATION_NO_LAST_WORD,
+        XML_HYPHENATION_WORD_CHAR_COUNT,
+        XML_HYPHENATION_ZONE,
         XML_I,
         XML_ICON,
         XML_ICON_SET,
@@ -1205,6 +1209,7 @@ namespace xmloff::token {
         XML_LINKED_CELL,
         XML_LINK_TO_SOURCE_DATA,
         XML_LIST,
+        XML_MARKER_STYLE_NAME,
         XML_LIST_BLOCK,
         XML_LIST_HEADER,
         XML_LIST_INFO,
@@ -1218,6 +1223,7 @@ namespace xmloff::token {
         XML_LIST_STYLE,
         XML_LIST_STYLE_NAME,
         XML_LN,
+        XML_LOCK,
         XML_LOCKED,
         XML_LOG,
         XML_LOGARITHMIC,
@@ -1451,6 +1457,7 @@ namespace xmloff::token {
         XML_OUTLINE_STYLE,
         XML_OUTSET,
         XML_OUTSIDE,
+        XML_OVERFLOW_BEHAVIOR,
         XML_OVERLAP,
         XML_OVERLAY,
         XML_P,
@@ -2281,6 +2288,7 @@ namespace xmloff::token {
         XML_LR,
         XML_RL,
         XML_TB,
+        XML_TB_RL90,
 
         XML_LAYOUT_GRID_COLOR,
         XML_LAYOUT_GRID_LINES,
@@ -2487,11 +2495,13 @@ namespace xmloff::token {
         XML_EXTRUSION_FIRST_LIGHT_DIRECTION,
         XML_EXTRUSION_SECOND_LIGHT_DIRECTION,
         XML_EXTRUSION_METAL,
+        XML_EXTRUSION_METAL_TYPE,
         XML_EXTRUSION_ROTATION_ANGLE,
         XML_EXTRUSION_ROTATION_CENTER,
         XML_EXTRUSION_SHININESS,
         XML_EXTRUSION_SKEW,
         XML_EXTRUSION_SPECULARITY,
+        XML_EXTRUSION_SPECULARITY_LOEXT,
         XML_EXTRUSION_PROJECTION_MODE,
         XML_EXTRUSION_VIEWPOINT,
         XML_EXTRUSION_ORIGIN,
@@ -2563,6 +2573,7 @@ namespace xmloff::token {
         XML_TABULAR_LAYOUT,
         XML_OUTLINE_SUBTOTALS_TOP,
         XML_OUTLINE_SUBTOTALS_BOTTOM,
+        XML_COMPACT_LAYOUT,
         XML_LAYOUT_MODE,
         XML_DATA_PILOT_LAYOUT_INFO,
 
@@ -2748,6 +2759,7 @@ namespace xmloff::token {
 
         XML_SHOW_FILTER_BUTTON,
         XML_DRILL_DOWN_ON_DOUBLE_CLICK,
+        XML_SHOW_DRILL_DOWN_BUTTONS,
         XML_HEADER_GRID_LAYOUT,
         XML_GROUPED_BY,
         XML_DAYS,
@@ -3308,6 +3320,7 @@ namespace xmloff::token {
         // enhanced fields
         XML_FIELDMARK,
         XML_FIELDMARK_START,
+        XML_FIELDMARK_SEPARATOR,
         XML_FIELDMARK_END,
 
         XML_IMAGE_SCALE,
@@ -3473,8 +3486,8 @@ namespace xmloff::token {
         XML_LINKED_STYLE_NAME,
 
         XML_THEME,
-        XML_THEME_COLOR,
-        XML_FILL_THEME_COLOR,
+        XML_CHAR_COLOR_THEME_REFERENCE,
+        XML_FILL_COLOR_THEME_REFERENCE,
         XML_DK1,
         XML_LT1,
         XML_DK2,
@@ -3487,10 +3500,6 @@ namespace xmloff::token {
         XML_ACCENT6,
         XML_HLINK,
         XML_FOLHLINK,
-        XML_COLOR_LUM_MOD,
-        XML_COLOR_LUM_OFF,
-        XML_FILL_COLOR_LUM_MOD,
-        XML_FILL_COLOR_LUM_OFF,
 
         XML_CONTENT_CONTROL,
         XML_SHOWING_PLACE_HOLDER,
@@ -3503,6 +3512,15 @@ namespace xmloff::token {
         XML_PLAIN_TEXT,
         XML_ALIAS,
         XML_TAG,
+
+        XML_FILL_USE_SLIDE_BACKGROUND,
+
+        XML_MAY_BREAK_BETWEEN_PAGES,
+
+        XML_GRADIENT_STOP, // multi-color-gradient
+        XML_OPACITY_STOP,
+        XML_COLOR_VALUE,
+        XML_COLOR_TYPE,
 
         XML_TOKEN_END
     };
@@ -3518,7 +3536,7 @@ namespace xmloff::token {
         enum XMLTokenEnum eToken );
 
     /// compare eToken to the string
-    XMLOFF_DLLPUBLIC bool IsXMLToken(
+    bool IsXMLToken(
         std::string_view rString,
         enum XMLTokenEnum eToken );
 

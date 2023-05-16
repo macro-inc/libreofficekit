@@ -53,6 +53,7 @@
 
 using namespace ::com::sun::star;
 
+#include <salframe.hxx>
 #include <svdata.hxx>
 
 struct ImplMouseData
@@ -67,7 +68,7 @@ struct ImplMouseData
     sal_Int32                       mnMenuDelay         = 150;
     MouseFollowFlags                mnFollow            = MouseFollowFlags::Menu;
     MouseMiddleButtonAction         mnMiddleButtonAction= MouseMiddleButtonAction::AutoScroll;
-    MouseWheelBehaviour             mnWheelBehavior     = MouseWheelBehaviour::ALWAYS;
+    MouseWheelBehaviour             mnWheelBehavior     = MouseWheelBehaviour::FocusOnly;
 };
 
 struct ImplStyleData
@@ -108,7 +109,6 @@ struct ImplStyleData
     Color                           maFieldColor;
     Color                           maFieldTextColor;
     Color                           maFieldRolloverTextColor;
-    Color                           maFontColor;
     Color                           maGroupTextColor;
     Color                           maHelpColor;
     Color                           maHelpTextColor;
@@ -125,12 +125,17 @@ struct ImplStyleData
     Color                           maMenuHighlightColor;
     Color                           maMenuHighlightTextColor;
     Color                           maMenuTextColor;
+    Color                           maListBoxWindowBackgroundColor;
+    Color                           maListBoxWindowTextColor;
+    Color                           maListBoxWindowHighlightColor;
+    Color                           maListBoxWindowHighlightTextColor;
     Color                           maMenuBarTextColor;
     Color                           maMenuBarRolloverTextColor;
     Color                           maMenuBarHighlightTextColor;
     Color                           maMonoColor;
     Color                           maRadioCheckTextColor;
     Color                           maShadowColor;
+    Color                           maWarningColor;
     Color                           maVisitedLinkColor;
     Color                           maToolTextColor;
     Color                           maWindowColor;
@@ -528,7 +533,6 @@ ImplStyleData::ImplStyleData( const ImplStyleData& rData ) :
     maFieldColor( rData.maFieldColor ),
     maFieldTextColor( rData.maFieldTextColor ),
     maFieldRolloverTextColor( rData.maFieldRolloverTextColor ),
-    maFontColor( rData.maFontColor ),
     maGroupTextColor( rData.maGroupTextColor ),
     maHelpColor( rData.maHelpColor ),
     maHelpTextColor( rData.maHelpTextColor ),
@@ -545,12 +549,17 @@ ImplStyleData::ImplStyleData( const ImplStyleData& rData ) :
     maMenuHighlightColor( rData.maMenuHighlightColor ),
     maMenuHighlightTextColor( rData.maMenuHighlightTextColor ),
     maMenuTextColor( rData.maMenuTextColor ),
+    maListBoxWindowBackgroundColor( rData.maListBoxWindowBackgroundColor ),
+    maListBoxWindowTextColor( rData.maListBoxWindowTextColor ),
+    maListBoxWindowHighlightColor( rData.maListBoxWindowHighlightColor ),
+    maListBoxWindowHighlightTextColor( rData.maListBoxWindowHighlightTextColor ),
     maMenuBarTextColor( rData.maMenuBarTextColor ),
     maMenuBarRolloverTextColor( rData.maMenuBarRolloverTextColor ),
     maMenuBarHighlightTextColor( rData.maMenuBarHighlightTextColor ),
     maMonoColor( rData.maMonoColor ),
     maRadioCheckTextColor( rData.maRadioCheckTextColor ),
     maShadowColor( rData.maShadowColor ),
+    maWarningColor( rData.maWarningColor ),
     maVisitedLinkColor( rData.maVisitedLinkColor ),
     maToolTextColor( rData.maToolTextColor ),
     maWindowColor( rData.maWindowColor ),
@@ -651,6 +660,8 @@ void ImplStyleData::SetStandardStyles()
     maShadowColor               = COL_GRAY;
     maDarkShadowColor           = COL_BLACK;
 
+    maWarningColor              = COL_YELLOW;
+
     maDefaultButtonTextColor                      = COL_BLACK;
     maButtonTextColor                             = COL_BLACK;
     maDefaultActionButtonTextColor                = COL_BLACK;
@@ -688,6 +699,10 @@ void ImplStyleData::SetStandardStyles()
     maMenuBarRolloverColor      = COL_BLUE;
     maMenuBorderColor           = COL_LIGHTGRAY;
     maMenuTextColor             = COL_BLACK;
+    maListBoxWindowBackgroundColor = COL_WHITE;
+    maListBoxWindowTextColor    = COL_BLACK;
+    maListBoxWindowHighlightColor = COL_BLUE;
+    maListBoxWindowHighlightTextColor = COL_WHITE;
     maMenuBarTextColor          = COL_BLACK;
     maMenuBarRolloverTextColor  = COL_WHITE;
     maMenuBarHighlightTextColor = COL_WHITE;
@@ -710,7 +725,6 @@ void ImplStyleData::SetStandardStyles()
     maLinkColor                 = COL_BLUE;
     maVisitedLinkColor          = Color( 0x00, 0x00, 0xCC );
     maToolTextColor             = COL_BLACK;
-    maFontColor                 = COL_BLACK;
     maAlternatingRowColor       = Color( 0xEE, 0xEE, 0xEE );
 
     mnTitleHeight                   = 18;
@@ -782,6 +796,19 @@ const Color&
 StyleSettings::GetLightBorderColor() const
 {
     return mxData->maLightBorderColor;
+}
+
+void
+StyleSettings::SetWarningColor( const Color& rColor )
+{
+    CopyData();
+    mxData->maWarningColor = rColor;
+}
+
+const Color&
+StyleSettings::GetWarningColor() const
+{
+    return mxData->maWarningColor;
 }
 
 void
@@ -1422,6 +1449,58 @@ StyleSettings::GetMenuHighlightTextColor() const
 }
 
 void
+StyleSettings::SetListBoxWindowBackgroundColor( const Color& rColor )
+{
+    CopyData();
+    mxData->maListBoxWindowBackgroundColor = rColor;
+}
+
+const Color&
+StyleSettings::GetListBoxWindowBackgroundColor() const
+{
+    return mxData->maListBoxWindowBackgroundColor;
+}
+
+void
+StyleSettings::SetListBoxWindowTextColor( const Color& rColor )
+{
+    CopyData();
+    mxData->maListBoxWindowTextColor = rColor;
+}
+
+const Color&
+StyleSettings::GetListBoxWindowTextColor() const
+{
+    return mxData->maListBoxWindowTextColor;
+}
+
+void
+StyleSettings::SetListBoxWindowHighlightColor( const Color& rColor )
+{
+    CopyData();
+    mxData->maListBoxWindowHighlightColor = rColor;
+}
+
+const Color&
+StyleSettings::GetListBoxWindowHighlightColor() const
+{
+    return mxData->maListBoxWindowHighlightColor;
+}
+
+void
+StyleSettings::SetListBoxWindowHighlightTextColor( const Color& rColor )
+{
+    CopyData();
+    mxData->maListBoxWindowHighlightTextColor = rColor;
+}
+
+const Color&
+StyleSettings::GetListBoxWindowHighlightTextColor() const
+{
+    return mxData->maListBoxWindowHighlightTextColor;
+}
+
+void
 StyleSettings::SetTabTextColor( const Color& rColor )
 {
     CopyData();
@@ -2045,19 +2124,6 @@ StyleSettings::GetDockingFloatsSupported()
 }
 
 void
-StyleSettings::SetFontColor( const Color& rColor )
-{
-    CopyData();
-    mxData->maFontColor = rColor;
-}
-
-const Color&
-StyleSettings::GetFontColor() const
-{
-    return mxData->maFontColor;
-}
-
-void
 StyleSettings::SetToolbarIconSize( ToolbarIconSize nSize )
 {
     CopyData();
@@ -2191,12 +2257,23 @@ void StyleSettings::Set3DColors( const Color& rColor )
     mxData->maDarkShadowColor   = COL_BLACK;
     if ( rColor != COL_LIGHTGRAY )
     {
-        mxData->maLightColor    = rColor;
-        mxData->maShadowColor   = rColor;
-        mxData->maDarkShadowColor=rColor;
-        mxData->maLightColor.IncreaseLuminance( 64 );
-        mxData->maShadowColor.DecreaseLuminance( 64 );
-        mxData->maDarkShadowColor.DecreaseLuminance( 100 );
+        mxData->maLightColor = rColor;
+        mxData->maShadowColor = rColor;
+        mxData->maDarkShadowColor = rColor;
+
+        if (!rColor.IsDark())
+        {
+            mxData->maLightColor.IncreaseLuminance(64);
+            mxData->maShadowColor.DecreaseLuminance(64);
+            mxData->maDarkShadowColor.DecreaseLuminance(100);
+        }
+        else
+        {
+            mxData->maLightColor.DecreaseLuminance(64);
+            mxData->maShadowColor.IncreaseLuminance(64);
+            mxData->maDarkShadowColor.IncreaseLuminance(100);
+        }
+
         sal_uLong   nRed    = mxData->maLightColor.GetRed();
         sal_uLong   nGreen  = mxData->maLightColor.GetGreen();
         sal_uLong   nBlue   = mxData->maLightColor.GetBlue();
@@ -2262,17 +2339,13 @@ enum WhichPersona { PERSONA_HEADER, PERSONA_FOOTER };
 /** Update the setting of the Persona header / footer in ImplStyleData */
 static void setupPersonaHeaderFooter( WhichPersona eWhich, OUString& rHeaderFooter, BitmapEx& rHeaderFooterBitmap, std::optional<Color>& rMenuBarTextColor )
 {
-    uno::Reference< uno::XComponentContext > xContext( comphelper::getProcessComponentContext() );
-    if ( !xContext.is() )
-        return;
-
     // don't burn time loading images we don't need.
     if ( Application::IsHeadlessModeEnabled() )
         return;
 
     // read from the configuration
-    OUString aPersona( officecfg::Office::Common::Misc::Persona::get( xContext ) );
-    OUString aPersonaSettings( officecfg::Office::Common::Misc::PersonaSettings::get( xContext ) );
+    OUString aPersona( officecfg::Office::Common::Misc::Persona::get() );
+    OUString aPersonaSettings( officecfg::Office::Common::Misc::PersonaSettings::get() );
 
     // have the settings changed? marks if header /footer prepared before
     //should maybe extended to a flag that marks if header /footer /both are loaded
@@ -2433,6 +2506,7 @@ bool StyleSettings::operator ==( const StyleSettings& rSet ) const
          (mxData->maLightBorderColor        == rSet.mxData->maLightBorderColor)         &&
          (mxData->maShadowColor             == rSet.mxData->maShadowColor)              &&
          (mxData->maDarkShadowColor         == rSet.mxData->maDarkShadowColor)          &&
+         (mxData->maWarningColor            == rSet.mxData->maWarningColor)             &&
          (mxData->maButtonTextColor         == rSet.mxData->maButtonTextColor)          &&
          (mxData->maDefaultActionButtonTextColor == rSet.mxData->maDefaultActionButtonTextColor) &&
          (mxData->maActionButtonTextColor   == rSet.mxData->maActionButtonTextColor)    &&
@@ -2460,6 +2534,10 @@ bool StyleSettings::operator ==( const StyleSettings& rSet ) const
          (mxData->maMenuBarRolloverColor    == rSet.mxData->maMenuBarRolloverColor)     &&
          (mxData->maMenuBorderColor         == rSet.mxData->maMenuBorderColor)          &&
          (mxData->maMenuTextColor           == rSet.mxData->maMenuTextColor)            &&
+         (mxData->maListBoxWindowBackgroundColor == rSet.mxData->maListBoxWindowBackgroundColor) &&
+         (mxData->maListBoxWindowTextColor       == rSet.mxData->maListBoxWindowTextColor) &&
+         (mxData->maListBoxWindowHighlightColor  == rSet.mxData->maListBoxWindowHighlightColor) &&
+         (mxData->maListBoxWindowHighlightTextColor == rSet.mxData->maListBoxWindowHighlightTextColor) &&
          (mxData->maMenuBarTextColor        == rSet.mxData->maMenuBarTextColor)         &&
          (mxData->maMenuBarRolloverTextColor == rSet.mxData->maMenuBarRolloverTextColor) &&
          (mxData->maMenuHighlightColor      == rSet.mxData->maMenuHighlightColor)       &&
@@ -2497,7 +2575,6 @@ bool StyleSettings::operator ==( const StyleSettings& rSet ) const
          (mxData->mbPreferredContextMenuShortcuts  == rSet.mxData->mbPreferredContextMenuShortcuts)&&
          (mxData->meContextMenuShortcuts    == rSet.mxData->meContextMenuShortcuts)     &&
          (mxData->mbPrimaryButtonWarpsSlider == rSet.mxData->mbPrimaryButtonWarpsSlider) &&
-         (mxData->maFontColor               == rSet.mxData->maFontColor)                &&
          (mxData->mnEdgeBlending                    == rSet.mxData->mnEdgeBlending)                     &&
          (mxData->maEdgeBlendingTopLeftColor        == rSet.mxData->maEdgeBlendingTopLeftColor)         &&
          (mxData->maEdgeBlendingBottomRightColor    == rSet.mxData->maEdgeBlendingBottomRightColor)     &&
@@ -2688,6 +2765,37 @@ void MiscSettings::SetEnableLocalizedDecimalSep( bool bEnable )
 bool MiscSettings::GetEnableLocalizedDecimalSep() const
 {
     return mxData->mbEnableLocalizedDecimalSep;
+}
+
+int MiscSettings::GetDarkMode()
+{
+    return officecfg::Office::Common::Misc::Appearance::get();
+}
+
+void MiscSettings::SetDarkMode(int nMode)
+{
+    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
+    officecfg::Office::Common::Misc::Appearance::set(nMode, batch);
+    batch->commit();
+
+    vcl::Window *pWin = Application::GetFirstTopLevelWindow();
+    while (pWin)
+    {
+        pWin->ImplGetFrame()->UpdateDarkMode();
+        pWin = Application::GetNextTopLevelWindow(pWin);
+    }
+}
+
+int MiscSettings::GetAppColorMode()
+{
+    return officecfg::Office::Common::Misc::ApplicationAppearance::get();
+}
+
+void MiscSettings::SetAppColorMode(int nMode)
+{
+    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
+    officecfg::Office::Common::Misc::ApplicationAppearance::set(nMode, batch);
+    batch->commit();
 }
 
 HelpSettings::HelpSettings()
@@ -3098,14 +3206,10 @@ StyleSettings::DetermineIconTheme() const
         else
         {
             // read from the configuration, or fallback to what the desktop wants
-            uno::Reference<uno::XComponentContext> xContext(comphelper::getProcessComponentContext());
-            if (xContext.is())
-            {
-                sTheme = officecfg::Office::Common::Misc::SymbolStyle::get(xContext);
+            sTheme = officecfg::Office::Common::Misc::SymbolStyle::get();
 
-                if (sTheme.isEmpty() || sTheme == "auto")
-                    sTheme = GetAutomaticallyChosenIconTheme();
-            }
+            if (sTheme.isEmpty() || sTheme == "auto")
+                sTheme = GetAutomaticallyChosenIconTheme();
         }
     }
 

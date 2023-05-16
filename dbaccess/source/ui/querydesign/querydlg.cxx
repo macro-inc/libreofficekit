@@ -21,7 +21,7 @@
 #include <JoinController.hxx>
 #include <JoinDesignView.hxx>
 #include <strings.hrc>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include "QTableConnectionData.hxx"
 #include <core_resource.hxx>
 #include <QueryTableView.hxx>
@@ -167,13 +167,9 @@ IMPL_LINK_NOARG( DlgQryJoin, LBChangeHdl, weld::ComboBox&, void )
             eJoinType = LEFT_JOIN;
             break;
         case ID_RIGHT_JOIN:
-            {
-                pResId = STR_QUERY_LEFTRIGHT_JOIN;
-                eJoinType = RIGHT_JOIN;
-                OUString sTemp = sFirstWinName;
-                sFirstWinName = sSecondWinName;
-                sSecondWinName = sTemp;
-            }
+            pResId = STR_QUERY_LEFTRIGHT_JOIN;
+            eJoinType = RIGHT_JOIN;
+            std::swap( sFirstWinName, sSecondWinName );
             break;
         case ID_FULL_JOIN:
             pResId = STR_QUERY_FULL_JOIN;

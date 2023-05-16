@@ -263,10 +263,10 @@ static void WriteLocalTimePS( osl::File *rFile )
         WritePS( rFile, "Unknown-Time" );
 }
 
-static bool isAscii( const OUString& rStr )
+static bool isAscii( std::u16string_view rStr )
 {
-    sal_Int32 nLen = rStr.getLength();
-    for( sal_Int32 i = 0; i < nLen; i++ )
+    size_t nLen = rStr.size();
+    for( size_t i = 0; i < nLen; i++ )
         if( rStr[i] > 127 )
             return false;
     return true;
@@ -277,7 +277,7 @@ PrinterJob::StartJob (
                       const OUString& rFileName,
                       int nMode,
                       const OUString& rJobName,
-                      const OUString& rAppName,
+                      std::u16string_view rAppName,
                       const JobData& rSetupData,
                       PrinterGfx* pGraphics,
                       bool bIsQuickJob
@@ -340,7 +340,7 @@ PrinterJob::StartJob (
     OUString aTitle( aFilterWS );
     if( ! isAscii( aTitle ) )
     {
-        aTitle = WhitespaceToSpace( rFileName.copy(rFileName.lastIndexOf('/')+1), false );
+        aTitle = WhitespaceToSpace( rFileName.subView(rFileName.lastIndexOf('/')+1), false );
         if( ! isAscii( aTitle ) )
             aTitle.clear();
     }

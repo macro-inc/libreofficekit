@@ -143,7 +143,7 @@ struct ImplIMEInfos
     sal_Int32   nLen;
     bool        bWasCursorOverwrite;
 
-            ImplIMEInfos( const EditPaM& rPos, const OUString& rOldTextAfterStartPos );
+            ImplIMEInfos( const EditPaM& rPos, OUString aOldTextAfterStartPos );
             ~ImplIMEInfos();
 
     void    CopyAttribs( const ExtTextInputAttr* pA, sal_uInt16 nL );
@@ -528,8 +528,11 @@ private:
 
     Color               maBackgroundColor;
 
-    sal_uInt16          nStretchX;
-    sal_uInt16          nStretchY;
+    double mfFontScaleX;
+    double mfFontScaleY;
+    double mfSpacingScaleX;
+    double mfSpacingScaleY;
+    bool mbRoundToNearestPt;
 
     CharCompressType    nAsianCompressionMode;
 
@@ -604,9 +607,10 @@ private:
     bool            bFirstWordCapitalization:1;   // specifies if auto-correction should capitalize the first word or not
     bool            mbLastTryMerge:1;
     bool            mbReplaceLeadingSingleQuotationMark:1;
+    bool            mbSkipOutsideFormat:1;
+    bool            mbFuzzing:1;
 
     bool            mbNbspRunNext;  // can't be a bitfield as it is passed as bool&
-
 
     // Methods...
 
@@ -732,11 +736,40 @@ private:
                             std::vector<std::unique_ptr<SvxFontItem>>& rFontTable, SvxColorList& rColorList );
     sal_Int32           LogicToTwips( sal_Int32 n );
 
-    inline short        GetXValue( short nXValue ) const;
-    inline tools::Long         GetXValue( tools::Long nXValue ) const;
+    double scaleXSpacingValue(tools::Long nXValue) const
+    {
+        if (!aStatus.DoStretch() || mfSpacingScaleX == 100.0)
+            return nXValue;
 
-    inline short        GetYValue( short nYValue ) const;
-    inline sal_uInt16   GetYValue( sal_uInt16 nYValue ) const;
+        return double(nXValue) * mfSpacingScaleX / 100.0;
+    }
+
+    double scaleYSpacingValue(sal_uInt16 nYValue) const
+    {
+        if (!aStatus.DoStretch() || mfSpacingScaleY == 100.0)
+            return nYValue;
+
+        return double(nYValue) * mfSpacingScaleY / 100.0;
+    }
+
+    double scaleYFontValue(sal_uInt16 nYValue) const
+    {
+        if (!aStatus.DoStretch() || (mfFontScaleY == 100.0))
+            return nYValue;
+
+        return double(nYValue) * mfFontScaleY / 100.0;
+    }
+
+    double scaleXFontValue(tools::Long nXValue) const
+    {
+        if (!aStatus.DoStretch() || (mfFontScaleX == 100.0))
+            return nXValue;
+
+        return double(nXValue) * mfFontScaleY / 100.0;
+    }
+
+    void setRoundToNearestPt(bool bRound) { mbRoundToNearestPt = bRound; }
+    double roundToNearestPt(double fInput) const;
 
     ContentNode*        GetPrevVisNode( ContentNode const * pCurNode );
     ContentNode*        GetNextVisNode( ContentNode const * pCurNode );
@@ -1017,7 +1050,7 @@ public:
     void                SetDefaultLanguage( LanguageType eLang ) { eDefLanguage = eLang; }
     LanguageType        GetDefaultLanguage() const { return eDefLanguage; }
 
-    LanguageType        GetLanguage( const EditPaM& rPaM, sal_Int32* pEndPos = nullptr ) const;
+    editeng::LanguageSpan GetLanguage( const EditPaM& rPaM, sal_Int32* pEndPos = nullptr ) const;
     css::lang::Locale   GetLocale( const EditPaM& rPaM ) const;
 
     void DoOnlineSpelling( ContentNode* pThisNodeOnly = nullptr, bool bSpellAtCursorPos = false, bool bInterruptible = true );
@@ -1079,8 +1112,19 @@ public:
     SvxCellJustifyMethod    GetJustifyMethod( sal_Int32 nPara ) const;
     SvxCellVerJustify       GetVerJustification( sal_Int32 nPara ) const;
 
-    void                SetCharStretching( sal_uInt16 nX, sal_uInt16 nY );
-    inline void         GetCharStretching( sal_uInt16& rX, sal_uInt16& rY ) const;
+    void setScale(double fFontScaleX, double fFontScaleY, double fSpacingScaleX, double fSpacingScaleY);
+
+    void getFontScale(double& rX, double& rY) const
+    {
+        rX = mfFontScaleX;
+        rY = mfFontScaleY;
+    }
+
+    void getSpacingScale(double& rX, double& rY) const
+    {
+        rX = mfSpacingScaleX;
+        rY = mfSpacingScaleY;
+    }
 
     sal_Int32           GetBigTextObjectStart() const                               { return nBigTextObjectStart; }
 
@@ -1131,6 +1175,8 @@ public:
 
     /** Whether last AutoCorrect inserted a NO-BREAK SPACE that may need to be removed again. */
     bool            IsNbspRunNext() const { return mbNbspRunNext; }
+
+    void EnableSkipOutsideFormat(bool set) { mbSkipOutsideFormat = set; }
 
     void Dispose();
     void SetLOKSpecialPaperSize(const Size& rSize) { aLOKSpecialPaperSize = rSize; }
@@ -1277,45 +1323,6 @@ inline ParaPortion* ImpEditEngine::FindParaPortion( ContentNode const * pNode )
     sal_Int32 nPos = aEditDoc.GetPos( pNode );
     DBG_ASSERT( nPos < GetParaPortions().Count(), "Portionloser Node?" );
     return GetParaPortions()[ nPos ];
-}
-
-inline void ImpEditEngine::GetCharStretching( sal_uInt16& rX, sal_uInt16& rY ) const
-{
-    rX = nStretchX;
-    rY = nStretchY;
-}
-
-inline short ImpEditEngine::GetXValue( short nXValue ) const
-{
-    if ( !aStatus.DoStretch() || ( nStretchX == 100 ) )
-        return nXValue;
-
-    return static_cast<short>(static_cast<tools::Long>(nXValue)*nStretchX/100);
-}
-
-
-inline tools::Long ImpEditEngine::GetXValue( tools::Long nXValue ) const
-{
-    if ( !aStatus.DoStretch() || ( nStretchX == 100 ) )
-        return nXValue;
-
-    return nXValue*nStretchX/100;
-}
-
-inline short ImpEditEngine::GetYValue( short nYValue ) const
-{
-    if ( !aStatus.DoStretch() || ( nStretchY == 100 ) )
-        return nYValue;
-
-    return static_cast<short>(static_cast<tools::Long>(nYValue)*nStretchY/100);
-}
-
-inline sal_uInt16 ImpEditEngine::GetYValue( sal_uInt16 nYValue ) const
-{
-    if ( !aStatus.DoStretch() || ( nStretchY == 100 ) )
-        return nYValue;
-
-    return static_cast<sal_uInt16>(static_cast<tools::Long>(nYValue)*nStretchY/100);
 }
 
 inline PointerStyle ImpEditView::GetPointer()

@@ -50,6 +50,10 @@
 #include <vector>
 #include <cstdint>
 
+#include "font/PhysicalFontFace.hxx"
+
+class SvStream;
+
 namespace vcl
 {
 
@@ -122,7 +126,7 @@ namespace vcl
     typedef struct {
         sal_uInt32 glyphID;                     /**< glyph ID                           */
         sal_uInt16 nbytes;                      /**< number of bytes in glyph data      */
-        sal_uInt8  *ptr;                         /**< pointer to glyph data              */
+        std::unique_ptr<sal_uInt8[]> ptr;       /**< pointer to glyph data              */
         sal_uInt16 aw;                          /**< advance width                      */
         sal_Int16  lsb;                         /**< left sidebearing                   */
         bool compflag;                          /**< false- if non-composite */
@@ -133,45 +137,44 @@ namespace vcl
     } GlyphData;
 
 /** Structure used by the TrueType Creator and CreateTTFromTTGlyphs() */
-    typedef struct {
+    struct NameRecord {
         sal_uInt16 platformID;                  /**< Platform ID                                            */
         sal_uInt16 encodingID;                  /**< Platform-specific encoding ID                          */
         LanguageType languageID;                /**< Language ID                                            */
         sal_uInt16 nameID;                      /**< Name ID                                                */
-        sal_uInt16 slen;                        /**< String length in bytes                                 */
-        sal_uInt8  *sptr;                        /**< Pointer to string data (not zero-terminated!)          */
-    } NameRecord;
+        std::vector<sal_uInt8> sptr;            /**< string data (not zero-terminated!)          */
+    };
 
 /** Return value of GetTTGlobalFontInfo() */
 
     typedef struct TTGlobalFontInfo_ {
-        char *family;             /**< family name                                             */
-        sal_Unicode *ufamily;     /**< family name UCS2                                         */
-        char *subfamily;          /**< subfamily name                                          */
-        sal_Unicode *usubfamily;  /**< subfamily name UCS2 */
-        char *psname;             /**< PostScript name                                         */
-        sal_uInt16 macStyle;      /**< macstyle bits from 'HEAD' table */
-        int   weight;             /**< value of WeightClass or 0 if can't be determined        */
-        int   width;              /**< value of WidthClass or 0 if can't be determined         */
-        int   pitch;              /**< 0: proportional font, otherwise: monospaced             */
-        int   italicAngle;        /**< in counter-clockwise degrees * 65536                    */
-        int   xMin;               /**< global bounding box: xMin                               */
-        int   yMin;               /**< global bounding box: yMin                               */
-        int   xMax;               /**< global bounding box: xMax                               */
-        int   yMax;               /**< global bounding box: yMax                               */
-        int   ascender;           /**< typographic ascent.                                     */
-        int   descender;          /**< typographic descent.                                    */
-        int   linegap;            /**< typographic line gap.\ Negative values are treated as
+        OString    family;        /**< family name                                             */
+        OUString   ufamily;       /**< family name UCS2                                         */
+        OString    subfamily;     /**< subfamily name                                          */
+        OUString   usubfamily;    /**< subfamily name UCS2 */
+        OString    psname;        /**< PostScript name                                         */
+        sal_uInt16 macStyle = 0;      /**< macstyle bits from 'HEAD' table */
+        int   weight = 0;             /**< value of WeightClass or 0 if can't be determined        */
+        int   width = 0;              /**< value of WidthClass or 0 if can't be determined         */
+        int   pitch = 0;              /**< 0: proportional font, otherwise: monospaced             */
+        int   italicAngle = 0;        /**< in counter-clockwise degrees * 65536                    */
+        int   xMin = 0;               /**< global bounding box: xMin                               */
+        int   yMin = 0;               /**< global bounding box: yMin                               */
+        int   xMax = 0;               /**< global bounding box: xMax                               */
+        int   yMax = 0;               /**< global bounding box: yMax                               */
+        int   ascender = 0;           /**< typographic ascent.                                     */
+        int   descender = 0;          /**< typographic descent.                                    */
+        int   linegap = 0;            /**< typographic line gap.\ Negative values are treated as
                                      zero in Win 3.1, System 6 and System 7.                 */
-        int   typoAscender;       /**< OS/2 portable typographic ascender                      */
-        int   typoDescender;      /**< OS/2 portable typographic descender                     */
-        int   typoLineGap;        /**< OS/2 portable typographic line gap                       */
-        int   winAscent;          /**< ascender metric for Windows                             */
-        int   winDescent;         /**< descender metric for Windows                            */
-        bool  symbolEncoded;      /**< true: MS symbol encoded */
-        sal_uInt8  panose[10];    /**< PANOSE classification number                            */
-        sal_uInt32 typeFlags;     /**< type flags (copyright bits)                             */
-        sal_uInt16 fsSelection;   /**< OS/2 fsSelection */
+        int   typoAscender = 0;       /**< OS/2 portable typographic ascender                      */
+        int   typoDescender = 0;      /**< OS/2 portable typographic descender                     */
+        int   typoLineGap = 0;        /**< OS/2 portable typographic line gap                       */
+        int   winAscent = 0;          /**< ascender metric for Windows                             */
+        int   winDescent = 0;         /**< descender metric for Windows                            */
+        bool  microsoftSymbolEncoded = false;  /**< true: MS symbol encoded */
+        sal_uInt8  panose[10] = {};   /**< PANOSE classification number                            */
+        sal_uInt32 typeFlags = 0;     /**< type flags (copyright bits)                             */
+        sal_uInt16 fsSelection = 0;   /**< OS/2 fsSelection */
     } TTGlobalFontInfo;
 
 /** ControlPoint structure used by GetTTGlyphPoints() */
@@ -445,7 +448,6 @@ constexpr sal_uInt32 T_post = 0x706F7374;
 constexpr sal_uInt32 T_cvt  = 0x63767420;
 constexpr sal_uInt32 T_prep = 0x70726570;
 constexpr sal_uInt32 T_fpgm = 0x6670676D;
-constexpr sal_uInt32 T_gsub = 0x47535542;
 constexpr sal_uInt32 T_CFF  = 0x43464620;
 
 class AbstractTrueTypeFont;
@@ -518,7 +520,7 @@ class TrueTypeFont;
  * @ingroup sft
  *
  */
-    int GetTTGlyphPoints(AbstractTrueTypeFont *ttf, sal_uInt32 glyphID, ControlPoint **pointArray);
+    int GetTTGlyphPoints(AbstractTrueTypeFont *ttf, sal_uInt32 glyphID, std::vector<ControlPoint>& pointArray);
 
 /**
  * Extracts raw glyph data from the 'glyf' table and returns it in an allocated
@@ -532,7 +534,7 @@ class TrueTypeFont;
  * @ingroup sft
  *
  */
-    GlyphData *GetTTRawGlyphData(AbstractTrueTypeFont *ttf, sal_uInt32 glyphID);
+    std::unique_ptr<GlyphData> GetTTRawGlyphData(AbstractTrueTypeFont *ttf, sal_uInt32 glyphID);
 
 /**
  * For a specified glyph adds all component glyphs IDs to the list and
@@ -556,23 +558,12 @@ class TrueTypeFont;
  * array of NameRecord structs
  *
  * @param ttf       pointer to the TrueTypeFont struct
- * @param nr        pointer to the array of NameRecord structs
- *
- * @return          number of NameRecord structs
- * @ingroup sft
- */
-
-    int GetTTNameRecords(AbstractTrueTypeFont const *ttf, NameRecord **nr);
-
-/**
- * Deallocates previously allocated array of NameRecords.
- *
- * @param nr        array of NameRecord structs
- * @param n         number of elements in the array
+ * @param nr        reference to the vector of NameRecord structs
  *
  * @ingroup sft
  */
-    void DisposeNameRecords(NameRecord* nr, int n);
+
+    void GetTTNameRecords(AbstractTrueTypeFont const *ttf, std::vector<NameRecord>& nr);
 
 /**
  * Generates a new PostScript Type 3 font and dumps it to <b>outf</b> file.
@@ -591,7 +582,7 @@ class TrueTypeFont;
  * @ingroup sft
  *
  */
-    SFErrCodes CreateT3FromTTGlyphs(TrueTypeFont *ttf, FILE *outf, const char *fname, sal_uInt16 const *glyphArray, sal_uInt8 *encoding, int nGlyphs, int wmode);
+    SFErrCodes CreateT3FromTTGlyphs(TrueTypeFont *ttf, SvStream *outf, const char *fname, sal_uInt16 const *glyphArray, sal_uInt8 *encoding, int nGlyphs, int wmode);
 
 /**
  * Generates a new TrueType font and dumps it to <b>outf</b> file.
@@ -611,11 +602,16 @@ class TrueTypeFont;
  *
  */
     VCL_DLLPUBLIC SFErrCodes CreateTTFromTTGlyphs(AbstractTrueTypeFont  *ttf,
-                              const char    *fname,
+                              std::vector<sal_uInt8>& rOutBuffer,
                               sal_uInt16 const *glyphArray,
                               sal_uInt8 const *encoding,
                               int            nGlyphs);
 
+    VCL_DLLPUBLIC bool CreateTTFfontSubset(AbstractTrueTypeFont& aTTF,
+                              std::vector<sal_uInt8>& rOutBuffer,
+                              const sal_GlyphId* pGlyphIds,
+                              const sal_uInt8* pEncoding,
+                              int nGlyphCount, FontSubsetInfo& rInfo);
 /**
  * Generates a new PostScript Type42 font and dumps it to <b>outf</b> file.
  * This function substitutes glyph 0 for all glyphIDs that are not found in the font.
@@ -637,23 +633,11 @@ class TrueTypeFont;
  *
  */
     SFErrCodes CreateT42FromTTGlyphs(TrueTypeFont  *ttf,
-                               FILE          *outf,
+                               SvStream      *outf,
                                const char    *psname,
                                sal_uInt16 const *glyphArray,
                                sal_uInt8          *encoding,
                                int            nGlyphs);
-
-/**
- * Queries glyph metrics. Allocates an array of advance width/height values and returns it.
- *
- * @param ttf         pointer to the TrueTypeFont structure
- * @param glyphArray  pointer to an array of glyphs that are to be extracted from ttf
- * @param nGlyphs     number of glyph IDs in glyphArray and encoding values in encoding
- * @param vertical    writing mode: false - horizontal, true - vertical
- * @ingroup sft
- *
- */
-    VCL_DLLPUBLIC std::unique_ptr<sal_uInt16[]> GetTTSimpleGlyphMetrics(AbstractTrueTypeFont const *ttf, const sal_uInt16 *glyphArray, int nGlyphs, bool vertical);
 
 /**
  * Returns global font information about the TrueType font.
@@ -664,7 +648,7 @@ class TrueTypeFont;
  * @ingroup sft
  *
  */
-    VCL_DLLPUBLIC void GetTTGlobalFontInfo(TrueTypeFont *ttf, TTGlobalFontInfo *info);
+    VCL_DLLPUBLIC void GetTTGlobalFontInfo(AbstractTrueTypeFont *ttf, TTGlobalFontInfo *info);
 
 /**
  * Returns part of the head table info, normally collected by GetTTGlobalFontInfo.
@@ -681,20 +665,6 @@ class TrueTypeFont;
  * @ingroup sft
  */
     VCL_DLLPUBLIC bool GetTTGlobalFontHeadInfo(const AbstractTrueTypeFont *ttf, int& xMin, int& yMin, int& xMax, int& yMax, sal_uInt16& macStyle);
-
-/**
- * Returns fonts metrics.
- * @see TTGlobalFontInfo
- *
- * @param hhea        hhea table data
- * @param os2         OS/2 table data
- * @param info        pointer to a TTGlobalFontInfo structure
- * @ingroup sft
- *
- */
- void GetTTFontMetrics(const uint8_t *pHhea, size_t nHhea,
-                       const uint8_t *pOs2, size_t nOs2,
-                       TTGlobalFontInfo *info);
 
 /*- private definitions */
 
@@ -714,9 +684,8 @@ constexpr int O_post = 11;   /* 'post' */
 constexpr int O_cvt  = 12;   /* 'cvt_' - only used in TT->TT generation */
 constexpr int O_prep = 13;   /* 'prep' - only used in TT->TT generation */
 constexpr int O_fpgm = 14;   /* 'fpgm' - only used in TT->TT generation */
-constexpr int O_gsub = 15;   /* 'GSUB' */
-constexpr int O_CFF = 16;   /* 'CFF' */
-constexpr int NUM_TAGS = 17;
+constexpr int O_CFF = 15;   /* 'CFF' */
+constexpr int NUM_TAGS = 16;
 
 class VCL_DLLPUBLIC AbstractTrueTypeFont
 {
@@ -727,6 +696,7 @@ class VCL_DLLPUBLIC AbstractTrueTypeFont
     sal_uInt32 m_nUnitsPerEm;
     std::vector<sal_uInt32> m_aGlyphOffsets;
     FontCharMapRef m_xCharMap;
+    bool m_bMicrosoftSymbolEncoded;
 
 protected:
     SFErrCodes indexGlyphData();
@@ -735,16 +705,24 @@ public:
     AbstractTrueTypeFont(const char* fileName = nullptr, const FontCharMapRef xCharMap = nullptr);
     virtual ~AbstractTrueTypeFont();
 
+    SFErrCodes initialize();
+
     std::string const & fileName() const { return m_sFileName; }
     sal_uInt32 glyphCount() const { return m_nGlyphs; }
     sal_uInt32 glyphOffset(sal_uInt32 glyphID) const;
     sal_uInt32 horzMetricCount() const { return m_nHorzMetrics; }
     sal_uInt32 vertMetricCount() const { return m_nVertMetrics; }
     sal_uInt32 unitsPerEm() const { return m_nUnitsPerEm; }
-    const FontCharMapRef & GetCharMap() const { return m_xCharMap; }
+    bool IsMicrosoftSymbolEncoded() const { return m_bMicrosoftSymbolEncoded; }
 
     virtual bool hasTable(sal_uInt32 ord) const = 0;
     virtual const sal_uInt8* table(sal_uInt32 ord, sal_uInt32& size) const = 0;
+
+    OString     psname;
+    OString     family;
+    OUString    ufamily;
+    OString     subfamily;
+    OUString    usubfamily;
 };
 
 class TrueTypeFont final : public AbstractTrueTypeFont
@@ -760,13 +738,6 @@ class TrueTypeFont final : public AbstractTrueTypeFont
 public:
         sal_Int32   fsize;
         sal_uInt8   *ptr;
-
-        char        *psname;
-        char        *family;
-        sal_Unicode *ufamily;
-        char        *subfamily;
-        sal_Unicode *usubfamily;
-
         sal_uInt32  ntables;
 
     TrueTypeFont(const char* pFileName = nullptr, const FontCharMapRef xCharMap = nullptr);

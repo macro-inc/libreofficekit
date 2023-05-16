@@ -32,8 +32,7 @@ namespace weld { class Widget; class Window; }
 
 namespace basctl
 {
-    void            Organize(weld::Window* pParent, sal_Int16 tabId);
-
+    void            Organize(weld::Window* pParent, const css::uno::Reference<css::frame::XFrame>& xDocFrame, sal_Int16 tabId);
 
     // help methods for the general use:
     SbMethod*       CreateMacro( SbModule* pModule, const OUString& rMacroName );
@@ -45,7 +44,7 @@ namespace basctl
     void            BasicStopped( bool* pbAppWindowDisabled = nullptr, bool* pbDispatcherLocked = nullptr, sal_uInt16* pnWaitCount = nullptr,
                             SfxUInt16Item** ppSWActionCount = nullptr, SfxUInt16Item** ppSWLockViewCount = nullptr );
 
-    bool            IsValidSbxName( const OUString& rName );
+    bool            IsValidSbxName( std::u16string_view rName );
 
     BasicManager*   FindBasicManager( StarBASIC const * pLib );
 

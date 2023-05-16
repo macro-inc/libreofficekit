@@ -17,7 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <canvas/canvastools.hxx>
 
 #include <eventqueue.hxx>
@@ -53,6 +53,7 @@
 #include <com/sun/star/util/XModifyListener.hpp>
 
 #include <memory>
+#include <utility>
 #include <vector>
 #include <algorithm>
 
@@ -111,7 +112,7 @@ basegfx::B2DPolyPolygon createClipPolygon( const basegfx::B2DPolyPolygon&    rCl
     // =====================
 
     // AW: Simplified
-    const basegfx::B2DRange aClipRange(0, 0, rUserSize.getX(), rUserSize.getY());
+    const basegfx::B2DRange aClipRange(0, 0, rUserSize.getWidth(), rUserSize.getHeight());
 
     if(rClip.count())
     {
@@ -415,8 +416,8 @@ public:
         @param rLayerBounds
         Initial layer bounds, in view coordinate system
      */
-    SlideViewLayer( const cppcanvas::SpriteCanvasSharedPtr& pCanvas,
-                    const basegfx::B2DHomMatrix&            rTransform,
+    SlideViewLayer( cppcanvas::SpriteCanvasSharedPtr        pCanvas,
+                    basegfx::B2DHomMatrix                   aTransform,
                     const basegfx::B2DRange&                rLayerBounds,
                     const basegfx::B2DSize&                 rUserSize,
                     View const* const                       pParentView) :
@@ -425,8 +426,8 @@ public:
         maLayerBoundsPixel(),
         maClip(),
         maUserSize(rUserSize),
-        maTransformation(rTransform),
-        mpSpriteCanvas(pCanvas),
+        maTransformation(std::move(aTransform)),
+        mpSpriteCanvas(std::move(pCanvas)),
         mpSprite(),
         mpOutputCanvas(),
         mpParentView(pParentView)
@@ -445,8 +446,8 @@ public:
         // limit layer bounds to visible screen
         maLayerBounds.intersect( basegfx::B2DRange(0.0,
                                                    0.0,
-                                                   maUserSize.getX(),
-                                                   maUserSize.getY()) );
+                                                   maUserSize.getWidth(),
+                                                   maUserSize.getHeight()) );
 
         basegfx::B2IRange const& rNewLayerPixel(
             getLayerBoundsPixel(maLayerBounds,
@@ -583,7 +584,7 @@ private:
 
                 const basegfx::B2I64Tuple& rSpriteSize(maLayerBoundsPixel.getRange());
                 mpSprite = mpSpriteCanvas->createCustomSprite(
-                    basegfx::B2DVector(sal::static_int_cast<sal_Int32>(rSpriteSize.getX()),
+                    basegfx::B2DSize(sal::static_int_cast<sal_Int32>(rSpriteSize.getX()),
                                        sal::static_int_cast<sal_Int32>(rSpriteSize.getY())) );
 
                 mpSprite->setPriority(
@@ -860,8 +861,8 @@ void SlideView::clear() const
     clearRect(getCanvas()->clone(),
               getLayerBoundsPixel(
                   basegfx::B2DRange(0,0,
-                                    maUserSize.getX(),
-                                    maUserSize.getY()),
+                                    maUserSize.getWidth(),
+                                    maUserSize.getHeight()),
                   getTransformation()));
 }
 
@@ -944,7 +945,7 @@ basegfx::B2DHomMatrix SlideView::getTransformation() const
     osl::MutexGuard aGuard( m_aMutex );
 
     basegfx::B2DHomMatrix aMatrix;
-    aMatrix.scale( 1.0/maUserSize.getX(), 1.0/maUserSize.getY() );
+    aMatrix.scale( 1.0 / maUserSize.getWidth(), 1.0 / maUserSize.getHeight() );
 
     return maViewTransform * aMatrix;
 }
@@ -1026,10 +1027,10 @@ struct WeakRefWrapper
     uno::WeakReference<uno::XInterface> const m_wObj;
     std::function<void (SlideView&)> const m_func;
 
-    WeakRefWrapper(SlideView & rObj, std::function<void (SlideView&)> const& func)
+    WeakRefWrapper(SlideView & rObj, std::function<void (SlideView&)> func)
         : m_rObj(rObj)
         , m_wObj(static_cast<::cppu::OWeakObject*>(&rObj))
-        , m_func(func)
+        , m_func(std::move(func))
     {
     }
 

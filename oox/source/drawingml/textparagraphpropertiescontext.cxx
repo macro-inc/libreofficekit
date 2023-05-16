@@ -26,9 +26,8 @@
 #include <com/sun/star/awt/Size.hpp>
 #include <com/sun/star/uno/Reference.hxx>
 
-#include <svx/unopage.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/UnitConversion.hxx>
 
 #include <drawingml/colorchoicecontext.hxx>
@@ -41,7 +40,6 @@
 #include <oox/token/namespaces.hxx>
 #include <oox/token/properties.hxx>
 #include <oox/token/tokens.hxx>
-#include <tools/helpers.hxx>
 
 using namespace ::oox::core;
 using namespace ::com::sun::star::uno;
@@ -95,10 +93,14 @@ TextParagraphPropertiesContext::TextParagraphPropertiesContext( ContextHandler2H
     // TODO see to do the same with RubyAdjust
 
     // ST_Coordinate32
-//  sValue = rAttribs.getString( XML_defTabSz ).get();    SJ: we need to be able to set the default tab size for each text object,
-//                                                          this is possible at the moment only for the whole document.
-//  sal_Int32 nDefTabSize = ( sValue.getLength() == 0 ? 0 : GetCoordinate(  sValue ) );
-    // TODO
+    if ( rAttribs.hasAttribute(XML_defTabSz))
+    {
+        sValue = rAttribs.getStringDefaulted(XML_defTabSz);
+        if(!sValue.isEmpty())
+        {
+            mrTextParagraphProperties.getDefaultTabSize() = GetCoordinate(sValue);
+        }
+    }
 
 //  bool bEaLineBrk = rAttribs.getBool( XML_eaLnBrk, true );
     if ( rAttribs.hasAttribute( XML_latinLnBrk ) )
@@ -121,7 +123,7 @@ TextParagraphPropertiesContext::TextParagraphPropertiesContext( ContextHandler2H
   // ST_Coordinate
     if ( rAttribs.hasAttribute( XML_indent ) )
     {
-        sValue = rAttribs.getString( XML_indent ).get();
+        sValue = rAttribs.getStringDefaulted( XML_indent );
         mrTextParagraphProperties.getFirstLineIndentation() = std::optional< sal_Int32 >( sValue.isEmpty() ? 0 : GetCoordinate( sValue ) );
     }
 
@@ -144,14 +146,14 @@ TextParagraphPropertiesContext::TextParagraphPropertiesContext( ContextHandler2H
     // ParaLeftMargin
     if ( rAttribs.hasAttribute( XML_marL ) )
     {
-        sValue = rAttribs.getString( XML_marL ).get();
+        sValue = rAttribs.getStringDefaulted( XML_marL );
         mrTextParagraphProperties.getParaLeftMargin() = std::optional< sal_Int32 >( sValue.isEmpty() ? 0 : GetCoordinate( sValue ) );
     }
 
     // ParaRightMargin
     if ( rAttribs.hasAttribute( XML_marR ) )
     {
-        sValue = rAttribs.getString( XML_marR ).get();
+        sValue = rAttribs.getStringDefaulted( XML_marR );
         sal_Int32 nMarR  = sValue.isEmpty() ? 0 : GetCoordinate( sValue ) ;
         rPropertyMap.setProperty( PROP_ParaRightMargin, nMarR);
     }
@@ -215,14 +217,14 @@ ContextHandlerRef TextParagraphPropertiesContext::onCreateContext( sal_Int32 aEl
             return new ColorContext( *this, *mrBulletList.maBulletColorPtr );
         // EG_TextBulletSize
         case A_TOKEN( buSzTx ):         // CT_TextBulletSizeFollowText
-            mrBulletList.setBulletSize(100);
+            mrBulletList.mbBulletSizeFollowText <<= true;
             break;
         case A_TOKEN( buSzPct ):        // CT_TextBulletSizePercent
-            mrBulletList.setBulletSize( std::lround( GetPercent( rAttribs.getString( XML_val ).get() ) / 1000.f ) );
+            mrBulletList.setBulletSize( std::lround( GetPercent( rAttribs.getStringDefaulted( XML_val ) ) / 1000.f ) );
             break;
         case A_TOKEN( buSzPts ):        // CT_TextBulletSizePoint
             mrBulletList.setBulletSize(0);
-            mrBulletList.setFontSize( static_cast<sal_Int16>(GetTextSize( rAttribs.getString( XML_val ).get() ) ) );
+            mrBulletList.setFontSize( static_cast<sal_Int16>(GetTextSize( rAttribs.getStringDefaulted( XML_val ) ) ) );
             break;
 
         // EG_TextBulletTypeface
@@ -262,7 +264,7 @@ ContextHandlerRef TextParagraphPropertiesContext::onCreateContext( sal_Int32 aEl
         case A_TOKEN( buChar ):         // CT_TextCharBullet
             try {
 
-                mrBulletList.setBulletChar( rAttribs.getString( XML_char ).get() );
+                mrBulletList.setBulletChar( rAttribs.getStringDefaulted( XML_char ) );
                 mrBulletList.setSuffixNone();
             }
             catch(SAXException& /* e */)
@@ -273,7 +275,7 @@ ContextHandlerRef TextParagraphPropertiesContext::onCreateContext( sal_Int32 aEl
         case A_TOKEN( buBlip ):         // CT_TextBlipBullet
             {
                 mxBlipProps = std::make_shared<BlipFillProperties>();
-                return new BlipFillContext( *this, rAttribs, *mxBlipProps );
+                return new BlipFillContext(*this, rAttribs, *mxBlipProps, nullptr);
             }
         case A_TOKEN( tabLst ):         // CT_TextTabStopList
             return new TextTabStopListContext( *this, maTabList );
@@ -281,10 +283,10 @@ ContextHandlerRef TextParagraphPropertiesContext::onCreateContext( sal_Int32 aEl
             return new TextCharacterPropertiesContext( *this, rAttribs, mrTextParagraphProperties.getTextCharacterProperties() );
         case W_TOKEN( jc ):
             {
-                OptValue< OUString > oParaAdjust = rAttribs.getString( W_TOKEN(val) );
-                if( oParaAdjust.has() && !oParaAdjust.get().isEmpty() )
+                std::optional< OUString > oParaAdjust = rAttribs.getString( W_TOKEN(val) );
+                if( oParaAdjust.has_value() && !oParaAdjust.value().isEmpty() )
                 {
-                    const OUString& sParaAdjust = oParaAdjust.get();
+                    const OUString& sParaAdjust = oParaAdjust.value();
                     if( sParaAdjust == "left" )
                         mrTextParagraphProperties.setParaAdjust(ParagraphAdjust_LEFT);
                     else if ( sParaAdjust == "right" )
@@ -301,22 +303,22 @@ ContextHandlerRef TextParagraphPropertiesContext::onCreateContext( sal_Int32 aEl
                 // Spacing before
                 if( !rAttribs.getBool(W_TOKEN(beforeAutospacing), false) )
                 {
-                    OptValue<sal_Int32> oBefore = rAttribs.getInteger(W_TOKEN(before));
-                    if (oBefore.has())
+                    std::optional<sal_Int32> oBefore = rAttribs.getInteger(W_TOKEN(before));
+                    if (oBefore.has_value())
                     {
                         TextSpacing& rSpacing = mrTextParagraphProperties.getParaTopMargin();
                         rSpacing.nUnit = TextSpacing::Unit::Points;
-                        rSpacing.nValue = convertTwipToMm100(oBefore.get());
+                        rSpacing.nValue = convertTwipToMm100(oBefore.value());
                         rSpacing.bHasValue = true;
                     }
                     else
                     {
-                        OptValue<sal_Int32> oBeforeLines = rAttribs.getInteger(W_TOKEN(beforeLines));
-                        if (oBeforeLines.has())
+                        std::optional<sal_Int32> oBeforeLines = rAttribs.getInteger(W_TOKEN(beforeLines));
+                        if (oBeforeLines.has_value())
                         {
                             TextSpacing& rSpacing = mrTextParagraphProperties.getParaTopMargin();
                             rSpacing.nUnit = TextSpacing::Unit::Percent;
-                            rSpacing.nValue = oBeforeLines.get() * MAX_PERCENT / 100;
+                            rSpacing.nValue = oBeforeLines.value() * MAX_PERCENT / 100;
                             rSpacing.bHasValue = true;
                         }
                     }
@@ -325,42 +327,42 @@ ContextHandlerRef TextParagraphPropertiesContext::onCreateContext( sal_Int32 aEl
                 // Spacing after
                 if( !rAttribs.getBool(W_TOKEN(afterAutospacing), false) )
                 {
-                    OptValue<sal_Int32> oAfter = rAttribs.getInteger(W_TOKEN(after));
-                    if (oAfter.has())
+                    std::optional<sal_Int32> oAfter = rAttribs.getInteger(W_TOKEN(after));
+                    if (oAfter.has_value())
                     {
                         TextSpacing& rSpacing = mrTextParagraphProperties.getParaBottomMargin();
                         rSpacing.nUnit = TextSpacing::Unit::Points;
-                        rSpacing.nValue = convertTwipToMm100(oAfter.get());
+                        rSpacing.nValue = convertTwipToMm100(oAfter.value());
                         rSpacing.bHasValue = true;
                     }
                     else
                     {
-                        OptValue<sal_Int32> oAfterLines = rAttribs.getInteger(W_TOKEN(afterLines));
-                        if (oAfterLines.has())
+                        std::optional<sal_Int32> oAfterLines = rAttribs.getInteger(W_TOKEN(afterLines));
+                        if (oAfterLines.has_value())
                         {
                             TextSpacing& rSpacing = mrTextParagraphProperties.getParaBottomMargin();
                             rSpacing.nUnit = TextSpacing::Unit::Percent;
-                            rSpacing.nValue = oAfterLines.get() * MAX_PERCENT / 100;
+                            rSpacing.nValue = oAfterLines.value() * MAX_PERCENT / 100;
                             rSpacing.bHasValue = true;
                         }
                     }
                 }
 
                 // Line spacing
-                OptValue<OUString> oLineRule = rAttribs.getString(W_TOKEN(lineRule));
-                OptValue<sal_Int32> oLineSpacing = rAttribs.getInteger(W_TOKEN(line));
-                if (oLineSpacing.has())
+                std::optional<OUString> oLineRule = rAttribs.getString(W_TOKEN(lineRule));
+                std::optional<sal_Int32> oLineSpacing = rAttribs.getInteger(W_TOKEN(line));
+                if (oLineSpacing.has_value())
                 {
                     TextSpacing& rLineSpacing = mrTextParagraphProperties.getLineSpacing();
-                    if( !oLineRule.has() || oLineRule.get() == "auto" )
+                    if( !oLineRule.has_value() || oLineRule.value() == "auto" )
                     {
                         rLineSpacing.nUnit = TextSpacing::Unit::Percent;
-                        rLineSpacing.nValue = oLineSpacing.get() * MAX_PERCENT / 240;
+                        rLineSpacing.nValue = oLineSpacing.value() * MAX_PERCENT / 240;
                     }
                     else
                     {
                         rLineSpacing.nUnit = TextSpacing::Unit::Points;
-                        rLineSpacing.nValue = convertTwipToMm100(oLineSpacing.get());
+                        rLineSpacing.nValue = convertTwipToMm100(oLineSpacing.value());
                     }
                     rLineSpacing.bHasValue = true;
                 }

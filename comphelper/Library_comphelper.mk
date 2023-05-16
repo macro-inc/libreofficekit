@@ -23,7 +23,7 @@ $(eval $(call gb_Library_use_custom_headers,comphelper,\
 	officecfg/registry \
 ))
 
-$(eval $(call gb_Library_set_componentfile,comphelper,comphelper/util/comphelp))
+$(eval $(call gb_Library_set_componentfile,comphelper,comphelper/util/comphelp,services))
 
 $(eval $(call gb_Library_set_precompiled_header,comphelper,comphelper/inc/pch/precompiled_comphelper))
 
@@ -85,21 +85,27 @@ $(eval $(call gb_Library_add_exception_objects,comphelper,\
     comphelper/source/misc/accessiblewrapper \
     comphelper/source/misc/accimplaccess \
     comphelper/source/misc/AccessibleImplementationHelper \
+    comphelper/source/misc/anycompare \
+    comphelper/source/misc/anytohash \
     comphelper/source/misc/anytostring \
     comphelper/source/misc/asyncnotification \
     comphelper/source/misc/asyncquithandler \
     comphelper/source/misc/automationinvokedzone \
     comphelper/source/misc/backupfilehelper \
     comphelper/source/misc/base64 \
+    comphelper/source/misc/compbase \
     comphelper/source/misc/componentbase \
     comphelper/source/misc/configuration \
     comphelper/source/misc/configurationhelper \
+    comphelper/source/misc/date \
     comphelper/source/misc/debuggerinfo \
+    comphelper/source/misc/diagnose_ex \
     comphelper/source/misc/DirectoryHelper \
     comphelper/source/misc/dispatchcommand \
     comphelper/source/misc/docpasswordhelper \
     comphelper/source/misc/docpasswordrequest \
     comphelper/source/misc/documentinfo \
+    comphelper/source/misc/errcode \
     comphelper/source/misc/evtlistenerhlp \
     comphelper/source/misc/evtmethodhelper \
     comphelper/source/misc/fileurl \
@@ -108,7 +114,6 @@ $(eval $(call gb_Library_add_exception_objects,comphelper,\
     comphelper/source/misc/hash \
     comphelper/source/misc/instancelocker \
     comphelper/source/misc/interaction \
-    comphelper/source/misc/listenernotification \
     comphelper/source/misc/logging \
     comphelper/source/misc/lok \
     comphelper/source/misc/mimeconfighelper \
@@ -126,14 +131,12 @@ $(eval $(call gb_Library_add_exception_objects,comphelper,\
     comphelper/source/misc/simplefileaccessinteraction \
     comphelper/source/misc/solarmutex \
     comphelper/source/misc/stillreadwriteinteraction \
-    comphelper/source/misc/anycompare \
     comphelper/source/misc/storagehelper \
     comphelper/source/misc/string \
     comphelper/source/misc/synchronousdispatch \
     comphelper/source/misc/syntaxhighlight \
     comphelper/source/misc/threadpool \
     comphelper/source/misc/types \
-    comphelper/source/misc/weak \
     comphelper/source/misc/weakeventlistener \
     comphelper/source/misc/xmlsechelper \
     comphelper/source/officeinstdir/officeinstallationdirectories \

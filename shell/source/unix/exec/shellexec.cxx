@@ -27,6 +27,7 @@
 #include <com/sun/star/system/SystemShellExecuteFlags.hpp>
 
 #include <com/sun/star/lang/IllegalArgumentException.hpp>
+#include <com/sun/star/security/AccessControlException.hpp>
 #include <com/sun/star/uri/ExternalUriReferenceTranslator.hpp>
 #include <com/sun/star/uri/UriReferenceFactory.hpp>
 #include <cppuhelper/supportsservice.hxx>
@@ -39,6 +40,11 @@
 #include <sys/stat.h>
 #endif
 
+#ifdef EMSCRIPTEN
+#include <rtl/uri.hxx>
+extern void execute_browser(const char* sUrl);
+#endif
+
 using com::sun::star::system::XSystemShellExecute;
 using com::sun::star::system::SystemShellExecuteException;
 
@@ -47,6 +53,7 @@ using namespace ::com::sun::star::lang;
 using namespace ::com::sun::star::system::SystemShellExecuteFlags;
 using namespace cppu;
 
+#ifndef EMSCRIPTEN
 namespace
 {
     void escapeForShell( OStringBuffer & rBuffer, const OString & rURL)
@@ -63,6 +70,7 @@ namespace
         }
     }
 }
+#endif
 
 ShellExec::ShellExec( const Reference< XComponentContext >& xContext ) :
     m_xContext(xContext)
@@ -71,6 +79,7 @@ ShellExec::ShellExec( const Reference< XComponentContext >& xContext ) :
 
 void SAL_CALL ShellExec::execute( const OUString& aCommand, const OUString& aParameter, sal_Int32 nFlags )
 {
+#ifndef EMSCRIPTEN
     OStringBuffer aBuffer, aLaunchBuffer;
 
     if (comphelper::LibreOfficeKit::isActive())
@@ -128,13 +137,17 @@ void SAL_CALL ShellExec::execute( const OUString& aCommand, const OUString& aPar
                 auto const e3 = errno;
                 SAL_INFO("shell", "lstat(" << pathname8 << ") failed with errno " << e3);
             }
-            if (e2 == 0 && (S_ISDIR(st.st_mode) || S_ISLNK(st.st_mode))) {
-                dir = true;
-            } else if (e2 != 0 || !S_ISREG(st.st_mode)
-                       || (st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0)
-            {
+            if (e2 != 0) {
                 throw css::lang::IllegalArgumentException(
                     "XSystemShellExecute.execute, cannot process <" + aCommand + ">", {}, 0);
+            } else if (S_ISDIR(st.st_mode) || S_ISLNK(st.st_mode)) {
+                dir = true;
+            } else if ((nFlags & css::system::SystemShellExecuteFlags::URIS_ONLY) != 0
+                       && (!S_ISREG(st.st_mode)
+                           || (st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0))
+            {
+                throw css::security::AccessControlException(
+                    "XSystemShellExecute.execute, bad <" + aCommand + ">", {}, {});
             } else if (pathname.endsWithIgnoreAsciiCase(".class")
                        || pathname.endsWithIgnoreAsciiCase(".dmg")
                        || pathname.endsWithIgnoreAsciiCase(".fileloc")
@@ -218,7 +231,7 @@ void SAL_CALL ShellExec::execute( const OUString& aCommand, const OUString& aPar
     OString cmd =
 #ifdef LINUX
         // avoid blocking (call it in background)
-        "( " + aBuffer.makeStringAndClear() +  " ) &";
+        "( " + aBuffer +  " ) &";
 #else
         aBuffer.makeStringAndClear();
 #endif
@@ -232,6 +245,22 @@ void SAL_CALL ShellExec::execute( const OUString& aCommand, const OUString& aPar
     int nerr = errno;
     throw SystemShellExecuteException(OUString::createFromAscii( strerror( nerr ) ),
         static_cast < XSystemShellExecute * > (this), nerr );
+#else // EMSCRIPTEN
+    (void)nFlags;
+
+    css::uno::Reference< css::uri::XUriReference > uri(
+        css::uri::UriReferenceFactory::create(m_xContext)->parse(aCommand));
+    if (!uri.is() || !uri->isAbsolute())
+        throw SystemShellExecuteException("Emscripten can just open absolute URIs.",
+                                          static_cast<XSystemShellExecute*>(this), 42);
+    if (!aParameter.isEmpty())
+        throw SystemShellExecuteException("Emscripten can't process parameters; encode in URI.",
+                                          static_cast<XSystemShellExecute*>(this), 42);
+
+    OUString sEscapedURI(rtl::Uri::encode(aCommand, rtl_UriCharClassUric,
+                                          rtl_UriEncodeIgnoreEscapes, RTL_TEXTENCODING_UTF8));
+    execute_browser(sEscapedURI.toUtf8().getStr());
+#endif
 }
 
 // XServiceInfo

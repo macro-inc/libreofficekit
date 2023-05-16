@@ -30,9 +30,10 @@
 #include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <tools/stream.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/streamwrap.hxx>
 #include <cppuhelper/implbase.hxx>
+#include <utility>
 
 namespace svt::GraphicAccess
 {
@@ -52,7 +53,7 @@ private:
     uno::Reference<io::XSeekable> m_xSeekable;
 
 public:
-    StreamSupplier(uno::Reference<io::XInputStream> const & rxInput, uno::Reference<io::XOutputStream> const & rxOutput);
+    StreamSupplier(uno::Reference<io::XInputStream> xInput, uno::Reference<io::XOutputStream> xOutput);
 
 protected:
     // XStream
@@ -67,9 +68,9 @@ protected:
 
 }
 
-StreamSupplier::StreamSupplier(uno::Reference<io::XInputStream> const & rxInput, uno::Reference<io::XOutputStream> const & rxOutput)
-    : m_xInput(rxInput)
-    , m_xOutput(rxOutput)
+StreamSupplier::StreamSupplier(uno::Reference<io::XInputStream> xInput, uno::Reference<io::XOutputStream> xOutput)
+    : m_xInput(std::move(xInput))
+    , m_xOutput(std::move(xOutput))
 {
     m_xSeekable.set(m_xInput, uno::UNO_QUERY);
     if (!m_xSeekable.is())

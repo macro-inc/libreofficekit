@@ -35,6 +35,7 @@
 #include <vcl/virdev.hxx>
 
 #include <window.h>
+#include <font/EmphasisMark.hxx>
 
 #include <ImplLayoutArgs.hxx>
 #include <drawmode.hxx>
@@ -47,6 +48,8 @@
 #include <sallayout.hxx>
 #include <salgdi.hxx>
 #include <svdata.hxx>
+
+#include <unicode/uchar.h>
 
 #include <strings.hrc>
 
@@ -160,17 +163,9 @@ bool OutputDevice::GetFontFeatures(std::vector<vcl::font::Feature>& rFontFeature
     if (!pFontInstance)
         return false;
 
-    hb_font_t* pHbFont = pFontInstance->GetHbFont();
-    if (!pHbFont)
-        return false;
+    const LanguageTag& rOfficeLanguage = Application::GetSettings().GetUILanguageTag();
 
-    hb_face_t* pHbFace = hb_font_get_face(pHbFont);
-    if (!pHbFace)
-        return false;
-
-    const LanguageType eOfficeLanguage = Application::GetSettings().GetLanguageTag().getLanguageType();
-
-    vcl::font::FeatureCollector aFeatureCollector(pHbFace, rFontFeatures, eOfficeLanguage);
+    vcl::font::FeatureCollector aFeatureCollector(pFontInstance->GetFontFace(), rFontFeatures, rOfficeLanguage);
     aFeatureCollector.collect();
 
     return true;
@@ -192,7 +187,7 @@ FontMetric OutputDevice::GetFontMetric() const
     aMetric.SetFamilyName( maFont.GetFamilyName() );
     aMetric.SetStyleName( xFontMetric->GetStyleName() );
     aMetric.SetFontSize( PixelToLogic( Size( xFontMetric->GetWidth(), xFontMetric->GetAscent() + xFontMetric->GetDescent() - xFontMetric->GetInternalLeading() ) ) );
-    aMetric.SetCharSet( xFontMetric->IsSymbolFont() ? RTL_TEXTENCODING_SYMBOL : RTL_TEXTENCODING_UNICODE );
+    aMetric.SetCharSet( xFontMetric->IsMicrosoftSymbolEncoded() ? RTL_TEXTENCODING_SYMBOL : RTL_TEXTENCODING_UNICODE );
     aMetric.SetFamily( xFontMetric->GetFamilyType() );
     aMetric.SetPitch( xFontMetric->GetPitch() );
     aMetric.SetWeight( xFontMetric->GetWeight() );
@@ -214,6 +209,7 @@ FontMetric OutputDevice::GetFontMetric() const
     aMetric.SetExternalLeading( ImplDevicePixelToLogicHeight( GetFontExtLeading() ) );
     aMetric.SetLineHeight( ImplDevicePixelToLogicHeight( xFontMetric->GetAscent() + xFontMetric->GetDescent() + mnEmphasisAscent + mnEmphasisDescent ) );
     aMetric.SetSlant( ImplDevicePixelToLogicHeight( xFontMetric->GetSlant() ) );
+    aMetric.SetHangingBaseline( ImplDevicePixelToLogicHeight( xFontMetric->GetHangingBaseline() ) );
 
     // get miscellaneous data
     aMetric.SetQuality( xFontMetric->GetQuality() );
@@ -257,192 +253,6 @@ bool OutputDevice::GetFontCapabilities( vcl::FontCapabilities& rFontCapabilities
     if (!InitFont())
         return false;
     return mpGraphics->GetFontCapabilities(rFontCapabilities);
-}
-
-void OutputDevice::ImplGetEmphasisMark( tools::PolyPolygon& rPolyPoly, bool& rPolyLine,
-                                        tools::Rectangle& rRect1, tools::Rectangle& rRect2,
-                                        tools::Long& rYOff, tools::Long& rWidth,
-                                        FontEmphasisMark eEmphasis,
-                                        tools::Long nHeight )
-{
-    static const PolyFlags aAccentPolyFlags[24] =
-    {
-        PolyFlags::Normal, PolyFlags::Control, PolyFlags::Control,
-        PolyFlags::Normal, PolyFlags::Control, PolyFlags::Control,
-        PolyFlags::Normal, PolyFlags::Control, PolyFlags::Control,
-        PolyFlags::Normal, PolyFlags::Control, PolyFlags::Control,
-        PolyFlags::Normal, PolyFlags::Control, PolyFlags::Control,
-        PolyFlags::Normal, PolyFlags::Control, PolyFlags::Control,
-        PolyFlags::Normal, PolyFlags::Normal,  PolyFlags::Control,
-        PolyFlags::Normal, PolyFlags::Control, PolyFlags::Control
-    };
-
-    static const Point aAccentPos[24] =
-    {
-        {  78,    0 },
-        { 348,   79 },
-        { 599,  235 },
-        { 843,  469 },
-        { 938,  574 },
-        { 990,  669 },
-        { 990,  773 },
-        { 990,  843 },
-        { 964,  895 },
-        { 921,  947 },
-        { 886,  982 },
-        { 860,  999 },
-        { 825,  999 },
-        { 764,  999 },
-        { 721,  964 },
-        { 686,  895 },
-        { 625,  791 },
-        { 556,  660 },
-        { 469,  504 },
-        { 400,  400 },
-        { 261,  252 },
-        {  61,   61 },
-        {   0,   27 },
-        {   9,    0 }
-    };
-
-    rWidth      = 0;
-    rYOff       = 0;
-    rPolyLine   = false;
-
-    if ( !nHeight )
-        return;
-
-    FontEmphasisMark    nEmphasisStyle = eEmphasis & FontEmphasisMark::Style;
-    tools::Long                nDotSize = 0;
-    switch ( nEmphasisStyle )
-    {
-        case FontEmphasisMark::Dot:
-            // Dot has 55% of the height
-            nDotSize = (nHeight*550)/1000;
-            if ( !nDotSize )
-                nDotSize = 1;
-            if ( nDotSize <= 2 )
-                rRect1 = tools::Rectangle( Point(), Size( nDotSize, nDotSize ) );
-            else
-            {
-                tools::Long nRad = nDotSize/2;
-                tools::Polygon aPoly( Point( nRad, nRad ), nRad, nRad );
-                rPolyPoly.Insert( aPoly );
-            }
-            rYOff = ((nHeight*250)/1000)/2; // Center to the another EmphasisMarks
-            rWidth = nDotSize;
-            break;
-
-        case FontEmphasisMark::Circle:
-            // Dot has 80% of the height
-            nDotSize = (nHeight*800)/1000;
-            if ( !nDotSize )
-                nDotSize = 1;
-            if ( nDotSize <= 2 )
-                rRect1 = tools::Rectangle( Point(), Size( nDotSize, nDotSize ) );
-            else
-            {
-                tools::Long nRad = nDotSize/2;
-                tools::Polygon aPoly( Point( nRad, nRad ), nRad, nRad );
-                rPolyPoly.Insert( aPoly );
-                // BorderWidth is 15%
-                tools::Long nBorder = (nDotSize*150)/1000;
-                if ( nBorder <= 1 )
-                    rPolyLine = true;
-                else
-                {
-                    tools::Polygon aPoly2( Point( nRad, nRad ),
-                                           nRad-nBorder, nRad-nBorder );
-                    rPolyPoly.Insert( aPoly2 );
-                }
-            }
-            rWidth = nDotSize;
-            break;
-
-        case FontEmphasisMark::Disc:
-            // Dot has 80% of the height
-            nDotSize = (nHeight*800)/1000;
-            if ( !nDotSize )
-                nDotSize = 1;
-            if ( nDotSize <= 2 )
-                rRect1 = tools::Rectangle( Point(), Size( nDotSize, nDotSize ) );
-            else
-            {
-                tools::Long nRad = nDotSize/2;
-                tools::Polygon aPoly( Point( nRad, nRad ), nRad, nRad );
-                rPolyPoly.Insert( aPoly );
-            }
-            rWidth = nDotSize;
-            break;
-
-        case FontEmphasisMark::Accent:
-            // Dot has 80% of the height
-            nDotSize = (nHeight*800)/1000;
-            if ( !nDotSize )
-                nDotSize = 1;
-            if ( nDotSize <= 2 )
-            {
-                if ( nDotSize == 1 )
-                {
-                    rRect1 = tools::Rectangle( Point(), Size( nDotSize, nDotSize ) );
-                    rWidth = nDotSize;
-                }
-                else
-                {
-                    rRect1 = tools::Rectangle( Point(), Size( 1, 1 ) );
-                    rRect2 = tools::Rectangle( Point( 1, 1 ), Size( 1, 1 ) );
-                }
-            }
-            else
-            {
-                tools::Polygon aPoly( SAL_N_ELEMENTS(aAccentPos), aAccentPos,
-                                      aAccentPolyFlags );
-                double dScale = static_cast<double>(nDotSize)/1000.0;
-                aPoly.Scale( dScale, dScale );
-                tools::Polygon aTemp;
-                aPoly.AdaptiveSubdivide( aTemp );
-                tools::Rectangle aBoundRect = aTemp.GetBoundRect();
-                rWidth = aBoundRect.GetWidth();
-                nDotSize = aBoundRect.GetHeight();
-                rPolyPoly.Insert( aTemp );
-            }
-            break;
-        default: break;
-    }
-
-    // calculate position
-    tools::Long nOffY = 1+(mnDPIY/300); // one visible pixel space
-    tools::Long nSpaceY = nHeight-nDotSize;
-    if ( nSpaceY >= nOffY*2 )
-        rYOff += nOffY;
-    if ( !(eEmphasis & FontEmphasisMark::PosBelow) )
-        rYOff += nDotSize;
-}
-
-FontEmphasisMark OutputDevice::ImplGetEmphasisMarkStyle( const vcl::Font& rFont )
-{
-    FontEmphasisMark nEmphasisMark = rFont.GetEmphasisMark();
-
-    // If no Position is set, then calculate the default position, which
-    // depends on the language
-    if ( !(nEmphasisMark & (FontEmphasisMark::PosAbove | FontEmphasisMark::PosBelow)) )
-    {
-        LanguageType eLang = rFont.GetLanguage();
-        // In Chinese Simplified the EmphasisMarks are below/left
-        if (MsLangId::isSimplifiedChinese(eLang))
-            nEmphasisMark |= FontEmphasisMark::PosBelow;
-        else
-        {
-            eLang = rFont.GetCJKContextLanguage();
-            // In Chinese Simplified the EmphasisMarks are below/left
-            if (MsLangId::isSimplifiedChinese(eLang))
-                nEmphasisMark |= FontEmphasisMark::PosBelow;
-            else
-                nEmphasisMark |= FontEmphasisMark::PosAbove;
-        }
-    }
-
-    return nEmphasisMark;
 }
 
 tools::Long OutputDevice::GetFontExtLeading() const
@@ -610,11 +420,17 @@ void OutputDevice::RemoveFontsSubstitute()
 vcl::Font OutputDevice::GetDefaultFont( DefaultFontType nType, LanguageType eLang,
                                         GetDefaultFontFlags nFlags, const OutputDevice* pOutDev )
 {
-    if (!pOutDev && !utl::ConfigManager::IsFuzzing()) // default is NULL
+    static bool bFuzzing = utl::ConfigManager::IsFuzzing();
+    static bool bAbortOnFontSubstitute = [] {
+        const char* pEnv = getenv("SAL_NON_APPLICATION_FONT_USE");
+        return pEnv && strcmp(pEnv, "abort") == 0;
+    }();
+
+    if (!pOutDev && !bFuzzing) // default is NULL
         pOutDev = Application::GetDefaultDevice();
 
     OUString aSearch;
-    if (!utl::ConfigManager::IsFuzzing())
+    if (!bFuzzing)
     {
         LanguageTag aLanguageTag(
                 ( eLang == LANGUAGE_NONE || eLang == LANGUAGE_SYSTEM || eLang == LANGUAGE_DONTKNOW ) ?
@@ -628,6 +444,16 @@ vcl::Font OutputDevice::GetDefaultFont( DefaultFontType nType, LanguageType eLan
             aSearch = aDefault;
         else
             aSearch = rDefaults.getUserInterfaceFont( aLanguageTag ); // use the UI font as a fallback
+
+        // during cppunit tests with SAL_NON_APPLICATION_FONT_USE set we don't have any bundled fonts
+        // that support the default CTL and CJK languages of Hindi and Chinese, so just pick something
+        // (unsuitable) that does exist, if they get used with SAL_NON_APPLICATION_FONT_USE=abort then
+        // glyph fallback will trigger std::abort
+        if (bAbortOnFontSubstitute)
+        {
+            if (eLang == LANGUAGE_HINDI || eLang == LANGUAGE_CHINESE_SIMPLIFIED)
+                aSearch = "DejaVu Sans";
+        }
     }
     else
         aSearch = "Liberation Serif";
@@ -875,7 +701,7 @@ bool OutputDevice::ImplNewFont() const
 
     // convert to pixel height
     // TODO: replace integer based aSize completely with subpixel accurate type
-    float fExactHeight = ImplFloatLogicHeightToDevicePixel( static_cast<float>(maFont.GetFontHeight()) );
+    float fExactHeight = ImplLogicHeightToDeviceSubPixel(maFont.GetFontHeight());
     Size aSize = ImplLogicToDevicePixel( maFont.GetFontSize() );
     if ( !aSize.Height() )
     {
@@ -929,7 +755,7 @@ bool OutputDevice::ImplNewFont() const
         mpGraphics->GetFontMetric( pFontInstance->mxFontMetric, 0 );
 
         pFontInstance->mxFontMetric->ImplInitTextLineSize( this );
-        pFontInstance->mxFontMetric->ImplInitAboveTextLineSize();
+        pFontInstance->mxFontMetric->ImplInitAboveTextLineSize( this );
         pFontInstance->mxFontMetric->ImplInitFlags( this );
 
         pFontInstance->mnLineHeight = pFontInstance->mxFontMetric->GetAscent() + pFontInstance->mxFontMetric->GetDescent();
@@ -942,7 +768,7 @@ bool OutputDevice::ImplNewFont() const
     mnEmphasisDescent = 0;
     if ( maFont.GetEmphasisMark() & FontEmphasisMark::Style )
     {
-        FontEmphasisMark    nEmphasisMark = ImplGetEmphasisMarkStyle( maFont );
+        FontEmphasisMark nEmphasisMark = maFont.GetEmphasisMarkStyle();
         tools::Long                nEmphasisHeight = (pFontInstance->mnLineHeight*250)/1000;
         if ( nEmphasisHeight < 1 )
             nEmphasisHeight = 1;
@@ -990,24 +816,32 @@ bool OutputDevice::ImplNewFont() const
     bool bRet = true;
 
     // #95414# fix for OLE objects which use scale factors very creatively
-    if( mbMap && !aSize.Width() )
-    {
-        int nOrigWidth = pFontInstance->mxFontMetric->GetWidth();
-        float fStretch = static_cast<float>(maMapRes.mnMapScNumX) * maMapRes.mnMapScDenomY;
-        fStretch /= static_cast<float>(maMapRes.mnMapScNumY) * maMapRes.mnMapScDenomX;
-        int nNewWidth = static_cast<int>(nOrigWidth * fStretch + 0.5);
-        if( (nNewWidth != nOrigWidth) && (nNewWidth != 0) )
-        {
-            Size aOrigSize = maFont.GetFontSize();
-            const_cast<vcl::Font&>(maFont).SetFontSize( Size( nNewWidth, aSize.Height() ) );
-            mbMap = false;
-            mbNewFont = true;
-            bRet = ImplNewFont();  // recurse once using stretched width
-            mbMap = true;
-            const_cast<vcl::Font&>(maFont).SetFontSize( aOrigSize );
-        }
-    }
+    if (mbMap && !aSize.Width())
+        bRet = AttemptOLEFontScaleFix(const_cast<vcl::Font&>(maFont), aSize.Height());
 
+    return bRet;
+}
+
+bool OutputDevice::AttemptOLEFontScaleFix(vcl::Font& rFont, tools::Long nHeight) const
+{
+    const float fDenominator = static_cast<float>(maMapRes.mnMapScNumY) * maMapRes.mnMapScDenomX;
+    if (fDenominator == 0.0)
+        return false;
+    const float fNumerator = static_cast<float>(maMapRes.mnMapScNumX) * maMapRes.mnMapScDenomY;
+    float fStretch = fNumerator / fDenominator;
+    int nOrigWidth = mpFontInstance->mxFontMetric->GetWidth();
+    int nNewWidth = static_cast<int>(nOrigWidth * fStretch + 0.5);
+    bool bRet = true;
+    if (nNewWidth != nOrigWidth && nNewWidth != 0)
+    {
+        Size aOrigSize = rFont.GetFontSize();
+        rFont.SetFontSize(Size(nNewWidth, nHeight));
+        mbMap = false;
+        mbNewFont = true;
+        bRet = ImplNewFont();  // recurse once using stretched width
+        mbMap = true;
+        rFont.SetFontSize(aOrigSize);
+    }
     return bRet;
 }
 
@@ -1075,27 +909,17 @@ void OutputDevice::ImplDrawEmphasisMarks( SalLayout& rSalLayout )
     mpMetaFile = nullptr;
     EnableMapMode( false );
 
-    FontEmphasisMark    nEmphasisMark = ImplGetEmphasisMarkStyle( maFont );
-    tools::PolyPolygon  aPolyPoly;
-    tools::Rectangle           aRect1;
-    tools::Rectangle           aRect2;
-    tools::Long                nEmphasisYOff;
-    tools::Long                nEmphasisWidth;
-    tools::Long                nEmphasisHeight;
-    bool                bPolyLine;
+    FontEmphasisMark nEmphasisMark = maFont.GetEmphasisMarkStyle();
+    tools::Long nEmphasisHeight;
 
     if ( nEmphasisMark & FontEmphasisMark::PosBelow )
         nEmphasisHeight = mnEmphasisDescent;
     else
         nEmphasisHeight = mnEmphasisAscent;
 
-    ImplGetEmphasisMark( aPolyPoly, bPolyLine,
-                         aRect1, aRect2,
-                         nEmphasisYOff, nEmphasisWidth,
-                         nEmphasisMark,
-                         nEmphasisHeight );
+    vcl::font::EmphasisMark aEmphasisMark(nEmphasisMark, nEmphasisHeight, GetDPIY());
 
-    if ( bPolyLine )
+    if (aEmphasisMark.IsShapePolyLine())
     {
         SetLineColor( GetTextColor() );
         SetFillColor();
@@ -1107,13 +931,22 @@ void OutputDevice::ImplDrawEmphasisMarks( SalLayout& rSalLayout )
     }
 
     Point aOffset(0,0);
+    Point aOffsetVert(0,0);
 
     if ( nEmphasisMark & FontEmphasisMark::PosBelow )
-        aOffset.AdjustY(mpFontInstance->mxFontMetric->GetDescent() + nEmphasisYOff );
+    {
+        aOffset.AdjustY(mpFontInstance->mxFontMetric->GetDescent() + aEmphasisMark.GetYOffset());
+        aOffsetVert = aOffset;
+    }
     else
-        aOffset.AdjustY( -(mpFontInstance->mxFontMetric->GetAscent() + nEmphasisYOff) );
+    {
+        aOffset.AdjustY(-(mpFontInstance->mxFontMetric->GetAscent() + aEmphasisMark.GetYOffset()));
+        // Todo: use ideographic em-box or ideographic character face information.
+        aOffsetVert.AdjustY(-(mpFontInstance->mxFontMetric->GetAscent() +
+                    mpFontInstance->mxFontMetric->GetDescent() + aEmphasisMark.GetYOffset()));
+    }
 
-    tools::Long nEmphasisWidth2  = nEmphasisWidth / 2;
+    tools::Long nEmphasisWidth2  = aEmphasisMark.GetWidth() / 2;
     tools::Long nEmphasisHeight2 = nEmphasisHeight / 2;
     aOffset += Point( nEmphasisWidth2, nEmphasisHeight2 );
 
@@ -1129,8 +962,18 @@ void OutputDevice::ImplDrawEmphasisMarks( SalLayout& rSalLayout )
 
         if (!pGlyph->IsSpacing())
         {
-            Point aAdjPoint = aOffset;
-            aAdjPoint.AdjustX(aRectangle.Left() + (aRectangle.GetWidth() - nEmphasisWidth) / 2 );
+            Point aAdjPoint;
+            if (pGlyph->IsVertical())
+            {
+                aAdjPoint = aOffsetVert;
+                aAdjPoint.AdjustX((-pGlyph->origWidth() + aEmphasisMark.GetWidth()) / 2);
+            }
+            else
+            {
+                aAdjPoint = aOffset;
+                aAdjPoint.AdjustX(aRectangle.Left() + (aRectangle.GetWidth() - aEmphasisMark.GetWidth()) / 2 );
+            }
+
             if ( mpFontInstance->mnOrientation )
             {
                 Point aOriginPt(0, 0);
@@ -1140,7 +983,8 @@ void OutputDevice::ImplDrawEmphasisMarks( SalLayout& rSalLayout )
             aOutPoint.adjustY(aAdjPoint.Y() - nEmphasisHeight2);
             ImplDrawEmphasisMark( rSalLayout.DrawBase().getX(),
                                   aOutPoint.getX(), aOutPoint.getY(),
-                                  aPolyPoly, bPolyLine, aRect1, aRect2 );
+                                  aEmphasisMark.GetShape(), aEmphasisMark.IsShapePolyLine(),
+                                  aEmphasisMark.GetRect1(), aEmphasisMark.GetRect2() );
         }
     }
 
@@ -1216,6 +1060,7 @@ std::unique_ptr<SalLayout> OutputDevice::ImplGlyphFallbackLayout( std::unique_pt
         // find a font family suited for glyph fallback
         // GetGlyphFallbackFont() needs a valid FontInstance
         // if the system-specific glyph fallback is active
+        OUString oldMissingCodes = aMissingCodes;
         if( !pFallbackFont )
             pFallbackFont = mxFontCache->GetGlyphFallbackFont( mxFontCollection.get(),
                 aFontSelData, mpFontInstance.get(), nFallbackLevel, aMissingCodes );
@@ -1225,11 +1070,20 @@ std::unique_ptr<SalLayout> OutputDevice::ImplGlyphFallbackLayout( std::unique_pt
         if( nFallbackLevel < MAX_FALLBACK-1)
         {
             // ignore fallback font if it is the same as the original font
-            // unless we are looking for a substitution for 0x202F, in which
-            // case we'll just use a normal space
-            if( mpFontInstance->GetFontFace() == pFallbackFont->GetFontFace() &&
-                aMissingCodes.indexOf(0x202F) == -1 )
+            // TODO: This seems broken. Either the font does not provide any of the missing
+            // codes, in which case the fallback should not select it. Or it does provide
+            // some of the missing codes, and then why weren't they used the first time?
+            // This will just loop repeatedly finding the same font (it used to remove
+            // the found font from mxFontCache, but doesn't do that anymore and I don't
+            // see how doing that would remove the font from consideration for fallback).
+            if( mpFontInstance->GetFontFace() == pFallbackFont->GetFontFace())
             {
+                if(aMissingCodes != oldMissingCodes)
+                {
+                    SAL_WARN("vcl.gdi", "Font fallback to the same font, but has missing codes");
+                    // Restore the missing codes if we're not going to use this font.
+                    aMissingCodes = oldMissingCodes;
+                }
                 continue;
             }
         }
@@ -1292,14 +1146,28 @@ sal_Int32 OutputDevice::ValidateKashidas ( const OUString& rTxt,
     std::unique_ptr<SalLayout> pSalLayout = ImplLayout( rTxt, nIdx, nLen );
     if( !pSalLayout )
         return 0;
+
+    auto nEnd = nIdx + nLen - 1;
     sal_Int32 nDropped = 0;
     for( int i = 0; i < nKashCount; ++i )
     {
-        if( !pSalLayout->IsKashidaPosValid( pKashidaPos[ i ] ))
-        {
-            pKashidaPosDropped[ nDropped ] = pKashidaPos [ i ];
-            ++nDropped;
-        }
+        auto nPos = pKashidaPos[i];
+        auto nNextPos = nPos + 1;
+
+        // Skip combining marks to find the next character after this position.
+        while (nNextPos <= nEnd &&
+               u_getIntPropertyValue(rTxt[nNextPos], UCHAR_JOINING_TYPE) == U_JT_TRANSPARENT)
+            nNextPos++;
+
+        // The next position is past end of the layout, it would happen if we
+        // changed the text styling in the middle of a word. Since we don’t do
+        // apply OpenType features across different layouts, this can’t be an
+        // invalid place to insert Kashida.
+        if (nNextPos > nEnd)
+            continue;
+
+        if (!pSalLayout->IsKashidaPosValid(nPos, nNextPos))
+            pKashidaPosDropped[nDropped++] = nPos;
     }
     return nDropped;
 }
@@ -1329,19 +1197,19 @@ bool OutputDevice::GetGlyphBoundRects( const Point& rOrigin, const OUString& rSt
     return (nLen == static_cast<int>(rVector.size()));
 }
 
-sal_Int32 OutputDevice::HasGlyphs( const vcl::Font& rTempFont, const OUString& rStr,
+sal_Int32 OutputDevice::HasGlyphs( const vcl::Font& rTempFont, std::u16string_view rStr,
     sal_Int32 nIndex, sal_Int32 nLen ) const
 {
-    if( nIndex >= rStr.getLength() )
+    if( nIndex >= static_cast<sal_Int32>(rStr.size()) )
         return nIndex;
     sal_Int32 nEnd;
     if( nLen == -1 )
-        nEnd = rStr.getLength();
+        nEnd = rStr.size();
     else
-        nEnd = std::min( rStr.getLength(), nIndex + nLen );
+        nEnd = std::min<sal_Int32>( rStr.size(), nIndex + nLen );
 
     SAL_WARN_IF( nIndex >= nEnd, "vcl.gdi", "StartPos >= EndPos?" );
-    SAL_WARN_IF( nEnd > rStr.getLength(), "vcl.gdi", "String too short" );
+    SAL_WARN_IF( nEnd > static_cast<sal_Int32>(rStr.size()), "vcl.gdi", "String too short" );
 
     // to get the map temporarily set font
     const vcl::Font aOrigFont = GetFont();

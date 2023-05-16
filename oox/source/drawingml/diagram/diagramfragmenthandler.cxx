@@ -24,6 +24,7 @@
 #include <drawingml/colorchoicecontext.hxx>
 #include <oox/helper/attributelist.hxx>
 #include <oox/token/namespaces.hxx>
+#include <utility>
 
 using namespace ::oox::core;
 using namespace ::com::sun::star::xml::sax;
@@ -33,9 +34,9 @@ namespace oox::drawingml {
 
 DiagramDataFragmentHandler::DiagramDataFragmentHandler( XmlFilterBase& rFilter,
                                                         const OUString& rFragmentPath,
-                                                        const DiagramDataPtr& rDataPtr )
+                                                        OoxDiagramDataPtr xDataPtr )
     : FragmentHandler2( rFilter, rFragmentPath )
-    , mpDataPtr( rDataPtr )
+    , mpDataPtr(std::move( xDataPtr ))
 {
 }
 
@@ -66,9 +67,9 @@ DiagramDataFragmentHandler::onCreateContext( ::sal_Int32 aElement,
 
 DiagramLayoutFragmentHandler::DiagramLayoutFragmentHandler( XmlFilterBase& rFilter,
                                                         const OUString& rFragmentPath,
-                                                        const DiagramLayoutPtr& rDataPtr )
+                                                        DiagramLayoutPtr xDataPtr )
     : FragmentHandler2( rFilter, rFragmentPath )
-    , mpDataPtr( rDataPtr )
+    , mpDataPtr(std::move( xDataPtr ))
 {
 }
 
@@ -157,7 +158,7 @@ void DiagramQStylesFragmentHandler::onStartElement( const AttributeList& rAttrib
 {
     if( getCurrentElement() == DGM_TOKEN( styleLbl ) )
     {
-        maStyleName = rAttribs.getString( XML_name, OUString() );
+        maStyleName = rAttribs.getStringDefaulted( XML_name);
         maStyleEntry = mrStylesMap[maStyleName];
     }
 }
@@ -218,7 +219,7 @@ void ColorFragmentHandler::onStartElement( const AttributeList& rAttribs )
 {
     if( getCurrentElement() == DGM_TOKEN(styleLbl) )
     {
-        maColorName = rAttribs.getString( XML_name, OUString() );
+        maColorName = rAttribs.getStringDefaulted( XML_name);
         maColorEntry = mrColorsMap[maColorName];
     }
 }

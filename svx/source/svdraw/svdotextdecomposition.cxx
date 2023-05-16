@@ -17,7 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-
+#include <svx/compatflags.hxx>
 #include <svx/svdetc.hxx>
 #include <svx/svdoutl.hxx>
 #include <svx/svdpage.hxx>
@@ -58,6 +58,7 @@
 #include <editeng/outlobj.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <sal/log.hxx>
+#include <osl/diagnose.h>
 
 using namespace com::sun::star;
 
@@ -144,7 +145,7 @@ namespace
             mrOutliner.SetDrawBulletHdl(Link<DrawBulletInfo*,void>());
         }
 
-        drawinglayer::primitive2d::Primitive2DContainer const & getPrimitive2DSequence();
+        drawinglayer::primitive2d::Primitive2DContainer extractPrimitive2DSequence();
     };
 
     void impTextBreakupHandler::impCreateTextPortionPrimitive(const DrawPortionInfo& rInfo)
@@ -233,6 +234,18 @@ namespace
             }
         }
 
+        ::std::vector< sal_Bool > aKashidaArray;
+
+        if(!rInfo.mpKashidaArray.empty() && rInfo.mnTextLen)
+        {
+            aKashidaArray.reserve(rInfo.mnTextLen);
+
+            for(sal_Int32 a=0; a < rInfo.mnTextLen; a++)
+            {
+                aKashidaArray.push_back(rInfo.mpKashidaArray[a]);
+            }
+        }
+
         // create complex text primitive and append
         const Color aFontColor(rInfo.mrFont.GetColor());
         const basegfx::BColor aBFontColor(aFontColor.getBColor());
@@ -315,6 +328,7 @@ namespace
                 rInfo.mnTextStart,
                 rInfo.mnTextLen,
                 std::vector(aDXArray),
+                std::vector(aKashidaArray),
                 aFontAttribute,
                 rInfo.mpLocale ? *rInfo.mpLocale : css::lang::Locale(),
                 aBFontColor,
@@ -343,7 +357,8 @@ namespace
                 rInfo.mnTextStart,
                 rInfo.mnTextLen,
                 std::vector(aDXArray),
-                aFontAttribute,
+                std::vector(aKashidaArray),
+                std::move(aFontAttribute),
                 rInfo.mpLocale ? *rInfo.mpLocale : css::lang::Locale(),
                 aBFontColor,
                 rInfo.mbFilled,
@@ -642,7 +657,7 @@ namespace
         }
     }
 
-    drawinglayer::primitive2d::Primitive2DContainer const & impTextBreakupHandler::getPrimitive2DSequence()
+    drawinglayer::primitive2d::Primitive2DContainer impTextBreakupHandler::extractPrimitive2DSequence()
     {
         if(!maTextPortionPrimitives.empty())
         {
@@ -656,7 +671,7 @@ namespace
             impFlushLinePrimitivesToParagraphPrimitives(mrOutliner.GetParagraphCount() - 1);
         }
 
-        return maParagraphPrimitives;
+        return std::move(maParagraphPrimitives);
     }
 } // end of anonymous namespace
 
@@ -711,7 +726,7 @@ void SdrTextObj::impDecomposeContourTextPrimitive(
     rOutliner.Clear();
     rOutliner.setVisualizedPage(nullptr);
 
-    rTarget = aConverter.getPrimitive2DSequence();
+    rTarget = aConverter.extractPrimitive2DSequence();
 }
 
 void SdrTextObj::impDecomposeAutoFitTextPrimitive(
@@ -744,7 +759,11 @@ void SdrTextObj::impDecomposeAutoFitTextPrimitive(
     rOutliner.SetMinAutoPaperSize(aNullSize);
     rOutliner.SetMaxAutoPaperSize(Size(1000000,1000000));
 
-    // add one to rage sizes to get back to the old Rectangle and outliner measurements
+    // That color needs to be restored on leaving this method
+    Color aOriginalBackColor(rOutliner.GetBackgroundColor());
+    setSuitableOutlinerBg(rOutliner);
+
+    // add one to range sizes to get back to the old Rectangle and outliner measurements
     const sal_uInt32 nAnchorTextWidth(FRound(aAnchorTextRange.getWidth() + 1));
     const sal_uInt32 nAnchorTextHeight(FRound(aAnchorTextRange.getHeight() + 1));
     const OutlinerParaObject* pOutlinerParaObject = rSdrAutofitTextPrimitive.getSdrText()->GetOutlinerParaObject();
@@ -846,16 +865,17 @@ void SdrTextObj::impDecomposeAutoFitTextPrimitive(
     aConverter.decomposeBlockTextPrimitive(aNewTransformA, aNewTransformB, aClipRange);
 
     // cleanup outliner
+    rOutliner.SetBackgroundColor(aOriginalBackColor);
     rOutliner.Clear();
     rOutliner.setVisualizedPage(nullptr);
     rOutliner.SetControlWord(nOriginalControlWord);
 
-    rTarget = aConverter.getPrimitive2DSequence();
+    rTarget = aConverter.extractPrimitive2DSequence();
 }
 
 // Resolves: fdo#35779 set background color of this shape as the editeng background if there
 // is one. Check the shape itself, then the host page, then that page's master page.
-void SdrObject::setSuitableOutlinerBg(::Outliner& rOutliner) const
+bool SdrObject::setSuitableOutlinerBg(::Outliner& rOutliner) const
 {
     const SfxItemSet* pBackgroundFillSet = getBackgroundFillSet();
     if (drawing::FillStyle_NONE != pBackgroundFillSet->Get(XATTR_FILLSTYLE).GetValue())
@@ -863,7 +883,9 @@ void SdrObject::setSuitableOutlinerBg(::Outliner& rOutliner) const
         Color aColor(rOutliner.GetBackgroundColor());
         GetDraftFillColor(*pBackgroundFillSet, aColor);
         rOutliner.SetBackgroundColor(aColor);
+        return true;
     }
+    return false;
 }
 
 const SfxItemSet* SdrObject::getBackgroundFillSet() const
@@ -933,7 +955,7 @@ void SdrTextObj::impDecomposeBlockTextPrimitive(
     Color aOriginalBackColor(rOutliner.GetBackgroundColor());
     setSuitableOutlinerBg(rOutliner);
 
-    // add one to rage sizes to get back to the old Rectangle and outliner measurements
+    // add one to range sizes to get back to the old Rectangle and outliner measurements
     const sal_uInt32 nAnchorTextWidth(FRound(aAnchorTextRange.getWidth() + 1));
     const sal_uInt32 nAnchorTextHeight(FRound(aAnchorTextRange.getHeight() + 1));
     const bool bVerticalWriting(rSdrBlockTextPrimitive.getOutlinerParaObject().IsEffectivelyVertical());
@@ -999,7 +1021,8 @@ void SdrTextObj::impDecomposeBlockTextPrimitive(
             bool bAllowGrowHorizontal = bVerticalWriting;
 
             // Compatibility mode for tdf#99729
-            if (getSdrModelFromSdrObject().IsAnchoredTextOverflowLegacy())
+            if (getSdrModelFromSdrObject().GetCompatibilityFlag(
+                    SdrCompatibilityFlag::AnchoredTextOverflowLegacy))
             {
                 bAllowGrowVertical = bHorizontalIsBlock;
                 bAllowGrowHorizontal = bVerticalIsBlock;
@@ -1080,19 +1103,21 @@ void SdrTextObj::impDecomposeBlockTextPrimitive(
         }
     }
 
+    const double fFreeVerticalSpace(aAnchorTextRange.getHeight() - aOutlinerScale.getY());
+    bool bClipVerticalTextOverflow = fFreeVerticalSpace < 0
+                                     && GetObjectItemSet().Get(SDRATTR_TEXT_CLIPVERTOVERFLOW).GetValue();
     // correct vertical translation using the now known text size
-    if(SDRTEXTVERTADJUST_CENTER == eVAdj || SDRTEXTVERTADJUST_BOTTOM == eVAdj)
+    if((SDRTEXTVERTADJUST_CENTER == eVAdj || SDRTEXTVERTADJUST_BOTTOM == eVAdj)
+       && !bClipVerticalTextOverflow)
     {
-        const double fFree(aAnchorTextRange.getHeight() - aOutlinerScale.getY());
-
         if(SDRTEXTVERTADJUST_CENTER == eVAdj)
         {
-            aAdjustTranslate.setY(fFree / 2.0);
+            aAdjustTranslate.setY(fFreeVerticalSpace / 2.0);
         }
 
         if(SDRTEXTVERTADJUST_BOTTOM == eVAdj)
         {
-            aAdjustTranslate.setY(fFree);
+            aAdjustTranslate.setY(fFreeVerticalSpace);
         }
     }
 
@@ -1136,6 +1161,8 @@ void SdrTextObj::impDecomposeBlockTextPrimitive(
 
     // create ClipRange (if needed)
     basegfx::B2DRange aClipRange;
+    if(bClipVerticalTextOverflow)
+        aClipRange = {0, 0, std::numeric_limits<double>::max(), aAnchorTextRange.getHeight()};
 
     // now break up text primitives.
     impTextBreakupHandler aConverter(rOutliner);
@@ -1146,7 +1173,7 @@ void SdrTextObj::impDecomposeBlockTextPrimitive(
     rOutliner.Clear();
     rOutliner.setVisualizedPage(nullptr);
 
-    rTarget = aConverter.getPrimitive2DSequence();
+    rTarget = aConverter.extractPrimitive2DSequence();
 }
 
 void SdrTextObj::impDecomposeStretchTextPrimitive(
@@ -1203,7 +1230,7 @@ void SdrTextObj::impDecomposeStretchTextPrimitive(
     // to layout without mirroring
     const double fScaleX(fabs(aScale.getX()) / aOutlinerScale.getX());
     const double fScaleY(fabs(aScale.getY()) / aOutlinerScale.getY());
-    rOutliner.SetGlobalCharStretching(static_cast<sal_Int16>(FRound(fScaleX * 100.0)), static_cast<sal_Int16>(FRound(fScaleY * 100.0)));
+    rOutliner.setGlobalScale(fScaleX * 100.0, fScaleY * 100.0, 100.0, 100.0);
 
     // When mirroring in X and Y,
     // move the null point which was top left to bottom right.
@@ -1225,7 +1252,7 @@ void SdrTextObj::impDecomposeStretchTextPrimitive(
     rOutliner.Clear();
     rOutliner.setVisualizedPage(nullptr);
 
-    rTarget = aConverter.getPrimitive2DSequence();
+    rTarget = aConverter.extractPrimitive2DSequence();
 }
 
 
@@ -1478,7 +1505,7 @@ void SdrTextObj::impHandleChainingEventsDuringDecomposition(SdrOutliner &rOutlin
     size_t nObjCount(getSdrPageFromSdrObject()->GetObjCount());
     for (size_t i = 0; i < nObjCount; i++)
     {
-        SdrTextObj* pCurObj(dynamic_cast< SdrTextObj* >(getSdrPageFromSdrObject()->GetObj(i)));
+        SdrTextObj* pCurObj(DynCastSdrTextObj(getSdrPageFromSdrObject()->GetObj(i)));
         if(pCurObj == this)
         {
             SAL_INFO("svx.chaining", "Working on TextBox " << i);
@@ -1542,7 +1569,7 @@ void SdrTextObj::impDecomposeChainedTextPrimitive(
     rOutliner.SetMinAutoPaperSize(aNullSize);
     rOutliner.SetMaxAutoPaperSize(Size(1000000,1000000));
 
-    // add one to rage sizes to get back to the old Rectangle and outliner measurements
+    // add one to range sizes to get back to the old Rectangle and outliner measurements
     const sal_uInt32 nAnchorTextWidth(FRound(aAnchorTextRange.getWidth() + 1));
     const sal_uInt32 nAnchorTextHeight(FRound(aAnchorTextRange.getHeight() + 1));
 
@@ -1655,7 +1682,7 @@ void SdrTextObj::impDecomposeChainedTextPrimitive(
     rOutliner.setVisualizedPage(nullptr);
     rOutliner.SetControlWord(nOriginalControlWord);
 
-    rTarget = aConverter.getPrimitive2DSequence();
+    rTarget = aConverter.extractPrimitive2DSequence();
 }
 
 // Direct decomposer for text visualization when you already have a prepared
@@ -1669,7 +1696,7 @@ void SdrTextObj::impDecomposeBlockTextPrimitiveDirect(
 {
     impTextBreakupHandler aConverter(rOutliner);
     aConverter.decomposeBlockTextPrimitive(rNewTransformA, rNewTransformB, rClipRange);
-    rTarget.append(aConverter.getPrimitive2DSequence());
+    rTarget.append(aConverter.extractPrimitive2DSequence());
 }
 
 double SdrTextObj::GetCameraZRotation() const

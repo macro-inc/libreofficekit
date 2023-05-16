@@ -24,12 +24,13 @@
 #include <sallayout.hxx>
 #include <salgeom.hxx>
 #include <salgdi.hxx>
-#include <fontinstance.hxx>
+#include <font/LogicalFontInstance.hxx>
 #include <fontattributes.hxx>
 #include <font/PhysicalFontFace.hxx>
 #include <impfont.hxx>
 #include <vcl/fontcapabilities.hxx>
 #include <vcl/fontcharmap.hxx>
+#include <systools/win32/comtools.hxx>
 
 #include <memory>
 #include <unordered_set>
@@ -58,42 +59,30 @@ class ImplFontMetricData;
 #define PALRGB_TO_RGB(nPalRGB)      ((nPalRGB)&0x00ffffff)
 
 // win32 specific physically available font face
-class WinFontFace : public vcl::font::PhysicalFontFace
+class WinFontFace final : public vcl::font::PhysicalFontFace
 {
 public:
-    explicit                WinFontFace( const FontAttributes&,
-                                BYTE eWinCharSet,
-                                BYTE nPitchAndFamily  );
-    virtual                 ~WinFontFace() override;
+    explicit                WinFontFace(const ENUMLOGFONTEXW&, const NEWTEXTMETRICW&);
+                            ~WinFontFace() override;
 
-    virtual rtl::Reference<LogicalFontInstance> CreateFontInstance( const vcl::font::FontSelectPattern& ) const override;
-    virtual sal_IntPtr      GetFontId() const override;
+    rtl::Reference<LogicalFontInstance> CreateFontInstance( const vcl::font::FontSelectPattern& ) const override;
+    sal_IntPtr              GetFontId() const override;
     void                    SetFontId( sal_IntPtr nId ) { mnId = nId; }
-    void                    UpdateFromHDC( HDC ) const;
-
-    bool                    HasChar( sal_uInt32 cChar ) const;
 
     BYTE                    GetCharSet() const          { return meWinCharSet; }
     BYTE                    GetPitchAndFamily() const   { return mnPitchAndFamily; }
 
-    FontCharMapRef GetFontCharMap() const override;
-    bool GetFontCapabilities(vcl::FontCapabilities&) const override;
+    hb_blob_t*              GetHbTable(hb_tag_t nTag) const override;
+
+    const std::vector<hb_variation_t>& GetVariations(const LogicalFontInstance&) const override;
 
 private:
     sal_IntPtr              mnId;
 
-    // some members that are initialized lazily when the font gets selected into a HDC
-    mutable bool                    mbFontCapabilitiesRead;
-    mutable FontCharMapRef          mxUnicodeMap;
-    mutable vcl::FontCapabilities   maFontCapabilities;
-
     BYTE                    meWinCharSet;
     BYTE                    mnPitchAndFamily;
-    bool                    mbAliasSymbolsHigh;
-    bool                    mbAliasSymbolsLow;
-
-    void                    ReadCmapTable( HDC ) const;
-    void                    GetFontCapabilities( HDC hDC ) const;
+    LOGFONTW                maLogFont;
+    mutable sal::systools::COMReference<IDWriteFontFace> mxDWFontFace;
 };
 
 /** Class that creates (and destroys) a compatible Device Context.
@@ -155,6 +144,7 @@ class WinSalGraphics : public SalGraphics
 
 protected:
     std::unique_ptr<SalGraphicsImpl> mpImpl;
+    WinSalGraphicsImplBase * mWinSalGraphicsImplBase;
 
 private:
     HDC                     mhLocalDC;              // HDC
@@ -175,6 +165,10 @@ private:
     RGNDATA*                mpClipRgnData;      // ClipRegion-Data
     RGNDATA*                mpStdClipRgnData;   // Cache Standard-ClipRegion-Data
     int                     mnPenWidth;         // line width
+
+    inline static sal::systools::COMReference<IDWriteFactory> mxDWriteFactory;
+    inline static sal::systools::COMReference<IDWriteGdiInterop> mxDWriteGdiInterop;
+    inline static bool bDWriteDone = false;
 
     // just call both from setHDC!
     void InitGraphics();
@@ -204,6 +198,8 @@ public:
         SCREEN
     };
 
+    static void getDWriteFactory(IDWriteFactory** pFactory, IDWriteGdiInterop** pInterop = nullptr);
+
 public:
 
     HWND gethWnd();
@@ -215,6 +211,7 @@ public:
     virtual ~WinSalGraphics() override;
 
     SalGraphicsImpl* GetImpl() const override;
+    WinSalGraphicsImplBase * getWinSalGraphicsImplBase() const { return mWinSalGraphicsImplBase; }
     bool isPrinter() const;
     bool isVirtualDevice() const;
     bool isWindow() const;
@@ -361,38 +358,6 @@ public:
     // graphics must drop any cached font info
     virtual void            ClearDevFontCache() override;
     virtual bool            AddTempDevFont( vcl::font::PhysicalFontCollection*, const OUString& rFileURL, const OUString& rFontName ) override;
-    // CreateFontSubset: a method to get a subset of glyhps of a font
-    // inside a new valid font file
-    // returns TRUE if creation of subset was successful
-    // parameters: rToFile: contains an osl file URL to write the subset to
-    //             pFont: describes from which font to create a subset
-    //             pGlyphIDs: the glyph ids to be extracted
-    //             pEncoding: the character code corresponding to each glyph
-    //             pWidths: the advance widths of the corresponding glyphs (in PS font units)
-    //             nGlyphs: the number of glyphs
-    //             rInfo: additional outgoing information
-    // implementation note: encoding 0 with glyph id 0 should be added implicitly
-    // as "undefined character"
-    virtual bool            CreateFontSubset( const OUString& rToFile,
-                                              const vcl::font::PhysicalFontFace*,
-                                              const sal_GlyphId* pGlyphIDs,
-                                              const sal_uInt8* pEncoding,
-                                              sal_Int32* pWidths,
-                                              int nGlyphs,
-                                              FontSubsetInfo& rInfo // out parameter
-                                              ) override;
-
-    // GetEmbedFontData: gets the font data for a font marked
-    // embeddable by GetDevFontList or NULL in case of error
-    // parameters: pFont: describes the font in question
-    //             pDataLen: out parameter, contains the byte length of the returned buffer
-    virtual const void* GetEmbedFontData(const vcl::font::PhysicalFontFace*, tools::Long* pDataLen) override;
-    // frees the font data again
-    virtual void            FreeEmbedFontData( const void* pData, tools::Long nDataLen ) override;
-    virtual void            GetGlyphWidths( const vcl::font::PhysicalFontFace*,
-                                            bool bVertical,
-                                            std::vector< sal_Int32 >& rWidths,
-                                            Ucs2UIntMap& rUnicodeEnc ) override;
 
     virtual std::unique_ptr<GenericSalLayout>
                             GetTextLayout(int nFallbackLevel) override;
@@ -413,20 +378,5 @@ void    ImplGetLogFontFromFontSelect( const vcl::font::FontSelectPattern&,
             const vcl::font::PhysicalFontFace*, LOGFONTW& );
 
 #define MAX_64KSALPOINTS    ((((sal_uInt16)0xFFFF)-8)/sizeof(POINTS))
-
-// called extremely often from just one spot => inline
-inline bool WinFontFace::HasChar( sal_uInt32 cChar ) const
-{
-    if( mxUnicodeMap->HasChar( cChar ) )
-        return true;
-    // second chance to allow symbol aliasing
-    if( mbAliasSymbolsLow && ((cChar-0xF000) <= 0xFF) )
-        cChar -= 0xF000;
-    else if( mbAliasSymbolsHigh && (cChar <= 0xFF) )
-        cChar += 0xF000;
-    else
-        return false;
-    return mxUnicodeMap->HasChar( cChar );
-}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

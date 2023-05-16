@@ -7,11 +7,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_SW_INC_CACHEOWNER_HXX
-#define INCLUDED_SW_INC_CACHEOWNER_HXX
+#pragma once
 
 #include <sal/types.h>
-#include "swdllapi.h"
 
 class SwBorderAttrs;
 class SwBorderAttrAccess;
@@ -45,5 +43,4 @@ public:
     void InvalidateInSwCache(const sal_uInt16);
 };
 }
-#endif
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

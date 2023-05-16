@@ -21,7 +21,7 @@
 #include <ModelImpl.hxx>
 #include <stringconstants.hxx>
 #include <sdbcoretools.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 #include <comphelper/sequence.hxx>
 #include <comphelper/namedvaluecollection.hxx>
@@ -32,6 +32,7 @@
 #include <com/sun/star/frame/XUntitledNumbers.hpp>
 #include <com/sun/star/awt/Size.hpp>
 #include <com/sun/star/lang/DisposedException.hpp>
+#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/frame/XModel.hpp>
@@ -76,6 +77,7 @@
 #include <com/sun/star/view/XViewSettingsSupplier.hpp>
 #include <core_resource.hxx>
 #include <strings.hrc>
+#include <strings.hxx>
 #include <com/sun/star/task/XInteractionApprove.hpp>
 #include <com/sun/star/task/XInteractionDisapprove.hpp>
 #include <com/sun/star/frame/XLayoutManager.hpp>
@@ -506,7 +508,7 @@ void SAL_CALL ODocumentDefinition::getFastPropertyValue( Any& o_rValue, sal_Int3
         OUString sPersistentPath;
         if ( !m_pImpl->m_aProps.sPersistentName.isEmpty() )
         {
-            sPersistentPath = ODatabaseModelImpl::getObjectContainerStorageName( m_bForm ? ODatabaseModelImpl::E_FORM : ODatabaseModelImpl::E_REPORT )
+            sPersistentPath = ODatabaseModelImpl::getObjectContainerStorageName( m_bForm ? ODatabaseModelImpl::ObjectType::Form : ODatabaseModelImpl::ObjectType::Report )
                 + "/" + m_pImpl->m_aProps.sPersistentName;
         }
         o_rValue <<= sPersistentPath;
@@ -719,14 +721,14 @@ void ODocumentDefinition::impl_initFormEditView( const Reference< XController >&
         LayoutManagerLock aLockLayout( _rxController );
 
         // setting of the visual properties
-        xViewSettings->setPropertyValue("ShowRulers",makeAny(true));
-        xViewSettings->setPropertyValue("ShowVertRuler",makeAny(true));
-        xViewSettings->setPropertyValue("ShowHoriRuler",makeAny(true));
-        xViewSettings->setPropertyValue("IsRasterVisible",makeAny(true));
-        xViewSettings->setPropertyValue("IsSnapToRaster",makeAny(true));
-        xViewSettings->setPropertyValue("ShowOnlineLayout",makeAny(true));
-        xViewSettings->setPropertyValue("RasterSubdivisionX",makeAny(sal_Int32(5)));
-        xViewSettings->setPropertyValue("RasterSubdivisionY",makeAny(sal_Int32(5)));
+        xViewSettings->setPropertyValue("ShowRulers",Any(true));
+        xViewSettings->setPropertyValue("ShowVertRuler",Any(true));
+        xViewSettings->setPropertyValue("ShowHoriRuler",Any(true));
+        xViewSettings->setPropertyValue("IsRasterVisible",Any(true));
+        xViewSettings->setPropertyValue("IsSnapToRaster",Any(true));
+        xViewSettings->setPropertyValue("ShowOnlineLayout",Any(true));
+        xViewSettings->setPropertyValue("RasterSubdivisionX",Any(sal_Int32(5)));
+        xViewSettings->setPropertyValue("RasterSubdivisionY",Any(sal_Int32(5)));
     }
     catch( const Exception& )
     {
@@ -850,7 +852,7 @@ Any ODocumentDefinition::onCommandOpenSomething( const Any& _rOpenArgument, cons
         // So, in such a case, and with 2. above, we would silently execute those macros,
         // regardless of the global security settings - which would be a security issue, of
         // course.
-        if ( m_pImpl->m_pDataSource->determineEmbeddedMacros() == ODatabaseModelImpl::eNoMacros )
+        if ( m_pImpl->m_pDataSource->determineEmbeddedMacros() == ODatabaseModelImpl::EmbeddedMacros::NONE )
         {
             // this is case 2. from above
             // So, pass a USE_CONFIG to the to-be-loaded document. This means that
@@ -880,7 +882,7 @@ Any ODocumentDefinition::onCommandOpenSomething( const Any& _rOpenArgument, cons
     {
         // not supported
         ucbhelper::cancelCommandExecution(
-                makeAny( UnsupportedOpenModeException(
+                Any( UnsupportedOpenModeException(
                                 OUString(),
                                 static_cast< cppu::OWeakObject * >( this ),
                                 sal_Int16( nOpenMode ) ) ),
@@ -928,8 +930,8 @@ Any ODocumentDefinition::onCommandOpenSomething( const Any& _rOpenArgument, cons
         xReportEngine->setReportDefinition(xReportDefinition);
         xReportEngine->setActiveConnection(m_xLastKnownConnection);
         if ( bOpenHidden )
-            return makeAny( xReportEngine->createDocumentModel() );
-        return makeAny( xReportEngine->createDocumentAlive( nullptr ) );
+            return Any( xReportEngine->createDocumentModel() );
+        return Any( xReportEngine->createDocumentAlive( nullptr ) );
     }
 
     if ( _bActivate && !bOpenHidden )
@@ -947,7 +949,7 @@ Any ODocumentDefinition::onCommandOpenSomething( const Any& _rOpenArgument, cons
     if ( !m_bForm && m_pImpl->m_aProps.bAsTemplate && !m_bOpenInDesign )
         ODocumentDefinition::fillReportData( m_aContext, getComponent(), xConnection );
 
-    return makeAny( xModel );
+    return Any( xModel );
 }
 
 Any SAL_CALL ODocumentDefinition::execute( const Command& aCommand, sal_Int32 CommandId, const Reference< XCommandEnvironment >& Environment )
@@ -994,7 +996,7 @@ Any SAL_CALL ODocumentDefinition::execute( const Command& aCommand, sal_Int32 Co
                 if ( !bIsAliveNewStyleReport )
                 {
                     impl_onActivateEmbeddedObject_nothrow( true );
-                    return makeAny( getComponent() );
+                    return Any( getComponent() );
                 }
             }
         }
@@ -1015,7 +1017,7 @@ Any SAL_CALL ODocumentDefinition::execute( const Command& aCommand, sal_Int32 Co
         {
             OSL_FAIL( "Wrong argument type!" );
             ucbhelper::cancelCommandExecution(
-                makeAny( IllegalArgumentException(
+                Any( IllegalArgumentException(
                                     OUString(),
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -1041,7 +1043,7 @@ Any SAL_CALL ODocumentDefinition::execute( const Command& aCommand, sal_Int32 Co
         {
             OSL_FAIL( "Wrong argument count!" );
             ucbhelper::cancelCommandExecution(
-                makeAny( IllegalArgumentException(
+                Any( IllegalArgumentException(
                                     OUString(),
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -1112,7 +1114,7 @@ namespace
             try
             {
                 Reference< XPropertySet > xFormProps( xForm, UNO_QUERY_THROW );
-                xFormProps->setPropertyValue( PROPERTY_DATASOURCENAME, makeAny( OUString() ) );
+                xFormProps->setPropertyValue( PROPERTY_DATASOURCENAME, Any( OUString() ) );
             }
             catch( const Exception& )
             {
@@ -1158,7 +1160,7 @@ void ODocumentDefinition::onCommandInsert( const OUString& _sURL, const Referenc
 
         Sequence<OUString> aProps { PROPERTY_URL };
         ucbhelper::cancelCommandExecution(
-            makeAny( MissingPropertiesException(
+            Any( MissingPropertiesException(
                                 OUString(),
                                 static_cast< cppu::OWeakObject * >( this ),
                                 aProps ) ),
@@ -1228,7 +1230,7 @@ bool ODocumentDefinition::save(bool _bApprove, const css::uno::Reference<css::aw
             }
 
             aRequest.Content.set(m_xParentContainer,UNO_QUERY);
-            rtl::Reference<OInteractionRequest> pRequest = new OInteractionRequest(makeAny(aRequest));
+            rtl::Reference<OInteractionRequest> pRequest = new OInteractionRequest(Any(aRequest));
             // some knittings
             // two continuations allowed: OK and Cancel
             rtl::Reference<ODocumentSaveContinuation> pDocuSave;
@@ -1269,7 +1271,7 @@ bool ODocumentDefinition::save(bool _bApprove, const css::uno::Reference<css::aw
                 m_pImpl->m_aProps.aTitle = pDocuSave->getName();
 
                 Reference< XContent> xContent = this;
-                xNC->insertByName(pDocuSave->getName(),makeAny(xContent));
+                xNC->insertByName(pDocuSave->getName(),Any(xContent));
 
                 updateDocumentTitle();
             }
@@ -1314,7 +1316,7 @@ void ODocumentDefinition::saveAs()
         aRequest.Name = m_pImpl->m_aProps.aTitle;
 
         aRequest.Content.set(m_xParentContainer,UNO_QUERY);
-        rtl::Reference<OInteractionRequest> pRequest = new OInteractionRequest(makeAny(aRequest));
+        rtl::Reference<OInteractionRequest> pRequest = new OInteractionRequest(Any(aRequest));
         // some knittings
         // two continuations allowed: OK and Cancel
         rtl::Reference<ODocumentSaveContinuation> pDocuSave = new ODocumentSaveContinuation;
@@ -1360,7 +1362,7 @@ void ODocumentDefinition::saveAs()
                         Reference< XMultiServiceFactory > xORB( m_xParentContainer, UNO_QUERY_THROW );
                         Reference< XInterface > xComponent( xORB->createInstanceWithArguments( SERVICE_SDB_DOCUMENTDEFINITION, aArguments ) );
                         Reference< XNameContainer > xNameContainer( m_xParentContainer, UNO_QUERY_THROW );
-                        xNameContainer->insertByName( sOldName, makeAny( xComponent ) );
+                        xNameContainer->insertByName( sOldName, Any( xComponent ) );
                     }
                     catch(const Exception&)
                     {
@@ -1429,7 +1431,7 @@ namespace
 bool ODocumentDefinition::objectSupportsEmbeddedScripts() const
 {
     bool bAllowDocumentMacros = !m_pImpl->m_pDataSource
-                            ||  ( m_pImpl->m_pDataSource->determineEmbeddedMacros() == ODatabaseModelImpl::eSubDocumentMacros );
+                            ||  ( m_pImpl->m_pDataSource->determineEmbeddedMacros() == ODatabaseModelImpl::EmbeddedMacros::SubDocument );
 
     // if *any* of the objects of the database document already has macros, we
     // continue to allow it to have them, until the user does a migration.
@@ -1925,7 +1927,7 @@ void SAL_CALL ODocumentDefinition::rename( const OUString& _rNewName )
 Reference< XStorage> ODocumentDefinition::getContainerStorage() const
 {
     return  m_pImpl->m_pDataSource
-        ?   m_pImpl->m_pDataSource->getStorage( m_bForm ? ODatabaseModelImpl::E_FORM : ODatabaseModelImpl::E_REPORT )
+        ?   m_pImpl->m_pDataSource->getStorage( m_bForm ? ODatabaseModelImpl::ObjectType::Form : ODatabaseModelImpl::ObjectType::Report )
         :   Reference< XStorage>();
 }
 
@@ -2075,8 +2077,8 @@ void ODocumentDefinition::firePropertyChange( sal_Int32 i_nHandle, const Any& i_
 NameChangeNotifier::NameChangeNotifier( ODocumentDefinition& i_rDocumentDefinition, const OUString& i_rNewName,
                                   ::osl::ResettableMutexGuard& i_rClearForNotify )
     :m_rDocumentDefinition( i_rDocumentDefinition )
-    ,m_aOldValue( makeAny( i_rDocumentDefinition.getCurrentName() ) )
-    ,m_aNewValue( makeAny( i_rNewName ) )
+    ,m_aOldValue( Any( i_rDocumentDefinition.getCurrentName() ) )
+    ,m_aNewValue( Any( i_rNewName ) )
     ,m_rClearForNotify( i_rClearForNotify )
 {
     impl_fireEvent_throw( true );

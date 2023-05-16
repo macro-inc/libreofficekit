@@ -75,14 +75,18 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <o3tl/safeint.hxx>
 #include <o3tl/typed_flags_set.hxx>
+#include <o3tl/string_view.hxx>
+#include <unotools/fcm.hxx>
 #include <unotools/mediadescriptor.hxx>
+#include <comphelper/multiinterfacecontainer3.hxx>
 #include <comphelper/namedvaluecollection.hxx>
 #include <comphelper/sequence.hxx>
+#include <utility>
 #include <vcl/evntpost.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/timer.hxx>
 #include <unotools/pathoptions.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/tempfile.hxx>
 #include <ucbhelper/content.hxx>
 #include <svtools/sfxecode.hxx>
@@ -94,10 +98,9 @@
 #include <unotools/configmgr.hxx>
 #include <svl/documentlockfile.hxx>
 #include <tools/urlobj.hxx>
+#include <officecfg/Office/Common.hxx>
 #include <officecfg/Office/Recovery.hxx>
 #include <officecfg/Setup.hxx>
-
-#include <stdtypes.h>
 
 using namespace css::uno;
 using namespace css::document;
@@ -110,7 +113,7 @@ namespace {
 /** @short  hold all needed information for an asynchronous dispatch alive.
 
     @descr  Because some operations are forced to be executed asynchronously
-            (e.g. requested by our CreashSave/Recovery dialog) ... we must make sure
+            (e.g. requested by our CrashSave/Recovery dialog) ... we must make sure
             that this information won't be set as "normal" members of our AutoRecovery
             instance. Otherwise they can disturb our normal AutoSave-timer handling.
             e.g. it can be unclear then, which progress has to be used for storing documents...
@@ -421,7 +424,7 @@ private:
 
     /** @short  contains all status listener registered at this instance.
      */
-    ListenerHash m_lListener;
+    comphelper::OMultiTypeInterfaceContainerHelperVar3<css::frame::XStatusListener, OUString> m_lListener;
 
     /** @descr  This member is used to prevent us against re-entrance problems.
                 A mutex can't help to prevent us from concurrent using of members
@@ -450,7 +453,7 @@ private:
 
 public:
 
-    explicit AutoRecovery(const css::uno::Reference< css::uno::XComponentContext >& xContext);
+    explicit AutoRecovery(css::uno::Reference< css::uno::XComponentContext >  xContext);
     virtual ~AutoRecovery(                                                                   ) override;
 
     virtual OUString SAL_CALL getImplementationName() override
@@ -681,7 +684,7 @@ private:
 
         @return [TDocumentList::iterator]
                 which points to the located document.
-                If document does not exists - its set to
+                If document does not exists - it's set to
                 rList.end()!
      */
     static TDocumentList::iterator impl_searchDocument(      AutoRecovery::TDocumentList&               rList    ,
@@ -1209,10 +1212,10 @@ void DispatchParams::forget()
     m_xHoldRefForAsyncOpAlive.clear();
 };
 
-AutoRecovery::AutoRecovery(const css::uno::Reference< css::uno::XComponentContext >& xContext)
+AutoRecovery::AutoRecovery(css::uno::Reference< css::uno::XComponentContext >  xContext)
     : AutoRecovery_BASE         (m_aMutex)
     , ::cppu::OPropertySetHelper(cppu::WeakComponentImplHelperBase::rBHelper)
-    , m_xContext                (xContext                                           )
+    , m_xContext                (std::move(xContext                                           ))
     , m_bListenForDocEvents     (false                                          )
     , m_bListenForConfigChanges (false                                          )
     , m_nAutoSaveTimeIntervall  (0                                                  )
@@ -1727,8 +1730,8 @@ void AutoRecovery::implts_openConfig()
 
     try
     {
-        nMinSpaceDocSave = officecfg::Office::Recovery::AutoSave::MinSpaceDocSave::get(m_xContext);
-        nMinSpaceConfigSave = officecfg::Office::Recovery::AutoSave::MinSpaceConfigSave::get(m_xContext);
+        nMinSpaceDocSave = officecfg::Office::Recovery::AutoSave::MinSpaceDocSave::get();
+        nMinSpaceConfigSave = officecfg::Office::Recovery::AutoSave::MinSpaceConfigSave::get();
     }
     catch(const css::uno::Exception&)
     {
@@ -1751,13 +1754,13 @@ void AutoRecovery::implts_readAutoSaveConfig()
     implts_openConfig();
 
     // AutoSave [bool]
-    bool bEnabled(officecfg::Office::Recovery::AutoSave::Enabled::get(m_xContext));
+    bool bEnabled(officecfg::Office::Common::Save::Document::AutoSave::get());
 
     /* SAFE */ {
     osl::MutexGuard g(cppu::WeakComponentImplHelperBase::rBHelper.rMutex);
     if (bEnabled)
     {
-        bool bUserEnabled(officecfg::Office::Recovery::AutoSave::UserAutoSaveEnabled::get(m_xContext));
+        bool bUserEnabled(officecfg::Office::Recovery::AutoSave::UserAutoSaveEnabled::get());
 
         m_eJob       |= Job::AutoSave;
         m_eTimerType  = AutoRecovery::E_NORMAL_AUTOSAVE_INTERVALL;
@@ -1779,7 +1782,8 @@ void AutoRecovery::implts_readAutoSaveConfig()
     } /* SAFE */
 
     // AutoSaveTimeIntervall [int] in min
-    sal_Int32 nTimeIntervall(officecfg::Office::Recovery::AutoSave::TimeIntervall::get(m_xContext));
+    sal_Int32 nTimeIntervall(
+        officecfg::Office::Common::Save::Document::AutoSaveTimeIntervall::get());
 
     /* SAFE */ {
     osl::MutexGuard g(cppu::WeakComponentImplHelperBase::rBHelper.rMutex);
@@ -1805,7 +1809,7 @@ void AutoRecovery::implts_readConfig()
     // <- REENTRANT --------------------------------
 
     css::uno::Reference<css::container::XNameAccess> xRecoveryList(
-            officecfg::Office::Recovery::RecoveryList::get(m_xContext));
+            officecfg::Office::Recovery::RecoveryList::get());
     const OUString sRECOVERY_ITEM_BASE_IDENTIFIER(RECOVERY_ITEM_BASE_IDENTIFIER);
     const css::uno::Sequence< OUString > lItems = xRecoveryList->getElementNames();
     const OUString*                      pItems = lItems.getConstArray();
@@ -1840,8 +1844,8 @@ void AutoRecovery::implts_readConfig()
 
         if (pItems[i].startsWith(sRECOVERY_ITEM_BASE_IDENTIFIER))
         {
-            OUString sID = pItems[i].copy(sRECOVERY_ITEM_BASE_IDENTIFIER.getLength());
-            aInfo.ID = sID.toInt32();
+            std::u16string_view sID = pItems[i].subView(sRECOVERY_ITEM_BASE_IDENTIFIER.getLength());
+            aInfo.ID = o3tl::toInt32(sID);
             /* SAFE */ {
             osl::MutexGuard g(cppu::WeakComponentImplHelperBase::rBHelper.rMutex);
             if (aInfo.ID > m_nIdPool)
@@ -1887,7 +1891,7 @@ void AutoRecovery::implts_specifyDefaultFilterAndExtension(AutoRecovery::TDocume
         {
             implts_openConfig();
             // open module config on demand and cache the update access
-            xCFG.set(officecfg::Setup::Office::Factories::get(m_xContext),
+            xCFG.set(officecfg::Setup::Office::Factories::get(),
                     css::uno::UNO_SET_THROW);
 
             /* SAFE */ {
@@ -1988,7 +1992,7 @@ void AutoRecovery::implts_persistAllActiveViewNames()
 void AutoRecovery::implts_flushConfigItem(const AutoRecovery::TDocumentInfo& rInfo, bool bRemoveIt)
 {
     std::shared_ptr<comphelper::ConfigurationChanges> batch(
-            comphelper::ConfigurationChanges::create(m_xContext));
+            comphelper::ConfigurationChanges::create());
 
     try
     {
@@ -2027,17 +2031,17 @@ void AutoRecovery::implts_flushConfigItem(const AutoRecovery::TDocumentInfo& rIn
             else
                 xCheck->getByName(sID) >>= xSet;
 
-            xSet->setPropertyValue(CFG_ENTRY_PROP_ORIGINALURL, css::uno::makeAny(rInfo.OrgURL       ));
-            xSet->setPropertyValue(CFG_ENTRY_PROP_TEMPURL, css::uno::makeAny(rInfo.OldTempURL   ));
-            xSet->setPropertyValue(CFG_ENTRY_PROP_TEMPLATEURL, css::uno::makeAny(rInfo.TemplateURL  ));
-            xSet->setPropertyValue(CFG_ENTRY_PROP_FILTER, css::uno::makeAny(rInfo.RealFilter));
-            xSet->setPropertyValue(CFG_ENTRY_PROP_DOCUMENTSTATE, css::uno::makeAny(sal_Int32(rInfo.DocumentState)));
-            xSet->setPropertyValue(CFG_ENTRY_PROP_MODULE, css::uno::makeAny(rInfo.AppModule));
-            xSet->setPropertyValue(CFG_ENTRY_PROP_TITLE, css::uno::makeAny(rInfo.Title));
-            xSet->setPropertyValue(CFG_ENTRY_PROP_VIEWNAMES, css::uno::makeAny(rInfo.ViewNames));
+            xSet->setPropertyValue(CFG_ENTRY_PROP_ORIGINALURL, css::uno::Any(rInfo.OrgURL       ));
+            xSet->setPropertyValue(CFG_ENTRY_PROP_TEMPURL, css::uno::Any(rInfo.OldTempURL   ));
+            xSet->setPropertyValue(CFG_ENTRY_PROP_TEMPLATEURL, css::uno::Any(rInfo.TemplateURL  ));
+            xSet->setPropertyValue(CFG_ENTRY_PROP_FILTER, css::uno::Any(rInfo.RealFilter));
+            xSet->setPropertyValue(CFG_ENTRY_PROP_DOCUMENTSTATE, css::uno::Any(sal_Int32(rInfo.DocumentState)));
+            xSet->setPropertyValue(CFG_ENTRY_PROP_MODULE, css::uno::Any(rInfo.AppModule));
+            xSet->setPropertyValue(CFG_ENTRY_PROP_TITLE, css::uno::Any(rInfo.Title));
+            xSet->setPropertyValue(CFG_ENTRY_PROP_VIEWNAMES, css::uno::Any(rInfo.ViewNames));
 
             if (bNew)
-                xModify->insertByName(sID, css::uno::makeAny(xSet));
+                xModify->insertByName(sID, css::uno::Any(xSet));
         }
     }
     catch(const css::uno::RuntimeException&)
@@ -3010,6 +3014,8 @@ void AutoRecovery::implts_saveOneDoc(const OUString&                            
     // for make hyperlinks working
     lNewArgs[utl::MediaDescriptor::PROP_DOCUMENTBASEURL] <<= OUString();
 
+    lNewArgs[utl::MediaDescriptor::PROP_AUTOSAVEEVENT] <<= true;
+
     // try to save this document as a new temp file every time.
     // Mark AutoSave state as "INCOMPLETE" if it failed.
     // Because the last temp file is too old and does not include all changes.
@@ -3417,11 +3423,7 @@ void AutoRecovery::implts_openOneDoc(const OUString&               sURL       ,
             }
 
             // introduce model/view/controller to each other
-            xController->attachModel( xModel );
-            xModel->connectController( xController );
-            xTargetFrame->setComponent( xController->getComponentWindow(), xController );
-            xController->attachFrame( xTargetFrame );
-            xModel->setCurrentController( xController );
+            utl::ConnectFrameControllerModel(xTargetFrame, xController, xModel);
         }
 
         rInfo.Document = xModel.get();
@@ -3478,21 +3480,16 @@ void AutoRecovery::implts_generateNewTempURL(const OUString&               sBack
         sUniqueName.append("untitled");
     sUniqueName.append("_");
 
-    // TODO: Must we strip some illegal signes - if we use the title?
+    // TODO: Must we strip some illegal signs - if we use the title?
 
-    OUString sName(sUniqueName.makeStringAndClear());
-    OUString sExtension(rInfo.Extension);
-    OUString sPath(sBackupPath);
-    ::utl::TempFile aTempFile(sName, true, &sExtension, &sPath, true);
-
-    rInfo.NewTempURL = aTempFile.GetURL();
+    rInfo.NewTempURL = ::utl::CreateTempURL(sUniqueName, true, rInfo.Extension, &sBackupPath, true);
 }
 
 void AutoRecovery::implts_informListener(      Job                      eJob  ,
                                          const css::frame::FeatureStateEvent& aEvent)
 {
     // Helper shares mutex with us -> threadsafe!
-    ::comphelper::OInterfaceContainerHelper2* pListenerForURL = nullptr;
+    ::comphelper::OInterfaceContainerHelper3<css::frame::XStatusListener>* pListenerForURL = nullptr;
     OUString                           sJob            = AutoRecovery::implst_getJobDescription(eJob);
 
     // inform listener, which are registered for any URLs(!)
@@ -3500,12 +3497,12 @@ void AutoRecovery::implts_informListener(      Job                      eJob  ,
     if(pListenerForURL == nullptr)
         return;
 
-    ::comphelper::OInterfaceIteratorHelper2 pIt(*pListenerForURL);
+    ::comphelper::OInterfaceIteratorHelper3 pIt(*pListenerForURL);
     while(pIt.hasMoreElements())
     {
         try
         {
-            static_cast<css::frame::XStatusListener*>(pIt.next())->statusChanged(aEvent);
+            pIt.next()->statusChanged(aEvent);
         }
         catch(const css::uno::RuntimeException&)
         {
@@ -3645,7 +3642,7 @@ void AutoRecovery::implts_doEmergencySave(const DispatchParams& aParams)
     // documents exists and was saved.
 
     std::shared_ptr<comphelper::ConfigurationChanges> batch(
-            comphelper::ConfigurationChanges::create(m_xContext));
+            comphelper::ConfigurationChanges::create());
     officecfg::Office::Recovery::RecoveryInfo::Crashed::set(true, batch);
     batch->commit();
 
@@ -3702,7 +3699,7 @@ void AutoRecovery::implts_doRecovery(const DispatchParams& aParams)
 
     // Reset the configuration hint "we were crashed"!
     std::shared_ptr<comphelper::ConfigurationChanges> batch(
-            comphelper::ConfigurationChanges::create(m_xContext));
+            comphelper::ConfigurationChanges::create());
     officecfg::Office::Recovery::RecoveryInfo::Crashed::set(false, batch);
     batch->commit();
 }
@@ -3764,7 +3761,7 @@ void AutoRecovery::implts_doSessionQuietQuit()
     // Write a hint for "stored session data" into the configuration, so
     // the on next startup we know what's happen last time
     std::shared_ptr<comphelper::ConfigurationChanges> batch(
-            comphelper::ConfigurationChanges::create(m_xContext));
+            comphelper::ConfigurationChanges::create());
     officecfg::Office::Recovery::RecoveryInfo::SessionData::set(true, batch);
     batch->commit();
 
@@ -3796,7 +3793,7 @@ void AutoRecovery::implts_doSessionRestore(const DispatchParams& aParams)
     // Reset the configuration hint for "session save"!
     SAL_INFO("fwk.autorecovery", "... reset config key 'SessionData'");
     std::shared_ptr<comphelper::ConfigurationChanges> batch(
-            comphelper::ConfigurationChanges::create(m_xContext));
+            comphelper::ConfigurationChanges::create());
     officecfg::Office::Recovery::RecoveryInfo::SessionData::set(false, batch);
     batch->commit();
 
@@ -3913,7 +3910,7 @@ void SAL_CALL AutoRecovery::getFastPropertyValue(css::uno::Any& aValue ,
     {
         case AUTORECOVERY_PROPHANDLE_EXISTS_RECOVERYDATA :
                 {
-                    bool bSessionData = officecfg::Office::Recovery::RecoveryInfo::SessionData::get(m_xContext);
+                    bool bSessionData = officecfg::Office::Recovery::RecoveryInfo::SessionData::get();
                     bool bRecoveryData = !m_lDocCache.empty();
 
                     // exists session data ... => then we can't say, that these
@@ -3926,11 +3923,11 @@ void SAL_CALL AutoRecovery::getFastPropertyValue(css::uno::Any& aValue ,
                 break;
 
         case AUTORECOVERY_PROPHANDLE_CRASHED :
-                aValue <<= officecfg::Office::Recovery::RecoveryInfo::Crashed::get(m_xContext);
+                aValue <<= officecfg::Office::Recovery::RecoveryInfo::Crashed::get();
                 break;
 
         case AUTORECOVERY_PROPHANDLE_EXISTS_SESSIONDATA :
-                aValue <<= officecfg::Office::Recovery::RecoveryInfo::SessionData::get(m_xContext);
+                aValue <<= officecfg::Office::Recovery::RecoveryInfo::SessionData::get();
                 break;
     }
 }
@@ -4136,7 +4133,7 @@ void AutoRecovery::impl_establishProgress(const AutoRecovery::TDocumentInfo&    
     {
         css::uno::Reference< css::beans::XPropertySet > xFrameProps(xFrame, css::uno::UNO_QUERY);
         if (xFrameProps.is())
-            xFrameProps->setPropertyValue(FRAME_PROPNAME_ASCII_INDICATORINTERCEPTION, css::uno::makeAny(xExternalProgress));
+            xFrameProps->setPropertyValue(FRAME_PROPNAME_ASCII_INDICATORINTERCEPTION, css::uno::Any(xExternalProgress));
     }
 
     // But inside the MediaDescriptor we must set our own create progress ...
@@ -4167,7 +4164,7 @@ void AutoRecovery::impl_forgetProgress(const AutoRecovery::TDocumentInfo&       
     // stop progress interception on corresponding frame.
     css::uno::Reference< css::beans::XPropertySet > xFrameProps(xFrame, css::uno::UNO_QUERY);
     if (xFrameProps.is())
-        xFrameProps->setPropertyValue(FRAME_PROPNAME_ASCII_INDICATORINTERCEPTION, css::uno::makeAny(css::uno::Reference< css::task::XStatusIndicator >()));
+        xFrameProps->setPropertyValue(FRAME_PROPNAME_ASCII_INDICATORINTERCEPTION, css::uno::Any(css::uno::Reference< css::task::XStatusIndicator >()));
 
     // forget progress inside list of arguments.
     utl::MediaDescriptor::iterator pArg = rArgs.find(utl::MediaDescriptor::PROP_STATUSINDICATOR);
@@ -4199,7 +4196,7 @@ void AutoRecovery::st_impl_removeFile(const OUString& sURL)
     try
     {
         ::ucbhelper::Content aContent(sURL, css::uno::Reference< css::ucb::XCommandEnvironment >(), m_xContext);
-        aContent.executeCommand("delete", css::uno::makeAny(true));
+        aContent.executeCommand("delete", css::uno::Any(true));
     }
     catch(const css::uno::Exception&)
     {

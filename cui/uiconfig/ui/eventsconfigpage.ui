@@ -95,6 +95,20 @@
                     <property name="position">1</property>
                   </packing>
                 </child>
+                <child>
+                  <object class="GtkButton" id="deleteall">
+                    <property name="label" translatable="yes" context="eventsconfigpage|deleteall">Remove _All</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <property name="use-underline">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -144,7 +158,7 @@
                     <property name="hexpand">True</property>
                     <child internal-child="accessible">
                       <object class="AtkObject" id="savein-atkobject">
-                        <property name="AtkObject::accessible-description" translatable="yes" context="eventsconfigpage|extended_tip|savein">Select first where to save the event binding, in the current document or in %PRODUCTNAME.</property>
+                        <property name="AtkObject::accessible-description" translatable="yes" context="eventsconfigpage|extended_tip|savein">Select first where to save the event binding, in the current document or in the office suite.</property>
                       </object>
                     </child>
                   </object>

@@ -116,9 +116,8 @@ SwLoadOptPage::SwLoadOptPage(weld::Container* pPage, weld::DialogController* pCo
     }
     m_xMetricLB->connect_changed(LINK(this, SwLoadOptPage, MetricHdl));
 
-    const SfxPoolItem* pItem;
-    if (SfxItemState::SET == rSet.GetItemState(SID_HTML_MODE, false, &pItem)
-        && static_cast<const SfxUInt16Item*>(pItem)->GetValue() & HTMLMODE_ON)
+    const SfxUInt16Item* pItem = rSet.GetItemIfSet(SID_HTML_MODE, false);
+    if (pItem && pItem->GetValue() & HTMLMODE_ON)
     {
         m_xTabFT->hide();
         m_xTabMF->hide();
@@ -259,10 +258,10 @@ bool SwLoadOptPage::FillItemSet( SfxItemSet* rSet )
 void SwLoadOptPage::Reset( const SfxItemSet* rSet)
 {
     const SwMasterUsrPref* pUsrPref = SW_MOD()->GetUsrPref(false);
-    const SfxPoolItem* pItem;
+    const SwPtrItem* pShellItem = rSet->GetItemIfSet(FN_PARAM_WRTSHELL, false);
 
-    if(SfxItemState::SET == rSet->GetItemState(FN_PARAM_WRTSHELL, false, &pItem))
-        m_pWrtShell = static_cast<SwWrtShell*>(static_cast<const SwPtrItem*>(pItem)->GetValue());
+    if(pShellItem)
+        m_pWrtShell = static_cast<SwWrtShell*>(pShellItem->GetValue());
 
     SwFieldUpdateFlags eFieldFlags = AUTOUPD_GLOBALSETTING;
     m_nOldLinkMode = GLOBALSETTING;
@@ -305,9 +304,9 @@ void SwLoadOptPage::Reset( const SfxItemSet* rSet)
         ::SetFieldUnit(*m_xTabMF, eFieldUnit);
     }
     m_xMetricLB->save_value();
-    if(SfxItemState::SET == rSet->GetItemState(SID_ATTR_DEFTABSTOP, false, &pItem))
+    if(const SfxUInt16Item* pItem = rSet->GetItemIfSet(SID_ATTR_DEFTABSTOP, false))
     {
-        m_nLastTab = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        m_nLastTab = pItem->GetValue();
         m_xTabMF->set_value(m_xTabMF->normalize(m_nLastTab), FieldUnit::TWIP);
     }
     m_xTabMF->save_value();
@@ -320,9 +319,9 @@ void SwLoadOptPage::Reset( const SfxItemSet* rSet)
         m_xUseSquaredPageMode->save_state();
     }
 
-    if(SfxItemState::SET == rSet->GetItemState(SID_ATTR_APPLYCHARUNIT, false, &pItem))
+    if(const SfxBoolItem* pItem = rSet->GetItemIfSet(SID_ATTR_APPLYCHARUNIT, false))
     {
-        bool bUseCharUnit = static_cast<const SfxBoolItem*>(pItem)->GetValue();
+        bool bUseCharUnit = pItem->GetValue();
         m_xUseCharUnit->set_active(bUseCharUnit);
     }
     else
@@ -376,10 +375,12 @@ SwCaptionPreview::SwCaptionPreview()
 
 void SwCaptionPreview::ApplySettings(vcl::RenderContext& rRenderContext)
 {
-    Wallpaper aBack(rRenderContext.GetSettings().GetStyleSettings().GetWindowColor());
+    const StyleSettings& rSettings = rRenderContext.GetSettings().GetStyleSettings();
+    Wallpaper aBack(rSettings.GetWindowColor());
     rRenderContext.SetBackground(aBack);
     rRenderContext.SetFillColor(aBack.GetColor());
     rRenderContext.SetLineColor(aBack.GetColor());
+    rRenderContext.SetTextColor(rSettings.GetWindowTextColor());
 
     if (!mbFontInitialized)
     {
@@ -432,8 +433,8 @@ SwCaptionOptPage::SwCaptionOptPage(weld::Container* pPage, weld::DialogControlle
     , m_sBelow(SwResId(STR_CAPTION_BELOW))
     , m_sNone(SwResId(SW_STR_NONE))
     , m_nPrevSelectedEntry(-1)
-    , pMgr(new SwFieldMgr)
-    , bHTMLMode(false)
+    , m_pMgr(new SwFieldMgr)
+    , m_bHTMLMode(false)
     , m_aTextFilter(m_sNone)
     , m_xCheckLB(m_xBuilder->weld_tree_view("objects"))
     , m_xLbCaptionOrder(m_xBuilder->weld_combo_box("captionorder"))
@@ -463,15 +464,16 @@ SwCaptionOptPage::SwCaptionOptPage(weld::Container* pPage, weld::DialogControlle
     SwStyleNameMapper::FillUIName(RES_POOLCOLL_LABEL_FRAME, m_sText);
     SwStyleNameMapper::FillUIName(RES_POOLCOLL_LABEL_DRAWING, m_sDrawing);
 
-    SwWrtShell* pSh = ::GetActiveWrtShell();
 
     // m_xFormatBox
     sal_uInt16 nSelFormat = SVX_NUM_ARABIC;
+    SwWrtShell* pSh = ::GetActiveWrtShell();
+
     if (pSh)
     {
-        for ( auto i = pMgr->GetFieldTypeCount(); i; )
+        for ( auto i = m_pMgr->GetFieldTypeCount(); i; )
         {
-            SwFieldType* pFieldType = pMgr->GetFieldType(SwFieldIds::Unknown, --i);
+            SwFieldType* pFieldType = m_pMgr->GetFieldType(SwFieldIds::Unknown, --i);
             if (!pFieldType->GetName().isEmpty()
                 && pFieldType->GetName() == m_xCategoryBox->get_active_text())
             {
@@ -483,11 +485,11 @@ SwCaptionOptPage::SwCaptionOptPage(weld::Container* pPage, weld::DialogControlle
         ::FillCharStyleListBox( *m_xCharStyleLB, pSh->GetView().GetDocShell(), true, true );
     }
 
-    const sal_uInt16 nCount = pMgr->GetFormatCount(SwFieldTypesEnum::Sequence, false);
+    const sal_uInt16 nCount = m_pMgr->GetFormatCount(SwFieldTypesEnum::Sequence, false);
     for ( sal_uInt16 i = 0; i < nCount; ++i )
     {
-        const sal_uInt16 nFormatId = pMgr->GetFormatId(SwFieldTypesEnum::Sequence, i);
-        m_xFormatBox->append(OUString::number(nFormatId), pMgr->GetFormatStr(SwFieldTypesEnum::Sequence, i));
+        const sal_uInt16 nFormatId = m_pMgr->GetFormatId(SwFieldTypesEnum::Sequence, i);
+        m_xFormatBox->append(OUString::number(nFormatId), m_pMgr->GetFormatStr(SwFieldTypesEnum::Sequence, i));
         if (nFormatId == nSelFormat)
             m_xFormatBox->set_active(i);
     }
@@ -500,7 +502,7 @@ SwCaptionOptPage::SwCaptionOptPage(weld::Container* pPage, weld::DialogControlle
 
     if (pSh)
     {
-        SwSetExpFieldType* pFieldType = static_cast<SwSetExpFieldType*>(pMgr->GetFieldType(
+        SwSetExpFieldType* pFieldType = static_cast<SwSetExpFieldType*>(m_pMgr->GetFieldType(
                                             SwFieldIds::SetExp, m_xCategoryBox->get_active_text() ));
         if( pFieldType )
         {
@@ -529,7 +531,7 @@ SwCaptionOptPage::SwCaptionOptPage(weld::Container* pPage, weld::DialogControlle
 SwCaptionOptPage::~SwCaptionOptPage()
 {
     DelUserData();
-    pMgr.reset();
+    m_pMgr.reset();
     m_xPreview.reset();
 }
 
@@ -551,11 +553,11 @@ bool SwCaptionOptPage::FillItemSet( SfxItemSet* )
     {
         if (m_xCheckLB->get_toggle(i) == TRISTATE_TRUE)
             ++nCheckCount;
-        InsCaptionOpt* pData = reinterpret_cast<InsCaptionOpt*>(m_xCheckLB->get_id(i).toInt64());
-        bRet |= pModOpt->SetCapOption(bHTMLMode, pData);
+        InsCaptionOpt* pData = weld::fromId<InsCaptionOpt*>(m_xCheckLB->get_id(i));
+        bRet |= pModOpt->SetCapOption(m_bHTMLMode, pData);
     }
 
-    pModOpt->SetInsWithCaption(bHTMLMode, nCheckCount > 0);
+    pModOpt->SetInsWithCaption(m_bHTMLMode, nCheckCount > 0);
 
     int nPos = m_xLbCaptionOrder->get_active();
     pModOpt->SetCaptionOrderNumberingFirst(nPos == 1);
@@ -565,10 +567,9 @@ bool SwCaptionOptPage::FillItemSet( SfxItemSet* )
 
 void SwCaptionOptPage::Reset( const SfxItemSet* rSet)
 {
-    const SfxPoolItem* pItem;
-    if(SfxItemState::SET == rSet->GetItemState(SID_HTML_MODE, false, &pItem))
+    if(const SfxUInt16Item* pItem = rSet->GetItemIfSet(SID_HTML_MODE, false))
     {
-        bHTMLMode = 0 != (static_cast<const SfxUInt16Item*>(pItem)->GetValue() & HTMLMODE_ON);
+        m_bHTMLMode = 0 != (pItem->GetValue() & HTMLMODE_ON);
     }
 
     DelUserData();
@@ -624,18 +625,18 @@ void SwCaptionOptPage::SetOptions(const sal_uLong nPos,
         const SwCapObjType eObjType, const SvGlobalName *pOleId)
 {
     SwModuleOptions* pModOpt = SW_MOD()->GetModuleConfig();
-    const InsCaptionOpt* pOpt = pModOpt->GetCapOption(bHTMLMode, eObjType, pOleId);
+    const InsCaptionOpt* pOpt = pModOpt->GetCapOption(m_bHTMLMode, eObjType, pOleId);
 
     if (pOpt)
     {
         InsCaptionOpt* pIns = new InsCaptionOpt(*pOpt);
-        m_xCheckLB->set_id(nPos, OUString::number(reinterpret_cast<sal_Int64>(pIns)));
+        m_xCheckLB->set_id(nPos, weld::toId(pIns));
         m_xCheckLB->set_toggle(nPos, pOpt->UseCaption() ? TRISTATE_TRUE : TRISTATE_FALSE);
     }
     else
     {
         InsCaptionOpt* pIns = new InsCaptionOpt(eObjType, pOleId);
-        m_xCheckLB->set_id(nPos, OUString::number(reinterpret_cast<sal_Int64>(pIns)));
+        m_xCheckLB->set_id(nPos, weld::toId(pIns));
     }
 }
 
@@ -643,7 +644,7 @@ void SwCaptionOptPage::DelUserData()
 {
     for (int i = 0, nCount = m_xCheckLB->n_children(); i < nCount; ++i)
     {
-        delete reinterpret_cast<InsCaptionOpt*>(m_xCheckLB->get_id(i).toInt64());
+        delete weld::fromId<InsCaptionOpt*>(m_xCheckLB->get_id(i));
         m_xCheckLB->set_id(i, "0");
     }
 }
@@ -663,19 +664,18 @@ void SwCaptionOptPage::UpdateEntry(int nSelEntry)
         m_xCategory->set_sensitive(bChecked);
         m_xPreview->set_sensitive(bChecked);
 
-        SwWrtShell *pSh = ::GetActiveWrtShell();
 
-        InsCaptionOpt* pOpt = reinterpret_cast<InsCaptionOpt*>(m_xCheckLB->get_id(nSelEntry).toInt64());
+        InsCaptionOpt* pOpt = weld::fromId<InsCaptionOpt*>(m_xCheckLB->get_id(nSelEntry));
 
         m_xCategoryBox->clear();
         m_xCategoryBox->append_text(m_sNone);
-        if (pSh)
+        if (::GetActiveWrtShell())
         {
-            const size_t nCount = pMgr->GetFieldTypeCount();
+            const size_t nCount = m_pMgr->GetFieldTypeCount();
 
             for (size_t i = 0; i < nCount; ++i)
             {
-                SwFieldType *pType = pMgr->GetFieldType( SwFieldIds::Unknown, i );
+                SwFieldType *pType = m_pMgr->GetFieldType( SwFieldIds::Unknown, i );
                 if( pType->Which() == SwFieldIds::SetExp &&
                     static_cast<SwSetExpFieldType *>( pType)->GetType() & nsSwGetSetExpType::GSE_SEQ )
                 {
@@ -773,7 +773,7 @@ void SwCaptionOptPage::SaveEntry(int nEntry)
     if (nEntry == -1)
         return;
 
-    InsCaptionOpt* pOpt = reinterpret_cast<InsCaptionOpt*>(m_xCheckLB->get_id(nEntry).toInt64());
+    InsCaptionOpt* pOpt = weld::fromId<InsCaptionOpt*>(m_xCheckLB->get_id(nEntry));
 
     pOpt->UseCaption() = m_xCheckLB->get_toggle(nEntry) == TRISTATE_TRUE;
     const OUString aName(m_xCategoryBox->get_active_text());
@@ -867,10 +867,9 @@ void SwCaptionOptPage::InvalidatePreview()
                 aStr += m_xCategoryBox->get_active_text() + " ";
             }
 
-            SwWrtShell *pSh = ::GetActiveWrtShell();
-            if (pSh)
+            if (SwWrtShell *pSh = ::GetActiveWrtShell())
             {
-                SwSetExpFieldType* pFieldType = static_cast<SwSetExpFieldType*>(pMgr->GetFieldType(
+                SwSetExpFieldType* pFieldType = static_cast<SwSetExpFieldType*>(m_pMgr->GetFieldType(
                                                 SwFieldIds::SetExp, m_xCategoryBox->get_active_text() ));
                 if( pFieldType && pFieldType->GetOutlineLvl() < MAXLEVEL )
                 {

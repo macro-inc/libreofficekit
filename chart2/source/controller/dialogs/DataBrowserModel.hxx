@@ -18,9 +18,14 @@
  */
 #pragma once
 
+#include <DataSeries.hxx>
+#include <ChartType.hxx>
+
 #include <com/sun/star/uno/Reference.hxx>
+#include <rtl/ref.hxx>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace com::sun::star::chart2 { class XChartDocument; }
@@ -35,13 +40,15 @@ namespace chart
 {
 
 class DialogModel;
+class ChartModel;
+class ChartType;
+class DataSeries;
 
 class DataBrowserModel final
 {
 public:
     explicit DataBrowserModel(
-        const css::uno::Reference< css::chart2::XChartDocument > & xChartDoc,
-        const css::uno::Reference< css::uno::XComponentContext > & xContext );
+        const rtl::Reference<::chart::ChartModel> & xChartDoc );
     ~DataBrowserModel();
 
     /** Inserts a new data series after the data series to which the data column
@@ -96,8 +103,8 @@ public:
 
     struct tDataHeader
     {
-        css::uno::Reference< css::chart2::XDataSeries > m_xDataSeries;
-        css::uno::Reference< css::chart2::XChartType >  m_xChartType;
+        rtl::Reference< ::chart::DataSeries > m_xDataSeries;
+        rtl::Reference< ::chart::ChartType >  m_xChartType;
         bool                                            m_bSwapXAndYAxis;
         sal_Int32                                       m_nStartColumn;
         sal_Int32                                       m_nEndColumn;
@@ -110,13 +117,13 @@ public:
         {}
         // "full" CTOR
         tDataHeader(
-            css::uno::Reference< css::chart2::XDataSeries > const & xDataSeries,
-            css::uno::Reference< css::chart2::XChartType > const &xChartType,
+            rtl::Reference< ::chart::DataSeries >  xDataSeries,
+            rtl::Reference< ::chart::ChartType > xChartType,
             bool                                        bSwapXAndYAxis,
             sal_Int32                                   nStartColumn,
             sal_Int32                                   nEndColumn ) :
-                m_xDataSeries( xDataSeries ),
-                m_xChartType( xChartType ),
+                m_xDataSeries(std::move( xDataSeries )),
+                m_xChartType(std::move( xChartType )),
                 m_bSwapXAndYAxis( bSwapXAndYAxis ),
                 m_nStartColumn( nStartColumn ),
                 m_nEndColumn( nEndColumn )
@@ -130,7 +137,7 @@ public:
     tDataHeader getHeaderForSeries(
         const css::uno::Reference< css::chart2::XDataSeries > &xSeries ) const;
 
-    css::uno::Reference< css::chart2::XDataSeries >
+    rtl::Reference< ::chart::DataSeries >
         getDataSeriesByColumn( sal_Int32 nColumn ) const;
 
 private:
@@ -146,7 +153,7 @@ private:
 
     sal_Int32 getCategoryColumnCount();
 
-    css::uno::Reference< css::chart2::XChartDocument > m_xChartDocument;
+    rtl::Reference<::chart::ChartModel> m_xChartDocument;
     std::unique_ptr< DialogModel > m_apDialogModel;
 
     struct tDataColumn;

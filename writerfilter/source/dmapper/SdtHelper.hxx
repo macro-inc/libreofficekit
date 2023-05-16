@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <optional>
+#include <unordered_map>
 
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/text/XTextRange.hpp>
@@ -93,8 +94,8 @@ class SdtHelper final : public virtual SvRefBase
     /// The last stored SDT element is outside paragraphs.
     bool m_bOutsideAParagraph;
 
-    /// Storage for all properties documents as xml::dom::XDocument for later quering xpath for data
-    css::uno::Sequence<css::uno::Reference<css::xml::dom::XDocument>> m_xPropertiesXMLs;
+    /// Storage for all properties documents as xml::dom::XDocument for later querying xpath for data
+    std::unordered_map<OUString, css::uno::Reference<css::xml::dom::XDocument>> m_xPropertiesXMLs;
 
     /// Check if m_xPropertiesXMLs is initialized and loaded (need extra flag to distinguish
     /// empty sequence from not yet initialized)
@@ -125,6 +126,9 @@ class SdtHelper final : public virtual SvRefBase
     /// <w:sdtPr>'s <w15:color w:val="...">.
     OUString m_aColor;
 
+    /// <w:sdtPr>'s <w15:appearance w:val="...">.
+    OUString m_aAppearance;
+
     /// <w:sdtPr>'s <w:alias w:val="...">.
     OUString m_aAlias;
 
@@ -134,9 +138,15 @@ class SdtHelper final : public virtual SvRefBase
     /// <w:sdtPr>'s <w:id w:val="...">.
     sal_Int32 m_nId = 0;
 
+    /// <w:sdtPr>'s <w:tabIndex w:val="...">.
+    sal_uInt32 m_nTabIndex = 0;
+
+    /// <w:sdtPr>'s <w:lock w:val="...">.
+    OUString m_aLock;
+
 public:
     explicit SdtHelper(DomainMapper_Impl& rDM_Impl,
-                       css::uno::Reference<css::uno::XComponentContext> const& xContext);
+                       css::uno::Reference<css::uno::XComponentContext> xContext);
     ~SdtHelper() override;
 
     std::vector<OUString>& getDropDownItems() { return m_aDropDownItems; }
@@ -151,13 +161,13 @@ public:
     {
         m_sDataBindingPrefixMapping = sValue;
     }
-    OUString GetDataBindingPrefixMapping() const { return m_sDataBindingPrefixMapping; }
+    const OUString& GetDataBindingPrefixMapping() const { return m_sDataBindingPrefixMapping; }
 
     void setDataBindingXPath(const OUString& sValue) { m_sDataBindingXPath = sValue; }
-    OUString GetDataBindingXPath() const { return m_sDataBindingXPath; }
+    const OUString& GetDataBindingXPath() const { return m_sDataBindingXPath; }
 
     void setDataBindingStoreItemID(const OUString& sValue) { m_sDataBindingStoreItemID = sValue; }
-    OUString GetDataBindingStoreItemID() const { return m_sDataBindingStoreItemID; }
+    const OUString& GetDataBindingStoreItemID() const { return m_sDataBindingStoreItemID; }
 
     void setDateFieldStartRange(const css::uno::Reference<css::text::XTextRange>& xStartRange)
     {
@@ -200,18 +210,21 @@ public:
     void SetChecked();
     bool GetChecked() const;
     void SetCheckedState(const OUString& rCheckedState);
-    OUString GetCheckedState() const;
+    const OUString& GetCheckedState() const;
     void SetUncheckedState(const OUString& rUncheckedState);
-    OUString GetUncheckedState() const;
+    const OUString& GetUncheckedState() const;
 
     /// Clear all collected attributes for further reuse
     void clear();
 
     void SetPlaceholderDocPart(const OUString& rPlaceholderDocPart);
-    OUString GetPlaceholderDocPart() const;
+    const OUString& GetPlaceholderDocPart() const;
 
     void SetColor(const OUString& rColor);
-    OUString GetColor() const;
+    const OUString& GetColor() const;
+
+    void SetAppearance(const OUString& rAppearance);
+    const OUString& GetAppearance() const;
 
     void SetAlias(const OUString& rAlias);
     const OUString& GetAlias() const;
@@ -221,6 +234,12 @@ public:
 
     void SetId(sal_Int32 nId);
     sal_Int32 GetId() const;
+
+    void SetTabIndex(sal_uInt32 nTabIndex);
+    sal_uInt32 GetTabIndex() const;
+
+    void SetLock(const OUString& rLock);
+    const OUString& GetLock() const;
 
     std::optional<OUString> getValueFromDataBinding();
 };

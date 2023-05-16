@@ -19,6 +19,7 @@
 
 #include <tools/gen.hxx>
 #include <tools/debug.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <rtl/ustring.hxx>
@@ -30,7 +31,6 @@
 #include <com/sun/star/accessibility/AccessibleEventId.hpp>
 #include <comphelper/accessibleeventnotifier.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <editeng/AccessibleEditableTextPara.hxx>
 #include <editeng/eerdll.hxx>
@@ -49,12 +49,12 @@ using namespace ::com::sun::star::accessibility;
 namespace accessibility
 {
 
-    AccessibleImageBullet::AccessibleImageBullet ( const uno::Reference< XAccessible >& rParent ) :
+    AccessibleImageBullet::AccessibleImageBullet ( uno::Reference< XAccessible > xParent ) :
         mnParagraphIndex( 0 ),
         mnIndexInParent( 0 ),
         mpEditSource( nullptr ),
         maEEOffset( 0, 0 ),
-        mxParent( rParent ),
+        mxParent(std::move( xParent )),
         // well, that's strictly (UNO) exception safe, though not
         // really robust. We rely on the fact that this member is
         // constructed last, and that the constructor body catches
@@ -65,14 +65,13 @@ namespace accessibility
         try
         {
             // Create the state set.
-            rtl::Reference<::utl::AccessibleStateSetHelper> pStateSet  = new ::utl::AccessibleStateSetHelper ();
-            mxStateSet = pStateSet;
+            mnStateSet = 0;
 
             // these are always on
-            pStateSet->AddState( AccessibleStateType::VISIBLE );
-            pStateSet->AddState( AccessibleStateType::SHOWING );
-            pStateSet->AddState( AccessibleStateType::ENABLED );
-            pStateSet->AddState( AccessibleStateType::SENSITIVE );
+            mnStateSet |= AccessibleStateType::VISIBLE;
+            mnStateSet |= AccessibleStateType::SHOWING;
+            mnStateSet |= AccessibleStateType::ENABLED;
+            mnStateSet |= AccessibleStateType::SENSITIVE;
         }
         catch( const uno::Exception& ) {}
     }
@@ -98,13 +97,13 @@ namespace accessibility
         return uno::Reference< XAccessibleContext > ( this );
     }
 
-    sal_Int32 SAL_CALL  AccessibleImageBullet::getAccessibleChildCount()
+    sal_Int64 SAL_CALL  AccessibleImageBullet::getAccessibleChildCount()
     {
 
         return 0;
     }
 
-    uno::Reference< XAccessible > SAL_CALL  AccessibleImageBullet::getAccessibleChild( sal_Int32 )
+    uno::Reference< XAccessible > SAL_CALL  AccessibleImageBullet::getAccessibleChild( sal_Int64 )
     {
         throw lang::IndexOutOfBoundsException("No children available",
                                               uno::Reference< uno::XInterface >
@@ -117,7 +116,7 @@ namespace accessibility
         return mxParent;
     }
 
-    sal_Int32 SAL_CALL  AccessibleImageBullet::getAccessibleIndexInParent()
+    sal_Int64 SAL_CALL  AccessibleImageBullet::getAccessibleIndexInParent()
     {
 
         return mnIndexInParent;
@@ -131,18 +130,12 @@ namespace accessibility
 
     OUString SAL_CALL  AccessibleImageBullet::getAccessibleDescription()
     {
-
-        SolarMutexGuard aGuard;
-
         // Get the string from the resource for the specified id.
         return EditResId(RID_SVXSTR_A11Y_IMAGEBULLET_DESCRIPTION);
     }
 
     OUString SAL_CALL  AccessibleImageBullet::getAccessibleName()
     {
-
-        SolarMutexGuard aGuard;
-
         // Get the string from the resource for the specified id.
         return EditResId(RID_SVXSTR_A11Y_IMAGEBULLET_NAME);
     }
@@ -154,18 +147,13 @@ namespace accessibility
         return uno::Reference< XAccessibleRelationSet >();
     }
 
-    uno::Reference< XAccessibleStateSet > SAL_CALL AccessibleImageBullet::getAccessibleStateSet()
+    sal_Int64 SAL_CALL AccessibleImageBullet::getAccessibleStateSet()
     {
-
         SolarMutexGuard aGuard;
 
         // Create a copy of the state set and return it.
-        ::utl::AccessibleStateSetHelper* pStateSet = static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
 
-        if( !pStateSet )
-            return uno::Reference<XAccessibleStateSet>();
-
-        return uno::Reference<XAccessibleStateSet>( new ::utl::AccessibleStateSetHelper (*pStateSet) );
+        return mnStateSet;
     }
 
     lang::Locale SAL_CALL AccessibleImageBullet::getLocale()
@@ -427,27 +415,21 @@ namespace accessibility
                                                          aEvent );
     }
 
-    void AccessibleImageBullet::SetState( const sal_Int16 nStateId )
+    void AccessibleImageBullet::SetState( const sal_Int64 nStateId )
     {
-
-        ::utl::AccessibleStateSetHelper* pStateSet = static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
-        if( pStateSet != nullptr &&
-            !pStateSet->contains(nStateId) )
+        if( !(mnStateSet & nStateId) )
         {
-            pStateSet->AddState( nStateId );
-            FireEvent( AccessibleEventId::STATE_CHANGED, uno::makeAny( nStateId ) );
+            mnStateSet |= nStateId;
+            FireEvent( AccessibleEventId::STATE_CHANGED, uno::Any( nStateId ) );
         }
     }
 
-    void AccessibleImageBullet::UnSetState( const sal_Int16 nStateId )
+    void AccessibleImageBullet::UnSetState( const sal_Int64 nStateId )
     {
-
-        ::utl::AccessibleStateSetHelper* pStateSet = static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
-        if( pStateSet != nullptr &&
-            pStateSet->contains(nStateId) )
+        if( mnStateSet & nStateId )
         {
-            pStateSet->RemoveState( nStateId );
-            FireEvent( AccessibleEventId::STATE_CHANGED, uno::Any(), uno::makeAny( nStateId ) );
+            mnStateSet &= ~nStateId;
+            FireEvent( AccessibleEventId::STATE_CHANGED, uno::Any(), uno::Any( nStateId ) );
         }
     }
 
@@ -474,8 +456,8 @@ namespace accessibility
             if( nOldIndex != nIndex )
             {
                 // index and therefore description changed
-                FireEvent( AccessibleEventId::DESCRIPTION_CHANGED, uno::makeAny( getAccessibleDescription() ), aOldDesc );
-                FireEvent( AccessibleEventId::NAME_CHANGED, uno::makeAny( getAccessibleName() ), aOldName );
+                FireEvent( AccessibleEventId::DESCRIPTION_CHANGED, uno::Any( getAccessibleDescription() ), aOldDesc );
+                FireEvent( AccessibleEventId::NAME_CHANGED, uno::Any( getAccessibleName() ), aOldName );
             }
         }
         catch( const uno::Exception& ) {} // optional behaviour

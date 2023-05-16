@@ -30,13 +30,18 @@
 #include <oox/helper/refvector.hxx>
 #include <rtl/ustring.hxx>
 #include <sal/types.h>
+#include <docmodel/theme/Theme.hxx>
 
 namespace com::sun::star {
     namespace drawing { class XDrawPage; }
     namespace xml::dom { class XDocument; }
 }
+namespace model {
+    class Theme;
+}
 
-namespace oox::drawingml {
+namespace oox::drawingml
+{
 
 struct EffectProperties;
 struct FillProperties;
@@ -57,8 +62,9 @@ class TextFont;
 class OOX_DLLPUBLIC Theme
 {
 public:
-    void                     setStyleName( const OUString& rStyleName ) { maStyleName = rStyleName; }
-    void setThemeName(const OUString& rThemeName) { maThemeName = rThemeName; }
+    void setThemeName(OUString const& rName) { maThemeName = rName; }
+    void setFormatSchemeName(OUString const& rName) { maFormatSchemeName = rName; }
+    void setFontSchemeName(OUString const& rName) { maFontSchemeName = rName; }
 
     ClrScheme&               getClrScheme() { return maClrScheme; }
     const ClrScheme&         getClrScheme() const { return maClrScheme; }
@@ -81,10 +87,14 @@ public:
 
     FontScheme&              getFontScheme() { return maFontScheme; }
     const FontScheme&        getFontScheme() const { return maFontScheme; }
+
+    std::map<sal_Int32, std::vector<std::pair<OUString, OUString>>>& getSupplementalFontMap() { return maSupplementalFontMap; }
+    std::map<sal_Int32, std::vector<std::pair<OUString, OUString>>> const& getSupplementalFontMap() const { return maSupplementalFontMap; }
+
     /** Returns theme font properties by scheme type (major/minor). */
     const TextCharacterProperties*  getFontStyle( sal_Int32 nSchemeType ) const;
     /** Returns theme font by placeholder name, e.g. the major latin theme font for the font name '+mj-lt'. */
-    const TextFont*                 resolveFont( const OUString& rName ) const;
+    const TextFont*                 resolveFont( std::u16string_view rName ) const;
 
     Shape&                   getSpDef() { return maSpDef; }
     const Shape&             getSpDef() const { return maSpDef; }
@@ -100,19 +110,32 @@ public:
 
     void addTheme(const css::uno::Reference<css::drawing::XDrawPage>& xDrawPage) const;
 
+    void setTheme(std::shared_ptr<model::Theme> const& pTheme)
+    {
+        mpTheme = pTheme;
+    }
+
+    std::shared_ptr<model::Theme> const& getTheme() const
+    {
+        return mpTheme;
+    }
 private:
-    OUString            maStyleName;
     OUString            maThemeName;
+    OUString            maFontSchemeName;
+    OUString            maFormatSchemeName;
     ClrScheme           maClrScheme;
     FillStyleList       maFillStyleList;
     FillStyleList       maBgFillStyleList;
     LineStyleList       maLineStyleList;
     EffectStyleList     maEffectStyleList;
     FontScheme          maFontScheme;
+    std::map<sal_Int32, std::vector<std::pair<OUString, OUString>>> maSupplementalFontMap;
     Shape               maSpDef;
     Shape               maLnDef;
     Shape               maTxDef;
     css::uno::Reference< css::xml::dom::XDocument> mxFragment;
+
+    std::shared_ptr<model::Theme> mpTheme;
 };
 
 

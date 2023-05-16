@@ -37,7 +37,7 @@ namespace sdr::properties
             virtual bool AllowItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr) const override;
 
             // react on ItemSet changes
-            virtual void ItemSetChanged(const SfxItemSet*) override;
+            virtual void ItemSetChanged(o3tl::span< const SfxPoolItem* const > aChangedItems, sal_uInt16 nDeletedWhich) override;
 
             // react on Item change
             virtual void ItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr) override;
@@ -56,7 +56,8 @@ namespace sdr::properties
         public:
 
             // set a new StyleSheet and broadcast
-            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr) override;
+            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast) override;
 
             // force default attributes for a specific object type, called from
             // DefaultProperties::GetObjectItemSet() if a new ItemSet is created

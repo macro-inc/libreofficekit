@@ -20,6 +20,7 @@
 #include "elementexport.hxx"
 
 #include "strings.hxx"
+#include <utility>
 #include <xmloff/xmlnamespace.hxx>
 #include "eventexport.hxx"
 #include "formenums.hxx"
@@ -56,7 +57,7 @@
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/maptype.hxx>
 #include <tools/time.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/extract.hxx>
 #include <sal/macros.h>
 #include <sal/log.hxx>
@@ -226,11 +227,11 @@ namespace xmloff
 
     //= OControlExport
     OControlExport::OControlExport(IFormsExportContext& _rContext,  const Reference< XPropertySet >& _rxControl,
-        const OUString& _rControlId, const OUString& _rReferringControls,
+        OUString _sControlId, OUString _sReferringControls,
         const Sequence< ScriptEventDescriptor >& _rEvents)
         :OElementExport(_rContext, _rxControl, _rEvents)
-        ,m_sControlId(_rControlId)
-        ,m_sReferringControls(_rReferringControls)
+        ,m_sControlId(std::move(_sControlId))
+        ,m_sReferringControls(std::move(_sReferringControls))
         ,m_nClassId(FormComponentType::CONTROL)
         ,m_eType( UNKNOWN )
         ,m_nIncludeCommon(CCAFlags::NONE)
@@ -324,16 +325,16 @@ namespace xmloff
         if ( xControlText.is() )
         {
             const XMLPropertyMapEntry* pCharAttributeProperties = XMLTextPropertySetMapper::getPropertyMapForType( TextPropMap::TEXT );
-            while ( pCharAttributeProperties->msApiName )
+            while ( !pCharAttributeProperties->IsEnd() )
             {
-                exportedProperty( OUString::createFromAscii( pCharAttributeProperties->msApiName ) );
+                exportedProperty( pCharAttributeProperties->getApiName() );
                 ++pCharAttributeProperties;
             }
 
             const XMLPropertyMapEntry* pParaAttributeProperties = XMLTextPropertySetMapper::getPropertyMapForType( TextPropMap::SHAPE_PARA );
-            while ( pParaAttributeProperties->msApiName )
+            while ( !pParaAttributeProperties->IsEnd() )
             {
-                exportedProperty( OUString::createFromAscii( pParaAttributeProperties->msApiName ) );
+                exportedProperty( pParaAttributeProperties->getApiName() );
                 ++pParaAttributeProperties;
             }
 
@@ -504,21 +505,21 @@ namespace xmloff
                 CCAFlags::Label, CCAFlags::Title
             };
             // the names of all properties which are expected to be of type string
-            static const char * aStringPropertyNames[] =
+            static const rtl::OUStringConstExpr aStringPropertyNames[] =
             {
                 PROPERTY_LABEL, PROPERTY_TITLE
             };
-            OSL_ENSURE( SAL_N_ELEMENTS(aStringPropertyNames) ==
-                        SAL_N_ELEMENTS(nStringPropertyAttributeIds),
+            OSL_ENSURE( std::size(aStringPropertyNames) ==
+                        std::size(nStringPropertyAttributeIds),
                         "OControlExport::exportCommonControlAttributes: somebody tampered with the maps (1)!");
 
-            for (i=0; i<SAL_N_ELEMENTS(nStringPropertyAttributeIds); ++i)
+            for (i=0; i<std::size(nStringPropertyAttributeIds); ++i)
                 if (nStringPropertyAttributeIds[i] & m_nIncludeCommon)
                 {
                     exportStringPropertyAttribute(
                         OAttributeMetaData::getCommonControlAttributeNamespace(nStringPropertyAttributeIds[i]),
                         OAttributeMetaData::getCommonControlAttributeName(nStringPropertyAttributeIds[i]),
-                        OUString::createFromAscii(aStringPropertyNames[i])
+                        aStringPropertyNames[i]
                         );
                 #if OSL_DEBUG_LEVEL > 0
                     //  reset the bit for later checking
@@ -533,7 +534,7 @@ namespace xmloff
             {   // attribute flags
                 CCAFlags::CurrentSelected, CCAFlags::Disabled, CCAFlags::Dropdown, CCAFlags::Printable, CCAFlags::ReadOnly, CCAFlags::Selected, CCAFlags::TabStop, CCAFlags::EnableVisible
             };
-            static const char * pBooleanPropertyNames[] =
+            static const rtl::OUStringConstExpr pBooleanPropertyNames[] =
             {   // property names
                 PROPERTY_STATE, PROPERTY_ENABLED,
                 PROPERTY_DROPDOWN, PROPERTY_PRINTABLE,
@@ -545,19 +546,19 @@ namespace xmloff
                 BoolAttrFlags::DefaultFalse, BoolAttrFlags::DefaultFalse | BoolAttrFlags::InverseSemantics, BoolAttrFlags::DefaultFalse, BoolAttrFlags::DefaultTrue, BoolAttrFlags::DefaultFalse, BoolAttrFlags::DefaultFalse, BoolAttrFlags::DefaultVoid, BoolAttrFlags::DefaultFalse
             };
         #if OSL_DEBUG_LEVEL > 0
-            static const sal_Int32 nIdCount = SAL_N_ELEMENTS(nBooleanPropertyAttributeIds);
-            static const sal_Int32 nNameCount = SAL_N_ELEMENTS(pBooleanPropertyNames);
-            static const sal_Int32 nFlagsCount = SAL_N_ELEMENTS(nBooleanPropertyAttrFlags);
+            static const sal_Int32 nIdCount = std::size(nBooleanPropertyAttributeIds);
+            static const sal_Int32 nNameCount = std::size(pBooleanPropertyNames);
+            static const sal_Int32 nFlagsCount = std::size(nBooleanPropertyAttrFlags);
             OSL_ENSURE((nIdCount == nNameCount) && (nNameCount == nFlagsCount),
                 "OControlExport::exportCommonControlAttributes: somebody tampered with the maps (2)!");
         #endif
-            for (i=0; i<SAL_N_ELEMENTS(nBooleanPropertyAttributeIds); ++i)
+            for (i=0; i<std::size(nBooleanPropertyAttributeIds); ++i)
                 if (nBooleanPropertyAttributeIds[i] & m_nIncludeCommon)
                 {
                     exportBooleanPropertyAttribute(
                         OAttributeMetaData::getCommonControlAttributeNamespace(nBooleanPropertyAttributeIds[i]),
                         OAttributeMetaData::getCommonControlAttributeName(nBooleanPropertyAttributeIds[i]),
-                        OUString::createFromAscii(pBooleanPropertyNames[i]),
+                        pBooleanPropertyNames[i],
                         nBooleanPropertyAttrFlags[i]);
         #if OSL_DEBUG_LEVEL > 0
                     //  reset the bit for later checking
@@ -573,7 +574,7 @@ namespace xmloff
             {   // attribute flags
                 CCAFlags::Size, CCAFlags::TabIndex
             };
-            static const char * pIntegerPropertyNames[] =
+            static const rtl::OUStringConstExpr pIntegerPropertyNames[] =
             {   // property names
                 PROPERTY_LINECOUNT, PROPERTY_TABINDEX
             };
@@ -586,19 +587,19 @@ namespace xmloff
                 exportedProperty(PROPERTY_MAXTEXTLENGTH);
 
         #if OSL_DEBUG_LEVEL > 0
-            static const sal_Int32 nIdCount = SAL_N_ELEMENTS(nIntegerPropertyAttributeIds);
-            static const sal_Int32 nNameCount = SAL_N_ELEMENTS(pIntegerPropertyNames);
-            static const sal_Int32 nDefaultCount = SAL_N_ELEMENTS(nIntegerPropertyAttrDefaults);
+            static const sal_Int32 nIdCount = std::size(nIntegerPropertyAttributeIds);
+            static const sal_Int32 nNameCount = std::size(pIntegerPropertyNames);
+            static const sal_Int32 nDefaultCount = std::size(nIntegerPropertyAttrDefaults);
             OSL_ENSURE((nIdCount == nNameCount) && (nNameCount == nDefaultCount),
                 "OControlExport::exportCommonControlAttributes: somebody tampered with the maps (3)!");
         #endif
-            for (i=0; i<SAL_N_ELEMENTS(nIntegerPropertyAttributeIds); ++i)
+            for (i=0; i<std::size(nIntegerPropertyAttributeIds); ++i)
                 if (nIntegerPropertyAttributeIds[i] & m_nIncludeCommon)
                 {
                     exportInt16PropertyAttribute(
                         OAttributeMetaData::getCommonControlAttributeNamespace(nIntegerPropertyAttributeIds[i]),
                         OAttributeMetaData::getCommonControlAttributeName(nIntegerPropertyAttributeIds[i]),
-                        OUString::createFromAscii(pIntegerPropertyNames[i]),
+                        pIntegerPropertyNames[i],
                         nIntegerPropertyAttrDefaults[i]);
         #if OSL_DEBUG_LEVEL > 0
                     //  reset the bit for later checking
@@ -733,20 +734,20 @@ namespace xmloff
 
         if ((CCAFlags::CurrentValue | CCAFlags::Value) & m_nIncludeCommon)
         {
-            const char* pCurrentValuePropertyName = nullptr;
-            const char* pValuePropertyName = nullptr;
+            OUString pCurrentValuePropertyName;
+            OUString pValuePropertyName;
 
             // get the property names
             getValuePropertyNames(m_eType, m_nClassId, pCurrentValuePropertyName, pValuePropertyName);
 
             // add the attributes if necessary and possible
-            if (pCurrentValuePropertyName && (CCAFlags::CurrentValue & m_nIncludeCommon))
+            if (!pCurrentValuePropertyName.isEmpty() && (CCAFlags::CurrentValue & m_nIncludeCommon))
             {
                 static const OUString pCurrentValueAttributeName = OAttributeMetaData::getCommonControlAttributeName(CCAFlags::CurrentValue);
                 // don't export the current-value if this value originates from a data binding
                 // #i26944#
                 if ( controlHasActiveDataBinding() )
-                    exportedProperty( OUString::createFromAscii( pCurrentValuePropertyName ) );
+                    exportedProperty( pCurrentValuePropertyName );
                 else
                 {
                     static const sal_uInt16 nCurrentValueAttributeNamespaceKey = OAttributeMetaData::getCommonControlAttributeNamespace(CCAFlags::CurrentValue);
@@ -758,7 +759,7 @@ namespace xmloff
                 }
             }
 
-            if (pValuePropertyName && (CCAFlags::Value & m_nIncludeCommon))
+            if (!pValuePropertyName.isEmpty() && (CCAFlags::Value & m_nIncludeCommon))
             {
                 static const OUString pValueAttributeName = OAttributeMetaData::getCommonControlAttributeName(CCAFlags::Value);
                 static const sal_uInt16 nValueAttributeNamespaceKey = OAttributeMetaData::getCommonControlAttributeNamespace(CCAFlags::Value);
@@ -768,9 +769,9 @@ namespace xmloff
                     pValuePropertyName);
             }
 
-            OSL_ENSURE((nullptr == pValuePropertyName) == (CCAFlags::NONE == (CCAFlags::Value & m_nIncludeCommon)),
+            OSL_ENSURE((pValuePropertyName.isEmpty()) == (CCAFlags::NONE == (CCAFlags::Value & m_nIncludeCommon)),
                 "OControlExport::exportCommonControlAttributes: no property found for the value attribute!");
-            OSL_ENSURE((nullptr == pCurrentValuePropertyName ) == (CCAFlags::NONE == (CCAFlags::CurrentValue & m_nIncludeCommon)),
+            OSL_ENSURE((pCurrentValuePropertyName.isEmpty()) == (CCAFlags::NONE == (CCAFlags::CurrentValue & m_nIncludeCommon)),
                 "OControlExport::exportCommonControlAttributes: no property found for the current-value attribute!");
 
         #if OSL_DEBUG_LEVEL > 0
@@ -933,7 +934,7 @@ namespace xmloff
                 SCAFlags::Validation, SCAFlags::MultiLine, SCAFlags::AutoCompletion, SCAFlags::Multiple, SCAFlags::DefaultButton, SCAFlags::IsTristate,
                 SCAFlags::Toggle, SCAFlags::FocusOnClick
             };
-            static const char * pBooleanPropertyNames[] =
+            static const rtl::OUStringConstExpr pBooleanPropertyNames[] =
             {   // property names
                 PROPERTY_STRICTFORMAT, PROPERTY_MULTILINE,
                 PROPERTY_AUTOCOMPLETE,
@@ -941,9 +942,9 @@ namespace xmloff
                 PROPERTY_DEFAULTBUTTON, PROPERTY_TRISTATE,
                 PROPERTY_TOGGLE, PROPERTY_FOCUS_ON_CLICK
             };
-            static const sal_Int32 nIdCount = SAL_N_ELEMENTS(nBooleanPropertyAttributeIds);
+            static const sal_Int32 nIdCount = std::size(nBooleanPropertyAttributeIds);
         #if OSL_DEBUG_LEVEL > 0
-            static const sal_Int32 nNameCount = SAL_N_ELEMENTS(pBooleanPropertyNames);
+            static const sal_Int32 nNameCount = std::size(pBooleanPropertyNames);
             OSL_ENSURE((nIdCount == nNameCount),
                 "OControlExport::exportSpecialAttributes: somebody tampered with the maps (1)!");
         #endif
@@ -955,7 +956,7 @@ namespace xmloff
                     exportBooleanPropertyAttribute(
                         OAttributeMetaData::getSpecialAttributeNamespace( *pAttributeId ),
                         OAttributeMetaData::getSpecialAttributeName( *pAttributeId ),
-                        OUString::createFromAscii(pBooleanPropertyNames[i]),
+                        pBooleanPropertyNames[i],
                         ( *pAttributeId == SCAFlags::FocusOnClick ) ? BoolAttrFlags::DefaultTrue : BoolAttrFlags::DefaultFalse
                     );
             #if OSL_DEBUG_LEVEL > 0
@@ -972,7 +973,7 @@ namespace xmloff
             {   // attribute flags
                 SCAFlags::PageStepSize
             };
-            static const char * pIntegerPropertyNames[] =
+            static const rtl::OUStringConstExpr pIntegerPropertyNames[] =
             {   // property names
                 PROPERTY_BLOCK_INCREMENT
             };
@@ -981,12 +982,12 @@ namespace xmloff
                 10
             };
 
-            static const sal_Int32 nIdCount = SAL_N_ELEMENTS( nIntegerPropertyAttributeIds );
+            static const sal_Int32 nIdCount = std::size( nIntegerPropertyAttributeIds );
         #if OSL_DEBUG_LEVEL > 0
-            static const sal_Int32 nNameCount = SAL_N_ELEMENTS( pIntegerPropertyNames );
+            static const sal_Int32 nNameCount = std::size( pIntegerPropertyNames );
             OSL_ENSURE( ( nIdCount == nNameCount ),
                 "OControlExport::exportSpecialAttributes: somebody tampered with the maps (2)!" );
-            static const sal_Int32 nDefaultCount = SAL_N_ELEMENTS( nIntegerPropertyAttrDefaults );
+            static const sal_Int32 nDefaultCount = std::size( nIntegerPropertyAttrDefaults );
             OSL_ENSURE( ( nIdCount == nDefaultCount ),
                 "OControlExport::exportSpecialAttributes: somebody tampered with the maps (3)!" );
         #endif
@@ -996,7 +997,7 @@ namespace xmloff
                     exportInt32PropertyAttribute(
                         OAttributeMetaData::getSpecialAttributeNamespace( nIntegerPropertyAttributeIds[i] ),
                         OAttributeMetaData::getSpecialAttributeName( nIntegerPropertyAttributeIds[i] ),
-                        OUString::createFromAscii(pIntegerPropertyNames[i]),
+                        pIntegerPropertyNames[i],
                         nIntegerPropertyAttrDefaults[i]
                     );
             #if OSL_DEBUG_LEVEL > 0
@@ -1123,14 +1124,14 @@ namespace xmloff
             {   // attribute flags
                 SCAFlags::GroupName
             };
-            static const std::u16string_view pStringPropertyNames[] =
+            static const rtl::OUStringConstExpr pStringPropertyNames[] =
             {   // property names
-                u"" PROPERTY_GROUP_NAME
+                PROPERTY_GROUP_NAME
             };
 
-            static const sal_Int32 nIdCount = SAL_N_ELEMENTS( nStringPropertyAttributeIds );
+            static const sal_Int32 nIdCount = std::size( nStringPropertyAttributeIds );
         #if OSL_DEBUG_LEVEL > 0
-            static const sal_Int32 nNameCount = SAL_N_ELEMENTS( pStringPropertyNames );
+            static const sal_Int32 nNameCount = std::size( pStringPropertyNames );
             OSL_ENSURE( ( nIdCount == nNameCount ),
                 "OControlExport::exportSpecialAttributes: somebody tampered with the maps (2)!" );
         #endif
@@ -1154,13 +1155,13 @@ namespace xmloff
             // need to export the min value and the max value as attributes
             // It depends on the real type (FormComponentType) of the control, which properties hold these
             // values
-            const char* pMinValuePropertyName = nullptr;
-            const char* pMaxValuePropertyName = nullptr;
+            OUString pMinValuePropertyName;
+            OUString pMaxValuePropertyName;
             getValueLimitPropertyNames(m_nClassId, pMinValuePropertyName, pMaxValuePropertyName);
 
-            OSL_ENSURE((nullptr == pMinValuePropertyName) == (SCAFlags::NONE == (SCAFlags::MinValue & m_nIncludeSpecial)),
+            OSL_ENSURE((pMinValuePropertyName.isEmpty()) == (SCAFlags::NONE == (SCAFlags::MinValue & m_nIncludeSpecial)),
                 "OControlExport::exportCommonControlAttributes: no property found for the min value attribute!");
-            OSL_ENSURE((nullptr == pMaxValuePropertyName) == (SCAFlags::NONE == (SCAFlags::MaxValue & m_nIncludeSpecial)),
+            OSL_ENSURE((pMaxValuePropertyName.isEmpty()) == (SCAFlags::NONE == (SCAFlags::MaxValue & m_nIncludeSpecial)),
                 "OControlExport::exportCommonControlAttributes: no property found for the max value attribute!");
 
             // add the two attributes
@@ -1169,13 +1170,13 @@ namespace xmloff
             static const sal_uInt16 nMinValueNamespaceKey = OAttributeMetaData::getSpecialAttributeNamespace(SCAFlags::MinValue);
             static const sal_uInt16 nMaxValueNamespaceKey = OAttributeMetaData::getSpecialAttributeNamespace(SCAFlags::MaxValue);
 
-            if (pMinValuePropertyName && (SCAFlags::MinValue & m_nIncludeSpecial))
+            if (!pMinValuePropertyName.isEmpty() && (SCAFlags::MinValue & m_nIncludeSpecial))
                 exportGenericPropertyAttribute(
                     nMinValueNamespaceKey,
                     pMinValueAttributeName,
                     pMinValuePropertyName);
 
-            if (pMaxValuePropertyName && (SCAFlags::MaxValue & m_nIncludeSpecial))
+            if (!pMaxValuePropertyName.isEmpty() && (SCAFlags::MaxValue & m_nIncludeSpecial))
                 exportGenericPropertyAttribute(
                     nMaxValueNamespaceKey,
                     pMaxValueAttributeName,
@@ -2045,13 +2046,13 @@ namespace xmloff
             {
                 faName, /*faAction,*/ faCommand, faFilter, faOrder
             };
-            static const char * aStringPropertyNames[] =
+            static const rtl::OUStringConstExpr aStringPropertyNames[] =
             {
                 PROPERTY_NAME, /*PROPERTY_TARGETURL,*/ PROPERTY_COMMAND, PROPERTY_FILTER, PROPERTY_ORDER
             };
-            static const sal_Int32 nIdCount = SAL_N_ELEMENTS(eStringPropertyIds);
+            static const sal_Int32 nIdCount = std::size(eStringPropertyIds);
         #if OSL_DEBUG_LEVEL > 0
-            static const sal_Int32 nNameCount = SAL_N_ELEMENTS(aStringPropertyNames);
+            static const sal_Int32 nNameCount = std::size(aStringPropertyNames);
             OSL_ENSURE((nIdCount == nNameCount),
                 "OFormExport::exportAttributes: somebody tampered with the maps (1)!");
         #endif
@@ -2059,7 +2060,7 @@ namespace xmloff
                 exportStringPropertyAttribute(
                     OAttributeMetaData::getFormAttributeNamespace(eStringPropertyIds[i]),
                     OAttributeMetaData::getFormAttributeName(eStringPropertyIds[i]),
-                    OUString::createFromAscii(aStringPropertyNames[i]));
+                    aStringPropertyNames[i]);
 
             // #i112082# xlink:type is added as part of exportTargetLocationAttribute
 
@@ -2089,7 +2090,7 @@ namespace xmloff
             {
                 faAllowDeletes, faAllowInserts, faAllowUpdates, faApplyFilter, faEscapeProcessing, faIgnoreResult
             };
-            static const char * pBooleanPropertyNames[] =
+            static const rtl::OUStringConstExpr pBooleanPropertyNames[] =
             {
                 PROPERTY_ALLOWDELETES,
                 PROPERTY_ALLOWINSERTS,
@@ -2102,10 +2103,10 @@ namespace xmloff
             {
                 BoolAttrFlags::DefaultTrue, BoolAttrFlags::DefaultTrue, BoolAttrFlags::DefaultTrue, BoolAttrFlags::DefaultFalse, BoolAttrFlags::DefaultTrue, BoolAttrFlags::DefaultFalse
             };
-            static const sal_Int32 nIdCount = SAL_N_ELEMENTS(eBooleanPropertyIds);
+            static const sal_Int32 nIdCount = std::size(eBooleanPropertyIds);
         #if OSL_DEBUG_LEVEL > 0
-            static const sal_Int32 nNameCount = SAL_N_ELEMENTS(pBooleanPropertyNames);
-            static const sal_Int32 nFlagsCount = SAL_N_ELEMENTS(nBooleanPropertyAttrFlags);
+            static const sal_Int32 nNameCount = std::size(pBooleanPropertyNames);
+            static const sal_Int32 nFlagsCount = std::size(nBooleanPropertyAttrFlags);
             OSL_ENSURE((nIdCount == nNameCount) && (nNameCount == nFlagsCount),
                 "OFormExport::exportAttributes: somebody tampered with the maps (2)!");
         #endif
@@ -2113,7 +2114,7 @@ namespace xmloff
                 exportBooleanPropertyAttribute(
                     OAttributeMetaData::getFormAttributeNamespace(eBooleanPropertyIds[i]),
                     OAttributeMetaData::getFormAttributeName(eBooleanPropertyIds[i]),
-                    OUString::createFromAscii(pBooleanPropertyNames[i]),
+                    pBooleanPropertyNames[i],
                     nBooleanPropertyAttrFlags[i]
                 );
         }

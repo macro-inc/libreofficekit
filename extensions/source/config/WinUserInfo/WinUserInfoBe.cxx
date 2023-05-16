@@ -11,20 +11,21 @@
 
 #include <com/sun/star/beans/Optional.hpp>
 #include <comphelper/base64.hxx>
-#include <comphelper/configurationhelper.hxx>
-#include <com/sun/star/container/XNameAccess.hpp>
-#include <com/sun/star/container/XNameReplace.hpp>
-#include <com/sun/star/util/XChangesBatch.hpp>
+#include <comphelper/configuration.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <map>
 #include <o3tl/char16_t2wchar_t.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <officecfg/UserProfile.hxx>
 
 #include <Iads.h>
 #include <Adshlp.h>
 #include <Lmcons.h>
 #define SECURITY_WIN32
 #include <Security.h>
+
+#include <systools/win32/comtools.hxx>
+#include <systools/win32/oleauto.hxx>
 
 namespace extensions
 {
@@ -84,43 +85,26 @@ constexpr OUStringLiteral mail(u"mail");
 class ADsUserAccess : public extensions::config::WinUserInfo::WinUserInfoBe_Impl
 {
 public:
-    ADsUserAccess(const css::uno::Reference<css::uno::XComponentContext>& xContext)
+    ADsUserAccess()
     {
         try
         {
-            struct CoInitializeGuard
-            {
-                CoInitializeGuard()
-                {
-                    if (FAILED(CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED)))
-                        throw css::uno::RuntimeException();
-                }
-                ~CoInitializeGuard() { CoUninitialize(); }
-            } aCoInitializeGuard;
+            sal::systools::CoInitializeGuard aCoInitializeGuard(COINIT_APARTMENTTHREADED);
 
-            IADsADSystemInfo* pADsys;
-            HRESULT hr = CoCreateInstance(CLSID_ADSystemInfo, nullptr, CLSCTX_INPROC_SERVER,
-                                          IID_IADsADSystemInfo, reinterpret_cast<void**>(&pADsys));
-            if (FAILED(hr))
-                throw css::uno::RuntimeException();
-            CoIfPtr<IADsADSystemInfo> aADsysGuard(pADsys);
+            sal::systools::COMReference<IADsADSystemInfo> pADsys(CLSID_ADSystemInfo, nullptr,
+                                                                 CLSCTX_INPROC_SERVER);
 
-            BSTR sUserDN;
-            hr = pADsys->get_UserName(&sUserDN);
-            if (FAILED(hr))
-                throw css::uno::RuntimeException();
-            BSTRGuard aUserNameGuard(sUserDN, SysFreeString);
+            sal::systools::BStr sUserDN;
+            sal::systools::ThrowIfFailed(pADsys->get_UserName(&sUserDN), "get_UserName failed");
             // If this user is an AD user, then without an active connection to the domain, all the
             // above will succeed, and m_sUserDN will be correctly initialized, but the following
             // call to ADsGetObject will fail, and we will attempt reading cached values.
-            m_sUserDN = o3tl::toU(sUserDN);
+            m_sUserDN = sUserDN;
             OUString sLdapUserDN = "LDAP://" + m_sUserDN;
-            IADsUser* pUser;
-            hr = ADsGetObject(o3tl::toW(sLdapUserDN.getStr()), IID_IADsUser,
-                              reinterpret_cast<void**>(&pUser));
-            if (FAILED(hr))
-                throw css::uno::RuntimeException();
-            CoIfPtr<IADsUser> pUserGuard(pUser);
+            sal::systools::COMReference<IADsUser> pUser;
+            sal::systools::ThrowIfFailed(ADsGetObject(o3tl::toW(sLdapUserDN.getStr()), IID_IADsUser,
+                                                      reinterpret_cast<void**>(&pUser)),
+                                         "ADsGetObject failed");
             // Fetch all the required information right now, when we know to have access to AD
             // (later the connection may already be lost)
             m_aMap[givenname] = Str(pUser, &IADsUser::get_FirstName);
@@ -138,12 +122,12 @@ public:
             m_aMap[facsimiletelephonenumber] = Str(pUser, L"facsimileTelephoneNumber");
             m_aMap[mail] = Str(pUser, &IADsUser::get_EmailAddress);
 
-            CacheData(xContext);
+            CacheData();
         }
-        catch (css::uno::Exception&)
+        catch (sal::systools::ComError&)
         {
             // Maybe we temporarily lost connection to AD; try to get cached data
-            GetCachedData(xContext);
+            GetCachedData();
         }
     }
 
@@ -163,39 +147,23 @@ public:
     virtual OUString GetMail() override { return m_aMap[mail]; }
 
 private:
-    static void ReleaseIUnknown(IUnknown* p)
-    {
-        if (p)
-            p->Release();
-    }
-    template <class If> class CoIfPtr : public std::unique_ptr<If, decltype(&ReleaseIUnknown)>
-    {
-    public:
-        CoIfPtr(If* p = nullptr)
-            : std::unique_ptr<If, decltype(&ReleaseIUnknown)>(p, ReleaseIUnknown)
-        {
-        }
-    };
-    typedef std::unique_ptr<OLECHAR, decltype(&SysFreeString)> BSTRGuard;
-
     typedef HRESULT (__stdcall IADsUser::*getstrfunc)(BSTR*);
     static OUString Str(IADsUser* pUser, getstrfunc func)
     {
-        BSTR sBstr;
+        sal::systools::BStr sBstr;
         if (FAILED((pUser->*func)(&sBstr)))
             return "";
-        BSTRGuard aBstrGuard(sBstr, SysFreeString);
-        return OUString(o3tl::toU(sBstr));
+        return OUString(sBstr);
     }
     static OUString Str(IADsUser* pUser, const wchar_t* property)
     {
-        BSTRGuard sBstrProp(SysAllocString(property), SysFreeString);
+        sal::systools::BStr sBstrProp{ o3tl::toU(property) };
         struct AutoVariant : public VARIANT
         {
             AutoVariant() { VariantInit(this); }
             ~AutoVariant() { VariantClear(this); }
         } varArr;
-        if (FAILED(pUser->GetEx(sBstrProp.get(), &varArr)))
+        if (FAILED(pUser->GetEx(sBstrProp, &varArr)))
             return "";
         SAFEARRAY* sa = V_ARRAY(&varArr);
         LONG nStart, nEnd;
@@ -213,7 +181,7 @@ private:
         return "";
     }
 
-    void CacheData(const css::uno::Reference<css::uno::XComponentContext>& xContext)
+    void CacheData()
     {
         try
         {
@@ -238,16 +206,10 @@ private:
             OUStringBuffer sOutBuf;
             comphelper::Base64::encode(sOutBuf, seqCachedData);
 
-            auto xIface = comphelper::ConfigurationHelper::openConfig(
-                xContext, "org.openoffice.UserProfile/WinUserInfo",
-                comphelper::EConfigurationModes::Standard);
-            css::uno::Reference<css::container::XNameReplace> xNameReplace(
-                xIface, css::uno::UNO_QUERY_THROW);
-            xNameReplace->replaceByName("Cache", css::uno::makeAny(sOutBuf.makeStringAndClear()));
-
-            css::uno::Reference<css::util::XChangesBatch> xChangesBatch(xIface,
-                                                                        css::uno::UNO_QUERY_THROW);
-            xChangesBatch->commitChanges();
+            std::shared_ptr<comphelper::ConfigurationChanges> batch(
+                comphelper::ConfigurationChanges::create());
+            officecfg::UserProfile::WinUserInfo::Cache::set(sOutBuf.makeStringAndClear(), batch);
+            batch->commit();
         }
         catch (const css::uno::Exception&)
         {
@@ -256,18 +218,13 @@ private:
         }
     }
 
-    void GetCachedData(const css::uno::Reference<css::uno::XComponentContext>& xContext)
+    void GetCachedData()
     {
         if (m_sUserDN.isEmpty())
             throw css::uno::RuntimeException();
 
-        auto xIface = comphelper::ConfigurationHelper::openConfig(
-            xContext, "org.openoffice.UserProfile/WinUserInfo",
-            comphelper::EConfigurationModes::ReadOnly);
-        css::uno::Reference<css::container::XNameAccess> xNameAccess(xIface,
-                                                                     css::uno::UNO_QUERY_THROW);
-        OUString sCache;
-        xNameAccess->getByName("Cache") >>= sCache;
+        OUString sCache = officecfg::UserProfile::WinUserInfo::Cache::get();
+
         if (sCache.isEmpty())
             throw css::uno::RuntimeException();
 
@@ -346,13 +303,13 @@ namespace config
 {
 namespace WinUserInfo
 {
-WinUserInfoBe::WinUserInfoBe(const css::uno::Reference<css::uno::XComponentContext>& xContext)
+WinUserInfoBe::WinUserInfoBe()
     : WinUserInfoMutexHolder()
     , BackendBase(mMutex)
 {
     try
     {
-        m_pImpl.reset(new ADsUserAccess(xContext));
+        m_pImpl.reset(new ADsUserAccess());
     }
     catch (css::uno::RuntimeException&)
     {
@@ -444,8 +401,8 @@ css::uno::Any WinUserInfoBe::getPropertyValue(OUString const& PropertyName)
     else
         throw css::beans::UnknownPropertyException(sToken, static_cast<cppu::OWeakObject*>(this));
 
-    return css::uno::makeAny(css::beans::Optional<css::uno::Any>(
-        !sValue.isEmpty(), sValue.isEmpty() ? css::uno::Any() : css::uno::makeAny(sValue)));
+    return css::uno::Any(css::beans::Optional<css::uno::Any>(
+        !sValue.isEmpty(), sValue.isEmpty() ? css::uno::Any() : css::uno::Any(sValue)));
 }
 
 OUString SAL_CALL WinUserInfoBe::getImplementationName()
@@ -467,10 +424,10 @@ css::uno::Sequence<OUString> SAL_CALL WinUserInfoBe::getSupportedServiceNames()
 }
 
 extern "C" SAL_DLLPUBLIC_EXPORT css::uno::XInterface*
-extensions_WinUserInfoBe_get_implementation(css::uno::XComponentContext* context,
+extensions_WinUserInfoBe_get_implementation(css::uno::XComponentContext*,
                                             css::uno::Sequence<css::uno::Any> const&)
 {
-    return cppu::acquire(new extensions::config::WinUserInfo::WinUserInfoBe(context));
+    return cppu::acquire(new extensions::config::WinUserInfo::WinUserInfoBe());
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

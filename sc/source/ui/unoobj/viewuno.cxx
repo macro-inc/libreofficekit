@@ -54,6 +54,7 @@
 #include <prevwsh.hxx>
 #include <docsh.hxx>
 #include <drwlayer.hxx>
+#include <attrib.hxx>
 #include <drawview.hxx>
 #include <fupoor.hxx>
 #include <sc.hrc>
@@ -65,9 +66,12 @@
 #include <markdata.hxx>
 #include <scextopt.hxx>
 #include <preview.hxx>
+#include <inputhdl.hxx>
+#include <inputwin.hxx>
 #include <svx/sdrhittesthelper.hxx>
 #include <formatsh.hxx>
 #include <sfx2/app.hxx>
+#include <scitems.hxx>
 
 using namespace com::sun::star;
 
@@ -75,39 +79,39 @@ using namespace com::sun::star;
 
 //  no Which-ID here, Map only for PropertySetInfo
 
-static const SfxItemPropertyMapEntry* lcl_GetViewOptPropertyMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetViewOptPropertyMap()
 {
     static const SfxItemPropertyMapEntry aViewOptPropertyMap_Impl[] =
     {
-        {u"" OLD_UNO_COLROWHDR,   0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_GRIDCOLOR,    0,  cppu::UnoType<sal_Int32>::get(),    0, 0},
-        {u"" SC_UNO_COLROWHDR,    0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_HORSCROLL,    0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_SHEETTABS,    0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_VERTSCROLL,   0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_HIDESPELL,    0,  cppu::UnoType<bool>::get(),          0, 0},  /* deprecated #i91949 */
-        {u"" OLD_UNO_HORSCROLL,   0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_OUTLSYMB,     0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_VALUEHIGH,    0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" OLD_UNO_OUTLSYMB,    0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" OLD_UNO_SHEETTABS,   0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_SHOWANCHOR,   0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_SHOWCHARTS,   0,  cppu::UnoType<sal_Int16>::get(),    0, 0},
-        {u"" SC_UNO_SHOWDRAW,     0,  cppu::UnoType<sal_Int16>::get(),    0, 0},
-        {u"" SC_UNO_SHOWFORM,     0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_SHOWGRID,     0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_SHOWHELP,     0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_SHOWNOTES,    0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_SHOWOBJ,      0,  cppu::UnoType<sal_Int16>::get(),    0, 0},
-        {u"" SC_UNO_SHOWPAGEBR,   0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_SHOWZERO,     0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" OLD_UNO_VALUEHIGH,   0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" OLD_UNO_VERTSCROLL,  0,  cppu::UnoType<bool>::get(),          0, 0},
-        {u"" SC_UNO_VISAREA,      0,  cppu::UnoType<awt::Rectangle>::get(), 0, 0},
-        {u"" SC_UNO_ZOOMTYPE,     0,  cppu::UnoType<sal_Int16>::get(),    0, 0},
-        {u"" SC_UNO_ZOOMVALUE,    0,  cppu::UnoType<sal_Int16>::get(),    0, 0},
-        {u"" SC_UNO_VISAREASCREEN,0,  cppu::UnoType<awt::Rectangle>::get(), 0, 0},
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { OLD_UNO_COLROWHDR,   0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_GRIDCOLOR,    0,  cppu::UnoType<sal_Int32>::get(),    0, 0},
+        { SC_UNO_COLROWHDR,    0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_HORSCROLL,    0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_SHEETTABS,    0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_VERTSCROLL,   0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_HIDESPELL,    0,  cppu::UnoType<bool>::get(),          0, 0},  /* deprecated #i91949 */
+        { OLD_UNO_HORSCROLL,   0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_OUTLSYMB,     0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_VALUEHIGH,    0,  cppu::UnoType<bool>::get(),          0, 0},
+        { OLD_UNO_OUTLSYMB,    0,  cppu::UnoType<bool>::get(),          0, 0},
+        { OLD_UNO_SHEETTABS,   0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_SHOWANCHOR,   0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_SHOWCHARTS,   0,  cppu::UnoType<sal_Int16>::get(),    0, 0},
+        { SC_UNO_SHOWDRAW,     0,  cppu::UnoType<sal_Int16>::get(),    0, 0},
+        { SC_UNO_SHOWFORM,     0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_SHOWGRID,     0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_SHOWHELP,     0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_SHOWNOTES,    0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_SHOWOBJ,      0,  cppu::UnoType<sal_Int16>::get(),    0, 0},
+        { SC_UNO_SHOWPAGEBR,   0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_SHOWZERO,     0,  cppu::UnoType<bool>::get(),          0, 0},
+        { OLD_UNO_VALUEHIGH,   0,  cppu::UnoType<bool>::get(),          0, 0},
+        { OLD_UNO_VERTSCROLL,  0,  cppu::UnoType<bool>::get(),          0, 0},
+        { SC_UNO_VISAREA,      0,  cppu::UnoType<awt::Rectangle>::get(), 0, 0},
+        { SC_UNO_ZOOMTYPE,     0,  cppu::UnoType<sal_Int16>::get(),    0, 0},
+        { SC_UNO_ZOOMVALUE,    0,  cppu::UnoType<sal_Int16>::get(),    0, 0},
+        { SC_UNO_VISAREASCREEN,0,  cppu::UnoType<awt::Rectangle>::get(), 0, 0},
+        { SC_UNO_FORMULABARHEIGHT,0,cppu::UnoType<sal_Int16>::get(),     0, 0},
     };
     return aViewOptPropertyMap_Impl;
 }
@@ -724,7 +728,7 @@ sal_Bool SAL_CALL ScTabViewObj::select( const uno::Any& aSelection )
                 if ( !lcl_TabInRanges( rViewData.GetTabNo(), rRanges ) )
                     pViewSh->SetTabNo( rFirst.aStart.Tab() );
                 pViewSh->DoneBlockMode();
-                pViewSh->InitOwnBlockMode();
+                pViewSh->InitOwnBlockMode( rFirst );    /* TODO: or even the overall range? */
                 rViewData.GetMarkData().MarkFromRangeList( rRanges, true );
                 pViewSh->MarkDataChanged();
                 rViewData.GetDocShell()->PostPaintGridAll();   // Marks (old&new)
@@ -856,7 +860,7 @@ uno::Any SAL_CALL ScTabViewObj::getSelection()
         //  is something selected in drawing layer?
         uno::Reference<uno::XInterface> xRet(pViewSh->getSelectedXShapes());
         if (xRet.is())
-            return uno::makeAny(xRet);
+            return uno::Any(xRet);
 
         //  otherwise sheet (cell) selection
 
@@ -870,7 +874,20 @@ uno::Any SAL_CALL ScTabViewObj::getSelection()
         ScMarkType eMarkType = rViewData.GetSimpleArea(aRange);
         if ( nTabs == 1 && (eMarkType == SC_MARK_SIMPLE) )
         {
-            if (aRange.aStart == aRange.aEnd)
+            // tdf#154803 - check if range is entirely merged
+            ScDocument& rDoc = pDocSh->GetDocument();
+            const ScMergeAttr* pMergeAttr = rDoc.GetAttr(aRange.aStart, ATTR_MERGE);
+            SCCOL nColSpan = 1;
+            SCROW nRowSpan = 1;
+            if (pMergeAttr && pMergeAttr->IsMerged())
+            {
+                nColSpan = pMergeAttr->GetColMerge();
+                nRowSpan = pMergeAttr->GetRowMerge();
+            }
+            // tdf#147122 - return cell object when a simple selection is entirely merged
+            if (aRange.aStart == aRange.aEnd
+                || (aRange.aEnd.Col() - aRange.aStart.Col() == nColSpan - 1
+                    && aRange.aEnd.Row() - aRange.aStart.Row() == nRowSpan - 1))
                 pObj = new ScCellObj( pDocSh, aRange.aStart );
             else
                 pObj = new ScCellRangeObj( pDocSh, aRange );
@@ -924,7 +941,7 @@ uno::Any SAL_CALL ScTabViewObj::getSelection()
         }
     }
 
-    return uno::makeAny(uno::Reference<uno::XInterface>(static_cast<cppu::OWeakObject*>(pObj.get())));
+    return uno::Any(uno::Reference<uno::XInterface>(static_cast<cppu::OWeakObject*>(pObj.get())));
 }
 
 // XEnumerationAccess
@@ -961,12 +978,11 @@ uno::Any SAL_CALL ScTabViewObj::getByIndex( sal_Int32 nIndex )
     if (!xPane.is())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xPane);
+    return uno::Any(xPane);
 }
 
 uno::Type SAL_CALL ScTabViewObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<sheet::XViewPane>::get();
 }
 
@@ -1793,6 +1809,22 @@ void SAL_CALL ScTabViewObj::setPropertyValue(
         if ( aValue >>= nIntVal )
             SetZoom(nIntVal);
     }
+    else if ( aPropertyName == SC_UNO_FORMULABARHEIGHT )
+    {
+        sal_Int16 nIntVal = ScUnoHelpFunctions::GetInt16FromAny(aValue);
+        if (nIntVal > 0)
+        {
+            rViewData.SetFormulaBarLines(nIntVal);
+            // Notify formula bar about changed lines
+            ScInputHandler* pInputHdl = SC_MOD()->GetInputHdl();
+            if (pInputHdl)
+            {
+                ScInputWindow* pInputWin = pInputHdl->GetInputWindow();
+                if (pInputWin)
+                    pInputWin->NumLinesChanged();
+            }
+        }
+    }
 
     //  Options are set on the view and document (for new views),
     //  so that they remain during saving.
@@ -1832,7 +1864,8 @@ uno::Any SAL_CALL ScTabViewObj::getPropertyValue( const OUString& aPropertyName 
     ScTabViewShell* pViewSh = GetViewShell();
     if (pViewSh)
     {
-        const ScViewOptions& rOpt = pViewSh->GetViewData().GetOptions();
+        ScViewData& rViewData = pViewSh->GetViewData();
+        const ScViewOptions& rOpt = rViewData.GetOptions();
 
         if ( aPropertyName == SC_UNO_COLROWHDR || aPropertyName == OLD_UNO_COLROWHDR )
             aRet <<= rOpt.GetOption( VOPT_HEADER );
@@ -1860,9 +1893,9 @@ uno::Any SAL_CALL ScTabViewObj::getPropertyValue( const OUString& aPropertyName 
         else if ( aPropertyName == SC_UNO_VISAREA ) aRet <<= GetVisArea();
         else if ( aPropertyName == SC_UNO_ZOOMTYPE ) aRet <<= GetZoomType();
         else if ( aPropertyName == SC_UNO_ZOOMVALUE ) aRet <<= GetZoom();
+        else if ( aPropertyName == SC_UNO_FORMULABARHEIGHT ) aRet <<= rViewData.GetFormulaBarLines();
         else if ( aPropertyName == SC_UNO_VISAREASCREEN )
         {
-            ScViewData& rViewData = pViewSh->GetViewData();
             vcl::Window* pActiveWin = rViewData.GetActiveWin();
             if ( pActiveWin )
             {

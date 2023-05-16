@@ -332,7 +332,7 @@ SwTabPortion::SwTabPortion( const sal_uInt16 nTabPosition, const sal_Unicode cFi
 {
     mnLineLength = TextFrameIndex(1);
     OSL_ENSURE(!IsFilled() || ' ' != m_cFill, "SwTabPortion::CTOR: blanks ?!");
-    SetWhichPor( PortionType::Table );
+    SetWhichPor( PortionType::Tab );
 }
 
 bool SwTabPortion::Format( SwTextFormatInfo &rInf )
@@ -374,14 +374,14 @@ bool SwTabPortion::PreFormat( SwTextFormatInfo &rInf )
         // #i89179#
         // tab portion representing the list tab of a list label gets the
         // same font as the corresponding number portion
-        std::unique_ptr< SwFontSave > pSave;
+        std::optional< SwFontSave > oSave;
         if ( GetLen() == TextFrameIndex(0) &&
              rInf.GetLast() && rInf.GetLast()->InNumberGrp() &&
              static_cast<SwNumberPortion*>(rInf.GetLast())->HasFont() )
         {
             const SwFont* pNumberPortionFont =
                     static_cast<SwNumberPortion*>(rInf.GetLast())->GetFont();
-            pSave.reset( new SwFontSave( rInf, const_cast<SwFont*>(pNumberPortionFont) ) );
+            oSave.emplace( rInf, const_cast<SwFont*>(pNumberPortionFont) );
         }
         OUString aTmp( ' ' );
         SwTextSizeInfo aInf( rInf, &aTmp );
@@ -575,7 +575,7 @@ void SwTabPortion::Paint( const SwTextPaintInfo &rInf ) const
     // #i89179#
     // tab portion representing the list tab of a list label gets the
     // same font as the corresponding number portion
-    std::unique_ptr< SwFontSave > pSave;
+    std::optional< SwFontSave > oSave;
     bool bAfterNumbering = false;
     if (GetLen() == TextFrameIndex(0))
     {
@@ -587,7 +587,7 @@ void SwTabPortion::Paint( const SwTextPaintInfo &rInf ) const
         {
             const SwFont* pNumberPortionFont =
                     static_cast<const SwNumberPortion*>(pPrevPortion)->GetFont();
-            pSave.reset( new SwFontSave( rInf, const_cast<SwFont*>(pNumberPortionFont) ) );
+            oSave.emplace( rInf, const_cast<SwFont*>(pNumberPortionFont) );
             bAfterNumbering = true;
         }
     }
@@ -604,7 +604,7 @@ void SwTabPortion::Paint( const SwTextPaintInfo &rInf ) const
     {
         // filled tabs are shaded in gray
         if( IsFilled() )
-            rInf.DrawViewOpt( *this, PortionType::Table );
+            rInf.DrawViewOpt( *this, PortionType::Tab );
         else
             rInf.DrawTab( *this );
     }
@@ -620,7 +620,7 @@ void SwTabPortion::Paint( const SwTextPaintInfo &rInf ) const
         {
             // Always with kerning, also on printer!
             sal_uInt16 nChar = Width() / nCharWidth;
-            OUStringBuffer aBuf;
+            OUStringBuffer aBuf(nChar);
             comphelper::string::padToLength(aBuf, nChar, ' ');
             rInf.DrawText(aBuf.makeStringAndClear(), *this, TextFrameIndex(0),
                             TextFrameIndex(nChar), true);
@@ -642,7 +642,7 @@ void SwTabPortion::Paint( const SwTextPaintInfo &rInf ) const
         sal_uInt16 nChar = Width() / nCharWidth;
         if ( m_cFill == '_' )
             ++nChar; // to avoid gaps
-        OUStringBuffer aBuf;
+        OUStringBuffer aBuf(nChar);
         comphelper::string::padToLength(aBuf, nChar, m_cFill);
         rInf.DrawText(aBuf.makeStringAndClear(), *this, TextFrameIndex(0),
                         TextFrameIndex(nChar), true);
@@ -655,7 +655,7 @@ void SwAutoTabDecimalPortion::Paint( const SwTextPaintInfo & ) const
 
 void SwTabPortion::HandlePortion( SwPortionHandler& rPH ) const
 {
-    rPH.Text( GetLen(), GetWhichPor(), Height(), Width() );
+    rPH.Text( GetLen(), GetWhichPor() );
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

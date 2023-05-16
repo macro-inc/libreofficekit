@@ -26,9 +26,7 @@
 #include <ucbhelper/content.hxx>
 #include <com/sun/star/io/Pipe.hpp>
 #include <com/sun/star/task/InteractionHandler.hpp>
-#include <tools/diagnose_ex.h>
-
-#include <memory>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace css::uno;
 using namespace css::ucb;
@@ -38,7 +36,7 @@ using namespace osl;
 using namespace ucbhelper;
 
 
-CSubmissionGet::CSubmissionGet(const OUString& aURL, const css::uno::Reference< css::xml::dom::XDocumentFragment >& aFragment)
+CSubmissionGet::CSubmissionGet(std::u16string_view aURL, const css::uno::Reference< css::xml::dom::XDocumentFragment >& aFragment)
     : CSubmission(aURL, aFragment)
 {
 }
@@ -81,7 +79,7 @@ CSubmission::SubmissionResult CSubmissionGet::submit(const css::uno::Reference< 
             aUTF8QueryURL.append('?');
             aUTF8QueryURL.append(aQueryString);
         }
-        OUString aQueryURL = OStringToOUString(aUTF8QueryURL.makeStringAndClear(), RTL_TEXTENCODING_UTF8);
+        OUString aQueryURL = OStringToOUString(aUTF8QueryURL, RTL_TEXTENCODING_UTF8);
         ucbhelper::Content aContent(aQueryURL, aEnvironment, m_xContext);
         css::uno::Reference< XOutputStream > aPipe( css::io::Pipe::create(m_xContext), UNO_QUERY_THROW );
         if (!aContent.openStream(aPipe))

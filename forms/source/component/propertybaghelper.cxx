@@ -22,12 +22,13 @@
 #include <property.hxx>
 
 #include <com/sun/star/lang/DisposedException.hpp>
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/beans/PropertyExistException.hpp>
 #include <com/sun/star/beans/XMultiPropertySet.hpp>
 #include <com/sun/star/beans/NotRemoveableException.hpp>
 #include <com/sun/star/beans/UnknownPropertyException.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <comphelper/sequence.hxx>
 

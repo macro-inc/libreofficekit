@@ -25,9 +25,9 @@
         <!-- When changing android:windowSoftInputMode, please don't specify multiple "adjust..." or "state...". -->
         <activity
             android:name=".LibreOfficeMainActivity"
-            android:label="@string/app_name"
             android:configChanges="orientation|keyboard|keyboardHidden|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:windowSoftInputMode="adjustResize" >
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -48,9 +48,7 @@
                 <data android:mimeType="application/vnd.oasis.opendocument.text-flat-xml" />
                 <data android:mimeType="application/vnd.oasis.opendocument.graphics-flat-xml" />
                 <data android:mimeType="application/vnd.oasis.opendocument.presentation-flat-xml" />
-                <!-- TODO: opening FODS documents crashes currently
                 <data android:mimeType="application/vnd.oasis.opendocument.spreadsheet-flat-xml" />
-                -->
 
                 <!-- ODF templates -->
                 <data android:mimeType="application/vnd.oasis.opendocument.text-template"/>
@@ -72,7 +70,7 @@
                 <!-- OOXML -->
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.presentationml.presentation" />
-                <!-- Currently crashes. <data android:mimeType="application/vnd.openxmlformats-officedocument.presentationml.slideshow"/> -->
+                <data android:mimeType="application/vnd.openxmlformats-officedocument.presentationml.slideshow" />
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
 
                 <!-- OOXML templates -->
@@ -103,7 +101,7 @@
 
         <!-- Document Browser Activity -->
         <activity android:name="org.libreoffice.ui.LibreOfficeUIActivity"
-                  android:label="@string/app_name" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -118,7 +116,7 @@
         </activity>
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">

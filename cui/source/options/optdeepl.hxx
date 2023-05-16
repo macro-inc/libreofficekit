@@ -23,7 +23,7 @@ class OptDeeplTabPage : public SfxTabPage
 {
 public:
     OptDeeplTabPage(weld::Container* pPage, weld::DialogController* pController,
-                           const SfxItemSet& rSet);
+                    const SfxItemSet& rSet);
     virtual ~OptDeeplTabPage() override;
     static std::unique_ptr<SfxTabPage>
     Create(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet* rAttrSet);

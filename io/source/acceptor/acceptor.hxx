@@ -21,7 +21,7 @@
 
 #include <osl/pipe.hxx>
 #include <osl/socket.hxx>
-#include <osl/mutex.hxx>
+#include <mutex>
 
 #include <com/sun/star/uno/Reference.hxx>
 
@@ -32,14 +32,15 @@ namespace io_acceptor {
     class PipeAcceptor
     {
     public:
-        PipeAcceptor( const OUString &sPipeName , const OUString &sConnectionDescription );
+        PipeAcceptor( OUString sPipeName, OUString sConnectionDescription );
 
         void init();
         css::uno::Reference < css::connection::XConnection >  accept(  );
 
         void stopAccepting();
 
-        ::osl::Mutex m_mutex;
+    private:
+        std::mutex m_mutex;
         ::osl::Pipe m_pipe;
         OUString m_sPipeName;
         OUString m_sConnectionDescription;
@@ -49,16 +50,17 @@ namespace io_acceptor {
     class SocketAcceptor
     {
     public:
-        SocketAcceptor( const OUString & sSocketName ,
+        SocketAcceptor( OUString sSocketName ,
                         sal_uInt16 nPort,
                         bool bTcpNoDelay,
-                        const OUString &sConnectionDescription );
+                        OUString sConnectionDescription );
 
         void init();
         css::uno::Reference < css::connection::XConnection > accept();
 
         void stopAccepting();
 
+    private:
         ::osl::SocketAddr m_addr;
         ::osl::AcceptorSocket m_socket;
         OUString m_sSocketName;

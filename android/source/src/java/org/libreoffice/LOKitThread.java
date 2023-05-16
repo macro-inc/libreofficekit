@@ -204,8 +204,9 @@ class LOKitThread extends Thread {
     /**
      * Handle load document event.
      * @param filePath - filePath to where the document is located
+     * @return Whether the document has been loaded successfully.
      */
-    private void loadDocument(String filePath) {
+    private boolean loadDocument(String filePath) {
         mLayerClient = mContext.getLayerClient();
 
         mInvalidationHandler = new InvalidationHandler(mContext);
@@ -214,18 +215,12 @@ class LOKitThread extends Thread {
         if (mTileProvider.isReady()) {
             LOKitShell.showProgressSpinner(mContext);
             updateZoomConstraints();
-            LOKitShell.getMainHandler().post(new Runnable() {
-                @Override
-                public void run() {
-                    // synchronize to avoid deletion while loading
-                    synchronized (LOKitThread.this) {
-                        refresh(true);
-                    }
-                }
-            });
+            refresh(true);
             LOKitShell.hideProgressSpinner(mContext);
+            return true;
         } else {
             closeDocument();
+            return false;
         }
     }
 
@@ -235,20 +230,9 @@ class LOKitThread extends Thread {
      * @param fileType - fileType what type of new document is to be loaded
      */
     private void loadNewDocument(String filePath, String fileType) {
-        mLayerClient = mContext.getLayerClient();
-
-        mInvalidationHandler = new InvalidationHandler(mContext);
-        mTileProvider = TileProviderFactory.create(mContext, mInvalidationHandler, fileType);
-
-        if (mTileProvider.isReady()) {
-            LOKitShell.showProgressSpinner(mContext);
-            updateZoomConstraints();
-            refresh(true);
-            LOKitShell.hideProgressSpinner(mContext);
-
+        boolean ok = loadDocument(fileType);
+        if (ok) {
             mTileProvider.saveDocumentAs(filePath, true);
-        } else {
-            closeDocument();
         }
     }
 
@@ -266,8 +250,7 @@ class LOKitThread extends Thread {
     /**
      * Close the currently loaded document.
      */
-    // needs to be synchronized to not destroy doc while it's loaded
-    private synchronized void closeDocument() {
+    private void closeDocument() {
         if (mTileProvider != null) {
             mTileProvider.close();
             mTileProvider = null;

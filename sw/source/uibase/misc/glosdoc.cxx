@@ -32,6 +32,7 @@
 #include <svl/fstathelper.hxx>
 #include <unotools/pathoptions.hxx>
 #include <unotools/tempfile.hxx>
+#include <o3tl/string_view.hxx>
 #include <swtypes.hxx>
 #include <glosdoc.hxx>
 #include <shellio.hxx>
@@ -54,14 +55,14 @@ OUString lcl_FullPathName(std::u16string_view sPath, std::u16string_view sName)
 }
 
 OUString lcl_CheckFileName( const OUString& rNewFilePath,
-                          const OUString& rNewGroupName )
+                          std::u16string_view aNewGroupName )
 {
-    const sal_Int32 nLen = rNewGroupName.getLength();
+    const sal_Int32 nLen = aNewGroupName.size();
     OUStringBuffer aBuf(nLen);
     //group name should contain only A-Z and a-z and spaces
     for( sal_Int32 i=0; i < nLen; ++i )
     {
-        const sal_Unicode cChar = rNewGroupName[i];
+        const sal_Unicode cChar = aNewGroupName[i];
         if (rtl::isAsciiAlphanumeric(cChar) ||
             cChar == '_' || cChar == 0x20)
         {
@@ -76,9 +77,8 @@ OUString lcl_CheckFileName( const OUString& rNewFilePath,
             return sRet;
     }
 
-    OUString rSG = SwGlossaries::GetExtension();
     //generate generic name
-    utl::TempFile aTemp("group", true, &rSG, &rNewFilePath);
+    utl::TempFileNamed aTemp(u"group", true, SwGlossaries::GetExtension(), &rNewFilePath);
     aTemp.EnableKillingFile();
 
     INetURLObject aTempURL( aTemp.GetURL() );
@@ -109,7 +109,7 @@ bool SwGlossaries::FindGroupName(OUString& rGroup)
     for(size_t i = 0; i < nCount; ++i)
     {
         const OUString sTemp(GetGroupName(i));
-        if (rGroup==sTemp.getToken(0, GLOS_DELIM))
+        if (rGroup == o3tl::getToken(sTemp, 0, GLOS_DELIM))
         {
             rGroup = sTemp;
             return true;
@@ -121,7 +121,7 @@ bool SwGlossaries::FindGroupName(OUString& rGroup)
     for(size_t i = 0; i < nCount; ++i)
     {
         const OUString sTemp( GetGroupName( i ));
-        sal_uInt16 nPath = sTemp.getToken(1, GLOS_DELIM).toUInt32();
+        sal_uInt16 nPath = o3tl::toUInt32(o3tl::getToken(sTemp, 1, GLOS_DELIM));
 
         if (!SWUnoHelper::UCB_IsCaseSensitiveFileName( m_PathArr[nPath] )
              && rSCmp.isEqual( rGroup, sTemp.getToken( 0, GLOS_DELIM) ) )
@@ -174,12 +174,12 @@ std::unique_ptr<SwTextBlocks> SwGlossaries::GetGroupDoc(const OUString &rName,
 // so that groups remain there later (without access).
 bool SwGlossaries::NewGroupDoc(OUString& rGroupName, const OUString& rTitle)
 {
-    const OUString sNewPath(rGroupName.getToken(1, GLOS_DELIM));
-    sal_uInt16 nNewPath = o3tl::narrowing<sal_uInt16>(sNewPath.toInt32());
+    const std::u16string_view sNewPath(o3tl::getToken(rGroupName, 1, GLOS_DELIM));
+    sal_uInt16 nNewPath = o3tl::narrowing<sal_uInt16>(o3tl::toInt32(sNewPath));
     if (static_cast<size_t>(nNewPath) >= m_PathArr.size())
         return false;
     const OUString sNewFilePath(m_PathArr[nNewPath]);
-    const OUString sNewGroup = lcl_CheckFileName(sNewFilePath, rGroupName.getToken(0, GLOS_DELIM))
+    const OUString sNewGroup = lcl_CheckFileName(sNewFilePath, o3tl::getToken(rGroupName, 0, GLOS_DELIM))
         + OUStringChar(GLOS_DELIM) + sNewPath;
     std::unique_ptr<SwTextBlocks> pBlock = GetGlosDoc( sNewGroup );
     if(pBlock)
@@ -195,12 +195,12 @@ bool SwGlossaries::NewGroupDoc(OUString& rGroupName, const OUString& rTitle)
 bool    SwGlossaries::RenameGroupDoc(
     const OUString& rOldGroup, OUString& rNewGroup, const OUString& rNewTitle )
 {
-    sal_uInt16 nOldPath = o3tl::narrowing<sal_uInt16>(rOldGroup.getToken(1, GLOS_DELIM).toInt32());
+    sal_uInt16 nOldPath = o3tl::narrowing<sal_uInt16>(o3tl::toInt32(o3tl::getToken(rOldGroup, 1, GLOS_DELIM)));
     if (static_cast<size_t>(nOldPath) >= m_PathArr.size())
         return false;
 
     const OUString sOldFileURL =
-        lcl_FullPathName(m_PathArr[nOldPath], rOldGroup.getToken(0, GLOS_DELIM));
+        lcl_FullPathName(m_PathArr[nOldPath], o3tl::getToken(rOldGroup, 0, GLOS_DELIM));
 
     if (!FStatHelper::IsDocument( sOldFileURL ))
     {
@@ -208,12 +208,12 @@ bool    SwGlossaries::RenameGroupDoc(
         return false;
     }
 
-    sal_uInt16 nNewPath = o3tl::narrowing<sal_uInt16>(rNewGroup.getToken(1, GLOS_DELIM).toInt32());
+    sal_uInt16 nNewPath = o3tl::narrowing<sal_uInt16>(o3tl::toInt32(o3tl::getToken(rNewGroup, 1, GLOS_DELIM)));
     if (static_cast<size_t>(nNewPath) >= m_PathArr.size())
         return false;
 
     const OUString sNewFileName = lcl_CheckFileName(m_PathArr[nNewPath],
-                                                    rNewGroup.getToken(0, GLOS_DELIM));
+                                                    o3tl::getToken(rNewGroup, 0, GLOS_DELIM));
     const OUString sNewFileURL = lcl_FullPathName(m_PathArr[nNewPath], sNewFileName);
 
     if (FStatHelper::IsDocument( sNewFileURL ))
@@ -244,12 +244,12 @@ bool    SwGlossaries::RenameGroupDoc(
 }
 
 // Deletes a text block group
-bool SwGlossaries::DelGroupDoc(const OUString &rName)
+bool SwGlossaries::DelGroupDoc(std::u16string_view rName)
 {
-    sal_uInt16 nPath = o3tl::narrowing<sal_uInt16>(rName.getToken(1, GLOS_DELIM).toInt32());
+    sal_uInt16 nPath = o3tl::narrowing<sal_uInt16>(o3tl::toInt32(o3tl::getToken(rName, 1, GLOS_DELIM)));
     if (static_cast<size_t>(nPath) >= m_PathArr.size())
         return false;
-    const OUString sBaseName(rName.getToken(0, GLOS_DELIM));
+    const std::u16string_view sBaseName(o3tl::getToken(rName, 0, GLOS_DELIM));
     const OUString sFileURL = lcl_FullPathName(m_PathArr[nPath], sBaseName);
     const OUString aName = sBaseName + OUStringChar(GLOS_DELIM) + OUString::number(nPath);
     // Even if the file doesn't exist it has to be deleted from
@@ -269,12 +269,12 @@ SwGlossaries::~SwGlossaries()
 // read a block document
 std::unique_ptr<SwTextBlocks> SwGlossaries::GetGlosDoc( const OUString &rName, bool bCreate ) const
 {
-    sal_uInt16 nPath = o3tl::narrowing<sal_uInt16>(rName.getToken(1, GLOS_DELIM).toInt32());
+    sal_uInt16 nPath = o3tl::narrowing<sal_uInt16>(o3tl::toInt32(o3tl::getToken(rName, 1, GLOS_DELIM)));
     std::unique_ptr<SwTextBlocks> pTmp;
     if (static_cast<size_t>(nPath) < m_PathArr.size())
     {
         const OUString sFileURL =
-            lcl_FullPathName(m_PathArr[nPath], rName.getToken(0, GLOS_DELIM));
+            lcl_FullPathName(m_PathArr[nPath], o3tl::getToken(rName, 0, GLOS_DELIM));
 
         bool bExist = false;
         if(!bCreate)
@@ -473,13 +473,13 @@ void SwGlossaries::RemoveFileFromList( const OUString& rGroup )
     m_GlosArr.erase(it);
 }
 
-OUString SwGlossaries::GetCompleteGroupName( const OUString& rGroupName )
+OUString SwGlossaries::GetCompleteGroupName( std::u16string_view rGroupName )
 {
     const size_t nCount = GetGroupCnt();
     // when the group name was created internally the path is here as well
     sal_Int32 nIndex = 0;
-    const OUString sGroupName(rGroupName.getToken(0, GLOS_DELIM, nIndex));
-    const bool bPathLen = !rGroupName.getToken(0, GLOS_DELIM, nIndex).isEmpty();
+    const std::u16string_view sGroupName(o3tl::getToken(rGroupName, 0, GLOS_DELIM, nIndex));
+    const bool bPathLen = !o3tl::getToken(rGroupName, 0, GLOS_DELIM, nIndex).empty();
     for ( size_t i = 0; i < nCount; i++ )
     {
         const OUString sGrpName = GetGroupName(i);
@@ -490,7 +490,7 @@ OUString SwGlossaries::GetCompleteGroupName( const OUString& rGroupName )
         }
         else
         {
-            if (sGroupName == sGrpName.getToken(0, GLOS_DELIM))
+            if (sGroupName == o3tl::getToken(sGrpName, 0, GLOS_DELIM))
                 return sGrpName;
         }
     }
@@ -518,7 +518,7 @@ void SwGlossaries::InvalidateUNOOjects()
     UnoAutoTextEntries().swap(m_aGlossaryEntries);
 }
 
-Reference< text::XAutoTextGroup > SwGlossaries::GetAutoTextGroup( const OUString& _rGroupName )
+Reference< text::XAutoTextGroup > SwGlossaries::GetAutoTextGroup( std::u16string_view _rGroupName )
 {
     bool _bCreate = true;
     // first, find the name with path-extension

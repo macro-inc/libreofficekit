@@ -173,6 +173,12 @@ class DocumentSettingManager final :
     bool mbGutterAtTop;
     bool mbFootnoteInColumnToPageEnd;
     sal_Int32 mnImagePreferredDPI;
+    bool mbAutoFirstLineIndentDisregardLineSpace;
+    bool mbHyphenateURLs = false;
+    // If this is on as_char flys wrapping will be handled the same like in Word
+    bool mbWrapAsCharFlysLikeInOOXML;
+    bool mbNoNumberingShowFollowBy;
+    bool mbDropCapPunctuation; // tdf#150200, tdf#150438
 
 public:
 

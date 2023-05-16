@@ -23,52 +23,24 @@
 
 #include <drawinglayer/primitive2d/Primitive2DContainer.hxx>
 #include <drawinglayer/primitive2d/Primitive2DVisitor.hxx>
+#include <drawinglayer/geometry/viewinformation2d.hxx>
 
-#include <cppuhelper/compbase.hxx>
 #include <com/sun/star/util/XAccounting.hpp>
-#include <cppuhelper/basemutex.hxx>
 #include <basegfx/range/b2drange.hxx>
 #include <com/sun/star/graphic/XPrimitive2D.hpp>
-#include <mutex>
+#include <comphelper/compbase.hxx>
+#include <salhelper/simplereferenceobject.hxx>
+#include <rtl/ref.hxx>
+#include <deque>
+#include <utility>
 
 namespace drawinglayer::geometry
 {
 class ViewInformation2D;
 }
 
-/** This is a custom re-implementation of cppu::WeakComponentImplHelper which uses
-   std::mutex and skips parts of the XComponent stuff.
-*/
-class DRAWINGLAYER_DLLPUBLIC BasePrimitive2DImplBase : public cppu::OWeakObject,
-                                                       public css::lang::XComponent,
-                                                       public css::lang::XTypeProvider,
-                                                       public css::graphic::XPrimitive2D,
-                                                       public css::util::XAccounting
-{
-public:
-    virtual ~BasePrimitive2DImplBase() override;
-
-    virtual void SAL_CALL acquire() noexcept override;
-    virtual void SAL_CALL release() noexcept override;
-    virtual css::uno::Any SAL_CALL queryInterface(css::uno::Type const& aType) override;
-
-    // css::lang::XComponent
-    virtual void SAL_CALL dispose() override;
-    virtual void SAL_CALL
-    addEventListener(css::uno::Reference<css::lang::XEventListener> const& xListener) override;
-    virtual void SAL_CALL
-    removeEventListener(css::uno::Reference<css::lang::XEventListener> const& xListener) override;
-
-    // css::lang::XTypeProvider
-    virtual css::uno::Sequence<css::uno::Type> SAL_CALL getTypes() override;
-    virtual css::uno::Sequence<sal_Int8> SAL_CALL getImplementationId() override
-    {
-        return css::uno::Sequence<sal_Int8>();
-    }
-
-protected:
-    mutable std::mutex m_aMutex;
-};
+typedef comphelper::WeakComponentImplHelper<css::graphic::XPrimitive2D, css::util::XAccounting>
+    BasePrimitive2DImplBase;
 
 namespace drawinglayer::primitive2d
 {
@@ -145,7 +117,7 @@ namespace drawinglayer::primitive2d
     for view-independent primitives which are defined by not using ViewInformation2D
     in their get2DDecomposition/getB2DRange implementations.
 */
-class DRAWINGLAYER_DLLPUBLIC BasePrimitive2D : public BasePrimitive2DImplBase
+class DRAWINGLAYERCORE_DLLPUBLIC BasePrimitive2D : public salhelper::SimpleReferenceObject
 {
     BasePrimitive2D(const BasePrimitive2D&) = delete;
     BasePrimitive2D& operator=(const BasePrimitive2D&) = delete;
@@ -181,6 +153,42 @@ public:
     /** The getDecomposition implementation for UNO API will use getDecomposition from this implementation. It
         will construct a ViewInformation2D from the ViewParameters for that purpose
      */
+    Primitive2DContainer
+    getDecomposition(const css::uno::Sequence<css::beans::PropertyValue>& rViewParameters);
+
+    /** The getRange implementation for UNO API will use getRange from this implementation. It
+        will construct a ViewInformation2D from the ViewParameters for that purpose
+     */
+    css::geometry::RealRectangle2D
+    getRange(const css::uno::Sequence<css::beans::PropertyValue>& rViewParameters);
+
+    // XAccounting
+    virtual sal_Int64 estimateUsage();
+};
+
+/**
+  Rather than make all the BasePrimitive2D classes bear the cost of being an UNO
+  object, we just wrap the top level BasePrimitive2D in this class when we need
+  to pass them over UNO
+*/
+class DRAWINGLAYERCORE_DLLPUBLIC UnoPrimitive2D final : public BasePrimitive2DImplBase
+{
+    UnoPrimitive2D(const UnoPrimitive2D&) = delete;
+    UnoPrimitive2D& operator=(const UnoPrimitive2D&) = delete;
+
+public:
+    // constructor/destructor
+    UnoPrimitive2D(rtl::Reference<BasePrimitive2D> xPrimitive)
+        : mxPrimitive(std::move(xPrimitive))
+    {
+    }
+    virtual ~UnoPrimitive2D() override;
+
+    // Methods from XPrimitive2D
+
+    /** The getDecomposition implementation for UNO API will use getDecomposition from this implementation. It
+        will construct a ViewInformation2D from the ViewParameters for that purpose
+     */
     virtual css::uno::Sequence<::css::uno::Reference<::css::graphic::XPrimitive2D>> SAL_CALL
     getDecomposition(const css::uno::Sequence<css::beans::PropertyValue>& rViewParameters) override;
 
@@ -192,6 +200,11 @@ public:
 
     // XAccounting
     virtual sal_Int64 SAL_CALL estimateUsage() override;
+
+    rtl::Reference<BasePrimitive2D> const& getBasePrimitive2D() const { return mxPrimitive; }
+
+private:
+    rtl::Reference<BasePrimitive2D> mxPrimitive;
 };
 
 } // end of namespace drawinglayer::primitive2d

@@ -14,7 +14,6 @@
 #include <tokenarray.hxx>
 #include <compiler.hxx>
 #include <comphelper/random.hxx>
-#include <formula/vectortoken.hxx>
 #include <scmatrix.hxx>
 #include <sal/log.hxx>
 
@@ -22,7 +21,6 @@
 #include <opencl/OpenCLZone.hxx>
 
 #include "op_financial.hxx"
-#include "op_database.hxx"
 #include "op_math.hxx"
 #include "op_logical.hxx"
 #include "op_statistical.hxx"
@@ -33,14 +31,6 @@
 #include <limits>
 
 #include <com/sun/star/sheet/FormulaLanguage.hpp>
-
-// FIXME: The idea that somebody would bother to (now and then? once a year? once a month?) manually
-// edit a source file and change the value of some #defined constant and run some ill-defined
-// "correctness test" is of course ludicrous. Either things are checked in normal unit tests, in
-// every 'make check', or not at all. The below comments are ridiculous.
-
-#define REDUCE_THRESHOLD 201  // set to 4 for correctness testing. priority 1
-#define UNROLLING_FACTOR 16  // set to 4 for correctness testing (if no reduce)
 
 const char* const publicFunc =
  "\n"
@@ -61,79 +51,11 @@ const char* const publicFunc =
 // "    return nan(nErr);\n"
  "}\n"
  "\n"
- "uint GetDoubleErrorValue(double fVal)\n"
- "{\n"
- "    if (isfinite(fVal))\n"
- "        return 0;\n"
- "    if (isinf(fVal))\n"
- "        return IllegalFPOperation; // normal INF\n"
- "    if (as_ulong(fVal) & 0XFFFF0000u)\n"
- "        return NoValue;            // just a normal NAN\n"
- "    return (as_ulong(fVal) & 0XFFFF); // any other error\n"
- "}\n"
- "\n"
- "double fsum_count(double a, double b, __private int *p) {\n"
- "    bool t = isnan(a);\n"
- "    (*p) += t?0:1;\n"
- "    return t?b:a+b;\n"
- "}\n"
- "double fmin_count(double a, double b, __private int *p) {\n"
- "    double result = fmin(a, b);\n"
- "    bool t = isnan(result);\n"
- "    (*p) += t?0:1;\n"
- "    return result;\n"
- "}\n"
- "double fmax_count(double a, double b, __private int *p) {\n"
- "    double result = fmax(a, b);\n"
- "    bool t = isnan(result);\n"
- "    (*p) += t?0:1;\n"
- "    return result;\n"
- "}\n"
  "double fsum(double a, double b) { return isnan(a)?b:a+b; }\n"
  "double legalize(double a, double b) { return isnan(a)?b:a;}\n"
- "double fsub(double a, double b) { return a-b; }\n"
- "double fdiv(double a, double b) { return a/b; }\n"
- "double strequal(unsigned a, unsigned b) { return (a==b)?1.0:0; }\n"
- "int is_representable_integer(double a) {\n"
- "    long kMaxInt = (1L << 53) - 1;\n"
- "    if (a <= as_double(kMaxInt))\n"
- "    {\n"
- "        long nInt = as_long(a);\n"
- "        double fInt;\n"
- "        return (nInt <= kMaxInt &&\n"
- "                (!((fInt = as_double(nInt)) < a) && !(fInt > a)));\n"
- "    }\n"
- "    return 0;\n"
- "}\n"
- "int approx_equal(double a, double b) {\n"
- "    double e48 = 1.0 / (16777216.0 * 16777216.0);\n"
- "    double e44 = e48 * 16.0;\n"
- "    if (a == b)\n"
- "        return 1;\n"
- "    if (a == 0.0 || b == 0.0)\n"
- "        return 0;\n"
- "    double d = fabs(a - b);\n"
- "    if (!isfinite(d))\n"
- "        return 0;   // Nan or Inf involved\n"
- "    if (d > ((a = fabs(a)) * e44) || d > ((b = fabs(b)) * e44))\n"
- "        return 0;\n"
- "    if (is_representable_integer(d) && is_representable_integer(a) && is_representable_integer(b))\n"
- "        return 0;   // special case for representable integers.\n"
- "    return (d < a * e48 && d < b * e48);\n"
- "}\n"
- "double fsum_approx(double a, double b) {\n"
- "    if ( ((a < 0.0 && b > 0.0) || (b < 0.0 && a > 0.0))\n"
- "         && approx_equal( a, -b ) )\n"
- "        return 0.0;\n"
- "    return a + b;\n"
- "}\n"
- "double fsub_approx(double a, double b) {\n"
- "    if ( ((a < 0.0 && b < 0.0) || (a > 0.0 && b > 0.0)) && approx_equal( a, b ) )\n"
- "        return 0.0;\n"
- "    return a - b;\n"
- "}\n"
  ;
 
+#include <utility>
 #include <vector>
 #include <map>
 #include <iostream>
@@ -151,7 +73,7 @@ namespace {
 
 std::string linenumberify(const std::string& s)
 {
-    std::stringstream ss;
+    outputstream ss;
     int linenumber = 1;
     size_t start = 0;
     size_t newline;
@@ -177,62 +99,73 @@ bool AllStringsAreNull(const rtl_uString* const* pStringArray, size_t nLength)
     return true;
 }
 
-OUString LimitedString( const OUString& str )
+OUString LimitedString( std::u16string_view str )
 {
-    if( str.getLength() < 20 )
-        return "\"" + str + "\"";
+    if( str.size() < 20 )
+        return OUString::Concat("\"") + str + "\"";
     else
-        return OUString::Concat("\"") + str.subView( 0, 20 ) + "\"...";
+        return OUString::Concat("\"") + str.substr( 0, 20 ) + "\"...";
 }
 
+const int MAX_PEEK_ELEMENTS = 5;
 // Returns formatted contents of the data (possibly shortened), to be used in debug output.
-OUString DebugPeekData(const FormulaToken* ref, int doubleRefIndex = 0)
+std::string DebugPeekData(const FormulaToken* ref, int doubleRefIndex = 0)
 {
     if (ref->GetType() == formula::svSingleVectorRef)
     {
         const formula::SingleVectorRefToken* pSVR =
             static_cast<const formula::SingleVectorRefToken*>(ref);
-        OUStringBuffer buf = "SingleRef {";
-        for( size_t i = 0; i < std::min< size_t >( 4, pSVR->GetArrayLength()); ++i )
+        outputstream buf;
+        buf << "SingleRef {";
+        for( size_t i = 0; i < std::min< size_t >( MAX_PEEK_ELEMENTS, pSVR->GetArrayLength()); ++i )
         {
             if( i != 0 )
-                buf.append( "," );
-            if( pSVR->GetArray().mpNumericArray != nullptr )
-                buf.append( pSVR->GetArray().mpNumericArray[ i ] );
-            else if( pSVR->GetArray().mpStringArray != nullptr )
-                buf.append( LimitedString( OUString( pSVR->GetArray().mpStringArray[ i ] )));
+                buf << ",";
+            if( pSVR->GetArray().mpStringArray != nullptr
+                && pSVR->GetArray().mpStringArray[ i ] != nullptr )
+            {
+                buf << LimitedString( OUString( pSVR->GetArray().mpStringArray[ i ] ));
+            }
+            else if( pSVR->GetArray().mpNumericArray != nullptr )
+                buf << pSVR->GetArray().mpNumericArray[ i ];
         }
-        if( pSVR->GetArrayLength() > 4 )
-            buf.append( ",..." );
-        buf.append( "}" );
-        return buf.makeStringAndClear();
+        if( pSVR->GetArrayLength() > MAX_PEEK_ELEMENTS )
+            buf << ",...";
+        buf << "}";
+        return buf.str();
     }
     else if (ref->GetType() == formula::svDoubleVectorRef)
     {
         const formula::DoubleVectorRefToken* pDVR =
             static_cast<const formula::DoubleVectorRefToken*>(ref);
-        OUStringBuffer buf = "DoubleRef {";
-        for( size_t i = 0; i < std::min< size_t >( 4, pDVR->GetArrayLength()); ++i )
+        outputstream buf;
+        buf << "DoubleRef {";
+        for( size_t i = 0; i < std::min< size_t >( MAX_PEEK_ELEMENTS, pDVR->GetArrayLength()); ++i )
         {
             if( i != 0 )
-                buf.append( "," );
-            if( pDVR->GetArrays()[doubleRefIndex].mpNumericArray != nullptr )
-                buf.append( pDVR->GetArrays()[doubleRefIndex].mpNumericArray[ i ] );
-            else if( pDVR->GetArrays()[doubleRefIndex].mpStringArray != nullptr )
-                buf.append( LimitedString( OUString( pDVR->GetArrays()[doubleRefIndex].mpStringArray[ i ] )));
+                buf << ",";
+            if( pDVR->GetArrays()[doubleRefIndex].mpStringArray != nullptr
+                && pDVR->GetArrays()[doubleRefIndex].mpStringArray[ i ] != nullptr )
+            {
+                buf << LimitedString( OUString( pDVR->GetArrays()[doubleRefIndex].mpStringArray[ i ] ));
+            }
+            else if( pDVR->GetArrays()[doubleRefIndex].mpNumericArray != nullptr )
+                buf << pDVR->GetArrays()[doubleRefIndex].mpNumericArray[ i ];
         }
-        if( pDVR->GetArrayLength() > 4 )
-            buf.append( ",..." );
-        buf.append( "}" );
-        return buf.makeStringAndClear();
+        if( pDVR->GetArrayLength() > MAX_PEEK_ELEMENTS )
+            buf << ",...";
+        buf << "}";
+        return buf.str();
     }
     else if (ref->GetType() == formula::svString)
     {
-        return "String " + LimitedString( ref->GetString().getString());
+        outputstream buf;
+        buf << "String " << LimitedString( ref->GetString().getString());
+        return buf.str();
     }
     else if (ref->GetType() == formula::svDouble)
     {
-        return OUString::number(ref->GetDouble());
+        return preciseFloat(ref->GetDouble());
     }
     else
     {
@@ -241,19 +174,20 @@ OUString DebugPeekData(const FormulaToken* ref, int doubleRefIndex = 0)
 }
 
 // Returns formatted contents of a doubles buffer, to be used in debug output.
-OUString DebugPeekDoubles(const double* data, int size)
+std::string DebugPeekDoubles(const double* data, int size)
 {
-    OUStringBuffer buf = "{";
-    for( int i = 0; i < std::min( 4, size ); ++i )
+    outputstream buf;
+    buf << "{";
+    for( int i = 0; i < std::min( MAX_PEEK_ELEMENTS, size ); ++i )
     {
         if( i != 0 )
-            buf.append( "," );
-        buf.append( data[ i ] );
+            buf << ",";
+        buf << data[ i ];
     }
-    if( size > 4 )
-        buf.append( ",..." );
-    buf.append( "}" );
-    return buf.makeStringAndClear();
+    if( size > MAX_PEEK_ELEMENTS )
+        buf << ",...";
+    buf << "}";
+    return buf.str();
 }
 
 } // anonymous namespace
@@ -272,7 +206,21 @@ size_t VectorRef::Marshal( cl_kernel k, int argno, int, cl_program )
 
         SAL_INFO("sc.opencl", "SingleVectorRef len=" << pSVR->GetArrayLength() << " mpNumericArray=" << pSVR->GetArray().mpNumericArray << " (mpStringArray=" << pSVR->GetArray().mpStringArray << ")");
 
-        pHostBuffer = const_cast<double*>(pSVR->GetArray().mpNumericArray);
+        if( forceStringsToZero && pSVR->GetArray().mpStringArray != nullptr )
+        {
+            dataBuffer.resize( pSVR->GetArrayLength());
+            for( size_t i = 0; i < pSVR->GetArrayLength(); ++i )
+                if( pSVR->GetArray().mpStringArray[ i ] != nullptr )
+                    dataBuffer[ i ] = 0;
+                else
+                    dataBuffer[ i ] = pSVR->GetArray().mpNumericArray[ i ];
+            pHostBuffer = dataBuffer.data();
+            SAL_INFO("sc.opencl", "Forced strings to zero : " << DebugPeekDoubles( pHostBuffer, pSVR->GetArrayLength()));
+        }
+        else
+        {
+            pHostBuffer = const_cast<double*>(pSVR->GetArray().mpNumericArray);
+        }
         szHostBuffer = pSVR->GetArrayLength() * sizeof(double);
     }
     else if (ref->GetType() == formula::svDoubleVectorRef)
@@ -282,8 +230,21 @@ size_t VectorRef::Marshal( cl_kernel k, int argno, int, cl_program )
 
         SAL_INFO("sc.opencl", "DoubleVectorRef index=" << mnIndex << " len=" << pDVR->GetArrayLength() << " mpNumericArray=" << pDVR->GetArrays()[mnIndex].mpNumericArray << " (mpStringArray=" << pDVR->GetArrays()[mnIndex].mpStringArray << ")");
 
-        pHostBuffer = const_cast<double*>(
-            pDVR->GetArrays()[mnIndex].mpNumericArray);
+        if( forceStringsToZero && pDVR->GetArrays()[mnIndex].mpStringArray != nullptr )
+        {
+            dataBuffer.resize( pDVR->GetArrayLength());
+            for( size_t i = 0; i < pDVR->GetArrayLength(); ++i )
+                if( pDVR->GetArrays()[mnIndex].mpStringArray[ i ] != nullptr )
+                    dataBuffer[ i ] = 0;
+                else
+                    dataBuffer[ i ] = pDVR->GetArrays()[mnIndex].mpNumericArray[ i ];
+            pHostBuffer = dataBuffer.data();
+            SAL_INFO("sc.opencl", "Forced strings to zero : " << DebugPeekDoubles( pHostBuffer, pDVR->GetArrayLength()));
+        }
+        else
+        {
+            pHostBuffer = const_cast<double*>(pDVR->GetArrays()[mnIndex].mpNumericArray);
+        }
         szHostBuffer = pDVR->GetArrayLength() * sizeof(double);
     }
     else
@@ -338,123 +299,7 @@ size_t VectorRef::Marshal( cl_kernel k, int argno, int, cl_program )
     return 1;
 }
 
-/// Arguments that are actually compile-time constant string
-/// Currently, only the hash is passed.
-/// TBD(IJSUNG): pass also length and the actual string if there is a
-/// hash function collision
-
-/// FIXME: This idea of passing of hashes of uppercased strings into OpenCL code is fairly potent
-/// crack. It is hopefully not used at all any more, but noticing that there are string arguments
-/// automatically disables use of OpenCL for a formula group. If at some point there are resources
-/// to drain the OpenCL swamp, this should go away.
-
 namespace {
-
-class ConstStringArgument : public DynamicKernelArgument
-{
-public:
-    ConstStringArgument( const ScCalcConfig& config, const std::string& s,
-        const FormulaTreeNodeRef& ft ) :
-        DynamicKernelArgument(config, s, ft) { }
-    /// Generate declaration
-    virtual void GenDecl( std::stringstream& ss ) const override
-    {
-        ss << "unsigned " << mSymName;
-    }
-    virtual void GenDeclRef( std::stringstream& ss ) const override
-    {
-        ss << GenSlidingWindowDeclRef();
-    }
-    virtual void GenSlidingWindowDecl( std::stringstream& ss ) const override
-    {
-        GenDecl(ss);
-    }
-    virtual std::string GenSlidingWindowDeclRef( bool = false ) const override
-    {
-        std::stringstream ss;
-        if (GetFormulaToken()->GetType() != formula::svString)
-            throw Unhandled(__FILE__, __LINE__);
-        FormulaToken* Tok = GetFormulaToken();
-        ss << Tok->GetString().getString().toAsciiUpperCase().hashCode() << "U";
-        return ss.str();
-    }
-    virtual size_t GetWindowSize() const override
-    {
-        return 1;
-    }
-    /// Pass the 32-bit hash of the string to the kernel
-    virtual size_t Marshal( cl_kernel k, int argno, int, cl_program ) override
-    {
-        OpenCLZone zone;
-        FormulaToken* ref = mFormulaTree->GetFormulaToken();
-        cl_uint hashCode = 0;
-        if (ref->GetType() != formula::svString)
-        {
-            throw Unhandled(__FILE__, __LINE__);
-        }
-
-        const OUString s = ref->GetString().getString().toAsciiUpperCase();
-        hashCode = s.hashCode();
-
-        // Pass the scalar result back to the rest of the formula kernel
-        SAL_INFO("sc.opencl", "Kernel " << k << " arg " << argno << ": cl_uint: " << hashCode << "(" << DebugPeekData(ref) << ")" );
-        cl_int err = clSetKernelArg(k, argno, sizeof(cl_uint), static_cast<void*>(&hashCode));
-        if (CL_SUCCESS != err)
-            throw OpenCLError("clSetKernelArg", err, __FILE__, __LINE__);
-        return 1;
-    }
-};
-
-/// Arguments that are actually compile-time constants
-class DynamicKernelConstantArgument : public DynamicKernelArgument
-{
-public:
-    DynamicKernelConstantArgument( const ScCalcConfig& config, const std::string& s,
-        const FormulaTreeNodeRef& ft ) :
-        DynamicKernelArgument(config, s, ft) { }
-    /// Generate declaration
-    virtual void GenDecl( std::stringstream& ss ) const override
-    {
-        ss << "double " << mSymName;
-    }
-    virtual void GenDeclRef( std::stringstream& ss ) const override
-    {
-        ss << mSymName;
-    }
-    virtual void GenSlidingWindowDecl( std::stringstream& ss ) const override
-    {
-        GenDecl(ss);
-    }
-    virtual std::string GenSlidingWindowDeclRef( bool = false ) const override
-    {
-        if (GetFormulaToken()->GetType() != formula::svDouble)
-            throw Unhandled(__FILE__, __LINE__);
-        return mSymName;
-    }
-    virtual size_t GetWindowSize() const override
-    {
-        return 1;
-    }
-    double GetDouble() const
-    {
-        FormulaToken* Tok = GetFormulaToken();
-        if (Tok->GetType() != formula::svDouble)
-            throw Unhandled(__FILE__, __LINE__);
-        return Tok->GetDouble();
-    }
-    /// Create buffer and pass the buffer to a given kernel
-    virtual size_t Marshal( cl_kernel k, int argno, int, cl_program ) override
-    {
-        OpenCLZone zone;
-        double tmp = GetDouble();
-        // Pass the scalar result back to the rest of the formula kernel
-        SAL_INFO("sc.opencl", "Kernel " << k << " arg " << argno << ": double: " << tmp);
-        cl_int err = clSetKernelArg(k, argno, sizeof(double), static_cast<void*>(&tmp));
-        if (CL_SUCCESS != err)
-            throw OpenCLError("clSetKernelArg", err, __FILE__, __LINE__);
-        return 1;
-    }
-};
 
 class DynamicKernelPiArgument : public DynamicKernelArgument
 {
@@ -463,15 +308,15 @@ public:
         const FormulaTreeNodeRef& ft ) :
         DynamicKernelArgument(config, s, ft) { }
     /// Generate declaration
-    virtual void GenDecl( std::stringstream& ss ) const override
+    virtual void GenDecl( outputstream& ss ) const override
     {
         ss << "double " << mSymName;
     }
-    virtual void GenDeclRef( std::stringstream& ss ) const override
+    virtual void GenDeclRef( outputstream& ss ) const override
     {
-        ss << "3.14159265358979";
+        ss << "M_PI";
     }
-    virtual void GenSlidingWindowDecl( std::stringstream& ss ) const override
+    virtual void GenSlidingWindowDecl( outputstream& ss ) const override
     {
         GenDecl(ss);
     }
@@ -489,7 +334,7 @@ public:
         OpenCLZone zone;
         double tmp = 0.0;
         // Pass the scalar result back to the rest of the formula kernel
-        SAL_INFO("sc.opencl", "Kernel " << k << " arg " << argno << ": double: " << tmp << " (PI)");
+        SAL_INFO("sc.opencl", "Kernel " << k << " arg " << argno << ": double: " << preciseFloat( tmp ) << " (PI)");
         cl_int err = clSetKernelArg(k, argno, sizeof(double), static_cast<void*>(&tmp));
         if (CL_SUCCESS != err)
             throw OpenCLError("clSetKernelArg", err, __FILE__, __LINE__);
@@ -504,15 +349,15 @@ public:
         const FormulaTreeNodeRef& ft ) :
         DynamicKernelArgument(config, s, ft) { }
     /// Generate declaration
-    virtual void GenDecl( std::stringstream& ss ) const override
+    virtual void GenDecl( outputstream& ss ) const override
     {
         ss << "double " << mSymName;
     }
-    virtual void GenDeclRef( std::stringstream& ss ) const override
+    virtual void GenDeclRef( outputstream& ss ) const override
     {
         ss << mSymName;
     }
-    virtual void GenSlidingWindowDecl( std::stringstream& ss ) const override
+    virtual void GenSlidingWindowDecl( outputstream& ss ) const override
     {
         ss << "int " << mSymName;
     }
@@ -520,7 +365,7 @@ public:
     {
         return mSymName + "_Random(" + mSymName + ")";
     }
-    virtual void GenSlidingWindowFunction( std::stringstream& ss ) override
+    virtual void GenSlidingWindowFunction( outputstream& ss ) override
     {
         // This string is from the pi_opencl_kernel.i file as
         // generated when building the Random123 examples. Unused
@@ -863,30 +708,65 @@ threefry2x32 (threefry2x32_ctr_t in, threefry2x32_key_t k)\n\
     }
 };
 
-/// A vector of strings
-class DynamicKernelStringArgument : public VectorRef
+// Arguments that are actually compile-time constant string
+class ConstStringArgument : public DynamicKernelArgument
 {
 public:
-    DynamicKernelStringArgument( const ScCalcConfig& config, const std::string& s,
-        const FormulaTreeNodeRef& ft, int index = 0 ) :
-        VectorRef(config, s, ft, index) { }
-
-    virtual void GenSlidingWindowFunction( std::stringstream& ) override { }
+    ConstStringArgument( const ScCalcConfig& config, const std::string& s,
+        const FormulaTreeNodeRef& ft ) :
+        DynamicKernelArgument(config, s, ft) { }
     /// Generate declaration
-    virtual void GenDecl( std::stringstream& ss ) const override
+    virtual void GenDecl( outputstream& ss ) const override
     {
-        ss << "__global unsigned int *" << mSymName;
+        ss << "double " << mSymName;
     }
-    virtual void GenSlidingWindowDecl( std::stringstream& ss ) const override
+    virtual void GenDeclRef( outputstream& ss ) const override
     {
-        DynamicKernelStringArgument::GenDecl(ss);
+        ss << GenSlidingWindowDeclRef();
     }
-    virtual size_t Marshal( cl_kernel, int, int, cl_program ) override;
+    virtual void GenSlidingWindowDecl( outputstream& ss ) const override
+    {
+        GenDecl(ss);
+    }
+    virtual std::string GenSlidingWindowDeclRef( bool = false ) const override
+    {
+        outputstream ss;
+        if (GetFormulaToken()->GetType() != formula::svString)
+            throw Unhandled(__FILE__, __LINE__);
+        FormulaToken* Tok = GetFormulaToken();
+        ss << GetStringId(Tok->GetString().getData());
+        return ss.str();
+    }
+    virtual std::string GenIsString( bool = false ) const override
+    {
+        return "true";
+    }
+    virtual size_t GetWindowSize() const override
+    {
+        return 1;
+    }
+    virtual size_t Marshal( cl_kernel k, int argno, int, cl_program ) override
+    {
+        FormulaToken* ref = mFormulaTree->GetFormulaToken();
+        if (ref->GetType() != formula::svString)
+        {
+            throw Unhandled(__FILE__, __LINE__);
+        }
+        cl_double stringId = GetStringId(ref->GetString().getData());
+
+        // Pass the scalar result back to the rest of the formula kernel
+        SAL_INFO("sc.opencl", "Kernel " << k << " arg " << argno
+            << ": stringId: " << stringId << " (" << DebugPeekData(ref) << ")" );
+        cl_int err = clSetKernelArg(k, argno, sizeof(cl_double), static_cast<void*>(&stringId));
+        if (CL_SUCCESS != err)
+            throw OpenCLError("clSetKernelArg", err, __FILE__, __LINE__);
+        return 1;
+    }
 };
 
-}
+} // namespace
 
-/// Marshal a string vector reference
+// Marshal a string vector reference
 size_t DynamicKernelStringArgument::Marshal( cl_kernel k, int argno, int, cl_program )
 {
     OpenCLZone zone;
@@ -911,12 +791,12 @@ size_t DynamicKernelStringArgument::Marshal( cl_kernel k, int argno, int, cl_pro
         nStrings = pDVR->GetArrayLength();
         vRef = pDVR->GetArrays()[mnIndex];
     }
-    size_t szHostBuffer = nStrings * sizeof(cl_int);
-    cl_uint* pHashBuffer = nullptr;
+    size_t szHostBuffer = nStrings * sizeof(cl_double);
+    cl_double* pStringIdsBuffer = nullptr;
 
     if (vRef.mpStringArray != nullptr)
     {
-        // Marshal strings. Right now we pass hashes of these string
+        // Marshal strings. See GetStringId().
         mpClmem = clCreateBuffer(kEnv.mpkContext,
             cl_mem_flags(CL_MEM_READ_ONLY) | CL_MEM_ALLOC_HOST_PTR,
             szHostBuffer, nullptr, &err);
@@ -924,7 +804,7 @@ size_t DynamicKernelStringArgument::Marshal( cl_kernel k, int argno, int, cl_pro
             throw OpenCLError("clCreateBuffer", err, __FILE__, __LINE__);
         SAL_INFO("sc.opencl", "Created buffer " << mpClmem << " size " << szHostBuffer);
 
-        pHashBuffer = static_cast<cl_uint*>(clEnqueueMapBuffer(
+        pStringIdsBuffer = static_cast<cl_double*>(clEnqueueMapBuffer(
             kEnv.mpkCmdQueue, mpClmem, CL_TRUE, CL_MAP_WRITE, 0,
             szHostBuffer, 0, nullptr, nullptr, &err));
         if (CL_SUCCESS != err)
@@ -933,20 +813,15 @@ size_t DynamicKernelStringArgument::Marshal( cl_kernel k, int argno, int, cl_pro
         for (size_t i = 0; i < nStrings; i++)
         {
             if (vRef.mpStringArray[i])
-            {
-                const OUString tmp(vRef.mpStringArray[i]);
-                pHashBuffer[i] = tmp.hashCode();
-            }
+                pStringIdsBuffer[i] = GetStringId(vRef.mpStringArray[i]);
             else
-            {
-                pHashBuffer[i] = 0;
-            }
+                rtl::math::setNan(&pStringIdsBuffer[i]);
         }
     }
     else
     {
         if (nStrings == 0)
-            szHostBuffer = sizeof(cl_int); // a dummy small value
+            szHostBuffer = sizeof(cl_double); // a dummy small value
                                            // Marshal as a buffer of NANs
         mpClmem = clCreateBuffer(kEnv.mpkContext,
             cl_mem_flags(CL_MEM_READ_ONLY) | CL_MEM_ALLOC_HOST_PTR,
@@ -955,25 +830,52 @@ size_t DynamicKernelStringArgument::Marshal( cl_kernel k, int argno, int, cl_pro
             throw OpenCLError("clCreateBuffer", err, __FILE__, __LINE__);
         SAL_INFO("sc.opencl", "Created buffer " << mpClmem << " size " << szHostBuffer);
 
-        pHashBuffer = static_cast<cl_uint*>(clEnqueueMapBuffer(
+        pStringIdsBuffer = static_cast<cl_double*>(clEnqueueMapBuffer(
             kEnv.mpkCmdQueue, mpClmem, CL_TRUE, CL_MAP_WRITE, 0,
             szHostBuffer, 0, nullptr, nullptr, &err));
         if (CL_SUCCESS != err)
             throw OpenCLError("clEnqueueMapBuffer", err, __FILE__, __LINE__);
 
-        for (size_t i = 0; i < szHostBuffer / sizeof(cl_int); i++)
-            pHashBuffer[i] = 0;
+        for (size_t i = 0; i < szHostBuffer / sizeof(cl_double); i++)
+            rtl::math::setNan(&pStringIdsBuffer[i]);
     }
     err = clEnqueueUnmapMemObject(kEnv.mpkCmdQueue, mpClmem,
-        pHashBuffer, 0, nullptr, nullptr);
+        pStringIdsBuffer, 0, nullptr, nullptr);
     if (CL_SUCCESS != err)
         throw OpenCLError("clEnqueueUnmapMemObject", err, __FILE__, __LINE__);
 
-    SAL_INFO("sc.opencl", "Kernel " << k << " arg " << argno << ": cl_mem: " << mpClmem << " (" << DebugPeekData(ref,mnIndex) << ")");
+    SAL_INFO("sc.opencl", "Kernel " << k << " arg " << argno << ": cl_mem: " << mpClmem
+        << " (stringIds: " << DebugPeekDoubles(pStringIdsBuffer, nStrings) << " "
+        << DebugPeekData(ref,mnIndex) << ")");
     err = clSetKernelArg(k, argno, sizeof(cl_mem), static_cast<void*>(&mpClmem));
     if (CL_SUCCESS != err)
         throw OpenCLError("clSetKernelArg", err, __FILE__, __LINE__);
     return 1;
+}
+
+std::string DynamicKernelStringArgument::GenIsString( bool nested ) const
+{
+    if( nested )
+        return "!isnan(" + mSymName + "[gid0])";
+    FormulaToken* ref = mFormulaTree->GetFormulaToken();
+    size_t nStrings = 0;
+    if (ref->GetType() == formula::svSingleVectorRef)
+    {
+        const formula::SingleVectorRefToken* pSVR =
+            static_cast<const formula::SingleVectorRefToken*>(ref);
+        nStrings = pSVR->GetArrayLength();
+    }
+    else if (ref->GetType() == formula::svDoubleVectorRef)
+    {
+        const formula::DoubleVectorRefToken* pDVR =
+            static_cast<const formula::DoubleVectorRefToken*>(ref);
+        nStrings = pDVR->GetArrayLength();
+    }
+    else
+        return "!isnan(" + mSymName + "[gid0])";
+    outputstream ss;
+    ss << "(gid0 < " << nStrings << "? !isnan(" << mSymName << "[gid0]):NAN)";
+    return ss.str();
 }
 
 namespace {
@@ -985,21 +887,21 @@ public:
     DynamicKernelMixedArgument( const ScCalcConfig& config, const std::string& s,
         const FormulaTreeNodeRef& ft ) :
         VectorRef(config, s, ft), mStringArgument(config, s + "s", ft) { }
-    virtual void GenSlidingWindowDecl( std::stringstream& ss ) const override
+    virtual void GenSlidingWindowDecl( outputstream& ss ) const override
     {
         VectorRef::GenSlidingWindowDecl(ss);
         ss << ", ";
         mStringArgument.GenSlidingWindowDecl(ss);
     }
-    virtual void GenSlidingWindowFunction( std::stringstream& ) override { }
+    virtual void GenSlidingWindowFunction( outputstream& ) override { }
     /// Generate declaration
-    virtual void GenDecl( std::stringstream& ss ) const override
+    virtual void GenDecl( outputstream& ss ) const override
     {
         VectorRef::GenDecl(ss);
         ss << ", ";
         mStringArgument.GenDecl(ss);
     }
-    virtual void GenDeclRef( std::stringstream& ss ) const override
+    virtual void GenDeclRef( outputstream& ss ) const override
     {
         VectorRef::GenDeclRef(ss);
         ss << ",";
@@ -1007,24 +909,28 @@ public:
     }
     virtual std::string GenSlidingWindowDeclRef( bool nested ) const override
     {
-        std::stringstream ss;
-        ss << "(!isnan(" << VectorRef::GenSlidingWindowDeclRef();
-        ss << ")?" << VectorRef::GenSlidingWindowDeclRef();
+        outputstream ss;
+        ss << "(!isnan(" << VectorRef::GenSlidingWindowDeclRef(nested);
+        ss << ")?" << VectorRef::GenSlidingWindowDeclRef(nested);
         ss << ":" << mStringArgument.GenSlidingWindowDeclRef(nested);
         ss << ")";
         return ss.str();
     }
-    virtual std::string GenDoubleSlidingWindowDeclRef( bool = false ) const override
+    virtual std::string GenDoubleSlidingWindowDeclRef( bool nested = false ) const override
     {
-        std::stringstream ss;
-        ss << VectorRef::GenSlidingWindowDeclRef();
+        outputstream ss;
+        ss << VectorRef::GenSlidingWindowDeclRef( nested );
         return ss.str();
     }
-    virtual std::string GenStringSlidingWindowDeclRef( bool = false ) const override
+    virtual std::string GenStringSlidingWindowDeclRef( bool nested = false ) const override
     {
-        std::stringstream ss;
-        ss << mStringArgument.GenSlidingWindowDeclRef();
+        outputstream ss;
+        ss << mStringArgument.GenSlidingWindowDeclRef( nested );
         return ss.str();
+    }
+    virtual std::string GenIsString( bool nested = false ) const override
+    {
+        return mStringArgument.GenIsString( nested );
     }
     virtual size_t Marshal( cl_kernel k, int argno, int vw, cl_program p ) override
     {
@@ -1037,191 +943,175 @@ protected:
     DynamicKernelStringArgument mStringArgument;
 };
 
-/// Handling a Double Vector that is used as a sliding window input
-/// to either a sliding window average or sum-of-products
-/// Generate a sequential loop for reductions
+}
+
 template<class Base>
-class DynamicKernelSlidingArgument : public Base
+DynamicKernelSlidingArgument<Base>::DynamicKernelSlidingArgument(
+    const ScCalcConfig& config, const std::string& s, const FormulaTreeNodeRef& ft,
+    std::shared_ptr<SlidingFunctionBase> CodeGen, int index)
+    : Base(config, s, ft, index)
+    , mpCodeGen(std::move(CodeGen))
 {
-public:
-    DynamicKernelSlidingArgument(const ScCalcConfig& config, const std::string& s,
-                                 const FormulaTreeNodeRef& ft,
-                                 const std::shared_ptr<SlidingFunctionBase>& CodeGen, int index)
-        : Base(config, s, ft, index)
-        , mpCodeGen(CodeGen)
+    FormulaToken* t = ft->GetFormulaToken();
+    if (t->GetType() != formula::svDoubleVectorRef)
+        throw Unhandled(__FILE__, __LINE__);
+    mpDVR = static_cast<const formula::DoubleVectorRefToken*>(t);
+    bIsStartFixed = mpDVR->IsStartFixed();
+    bIsEndFixed = mpDVR->IsEndFixed();
+}
+
+template<class Base>
+bool DynamicKernelSlidingArgument<Base>::NeedParallelReduction() const
+{
+    assert(dynamic_cast<OpSumIfs*>(mpCodeGen.get()));
+    return GetWindowSize() > 100 &&
+           ((GetStartFixed() && GetEndFixed()) ||
+        (!GetStartFixed() && !GetEndFixed()));
+}
+
+template<class Base>
+std::string DynamicKernelSlidingArgument<Base>::GenSlidingWindowDeclRef( bool nested ) const
+{
+    size_t nArrayLength = mpDVR->GetArrayLength();
+    outputstream ss;
+    if (!bIsStartFixed && !bIsEndFixed)
     {
-        FormulaToken* t = ft->GetFormulaToken();
-        if (t->GetType() != formula::svDoubleVectorRef)
-            throw Unhandled(__FILE__, __LINE__);
-        mpDVR = static_cast<const formula::DoubleVectorRefToken*>(t);
-        bIsStartFixed = mpDVR->IsStartFixed();
-        bIsEndFixed = mpDVR->IsEndFixed();
+        if (!nested)
+            ss << "((i+gid0) <" << nArrayLength << "?";
+        ss << Base::GetName() << "[i + gid0]";
+        if (!nested)
+            ss << ":NAN)";
     }
-
-    // Should only be called by SumIfs. Yikes!
-    virtual bool NeedParallelReduction() const
+    else
     {
-        assert(dynamic_cast<OpSumIfs*>(mpCodeGen.get()));
-        return GetWindowSize() > 100 &&
-               ((GetStartFixed() && GetEndFixed()) ||
-            (!GetStartFixed() && !GetEndFixed()));
+        if (!nested)
+            ss << "(i <" << nArrayLength << "?";
+        ss << Base::GetName() << "[i]";
+        if (!nested)
+            ss << ":NAN)";
     }
+    return ss.str();
+}
 
-    virtual void GenSlidingWindowFunction( std::stringstream& ) { }
+template<class Base>
+size_t DynamicKernelSlidingArgument<Base>::GenReductionLoopHeader( outputstream& ss, bool& needBody )
+{
+    assert(mpDVR);
+    size_t nCurWindowSize = mpDVR->GetRefRowSize();
 
-    std::string GenSlidingWindowDeclRef( bool nested = false ) const
+    if (!mpDVR->IsStartFixed() && mpDVR->IsEndFixed())
     {
-        size_t nArrayLength = mpDVR->GetArrayLength();
-        std::stringstream ss;
-        if (!bIsStartFixed && !bIsEndFixed)
+        ss << "for (int i = ";
+        ss << "gid0; i < " << mpDVR->GetArrayLength();
+        ss << " && i < " << nCurWindowSize  << "; i++){\n\t\t";
+        needBody = true;
+        return nCurWindowSize;
+    }
+    else if (mpDVR->IsStartFixed() && !mpDVR->IsEndFixed())
+    {
+        ss << "for (int i = ";
+        ss << "0; i < " << mpDVR->GetArrayLength();
+        ss << " && i < gid0+" << nCurWindowSize << "; i++){\n\t\t";
+        needBody = true;
+        return nCurWindowSize;
+    }
+    else if (!mpDVR->IsStartFixed() && !mpDVR->IsEndFixed())
+    {
+        ss << "tmpBottom = " << mpCodeGen->GetBottom() << ";\n\t";
+        ss << "{int i;\n\t";
+        outputstream temp1, temp2;
+        int outLoopSize = UNROLLING_FACTOR;
+        if (nCurWindowSize / outLoopSize != 0)
         {
-            if (nested)
-                ss << "((i+gid0) <" << nArrayLength << "?";
-            ss << Base::GetName() << "[i + gid0]";
-            if (nested)
-                ss << ":NAN)";
+            ss << "for(int outLoop=0; outLoop<" << nCurWindowSize / outLoopSize << "; outLoop++){\n\t";
+            for (int count = 0; count < outLoopSize; count++)
+            {
+                ss << "i = outLoop*" << outLoopSize << "+" << count << ";\n\t";
+                if (count == 0)
+                {
+                    temp1 << "if(i + gid0 < " << mpDVR->GetArrayLength();
+                    temp1 << "){\n\t\t";
+                    temp1 << "tmp = legalize(";
+                    temp1 <<  mpCodeGen->Gen2(GenSlidingWindowDeclRef(), "tmp");
+                    temp1 << ", tmp);\n\t\t\t";
+                    temp1 << "}\n\t";
+                }
+                ss << temp1.str();
+            }
+            ss << "}\n\t";
         }
-        else
+        // The residual of mod outLoopSize
+        for (size_t count = nCurWindowSize / outLoopSize * outLoopSize; count < nCurWindowSize; count++)
         {
-            if (nested)
-                ss << "(i <" << nArrayLength << "?";
-            ss << Base::GetName() << "[i]";
-            if (nested)
-                ss << ":NAN)";
+            ss << "i = " << count << ";\n\t";
+            if (count == nCurWindowSize / outLoopSize * outLoopSize)
+            {
+                temp2 << "if(i + gid0 < " << mpDVR->GetArrayLength();
+                temp2 << "){\n\t\t";
+                temp2 << "tmp = legalize(";
+                temp2 << mpCodeGen->Gen2(GenSlidingWindowDeclRef(), "tmp");
+                temp2 << ", tmp);\n\t\t\t";
+                temp2 << "}\n\t";
+            }
+            ss << temp2.str();
         }
-        return ss.str();
+        ss << "}\n";
+        needBody = false;
+        return nCurWindowSize;
     }
-    /// Controls how the elements in the DoubleVectorRef are traversed
-    size_t GenReductionLoopHeader(
-        std::stringstream& ss, bool& needBody )
+    // (mpDVR->IsStartFixed() && mpDVR->IsEndFixed())
+    else
     {
-        assert(mpDVR);
-        size_t nCurWindowSize = mpDVR->GetRefRowSize();
-
+        ss << "\n\t";
+        ss << "tmpBottom = " << mpCodeGen->GetBottom() << ";\n\t";
+        ss << "{int i;\n\t";
+        outputstream temp1, temp2;
+        int outLoopSize = UNROLLING_FACTOR;
+        if (nCurWindowSize / outLoopSize != 0)
         {
-            if (!mpDVR->IsStartFixed() && mpDVR->IsEndFixed())
+            ss << "for(int outLoop=0; outLoop<" << nCurWindowSize / outLoopSize << "; outLoop++){\n\t";
+            for (int count = 0; count < outLoopSize; count++)
             {
-                ss << "for (int i = ";
-                ss << "gid0; i < " << mpDVR->GetArrayLength();
-                ss << " && i < " << nCurWindowSize  << "; i++){\n\t\t";
-                needBody = true;
-                return nCurWindowSize;
-            }
-            else if (mpDVR->IsStartFixed() && !mpDVR->IsEndFixed())
-            {
-                ss << "for (int i = ";
-                ss << "0; i < " << mpDVR->GetArrayLength();
-                ss << " && i < gid0+" << nCurWindowSize << "; i++){\n\t\t";
-                needBody = true;
-                return nCurWindowSize;
-            }
-            else if (!mpDVR->IsStartFixed() && !mpDVR->IsEndFixed())
-            {
-                ss << "tmpBottom = " << mpCodeGen->GetBottom() << ";\n\t";
-                ss << "{int i;\n\t";
-                std::stringstream temp1, temp2;
-                int outLoopSize = UNROLLING_FACTOR;
-                if (nCurWindowSize / outLoopSize != 0)
+                ss << "i = outLoop*" << outLoopSize << "+" << count << ";\n\t";
+                if (count == 0)
                 {
-                    ss << "for(int outLoop=0; outLoop<" << nCurWindowSize / outLoopSize << "; outLoop++){\n\t";
-                    for (int count = 0; count < outLoopSize; count++)
-                    {
-                        ss << "i = outLoop*" << outLoopSize << "+" << count << ";\n\t";
-                        if (count == 0)
-                        {
-                            temp1 << "if(i + gid0 < " << mpDVR->GetArrayLength();
-                            temp1 << "){\n\t\t";
-                            temp1 << "tmp = legalize(";
-                            temp1 <<  mpCodeGen->Gen2(GenSlidingWindowDeclRef(), "tmp");
-                            temp1 << ", tmp);\n\t\t\t";
-                            temp1 << "}\n\t";
-                        }
-                        ss << temp1.str();
-                    }
-                    ss << "}\n\t";
+                    temp1 << "if(i < " << mpDVR->GetArrayLength();
+                    temp1 << "){\n\t\t";
+                    temp1 << "tmp = legalize(";
+                    temp1 << mpCodeGen->Gen2(GenSlidingWindowDeclRef(), "tmp");
+                    temp1 << ", tmp);\n\t\t\t";
+                    temp1 << "}\n\t";
                 }
-                // The residual of mod outLoopSize
-                for (size_t count = nCurWindowSize / outLoopSize * outLoopSize; count < nCurWindowSize; count++)
-                {
-                    ss << "i = " << count << ";\n\t";
-                    if (count == nCurWindowSize / outLoopSize * outLoopSize)
-                    {
-                        temp2 << "if(i + gid0 < " << mpDVR->GetArrayLength();
-                        temp2 << "){\n\t\t";
-                        temp2 << "tmp = legalize(";
-                        temp2 << mpCodeGen->Gen2(GenSlidingWindowDeclRef(), "tmp");
-                        temp2 << ", tmp);\n\t\t\t";
-                        temp2 << "}\n\t";
-                    }
-                    ss << temp2.str();
-                }
-                ss << "}\n";
-                needBody = false;
-                return nCurWindowSize;
+                ss << temp1.str();
             }
-            // (mpDVR->IsStartFixed() && mpDVR->IsEndFixed())
-            else
-            {
-                ss << "\n\t";
-                ss << "tmpBottom = " << mpCodeGen->GetBottom() << ";\n\t";
-                ss << "{int i;\n\t";
-                std::stringstream temp1, temp2;
-                int outLoopSize = UNROLLING_FACTOR;
-                if (nCurWindowSize / outLoopSize != 0)
-                {
-                    ss << "for(int outLoop=0; outLoop<" << nCurWindowSize / outLoopSize << "; outLoop++){\n\t";
-                    for (int count = 0; count < outLoopSize; count++)
-                    {
-                        ss << "i = outLoop*" << outLoopSize << "+" << count << ";\n\t";
-                        if (count == 0)
-                        {
-                            temp1 << "if(i < " << mpDVR->GetArrayLength();
-                            temp1 << "){\n\t\t";
-                            temp1 << "tmp = legalize(";
-                            temp1 << mpCodeGen->Gen2(GenSlidingWindowDeclRef(), "tmp");
-                            temp1 << ", tmp);\n\t\t\t";
-                            temp1 << "}\n\t";
-                        }
-                        ss << temp1.str();
-                    }
-                    ss << "}\n\t";
-                }
-                // The residual of mod outLoopSize
-                for (size_t count = nCurWindowSize / outLoopSize * outLoopSize; count < nCurWindowSize; count++)
-                {
-                    ss << "i = " << count << ";\n\t";
-                    if (count == nCurWindowSize / outLoopSize * outLoopSize)
-                    {
-                        temp2 << "if(i < " << mpDVR->GetArrayLength();
-                        temp2 << "){\n\t\t";
-                        temp2 << "tmp = legalize(";
-                        temp2 << mpCodeGen->Gen2(GenSlidingWindowDeclRef(), "tmp");
-                        temp2 << ", tmp);\n\t\t\t";
-                        temp2 << "}\n\t";
-                    }
-                    ss << temp2.str();
-                }
-                ss << "}\n";
-                needBody = false;
-                return nCurWindowSize;
-            }
+            ss << "}\n\t";
         }
+        // The residual of mod outLoopSize
+        for (size_t count = nCurWindowSize / outLoopSize * outLoopSize; count < nCurWindowSize; count++)
+        {
+            ss << "i = " << count << ";\n\t";
+            if (count == nCurWindowSize / outLoopSize * outLoopSize)
+            {
+                temp2 << "if(i < " << mpDVR->GetArrayLength();
+                temp2 << "){\n\t\t";
+                temp2 << "tmp = legalize(";
+                temp2 << mpCodeGen->Gen2(GenSlidingWindowDeclRef(), "tmp");
+                temp2 << ", tmp);\n\t\t\t";
+                temp2 << "}\n\t";
+            }
+            ss << temp2.str();
+        }
+        ss << "}\n";
+        needBody = false;
+        return nCurWindowSize;
     }
+}
 
-    size_t GetArrayLength() const { return mpDVR->GetArrayLength(); }
+template class DynamicKernelSlidingArgument<VectorRef>;
+template class DynamicKernelSlidingArgument<VectorRefStringsToZero>;
+template class DynamicKernelSlidingArgument<DynamicKernelStringArgument>;
 
-    size_t GetWindowSize() const { return mpDVR->GetRefRowSize(); }
-
-    bool GetStartFixed() const { return bIsStartFixed; }
-
-    bool GetEndFixed() const { return bIsEndFixed; }
-
-protected:
-    bool bIsStartFixed, bIsEndFixed;
-    const formula::DoubleVectorRefToken* mpDVR;
-    // from parent nodes
-    std::shared_ptr<SlidingFunctionBase> mpCodeGen;
-};
+namespace {
 
 /// A mixed string/numeric vector
 class DynamicKernelMixedSlidingArgument : public VectorRef
@@ -1233,21 +1123,21 @@ public:
         VectorRef(config, s, ft),
         mDoubleArgument(mCalcConfig, s, ft, CodeGen, index),
         mStringArgument(mCalcConfig, s + "s", ft, CodeGen, index) { }
-    virtual void GenSlidingWindowDecl( std::stringstream& ss ) const override
+    virtual void GenSlidingWindowDecl( outputstream& ss ) const override
     {
         mDoubleArgument.GenSlidingWindowDecl(ss);
         ss << ", ";
         mStringArgument.GenSlidingWindowDecl(ss);
     }
-    virtual void GenSlidingWindowFunction( std::stringstream& ) override { }
+    virtual void GenSlidingWindowFunction( outputstream& ) override { }
     /// Generate declaration
-    virtual void GenDecl( std::stringstream& ss ) const override
+    virtual void GenDecl( outputstream& ss ) const override
     {
         mDoubleArgument.GenDecl(ss);
         ss << ", ";
         mStringArgument.GenDecl(ss);
     }
-    virtual void GenDeclRef( std::stringstream& ss ) const override
+    virtual void GenDeclRef( outputstream& ss ) const override
     {
         mDoubleArgument.GenDeclRef(ss);
         ss << ",";
@@ -1255,22 +1145,22 @@ public:
     }
     virtual std::string GenSlidingWindowDeclRef( bool nested ) const override
     {
-        std::stringstream ss;
-        ss << "(!isnan(" << mDoubleArgument.GenSlidingWindowDeclRef();
-        ss << ")?" << mDoubleArgument.GenSlidingWindowDeclRef();
+        outputstream ss;
+        ss << "(!isnan(" << mDoubleArgument.GenSlidingWindowDeclRef(nested);
+        ss << ")?" << mDoubleArgument.GenSlidingWindowDeclRef(nested);
         ss << ":" << mStringArgument.GenSlidingWindowDeclRef(nested);
         ss << ")";
         return ss.str();
     }
     virtual std::string GenDoubleSlidingWindowDeclRef( bool = false ) const override
     {
-        std::stringstream ss;
+        outputstream ss;
         ss << mDoubleArgument.GenSlidingWindowDeclRef();
         return ss.str();
     }
     virtual std::string GenStringSlidingWindowDeclRef( bool = false ) const override
     {
-        std::stringstream ss;
+        outputstream ss;
         ss << mStringArgument.GenSlidingWindowDeclRef();
         return ss.str();
     }
@@ -1297,7 +1187,7 @@ public:
     const DynamicKernelArgument* DeclRefArg(const ScCalcConfig& config, const FormulaTreeNodeRef&,
                                             std::shared_ptr<SlidingFunctionBase> pCodeGen, int nResultSize);
     /// Used to generate sliding window helpers
-    void DumpSlidingWindowFunctions( std::stringstream& ss )
+    void DumpSlidingWindowFunctions( outputstream& ss )
     {
         for (auto const& argument : mParams)
         {
@@ -1315,8 +1205,6 @@ private:
     std::vector<DynamicKernelArgumentRef> mParams;
 };
 
-}
-
 void SymbolTable::Marshal( cl_kernel k, int nVectorWidth, cl_program pProgram )
 {
     int i = 1; //The first argument is reserved for results
@@ -1326,651 +1214,26 @@ void SymbolTable::Marshal( cl_kernel k, int nVectorWidth, cl_program pProgram )
     }
 }
 
-namespace {
-
-/// Handling a Double Vector that is used as a sliding window input
-/// Performs parallel reduction based on given operator
-template<class Base>
-class ParallelReductionVectorRef : public Base
-{
-public:
-    ParallelReductionVectorRef(const ScCalcConfig& config, const std::string& s,
-                               const FormulaTreeNodeRef& ft,
-                               const std::shared_ptr<SlidingFunctionBase>& CodeGen, int index)
-        : Base(config, s, ft, index)
-        , mpCodeGen(CodeGen)
-        , mpClmem2(nullptr)
-    {
-        FormulaToken* t = ft->GetFormulaToken();
-        if (t->GetType() != formula::svDoubleVectorRef)
-            throw Unhandled(__FILE__, __LINE__);
-        mpDVR = static_cast<const formula::DoubleVectorRefToken*>(t);
-        bIsStartFixed = mpDVR->IsStartFixed();
-        bIsEndFixed = mpDVR->IsEndFixed();
-    }
-
-    /// Emit the definition for the auxiliary reduction kernel
-    virtual void GenSlidingWindowFunction( std::stringstream& ss );
-
-    virtual std::string GenSlidingWindowDeclRef( bool ) const
-    {
-        std::stringstream ss;
-        if (!bIsStartFixed && !bIsEndFixed)
-            ss << Base::GetName() << "[i + gid0]";
-        else
-            ss << Base::GetName() << "[i]";
-        return ss.str();
-    }
-
-    /// Controls how the elements in the DoubleVectorRef are traversed
-    size_t GenReductionLoopHeader(
-        std::stringstream& ss, int nResultSize, bool& needBody );
-
-    virtual size_t Marshal( cl_kernel k, int argno, int w, cl_program mpProgram );
-
-    ~ParallelReductionVectorRef()
-    {
-        if (mpClmem2)
-        {
-            cl_int err;
-            err = clReleaseMemObject(mpClmem2);
-            SAL_WARN_IF(err != CL_SUCCESS, "sc.opencl", "clReleaseMemObject failed: " << openclwrapper::errorString(err));
-            mpClmem2 = nullptr;
-        }
-    }
-
-    size_t GetArrayLength() const { return mpDVR->GetArrayLength(); }
-
-    size_t GetWindowSize() const { return mpDVR->GetRefRowSize(); }
-
-    bool GetStartFixed() const { return bIsStartFixed; }
-
-    bool GetEndFixed() const { return bIsEndFixed; }
-
-protected:
-    bool bIsStartFixed, bIsEndFixed;
-    const formula::DoubleVectorRefToken* mpDVR;
-    // from parent nodes
-    std::shared_ptr<SlidingFunctionBase> mpCodeGen;
-    // controls whether to invoke the reduction kernel during marshaling or not
-    cl_mem mpClmem2;
-};
-
-class Reduction : public SlidingFunctionBase
-{
-    int mnResultSize;
-public:
-    explicit Reduction(int nResultSize) : mnResultSize(nResultSize) {}
-
-    typedef DynamicKernelSlidingArgument<VectorRef> NumericRange;
-    typedef DynamicKernelSlidingArgument<DynamicKernelStringArgument> StringRange;
-    typedef ParallelReductionVectorRef<VectorRef> ParallelNumericRange;
-
-    virtual bool HandleNaNArgument( std::stringstream&, unsigned, SubArguments& ) const
-    {
-        return false;
-    }
-
-    virtual void GenSlidingWindowFunction( std::stringstream& ss,
-        const std::string& sSymName, SubArguments& vSubArguments ) override
-    {
-        ss << "\ndouble " << sSymName;
-        ss << "_" << BinFuncName() << "(";
-        for (size_t i = 0; i < vSubArguments.size(); i++)
-        {
-            if (i)
-                ss << ", ";
-            vSubArguments[i]->GenSlidingWindowDecl(ss);
-        }
-        ss << ") {\n";
-        ss << "double tmp = " << GetBottom() << ";\n";
-        ss << "int gid0 = get_global_id(0);\n";
-        if (isAverage() || isMinOrMax())
-            ss << "int nCount = 0;\n";
-        ss << "double tmpBottom;\n";
-        unsigned i = vSubArguments.size();
-        while (i--)
-        {
-            if (NumericRange* NR =
-                dynamic_cast<NumericRange*>(vSubArguments[i].get()))
-            {
-                bool needBody;
-                NR->GenReductionLoopHeader(ss, needBody);
-                if (!needBody)
-                    continue;
-            }
-            else if (ParallelNumericRange* PNR =
-                dynamic_cast<ParallelNumericRange*>(vSubArguments[i].get()))
-            {
-                //did not handle yet
-                bool bNeedBody = false;
-                PNR->GenReductionLoopHeader(ss, mnResultSize, bNeedBody);
-                if (!bNeedBody)
-                    continue;
-            }
-            else if (StringRange* SR =
-                dynamic_cast<StringRange*>(vSubArguments[i].get()))
-            {
-                //did not handle yet
-                bool needBody;
-                SR->GenReductionLoopHeader(ss, needBody);
-                if (!needBody)
-                    continue;
-            }
-            else
-            {
-                FormulaToken* pCur = vSubArguments[i]->GetFormulaToken();
-                assert(pCur);
-                assert(pCur->GetType() != formula::svDoubleVectorRef);
-
-                if (pCur->GetType() == formula::svSingleVectorRef ||
-                    pCur->GetType() == formula::svDouble)
-                {
-                    ss << "{\n";
-                }
-            }
-            if (ocPush == vSubArguments[i]->GetFormulaToken()->GetOpCode())
-            {
-                bool bNanHandled = HandleNaNArgument(ss, i, vSubArguments);
-
-                ss << "tmpBottom = " << GetBottom() << ";\n";
-
-                if (!bNanHandled)
-                {
-                    ss << "if (isnan(";
-                    ss << vSubArguments[i]->GenSlidingWindowDeclRef();
-                    ss << "))\n";
-                    if (ZeroReturnZero())
-                        ss << "    return 0;\n";
-                    else
-                    {
-                        ss << "    tmp = ";
-                        ss << Gen2("tmpBottom", "tmp") << ";\n";
-                    }
-                    ss << "else\n";
-                }
-                ss << "{";
-                ss << "        tmp = ";
-                ss << Gen2(vSubArguments[i]->GenSlidingWindowDeclRef(), "tmp");
-                ss << ";\n";
-                ss << "    }\n";
-                ss << "}\n";
-            }
-            else
-            {
-                ss << "tmp = ";
-                ss << Gen2(vSubArguments[i]->GenSlidingWindowDeclRef(), "tmp");
-                ss << ";\n";
-            }
-        }
-        if (isAverage())
-            ss <<
-                "if (nCount==0)\n"
-                "    return CreateDoubleError(DivisionByZero);\n";
-        else if (isMinOrMax())
-            ss <<
-                "if (nCount==0)\n"
-                "    return 0;\n";
-        ss << "return tmp";
-        if (isAverage())
-            ss << "*pow((double)nCount,-1.0)";
-        ss << ";\n}";
-    }
-    virtual bool isAverage() const { return false; }
-    virtual bool isMinOrMax() const { return false; }
-    virtual bool takeString() const override { return false; }
-    virtual bool takeNumeric() const override { return true; }
-};
-
-// Strictly binary operators
-class Binary : public SlidingFunctionBase
-{
-public:
-    virtual void GenSlidingWindowFunction( std::stringstream& ss,
-        const std::string& sSymName, SubArguments& vSubArguments ) override
-    {
-        ss << "\ndouble " << sSymName;
-        ss << "_" << BinFuncName() << "(";
-        assert(vSubArguments.size() == 2);
-        for (size_t i = 0; i < vSubArguments.size(); i++)
-        {
-            if (i)
-                ss << ", ";
-            vSubArguments[i]->GenSlidingWindowDecl(ss);
-        }
-        ss << ") {\n\t";
-        ss << "int gid0 = get_global_id(0), i = 0;\n\t";
-        ss << "double tmp = ";
-        ss << Gen2(vSubArguments[0]->GenSlidingWindowDeclRef(),
-            vSubArguments[1]->GenSlidingWindowDeclRef()) << ";\n\t";
-        ss << "return tmp;\n}";
-    }
-    virtual bool takeString() const override { return true; }
-    virtual bool takeNumeric() const override { return true; }
-};
-
-class SumOfProduct : public SlidingFunctionBase
-{
-public:
-    virtual void GenSlidingWindowFunction( std::stringstream& ss,
-        const std::string& sSymName, SubArguments& vSubArguments ) override
-    {
-        size_t nCurWindowSize = 0;
-        FormulaToken* tmpCur = nullptr;
-        const formula::DoubleVectorRefToken* pCurDVR = nullptr;
-        ss << "\ndouble " << sSymName;
-        ss << "_" << BinFuncName() << "(";
-        for (size_t i = 0; i < vSubArguments.size(); i++)
-        {
-            if (i)
-                ss << ",";
-            vSubArguments[i]->GenSlidingWindowDecl(ss);
-            size_t nCurChildWindowSize = vSubArguments[i]->GetWindowSize();
-            nCurWindowSize = (nCurWindowSize < nCurChildWindowSize) ?
-                nCurChildWindowSize : nCurWindowSize;
-            tmpCur = vSubArguments[i]->GetFormulaToken();
-            if (ocPush == tmpCur->GetOpCode())
-            {
-
-                pCurDVR = static_cast<const formula::DoubleVectorRefToken*>(tmpCur);
-                if (pCurDVR->IsStartFixed() != pCurDVR->IsEndFixed())
-                    throw Unhandled(__FILE__, __LINE__);
-            }
-        }
-        ss << ") {\n";
-        ss << "    double tmp = 0.0;\n";
-        ss << "    int gid0 = get_global_id(0);\n";
-
-        ss << "\tint i;\n\t";
-        ss << "int currentCount0;\n";
-        for (size_t i = 0; i < vSubArguments.size() - 1; i++)
-            ss << "int currentCount" << i + 1 << ";\n";
-        std::stringstream temp3, temp4;
-        int outLoopSize = UNROLLING_FACTOR;
-        if (nCurWindowSize / outLoopSize != 0)
-        {
-            ss << "for(int outLoop=0; outLoop<" <<
-                nCurWindowSize / outLoopSize << "; outLoop++){\n\t";
-            for (int count = 0; count < outLoopSize; count++)
-            {
-                ss << "i = outLoop*" << outLoopSize << "+" << count << ";\n";
-                if (count == 0)
-                {
-                    for (size_t i = 0; i < vSubArguments.size(); i++)
-                    {
-                        tmpCur = vSubArguments[i]->GetFormulaToken();
-                        if (ocPush == tmpCur->GetOpCode())
-                        {
-                            pCurDVR = static_cast<const formula::DoubleVectorRefToken*>(tmpCur);
-                            if (!pCurDVR->IsStartFixed() && !pCurDVR->IsEndFixed())
-                            {
-                                temp3 << "        currentCount";
-                                temp3 << i;
-                                temp3 << " =i+gid0+1;\n";
-                            }
-                            else
-                            {
-                                temp3 << "        currentCount";
-                                temp3 << i;
-                                temp3 << " =i+1;\n";
-                            }
-                        }
-                    }
-
-                    temp3 << "tmp = fsum(";
-                    for (size_t i = 0; i < vSubArguments.size(); i++)
-                    {
-                        if (i)
-                            temp3 << "*";
-                        if (ocPush == vSubArguments[i]->GetFormulaToken()->GetOpCode())
-                        {
-                            temp3 << "(";
-                            temp3 << "(currentCount";
-                            temp3 << i;
-                            temp3 << ">";
-                            if (vSubArguments[i]->GetFormulaToken()->GetType() ==
-                                    formula::svSingleVectorRef)
-                            {
-                                const formula::SingleVectorRefToken* pSVR =
-                                    static_cast<const formula::SingleVectorRefToken*>
-                                    (vSubArguments[i]->GetFormulaToken());
-                                temp3 << pSVR->GetArrayLength();
-                                temp3 << ")||isnan(" << vSubArguments[i]
-                                    ->GenSlidingWindowDeclRef();
-                                temp3 << ")?0:";
-                                temp3 << vSubArguments[i]->GenSlidingWindowDeclRef();
-                                temp3  << ")";
-                            }
-                            else if (vSubArguments[i]->GetFormulaToken()->GetType() ==
-                                    formula::svDoubleVectorRef)
-                            {
-                                const formula::DoubleVectorRefToken* pSVR =
-                                    static_cast<const formula::DoubleVectorRefToken*>
-                                    (vSubArguments[i]->GetFormulaToken());
-                                temp3 << pSVR->GetArrayLength();
-                                temp3 << ")||isnan(" << vSubArguments[i]
-                                    ->GenSlidingWindowDeclRef(true);
-                                temp3 << ")?0:";
-                                temp3 << vSubArguments[i]->GenSlidingWindowDeclRef(true);
-                                temp3  << ")";
-                            }
-
-                        }
-                        else
-                            temp3 << vSubArguments[i]->GenSlidingWindowDeclRef(true);
-                    }
-                    temp3 << ", tmp);\n\t";
-                }
-                ss << temp3.str();
-            }
-            ss << "}\n\t";
-        }
-        //The residual of mod outLoopSize
-        for (size_t count = nCurWindowSize / outLoopSize * outLoopSize;
-            count < nCurWindowSize; count++)
-        {
-            ss << "i =" << count << ";\n";
-            if (count == nCurWindowSize / outLoopSize * outLoopSize)
-            {
-                for (size_t i = 0; i < vSubArguments.size(); i++)
-                {
-                    tmpCur = vSubArguments[i]->GetFormulaToken();
-                    if (ocPush == tmpCur->GetOpCode())
-                    {
-                        pCurDVR = static_cast<const formula::DoubleVectorRefToken*>(tmpCur);
-                        if (!pCurDVR->IsStartFixed() && !pCurDVR->IsEndFixed())
-                        {
-                            temp4 << "        currentCount";
-                            temp4 << i;
-                            temp4 << " =i+gid0+1;\n";
-                        }
-                        else
-                        {
-                            temp4 << "        currentCount";
-                            temp4 << i;
-                            temp4 << " =i+1;\n";
-                        }
-                    }
-                }
-
-                temp4 << "tmp = fsum(";
-                for (size_t i = 0; i < vSubArguments.size(); i++)
-                {
-                    if (i)
-                        temp4 << "*";
-                    if (ocPush == vSubArguments[i]->GetFormulaToken()->GetOpCode())
-                    {
-                        temp4 << "(";
-                        temp4 << "(currentCount";
-                        temp4 << i;
-                        temp4 << ">";
-                        if (vSubArguments[i]->GetFormulaToken()->GetType() ==
-                                formula::svSingleVectorRef)
-                        {
-                            const formula::SingleVectorRefToken* pSVR =
-                                static_cast<const formula::SingleVectorRefToken*>
-                                (vSubArguments[i]->GetFormulaToken());
-                            temp4 << pSVR->GetArrayLength();
-                            temp4 << ")||isnan(" << vSubArguments[i]
-                                ->GenSlidingWindowDeclRef();
-                            temp4 << ")?0:";
-                            temp4 << vSubArguments[i]->GenSlidingWindowDeclRef();
-                            temp4  << ")";
-                        }
-                        else if (vSubArguments[i]->GetFormulaToken()->GetType() ==
-                                formula::svDoubleVectorRef)
-                        {
-                            const formula::DoubleVectorRefToken* pSVR =
-                                static_cast<const formula::DoubleVectorRefToken*>
-                                (vSubArguments[i]->GetFormulaToken());
-                            temp4 << pSVR->GetArrayLength();
-                            temp4 << ")||isnan(" << vSubArguments[i]
-                                ->GenSlidingWindowDeclRef(true);
-                            temp4 << ")?0:";
-                            temp4 << vSubArguments[i]->GenSlidingWindowDeclRef(true);
-                            temp4  << ")";
-                        }
-
-                    }
-                    else
-                    {
-                        temp4 << vSubArguments[i]
-                            ->GenSlidingWindowDeclRef(true);
-                    }
-                }
-                temp4 << ", tmp);\n\t";
-            }
-            ss << temp4.str();
-        }
-        ss << "return tmp;\n";
-        ss << "}";
-    }
-    virtual bool takeString() const override { return false; }
-    virtual bool takeNumeric() const override { return true; }
-};
-
-/// operator traits
-class OpNop : public Reduction
-{
-public:
-    explicit OpNop(int nResultSize) : Reduction(nResultSize) {}
-
-    virtual std::string GetBottom() override { return "0"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& ) const override
-    {
-        return lhs;
-    }
-    virtual std::string BinFuncName() const override { return "nop"; }
-};
-
-class OpCount : public Reduction
-{
-public:
-    explicit OpCount(int nResultSize) : Reduction(nResultSize) {}
-
-    virtual std::string GetBottom() override { return "0"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& rhs ) const override
-    {
-        std::stringstream ss;
-        ss << "(isnan(" << lhs << ")?" << rhs << ":" << rhs << "+1.0)";
-        return ss.str();
-    }
-    virtual std::string BinFuncName() const override { return "fcount"; }
-    virtual bool canHandleMultiVector() const override { return true; }
-};
-
-class OpEqual : public Binary
-{
-public:
-    virtual std::string GetBottom() override { return "0"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& rhs ) const override
-    {
-        std::stringstream ss;
-        ss << "strequal(" << lhs << "," << rhs << ")";
-        return ss.str();
-    }
-    virtual std::string BinFuncName() const override { return "eq"; }
-};
-
-class OpLessEqual : public Binary
-{
-public:
-    virtual std::string GetBottom() override { return "0"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& rhs ) const override
-    {
-        std::stringstream ss;
-        ss << "(" << lhs << "<=" << rhs << ")";
-        return ss.str();
-    }
-    virtual std::string BinFuncName() const override { return "leq"; }
-};
-
-class OpLess : public Binary
-{
-public:
-    virtual std::string GetBottom() override { return "0"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& rhs ) const override
-    {
-        std::stringstream ss;
-        ss << "(" << lhs << "<" << rhs << ")";
-        return ss.str();
-    }
-    virtual std::string BinFuncName() const override { return "less"; }
-};
-
-class OpGreater : public Binary
-{
-public:
-    virtual std::string GetBottom() override { return "0"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& rhs ) const override
-    {
-        std::stringstream ss;
-        ss << "(" << lhs << ">" << rhs << ")";
-        return ss.str();
-    }
-    virtual std::string BinFuncName() const override { return "gt"; }
-};
-
-class OpSum : public Reduction
-{
-public:
-    explicit OpSum(int nResultSize) : Reduction(nResultSize) {}
-
-    virtual std::string GetBottom() override { return "0"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& rhs ) const override
-    {
-        std::stringstream ss;
-        ss << "fsum_approx((" << lhs << "),(" << rhs << "))";
-        return ss.str();
-    }
-    virtual std::string BinFuncName() const override { return "fsum"; }
-    // All arguments are simply summed, so it doesn't matter if SvDoubleVector is split.
-    virtual bool canHandleMultiVector() const override { return true; }
-};
-
-class OpAverage : public Reduction
-{
-public:
-    explicit OpAverage(int nResultSize) : Reduction(nResultSize) {}
-
-    virtual std::string GetBottom() override { return "0"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& rhs ) const override
-    {
-        std::stringstream ss;
-        ss << "fsum_count(" << lhs << "," << rhs << ", &nCount)";
-        return ss.str();
-    }
-    virtual std::string BinFuncName() const override { return "average"; }
-    virtual bool isAverage() const override { return true; }
-    virtual bool canHandleMultiVector() const override { return true; }
-};
-
-class OpSub : public Reduction
-{
-public:
-    explicit OpSub(int nResultSize) : Reduction(nResultSize) {}
-
-    virtual std::string GetBottom() override { return "0"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& rhs ) const override
-    {
-        return "fsub_approx(" + lhs + "," + rhs + ")";
-    }
-    virtual std::string BinFuncName() const override { return "fsub"; }
-};
-
-class OpMul : public Reduction
-{
-public:
-    explicit OpMul(int nResultSize) : Reduction(nResultSize) {}
-
-    virtual std::string GetBottom() override { return "1"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& rhs ) const override
-    {
-        return lhs + "*" + rhs;
-    }
-    virtual std::string BinFuncName() const override { return "fmul"; }
-    virtual bool ZeroReturnZero() override { return true; }
-};
-
-/// Technically not a reduction, but fits the framework.
-class OpDiv : public Reduction
-{
-public:
-    explicit OpDiv(int nResultSize) : Reduction(nResultSize) {}
-
-    virtual std::string GetBottom() override { return "1.0"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& rhs ) const override
-    {
-        return "(" + rhs + "==0 ? CreateDoubleError(DivisionByZero) : (" + lhs + "/" + rhs + ") )";
-    }
-    virtual std::string BinFuncName() const override { return "fdiv"; }
-
-    virtual bool HandleNaNArgument( std::stringstream& ss, unsigned argno, SubArguments& vSubArguments ) const override
-    {
-        if (argno == 1)
-        {
-            ss <<
-                "if (isnan(" << vSubArguments[argno]->GenSlidingWindowDeclRef() << ")) {\n"
-                "    return CreateDoubleError(DivisionByZero);\n"
-                "}\n";
-            return true;
-        }
-        else if (argno == 0)
-        {
-            ss <<
-                "if (isnan(" << vSubArguments[argno]->GenSlidingWindowDeclRef() << ") &&\n"
-                "    !(isnan(" << vSubArguments[1]->GenSlidingWindowDeclRef() << ") || " << vSubArguments[1]->GenSlidingWindowDeclRef() << " == 0)) {\n"
-                "    return 0;\n"
-                "}\n";
-        }
-        return false;
-    }
-
-};
-
-class OpMin : public Reduction
-{
-public:
-    explicit OpMin(int nResultSize) : Reduction(nResultSize) {}
-
-    virtual std::string GetBottom() override { return "NAN"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& rhs ) const override
-    {
-        return "fmin_count(" + lhs + "," + rhs + ", &nCount)";
-    }
-    virtual std::string BinFuncName() const override { return "min"; }
-    virtual bool isMinOrMax() const override { return true; }
-    virtual bool canHandleMultiVector() const override { return true; }
-};
-
-class OpMax : public Reduction
-{
-public:
-    explicit OpMax(int nResultSize) : Reduction(nResultSize) {}
-
-    virtual std::string GetBottom() override { return "NAN"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& rhs ) const override
-    {
-        return "fmax_count(" + lhs + "," + rhs + ", &nCount)";
-    }
-    virtual std::string BinFuncName() const override { return "max"; }
-    virtual bool isMinOrMax() const override { return true; }
-    virtual bool canHandleMultiVector() const override { return true; }
-};
-
-class OpSumProduct : public SumOfProduct
-{
-public:
-    virtual std::string GetBottom() override { return "0"; }
-    virtual std::string Gen2( const std::string& lhs, const std::string& rhs ) const override
-    {
-        return lhs + "*" + rhs;
-    }
-    virtual std::string BinFuncName() const override { return "fsop"; }
-};
+}
 
 template<class Base>
-void ParallelReductionVectorRef<Base>::GenSlidingWindowFunction( std::stringstream& ss )
+ParallelReductionVectorRef<Base>::ParallelReductionVectorRef(
+    const ScCalcConfig& config, const std::string& s, const FormulaTreeNodeRef& ft,
+    std::shared_ptr<SlidingFunctionBase> CodeGen, int index)
+    : Base(config, s, ft, index)
+    , mpCodeGen(std::move(CodeGen))
+    , mpClmem2(nullptr)
+{
+    FormulaToken* t = ft->GetFormulaToken();
+    if (t->GetType() != formula::svDoubleVectorRef)
+        throw Unhandled(__FILE__, __LINE__);
+    mpDVR = static_cast<const formula::DoubleVectorRefToken*>(t);
+    bIsStartFixed = mpDVR->IsStartFixed();
+    bIsEndFixed = mpDVR->IsEndFixed();
+}
+
+template<class Base>
+void ParallelReductionVectorRef<Base>::GenSlidingWindowFunction( outputstream& ss )
 {
     if (!dynamic_cast<OpAverage*>(mpCodeGen.get()))
     {
@@ -2147,12 +1410,22 @@ void ParallelReductionVectorRef<Base>::GenSlidingWindowFunction( std::stringstre
         ss << "        result[writePos] = current_result;\n";
         ss << "}\n";
     }
+}
 
+template<class Base>
+std::string ParallelReductionVectorRef<Base>::GenSlidingWindowDeclRef( bool ) const
+{
+    outputstream ss;
+    if (!bIsStartFixed && !bIsEndFixed)
+        ss << Base::GetName() << "[i + gid0]";
+    else
+        ss << Base::GetName() << "[i]";
+    return ss.str();
 }
 
 template<class Base>
 size_t ParallelReductionVectorRef<Base>::GenReductionLoopHeader(
-    std::stringstream& ss, int nResultSize, bool& needBody )
+    outputstream& ss, int nResultSize, bool& needBody )
 {
     assert(mpDVR);
     size_t nCurWindowSize = mpDVR->GetRefRowSize();
@@ -2343,6 +1616,22 @@ size_t ParallelReductionVectorRef<Base>::Marshal( cl_kernel k, int argno, int w,
     return 1;
 }
 
+template<class Base>
+ParallelReductionVectorRef<Base>::~ParallelReductionVectorRef()
+{
+    if (mpClmem2)
+    {
+        cl_int err;
+        err = clReleaseMemObject(mpClmem2);
+        SAL_WARN_IF(err != CL_SUCCESS, "sc.opencl", "clReleaseMemObject failed: " << openclwrapper::errorString(err));
+        mpClmem2 = nullptr;
+    }
+}
+
+template class ParallelReductionVectorRef<VectorRef>;
+
+namespace {
+
 struct SumIfsArgs
 {
     explicit SumIfsArgs(cl_mem x) : mCLMem(x), mConst(0.0) { }
@@ -2369,66 +1658,6 @@ public:
         for (const auto& rxSubArgument : mvSubArguments)
         {
             i += rxSubArgument->Marshal(k, argno + i, nVectorWidth, pProgram);
-        }
-        if (dynamic_cast<OpGeoMean*>(mpCodeGen.get()))
-        {
-            openclwrapper::KernelEnv kEnv;
-            openclwrapper::setKernelEnv(&kEnv);
-            cl_int err;
-            cl_mem pClmem2;
-
-            std::vector<cl_mem> vclmem;
-            for (const auto& rxSubArgument : mvSubArguments)
-            {
-                if (VectorRef* VR = dynamic_cast<VectorRef*>(rxSubArgument.get()))
-                    vclmem.push_back(VR->GetCLBuffer());
-                else
-                    vclmem.push_back(nullptr);
-            }
-            pClmem2 = clCreateBuffer(kEnv.mpkContext, CL_MEM_READ_WRITE,
-                sizeof(double) * nVectorWidth, nullptr, &err);
-            if (CL_SUCCESS != err)
-                throw OpenCLError("clCreateBuffer", err, __FILE__, __LINE__);
-            SAL_INFO("sc.opencl", "Created buffer " << pClmem2 << " size " << sizeof(double) << "*" << nVectorWidth << "=" << (sizeof(double)*nVectorWidth));
-
-            std::string kernelName = "GeoMean_reduction";
-            cl_kernel redKernel = clCreateKernel(pProgram, kernelName.c_str(), &err);
-            if (err != CL_SUCCESS)
-                throw OpenCLError("clCreateKernel", err, __FILE__, __LINE__);
-            SAL_INFO("sc.opencl", "Created kernel " << redKernel << " with name " << kernelName << " in program " << pProgram);
-
-            // set kernel arg of reduction kernel
-            for (size_t j = 0; j < vclmem.size(); j++)
-            {
-                SAL_INFO("sc.opencl", "Kernel " << redKernel << " arg " << j << ": " << (vclmem[j] ? "cl_mem" : "double") << ": " << vclmem[j]);
-                err = clSetKernelArg(redKernel, j,
-                    vclmem[j] ? sizeof(cl_mem) : sizeof(double),
-                    static_cast<void*>(&vclmem[j]));
-                if (CL_SUCCESS != err)
-                    throw OpenCLError("clSetKernelArg", err, __FILE__, __LINE__);
-            }
-            SAL_INFO("sc.opencl", "Kernel " << redKernel << " arg " << vclmem.size() << ": cl_mem: " << pClmem2);
-            err = clSetKernelArg(redKernel, vclmem.size(), sizeof(cl_mem), static_cast<void*>(&pClmem2));
-            if (CL_SUCCESS != err)
-                throw OpenCLError("clSetKernelArg", err, __FILE__, __LINE__);
-
-            // set work group size and execute
-            size_t global_work_size[] = { 256, static_cast<size_t>(nVectorWidth) };
-            size_t const local_work_size[] = { 256, 1 };
-            SAL_INFO("sc.opencl", "Enqueuing kernel " << redKernel);
-            err = clEnqueueNDRangeKernel(kEnv.mpkCmdQueue, redKernel, 2, nullptr,
-                global_work_size, local_work_size, 0, nullptr, nullptr);
-            if (CL_SUCCESS != err)
-                throw OpenCLError("clEnqueueNDRangeKernel", err, __FILE__, __LINE__);
-            err = clFinish(kEnv.mpkCmdQueue);
-            if (CL_SUCCESS != err)
-                throw OpenCLError("clFinish", err, __FILE__, __LINE__);
-
-            // Pass pClmem2 to the "real" kernel
-            SAL_INFO("sc.opencl", "Kernel " << k << " arg " << argno << ": cl_mem: " << pClmem2);
-            err = clSetKernelArg(k, argno, sizeof(cl_mem), static_cast<void*>(&pClmem2));
-            if (CL_SUCCESS != err)
-                throw OpenCLError("clSetKernelArg", err, __FILE__, __LINE__);
         }
         if (OpSumIfs* OpSumCodeGen = dynamic_cast<OpSumIfs*>(mpCodeGen.get()))
         {
@@ -2473,7 +1702,7 @@ public:
                     if (vclmem[j].mCLMem)
                         SAL_INFO("sc.opencl", "Kernel " << redKernel << " arg " << j << ": cl_mem: " << vclmem[j].mCLMem);
                     else
-                        SAL_INFO("sc.opencl", "Kernel " << redKernel << " arg " << j << ": double: " << vclmem[j].mConst);
+                        SAL_INFO("sc.opencl", "Kernel " << redKernel << " arg " << j << ": double: " << preciseFloat( vclmem[j].mConst ));
                     err = clSetKernelArg(redKernel, j,
                         vclmem[j].mCLMem ? sizeof(cl_mem) : sizeof(double),
                         vclmem[j].mCLMem ? static_cast<void*>(&vclmem[j].mCLMem) :
@@ -2522,13 +1751,13 @@ public:
         return i;
     }
 
-    virtual void GenSlidingWindowFunction( std::stringstream& ss ) override
+    virtual void GenSlidingWindowFunction( outputstream& ss ) override
     {
         for (DynamicKernelArgumentRef & rArg : mvSubArguments)
             rArg->GenSlidingWindowFunction(ss);
         mpCodeGen->GenSlidingWindowFunction(ss, mSymName, mvSubArguments);
     }
-    virtual void GenDeclRef( std::stringstream& ss ) const override
+    virtual void GenDeclRef( outputstream& ss ) const override
     {
         for (size_t i = 0; i < mvSubArguments.size(); i++)
         {
@@ -2537,7 +1766,7 @@ public:
             mvSubArguments[i]->GenDeclRef(ss);
         }
     }
-    virtual void GenDecl( std::stringstream& ss ) const override
+    virtual void GenDecl( outputstream& ss ) const override
     {
         for (SubArgumentsType::const_iterator it = mvSubArguments.begin(), e = mvSubArguments.end(); it != e;
             ++it)
@@ -2561,7 +1790,7 @@ public:
     }
 
     /// When declared as input to a sliding window function
-    virtual void GenSlidingWindowDecl( std::stringstream& ss ) const override
+    virtual void GenSlidingWindowDecl( outputstream& ss ) const override
     {
         for (SubArgumentsType::const_iterator it = mvSubArguments.begin(), e = mvSubArguments.end(); it != e;
             ++it)
@@ -2575,7 +1804,7 @@ public:
     /// or directly inline it if we are already inside a loop
     virtual std::string GenSlidingWindowDeclRef( bool nested = false ) const override
     {
-        std::stringstream ss;
+        outputstream ss;
         if (!nested)
         {
             ss << mSymName << "_" << mpCodeGen->BinFuncName() << "(";
@@ -2718,7 +1947,7 @@ DynamicKernelSoPArguments::DynamicKernelSoPArguments(const ScCalcConfig& config,
         if (!pChild)
             throw Unhandled(__FILE__, __LINE__);
         OpCode opc = pChild->GetOpCode();
-        std::stringstream tmpname;
+        outputstream tmpname;
         tmpname << s << "_" << i;
         std::string ts = tmpname.str();
         switch (opc)
@@ -2781,26 +2010,38 @@ DynamicKernelSoPArguments::DynamicKernelSoPArguments(const ScCalcConfig& config,
                         }
                         else if (pDVR->GetArrays()[j].mpNumericArray &&
                             pCodeGen->takeNumeric() &&
-                                 (AllStringsAreNull(pDVR->GetArrays()[j].mpStringArray, pDVR->GetArrayLength()) || mCalcConfig.meStringConversion == ScCalcConfig::StringConversion::ZERO))
+                                 (AllStringsAreNull(pDVR->GetArrays()[j].mpStringArray, pDVR->GetArrayLength())
+                                    || mCalcConfig.meStringConversion == ScCalcConfig::StringConversion::ZERO
+                                    || pCodeGen->forceStringsToZero()))
                         {
                             // Function takes numbers, and either there
                             // are no strings, or there are strings but
                             // they are to be treated as zero
                             SAL_INFO("sc.opencl", "Numbers (no strings or strings treated as zero)");
-                            mvSubArguments.push_back(
-                                VectorRefFactory<VectorRef>(mCalcConfig,
-                                        ts, ft->Children[i], mpCodeGen, j));
+                            if(!AllStringsAreNull(pDVR->GetArrays()[j].mpStringArray, pDVR->GetArrayLength()))
+                            {
+                                mvSubArguments.push_back(
+                                    VectorRefFactory<VectorRefStringsToZero>(mCalcConfig,
+                                            ts, ft->Children[i], mpCodeGen, j));
+                            }
+                            else
+                            {
+                                mvSubArguments.push_back(
+                                    VectorRefFactory<VectorRef>(mCalcConfig,
+                                            ts, ft->Children[i], mpCodeGen, j));
+                            }
                         }
                         else if (pDVR->GetArrays()[j].mpNumericArray == nullptr &&
                             pCodeGen->takeNumeric() &&
                             pDVR->GetArrays()[j].mpStringArray &&
-                            mCalcConfig.meStringConversion == ScCalcConfig::StringConversion::ZERO)
+                            ( mCalcConfig.meStringConversion == ScCalcConfig::StringConversion::ZERO
+                                || pCodeGen->forceStringsToZero()))
                         {
                             // Function takes numbers, and there are only
                             // strings, but they are to be treated as zero
                             SAL_INFO("sc.opencl", "Only strings even if want numbers but should be treated as zero");
                             mvSubArguments.push_back(
-                                VectorRefFactory<VectorRef>(mCalcConfig,
+                                VectorRefFactory<VectorRefStringsToZero>(mCalcConfig,
                                         ts, ft->Children[i], mpCodeGen, j));
                         }
                         else if (pDVR->GetArrays()[j].mpStringArray &&
@@ -2856,26 +2097,34 @@ DynamicKernelSoPArguments::DynamicKernelSoPArguments(const ScCalcConfig& config,
                     }
                     else if (pSVR->GetArray().mpNumericArray &&
                         pCodeGen->takeNumeric() &&
-                             (AllStringsAreNull(pSVR->GetArray().mpStringArray, pSVR->GetArrayLength()) || mCalcConfig.meStringConversion == ScCalcConfig::StringConversion::ZERO))
+                             (AllStringsAreNull(pSVR->GetArray().mpStringArray, pSVR->GetArrayLength())
+                                || mCalcConfig.meStringConversion == ScCalcConfig::StringConversion::ZERO
+                                || pCodeGen->forceStringsToZero()))
                     {
                         // Function takes numbers, and either there
                         // are no strings, or there are strings but
                         // they are to be treated as zero
                         SAL_INFO("sc.opencl", "Numbers (no strings or strings treated as zero)");
-                        mvSubArguments.push_back(
-                            std::make_shared<VectorRef>(mCalcConfig, ts,
-                                    ft->Children[i]));
+                        if( !AllStringsAreNull(pSVR->GetArray().mpStringArray, pSVR->GetArrayLength()))
+                            mvSubArguments.push_back(
+                                std::make_shared<VectorRefStringsToZero>(mCalcConfig, ts,
+                                        ft->Children[i]));
+                        else
+                            mvSubArguments.push_back(
+                                std::make_shared<VectorRef>(mCalcConfig, ts,
+                                        ft->Children[i]));
                     }
                     else if (pSVR->GetArray().mpNumericArray == nullptr &&
                         pCodeGen->takeNumeric() &&
                         pSVR->GetArray().mpStringArray &&
-                        mCalcConfig.meStringConversion == ScCalcConfig::StringConversion::ZERO)
+                        (mCalcConfig.meStringConversion == ScCalcConfig::StringConversion::ZERO
+                            || pCodeGen->forceStringsToZero()))
                     {
                         // Function takes numbers, and there are only
                         // strings, but they are to be treated as zero
                         SAL_INFO("sc.opencl", "Only strings even if want numbers but should be treated as zero");
                         mvSubArguments.push_back(
-                            std::make_shared<VectorRef>(mCalcConfig, ts,
+                            std::make_shared<VectorRefStringsToZero>(mCalcConfig, ts,
                                     ft->Children[i]));
                     }
                     else if (pSVR->GetArray().mpStringArray &&
@@ -2919,482 +2168,21 @@ DynamicKernelSoPArguments::DynamicKernelSoPArguments(const ScCalcConfig& config,
                         std::make_shared<ConstStringArgument>(mCalcConfig, ts,
                                 ft->Children[i]));
                 }
+                else if (pChild->GetType() == formula::svString
+                    && !pCodeGen->takeString()
+                    && pCodeGen->takeNumeric()
+                    && pCodeGen->forceStringsToZero())
+                {
+                    SAL_INFO("sc.opencl", "Constant string case, treated as zero");
+                    mvSubArguments.push_back(
+                        DynamicKernelArgumentRef(new DynamicKernelStringToZeroArgument(mCalcConfig, ts,
+                                ft->Children[i])));
+                }
                 else
                 {
                     SAL_INFO("sc.opencl", "Unhandled operand, rejecting for OpenCL");
                     throw UnhandledToken(("unhandled operand " + StackVarEnumToString(pChild->GetType()) + " for ocPush").c_str(), __FILE__, __LINE__);
                 }
-                break;
-            case ocDiv:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpDiv>(nResultSize), nResultSize));
-                break;
-            case ocMul:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpMul>(nResultSize), nResultSize));
-                break;
-            case ocSub:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpSub>(nResultSize), nResultSize));
-                break;
-            case ocAdd:
-            case ocSum:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpSum>(nResultSize), nResultSize));
-                break;
-            case ocAverage:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpAverage>(nResultSize), nResultSize));
-                break;
-            case ocMin:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpMin>(nResultSize), nResultSize));
-                break;
-            case ocMax:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpMax>(nResultSize), nResultSize));
-                break;
-            case ocCount:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpCount>(nResultSize), nResultSize));
-                break;
-            case ocSumProduct:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpSumProduct>(), nResultSize));
-                break;
-            case ocIRR:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpIRR>(), nResultSize));
-                break;
-            case ocMIRR:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpMIRR>(), nResultSize));
-                break;
-            case ocPMT:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpPMT>(), nResultSize));
-                break;
-            case ocRate:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpIntrate>(), nResultSize));
-                break;
-            case ocRRI:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpRRI>(), nResultSize));
-                break;
-            case ocPpmt:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpPPMT>(), nResultSize));
-                break;
-            case ocFisher:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpFisher>(), nResultSize));
-                break;
-            case ocFisherInv:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpFisherInv>(), nResultSize));
-                break;
-            case ocGamma:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpGamma>(), nResultSize));
-                break;
-            case ocSLN:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpSLN>(), nResultSize));
-                break;
-            case ocGammaLn:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpGammaLn>(), nResultSize));
-                break;
-            case ocGauss:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpGauss>(), nResultSize));
-                break;
-            /*case ocGeoMean:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpGeoMean));
-                break;*/
-            case ocHarMean:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpHarMean>(), nResultSize));
-                break;
-            case ocLessEqual:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpLessEqual>(), nResultSize));
-                break;
-            case ocLess:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpLess>(), nResultSize));
-                break;
-            case ocEqual:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpEqual>(), nResultSize));
-                break;
-            case ocGreater:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpGreater>(), nResultSize));
-                break;
-            case ocSYD:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpSYD>(), nResultSize));
-                break;
-            case ocCorrel:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpCorrel>(), nResultSize));
-                break;
-            case ocCos:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpCos>(), nResultSize));
-                break;
-            case ocNegBinomVert :
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpNegbinomdist>(), nResultSize));
-                break;
-            case ocPearson:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpPearson>(), nResultSize));
-                break;
-            case ocRSQ:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpRsq>(), nResultSize));
-                break;
-            case ocCosecant:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpCsc>(), nResultSize));
-                break;
-            case ocISPMT:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpISPMT>(), nResultSize));
-                break;
-            case ocPDuration:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpPDuration>(), nResultSize));
-                break;
-            case ocSinHyp:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSinh>(), nResultSize));
-                break;
-            case ocAbs:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpAbs>(), nResultSize));
-                break;
-            case ocPV:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpPV>(), nResultSize));
-                break;
-            case ocSin:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSin>(), nResultSize));
-                break;
-            case ocTan:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpTan>(), nResultSize));
-                break;
-            case ocTanHyp:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpTanH>(), nResultSize));
-                break;
-            case ocStandard:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpStandard>(), nResultSize));
-                break;
-            case ocWeibull:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpWeibull>(), nResultSize));
-                break;
-            /*case ocMedian:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                         ft->Children[i],std::make_shared<OpMedian));
-                break;*/
-            case ocDDB:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDDB>(), nResultSize));
-                break;
-            case ocFV:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpFV>(), nResultSize));
-                break;
-            case ocSumIfs:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSumIfs>(), nResultSize));
-                break;
-                /*case ocVBD:
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                             ft->Children[i],std::make_shared<OpVDB));
-                     break;*/
-            case ocKurt:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpKurt>(), nResultSize));
-                break;
-                /*case ocNper:
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                            ft->Children[i], std::make_shared<OpNper));
-                     break;*/
-            case ocNormDist:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpNormdist>(), nResultSize));
-                break;
-            case ocArcCos:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpArcCos>(), nResultSize));
-                break;
-            case ocSqrt:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSqrt>(), nResultSize));
-                break;
-            case ocArcCosHyp:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpArcCosHyp>(), nResultSize));
-                break;
-            case ocNPV:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpNPV>(), nResultSize));
-                break;
-            case ocStdNormDist:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpNormsdist>(), nResultSize));
-                break;
-            case ocNormInv:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpNorminv>(), nResultSize));
-                break;
-            case ocSNormInv:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpNormsinv>(), nResultSize));
-                break;
-            case ocPermut:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpPermut>(), nResultSize));
-                break;
-            case ocPermutationA:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpPermutationA>(), nResultSize));
-                break;
-            case ocPhi:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpPhi>(), nResultSize));
-                break;
-            case ocIpmt:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpIPMT>(), nResultSize));
-                break;
-            case ocConfidence:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpConfidence>(), nResultSize));
-                break;
-            case ocIntercept:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpIntercept>(), nResultSize));
-                break;
-            case ocDB:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                        std::make_shared<OpDB>(), nResultSize));
-                break;
-            case ocLogInv:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpLogInv>(), nResultSize));
-                break;
-            case ocArcCot:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpArcCot>(), nResultSize));
-                break;
-            case ocCosHyp:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpCosh>(), nResultSize));
-                break;
-            case ocCritBinom:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpCritBinom>(), nResultSize));
-                break;
-            case ocArcCotHyp:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpArcCotHyp>(), nResultSize));
-                break;
-            case ocArcSin:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpArcSin>(), nResultSize));
-                break;
-            case ocArcSinHyp:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpArcSinHyp>(), nResultSize));
-                break;
-            case ocArcTan:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpArcTan>(), nResultSize));
-                break;
-            case ocArcTanHyp:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpArcTanH>(), nResultSize));
-                break;
-            case ocBitAnd:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpBitAnd>(), nResultSize));
-                break;
-            case ocForecast:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpForecast>(), nResultSize));
-                break;
-            case ocLogNormDist:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpLogNormDist>(), nResultSize));
-                break;
-            /*case ocGammaDist:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                         ft->Children[i], std::make_shared<OpGammaDist));
-                break;*/
-            case ocLn:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpLn>(), nResultSize));
-                break;
-            case ocRound:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpRound>(), nResultSize));
-                break;
-            case ocCot:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpCot>(), nResultSize));
-                break;
-            case ocCotHyp:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpCoth>(), nResultSize));
-                break;
-            case ocFDist:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpFdist>(), nResultSize));
-                break;
-            case ocVar:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpVar>(), nResultSize));
-                break;
-            /*case ocChiDist:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                         ft->Children[i],std::make_shared<OpChiDist));
-                break;*/
-            case ocPow:
-            case ocPower:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpPower>(), nResultSize));
-                break;
-            case ocOdd:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpOdd>(), nResultSize));
-                break;
-            /*case ocChiSqDist:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                         ft->Children[i],std::make_shared<OpChiSqDist));
-                break;
-            case ocChiSqInv:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                         ft->Children[i],std::make_shared<OpChiSqInv));
-                break;
-            case ocGammaInv:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                         ft->Children[i], std::make_shared<OpGammaInv));
-                break;*/
-            case ocFloor:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpFloor>(), nResultSize));
-                break;
-            /*case ocFInv:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                         ft->Children[i], std::make_shared<OpFInv));
-                break;*/
-            case ocFTest:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpFTest>(), nResultSize));
-                break;
-            case ocB:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpB>(), nResultSize));
-                break;
-            case ocBetaDist:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpBetaDist>(), nResultSize));
-                break;
-            case ocCosecantHyp:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpCscH>(), nResultSize));
-                break;
-            case ocExp:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpExp>(), nResultSize));
-                break;
-            case ocLog10:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpLog10>(), nResultSize));
-                break;
-            case ocExpDist:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpExponDist>(), nResultSize));
-                break;
-            case ocAverageIfs:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpAverageIfs>(), nResultSize));
-                break;
-            case ocCountIfs:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpCountIfs>(), nResultSize));
-                break;
-            case ocCombinA:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpCombinA>(), nResultSize));
-                break;
-            case ocEven:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpEven>(), nResultSize));
-                break;
-            case ocLog:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpLog>(), nResultSize));
-                break;
-            case ocMod:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpMod>(), nResultSize));
-                break;
-            case ocTrunc:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpTrunc>(), nResultSize));
-                break;
-            case ocSkew:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSkew>(), nResultSize));
-                break;
-            case ocArcTan2:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpArcTan2>(), nResultSize));
-                break;
-            case ocBitOr:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpBitOr>(), nResultSize));
-                break;
-            case ocBitLshift:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpBitLshift>(), nResultSize));
-                break;
-            case ocBitRshift:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpBitRshift>(), nResultSize));
-                break;
-            case ocBitXor:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpBitXor>(), nResultSize));
-                break;
-            /*case ocChiInv:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                         ft->Children[i],std::make_shared<OpChiInv));
-                break;*/
-            case ocPoissonDist:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpPoisson>(), nResultSize));
-                break;
-            case ocSumSQ:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSumSQ>(), nResultSize));
-                break;
-            case ocSkewp:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSkewp>(), nResultSize));
-                break;
-            case ocBinomDist:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpBinomdist>(), nResultSize));
-                break;
-            case ocVarP:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpVarP>(), nResultSize));
-                break;
-            case ocCeil:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpCeil>(), nResultSize));
-                break;
-            case ocCombin:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpCombin>(), nResultSize));
-                break;
-            case ocDevSq:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDevSq>(), nResultSize));
-                break;
-            case ocStDev:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpStDev>(), nResultSize));
-                break;
-            case ocSlope:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSlope>(), nResultSize));
-                break;
-            case ocSTEYX:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSTEYX>(), nResultSize));
-                break;
-            case ocZTest:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpZTest>(), nResultSize));
                 break;
             case ocPi:
                 mvSubArguments.push_back(
@@ -3406,412 +2194,236 @@ DynamicKernelSoPArguments::DynamicKernelSoPArguments(const ScCalcConfig& config,
                     std::make_shared<DynamicKernelRandomArgument>(mCalcConfig, ts,
                             ft->Children[i]));
                 break;
-            case ocProduct:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpProduct>(), nResultSize));
+#define CASE(opcode, createCode) \
+            case opcode: \
+                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], createCode, nResultSize)); \
                 break;
-            /*case ocHypGeomDist:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                         ft->Children[i],std::make_shared<OpHypGeomDist));
-                break;*/
-            case ocSumX2MY2:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSumX2MY2>(), nResultSize));
-                break;
-            case ocSumX2DY2:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSumX2PY2>(), nResultSize));
-                break;
-            /*case ocBetaInv:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                         ft->Children[i],std::make_shared<OpBetainv));
-                 break;*/
-            case ocTTest:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpTTest>(), nResultSize));
-                break;
-            case ocTDist:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpTDist>(), nResultSize));
-                break;
-            /*case ocTInv:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                         ft->Children[i], std::make_shared<OpTInv));
-                 break;*/
-            case ocSumXMY2:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSumXMY2>(), nResultSize));
-                break;
-            case ocStDevP:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpStDevP>(), nResultSize));
-                break;
-            case ocCovar:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpCovar>(), nResultSize));
-                break;
-            case ocAnd:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpAnd>(), nResultSize));
-                break;
-            case ocVLookup:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpVLookup>(), nResultSize));
-                break;
-            case ocOr:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpOr>(), nResultSize));
-                break;
-            case ocNot:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpNot>(), nResultSize));
-                break;
-            case ocXor:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpXor>(), nResultSize));
-                break;
-            case ocDBMax:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDmax>(), nResultSize));
-                break;
-            case ocDBMin:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDmin>(), nResultSize));
-                break;
-            case ocDBProduct:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDproduct>(), nResultSize));
-                break;
-            case ocDBAverage:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDaverage>(), nResultSize));
-                break;
-            case ocDBStdDev:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDstdev>(), nResultSize));
-                break;
-            case ocDBStdDevP:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDstdevp>(), nResultSize));
-                break;
-            case ocDBSum:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDsum>(), nResultSize));
-                break;
-            case ocDBVar:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDvar>(), nResultSize));
-                break;
-            case ocDBVarP:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDvarp>(), nResultSize));
-                break;
-            case ocAverageIf:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpAverageIf>(), nResultSize));
-                break;
-            case ocDBCount:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDcount>(), nResultSize));
-                break;
-            case ocDBCount2:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDcount2>(), nResultSize));
-                break;
-            case ocDeg:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpDeg>(), nResultSize));
-                break;
-            case ocRoundUp:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpRoundUp>(), nResultSize));
-                break;
-            case ocRoundDown:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpRoundDown>(), nResultSize));
-                break;
-            case ocInt:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpInt>(), nResultSize));
-                break;
-            case ocRad:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpRadians>(), nResultSize));
-                break;
-            case ocCountIf:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpCountIf>(), nResultSize));
-                break;
-            case ocIsEven:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpIsEven>(), nResultSize));
-                break;
-            case ocIsOdd:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpIsOdd>(), nResultSize));
-                break;
-            case ocFact:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpFact>(), nResultSize));
-                break;
-            case ocMinA:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpMinA>(), nResultSize));
-                break;
-            case ocCount2:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpCountA>(), nResultSize));
-                break;
-            case ocMaxA:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpMaxA>(), nResultSize));
-                break;
-            case ocAverageA:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpAverageA>(), nResultSize));
-                break;
-            case ocVarA:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpVarA>(), nResultSize));
-                break;
-            case ocVarPA:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpVarPA>(), nResultSize));
-                break;
-            case ocStDevA:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpStDevA>(), nResultSize));
-                break;
-            case ocStDevPA:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpStDevPA>(), nResultSize));
-                break;
-            case ocSecant:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSec>(), nResultSize));
-                break;
-            case ocSecantHyp:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSecH>(), nResultSize));
-                break;
-            case ocSumIf:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpSumIf>(), nResultSize));
-                break;
-            case ocNegSub:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpNegSub>(), nResultSize));
-                break;
-            case ocAveDev:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpAveDev>(), nResultSize));
-                break;
-            case ocIf:
-                mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                        ft->Children[i], std::make_shared<OpIf>(), nResultSize));
-                break;
+            CASE(ocAbs, std::make_shared<OpAbs>())
+            CASE(ocAdd, std::make_shared<OpSum>(nResultSize))
+            CASE(ocAnd, std::make_shared<OpAnd>())
+            CASE(ocArcCos, std::make_shared<OpArcCos>())
+            CASE(ocArcCosHyp, std::make_shared<OpArcCosHyp>())
+            CASE(ocArcCot, std::make_shared<OpArcCot>())
+            CASE(ocArcCotHyp, std::make_shared<OpArcCotHyp>())
+            CASE(ocArcSin, std::make_shared<OpArcSin>())
+            CASE(ocArcSinHyp, std::make_shared<OpArcSinHyp>())
+            CASE(ocArcTan, std::make_shared<OpArcTan>())
+            CASE(ocArcTan2, std::make_shared<OpArcTan2>())
+            CASE(ocArcTanHyp, std::make_shared<OpArcTanH>())
+            CASE(ocAveDev, std::make_shared<OpAveDev>())
+            CASE(ocAverage, std::make_shared<OpAverage>(nResultSize))
+            CASE(ocAverageA, std::make_shared<OpAverageA>(nResultSize))
+            CASE(ocAverageIf, std::make_shared<OpAverageIf>())
+            CASE(ocAverageIfs, std::make_shared<OpAverageIfs>())
+            CASE(ocB, std::make_shared<OpB>())
+            CASE(ocBetaDist, std::make_shared<OpBetaDist>())
+            CASE(ocBetaInv, std::make_shared<OpBetainv>())
+            CASE(ocBinomDist, std::make_shared<OpBinomdist>())
+            CASE(ocBitAnd, std::make_shared<OpBitAnd>())
+            CASE(ocBitLshift, std::make_shared<OpBitLshift>())
+            CASE(ocBitOr, std::make_shared<OpBitOr>())
+            CASE(ocBitRshift, std::make_shared<OpBitRshift>())
+            CASE(ocBitXor, std::make_shared<OpBitXor>())
+            CASE(ocCeil, std::make_shared<OpCeil>())
+            CASE(ocChiDist, std::make_shared<OpChiDist>())
+            CASE(ocChiInv, std::make_shared<OpChiInv>())
+            CASE(ocChiSqDist, std::make_shared<OpChiSqDist>())
+            CASE(ocChiSqInv, std::make_shared<OpChiSqInv>())
+            CASE(ocCombin, std::make_shared<OpCombin>())
+            CASE(ocCombinA, std::make_shared<OpCombinA>())
+            CASE(ocConfidence, std::make_shared<OpConfidence>())
+            CASE(ocCorrel, std::make_shared<OpCorrel>())
+            CASE(ocCos, std::make_shared<OpCos>())
+            CASE(ocCosHyp, std::make_shared<OpCosh>())
+            CASE(ocCosecant, std::make_shared<OpCsc>())
+            CASE(ocCosecantHyp, std::make_shared<OpCscH>())
+            CASE(ocCot, std::make_shared<OpCot>())
+            CASE(ocCotHyp, std::make_shared<OpCoth>())
+            CASE(ocCount, std::make_shared<OpCount>(nResultSize))
+            CASE(ocCount2, std::make_shared<OpCountA>(nResultSize))
+            CASE(ocCountIf, std::make_shared<OpCountIf>())
+            CASE(ocCountIfs, std::make_shared<OpCountIfs>())
+            CASE(ocCovar, std::make_shared<OpCovar>())
+            CASE(ocCritBinom, std::make_shared<OpCritBinom>())
+            CASE(ocDB, std::make_shared<OpDB>())
+            CASE(ocDDB, std::make_shared<OpDDB>())
+            CASE(ocDeg, std::make_shared<OpDeg>())
+            CASE(ocDevSq, std::make_shared<OpDevSq>())
+            CASE(ocDiv, std::make_shared<OpDiv>(nResultSize))
+            CASE(ocEqual, std::make_shared<OpEqual>())
+            CASE(ocEven, std::make_shared<OpEven>())
+            CASE(ocExp, std::make_shared<OpExp>())
+            CASE(ocExpDist, std::make_shared<OpExponDist>())
+            CASE(ocFDist, std::make_shared<OpFdist>())
+            CASE(ocFInv, std::make_shared<OpFInv>())
+            CASE(ocFTest, std::make_shared<OpFTest>())
+            CASE(ocFV, std::make_shared<OpFV>())
+            CASE(ocFact, std::make_shared<OpFact>())
+            CASE(ocFisher, std::make_shared<OpFisher>())
+            CASE(ocFisherInv, std::make_shared<OpFisherInv>())
+            CASE(ocFloor, std::make_shared<OpFloor>())
+            CASE(ocForecast, std::make_shared<OpForecast>())
+            CASE(ocGamma, std::make_shared<OpGamma>())
+            CASE(ocGammaDist, std::make_shared<OpGammaDist>())
+            CASE(ocGammaInv, std::make_shared<OpGammaInv>())
+            CASE(ocGammaLn, std::make_shared<OpGammaLn>())
+            CASE(ocGauss, std::make_shared<OpGauss>())
+            CASE(ocGeoMean, std::make_shared<OpGeoMean>())
+            CASE(ocGreater, std::make_shared<OpGreater>())
+            CASE(ocGreaterEqual, std::make_shared<OpGreaterEqual>())
+            CASE(ocHarMean, std::make_shared<OpHarMean>())
+            CASE(ocHypGeomDist, std::make_shared<OpHypGeomDist>())
+            CASE(ocIRR, std::make_shared<OpIRR>())
+            CASE(ocISPMT, std::make_shared<OpISPMT>())
+            CASE(ocIf, std::make_shared<OpIf>())
+            CASE(ocInt, std::make_shared<OpInt>())
+            CASE(ocIntercept, std::make_shared<OpIntercept>())
+            CASE(ocIpmt, std::make_shared<OpIPMT>())
+            CASE(ocIsEven, std::make_shared<OpIsEven>())
+            CASE(ocIsOdd, std::make_shared<OpIsOdd>())
+            CASE(ocKurt, std::make_shared<OpKurt>())
+            CASE(ocLess, std::make_shared<OpLess>())
+            CASE(ocLessEqual, std::make_shared<OpLessEqual>())
+            CASE(ocLn, std::make_shared<OpLn>())
+            CASE(ocLog, std::make_shared<OpLog>())
+            CASE(ocLog10, std::make_shared<OpLog10>())
+            CASE(ocLogInv, std::make_shared<OpLogInv>())
+            CASE(ocLogNormDist, std::make_shared<OpLogNormDist>())
+            CASE(ocMIRR, std::make_shared<OpMIRR>())
+            CASE(ocMax, std::make_shared<OpMax>(nResultSize))
+            CASE(ocMaxA, std::make_shared<OpMaxA>(nResultSize))
+            CASE(ocMin, std::make_shared<OpMin>(nResultSize))
+            CASE(ocMinA, std::make_shared<OpMinA>(nResultSize))
+            CASE(ocMod, std::make_shared<OpMod>())
+            CASE(ocMul, std::make_shared<OpMul>(nResultSize))
+            CASE(ocNPV, std::make_shared<OpNPV>())
+            CASE(ocNegBinomVert , std::make_shared<OpNegbinomdist>())
+            CASE(ocNegSub, std::make_shared<OpNegSub>())
+            CASE(ocNormDist, std::make_shared<OpNormdist>())
+            CASE(ocNormInv, std::make_shared<OpNorminv>())
+            CASE(ocNot, std::make_shared<OpNot>())
+            CASE(ocNotEqual, std::make_shared<OpNotEqual>())
+            CASE(ocNper, std::make_shared<OpNper>())
+            CASE(ocOdd, std::make_shared<OpOdd>())
+            CASE(ocOr, std::make_shared<OpOr>())
+            CASE(ocPDuration, std::make_shared<OpPDuration>())
+            CASE(ocPMT, std::make_shared<OpPMT>())
+            CASE(ocPV, std::make_shared<OpPV>())
+            CASE(ocPearson, std::make_shared<OpPearson>())
+            CASE(ocPermut, std::make_shared<OpPermut>())
+            CASE(ocPermutationA, std::make_shared<OpPermutationA>())
+            CASE(ocPhi, std::make_shared<OpPhi>())
+            CASE(ocPoissonDist, std::make_shared<OpPoisson>())
+            CASE(ocPow, std::make_shared<OpPower>())
+            CASE(ocPower, std::make_shared<OpPower>())
+            CASE(ocPpmt, std::make_shared<OpPPMT>())
+            CASE(ocProduct, std::make_shared<OpProduct>())
+            CASE(ocRRI, std::make_shared<OpRRI>())
+            CASE(ocRSQ, std::make_shared<OpRsq>())
+            CASE(ocRad, std::make_shared<OpRadians>())
+            CASE(ocRate, std::make_shared<OpRate>())
+            CASE(ocRound, std::make_shared<OpRound>())
+            CASE(ocRoundDown, std::make_shared<OpRoundDown>())
+            CASE(ocRoundUp, std::make_shared<OpRoundUp>())
+            CASE(ocSLN, std::make_shared<OpSLN>())
+            CASE(ocSNormInv, std::make_shared<OpNormsinv>())
+            CASE(ocSTEYX, std::make_shared<OpSTEYX>())
+            CASE(ocSYD, std::make_shared<OpSYD>())
+            CASE(ocSecant, std::make_shared<OpSec>())
+            CASE(ocSecantHyp, std::make_shared<OpSecH>())
+            CASE(ocSin, std::make_shared<OpSin>())
+            CASE(ocSinHyp, std::make_shared<OpSinh>())
+            CASE(ocSkew, std::make_shared<OpSkew>())
+            CASE(ocSkewp, std::make_shared<OpSkewp>())
+            CASE(ocSlope, std::make_shared<OpSlope>())
+            CASE(ocSqrt, std::make_shared<OpSqrt>())
+            CASE(ocStDev, std::make_shared<OpStDev>())
+            CASE(ocStDevA, std::make_shared<OpStDevA>())
+            CASE(ocStDevP, std::make_shared<OpStDevP>())
+            CASE(ocStDevPA, std::make_shared<OpStDevPA>())
+            CASE(ocStandard, std::make_shared<OpStandard>())
+            CASE(ocStdNormDist, std::make_shared<OpNormsdist>())
+            CASE(ocSub, std::make_shared<OpSub>(nResultSize))
+            CASE(ocSum, std::make_shared<OpSum>(nResultSize))
+            CASE(ocSumIf, std::make_shared<OpSumIf>())
+            CASE(ocSumIfs, std::make_shared<OpSumIfs>())
+            CASE(ocSumProduct, std::make_shared<OpSumProduct>())
+            CASE(ocSumSQ, std::make_shared<OpSumSQ>())
+            CASE(ocSumX2DY2, std::make_shared<OpSumX2PY2>())
+            CASE(ocSumX2MY2, std::make_shared<OpSumX2MY2>())
+            CASE(ocSumXMY2, std::make_shared<OpSumXMY2>())
+            CASE(ocTDist, std::make_shared<OpTDist>())
+            CASE(ocTInv, std::make_shared<OpTInv>())
+            CASE(ocTTest, std::make_shared<OpTTest>())
+            CASE(ocTan, std::make_shared<OpTan>())
+            CASE(ocTanHyp, std::make_shared<OpTanH>())
+            CASE(ocTrunc, std::make_shared<OpTrunc>())
+            CASE(ocVBD, std::make_shared<OpVDB>())
+            CASE(ocVLookup, std::make_shared<OpVLookup>())
+            CASE(ocVar, std::make_shared<OpVar>())
+            CASE(ocVarA, std::make_shared<OpVarA>())
+            CASE(ocVarP, std::make_shared<OpVarP>())
+            CASE(ocVarPA, std::make_shared<OpVarPA>())
+            CASE(ocWeibull, std::make_shared<OpWeibull>())
+            CASE(ocXor, std::make_shared<OpXor>())
+            CASE(ocZTest, std::make_shared<OpZTest>())
+#undef CASE
             case ocExternal:
-                if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getEffect")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpEffective>(), nResultSize));
+#define EXTCASE( name, createCode ) \
+                else if (pChild->GetExternal() == name) \
+                { \
+                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], createCode, nResultSize)); \
                 }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getCumipmt")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpCumipmt>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getNominal")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpNominal>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getCumprinc")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpCumprinc>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getXnpv")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpXNPV>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getPricemat")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpPriceMat>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getReceived")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpReceived>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getTbilleq")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpTbilleq>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getTbillprice")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpTbillprice>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getTbillyield")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpTbillyield>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getFvschedule")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpFvschedule>(), nResultSize));
-                }
-                /*else if ( pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getYield")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpYield));
-                }*/
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getYielddisc")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpYielddisc>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getYieldmat")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpYieldmat>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getAccrintm")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpAccrintm>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getCoupdaybs")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpCoupdaybs>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getDollarde")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpDollarde>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getDollarfr")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpDollarfr>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getCoupdays")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpCoupdays>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getCoupdaysnc")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpCoupdaysnc>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getDisc")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpDISC>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getIntrate")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpINTRATE>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getPrice")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                            ft->Children[i], std::make_shared<OpPrice>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getCoupnum")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpCoupnum>(), nResultSize));
-                }
-                /*else if pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getDuration"))
-                {
-                    mvSubArguments.push_back(
-                        SoPHelper(mCalcConfig, ts, ft->Children[i], std::make_shared<OpDuration_ADD));
-                }*/
-                /*else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getAmordegrc")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpAmordegrc, nResultSize));
-                }*/
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getAmorlinc")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpAmorlinc>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getMduration")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpMDuration>(), nResultSize));
-                }
-                /*else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getXirr")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpXirr, nResultSize));
-                }*/
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getOddlprice")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                            ft->Children[i], std::make_shared<OpOddlprice>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getOddlyield")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpOddlyield>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getPricedisc")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts,
-                            ft->Children[i], std::make_shared<OpPriceDisc>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getCouppcd")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpCouppcd>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getCoupncd")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpCoupncd>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getAccrint")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpAccrint>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getSqrtpi")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpSqrtPi>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getConvert")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpConvert>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getIseven")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpIsEven>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getIsodd")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpIsOdd>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getMround")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpMROUND>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getQuotient")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpQuotient>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getSeriessum")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpSeriesSum>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getBesselj")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpBesselj>(), nResultSize));
-                }
-                else if (pChild->GetExternal() == "com.sun.star.sheet.addin.Analysis.getGestep")
-                {
-                    mvSubArguments.push_back(SoPHelper(mCalcConfig, ts, ft->Children[i],
-                            std::make_shared<OpGestep>(), nResultSize));
-                }
+
+                if(false) // start else-if chain
+                    ;
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getAccrint", std::make_shared<OpAccrint>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getAccrintm", std::make_shared<OpAccrintm>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getAmordegrc", std::make_shared<OpAmordegrc>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getAmorlinc", std::make_shared<OpAmorlinc>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getBesselj", std::make_shared<OpBesselj>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getCoupdaybs", std::make_shared<OpCoupdaybs>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getCoupdays", std::make_shared<OpCoupdays>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getCoupdaysnc", std::make_shared<OpCoupdaysnc>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getCoupncd", std::make_shared<OpCoupncd>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getCoupnum", std::make_shared<OpCoupnum>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getCouppcd", std::make_shared<OpCouppcd>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getCumipmt", std::make_shared<OpCumipmt>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getCumprinc", std::make_shared<OpCumprinc>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getDisc", std::make_shared<OpDISC>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getDollarde", std::make_shared<OpDollarde>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getDollarfr", std::make_shared<OpDollarfr>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getDuration", std::make_shared<OpDuration_ADD>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getEffect", std::make_shared<OpEffective>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getFvschedule", std::make_shared<OpFvschedule>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getGestep", std::make_shared<OpGestep>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getIntrate", std::make_shared<OpINTRATE>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getIseven", std::make_shared<OpIsEven>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getIsodd", std::make_shared<OpIsOdd>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getMduration", std::make_shared<OpMDuration>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getMround", std::make_shared<OpMROUND>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getNominal", std::make_shared<OpNominal>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getOddlprice", std::make_shared<OpOddlprice>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getOddlyield", std::make_shared<OpOddlyield>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getPrice", std::make_shared<OpPrice>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getPricedisc", std::make_shared<OpPriceDisc>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getPricemat", std::make_shared<OpPriceMat>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getQuotient", std::make_shared<OpQuotient>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getReceived", std::make_shared<OpReceived>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getSeriessum", std::make_shared<OpSeriesSum>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getSqrtpi", std::make_shared<OpSqrtPi>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getTbilleq", std::make_shared<OpTbilleq>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getTbillprice", std::make_shared<OpTbillprice>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getTbillyield", std::make_shared<OpTbillyield>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getXirr", std::make_shared<OpXirr>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getXnpv", std::make_shared<OpXNPV>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getYield", std::make_shared<OpYield>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getYielddisc", std::make_shared<OpYielddisc>())
+                EXTCASE("com.sun.star.sheet.addin.Analysis.getYieldmat", std::make_shared<OpYieldmat>())
                 else
                     throw UnhandledToken(OUString("unhandled external " + pChild->GetExternal()).toUtf8().getStr(), __FILE__, __LINE__);
                 break;
+#undef EXTCASE
 
             default:
                 throw UnhandledToken(OUString("unhandled opcode "
@@ -3826,7 +2438,7 @@ namespace {
 class DynamicKernel : public CompiledFormula
 {
 public:
-    DynamicKernel( const ScCalcConfig& config, const FormulaTreeNodeRef& r, int nResultSize );
+    DynamicKernel( ScCalcConfig  config, FormulaTreeNodeRef r, int nResultSize );
     virtual ~DynamicKernel() override;
 
     static std::shared_ptr<DynamicKernel> create( const ScCalcConfig& config, const ScTokenArray& rCode, int nResultSize );
@@ -3865,9 +2477,9 @@ private:
 
 }
 
-DynamicKernel::DynamicKernel( const ScCalcConfig& config, const FormulaTreeNodeRef& r, int nResultSize ) :
-    mCalcConfig(config),
-    mpRoot(r),
+DynamicKernel::DynamicKernel( ScCalcConfig config, FormulaTreeNodeRef x, int nResultSize ) :
+    mCalcConfig(std::move(config)),
+    mpRoot(std::move(x)),
     mpProgram(nullptr),
     mpKernel(nullptr),
     mpResClmem(nullptr),
@@ -3895,7 +2507,7 @@ void DynamicKernel::CodeGen()
     // Traverse the tree of expression and declare symbols used
     const DynamicKernelArgument* DK = mSyms.DeclRefArg<DynamicKernelSoPArguments>(mCalcConfig, mpRoot, std::make_shared<OpNop>(mnResultSize), mnResultSize);
 
-    std::stringstream decl;
+    outputstream decl;
     if (openclwrapper::gpuEnv.mnKhrFp64Flag)
     {
         decl << "#if __OPENCL_VERSION__ < 120\n";
@@ -3941,7 +2553,7 @@ std::string const & DynamicKernel::GetMD5()
 {
     if (mKernelHash.empty())
     {
-        std::stringstream md5s;
+        outputstream md5s;
         // Compute MD5SUM of kernel body to obtain the name
         sal_uInt8 result[RTL_DIGEST_LENGTH_MD5];
         rtl_digest_MD5(
@@ -4125,7 +2737,7 @@ const DynamicKernelArgument* SymbolTable::DeclRefArg(const ScCalcConfig& config,
     if (it == mSymbols.end())
     {
         // Allocate new symbols
-        std::stringstream ss;
+        outputstream ss;
         ss << "tmp" << mCurId++;
         DynamicKernelArgumentRef new_arg = std::make_shared<T>(config, ss.str(), t, std::move(pCodeGen), nResultSize);
         mSymbols[ref] = new_arg;
@@ -4318,19 +2930,19 @@ class CLInterpreterContext
     SCROW mnGroupLength;
 
 public:
-    explicit CLInterpreterContext(SCROW nGroupLength)
-        : mpKernel(nullptr)
+    explicit CLInterpreterContext(SCROW nGroupLength, std::shared_ptr<DynamicKernel> pKernel )
+        : mpKernelStore(std::move(pKernel))
+        , mpKernel(mpKernelStore.get())
         , mnGroupLength(nGroupLength) {}
+
+    ~CLInterpreterContext()
+    {
+        DynamicKernelArgument::ClearStringIds();
+    }
 
     bool isValid() const
     {
         return mpKernel != nullptr;
-    }
-
-    void setManagedKernel( std::shared_ptr<DynamicKernel> pKernel )
-    {
-        mpKernelStore = std::move(pKernel);
-        mpKernel = mpKernelStore.get();
     }
 
     CLInterpreterResult launchKernel()
@@ -4376,11 +2988,7 @@ public:
 CLInterpreterContext createCLInterpreterContext( const ScCalcConfig& rConfig,
     const ScFormulaCellGroupRef& xGroup, const ScTokenArray& rCode )
 {
-    CLInterpreterContext aCxt(xGroup->mnLength);
-
-    aCxt.setManagedKernel(DynamicKernel::create(rConfig, rCode, xGroup->mnLength));
-
-    return aCxt;
+    return CLInterpreterContext(xGroup->mnLength, DynamicKernel::create(rConfig, rCode, xGroup->mnLength));
 }
 
 void genRPNTokens( ScDocument& rDoc, const ScAddress& rTopPos, ScTokenArray& rCode )
@@ -4410,6 +3018,7 @@ bool FormulaGroupInterpreterOpenCL::interpret( ScDocument& rDoc,
     const ScAddress& rTopPos, ScFormulaCellGroupRef& xGroup,
     ScTokenArray& rCode )
 {
+    SAL_INFO("sc.opencl", "Interpret cell group " << rTopPos);
     MergeCalcConfig(rDoc);
 
     genRPNTokens(rDoc, rTopPos, rCode);

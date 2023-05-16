@@ -14,6 +14,8 @@ $(eval $(call gb_CppunitTest_CppunitTest,sw_uibase_shells))
 $(eval $(call gb_CppunitTest_use_common_precompiled_header,sw_uibase_shells))
 
 $(eval $(call gb_CppunitTest_add_exception_objects,sw_uibase_shells, \
+    sw/qa/uibase/shells/textfld \
+    sw/qa/uibase/shells/textsh \
     sw/qa/uibase/shells/shells \
 ))
 
@@ -24,6 +26,7 @@ $(eval $(call gb_CppunitTest_use_libraries,sw_uibase_shells, \
     editeng \
     sal \
     sfx \
+    subsequenttest \
     svl \
     svx \
     svxcore \

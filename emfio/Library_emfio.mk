@@ -18,7 +18,7 @@
 
 $(eval $(call gb_Library_Library,emfio))
 
-$(eval $(call gb_Library_set_componentfile,emfio,emfio/emfio))
+$(eval $(call gb_Library_set_componentfile,emfio,emfio/emfio,services))
 
 $(eval $(call gb_Library_set_include,emfio,\
     $$(INCLUDE) \
@@ -41,6 +41,7 @@ $(eval $(call gb_Library_use_sdk_api,emfio))
 
 $(eval $(call gb_Library_use_libraries,emfio,\
     basegfx \
+    drawinglayercore \
     drawinglayer \
     cppu \
     cppuhelper \

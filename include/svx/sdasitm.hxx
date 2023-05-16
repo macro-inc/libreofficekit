@@ -48,6 +48,16 @@ private:
 
     css::uno::Sequence< css::beans::PropertyValue > aPropSeq;
 
+    // For fast comparisons keep a hash of the content, computed on demand
+    // (unusable state is if anyToHash() returns no hash).
+    enum HashState { Unknown, Valid, Unusable };
+    mutable HashState aHashState = HashState::Unknown;
+    mutable size_t aHash = 0xdeadbeef;
+
+    void SetPropSeq( const css::uno::Sequence< css::beans::PropertyValue >& rPropSeq );
+    inline void UpdateHash() const;
+    inline void InvalidateHash();
+
     public:
 
             SdrCustomShapeGeometryItem();
@@ -60,6 +70,9 @@ private:
             SdrCustomShapeGeometryItem & operator =(SdrCustomShapeGeometryItem &&) = delete; // due to SfxPoolItem
 
             virtual bool                operator==( const SfxPoolItem& ) const override;
+            virtual bool                operator<( const SfxPoolItem& ) const override;
+            virtual bool                IsSortable() const override { return true; }
+
             virtual bool GetPresentation(SfxItemPresentation ePresentation,
                                          MapUnit eCoreMetric, MapUnit ePresentationMetric,
                                          OUString &rText, const IntlWrapper&) const override;

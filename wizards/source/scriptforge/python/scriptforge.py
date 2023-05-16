@@ -51,7 +51,7 @@
             ScriptForge(hostname = 'localhost', port = 2021)
 
     Specific documentation about the use of ScriptForge from Python scripts:
-        https://help.libreoffice.org/7.3/en-US/text/sbasic/shared/03/sf_intro.html
+        https://help.libreoffice.org/latest/en-US/text/sbasic/shared/03/sf_intro.html?DbPAR=BASIC
     """
 
 import uno
@@ -103,7 +103,7 @@ class ScriptForge(object, metaclass = _Singleton):
     # Class constants
     # #########################################################################
     library = 'ScriptForge'
-    Version = '7.3'  # Actual version number
+    Version = '7.4'  # Actual version number
     #
     # Basic dispatcher for Python scripts
     basicdispatcher = '@application#ScriptForge.SF_PythonHelper._PythonDispatcher'
@@ -123,10 +123,11 @@ class ScriptForge(object, metaclass = _Singleton):
                             ('ScriptForge.Exception', 1),
                             ('ScriptForge.FileSystem', 2),
                             ('ScriptForge.Platform', 3),
-                            ('ScriptForge.Services', 4),
-                            ('ScriptForge.Session', 5),
-                            ('ScriptForge.String', 6),
-                            ('ScriptForge.UI', 7)])
+                            ('ScriptForge.Region', 4),
+                            ('ScriptForge.Services', 5),
+                            ('ScriptForge.Session', 6),
+                            ('ScriptForge.String', 7),
+                            ('ScriptForge.UI', 8)])
 
     def __init__(self, hostname = '', port = 0):
         """
@@ -211,7 +212,7 @@ class ScriptForge(object, metaclass = _Singleton):
             fullscript = script
             paramarray = True
         #    Build the URI specification described in
-        #    https://wiki.openoffice.org/wiki/Documentation/DevGuide/Scripting/Scripting_Framework_URI_Specification
+        #    https://wiki.documentfoundation.org/Documentation/DevGuide/Scripting_Framework#Scripting_Framework_URI_Specification
         elif len(script) > 0:
             # Check ParamArray arguments
             paramarray = False
@@ -223,7 +224,7 @@ class ScriptForge(object, metaclass = _Singleton):
                 scope, script = script.split('#')
             if '.py$' in script.lower():  # Python
                 if len(scope) == 0:
-                    scope = 'share'     # Default for Python
+                    scope = 'share'  # Default for Python
                 # Provide an alternate helper script depending on test context
                 if script.startswith(cls.pythonhelpermodule) and hasattr(cls, 'pythonhelpermodule2'):
                     script = cls.pythonhelpermodule2 + script[len(cls.pythonhelpermodule):]
@@ -232,10 +233,10 @@ class ScriptForge(object, metaclass = _Singleton):
                 uri = 'vnd.sun.star.script:{0}?language=Python&location={1}'.format(script, scope)
             else:  # Basic
                 if len(scope) == 0:
-                    scope = 'application'     # Default for Basic
+                    scope = 'application'  # Default for Basic
                 lib = ''
                 if len(script.split('.')) < 3:
-                    lib = cls.library + '.'     # Default library = ScriptForge
+                    lib = cls.library + '.'  # Default library = ScriptForge
                 uri = 'vnd.sun.star.script:{0}{1}?language=Basic&location={2}'.format(lib, script, scope)
             # Get the script object
             fullscript = ('@' if paramarray else '') + scope + ':' + script
@@ -267,7 +268,7 @@ class ScriptForge(object, metaclass = _Singleton):
             Execute a given Basic script and interpret its result
             This method has as counterpart the ScriptForge.SF_PythonHelper._PythonDispatcher() Basic method
             :param basicobject: a Service subclass
-            :param flags: see the vb* and flg* constants below
+            :param flags: see the vb* and flg* constants in the SFServices class
             :param method: the name of the method or property to invoke, as a string
             :param args: the arguments of the method. Symbolic cst* constants may be necessary
             :return: The invoked Basic counterpart script (with InvokeSimpleScript()) will return a tuple
@@ -326,7 +327,7 @@ class ScriptForge(object, metaclass = _Singleton):
         elif returntuple[cstVarType] == ScriptForge.V_DATE:
             dat = SFScriptForge.SF_Basic.CDateFromUnoDateTime(returntuple[cstValue])
             return dat
-        else:         # All other scalar values
+        else:  # All other scalar values
             pass
         return returntuple[cstValue]
 
@@ -346,6 +347,7 @@ class ScriptForge(object, metaclass = _Singleton):
                         # etc ...
                     copyFile, copyfile = CopyFile, CopyFile
             """
+
         def camelCase(key):
             return key[0].lower() + key[1:]
 
@@ -353,8 +355,8 @@ class ScriptForge(object, metaclass = _Singleton):
             # Synonyms of properties
             if hasattr(cls, 'serviceproperties'):
                 dico = cls.serviceproperties
-                dicosyn = dict(zip(map(str.lower, dico.keys()), dico.keys()))   # lower case
-                cc = dict(zip(map(camelCase, dico.keys()), dico.keys()))        # camel Case
+                dicosyn = dict(zip(map(str.lower, dico.keys()), dico.keys()))  # lower case
+                cc = dict(zip(map(camelCase, dico.keys()), dico.keys()))  # camel Case
                 dicosyn.update(cc)
                 setattr(cls, 'propertysynonyms', dicosyn)
             # Synonyms of methods. A method is a public callable attribute
@@ -369,6 +371,15 @@ class ScriptForge(object, metaclass = _Singleton):
                     if cc != lc:
                         setattr(cls, cc, func)
         return
+
+    @staticmethod
+    def unpack_args(kwargs):
+        """
+            Convert a dictionary passed as argument to a list alternating keys and values
+            Example:
+                dict(A = 'a', B = 2) => 'A', 'a', 'B', 2
+            """
+        return [v for p in zip(list(kwargs.keys()), list(kwargs.values())) for v in p]
 
 
 # #####################################################################################################################
@@ -438,7 +449,7 @@ class SFServices(object):
         """
     # Python-Basic protocol constants and flags
     vbGet, vbLet, vbMethod, vbSet = 2, 4, 1, 8  # CallByName constants
-    flgPost = 32    # The method or the property implies a hardcoded post-processing
+    flgPost = 32  # The method or the property implies a hardcoded post-processing
     flgDateArg = 64  # Invoked service method may contain a date argument
     flgDateRet = 128  # Invoked service method can return a date
     flgArrayArg = 512  # 1st argument can be a 2D array
@@ -496,7 +507,7 @@ class SFServices(object):
                         prop = self.GetProperty(name)
                         self.__dict__[name] = prop
                         return prop
-                else:   # Get Property from Basic and do not store it
+                else:  # Get Property from Basic and do not store it
                     return self.GetProperty(name)
         # Execute the usual attributes getter
         return super(SFServices, self).__getattribute__(name)
@@ -535,7 +546,7 @@ class SFServices(object):
 
     def Dispose(self):
         if self.serviceimplementation == 'basic':
-            if self.objectreference >= len(ScriptForge.servicesmodules):    # Do not dispose predefined module objects
+            if self.objectreference >= len(ScriptForge.servicesmodules):  # Do not dispose predefined module objects
                 self.ExecMethod(self.vbMethod, 'Dispose')
                 self.objectreference = -1
 
@@ -554,12 +565,24 @@ class SFServices(object):
             calltype = self.vbGet + (self.flgUno if propertyname[0] == 'X' else 0)
             if arg is None:
                 return self.EXEC(self.objectreference, calltype, propertyname)
-            else:   # There are a few cases (Calc ...) where GetProperty accepts an argument
+            else:  # There are a few cases (Calc ...) where GetProperty accepts an argument
                 return self.EXEC(self.objectreference, calltype, propertyname, arg)
         return None
 
     def Properties(self):
         return list(self.serviceproperties)
+
+    def basicmethods(self):
+        if self.serviceimplementation == 'basic':
+            return self.ExecMethod(self.vbMethod + self.flgArrayRet, 'Methods')
+        else:
+            return []
+
+    def basicproperties(self):
+        if self.serviceimplementation == 'basic':
+            return self.ExecMethod(self.vbMethod + self.flgArrayRet, 'Properties')
+        else:
+            return []
 
     def SetProperty(self, propertyname, value):
         """
@@ -645,7 +668,7 @@ class SFScriptForge:
                 :param unodate: com.sun.star.util.DateTime, com.sun.star.util.Date or com.sun.star.util.Time
                 :return: the equivalent datetime.datetime
                 """
-            date = datetime.datetime(1899, 12, 30, 0, 0, 0, 0)      # Idem as Basic builtin TimeSeria() function
+            date = datetime.datetime(1899, 12, 30, 0, 0, 0, 0)  # Idem as Basic builtin TimeSeria() function
             datetype = repr(type(unodate))
             if 'com.sun.star.util.DateTime' in datetype:
                 if 1900 <= unodate.Year <= datetime.MAXYEAR:
@@ -671,16 +694,16 @@ class SFScriptForge:
                 """
             unodate = uno.createUnoStruct('com.sun.star.util.DateTime')
             unodate.Year, unodate.Month, unodate.Day, unodate.Hours, unodate.Minutes, unodate.Seconds, \
-                unodate.NanoSeconds, unodate.IsUTC = \
-                1899, 12, 30, 0, 0, 0, 0, False    # Identical to Basic TimeSerial() function
+            unodate.NanoSeconds, unodate.IsUTC = \
+                1899, 12, 30, 0, 0, 0, 0, False  # Identical to Basic TimeSerial() function
 
             if isinstance(date, float):
                 date = time.localtime(date)
             if isinstance(date, time.struct_time):
                 if 1900 <= date[0] <= 32767:
-                    unodate.Year, unodate.Month, unodate.Day, unodate.Hours, unodate.Minutes, unodate.Seconds =\
+                    unodate.Year, unodate.Month, unodate.Day, unodate.Hours, unodate.Minutes, unodate.Seconds = \
                         date[0:6]
-                else:   # Copy only the time related part
+                else:  # Copy only the time related part
                     unodate.Hours, unodate.Minutes, unodate.Seconds = date[3:3]
             elif isinstance(date, (datetime.datetime, datetime.date, datetime.time)):
                 if isinstance(date, (datetime.datetime, datetime.date)):
@@ -690,7 +713,7 @@ class SFScriptForge:
                     unodate.Hours, unodate.Minutes, unodate.Seconds, unodate.NanoSeconds = \
                         date.hour, date.minute, date.second, date.microsecond * 1000
             else:
-                return date     # Not recognized as a date
+                return date  # Not recognized as a date
             return unodate
 
         @classmethod
@@ -704,6 +727,10 @@ class SFScriptForge:
         @classmethod
         def CreateUnoService(cls, servicename):
             return cls.SIMPLEEXEC(cls.module + '.PyCreateUnoService', servicename)
+
+        @classmethod
+        def CreateUnoStruct(cls, unostructure):
+            return uno.createUnoStruct(unostructure)
 
         @classmethod
         def DateAdd(cls, interval, number, date):
@@ -791,6 +818,7 @@ class SFScriptForge:
             DESK = 'com.sun.star.frame.Desktop'
             desktop = smgr.createInstanceWithContext(DESK, ctx)
             return desktop
+
         starDesktop, stardesktop = StarDesktop, StarDesktop
 
         @property
@@ -806,8 +834,9 @@ class SFScriptForge:
                 return None
             impl = comp.ImplementationName
             if impl in ('com.sun.star.comp.basic.BasicIDE', 'com.sun.star.comp.sfx2.BackingComp'):
-                return None     # None when Basic IDE or welcome screen
+                return None  # None when Basic IDE or welcome screen
             return comp
+
         thisComponent, thiscomponent = ThisComponent, ThisComponent
 
         @property
@@ -818,7 +847,7 @@ class SFScriptForge:
                 Above behaviour cannot be reproduced in Python.
                 :return: the current Base (main) component or None when not a Base document or one of its subcomponents
             """
-            comp = self.ThisComponent   # Get the current component
+            comp = self.ThisComponent  # Get the current component
             if comp is None:
                 return None
             #
@@ -843,6 +872,7 @@ class SFScriptForge:
                     if db.ImplementationName == targetimpl:
                         return db
             return None
+
         thisDatabaseDocument, thisdatabasedocument = ThisDatabaseDocument, ThisDatabaseDocument
 
         @classmethod
@@ -1000,6 +1030,10 @@ class SFScriptForge:
             ext = ctx.getByName('/singletons/com.sun.star.deployment.PackageInformationProvider')
             apso = 'apso.python.script.organizer'
             if len(ext.getPackageLocation(apso)) > 0:
+                # APSO is available. However, PythonShell() is ignored in bridge mode
+                # because APSO library not in pythonpath
+                if ScriptForge.port > 0:
+                    return None
                 # Directly derived from apso.oxt|python|scripts|tools.py$console
                 # we need to load apso before import statement
                 ctx.ServiceManager.createInstance('apso.python.script.organizer.impl')
@@ -1025,7 +1059,7 @@ class SFScriptForge:
             # Direct call because RaiseFatal forces an execution stop in Basic
             if len(args) == 0:
                 args = (None,)
-            return cls.SIMPLEEXEC('@SF_Exception.RaiseFatal', (errorcode, *args))   # With ParamArray
+            return cls.SIMPLEEXEC('@SF_Exception.RaiseFatal', (errorcode, *args))  # With ParamArray
 
         @classmethod
         def _RaiseFatal(cls, sub, subargs, errorcode, *args):
@@ -1087,6 +1121,9 @@ class SFScriptForge:
         def DeleteFolder(self, foldername):
             return self.ExecMethod(self.vbMethod, 'DeleteFolder', foldername)
 
+        def ExtensionFolder(self, extension):
+            return self.ExecMethod(self.vbMethod, 'ExtensionFolder', extension)
+
         def FileExists(self, filename):
             return self.ExecMethod(self.vbMethod, 'FileExists', filename)
 
@@ -1133,6 +1170,9 @@ class SFScriptForge:
         def MoveFile(self, source, destination):
             return self.ExecMethod(self.vbMethod, 'MoveFile', source, destination)
 
+        def Normalize(self, filename):
+            return self.ExecMethod(self.vbMethod, 'Normalize', filename)
+
         def MoveFolder(self, source, destination):
             return self.ExecMethod(self.vbMethod, 'MoveFolder', source, destination)
 
@@ -1171,11 +1211,12 @@ class SFScriptForge:
         serviceproperties = dict(Folder = False, Languages = False, Locale = False)
 
         @classmethod
-        def ReviewServiceArgs(cls, foldername = '', locale = '', encoding = 'UTF-8'):
+        def ReviewServiceArgs(cls, foldername = '', locale = '', encoding = 'UTF-8',
+                              locale2 = '', encoding2 = 'UTF-8'):
             """
                 Transform positional and keyword arguments into positional only
                 """
-            return foldername, locale, encoding
+            return foldername, locale, encoding, locale2, encoding2
 
         def AddText(self, context = '', msgid = '', comment = ''):
             return self.ExecMethod(self.vbMethod, 'AddText', context, msgid, comment)
@@ -1184,11 +1225,12 @@ class SFScriptForge:
             dialogobj = dialog.objectreference if isinstance(dialog, SFDialogs.SF_Dialog) else dialog
             return self.ExecMethod(self.vbMethod + self.flgObject, 'AddTextsFromDialog', dialogobj)
 
-        def ExportToPOTFile(self, filename, header = '', encoding= 'UTF-8'):
+        def ExportToPOTFile(self, filename, header = '', encoding = 'UTF-8'):
             return self.ExecMethod(self.vbMethod, 'ExportToPOTFile', filename, header, encoding)
 
         def GetText(self, msgid, *args):
             return self.ExecMethod(self.vbMethod, 'GetText', msgid, *args)
+
         _ = GetText
 
     # #########################################################################
@@ -1210,9 +1252,10 @@ class SFScriptForge:
         servicename = 'ScriptForge.Platform'
         servicesynonyms = ('platform', 'scriptforge.platform')
         serviceproperties = dict(Architecture = False, ComputerName = False, CPUCount = False, CurrentUser = False,
-                                 Fonts = False, Locale = False, Machine = False, OfficeVersion = False, OSName = False,
-                                 OSPlatform = False, OSRelease = False, OSVersion = False, Printers = False,
-                                 Processor = False, PythonVersion = False)
+                                 Extensions = False, FilterNames = False, Fonts = False, FormatLocale = False,
+                                 Locale = False, Machine = False, OfficeLocale = False, OfficeVersion = False,
+                                 OSName = False, OSPlatform = False, OSRelease = False, OSVersion = False,
+                                 Printers = False, Processor = False, PythonVersion = False, SystemLocale = False)
         # Python helper functions
         py = ScriptForge.pythonhelpermodule + '$' + '_SF_Platform'
 
@@ -1261,6 +1304,101 @@ class SFScriptForge:
             return self.SIMPLEEXEC(self.py, 'PythonVersion')
 
     # #########################################################################
+    # SF_Region CLASS
+    # #########################################################################
+    class SF_Region(SFServices, metaclass = _Singleton):
+        """
+            The "Region" service gathers a collection of functions about languages, countries and timezones
+                - Locales
+                - Currencies
+                - Numbers and dates formatting
+                - Calendars
+                - Timezones conversions
+                - Numbers transformed to text
+            """
+        # Mandatory class properties for service registration
+        serviceimplementation = 'basic'
+        servicename = 'ScriptForge.Region'
+        servicesynonyms = ('region', 'scriptforge.region')
+        serviceproperties = dict()
+
+        # Next functions are implemented in Basic as read-only properties with 1 argument
+        def Country(self, region = ''):
+            return self.GetProperty('Country', region)
+
+        def Currency(self, region = ''):
+            return self.GetProperty('Currency', region)
+
+        def DatePatterns(self, region = ''):
+            return self.GetProperty('DatePatterns', region)
+
+        def DateSeparator(self, region = ''):
+            return self.GetProperty('DateSeparator', region)
+
+        def DayAbbrevNames(self, region = ''):
+            return self.GetProperty('DayAbbrevNames', region)
+
+        def DayNames(self, region = ''):
+            return self.GetProperty('DayNames', region)
+
+        def DayNarrowNames(self, region = ''):
+            return self.GetProperty('DayNarrowNames', region)
+
+        def DecimalPoint(self, region = ''):
+            return self.GetProperty('DecimalPoint', region)
+
+        def Language(self, region = ''):
+            return self.GetProperty('Language', region)
+
+        def ListSeparator(self, region = ''):
+            return self.GetProperty('ListSeparator', region)
+
+        def MonthAbbrevNames(self, region = ''):
+            return self.GetProperty('MonthAbbrevNames', region)
+
+        def MonthNames(self, region = ''):
+            return self.GetProperty('MonthNames', region)
+
+        def MonthNarrowNames(self, region = ''):
+            return self.GetProperty('MonthNarrowNames', region)
+
+        def ThousandSeparator(self, region = ''):
+            return self.GetProperty('ThousandSeparator', region)
+
+        def TimeSeparator(self, region = ''):
+            return self.GetProperty('TimeSeparator', region)
+
+        # Usual methods
+        def DSTOffset(self, localdatetime, timezone, locale = ''):
+            if isinstance(localdatetime, datetime.datetime):
+                localdatetime = SFScriptForge.SF_Basic.CDateToUnoDateTime(localdatetime)
+            return self.ExecMethod(self.vbMethod + self.flgDateArg, 'DSTOffset', localdatetime, timezone, locale)
+
+        def LocalDateTime(self, utcdatetime, timezone, locale = ''):
+            if isinstance(utcdatetime, datetime.datetime):
+                utcdatetime = SFScriptForge.SF_Basic.CDateToUnoDateTime(utcdatetime)
+            localdate = self.ExecMethod(self.vbMethod + self.flgDateArg + self.flgDateRet, 'LocalDateTime',
+                                        utcdatetime, timezone, locale)
+            return SFScriptForge.SF_Basic.CDateFromUnoDateTime(localdate)
+
+        def Number2Text(self, number, locale = ''):
+            return self.ExecMethod(self.vbMethod, 'Number2Text', number, locale)
+
+        def TimeZoneOffset(self, timezone, locale = ''):
+            return self.ExecMethod(self.vbMethod, 'TimeZoneOffset', timezone, locale)
+
+        def UTCDateTime(self, localdatetime, timezone, locale = ''):
+            if isinstance(localdatetime, datetime.datetime):
+                localdatetime = SFScriptForge.SF_Basic.CDateToUnoDateTime(localdatetime)
+            utcdate = self.ExecMethod(self.vbMethod + self.flgDateArg + self.flgDateRet, 'UTCDateTime', localdatetime,
+                                      timezone, locale)
+            return SFScriptForge.SF_Basic.CDateFromUnoDateTime(utcdate)
+
+        def UTCNow(self, timezone, locale = ''):
+            now = self.ExecMethod(self.vbMethod + self.flgDateRet, 'UTCNow', timezone, locale)
+            return SFScriptForge.SF_Basic.CDateFromUnoDateTime(now)
+
+    # #########################################################################
     # SF_Session CLASS
     # #########################################################################
     class SF_Session(SFServices, metaclass = _Singleton):
@@ -1276,13 +1414,13 @@ class SFScriptForge:
         serviceproperties = dict()
 
         # Class constants                       Where to find an invoked library ?
-        SCRIPTISEMBEDDED = 'document'           # in the document
-        SCRIPTISAPPLICATION = 'application'     # in any shared library (Basic)
-        SCRIPTISPERSONAL = 'user'               # in My Macros (Python)
-        SCRIPTISPERSOXT = 'user:uno_packages'   # in an extension installed for the current user (Python)
-        SCRIPTISSHARED = 'share'                # in LibreOffice macros (Python)
+        SCRIPTISEMBEDDED = 'document'  # in the document
+        SCRIPTISAPPLICATION = 'application'  # in any shared library (Basic)
+        SCRIPTISPERSONAL = 'user'  # in My Macros (Python)
+        SCRIPTISPERSOXT = 'user:uno_packages'  # in an extension installed for the current user (Python)
+        SCRIPTISSHARED = 'share'  # in LibreOffice macros (Python)
         SCRIPTISSHAROXT = 'share:uno_packages'  # in an extension installed for all users (Python)
-        SCRIPTISOXT = 'uno_packages'            # in an extension but the installation parameters are unknown (Python)
+        SCRIPTISOXT = 'uno_packages'  # in an extension but the installation parameters are unknown (Python)
 
         @classmethod
         def ExecuteBasicScript(cls, scope = '', script = '', *args):
@@ -1406,11 +1544,13 @@ class SFScriptForge:
         @property
         def AtEndOfStream(self):
             return self.GetProperty('AtEndOfStream')
+
         atEndOfStream, atendofstream = AtEndOfStream, AtEndOfStream
 
         @property
         def Line(self):
             return self.GetProperty('Line')
+
         line = Line
 
         def CloseFile(self):
@@ -1486,7 +1626,7 @@ class SFScriptForge:
         serviceimplementation = 'basic'
         servicename = 'ScriptForge.UI'
         servicesynonyms = ('ui', 'scriptforge.ui')
-        serviceproperties = dict(ActiveWindow = False)
+        serviceproperties = dict(ActiveWindow = False, Height = False, Width = False, X = False, Y = False)
 
         # Class constants
         MACROEXECALWAYS, MACROEXECNEVER, MACROEXECNORMAL = 2, 1, 0
@@ -1496,6 +1636,7 @@ class SFScriptForge:
         @property
         def ActiveWindow(self):
             return self.ExecMethod(self.vbMethod, 'ActiveWindow')
+
         activeWindow, activewindow = ActiveWindow, ActiveWindow
 
         def Activate(self, windowname = ''):
@@ -1530,6 +1671,14 @@ class SFScriptForge:
 
         def Resize(self, left = -1, top = -1, width = -1, height = -1):
             return self.ExecMethod(self.vbMethod, 'Resize', left, top, width, height)
+
+        def RunCommand(self, command, *args, **kwargs):
+            params = tuple(list(args) + ScriptForge.unpack_args(kwargs))
+            if len(params) == 0:
+                params = (command,) + (None,)
+            else:
+                params = (command,) + params
+            return self.SIMPLEEXEC('@SF_UI.RunCommand', params)
 
         def SetStatusbar(self, text = '', percentage = -1):
             return self.ExecMethod(self.vbMethod, 'SetStatusbar', text, percentage)
@@ -1602,8 +1751,57 @@ class SFDatabases:
         def GetRows(self, sqlcommand, directsql = False, header = False, maxrows = 0):
             return self.ExecMethod(self.vbMethod + self.flgArrayRet, 'GetRows', sqlcommand, directsql, header, maxrows)
 
+        def OpenQuery(self, queryname):
+            return self.ExecMethod(self.vbMethod, 'OpenQuery', queryname)
+
+        def OpenSql(self, sql, directsql = False):
+            return self.ExecMethod(self.vbMethod, 'OpenSql', sql, directsql)
+
+        def OpenTable(self, tablename):
+            return self.ExecMethod(self.vbMethod, 'OpenTable', tablename)
+
         def RunSql(self, sqlcommand, directsql = False):
             return self.ExecMethod(self.vbMethod, 'RunSql', sqlcommand, directsql)
+
+    # #########################################################################
+    # SF_Datasheet CLASS
+    # #########################################################################
+    class SF_Datasheet(SFServices):
+        """
+            A datasheet is the visual representation of tabular data produced by a database.
+            A datasheet may be opened automatically by script code at any moment.
+            The Base document owning the data may or may not be opened.
+            Any SELECT SQL statement may trigger the datasheet display.
+            """
+        # Mandatory class properties for service registration
+        serviceimplementation = 'basic'
+        servicename = 'SFDatabases.Datasheet'
+        servicesynonyms = ('datasheet', 'sfdatabases.datasheet')
+        serviceproperties = dict(ColumnHeaders = False, CurrentColumn = False, CurrentRow = False,
+                                 DatabaseFileName = False, Filter = True, LastRow = False, OrderBy = True,
+                                 ParentDatabase = False, Source = False, SourceType = False, XComponent = False,
+                                 XControlModel = False, XTabControllerModel = False)
+
+        def Activate(self):
+            return self.ExecMethod(self.vbMethod, 'Activate')
+
+        def CloseDatasheet(self):
+            return self.ExecMethod(self.vbMethod, 'CloseDatasheet')
+
+        def CreateMenu(self, menuheader, before = '', submenuchar = '>'):
+            return self.ExecMethod(self.vbMethod, 'CreateMenu', menuheader, before, submenuchar)
+
+        def GetText(self, column = 0):
+            return self.ExecMethod(self.vbMethod, 'GetText', column)
+
+        def GetValue(self, column = 0):
+            return self.ExecMethod(self.vbMethod, 'GetValue', column)
+
+        def GoToCell(self, row = 0, column = 0):
+            return self.ExecMethod(self.vbMethod, 'GoToCell', row, column)
+
+        def RemoveMenu(self, menuheader):
+            return self.ExecMethod(self.vbMethod, 'RemoveMenu', menuheader)
 
 
 # #####################################################################################################################
@@ -1652,8 +1850,15 @@ class SFDialogs:
                 """
             return container, library, dialogname, ScriptForge.componentcontext
 
+        # Methods potentially executed while the dialog is in execution require the flgHardCode flag
         def Activate(self):
             return self.ExecMethod(self.vbMethod + self.flgHardCode, 'Activate')
+
+        def Center(self, parent = ScriptForge.cstSymMissing):
+            parentclasses = (SFDocuments.SF_Document, SFDocuments.SF_Base, SFDocuments.SF_Calc, SFDocuments.SF_Writer,
+                             SFDialogs.SF_Dialog)
+            parentobj = parent.objectreference if isinstance(parent, parentclasses) else parent
+            return self.ExecMethod(self.vbMethod + self.flgObject + self.flgHardCode, 'Center', parentobj)
 
         def Controls(self, controlname = ''):
             return self.ExecMethod(self.vbMethod + self.flgArrayRet + self.flgHardCode, 'Controls', controlname)
@@ -1667,6 +1872,13 @@ class SFDialogs:
         def GetTextsFromL10N(self, l10n):
             l10nobj = l10n.objectreference if isinstance(l10n, SFScriptForge.SF_L10N) else l10n
             return self.ExecMethod(self.vbMethod + self.flgObject, 'GetTextsFromL10N', l10nobj)
+
+        def Resize(self, left = -1, top = -1, width = -1, height = -1):
+            return self.ExecMethod(self.vbMethod + self.flgHardCode, 'Resize', left, top, width, height)
+
+        def SetPageManager(self, pilotcontrols = '', tabcontrols = '', wizardcontrols = '', lastpage = 0):
+            return self.ExecMethod(self.vbMethod, 'SetPageManager', pilotcontrols, tabcontrols, wizardcontrols,
+                                   lastpage)
 
         def Terminate(self):
             return self.ExecMethod(self.vbMethod, 'Terminate')
@@ -1755,9 +1967,9 @@ class SFDocuments:
         serviceimplementation = 'basic'
         servicename = 'SFDocuments.Document'
         servicesynonyms = ('document', 'sfdocuments.document')
-        serviceproperties = dict(Description = True, DocumentType = False, IsBase = False, IsCalc = False,
-                                 IsDraw = False, IsImpress = False, IsMath = False, IsWriter = False,
-                                 Keywords = True, Readonly = False, Subject = True, Title = True,
+        serviceproperties = dict(Description = True, DocumentType = False, ExportFilters = False, ImportFilters = False,
+                                 IsBase = False, IsCalc = False, IsDraw = False, IsImpress = False, IsMath = False,
+                                 IsWriter = False, Keywords = True, Readonly = False, Subject = True, Title = True,
                                  XComponent = False)
         # Force for each property to get its value from Basic - due to intense interactivity with user
         forceGetProperty = True
@@ -1775,14 +1987,21 @@ class SFDocuments:
         def CloseDocument(self, saveask = True):
             return self.ExecMethod(self.vbMethod, 'CloseDocument', saveask)
 
+        def CreateMenu(self, menuheader, before = '', submenuchar = '>'):
+            return self.ExecMethod(self.vbMethod, 'CreateMenu', menuheader, before, submenuchar)
+
         def ExportAsPDF(self, filename, overwrite = False, pages = '', password = '', watermark = ''):
             return self.ExecMethod(self.vbMethod, 'ExportAsPDF', filename, overwrite, pages, password, watermark)
 
         def PrintOut(self, pages = '', copies = 1):
             return self.ExecMethod(self.vbMethod, 'PrintOut', pages, copies)
 
-        def RunCommand(self, command):
-            return self.ExecMethod(self.vbMethod, 'RunCommand', command)
+        def RemoveMenu(self, menuheader):
+            return self.ExecMethod(self.vbMethod, 'RemoveMenu', menuheader)
+
+        def RunCommand(self, command, *args, **kwargs):
+            params = tuple([command] + list(args) + ScriptForge.unpack_args(kwargs))
+            return self.ExecMethod(self.vbMethod, 'RunCommand', *params)
 
         def Save(self):
             return self.ExecMethod(self.vbMethod, 'Save')
@@ -1842,6 +2061,12 @@ class SFDocuments:
         def OpenFormDocument(self, formdocument, designmode = False):
             return self.ExecMethod(self.vbMethod, 'OpenFormDocument', formdocument, designmode)
 
+        def OpenQuery(self, queryname):
+            return self.ExecMethod(self.vbMethod, 'OpenQuery', queryname)
+
+        def OpenTable(self, tablename):
+            return self.ExecMethod(self.vbMethod, 'OpenTable', tablename)
+
         def PrintOut(self, formdocument, pages = '', copies = 1):
             return self.ExecMethod(self.vbMethod, 'PrintOut', formdocument, pages, copies)
 
@@ -1862,9 +2087,9 @@ class SFDocuments:
         servicename = 'SFDocuments.Calc'
         servicesynonyms = ('calc', 'sfdocuments.calc')
         serviceproperties = dict(CurrentSelection = True, Sheets = False,
-                                 Description = True, DocumentType = False, IsBase = False, IsCalc = False,
-                                 IsDraw = False, IsImpress = False, IsMath = False, IsWriter = False,
-                                 Keywords = True, Readonly = False, Subject = True, Title = True,
+                                 Description = True, DocumentType = False, ExportFilters = False, ImportFilters = False,
+                                 IsBase = False, IsCalc = False, IsDraw = False, IsImpress = False, IsMath = False,
+                                 IsWriter = False, Keywords = True, Readonly = False, Subject = True, Title = True,
                                  XComponent = False)
         # Force for each property to get its value from Basic - due to intense interactivity with user
         forceGetProperty = True
@@ -1932,14 +2157,20 @@ class SFDocuments:
         def Charts(self, sheetname, chartname = ''):
             return self.ExecMethod(self.vbMethod + self.flgArrayRet, 'Charts', sheetname, chartname)
 
-        def ClearAll(self, range):
-            return self.ExecMethod(self.vbMethod, 'ClearAll', range)
+        def ClearAll(self, range, filterformula = '', filterscope = ''):
+            return self.ExecMethod(self.vbMethod, 'ClearAll', range, filterformula, filterscope)
 
-        def ClearFormats(self, range):
-            return self.ExecMethod(self.vbMethod, 'ClearFormats', range)
+        def ClearFormats(self, range, filterformula = '', filterscope = ''):
+            return self.ExecMethod(self.vbMethod, 'ClearFormats', range, filterformula, filterscope)
 
-        def ClearValues(self, range):
-            return self.ExecMethod(self.vbMethod, 'ClearValues', range)
+        def ClearValues(self, range, filterformula = '', filterscope = ''):
+            return self.ExecMethod(self.vbMethod, 'ClearValues', range, filterformula, filterscope)
+
+        def CompactLeft(self, range, wholecolumn = False, filterformula = ''):
+            return self.ExecMethod(self.vbMethod, 'CompactLeft', range, wholecolumn, filterformula)
+
+        def CompactUp(self, range, wholerow = False, filterformula = ''):
+            return self.ExecMethod(self.vbMethod, 'CompactUp', range, wholerow, filterformula)
 
         def CopySheet(self, sheetname, newname, beforesheet = 32768):
             sheet = (sheetname.objectreference if isinstance(sheetname, SFDocuments.SF_CalcReference) else sheetname)
@@ -1963,6 +2194,12 @@ class SFDocuments:
         def CreateChart(self, chartname, sheetname, range, columnheader = False, rowheader = False):
             return self.ExecMethod(self.vbMethod, 'CreateChart', chartname, sheetname, range, columnheader, rowheader)
 
+        def CreatePivotTable(self, pivottablename, sourcerange, targetcell, datafields = ScriptForge.cstSymEmpty,
+                             rowfields = ScriptForge.cstSymEmpty, columnfields = ScriptForge.cstSymEmpty,
+                             filterbutton = True, rowtotals = True, columntotals = True):
+            return self.ExecMethod(self.vbMethod, 'CreatePivotTable', pivottablename, sourcerange, targetcell,
+                                   datafields, rowfields, columnfields, filterbutton, rowtotals, columntotals)
+
         def DAvg(self, range):
             return self.ExecMethod(self.vbMethod, 'DAvg', range)
 
@@ -1977,6 +2214,9 @@ class SFDocuments:
 
         def DSum(self, range):
             return self.ExecMethod(self.vbMethod, 'DSum', range)
+
+        def ExportRangeToFile(self, range, filename, imagetype = 'pdf', overwrite = False):
+            return self.ExecMethod(self.vbMethod, 'ExportRangeToFile', range, filename, imagetype, overwrite)
 
         def Forms(self, sheetname, form = ''):
             return self.ExecMethod(self.vbMethod + self.flgArrayRet, 'Forms', sheetname, form)
@@ -2029,8 +2269,8 @@ class SFDocuments:
         def SetArray(self, targetcell, value):
             return self.ExecMethod(self.vbMethod + self.flgArrayArg, 'SetArray', targetcell, value)
 
-        def SetCellStyle(self, targetrange, style):
-            return self.ExecMethod(self.vbMethod, 'SetCellStyle', targetrange, style)
+        def SetCellStyle(self, targetrange, style, filterformula = '', filterscope = ''):
+            return self.ExecMethod(self.vbMethod, 'SetCellStyle', targetrange, style, filterformula, filterscope)
 
         def SetFormula(self, targetrange, formula):
             return self.ExecMethod(self.vbMethod + self.flgArrayArg, 'SetFormula', targetrange, formula)
@@ -2198,9 +2438,9 @@ class SFDocuments:
         serviceimplementation = 'basic'
         servicename = 'SFDocuments.Writer'
         servicesynonyms = ('writer', 'sfdocuments.writer')
-        serviceproperties = dict(Description = True, DocumentType = False, IsBase = False, IsCalc = False,
-                                 IsDraw = False, IsImpress = False, IsMath = False, IsWriter = False,
-                                 Keywords = True, Readonly = False, Subject = True, Title = True,
+        serviceproperties = dict(Description = True, DocumentType = False, ExportFilters = False, ImportFilters = False,
+                                 IsBase = False, IsCalc = False, IsDraw = False, IsImpress = False, IsMath = False,
+                                 IsWriter = False, Keywords = True, Readonly = False, Subject = True, Title = True,
                                  XComponent = False)
         # Force for each property to get its value from Basic - due to intense interactivity with user
         forceGetProperty = True
@@ -2229,6 +2469,39 @@ class SFWidgets:
         The SFWidgets class manages toolbars and popup menus
         """
     pass
+
+    # #########################################################################
+    # SF_Menu CLASS
+    # #########################################################################
+    class SF_Menu(SFServices):
+        """
+            Display a menu in the menubar of a document or a form document.
+            After use, the menu will not be saved neither in the application settings, nor in the document.
+            The menu will be displayed, as usual, when its header in the menubar is clicked.
+            When one of its items is selected, there are 3 alternative options:
+            - a UNO command (like ".uno:About") is triggered
+            - a user script is run receiving a standard argument defined in this service
+            - one of above combined with a toggle of the status of the item
+            The menu is described from top to bottom. Each menu item receives a numeric and a string identifier.
+            """
+        # Mandatory class properties for service registration
+        serviceimplementation = 'basic'
+        servicename = 'SFWidgets.Menu'
+        servicesynonyms = ('menu', 'sfwidgets.menu')
+        serviceproperties = dict(ShortcutCharacter = False, SubmenuCharacter = False)
+
+        def AddCheckBox(self, menuitem, name = '', status = False, icon = '', tooltip = '',
+                        command = '', script = ''):
+            return self.ExecMethod(self.vbMethod, 'AddCheckBox', menuitem, name, status, icon, tooltip,
+                                   command, script)
+
+        def AddItem(self, menuitem, name = '', icon = '', tooltip = '', command = '', script = ''):
+            return self.ExecMethod(self.vbMethod, 'AddItem', menuitem, name, icon, tooltip, command, script)
+
+        def AddRadioButton(self, menuitem, name = '', status = False, icon = '', tooltip = '',
+                           command = '', script = ''):
+            return self.ExecMethod(self.vbMethod, 'AddRadioButton', menuitem, name, status, icon, tooltip,
+                                   command, script)
 
     # #########################################################################
     # SF_PopupMenu CLASS
@@ -2335,7 +2608,6 @@ def CreateScriptService(service, *args, **kwargs):
 
 
 createScriptService, createscriptservice = CreateScriptService, CreateScriptService
-
 
 # ######################################################################
 # Lists the scripts, that shall be visible inside the Basic/Python IDE

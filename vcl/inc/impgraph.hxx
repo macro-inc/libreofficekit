@@ -47,6 +47,7 @@ class GfxLink;
 class ImpSwapFile;
 class GraphicConversionParameters;
 class ImpGraphic;
+namespace rtl { class OStringBuffer; }
 
 enum class GraphicContentType : sal_Int32
 {
@@ -90,8 +91,8 @@ public:
     ImpGraphic();
     ImpGraphic( const ImpGraphic& rImpGraphic );
     ImpGraphic( ImpGraphic&& rImpGraphic ) noexcept;
-    ImpGraphic( const GraphicExternalLink& rExternalLink);
-    ImpGraphic(std::shared_ptr<GfxLink> const& rGfxLink, sal_Int32 nPageIndex = 0);
+    ImpGraphic( GraphicExternalLink aExternalLink);
+    ImpGraphic(std::shared_ptr<GfxLink> xGfxLink, sal_Int32 nPageIndex = 0);
     ImpGraphic( const BitmapEx& rBmpEx );
     ImpGraphic(const std::shared_ptr<VectorGraphicData>& rVectorGraphicDataPtr);
     ImpGraphic( const Animation& rAnimation );
@@ -166,10 +167,10 @@ private:
     void                startAnimation(OutputDevice& rOutDev,
                                        const Point& rDestPt,
                                        const Size& rDestSize,
-                                       tools::Long nExtraData,
+                                       tools::Long nRendererId,
                                        OutputDevice* pFirstFrameOutDev);
     void                stopAnimation( const OutputDevice* pOutputDevice,
-                                           tools::Long nExtraData );
+                                           tools::Long nRendererId );
 
     void                setAnimationNotifyHdl( const Link<Animation*,void>& rLink );
     Link<Animation*,void> getAnimationNotifyHdl() const;
@@ -219,6 +220,7 @@ public:
     OUString getSwapFileURL() const;
     // public only because of use in GraphicFilter
     void updateFromLoadedGraphic(const ImpGraphic* graphic);
+    void dumpState(rtl::OStringBuffer &rState);
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

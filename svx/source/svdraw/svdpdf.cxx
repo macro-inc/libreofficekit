@@ -72,11 +72,6 @@
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
 
-namespace
-{
-double sqrt2(double a, double b) { return sqrt(a * a + b * b); }
-}
-
 using namespace com::sun::star;
 
 ImpSdrPdfImport::ImpSdrPdfImport(SdrModel& rModel, SdrLayerID nLay, const tools::Rectangle& rRect,
@@ -120,7 +115,7 @@ ImpSdrPdfImport::ImpSdrPdfImport(SdrModel& rModel, SdrLayerID nLay, const tools:
     auto const& rVectorGraphicData = rGraphic.getVectorGraphicData();
     auto* pData = rVectorGraphicData->getBinaryDataContainer().getData();
     sal_Int32 nSize = rVectorGraphicData->getBinaryDataContainer().getSize();
-    mpPdfDocument = mpPDFium->openDocument(pData, nSize, OString());
+    mpPdfDocument = mpPDFium ? mpPDFium->openDocument(pData, nSize, OString()) : nullptr;
     if (!mpPdfDocument)
         return;
 
@@ -143,10 +138,7 @@ void ImpSdrPdfImport::DoObjects(SvdProgressInfo* pProgrInfo, sal_uInt32* pAction
 
     basegfx::B2DSize dPageSize = mpPdfDocument->getPageSize(nPageIndex);
 
-    const double dPageWidth = dPageSize.getX();
-    const double dPageHeight = dPageSize.getY();
-
-    SetupPageScale(dPageWidth, dPageHeight);
+    SetupPageScale(dPageSize.getWidth(), dPageSize.getHeight());
 
     // Load the page text to extract it when we get text elements.
     auto pTextPage = pPdfPage->getTextPage();
@@ -252,9 +244,9 @@ size_t ImpSdrPdfImport::DoImport(SdrObjList& rOL, size_t nInsPos, int nPageNumbe
     // insert all objects cached in aTmpList now into rOL from nInsPos
     nInsPos = std::min(nInsPos, rOL.GetObjCount());
 
-    for (SdrObject* pObj : maTmpList)
+    for (rtl::Reference<SdrObject>& pObj : maTmpList)
     {
-        rOL.NbcInsertObject(pObj, nInsPos);
+        rOL.NbcInsertObject(pObj.get(), nInsPos);
         nInsPos++;
 
         if (pProgrInfo)
@@ -401,8 +393,9 @@ void ImpSdrPdfImport::SetAttributes(SdrObject* pObj, bool bForceTextAttr)
     }
 }
 
-void ImpSdrPdfImport::InsertObj(SdrObject* pObj, bool bScale)
+void ImpSdrPdfImport::InsertObj(SdrObject* pObj1, bool bScale)
 {
+    rtl::Reference<SdrObject> pObj = pObj1;
     if (bScale && !maScaleRect.IsEmpty())
     {
         if (mbSize)
@@ -422,8 +415,8 @@ void ImpSdrPdfImport::InsertObj(SdrObject* pObj, bool bScale)
         const basegfx::B2DRange aOldRange(aPoly.getB2DRange());
         const SdrLayerID aOldLayer(pObj->GetLayer());
         const SfxItemSet aOldItemSet(pObj->GetMergedItemSet());
-        const SdrGrafObj* pSdrGrafObj = dynamic_cast<SdrGrafObj*>(pObj);
-        const SdrTextObj* pSdrTextObj = dynamic_cast<SdrTextObj*>(pObj);
+        const SdrGrafObj* pSdrGrafObj = dynamic_cast<SdrGrafObj*>(pObj.get());
+        const SdrTextObj* pSdrTextObj = DynCastSdrTextObj(pObj.get());
 
         if (pSdrTextObj && pSdrTextObj->HasText())
         {
@@ -438,7 +431,7 @@ void ImpSdrPdfImport::InsertObj(SdrObject* pObj, bool bScale)
                 // no overlap -> completely outside
                 if (!aClipRange.overlaps(aTextRange))
                 {
-                    SdrObject::Free(pObj);
+                    pObj.clear();
                     break;
                 }
 
@@ -451,9 +444,8 @@ void ImpSdrPdfImport::InsertObj(SdrObject* pObj, bool bScale)
 
                 // here text needs to be clipped; to do so, convert to SdrObjects with polygons
                 // and add these recursively. Delete original object, do not add in this run
-                SdrObjectUniquePtr pConverted = pSdrTextObj->ConvertToPolyObj(true, true);
-                SdrObject::Free(pObj);
-
+                rtl::Reference<SdrObject> pConverted = pSdrTextObj->ConvertToPolyObj(true, true);
+                pObj.clear();
                 if (pConverted)
                 {
                     // recursively add created conversion; per definition this shall not
@@ -469,12 +461,12 @@ void ImpSdrPdfImport::InsertObj(SdrObject* pObj, bool bScale)
                         SdrObject* pCandidate = aIter.Next();
                         OSL_ENSURE(pCandidate && dynamic_cast<SdrObjGroup*>(pCandidate) == nullptr,
                                    "SdrObjListIter with SdrIterMode::DeepNoGroups error (!)");
-                        SdrObject* pNewClone(
+                        rtl::Reference<SdrObject> pNewClone(
                             pCandidate->CloneSdrObject(pCandidate->getSdrModelFromSdrObject()));
 
                         if (pNewClone)
                         {
-                            InsertObj(pNewClone, false);
+                            InsertObj(pNewClone.get(), false);
                         }
                         else
                         {
@@ -495,7 +487,7 @@ void ImpSdrPdfImport::InsertObj(SdrObject* pObj, bool bScale)
                 aBitmapEx = pSdrGrafObj->GetGraphic().GetBitmapEx();
             }
 
-            SdrObject::Free(pObj);
+            pObj.clear();
 
             if (!aOldRange.isEmpty())
             {
@@ -506,8 +498,9 @@ void ImpSdrPdfImport::InsertObj(SdrObject* pObj, bool bScale)
 
                 if (!aNewRange.isEmpty())
                 {
-                    pObj = new SdrPathObj(*mpModel, aNewPoly.isClosed() ? OBJ_POLY : OBJ_PLIN,
-                                          aNewPoly);
+                    pObj = new SdrPathObj(
+                        *mpModel, aNewPoly.isClosed() ? SdrObjKind::Polygon : SdrObjKind::PolyLine,
+                        aNewPoly);
 
                     pObj->SetLayer(aOldLayer);
                     pObj->SetMergedItemSet(aOldItemSet);
@@ -568,7 +561,7 @@ void ImpSdrPdfImport::InsertObj(SdrObject* pObj, bool bScale)
 
     if (!bVisible)
     {
-        SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>(pObj);
+        SdrTextObj* pTextObj = DynCastSdrTextObj(pObj.get());
 
         if (pTextObj && pTextObj->HasText())
         {
@@ -578,7 +571,7 @@ void ImpSdrPdfImport::InsertObj(SdrObject* pObj, bool bScale)
 
     if (!bVisible)
     {
-        SdrGrafObj* pGrafObj = dynamic_cast<SdrGrafObj*>(pObj);
+        SdrGrafObj* pGrafObj = dynamic_cast<SdrGrafObj*>(pObj.get());
 
         if (pGrafObj)
         {
@@ -589,15 +582,11 @@ void ImpSdrPdfImport::InsertObj(SdrObject* pObj, bool bScale)
         }
     }
 
-    if (!bVisible)
-    {
-        SdrObject::Free(pObj);
-    }
-    else
+    if (bVisible)
     {
         maTmpList.push_back(pObj);
 
-        if (dynamic_cast<SdrPathObj*>(pObj))
+        if (dynamic_cast<SdrPathObj*>(pObj.get()))
         {
             const bool bClosed(pObj->IsClosedObj());
 
@@ -615,7 +604,7 @@ bool ImpSdrPdfImport::CheckLastPolyLineAndFillMerge(const basegfx::B2DPolyPolygo
     // #i73407# reformulation to use new B2DPolygon classes
     if (mbLastObjWasPolyWithoutLine)
     {
-        SdrObject* pTmpObj = !maTmpList.empty() ? maTmpList[maTmpList.size() - 1] : nullptr;
+        SdrObject* pTmpObj = !maTmpList.empty() ? maTmpList[maTmpList.size() - 1].get() : nullptr;
         SdrPathObj* pLastPoly = dynamic_cast<SdrPathObj*>(pTmpObj);
 
         if (pLastPoly)
@@ -723,8 +712,8 @@ void ImpSdrPdfImport::ImportText(std::unique_ptr<vcl::pdf::PDFiumPageObject> con
     OUString sText = pPageObject->getText(pTextPage);
 
     const double dFontSize = pPageObject->getFontSize();
-    double dFontSizeH = fabs(sqrt2(aMatrix.a(), aMatrix.c()) * dFontSize);
-    double dFontSizeV = fabs(sqrt2(aMatrix.b(), aMatrix.d()) * dFontSize);
+    double dFontSizeH = fabs(std::hypot(aMatrix.a(), aMatrix.c()) * dFontSize);
+    double dFontSizeV = fabs(std::hypot(aMatrix.b(), aMatrix.d()) * dFontSize);
 
     dFontSizeH = convertPointToMm100(dFontSizeH);
     dFontSizeV = convertPointToMm100(dFontSizeV);
@@ -803,7 +792,7 @@ void ImpSdrPdfImport::InsertTextObject(const Point& rPos, const Size& rSize, con
         aPosition.AdjustY(-nTextHeight);
 
     tools::Rectangle aTextRect(aPosition, aSize);
-    SdrRectObj* pText = new SdrRectObj(*mpModel, OBJ_TEXT, aTextRect);
+    rtl::Reference<SdrRectObj> pText = new SdrRectObj(*mpModel, SdrObjKind::Text, aTextRect);
 
     pText->SetMergedItem(makeSdrTextUpperDistItem(0));
     pText->SetMergedItem(makeSdrTextLowerDistItem(0));
@@ -824,7 +813,7 @@ void ImpSdrPdfImport::InsertTextObject(const Point& rPos, const Size& rSize, con
 
     pText->SetLayer(mnLayer);
     pText->NbcSetText(rStr);
-    SetAttributes(pText, true);
+    SetAttributes(pText.get(), true);
     pText->SetSnapRect(aTextRect);
 
     if (!aFont.IsTransparent())
@@ -837,7 +826,7 @@ void ImpSdrPdfImport::InsertTextObject(const Point& rPos, const Size& rSize, con
     Degree100 nAngle = to<Degree100>(aFont.GetOrientation());
     if (nAngle)
         pText->SdrAttrObj::NbcRotate(aPosition, nAngle);
-    InsertObj(pText, false);
+    InsertObj(pText.get(), false);
 }
 
 void ImpSdrPdfImport::MapScaling()
@@ -851,7 +840,7 @@ void ImpSdrPdfImport::MapScaling()
     {
         for (size_t i = mnMapScalingOfs; i < nCount; i++)
         {
-            SdrObject* pObj = maTmpList[i];
+            SdrObject* pObj = maTmpList[i].get();
 
             pObj->NbcMove(Size(aMapOrg.X(), aMapOrg.Y()));
         }
@@ -912,12 +901,12 @@ void ImpSdrPdfImport::ImportImage(std::unique_ptr<vcl::pdf::PDFiumPageObject> co
     aRect.AdjustRight(1);
     aRect.AdjustBottom(1);
 
-    SdrGrafObj* pGraf = new SdrGrafObj(*mpModel, Graphic(aBitmap), aRect);
+    rtl::Reference<SdrGrafObj> pGraf = new SdrGrafObj(*mpModel, Graphic(aBitmap), aRect);
 
     // This action is not creating line and fill, set directly, do not use SetAttributes(..)
     pGraf->SetMergedItem(XLineStyleItem(drawing::LineStyle_NONE));
     pGraf->SetMergedItem(XFillStyleItem(drawing::FillStyle_NONE));
-    InsertObj(pGraf);
+    InsertObj(pGraf.get());
 }
 
 void ImpSdrPdfImport::ImportPath(std::unique_ptr<vcl::pdf::PDFiumPageObject> const& pPageObject,
@@ -1001,7 +990,7 @@ void ImpSdrPdfImport::ImportPath(std::unique_ptr<vcl::pdf::PDFiumPageObject> con
     aPolyPoly.transform(aTransform);
 
     float fWidth = pPageObject->getStrokeWidth();
-    const double dWidth = 0.5 * fabs(sqrt2(aPathMatrix.a(), aPathMatrix.c()) * fWidth);
+    const double dWidth = 0.5 * fabs(std::hypot(aPathMatrix.a(), aPathMatrix.c()) * fWidth);
     mnLineWidth = convertPointToMm100(dWidth);
 
     vcl::pdf::PDFFillMode nFillMode = vcl::pdf::PDFFillMode::Alternate;
@@ -1027,9 +1016,10 @@ void ImpSdrPdfImport::ImportPath(std::unique_ptr<vcl::pdf::PDFiumPageObject> con
 
     if (!mbLastObjWasPolyWithoutLine || !CheckLastPolyLineAndFillMerge(aPolyPoly))
     {
-        SdrPathObj* pPath = new SdrPathObj(*mpModel, OBJ_POLY, aPolyPoly);
-        SetAttributes(pPath);
-        InsertObj(pPath, false);
+        rtl::Reference<SdrPathObj> pPath
+            = new SdrPathObj(*mpModel, SdrObjKind::Polygon, std::move(aPolyPoly));
+        SetAttributes(pPath.get());
+        InsertObj(pPath.get(), false);
     }
 }
 

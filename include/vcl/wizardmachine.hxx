@@ -49,7 +49,7 @@ namespace vcl
         };
     };
 
-    class SAL_NO_VTABLE IWizardPageController
+    class SAL_NO_VTABLE SAL_LOPLUGIN_ANNOTATE("crosscast") IWizardPageController
     {
     public:
 
@@ -301,6 +301,9 @@ namespace vcl
         /** retrieves a copy of the state history, i.e. all states we already visited
         */
         void                    getStateHistory(std::vector<WizardTypes::WizardState>& out_rHistory);
+
+        virtual OString         getPageIdentForState(WizardTypes::WizardState nState) const;
+        virtual WizardTypes::WizardState getStateFromPageIdent(const OString& rIdent) const;
 
     public:
         class AccessGuard

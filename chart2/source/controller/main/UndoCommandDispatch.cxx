@@ -18,14 +18,14 @@
  */
 
 #include "UndoCommandDispatch.hxx"
+#include <ChartModel.hxx>
 
-#include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/util/XModifyBroadcaster.hpp>
 #include <com/sun/star/document/UndoFailedException.hpp>
-#include <com/sun/star/document/XUndoManagerSupplier.hpp>
 
+#include <utility>
 #include <vcl/svapp.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <svtools/strings.hrc>
 #include <svtools/svtresid.hxx>
@@ -40,12 +40,11 @@ namespace chart
 
 UndoCommandDispatch::UndoCommandDispatch(
     const Reference< uno::XComponentContext > & xContext,
-    const Reference< frame::XModel > & xModel ) :
+    rtl::Reference<::chart::ChartModel> xModel ) :
         CommandDispatch( xContext ),
-        m_xModel( xModel )
+        m_xModel(std::move( xModel ))
 {
-    uno::Reference< document::XUndoManagerSupplier > xSuppUndo( m_xModel, uno::UNO_QUERY_THROW );
-    m_xUndoManager.set( xSuppUndo->getUndoManager(), uno::UNO_SET_THROW );
+    m_xUndoManager.set( m_xModel->getUndoManager(), uno::UNO_SET_THROW );
 }
 
 UndoCommandDispatch::~UndoCommandDispatch()

@@ -25,12 +25,11 @@
 #include <com/sun/star/accessibility/XAccessibleEventBroadcaster.hpp>
 #include <com/sun/star/uno/Reference.hxx>
 #include <com/sun/star/lang/XServiceInfo.hpp>
-#include <osl/mutex.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <cppuhelper/basemutex.hxx>
 #include <editeng/editengdllapi.h>
+#include <rtl/ref.hxx>
 
-namespace com::sun::star::accessibility { class XAccessibleStateSet; }
 namespace com::sun::star::accessibility { class XAccessibleRelationSet; }
 namespace com::sun::star::accessibility { struct AccessibleEventObject; }
 
@@ -65,7 +64,7 @@ public:
     };
 
     AccessibleContextBase (
-        const css::uno::Reference< css::accessibility::XAccessible>& rxParent,
+        css::uno::Reference< css::accessibility::XAccessible> xParent,
         const sal_Int16 aRole);
     virtual ~AccessibleContextBase() override;
 
@@ -124,7 +123,7 @@ public:
             If the specified state changed its value due to this call
             <TRUE/> is returned, otherwise <FALSE/>.
     */
-    virtual bool SetState (sal_Int16 aState);
+    virtual bool SetState (sal_Int64 aState);
 
     /** Reset the specified state (turn it off) and send events to all
         listeners to inform them of the change.
@@ -136,7 +135,7 @@ public:
             If the specified state changed its value due to this call
             <TRUE/> is returned, otherwise <FALSE/>.
     */
-    virtual bool ResetState (sal_Int16 aState);
+    virtual bool ResetState (sal_Int64 aState);
 
     /** Return the state of the specified state.
 
@@ -147,7 +146,7 @@ public:
             A value of <TRUE/> indicates that the state is set.  A <FALSE/>
             value indicates an unset state.
     */
-    bool GetState (sal_Int16 aState);
+    bool GetState (sal_Int64 aState);
 
     /** Replace the current relation set with the specified one.  Send
         events for relations that are not in both sets.
@@ -171,19 +170,19 @@ public:
     //=====  XAccessibleContext  ==============================================
 
     /// Return the number of currently visible children.
-    virtual sal_Int32 SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getAccessibleChildCount() override;
 
     /// Return the specified child or throw exception.
     virtual css::uno::Reference< css::accessibility::XAccessible> SAL_CALL
-        getAccessibleChild (sal_Int32 nIndex) override;
+        getAccessibleChild (sal_Int64 nIndex) override;
 
     /// Return a reference to the parent.
     virtual css::uno::Reference< css::accessibility::XAccessible> SAL_CALL
         getAccessibleParent() override;
 
     /// Return this objects index among the parents children.
-    virtual sal_Int32 SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getAccessibleIndexInParent() override;
 
     /// Return this object's role.
@@ -203,8 +202,7 @@ public:
         getAccessibleRelationSet() override;
 
     /// Return the set of current states.
-    virtual css::uno::Reference< css::accessibility::XAccessibleStateSet> SAL_CALL
-        getAccessibleStateSet() override;
+    virtual sal_Int64 SAL_CALL getAccessibleStateSet() override;
 
     /** Return the parents locale or throw exception if this object has no
         parent yet/anymore.
@@ -260,7 +258,7 @@ public:
 protected:
     /** The state set.
     */
-    css::uno::Reference< css::accessibility::XAccessibleStateSet> mxStateSet;
+    sal_Int64 mnStateSet;
 
     /** The relation set.  Relations can be set or removed by calling the
         <member>AddRelation</member> and <member>RemoveRelation</member> methods.

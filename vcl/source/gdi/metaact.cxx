@@ -24,12 +24,14 @@
 #include <tools/stream.hxx>
 #include <tools/vcompat.hxx>
 #include <tools/helpers.hxx>
+#include <utility>
 #include <vcl/dibtools.hxx>
 #include <vcl/filter/SvmReader.hxx>
 #include <vcl/filter/SvmWriter.hxx>
 #include <vcl/outdev.hxx>
 #include <vcl/metaact.hxx>
 #include <vcl/graphictools.hxx>
+#include <unotools/configmgr.hxx>
 #include <unotools/fontdefs.hxx>
 #include <vcl/TypeSerializer.hxx>
 
@@ -51,7 +53,7 @@ void ImplScaleRect( tools::Rectangle& rRect, double fScaleX, double fScaleY )
     ImplScalePoint( aBR, fScaleX, fScaleY );
 
     rRect = tools::Rectangle( aTL, aBR );
-    rRect.Justify();
+    rRect.Normalize();
 }
 
 void ImplScalePoly( tools::Polygon& rPoly, double fScaleX, double fScaleY )
@@ -190,9 +192,9 @@ MetaLineAction::MetaLineAction( const Point& rStart, const Point& rEnd ) :
 {}
 
 MetaLineAction::MetaLineAction( const Point& rStart, const Point& rEnd,
-                                const LineInfo& rLineInfo ) :
+                                LineInfo aLineInfo ) :
     MetaAction  ( MetaActionType::LINE ),
-    maLineInfo  ( rLineInfo ),
+    maLineInfo  (std::move( aLineInfo )),
     maStartPt   ( rStart ),
     maEndPt     ( rEnd )
 {}
@@ -450,15 +452,15 @@ MetaPolyLineAction::MetaPolyLineAction() :
 MetaPolyLineAction::~MetaPolyLineAction()
 {}
 
-MetaPolyLineAction::MetaPolyLineAction( const tools::Polygon& rPoly ) :
+MetaPolyLineAction::MetaPolyLineAction( tools::Polygon aPoly ) :
     MetaAction  ( MetaActionType::POLYLINE ),
-    maPoly      ( rPoly )
+    maPoly      (std::move( aPoly ))
 {}
 
-MetaPolyLineAction::MetaPolyLineAction( const tools::Polygon& rPoly, const LineInfo& rLineInfo ) :
+MetaPolyLineAction::MetaPolyLineAction( tools::Polygon aPoly, LineInfo aLineInfo ) :
     MetaAction  ( MetaActionType::POLYLINE ),
-    maLineInfo  ( rLineInfo ),
-    maPoly      ( rPoly )
+    maLineInfo  (std::move( aLineInfo )),
+    maPoly      (std::move( aPoly ))
 {}
 
 void MetaPolyLineAction::Execute( OutputDevice* pOut )
@@ -492,9 +494,9 @@ MetaPolygonAction::MetaPolygonAction() :
 MetaPolygonAction::~MetaPolygonAction()
 {}
 
-MetaPolygonAction::MetaPolygonAction( const tools::Polygon& rPoly ) :
+MetaPolygonAction::MetaPolygonAction( tools::Polygon aPoly ) :
     MetaAction  ( MetaActionType::POLYGON ),
-    maPoly      ( rPoly )
+    maPoly      (std::move( aPoly ))
 {}
 
 void MetaPolygonAction::Execute( OutputDevice* pOut )
@@ -524,9 +526,9 @@ MetaPolyPolygonAction::MetaPolyPolygonAction() :
 MetaPolyPolygonAction::~MetaPolyPolygonAction()
 {}
 
-MetaPolyPolygonAction::MetaPolyPolygonAction( const tools::PolyPolygon& rPolyPoly ) :
+MetaPolyPolygonAction::MetaPolyPolygonAction( tools::PolyPolygon aPolyPoly ) :
     MetaAction  ( MetaActionType::POLYPOLYGON ),
-    maPolyPoly  ( rPolyPoly )
+    maPolyPoly  (std::move( aPolyPoly ))
 {}
 
 void MetaPolyPolygonAction::Execute( OutputDevice* pOut )
@@ -559,11 +561,11 @@ MetaTextAction::MetaTextAction() :
 MetaTextAction::~MetaTextAction()
 {}
 
-MetaTextAction::MetaTextAction( const Point& rPt, const OUString& rStr,
+MetaTextAction::MetaTextAction( const Point& rPt, OUString aStr,
                                 sal_Int32 nIndex, sal_Int32 nLen ) :
     MetaAction  ( MetaActionType::TEXT ),
     maPt        ( rPt ),
-    maStr       ( rStr ),
+    maStr       (std::move( aStr )),
     mnIndex     ( nIndex ),
     mnLen       ( nLen )
 {}
@@ -599,37 +601,42 @@ MetaTextArrayAction::MetaTextArrayAction( const MetaTextArrayAction& rAction ) :
     maStartPt   ( rAction.maStartPt ),
     maStr       ( rAction.maStr ),
     maDXAry     ( rAction.maDXAry ),
+    maKashidaAry( rAction.maKashidaAry ),
     mnIndex     ( rAction.mnIndex ),
     mnLen       ( rAction.mnLen )
 {
 }
 
 MetaTextArrayAction::MetaTextArrayAction( const Point& rStartPt,
-                                          const OUString& rStr,
-                                          const std::vector<sal_Int32>& rDXAry,
+                                          OUString aStr,
+                                          KernArray aDXAry,
+                                          std::vector<sal_Bool> aKashidaAry,
                                           sal_Int32 nIndex,
                                           sal_Int32 nLen ) :
     MetaAction  ( MetaActionType::TEXTARRAY ),
     maStartPt   ( rStartPt ),
-    maStr       ( rStr ),
-    maDXAry     ( rDXAry ),
+    maStr       (std::move( aStr )),
+    maDXAry     (std::move( aDXAry )),
+    maKashidaAry(std::move( aKashidaAry )),
     mnIndex     ( nIndex ),
     mnLen       ( nLen )
 {
 }
 
 MetaTextArrayAction::MetaTextArrayAction( const Point& rStartPt,
-                                          const OUString& rStr,
-                                          o3tl::span<const sal_Int32> pDXAry,
+                                          OUString aStr,
+                                          KernArraySpan pDXAry,
+                                          o3tl::span<const sal_Bool> pKashidaAry,
                                           sal_Int32 nIndex,
                                           sal_Int32 nLen ) :
     MetaAction  ( MetaActionType::TEXTARRAY ),
     maStartPt   ( rStartPt ),
-    maStr       ( rStr ),
-    maDXAry     ( pDXAry.begin(), pDXAry.end() ),
+    maStr       (std::move( aStr )),
+    maKashidaAry( pKashidaAry.begin(), pKashidaAry.end() ),
     mnIndex     ( nIndex ),
     mnLen       ( nLen )
 {
+    maDXAry.assign(pDXAry);
 }
 
 MetaTextArrayAction::~MetaTextArrayAction()
@@ -638,7 +645,7 @@ MetaTextArrayAction::~MetaTextArrayAction()
 
 void MetaTextArrayAction::Execute( OutputDevice* pOut )
 {
-    pOut->DrawTextArray( maStartPt, maStr, maDXAry, mnIndex, mnLen );
+    pOut->DrawTextArray( maStartPt, maStr, maDXAry, maKashidaAry, mnIndex, mnLen );
 }
 
 rtl::Reference<MetaAction> MetaTextArrayAction::Clone() const
@@ -658,13 +665,18 @@ void MetaTextArrayAction::Scale( double fScaleX, double fScaleY )
     if ( !maDXAry.empty() && mnLen )
     {
         for ( sal_uInt16 i = 0, nCount = mnLen; i < nCount; i++ )
-            maDXAry[ i ] = FRound( maDXAry[ i ] * fabs(fScaleX) );
+            maDXAry.set(i, FRound(maDXAry[i] * fabs(fScaleX)));
     }
 }
 
-void MetaTextArrayAction::SetDXArray(std::vector<sal_Int32> aArray)
+void MetaTextArrayAction::SetDXArray(KernArray aArray)
 {
     maDXAry = std::move(aArray);
+}
+
+void MetaTextArrayAction::SetKashidaArray(std::vector<sal_Bool> aArray)
+{
+    maKashidaAry = std::move(aArray);
 }
 
 MetaStretchTextAction::MetaStretchTextAction() :
@@ -678,11 +690,11 @@ MetaStretchTextAction::~MetaStretchTextAction()
 {}
 
 MetaStretchTextAction::MetaStretchTextAction( const Point& rPt, sal_uInt32 nWidth,
-                                              const OUString& rStr,
+                                              OUString aStr,
                                               sal_Int32 nIndex, sal_Int32 nLen ) :
     MetaAction  ( MetaActionType::STRETCHTEXT ),
     maPt        ( rPt ),
-    maStr       ( rStr ),
+    maStr       (std::move( aStr )),
     mnWidth     ( nWidth ),
     mnIndex     ( nIndex ),
     mnLen       ( nLen )
@@ -717,15 +729,37 @@ MetaTextRectAction::~MetaTextRectAction()
 {}
 
 MetaTextRectAction::MetaTextRectAction( const tools::Rectangle& rRect,
-                                        const OUString& rStr, DrawTextFlags nStyle ) :
+                                        OUString aStr, DrawTextFlags nStyle ) :
     MetaAction  ( MetaActionType::TEXTRECT ),
     maRect      ( rRect ),
-    maStr       ( rStr ),
+    maStr       (std::move( aStr )),
     mnStyle     ( nStyle )
 {}
 
+static bool AllowRect(const tools::Rectangle& rRect)
+{
+    static bool bFuzzing = utl::ConfigManager::IsFuzzing();
+    if (bFuzzing)
+    {
+        if (rRect.Top() > 0x20000000 || rRect.Top() < -0x20000000)
+        {
+            SAL_WARN("vcl", "skipping huge rect top: " << rRect.Top());
+            return false;
+        }
+        if (rRect.Bottom() > 0x20000000 || rRect.Bottom() < -0x20000000)
+        {
+            SAL_WARN("vcl", "skipping huge rect bottom: " << rRect.Bottom());
+            return false;
+        }
+    }
+    return true;
+}
+
 void MetaTextRectAction::Execute( OutputDevice* pOut )
 {
+    if (!AllowRect(maRect))
+        return;
+
     pOut->DrawText( maRect, maStr, mnStyle );
 }
 
@@ -836,8 +870,50 @@ MetaBmpScaleAction::MetaBmpScaleAction( const Point& rPt, const Size& rSz,
     maSz        ( rSz )
 {}
 
+static bool AllowScale(const Size& rSource, const Size& rDest)
+{
+    static bool bFuzzing = utl::ConfigManager::IsFuzzing();
+    if (bFuzzing)
+    {
+        constexpr int nMaxScaleWhenFuzzing = 512;
+
+        auto nSourceHeight = rSource.Height();
+        auto nDestHeight = rDest.Height();
+        if (nSourceHeight && nDestHeight > nSourceHeight && nDestHeight / nSourceHeight > nMaxScaleWhenFuzzing)
+        {
+            SAL_WARN("vcl", "skipping large vertical scaling: " << nSourceHeight << " to " << nDestHeight);
+            return false;
+        }
+
+        if (nDestHeight && nSourceHeight > nDestHeight && nSourceHeight / nDestHeight > nMaxScaleWhenFuzzing)
+        {
+            SAL_WARN("vcl", "skipping large vertical scaling: " << nSourceHeight << " to " << nDestHeight);
+            return false;
+        }
+
+        auto nSourceWidth = rSource.Width();
+        auto nDestWidth = rDest.Width();
+        if (nSourceWidth && nDestWidth > nSourceWidth && nDestWidth / nSourceWidth > nMaxScaleWhenFuzzing)
+        {
+            SAL_WARN("vcl", "skipping large horizontal scaling: " << nSourceWidth << " to " << nDestWidth);
+            return false;
+        }
+
+        if (nDestWidth && nSourceWidth > nDestWidth && nSourceWidth / nDestWidth > nMaxScaleWhenFuzzing)
+        {
+            SAL_WARN("vcl", "skipping large horizontal scaling: " << nSourceWidth << " to " << nDestWidth);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void MetaBmpScaleAction::Execute( OutputDevice* pOut )
 {
+    if (!AllowScale(maBmp.GetSizePixel(), pOut->LogicToPixel(maSz)))
+        return;
+
     pOut->DrawBitmap( maPt, maSz, maBmp );
 }
 
@@ -950,6 +1026,9 @@ MetaBmpExScaleAction::MetaBmpExScaleAction( const Point& rPt, const Size& rSz,
 
 void MetaBmpExScaleAction::Execute( OutputDevice* pOut )
 {
+    if (!AllowScale(maBmpEx.GetSizePixel(), pOut->LogicToPixel(maSz)))
+        return;
+
     pOut->DrawBitmapEx( maPt, maSz, maBmpEx );
 }
 
@@ -1110,6 +1189,9 @@ MetaMaskScalePartAction::MetaMaskScalePartAction( const Point& rDstPt, const Siz
 
 void MetaMaskScalePartAction::Execute( OutputDevice* pOut )
 {
+    if (!AllowRect(tools::Rectangle(maDstPt, maDstSz)))
+        return;
+
     pOut->DrawMask( maDstPt, maDstSz, maSrcPt, maSrcSz, maBmp, maColor, MetaActionType::MASKSCALE );
 }
 
@@ -1138,10 +1220,10 @@ MetaGradientAction::MetaGradientAction() :
 MetaGradientAction::~MetaGradientAction()
 {}
 
-MetaGradientAction::MetaGradientAction( const tools::Rectangle& rRect, const Gradient& rGradient ) :
+MetaGradientAction::MetaGradientAction( const tools::Rectangle& rRect, Gradient aGradient ) :
     MetaAction  ( MetaActionType::GRADIENT ),
     maRect      ( rRect ),
-    maGradient  ( rGradient )
+    maGradient  (std::move( aGradient ))
 {}
 
 void MetaGradientAction::Execute( OutputDevice* pOut )
@@ -1168,10 +1250,10 @@ MetaGradientExAction::MetaGradientExAction() :
     MetaAction  ( MetaActionType::GRADIENTEX )
 {}
 
-MetaGradientExAction::MetaGradientExAction( const tools::PolyPolygon& rPolyPoly, const Gradient& rGradient ) :
+MetaGradientExAction::MetaGradientExAction( tools::PolyPolygon aPolyPoly, Gradient aGradient ) :
     MetaAction  ( MetaActionType::GRADIENTEX ),
-    maPolyPoly  ( rPolyPoly ),
-    maGradient  ( rGradient )
+    maPolyPoly  (std::move( aPolyPoly )),
+    maGradient  (std::move( aGradient ))
 {}
 
 MetaGradientExAction::~MetaGradientExAction()
@@ -1208,9 +1290,9 @@ MetaHatchAction::MetaHatchAction() :
 MetaHatchAction::~MetaHatchAction()
 {}
 
-MetaHatchAction::MetaHatchAction( const tools::PolyPolygon& rPolyPoly, const Hatch& rHatch ) :
+MetaHatchAction::MetaHatchAction( tools::PolyPolygon aPolyPoly, const Hatch& rHatch ) :
     MetaAction  ( MetaActionType::HATCH ),
-    maPolyPoly  ( rPolyPoly ),
+    maPolyPoly  (std::move( aPolyPoly )),
     maHatch     ( rHatch )
 {}
 
@@ -1277,9 +1359,9 @@ MetaClipRegionAction::MetaClipRegionAction() :
 MetaClipRegionAction::~MetaClipRegionAction()
 {}
 
-MetaClipRegionAction::MetaClipRegionAction( const vcl::Region& rRegion, bool bClip ) :
+MetaClipRegionAction::MetaClipRegionAction( vcl::Region aRegion, bool bClip ) :
     MetaAction  ( MetaActionType::CLIPREGION ),
-    maRegion    ( rRegion ),
+    maRegion    (std::move( aRegion )),
     mbClip      ( bClip )
 {}
 
@@ -1345,9 +1427,9 @@ MetaISectRegionClipRegionAction::MetaISectRegionClipRegionAction() :
 MetaISectRegionClipRegionAction::~MetaISectRegionClipRegionAction()
 {}
 
-MetaISectRegionClipRegionAction::MetaISectRegionClipRegionAction( const vcl::Region& rRegion ) :
+MetaISectRegionClipRegionAction::MetaISectRegionClipRegionAction( vcl::Region aRegion ) :
     MetaAction  ( MetaActionType::ISECTREGIONCLIPREGION ),
-    maRegion    ( rRegion )
+    maRegion    (std::move( aRegion ))
 {
 }
 
@@ -1619,17 +1701,18 @@ MetaFontAction::MetaFontAction() :
 MetaFontAction::~MetaFontAction()
 {}
 
-MetaFontAction::MetaFontAction( const vcl::Font& rFont ) :
+MetaFontAction::MetaFontAction( vcl::Font aFont ) :
     MetaAction  ( MetaActionType::FONT ),
-    maFont      ( rFont )
+    maFont      (std::move( aFont ))
 {
-    // #96876: because RTL_TEXTENCODING_SYMBOL is often set at the StarSymbol font,
+    // #96876: because RTL_TEXTENCODING_SYMBOL is often set at the OpenSymbol font,
     // we change the textencoding to RTL_TEXTENCODING_UNICODE here, which seems
     // to be the right way; changing the textencoding at other sources
     // is too dangerous at the moment
-    if ( IsStarSymbol( maFont.GetFamilyName() )
+    if ( IsOpenSymbol( maFont.GetFamilyName() )
         && ( maFont.GetCharSet() != RTL_TEXTENCODING_UNICODE ) )
     {
+        SAL_WARN_IF(maFont.GetCharSet() == RTL_TEXTENCODING_SYMBOL, "vcl", "OpenSymbol should not have charset of RTL_TEXTENCODING_SYMBOL in new documents");
         maFont.SetCharSet( RTL_TEXTENCODING_UNICODE );
     }
 }
@@ -1724,9 +1807,9 @@ MetaTransparentAction::MetaTransparentAction() :
 MetaTransparentAction::~MetaTransparentAction()
 {}
 
-MetaTransparentAction::MetaTransparentAction( const tools::PolyPolygon& rPolyPoly, sal_uInt16 nTransPercent ) :
+MetaTransparentAction::MetaTransparentAction( tools::PolyPolygon aPolyPoly, sal_uInt16 nTransPercent ) :
     MetaAction      ( MetaActionType::Transparent ),
-    maPolyPoly      ( rPolyPoly ),
+    maPolyPoly      (std::move( aPolyPoly )),
     mnTransPercent  ( nTransPercent )
 {}
 
@@ -1759,12 +1842,12 @@ MetaFloatTransparentAction::~MetaFloatTransparentAction()
 {}
 
 MetaFloatTransparentAction::MetaFloatTransparentAction( const GDIMetaFile& rMtf, const Point& rPos,
-                                                        const Size& rSize, const Gradient& rGradient ) :
+                                                        const Size& rSize, Gradient aGradient ) :
     MetaAction      ( MetaActionType::FLOATTRANSPARENT ),
     maMtf           ( rMtf ),
     maPoint         ( rPos ),
     maSize          ( rSize ),
-    maGradient      ( rGradient )
+    maGradient      (std::move( aGradient ))
 {}
 
 void MetaFloatTransparentAction::Execute( OutputDevice* pOut )
@@ -1798,9 +1881,9 @@ MetaEPSAction::~MetaEPSAction()
 {}
 
 MetaEPSAction::MetaEPSAction( const Point& rPoint, const Size& rSize,
-                              const GfxLink& rGfxLink, const GDIMetaFile& rSubst ) :
+                              GfxLink aGfxLink, const GDIMetaFile& rSubst ) :
     MetaAction  ( MetaActionType::EPS ),
-    maGfxLink   ( rGfxLink ),
+    maGfxLink   (std::move( aGfxLink )),
     maSubst     ( rSubst ),
     maPoint     ( rPoint ),
     maSize      ( rSize )
@@ -1871,9 +1954,9 @@ MetaCommentAction::MetaCommentAction( const MetaCommentAction& rAct ) :
     ImplInitDynamicData( rAct.mpData.get(), rAct.mnDataSize );
 }
 
-MetaCommentAction::MetaCommentAction( const OString& rComment, sal_Int32 nValue, const sal_uInt8* pData, sal_uInt32 nDataSize ) :
+MetaCommentAction::MetaCommentAction( OString aComment, sal_Int32 nValue, const sal_uInt8* pData, sal_uInt32 nDataSize ) :
     MetaAction  ( MetaActionType::COMMENT ),
-    maComment   ( rComment ),
+    maComment   (std::move( aComment )),
     mnValue     ( nValue )
 {
     ImplInitDynamicData( pData, nDataSize );

@@ -57,6 +57,7 @@ public:
     void testTdf99402();
     void testTdf39894();
     void testETO_PDY();
+    void testStockObject();
 
     CPPUNIT_TEST_SUITE(WmfTest);
     CPPUNIT_TEST(testNonPlaceableWmf);
@@ -71,6 +72,7 @@ public:
     CPPUNIT_TEST(testTdf99402);
     CPPUNIT_TEST(testTdf39894);
     CPPUNIT_TEST(testETO_PDY);
+    CPPUNIT_TEST(testStockObject);
     CPPUNIT_TEST_SUITE_END();
 };
 
@@ -358,8 +360,8 @@ void WmfTest::testTdf99402()
     logfontw.lfItalic = 0;
     logfontw.lfUnderline = 0;
     logfontw.lfStrikeOut = 0;
-    logfontw.lfCharSet = OEM_CHARSET;
-    logfontw.lfPitchAndFamily = FF_ROMAN | DEFAULT_PITCH;
+    logfontw.lfCharSet = emfio::CharacterSet::OEM_CHARSET;
+    logfontw.lfPitchAndFamily = emfio::FamilyFont::FF_ROMAN << 4 | emfio::PitchFont::DEFAULT_PITCH;
     logfontw.alfFaceName = "Symbol";
 
     emfio::WinMtfFontStyle fontStyle(logfontw);
@@ -384,7 +386,7 @@ void WmfTest::testTdf39894()
         // The x position of the second text must take into account
         // the previous text's last Dx (previously was ~300)
         auto x = getXPath(pDoc, "/metafile/push[2]/textarray[2]", "x");
-        CPPUNIT_ASSERT_MESSAGE(file.toUtf8().getStr(), x.toInt32() > 2700);
+        CPPUNIT_ASSERT_GREATER(sal_Int32(2700), x.toInt32());
     }
 }
 
@@ -410,6 +412,24 @@ void WmfTest::testETO_PDY()
         CPPUNIT_ASSERT_MESSAGE(file.toUtf8().getStr(), y2.toInt32() < y1.toInt32());
         CPPUNIT_ASSERT_MESSAGE(file.toUtf8().getStr(), y3.toInt32() < y2.toInt32());
     }
+}
+
+void WmfTest::testStockObject()
+{
+    SvFileStream aFileStream(getFullUrl(u"stockobject.emf"), StreamMode::READ);
+    GDIMetaFile aGDIMetaFile;
+    ReadWindowMetafile(aFileStream, aGDIMetaFile);
+
+    MetafileXmlDump dumper;
+    xmlDocUniquePtr pDoc = dumpAndParse(dumper, aGDIMetaFile);
+
+    CPPUNIT_ASSERT(pDoc);
+
+    //   Without the fix in place, this test would have failed with
+    // - Expected: 1
+    // - Actual  : 0
+    // - In <>, XPath '/metafile/push[2]/fillcolor[2]' number of nodes is incorrect
+    assertXPath(pDoc, "/metafile/push[2]/fillcolor[2]", "color", "#000000");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(WmfTest);

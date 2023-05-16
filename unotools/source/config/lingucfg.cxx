@@ -26,17 +26,17 @@
 #include <com/sun/star/container/XNameAccess.hpp>
 #include <com/sun/star/util/XChangesBatch.hpp>
 #include <sal/log.hxx>
-#include <osl/mutex.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <i18nlangtag/mslangid.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <tools/debug.hxx>
 #include <unotools/configitem.hxx>
 #include <unotools/lingucfg.hxx>
 #include <unotools/linguprops.hxx>
-#include <sal/macros.h>
 #include <comphelper/getexpandeduri.hxx>
 #include <comphelper/processfactory.hxx>
+#include <o3tl/string_view.hxx>
+#include <mutex>
 
 #include "itemholder1.hxx"
 
@@ -46,9 +46,9 @@ constexpr OUStringLiteral FILE_PROTOCOL = u"file:///";
 
 namespace
 {
-    osl::Mutex& theSvtLinguConfigItemMutex()
+    std::mutex& theSvtLinguConfigItemMutex()
     {
-        static osl::Mutex SINGLETON;
+        static std::mutex SINGLETON;
         return SINGLETON;
     }
 }
@@ -149,7 +149,7 @@ class SvtLinguConfigItem : public utl::ConfigItem
 {
     SvtLinguOptions     aOpt;
 
-    static bool GetHdlByName( sal_Int32 &rnHdl, const OUString &rPropertyName, bool bFullPropName = false );
+    static bool GetHdlByName( sal_Int32 &rnHdl, std::u16string_view rPropertyName, bool bFullPropName = false );
     static uno::Sequence< OUString > GetPropertyNames();
     void                LoadOptions( const uno::Sequence< OUString > &rProperyNames );
     bool                SaveOptions( const uno::Sequence< OUString > &rProperyNames );
@@ -173,18 +173,18 @@ public:
     //using utl::ConfigItem::GetReadOnlyStates;
 
     css::uno::Any
-            GetProperty( const OUString &rPropertyName ) const;
+            GetProperty( std::u16string_view rPropertyName ) const;
     css::uno::Any
             GetProperty( sal_Int32 nPropertyHandle ) const;
 
-    bool    SetProperty( const OUString &rPropertyName,
+    bool    SetProperty( std::u16string_view rPropertyName,
                          const css::uno::Any &rValue );
     bool    SetProperty( sal_Int32 nPropertyHandle,
                          const css::uno::Any &rValue );
 
-    const SvtLinguOptions& GetOptions() const;
+    void GetOptions( SvtLinguOptions& ) const;
 
-    bool    IsReadOnly( const OUString &rPropertyName ) const;
+    bool    IsReadOnly( std::u16string_view rPropertyName ) const;
     bool    IsReadOnly( sal_Int32 nPropertyHandle ) const;
 };
 
@@ -201,7 +201,10 @@ SvtLinguConfigItem::SvtLinguConfigItem() :
 
 void SvtLinguConfigItem::Notify( const uno::Sequence< OUString > &rPropertyNames )
 {
-    LoadOptions( rPropertyNames );
+    {
+        std::unique_lock aGuard(theSvtLinguConfigItemMutex());
+        LoadOptions( rPropertyNames );
+    }
     NotifyListeners(ConfigurationHints::NONE);
 }
 
@@ -267,15 +270,12 @@ NamesToHdl const aNamesToHdl[] =
 uno::Sequence< OUString > SvtLinguConfigItem::GetPropertyNames()
 {
     uno::Sequence< OUString > aNames;
-
-    sal_Int32 nMax = SAL_N_ELEMENTS(aNamesToHdl);
-
-    aNames.realloc( nMax );
+    aNames.realloc(std::size(aNamesToHdl));
     OUString *pNames = aNames.getArray();
     sal_Int32 nIdx = 0;
-    for (sal_Int32 i = 0; i < nMax;  ++i)
+    for (auto const & nameToHdl: aNamesToHdl)
     {
-        const char *pFullPropName = aNamesToHdl[i].pFullPropName;
+        const char *pFullPropName = nameToHdl.pFullPropName;
         if (pFullPropName)
             pNames[ nIdx++ ] = OUString::createFromAscii( pFullPropName );
     }
@@ -286,7 +286,7 @@ uno::Sequence< OUString > SvtLinguConfigItem::GetPropertyNames()
 
 bool SvtLinguConfigItem::GetHdlByName(
     sal_Int32 &rnHdl,
-    const OUString &rPropertyName,
+    std::u16string_view rPropertyName,
     bool bFullPropName )
 {
     NamesToHdl const *pEntry = &aNamesToHdl[0];
@@ -295,7 +295,7 @@ bool SvtLinguConfigItem::GetHdlByName(
     {
         while (pEntry && pEntry->pFullPropName != nullptr)
         {
-            if (rPropertyName.equalsAscii( pEntry->pFullPropName ))
+            if (o3tl::equalsAscii(rPropertyName, pEntry->pFullPropName ))
             {
                 rnHdl = pEntry->nHdl;
                 break;
@@ -319,17 +319,15 @@ bool SvtLinguConfigItem::GetHdlByName(
     }
 }
 
-uno::Any SvtLinguConfigItem::GetProperty( const OUString &rPropertyName ) const
+uno::Any SvtLinguConfigItem::GetProperty( std::u16string_view rPropertyName ) const
 {
-    osl::MutexGuard aGuard(theSvtLinguConfigItemMutex());
-
     sal_Int32 nHdl;
     return GetHdlByName( nHdl, rPropertyName ) ? GetProperty( nHdl ) : uno::Any();
 }
 
 uno::Any SvtLinguConfigItem::GetProperty( sal_Int32 nPropertyHandle ) const
 {
-    osl::MutexGuard aGuard(theSvtLinguConfigItemMutex());
+    std::unique_lock aGuard(theSvtLinguConfigItemMutex());
 
     uno::Any aRes;
 
@@ -409,10 +407,8 @@ uno::Any SvtLinguConfigItem::GetProperty( sal_Int32 nPropertyHandle ) const
     return aRes;
 }
 
-bool SvtLinguConfigItem::SetProperty( const OUString &rPropertyName, const uno::Any &rValue )
+bool SvtLinguConfigItem::SetProperty( std::u16string_view rPropertyName, const uno::Any &rValue )
 {
-    osl::MutexGuard aGuard(theSvtLinguConfigItemMutex());
-
     bool bSucc = false;
     sal_Int32 nHdl;
     if (GetHdlByName( nHdl, rPropertyName ))
@@ -422,7 +418,7 @@ bool SvtLinguConfigItem::SetProperty( const OUString &rPropertyName, const uno::
 
 bool SvtLinguConfigItem::SetProperty( sal_Int32 nPropertyHandle, const uno::Any &rValue )
 {
-    osl::MutexGuard aGuard(theSvtLinguConfigItemMutex());
+    std::unique_lock aGuard(theSvtLinguConfigItemMutex());
 
     bool bSucc = false;
     if (!rValue.hasValue())
@@ -559,16 +555,14 @@ bool SvtLinguConfigItem::SetProperty( sal_Int32 nPropertyHandle, const uno::Any 
     return bSucc;
 }
 
-const SvtLinguOptions& SvtLinguConfigItem::GetOptions() const
+void SvtLinguConfigItem::GetOptions(SvtLinguOptions &rOptions) const
 {
-    osl::MutexGuard aGuard(theSvtLinguConfigItemMutex());
-    return aOpt;
+    std::unique_lock aGuard(theSvtLinguConfigItemMutex());
+    rOptions = aOpt;
 }
 
 void SvtLinguConfigItem::LoadOptions( const uno::Sequence< OUString > &rProperyNames )
 {
-    osl::MutexGuard aGuard(theSvtLinguConfigItemMutex());
-
     bool bRes = false;
 
     const OUString *pProperyNames = rProperyNames.getConstArray();
@@ -686,7 +680,7 @@ bool SvtLinguConfigItem::SaveOptions( const uno::Sequence< OUString > &rProperyN
     if (!IsModified())
         return true;
 
-    osl::MutexGuard aGuard(theSvtLinguConfigItemMutex());
+    std::unique_lock aGuard(theSvtLinguConfigItemMutex());
 
     bool bRet = false;
 
@@ -746,10 +740,8 @@ bool SvtLinguConfigItem::SaveOptions( const uno::Sequence< OUString > &rProperyN
     return bRet;
 }
 
-bool SvtLinguConfigItem::IsReadOnly( const OUString &rPropertyName ) const
+bool SvtLinguConfigItem::IsReadOnly( std::u16string_view rPropertyName ) const
 {
-    osl::MutexGuard aGuard(theSvtLinguConfigItemMutex());
-
     bool bReadOnly = false;
     sal_Int32 nHdl;
     if (GetHdlByName( nHdl, rPropertyName ))
@@ -759,7 +751,7 @@ bool SvtLinguConfigItem::IsReadOnly( const OUString &rPropertyName ) const
 
 bool SvtLinguConfigItem::IsReadOnly( sal_Int32 nPropertyHandle ) const
 {
-    osl::MutexGuard aGuard(theSvtLinguConfigItemMutex());
+    std::unique_lock aGuard(theSvtLinguConfigItemMutex());
 
     bool bReadOnly = false;
 
@@ -810,16 +802,16 @@ constexpr OUStringLiteral aG_Dictionaries = u"Dictionaries";
 SvtLinguConfig::SvtLinguConfig()
 {
     // Global access, must be guarded (multithreading)
-    osl::MutexGuard aGuard(theSvtLinguConfigItemMutex());
+    std::unique_lock aGuard(theSvtLinguConfigItemMutex());
     ++nCfgItemRefCount;
 }
 
 SvtLinguConfig::~SvtLinguConfig()
 {
-    osl::MutexGuard aGuard(theSvtLinguConfigItemMutex());
-
     if (pCfgItem && pCfgItem->IsModified())
         pCfgItem->Commit();
+
+    std::unique_lock aGuard(theSvtLinguConfigItemMutex());
 
     if (--nCfgItemRefCount <= 0)
     {
@@ -831,10 +823,11 @@ SvtLinguConfig::~SvtLinguConfig()
 SvtLinguConfigItem & SvtLinguConfig::GetConfigItem()
 {
     // Global access, must be guarded (multithreading)
-    osl::MutexGuard aGuard(theSvtLinguConfigItemMutex());
+    std::unique_lock aGuard(theSvtLinguConfigItemMutex());
     if (!pCfgItem)
     {
         pCfgItem = new SvtLinguConfigItem;
+        aGuard.unlock();
         ItemHolder1::holdConfigItem(EItem::LinguConfig);
     }
     return *pCfgItem;
@@ -856,7 +849,7 @@ bool SvtLinguConfig::ReplaceSetProperties(
     return GetConfigItem().ReplaceSetProperties( rNode, rValues );
 }
 
-uno::Any SvtLinguConfig::GetProperty( const OUString &rPropertyName ) const
+uno::Any SvtLinguConfig::GetProperty( std::u16string_view rPropertyName ) const
 {
     return GetConfigItem().GetProperty( rPropertyName );
 }
@@ -866,7 +859,7 @@ uno::Any SvtLinguConfig::GetProperty( sal_Int32 nPropertyHandle ) const
     return GetConfigItem().GetProperty( nPropertyHandle );
 }
 
-bool SvtLinguConfig::SetProperty( const OUString &rPropertyName, const uno::Any &rValue )
+bool SvtLinguConfig::SetProperty( std::u16string_view rPropertyName, const uno::Any &rValue )
 {
     return GetConfigItem().SetProperty( rPropertyName, rValue );
 }
@@ -878,10 +871,10 @@ bool SvtLinguConfig::SetProperty( sal_Int32 nPropertyHandle, const uno::Any &rVa
 
 void SvtLinguConfig::GetOptions( SvtLinguOptions &rOptions ) const
 {
-    rOptions = GetConfigItem().GetOptions();
+    GetConfigItem().GetOptions(rOptions);
 }
 
-bool SvtLinguConfig::IsReadOnly( const OUString &rPropertyName ) const
+bool SvtLinguConfig::IsReadOnly( std::u16string_view rPropertyName ) const
 {
     return GetConfigItem().IsReadOnly( rPropertyName );
 }
@@ -922,27 +915,6 @@ bool SvtLinguConfig::GetSupportedDictionaryFormatsFor(
         if (xNA->getByName( "SupportedDictionaryFormats" ) >>= rFormatList)
             bSuccess = true;
         DBG_ASSERT( rFormatList.hasElements(), "supported dictionary format list is empty" );
-    }
-    catch (uno::Exception &)
-    {
-    }
-    return bSuccess;
-}
-
-bool SvtLinguConfig::GetLocaleListFor( const OUString &rSetName, const OUString &rSetEntry, css::uno::Sequence< OUString > &rLocaleList ) const
-{
-    if (rSetName.isEmpty() || rSetEntry.isEmpty())
-        return false;
-    bool bSuccess = false;
-    try
-    {
-        uno::Reference< container::XNameAccess > xNA( GetMainUpdateAccess(), uno::UNO_QUERY_THROW );
-        xNA.set( xNA->getByName("ServiceManager"), uno::UNO_QUERY_THROW );
-        xNA.set( xNA->getByName( rSetName ), uno::UNO_QUERY_THROW );
-        xNA.set( xNA->getByName( rSetEntry ), uno::UNO_QUERY_THROW );
-        if (xNA->getByName( "Locales" ) >>= rLocaleList)
-            bSuccess = true;
-        DBG_ASSERT( rLocaleList.hasElements(), "Locale list is empty" );
     }
     catch (uno::Exception &)
     {

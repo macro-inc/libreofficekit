@@ -21,6 +21,15 @@
 
 #include <sal/config.h>
 
+#include <o3tl/typed_flags_set.hxx>
+#include <sfx2/bindings.hxx>
+#include <sfx2/styfitem.hxx>
+#include <svl/eitem.hxx>
+#include <svl/style.hxx>
+#include <vcl/idle.hxx>
+#include <vcl/transfer.hxx>
+#include <vcl/weld.hxx>
+
 class SfxObjectShell;
 class SfxStyleFamilyItem;
 class SfxTemplateItem;
@@ -115,7 +124,6 @@ public:
     void connect_ClearResource(const Link<void*, void>& rLink) { m_aClearResource = rLink; }
     void connect_LoadFactoryStyleFilter(const Link<SfxObjectShell const*, sal_Int32>& rLink);
     void connect_SaveSelection(const Link<StyleList&, SfxObjectShell*> rLink);
-    void connect_UpdateStyleDependents(const Link<void*, void> rLink);
     void connect_UpdateFamily(const Link<StyleList&, void> rLink) { m_aUpdateFamily = rLink; }
 
     void FamilySelect(sal_uInt16 nEntry);
@@ -168,7 +176,6 @@ private:
     Link<void*, void> m_aClearResource;
     Link<SfxObjectShell const*, sal_Int32> m_aLoadFactoryStyleFilter;
     Link<StyleList&, SfxObjectShell*> m_aSaveSelection;
-    Link<void*, void> m_aUpdateStyleDependents;
     Link<StyleList&, void> m_aUpdateFamily;
 
     void NewHdl();

@@ -32,9 +32,9 @@
 #include <vcl/toolkit/edit.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/commandevent.hxx>
+#include <vcl/decoview.hxx>
 #include <vcl/uitest/uiobject.hxx>
 #include <sot/formats.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <comphelper/string.hxx>
 #include <sal/log.hxx>
 #include <tools/debug.hxx>
@@ -85,6 +85,7 @@ public:
     OUString const & GetSavedValue() const;
     void        StopEditing( bool bCancel );
     void        Hide();
+    const VclPtr<Edit> & GetEditWidget() const { return pEdit; };
 };
 
 // ***************************************************************
@@ -287,11 +288,6 @@ SvLBoxTab::SvLBoxTab( const SvLBoxTab& rTab )
     nFlags = rTab.nFlags;
 }
 
-SvLBoxTab::~SvLBoxTab()
-{
-}
-
-
 tools::Long SvLBoxTab::CalcOffset( tools::Long nItemWidth, tools::Long nTabWidth )
 {
     tools::Long nOffset = 0;
@@ -398,6 +394,7 @@ SvTreeListBox::SvTreeListBox(vcl::Window* pParent, WinBits nWinStyle) :
     mbQuickSearch(false),
     mbActivateOnSingleClick(false),
     mbHoverSelection(false),
+    mbSelectingByHover(false),
     mnClicksToToggle(0), //at default clicking on a row won't toggle its default checkbox
     eSelMode(SelectionMode::NONE),
     nMinWidthInChars(0),
@@ -878,6 +875,11 @@ void SvTreeListBox::EnableSelectionAsDropTarget( bool bEnable )
 // ******************************************************************
 // InplaceEditing
 // ******************************************************************
+
+VclPtr<Edit> SvTreeListBox::GetEditWidget() const
+{
+    return pEdCtrl ? pEdCtrl->GetEditWidget() : nullptr;
+}
 
 void SvTreeListBox::EditText( const OUString& rStr, const tools::Rectangle& rRect,
     const Selection& rSel )
@@ -1807,10 +1809,10 @@ const Image& SvTreeListBox::GetDefaultCollapsedNodeImage( )
     return SvImpLBox::GetDefaultCollapsedNodeImage( );
 }
 
-void SvTreeListBox::SetNodeBitmaps( const Image& rCollapsedNodeBmp, const Image& rExpandedNodeBmp )
+void SvTreeListBox::SetNodeDefaultImages()
 {
-    SetExpandedNodeBmp( rExpandedNodeBmp );
-    SetCollapsedNodeBmp( rCollapsedNodeBmp );
+    SetExpandedNodeBmp(GetDefaultExpandedNodeImage());
+    SetCollapsedNodeBmp(GetDefaultCollapsedNodeImage());
     SetTabs();
 }
 
@@ -2286,7 +2288,7 @@ void SvTreeListBox::MouseButtonUp( const MouseEvent& rMEvt )
             {
                 SvLBoxButton* pItemCheckBox
                     = static_cast<SvLBoxButton*>(pEntry->GetFirstItem(SvLBoxItemType::Button));
-                if (pItemCheckBox && GetItemPos(pEntry, 0).first < aPnt.X() - GetMapMode().GetOrigin().X())
+                if (pItemCheckBox && pItemCheckBox->isEnable() && GetItemPos(pEntry, 0).first < aPnt.X() - GetMapMode().GetOrigin().X())
                 {
                     pItemCheckBox->ClickHdl(pEntry);
                     InvalidateEntry(pEntry);
@@ -2797,60 +2799,67 @@ void SvTreeListBox::PaintEntry1(SvTreeListEntry& rEntry, tools::Long nLine, vcl:
 
     const Image* pImg = nullptr;
 
-    if (IsExpanded(&rEntry))
+    const bool bExpanded = IsExpanded(&rEntry);
+    if (bExpanded)
         pImg = &pImpl->GetExpandedNodeBmp();
     else
-    {
-        if ((!rEntry.HasChildren()) && rEntry.HasChildrenOnDemand() &&
-            (!(rEntry.GetFlags() & SvTLEntryFlags::HAD_CHILDREN)) &&
-            pImpl->GetDontKnowNodeBmp().GetSizePixel().Width())
-        {
-            pImg = &pImpl->GetDontKnowNodeBmp( );
-        }
-        else
-        {
-            pImg = &pImpl->GetCollapsedNodeBmp( );
-        }
-    }
+        pImg = &pImpl->GetCollapsedNodeBmp();
+    const bool bDefaultImage = bExpanded ? *pImg == GetDefaultExpandedNodeImage()
+                                         : *pImg == GetDefaultCollapsedNodeImage();
     aPos.AdjustY((nTempEntryHeight - pImg->GetSizePixel().Height()) / 2 );
 
-    DrawImageFlags nStyle = DrawImageFlags::NONE;
-    if (!IsEnabled())
-        nStyle |= DrawImageFlags::Disable;
-
-    //native
-    bool bNativeOK = false;
-    if (rRenderContext.IsNativeControlSupported(ControlType::ListNode, ControlPart::Entire))
+    if (!bDefaultImage)
     {
-        ImplControlValue aControlValue;
-        tools::Rectangle aCtrlRegion(aPos,  pImg->GetSizePixel());
-        ControlState nState = ControlState::NONE;
-
-        if (IsEnabled())
-            nState |= ControlState::ENABLED;
-
-        if (IsExpanded(&rEntry))
-            aControlValue.setTristateVal(ButtonValue::On); //expanded node
-        else
+        // If it's a custom image then draw what was explicitly set to use
+        DrawImageFlags nStyle = DrawImageFlags::NONE;
+        if (!IsEnabled())
+            nStyle |= DrawImageFlags::Disable;
+        rRenderContext.DrawImage(aPos, *pImg, nStyle);
+    }
+    else
+    {
+        bool bNativeOK = false;
+        // native
+        if (rRenderContext.IsNativeControlSupported(ControlType::ListNode, ControlPart::Entire))
         {
-            if ((!rEntry.HasChildren()) && rEntry.HasChildrenOnDemand() &&
-                (!(rEntry.GetFlags() & SvTLEntryFlags::HAD_CHILDREN)) &&
-                pImpl->GetDontKnowNodeBmp().GetSizePixel().Width())
-            {
-                aControlValue.setTristateVal( ButtonValue::DontKnow ); //don't know
-            }
+            ImplControlValue aControlValue;
+            tools::Rectangle aCtrlRegion(aPos,  pImg->GetSizePixel());
+            ControlState nState = ControlState::NONE;
+
+            if (IsEnabled())
+                nState |= ControlState::ENABLED;
+
+            if (bExpanded)
+                aControlValue.setTristateVal(ButtonValue::On); //expanded node
             else
             {
-                aControlValue.setTristateVal( ButtonValue::Off ); //collapsed node
+                if ((!rEntry.HasChildren()) && rEntry.HasChildrenOnDemand() &&
+                    (!(rEntry.GetFlags() & SvTLEntryFlags::HAD_CHILDREN)))
+                {
+                    aControlValue.setTristateVal( ButtonValue::DontKnow ); //don't know
+                }
+                else
+                {
+                    aControlValue.setTristateVal( ButtonValue::Off ); //collapsed node
+                }
             }
+
+            bNativeOK = rRenderContext.DrawNativeControl(ControlType::ListNode, ControlPart::Entire, aCtrlRegion, nState, aControlValue, OUString());
         }
+        if (!bNativeOK)
+        {
+            DecorationView aDecoView(&rRenderContext);
+            DrawSymbolFlags nSymbolStyle = DrawSymbolFlags::NONE;
+            if (!IsEnabled())
+                nSymbolStyle |= DrawSymbolFlags::Disable;
 
-        bNativeOK = rRenderContext.DrawNativeControl(ControlType::ListNode, ControlPart::Entire, aCtrlRegion, nState, aControlValue, OUString());
-    }
+            Color aCol = aBackupTextColor;
+            if (pViewDataEntry->IsHighlighted())
+                aCol = aHighlightTextColor;
 
-    if (!bNativeOK)
-    {
-        rRenderContext.DrawImage(aPos, *pImg ,nStyle);
+            SymbolType eSymbol = bExpanded ? SymbolType::SPIN_DOWN : SymbolType::SPIN_RIGHT;
+            aDecoView.DrawSymbol(tools::Rectangle(aPos, pImg->GetSizePixel()), eSymbol, aCol, nSymbolStyle);
+        }
     }
 }
 
@@ -3489,31 +3498,31 @@ css::uno::Reference< XAccessible > SvTreeListBox::CreateAccessible()
     return xAccessible;
 }
 
-void SvTreeListBox::FillAccessibleEntryStateSet( SvTreeListEntry* pEntry, ::utl::AccessibleStateSetHelper& rStateSet ) const
+void SvTreeListBox::FillAccessibleEntryStateSet( SvTreeListEntry* pEntry, sal_Int64& rStateSet ) const
 {
     assert(pEntry && "SvTreeListBox::FillAccessibleEntryStateSet: invalid entry");
 
     if ( pEntry->HasChildrenOnDemand() || pEntry->HasChildren() )
     {
-        rStateSet.AddState( AccessibleStateType::EXPANDABLE );
+        rStateSet |= AccessibleStateType::EXPANDABLE;
         if ( IsExpanded( pEntry ) )
-            rStateSet.AddState( sal_Int16(AccessibleStateType::EXPANDED) );
+            rStateSet |= AccessibleStateType::EXPANDED;
     }
 
     if ( GetCheckButtonState( pEntry ) == SvButtonState::Checked )
-        rStateSet.AddState( AccessibleStateType::CHECKED );
+        rStateSet |= AccessibleStateType::CHECKED;
     if ( IsEntryVisible( pEntry ) )
-        rStateSet.AddState( AccessibleStateType::VISIBLE );
+        rStateSet |= AccessibleStateType::VISIBLE;
     if ( IsSelected( pEntry ) )
-        rStateSet.AddState( AccessibleStateType::SELECTED );
+        rStateSet |= AccessibleStateType::SELECTED;
     if ( IsEnabled() )
     {
-        rStateSet.AddState( AccessibleStateType::ENABLED );
-        rStateSet.AddState( AccessibleStateType::FOCUSABLE );
-        rStateSet.AddState( AccessibleStateType::SELECTABLE );
+        rStateSet |= AccessibleStateType::ENABLED;
+        rStateSet |= AccessibleStateType::FOCUSABLE;
+        rStateSet |= AccessibleStateType::SELECTABLE;
         SvViewDataEntry* pViewDataNewCur = GetViewDataEntry(pEntry);
         if (pViewDataNewCur && pViewDataNewCur->HasFocus())
-            rStateSet.AddState( AccessibleStateType::FOCUSED );
+            rStateSet |= AccessibleStateType::FOCUSED;
     }
 }
 
@@ -3604,6 +3613,14 @@ bool SvTreeListBox::set_property(const OString &rKey, const OUString &rValue)
     else
         return Control::set_property(rKey, rValue);
     return true;
+}
+
+void SvTreeListBox::EnableRTL(bool bEnable)
+{
+    Control::EnableRTL(bEnable);
+    pImpl->m_aHorSBar->EnableRTL(bEnable);
+    pImpl->m_aVerSBar->EnableRTL(bEnable);
+    pImpl->m_aScrBarBox->EnableRTL(bEnable);
 }
 
 FactoryFunction SvTreeListBox::GetUITestFactory() const

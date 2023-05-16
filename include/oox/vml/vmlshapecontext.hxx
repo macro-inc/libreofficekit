@@ -106,10 +106,10 @@ public:
 
 private:
     /** Processes the 'style' attribute. */
-    void                setStyle( const OUString& rStyle );
+    void                setStyle( std::u16string_view rStyle );
 
     /** Resolve a relation identifier to a fragment path. */
-    OptValue< OUString > decodeFragmentPath( const AttributeList& rAttribs, sal_Int32 nToken ) const;
+    std::optional< OUString > decodeFragmentPath( const AttributeList& rAttribs, sal_Int32 nToken ) const;
 
 private:
     std::shared_ptr<ShapeType> m_pShapeType;
@@ -128,7 +128,7 @@ public:
 
 private:
     /** Processes the 'points' attribute. */
-    void                setPoints( const OUString& rPoints );
+    void                setPoints( std::u16string_view rPoints );
     /** Processes the 'from' attribute. */
     void                setFrom( const OUString& rPoints );
     /** Processes the 'to' attribute. */

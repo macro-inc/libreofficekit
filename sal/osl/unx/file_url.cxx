@@ -79,23 +79,8 @@ namespace {
 
 // A slightly modified version of Pchar in rtl/source/uri.c, but without
 // encoding slashes:
-const sal_Bool uriCharClass[128] = {
-    false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false,
-    false,  true, false, false,  true, false,  true,  true,  //  !"#$%&'
-     true,  true,  true,  true,  true,  true,  true,  true,  // ()*+,-./
-     true,  true,  true,  true,  true,  true,  true,  true,  // 01234567
-     true,  true,  true, false, false,  true, false, false,  // 89:;<=>?
-     true,  true,  true,  true,  true,  true,  true,  true,  // @ABCDEFG
-     true,  true,  true,  true,  true,  true,  true,  true,  // HIJKLMNO
-     true,  true,  true,  true,  true,  true,  true,  true,  // PQRSTUVW
-     true,  true,  true, false, false, false, false,  true,  // XYZ[\]^_
-    false,  true,  true,  true,  true,  true,  true,  true,  // `abcdefg
-     true,  true,  true,  true,  true,  true,  true,  true,  // hijklmno
-     true,  true,  true,  true,  true,  true,  true,  true,  // pqrstuvw
-     true,  true,  true, false, false, false,  true, false}; // xyz{|}~
+constexpr auto uriCharClass = rtl::createUriCharClass(
+    u8"!$&'()*+,-./0123456789:=@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~");
 
 }
 
@@ -439,7 +424,7 @@ oslFileError SAL_CALL osl_getFileURLFromSystemPath( rtl_uString *ustrSystemPath,
         rtl_uString_assign( &pTmp, systemPath.pData );
 
     /* file URLs must be URI encoded */
-    rtl_uriEncode( pTmp, uriCharClass, rtl_UriEncodeIgnoreEscapes, RTL_TEXTENCODING_UTF8, pustrFileURL );
+    rtl_uriEncode( pTmp, uriCharClass.data(), rtl_UriEncodeIgnoreEscapes, RTL_TEXTENCODING_UTF8, pustrFileURL );
 
     rtl_uString_release( pTmp );
 
@@ -459,7 +444,7 @@ oslFileError SAL_CALL osl_getFileURLFromSystemPath( rtl_uString *ustrSystemPath,
 /*
  * relative URLs are not accepted
  */
-oslFileError osl_getSystemPathFromFileURL_Ex(
+oslFileError getSystemPathFromFileURL_Ex(
     rtl_uString *ustrFileURL, rtl_uString **pustrSystemPath)
 {
     rtl_uString* temp = nullptr;
@@ -726,7 +711,7 @@ oslFileError osl_getAbsoluteFileURL(
     if (systemPathIsRelativePath(unresolved_path))
     {
         OUString base_path;
-        oslFileError rc = osl_getSystemPathFromFileURL_Ex(ustrBaseDirURL, &base_path.pData);
+        oslFileError rc = getSystemPathFromFileURL_Ex(ustrBaseDirURL, &base_path.pData);
         if (rc != osl_File_E_None)
             return rc;
 
@@ -957,7 +942,7 @@ oslFileError osl::detail::convertPathnameToUrl(OString const & pathname, OUStrin
         ubuf.setLength(n);
         buf.append(
             rtl::Uri::encode(
-                ubuf.makeStringAndClear(), uriCharClass, rtl_UriEncodeIgnoreEscapes,
+                ubuf.makeStringAndClear(), uriCharClass.data(), rtl_UriEncodeIgnoreEscapes,
                 RTL_TEXTENCODING_UTF8));
         assert(converted <= convert);
         convert -= converted;

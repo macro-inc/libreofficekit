@@ -14,15 +14,18 @@ $(eval $(call gb_CppunitTest_CppunitTest,sw_core_layout))
 $(eval $(call gb_CppunitTest_use_common_precompiled_header,sw_core_layout))
 
 $(eval $(call gb_CppunitTest_add_exception_objects,sw_core_layout, \
+    sw/qa/core/layout/flycnt \
     sw/qa/core/layout/layout \
 ))
 
 $(eval $(call gb_CppunitTest_use_libraries,sw_core_layout, \
+    editeng \
     comphelper \
     cppu \
     cppuhelper \
     sal \
     sfx \
+    subsequenttest \
     sw \
 	swqahelper \
     test \
@@ -70,6 +73,9 @@ $(eval $(call gb_CppunitTest_use_uiconfigs,sw_core_layout, \
     svt \
     svx \
 ))
+
+# assert if font/glyph fallback occurs
+$(eval $(call gb_CppunitTest_set_non_application_font_use,sw_core_layout,abort))
 
 $(eval $(call gb_CppunitTest_use_more_fonts,sw_core_layout))
 

@@ -40,6 +40,7 @@
 #include <svl/intitem.hxx>
 #include <svl/stritem.hxx>
 #include <svl/srchdefs.hxx>
+#include <utility>
 #include <vcl/commandevent.hxx>
 #include <vcl/event.hxx>
 #include <vcl/svapp.hxx>
@@ -53,14 +54,14 @@ namespace basctl
 using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star;
 
-BaseWindow::BaseWindow( vcl::Window* pParent, const ScriptDocument& rDocument, const OUString& aLibName, const OUString& aName )
+BaseWindow::BaseWindow( vcl::Window* pParent, ScriptDocument aDocument, OUString aLibName, OUString aName )
     :Window( pParent, WinBits( WB_3DLOOK ) )
     ,pShellHScrollBar( nullptr)
     ,pShellVScrollBar( nullptr)
     ,nStatus( 0)
-    ,m_aDocument( rDocument )
-    ,m_aLibName( aLibName )
-    ,m_aName( aName )
+    ,m_aDocument(std::move( aDocument ))
+    ,m_aLibName(std::move( aLibName ))
+    ,m_aName(std::move( aName ))
 {
 }
 
@@ -71,55 +72,57 @@ BaseWindow::~BaseWindow()
 
 void BaseWindow::dispose()
 {
-    if ( pShellVScrollBar )
-        pShellVScrollBar->SetScrollHdl( Link<ScrollBar*,void>() );
-    if ( pShellHScrollBar )
-        pShellHScrollBar->SetScrollHdl( Link<ScrollBar*,void>() );
+    if (pShellVScrollBar && !pShellVScrollBar->isDisposed())
+        pShellVScrollBar->SetScrollHdl( Link<weld::Scrollbar&,void>() );
+    if (pShellHScrollBar && !pShellHScrollBar->isDisposed())
+        pShellHScrollBar->SetScrollHdl( Link<weld::Scrollbar&,void>() );
     pShellVScrollBar.clear();
     pShellHScrollBar.clear();
     vcl::Window::dispose();
 }
 
-
 void BaseWindow::Init()
 {
     if ( pShellVScrollBar )
-        pShellVScrollBar->SetScrollHdl( LINK( this, BaseWindow, ScrollHdl ) );
+        pShellVScrollBar->SetScrollHdl( LINK( this, BaseWindow, VertScrollHdl ) );
     if ( pShellHScrollBar )
-        pShellHScrollBar->SetScrollHdl( LINK( this, BaseWindow, ScrollHdl ) );
+        pShellHScrollBar->SetScrollHdl( LINK( this, BaseWindow, HorzScrollHdl ) );
     DoInit();   // virtual...
 }
 
-
 void BaseWindow::DoInit()
-{ }
+{
+}
 
-
-void BaseWindow::GrabScrollBars( ScrollBar* pHScroll, ScrollBar* pVScroll )
+void BaseWindow::GrabScrollBars(ScrollAdaptor* pHScroll, ScrollAdaptor* pVScroll)
 {
     pShellHScrollBar = pHScroll;
     pShellVScrollBar = pVScroll;
-//  Init(); // does not make sense, leads to flickering and errors...
 }
 
-
-IMPL_LINK( BaseWindow, ScrollHdl, ScrollBar *, pCurScrollBar, void )
+IMPL_LINK_NOARG(BaseWindow, VertScrollHdl, weld::Scrollbar&, void)
 {
-    DoScroll( pCurScrollBar );
+    DoScroll(pShellVScrollBar);
+}
+
+IMPL_LINK_NOARG(BaseWindow, HorzScrollHdl, weld::Scrollbar&, void)
+{
+    DoScroll(pShellHScrollBar);
 }
 
 void BaseWindow::ExecuteCommand (SfxRequest&)
-{ }
+{
+}
 
 void BaseWindow::ExecuteGlobal (SfxRequest&)
-{ }
-
+{
+}
 
 bool BaseWindow::EventNotify( NotifyEvent& rNEvt )
 {
     bool bDone = false;
 
-    if ( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT )
+    if ( rNEvt.GetType() == NotifyEventType::KEYINPUT )
     {
         KeyEvent aKEvt = *rNEvt.GetKeyEvent();
         vcl::KeyCode aCode = aKEvt.GetKeyCode();
@@ -144,11 +147,39 @@ bool BaseWindow::EventNotify( NotifyEvent& rNEvt )
     return bDone || Window::EventNotify( rNEvt );
 }
 
-
-void BaseWindow::DoScroll( ScrollBar* )
+void BaseWindow::ShowShellScrollBars(bool bVisible)
 {
+    if (bVisible)
+    {
+        if (pShellHScrollBar)
+        {
+            pShellHScrollBar->Enable();
+            pShellHScrollBar->Show();
+        }
+        if (pShellVScrollBar)
+        {
+            pShellVScrollBar->Enable();
+            pShellVScrollBar->Show();
+        }
+    }
+    else
+    {
+        if (pShellHScrollBar)
+        {
+            pShellHScrollBar->Disable();
+            pShellHScrollBar->Hide();
+        }
+        if (pShellVScrollBar)
+        {
+            pShellVScrollBar->Disable();
+            pShellVScrollBar->Hide();
+        }
+    }
 }
 
+void BaseWindow::DoScroll( Scrollable* )
+{
+}
 
 void BaseWindow::StoreData()
 {
@@ -158,7 +189,6 @@ bool BaseWindow::AllowUndo()
 {
     return true;
 }
-
 
 void BaseWindow::UpdateData()
 {
@@ -583,9 +613,7 @@ void CutLines( OUString& rStr, sal_Int32 nStartLine, sal_Int32 nLines )
     else
         nEndPos++;
 
-    OUString aEndStr = rStr.copy( nEndPos );
-    rStr = rStr.copy( 0, nStartPos );
-    rStr += aEndStr;
+    rStr = OUString::Concat(rStr.subView( 0, nStartPos )) + rStr.subView( nEndPos );
 
     // erase trailing empty lines
     {
@@ -599,9 +627,7 @@ void CutLines( OUString& rStr, sal_Int32 nStartLine, sal_Int32 nLines )
 
         if ( n > nStartPos )
         {
-            aEndStr = rStr.copy( n );
-            rStr = rStr.copy( 0, nStartPos );
-            rStr += aEndStr;
+            rStr = OUString::Concat(rStr.subView( 0, nStartPos )) + rStr.subView( n );
         }
     }
 }
@@ -667,8 +693,8 @@ LibInfo::Item const* LibInfo::GetInfo (
     return it != m_aMap.end() ? &it->second : nullptr;
 }
 
-LibInfo::Key::Key (ScriptDocument const& rDocument, OUString const& rLibName) :
-    m_aDocument(rDocument), m_aLibName(rLibName)
+LibInfo::Key::Key (ScriptDocument aDocument, OUString aLibName) :
+    m_aDocument(std::move(aDocument)), m_aLibName(std::move(aLibName))
 { }
 
 bool LibInfo::Key::operator == (Key const& rKey) const
@@ -685,10 +711,10 @@ size_t LibInfo::Key::Hash::operator () (Key const& rKey) const
 }
 
 LibInfo::Item::Item (
-    OUString const& rCurrentName,
+    OUString aCurrentName,
     ItemType eCurrentType
 ) :
-    m_aCurrentName(rCurrentName),
+    m_aCurrentName(std::move(aCurrentName)),
     m_eCurrentType(eCurrentType)
 { }
 

@@ -98,7 +98,7 @@ namespace oox::ppt {
     {
         if( maCond.mnType == 0 || maCond.mnType == PPT_TOKEN(tn))
         {
-            maCond.maValue = (maEvent.Trigger == EventTrigger::NONE) ? maEvent.Offset : makeAny( maEvent );
+            maCond.maValue = (maEvent.Trigger == EventTrigger::NONE) ? maEvent.Offset : Any( maEvent );
         }
     }
 
@@ -134,7 +134,7 @@ namespace oox::ppt {
         {
             maCond.mnType = aElementToken;
             // Convert the node id string to XAnimationNode later
-            maEvent.Source <<= rAttribs.getString(XML_val, OUString());
+            maEvent.Source <<= rAttribs.getStringDefaulted(XML_val);
             return this;
         }
         case PPT_TOKEN( tgtEl ):

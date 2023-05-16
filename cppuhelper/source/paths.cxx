@@ -28,12 +28,13 @@
 #include <osl/module.hxx>
 #include <rtl/ustring.hxx>
 #include <sal/types.h>
+#include <o3tl/string_view.hxx>
 
 #include "paths.hxx"
 
 namespace {
 
-#ifndef ANDROID
+#if !(defined ANDROID || defined EMSCRIPTEN)
 OUString get_this_libpath() {
     static OUString s_uri = []() {
         OUString uri;
@@ -61,16 +62,13 @@ OUString cppu::getUnoIniUri() {
     // and since rtlBootstrapHandle is not ref-counted doing anything
     // clean here is hardish.
     OUString uri("file:///assets/program");
+#elif defined(EMSCRIPTEN)
+    OUString uri("file:///instdir/program");
 #else
     OUString uri(get_this_libpath());
 #ifdef MACOSX
-    // We keep both the LO and URE dylibs directly in "Frameworks"
-    // (that is, LIBO_LIB_FOLDER) and rc files in "Resources"
-    // (LIBO_ETC_FOLDER). Except for unorc, of which there are two,
-    // the "LO" one (which is in "Resources") and the "URE" one (which
-    // is in "Resources/ure/etc" (LIBO_URE_ETC_FOLDER)). As this code
-    // goes into the cppuhelper library which is part of URE, we are
-    // looking for the latter one here. I think...
+    // We keep the URE dylibs directly in "Frameworks" (that is, LIBO_LIB_FOLDER) and unorc in
+    // "Resources/ure/etc" (LIBO_URE_ETC_FOLDER).
     if (uri.endsWith( "/" LIBO_LIB_FOLDER ) )
     {
         uri = OUString::Concat(uri.subView( 0, uri.getLength() - (sizeof(LIBO_LIB_FOLDER)-1) )) + LIBO_URE_ETC_FOLDER;
@@ -101,9 +99,11 @@ bool cppu::nextDirectoryItem(osl::Directory & directory, OUString * url) {
                 "Cannot stat in directory");
         }
         if (stat.getFileType() != osl::FileStatus::Directory) { //TODO: symlinks
-            // Ignore backup files:
+            // Ignore backup and spurious junk files:
             OUString name(stat.getFileName());
-            if (!(name.match(".") || name.endsWith("~"))) {
+            if (name.match(".") || !name.endsWithIgnoreAsciiCase(u".rdb")) {
+                SAL_WARN("cppuhelper", "ignoring <" << stat.getFileURL() << ">");
+            } else {
                 *url = stat.getFileURL();
                 return true;
             }
@@ -111,18 +111,18 @@ bool cppu::nextDirectoryItem(osl::Directory & directory, OUString * url) {
     }
 }
 
-void cppu::decodeRdbUri(OUString * uri, bool * optional, bool * directory)
+void cppu::decodeRdbUri(std::u16string_view * uri, bool * optional, bool * directory)
 {
     assert(uri != nullptr && optional != nullptr && directory != nullptr);
-    if(!(uri->isEmpty()))
+    if(!(uri->empty()))
     {
         *optional = (*uri)[0] == '?';
         if (*optional) {
-            *uri = uri->copy(1);
+            *uri = uri->substr(1);
         }
-        *directory = uri->startsWith("<") && uri->endsWith(">*");
+        *directory = o3tl::starts_with(*uri, u"<") && o3tl::ends_with(*uri, u">*");
         if (*directory) {
-            *uri = uri->copy(1, uri->getLength() - 3);
+            *uri = uri->substr(1, uri->size() - 3);
         }
     }
     else

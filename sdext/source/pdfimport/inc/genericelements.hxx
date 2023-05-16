@@ -25,6 +25,7 @@
 
 #include <com/sun/star/task/XStatusIndicator.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
+#include <com/sun/star/i18n/BreakIterator.hpp>
 #include <basegfx/polygon/b2dpolypolygon.hxx>
 #include <rtl/ustring.hxx>
 #include <rtl/ustrbuf.hxx>
@@ -91,6 +92,10 @@ namespace pdfi
         void applyToChildren( ElementTreeVisitor& );
         /// Union element geometry with given element
         void updateGeometryWith( const Element* pMergeFrom );
+
+        /// To avoid some dynamic_cast cost
+        virtual const TextElement* dynCastAsTextElement() const { return nullptr; }
+        virtual TextElement* dynCastAsTextElement() { return nullptr; }
 
 #if OSL_DEBUG_LEVEL > 0
         // xxx refact TODO: move code to visitor
@@ -174,6 +179,9 @@ namespace pdfi
 
     public:
         virtual void visitedBy( ElementTreeVisitor&, const std::list< std::unique_ptr<Element> >::const_iterator& ) override;
+
+        virtual const TextElement* dynCastAsTextElement() const override { return this; }
+        virtual TextElement* dynCastAsTextElement() override { return this; }
 
         OUStringBuffer Text;
         sal_Int32           FontId;
@@ -302,6 +310,8 @@ namespace pdfi
         static std::shared_ptr<DocumentElement> createDocumentElement()
         { return std::make_shared<DocumentElement>(); }
     };
+
+    bool isComplex(const css::uno::Reference<css::i18n::XBreakIterator>& rBreakIterator, TextElement* const pTextElem);
 }
 
 #endif

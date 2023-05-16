@@ -68,6 +68,7 @@
 #include "nodetype.hxx"
 
 #include <editeng/editdata.hxx>
+#include <rtl/ustrbuf.hxx>
 
 enum class FontAttribute {
     None   = 0x0000,
@@ -139,7 +140,7 @@ class SmNode : public SmRect
     sal_Int32       mnAccIndex;
 
 protected:
-    SmNode(SmNodeType eNodeType, const SmToken &rNodeToken);
+    SmNode(SmNodeType eNodeType, SmToken aNodeToken);
 
 public:
     SmNode(const SmNode&) = delete;
@@ -754,8 +755,6 @@ public:
  */
 class SmTextNode : public SmVisibleNode
 {
-
-protected:
     OUString   maText;
     sal_uInt16 mnFontDesc;
     /** Index within text where the selection starts

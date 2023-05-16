@@ -17,7 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/document/XEventsSupplier.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/frame/theGlobalEventBroadcaster.hpp>
@@ -44,6 +44,7 @@ SvxEventConfigPage::SvxEventConfigPage(weld::Container* pPage, weld::DialogContr
     mpImpl->xEventLB = m_xBuilder->weld_tree_view("events");
     mpImpl->xAssignPB = m_xBuilder->weld_button("macro");
     mpImpl->xDeletePB = m_xBuilder->weld_button("delete");
+    mpImpl->xDeleteAllPB = m_xBuilder->weld_button("deleteall");
     mpImpl->xAssignComponentPB = m_xBuilder->weld_button("component");
 
     mpImpl->xEventLB->set_size_request(mpImpl->xEventLB->get_approximate_digit_width() * 70,

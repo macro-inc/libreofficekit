@@ -33,7 +33,7 @@
 #include <vcl/virdev.hxx>
 #include <svx/svdview.hxx>
 #include <svx/svdpage.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace chart
 {
@@ -110,20 +110,16 @@ SdrObjList* ViewElementListProvider::GetSymbolList() const
     {
         //@todo use mutex
 
-        //get shape factory
-        uno::Reference<lang::XMultiServiceFactory> xShapeFactory(
-            m_pDrawModelWrapper->getShapeFactory());
-
         //get hidden draw page (target):
-        uno::Reference<drawing::XShapes> xTarget = m_pDrawModelWrapper->getHiddenDrawPage();
+        rtl::Reference<SvxDrawPage> xTarget = m_pDrawModelWrapper->getHiddenDrawPage();
 
         //create symbols via uno and convert to native sdr objects
         drawing::Direction3D aSymbolSize(220, 220, 0); // should be 250, but 250 -> 280 ??
-        uno::Reference<drawing::XShapes> xSymbols
-            = DataPointSymbolSupplier::create2DSymbolList(xShapeFactory, xTarget, aSymbolSize);
+        rtl::Reference< SvxShapeGroup > xSymbols
+            = DataPointSymbolSupplier::create2DSymbolList(xTarget, aSymbolSize);
 
         SdrObject* pSdrObject = DrawViewWrapper::getSdrObject(
-            uno::Reference<drawing::XShape>(xSymbols, uno::UNO_QUERY));
+            uno::Reference<drawing::XShape>(static_cast<cppu::OWeakObject*>(xSymbols.get()), uno::UNO_QUERY));
         if (pSdrObject)
             pSymbolList = pSdrObject->GetSubList();
     }
@@ -143,7 +139,7 @@ Graphic ViewElementListProvider::GetSymbolGraphic( sal_Int32 nStandardSymbol, co
         nStandardSymbol*=-1;
     if( o3tl::make_unsigned(nStandardSymbol) >= pSymbolList->GetObjCount() )
         nStandardSymbol %= pSymbolList->GetObjCount();
-    SdrObject* pObj = pSymbolList->GetObj(nStandardSymbol);
+    rtl::Reference<SdrObject> pObj = pSymbolList->GetObj(nStandardSymbol);
 
     ScopedVclPtrInstance< VirtualDevice > pVDev;
     pVDev->SetMapMode(MapMode(MapUnit::Map100thMM));
@@ -162,8 +158,8 @@ Graphic ViewElementListProvider::GetSymbolGraphic( sal_Int32 nStandardSymbol, co
     // directly clone to target SdrModel
     pObj = pObj->CloneSdrObject(*pModel);
 
-    pPage->NbcInsertObject(pObj);
-    aView.MarkObj(pObj,pPageView);
+    pPage->NbcInsertObject(pObj.get());
+    aView.MarkObj(pObj.get(),pPageView);
     if( pSymbolShapeProperties )
         pObj->SetMergedItemSet(*pSymbolShapeProperties);
 
@@ -176,7 +172,9 @@ Graphic ViewElementListProvider::GetSymbolGraphic( sal_Int32 nStandardSymbol, co
 
     aView.UnmarkAll();
     pObj=pPage->RemoveObject(0);
-    SdrObject::Free( pObj );
+    // these need to die before the associated SdrModel
+    pObj.clear();
+    pPage.clear();
 
     return aGraph;
 }

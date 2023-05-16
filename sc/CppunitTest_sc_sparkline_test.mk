@@ -15,7 +15,6 @@ $(eval $(call gb_CppunitTest_use_common_precompiled_header,sc_sparkline_test))
 
 $(eval $(call gb_CppunitTest_add_exception_objects,sc_sparkline_test, \
     sc/qa/unit/SparklineImportExportTest \
-    sc/qa/unit/SparklineTest \
 ))
 
 $(eval $(call gb_CppunitTest_use_externals,sc_sparkline_test, \
@@ -43,6 +42,10 @@ $(eval $(call gb_CppunitTest_use_libraries,sc_sparkline_test, \
     vcl \
 ))
 
+$(eval $(call gb_CppunitTest_use_externals,sc_sparkline_test,\
+    boost_headers \
+))
+
 $(eval $(call gb_CppunitTest_set_include,sc_sparkline_test,\
     -I$(SRCDIR)/sc/source/ui/inc \
     -I$(SRCDIR)/sc/inc \
@@ -64,5 +67,9 @@ $(eval $(call gb_CppunitTest_use_rdb,sc_sparkline_test,services))
 $(eval $(call gb_CppunitTest_use_components,sc_sparkline_test))
 
 $(eval $(call gb_CppunitTest_use_configuration,sc_sparkline_test))
+
+$(eval $(call gb_CppunitTest_add_arguments,sc_sparkline_test, \
+    -env:arg-env=$(gb_Helper_LIBRARY_PATH_VAR)"$$$${$(gb_Helper_LIBRARY_PATH_VAR)+=$$$$$(gb_Helper_LIBRARY_PATH_VAR)}" \
+))
 
 # vim: set noet sw=4 ts=4:

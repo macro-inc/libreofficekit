@@ -63,23 +63,22 @@ bool SwCursor::GotoFootnoteText()
 {
     // jump from content to footnote
     bool bRet = false;
-    SwTextNode* pTextNd = GetPoint()->nNode.GetNode().GetTextNode();
+    SwTextNode* pTextNd = GetPoint()->GetNode().GetTextNode();
 
     SwTextAttr *const pFootnote( pTextNd
         ? pTextNd->GetTextAttrForCharAt(
-            GetPoint()->nContent.GetIndex(), RES_TXTATR_FTN)
+            GetPoint()->GetContentIndex(), RES_TXTATR_FTN)
         : nullptr);
     if (pFootnote)
     {
         SwCursorSaveState aSaveState( *this );
-        GetPoint()->nNode = *static_cast<SwTextFootnote*>(pFootnote)->GetStartNode();
+        GetPoint()->Assign( *static_cast<SwTextFootnote*>(pFootnote)->GetStartNode() );
 
         SwContentNode* pCNd = GetDoc().GetNodes().GoNextSection(
-                                            &GetPoint()->nNode,
+                                            GetPoint(),
                                             true, !IsReadOnlyAvailable() );
         if( pCNd )
         {
-            GetPoint()->nContent.Assign( pCNd, 0 );
             bRet = !IsSelOvr( SwCursorSelOverFlags::CheckNodeSection |
                               SwCursorSelOverFlags::Toggle );
         }
@@ -93,7 +92,7 @@ bool SwCursorShell::GotoFootnoteText()
     if( !bRet )
     {
         SwTextNode* pTextNd = GetCursor_() ?
-                   GetCursor_()->GetPoint()->nNode.GetNode().GetTextNode() : nullptr;
+                   GetCursor_()->GetPoint()->GetNode().GetTextNode() : nullptr;
         if( pTextNd )
         {
             std::pair<Point, bool> const tmp(GetCursor_()->GetSttPos(), true);
@@ -141,7 +140,7 @@ bool SwCursorShell::GotoFootnoteText()
 bool SwCursor::GotoFootnoteAnchor()
 {
     // jump from footnote to anchor
-    const SwNode* pSttNd = GetNode().FindFootnoteStartNode();
+    const SwNode* pSttNd = GetPointNode().FindFootnoteStartNode();
     if( pSttNd )
     {
         // search in all footnotes in document for this StartIndex
@@ -155,8 +154,7 @@ bool SwCursor::GotoFootnoteAnchor()
                 SwCursorSaveState aSaveState( *this );
 
                 SwTextNode& rTNd = const_cast<SwTextNode&>(pTextFootnote->GetTextNode());
-                GetPoint()->nNode = rTNd;
-                GetPoint()->nContent.Assign( &rTNd, pTextFootnote->GetStart() );
+                GetPoint()->Assign( rTNd, pTextFootnote->GetStart() );
 
                 return !IsSelOvr( SwCursorSelOverFlags::CheckNodeSection |
                                   SwCursorSelOverFlags::Toggle );
@@ -208,13 +206,13 @@ bool SwCursor::GotoNextFootnoteAnchor()
         return false;
     }
 
-    if( rFootnoteArr.SeekEntry( GetPoint()->nNode, &nPos ))
+    if( rFootnoteArr.SeekEntry( GetPoint()->GetNode(), &nPos ))
     {
         // there is a footnote with this index, so search also for the next one
         if( nPos < rFootnoteArr.size() )
         {
-            SwNodeOffset nNdPos = GetPoint()->nNode.GetIndex();
-            const sal_Int32 nCntPos = GetPoint()->nContent.GetIndex();
+            SwNodeOffset nNdPos = GetPoint()->GetNodeIndex();
+            const sal_Int32 nCntPos = GetPoint()->GetContentIndex();
 
             pTextFootnote = rFootnoteArr[ nPos ];
             // search forwards
@@ -262,8 +260,7 @@ bool SwCursor::GotoNextFootnoteAnchor()
         SwCursorSaveState aSaveState( *this );
 
         SwTextNode& rTNd = const_cast<SwTextNode&>(pTextFootnote->GetTextNode());
-        GetPoint()->nNode = rTNd;
-        GetPoint()->nContent.Assign( &rTNd, pTextFootnote->GetStart() );
+        GetPoint()->Assign( rTNd, pTextFootnote->GetStart() );
         bRet = !IsSelOvr();
     }
     return bRet;
@@ -281,11 +278,11 @@ bool SwCursor::GotoPrevFootnoteAnchor()
         return false;
     }
 
-    if( rFootnoteArr.SeekEntry( GetPoint()->nNode, &nPos ) )
+    if( rFootnoteArr.SeekEntry( GetPoint()->GetNode(), &nPos ) )
     {
         // there is a footnote with this index, so search also for the next one
-        SwNodeOffset nNdPos = GetPoint()->nNode.GetIndex();
-        const sal_Int32 nCntPos = GetPoint()->nContent.GetIndex();
+        SwNodeOffset nNdPos = GetPoint()->GetNodeIndex();
+        const sal_Int32 nCntPos = GetPoint()->GetContentIndex();
 
         pTextFootnote = rFootnoteArr[ nPos ];
         // search forwards
@@ -333,8 +330,7 @@ bool SwCursor::GotoPrevFootnoteAnchor()
         SwCursorSaveState aSaveState( *this );
 
         SwTextNode& rTNd = const_cast<SwTextNode&>(pTextFootnote->GetTextNode());
-        GetPoint()->nNode = rTNd;
-        GetPoint()->nContent.Assign( &rTNd, pTextFootnote->GetStart() );
+        GetPoint()->Assign( rTNd, pTextFootnote->GetStart() );
         bRet = !IsSelOvr();
     }
     return bRet;

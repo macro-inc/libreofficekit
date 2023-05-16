@@ -18,7 +18,6 @@
  */
 
 
-#include <svx/def3d.hxx>
 #include <svx/dlgctl3d.hxx>
 #include <svx/strings.hrc>
 #include <svx/view3d.hxx>
@@ -45,9 +44,7 @@
 using namespace com::sun::star;
 
 Svx3DPreviewControl::Svx3DPreviewControl()
-    : mpScene(nullptr)
-    , mp3DObj(nullptr)
-    , mnObjectType(SvxPreviewObjectType::SPHERE)
+    : mnObjectType(SvxPreviewObjectType::SPHERE)
 {
 }
 
@@ -63,7 +60,9 @@ void Svx3DPreviewControl::SetDrawingArea(weld::DrawingArea* pDrawingArea)
 
 Svx3DPreviewControl::~Svx3DPreviewControl()
 {
+    mp3DObj.clear();
     mxFmPage.clear();
+    mpScene.clear();
     mp3DView.reset();
     mpModel.reset();
 }
@@ -112,7 +111,7 @@ void Svx3DPreviewControl::Construct()
     rCamera.SetFocalLength(fDefaultCamFocal);
 
     mpScene->SetCamera( rCamera );
-    mxFmPage->InsertObject( mpScene );
+    mxFmPage->InsertObject( mpScene.get() );
 
     basegfx::B3DHomMatrix aRotation;
     aRotation.rotate(basegfx::deg2rad( 25 ), 0.0, 0.0);
@@ -135,7 +134,7 @@ void Svx3DPreviewControl::Construct()
     mp3DView->hideMarkHandles();
 
     // mark scene
-    mp3DView->MarkObj( mpScene, pPageView );
+    mp3DView->MarkObj( mpScene.get(), pPageView );
 }
 
 void Svx3DPreviewControl::Resize()
@@ -186,9 +185,7 @@ void Svx3DPreviewControl::SetObjectType(SvxPreviewObjectType nType)
     {
         aSet.Put(mp3DObj->GetMergedItemSet());
         mpScene->RemoveObject( mp3DObj->GetOrdNum() );
-        // always use SdrObject::Free(...) for SdrObjects (!)
-        SdrObject* pTemp(mp3DObj);
-        SdrObject::Free(pTemp);
+        mp3DObj.clear();
     }
 
     switch( nType )
@@ -216,7 +213,7 @@ void Svx3DPreviewControl::SetObjectType(SvxPreviewObjectType nType)
 
     if (mp3DObj)
     {
-        mpScene->InsertObject( mp3DObj );
+        mpScene->InsertObject( mp3DObj.get() );
         mp3DObj->SetMergedItemSet(aSet);
     }
 
@@ -245,9 +242,6 @@ const sal_Int32 g_nInteractionStartDistance = 5 * 5 * 2;
 
 Svx3DLightControl::Svx3DLightControl()
 :   maSelectedLight(NO_LIGHT_SELECTED),
-    mpExpansionObject(nullptr),
-    mpLampBottomObject(nullptr),
-    mpLampShaftObject(nullptr),
     maLightObjects(MAX_NUMBER_LIGHTS, nullptr),
     mfRotateX(-20.0),
     mfRotateY(45.0),
@@ -285,7 +279,7 @@ void Svx3DLightControl::Construct2()
             mp3DView->Get3DDefaultAttributes(),
             basegfx::B3DPoint(-fMaxExpansion, -fMaxExpansion, -fMaxExpansion),
             basegfx::B3DVector(2.0 * fMaxExpansion, 2.0 * fMaxExpansion, 2.0 * fMaxExpansion));
-        mpScene->InsertObject( mpExpansionObject );
+        mpScene->InsertObject( mpExpansionObject.get() );
         SfxItemSet aSet(mpModel->GetItemPool());
         aSet.Put( XLineStyleItem( drawing::LineStyle_NONE ) );
         aSet.Put( XFillStyleItem( drawing::FillStyle_NONE ) );
@@ -307,7 +301,7 @@ void Svx3DLightControl::Construct2()
         mpLampBottomObject = new E3dPolygonObj(
             *mpModel,
             basegfx::B3DPolyPolygon(a3DCircle));
-        mpScene->InsertObject( mpLampBottomObject );
+        mpScene->InsertObject( mpLampBottomObject.get() );
 
         // half circle with stand
         basegfx::B2DPolygon a2DHalfCircle;
@@ -321,7 +315,7 @@ void Svx3DLightControl::Construct2()
         mpLampShaftObject = new E3dPolygonObj(
             *mpModel,
             basegfx::B3DPolyPolygon(a3DHalfCircle));
-        mpScene->InsertObject( mpLampShaftObject );
+        mpScene->InsertObject( mpLampShaftObject.get() );
 
         // initially invisible
         SfxItemSet aSet(mpModel->GetItemPool());
@@ -367,9 +361,6 @@ void Svx3DLightControl::ConstructLightObjects()
         if(maLightObjects[a])
         {
             mpScene->RemoveObject(maLightObjects[a]->GetOrdNum());
-            // always use SdrObject::Free(...) for SdrObjects (!)
-            SdrObject* pTemp(maLightObjects[a]);
-            SdrObject::Free(pTemp);
             maLightObjects[a] = nullptr;
         }
 
@@ -381,12 +372,12 @@ void Svx3DLightControl::ConstructLightObjects()
             aDirection *= RADIUS_LAMP_PREVIEW_SIZE;
 
             const double fLampSize(bIsSelectedLight ? RADIUS_LAMP_BIG : RADIUS_LAMP_SMALL);
-            E3dObject* pNewLight = new E3dSphereObj(
+            rtl::Reference<E3dObject> pNewLight = new E3dSphereObj(
                 *mpModel,
                 mp3DView->Get3DDefaultAttributes(),
                 basegfx::B3DPoint( 0, 0, 0 ),
                 basegfx::B3DVector( fLampSize, fLampSize, fLampSize));
-            mpScene->InsertObject(pNewLight);
+            mpScene->InsertObject(pNewLight.get());
 
             basegfx::B3DHomMatrix aTransform;
             aTransform.translate(aDirection.getX(), aDirection.getY(), aDirection.getZ());
@@ -398,7 +389,7 @@ void Svx3DLightControl::ConstructLightObjects()
             aSet.Put( XFillColorItem(OUString(), GetLightColor(a)));
             pNewLight->SetMergedItemSet(aSet);
 
-            maLightObjects[a] = pNewLight;
+            maLightObjects[a] = pNewLight.get();
         }
     }
 }
@@ -474,14 +465,14 @@ void Svx3DLightControl::TrySelection(Point aPosPixel)
 
     for(auto const & b: aResult)
     {
-        if(b && b != mpExpansionObject)
+        if(b && b != mpExpansionObject.get())
         {
             pResult = b;
             break;
         }
     }
 
-    if(pResult == mp3DObj)
+    if(pResult == mp3DObj.get())
     {
         if(!mbGeometrySelected)
         {
@@ -963,10 +954,6 @@ void SvxLightCtl3D::Init()
 
     // check selection
     CheckSelection();
-}
-
-SvxLightCtl3D::~SvxLightCtl3D()
-{
 }
 
 void SvxLightCtl3D::CheckSelection()

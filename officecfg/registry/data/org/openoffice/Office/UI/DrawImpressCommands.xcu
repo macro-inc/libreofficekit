@@ -757,7 +757,7 @@
       </node>
       <node oor:name=".uno:ManageLinks" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
-          <value xml:lang="en-US">Lin~ks to External Files...</value>
+          <value xml:lang="en-US">E~xternal Links...</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
@@ -1914,22 +1914,6 @@
           <value xml:lang="en-US">Tas~k Pane</value>
         </prop>
       </node>
-      <node oor:name=".uno:MergeCells" oor:op="replace">
-        <prop oor:name="Label" oor:type="xs:string">
-          <value xml:lang="en-US">Merge Cells</value>
-        </prop>
-        <prop oor:name="Properties" oor:type="xs:int">
-          <value>1</value>
-        </prop>
-      </node>
-      <node oor:name=".uno:SplitCell" oor:op="replace">
-        <prop oor:name="Label" oor:type="xs:string">
-          <value xml:lang="en-US">Split Cells</value>
-        </prop>
-        <prop oor:name="Properties" oor:type="xs:int">
-          <value>1</value>
-        </prop>
-      </node>
       <node oor:name=".uno:OptimizeTable" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">Optimize</value>
@@ -1980,7 +1964,7 @@
       </node>
       <node oor:name=".uno:DistributeRows" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
-          <value xml:lang="en-US">Distribute Rows Equally </value>
+          <value xml:lang="en-US">Distribute Rows Evenly</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
@@ -2029,22 +2013,6 @@
       <node oor:name=".uno:InsertColumnDialog" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">Insert Columns</value>
-        </prop>
-        <prop oor:name="Properties" oor:type="xs:int">
-          <value>1</value>
-        </prop>
-      </node>
-      <node oor:name=".uno:DeleteRows" oor:op="replace">
-        <prop oor:name="Label" oor:type="xs:string">
-          <value xml:lang="en-US">Delete Row</value>
-        </prop>
-        <prop oor:name="Properties" oor:type="xs:int">
-          <value>1</value>
-        </prop>
-      </node>
-      <node oor:name=".uno:DeleteColumns" oor:op="replace">
-        <prop oor:name="Label" oor:type="xs:string">
-          <value xml:lang="en-US">Delete Column</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
@@ -2113,14 +2081,6 @@
       <node oor:name=".uno:InsertTable" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">~Table...</value>
-        </prop>
-        <prop oor:name="Properties" oor:type="xs:int">
-          <value>1</value>
-        </prop>
-      </node>
-      <node oor:name=".uno:InsertAnnotation" oor:op="replace">
-        <prop oor:name="Label" oor:type="xs:string">
-          <value xml:lang="en-US">Comme~nt</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>

@@ -435,14 +435,14 @@ bool SwDoc::SetCurFootnote( const SwPaM& rPam, const OUString& rNumStr,
     SwFootnoteIdxs& rFootnoteArr = GetFootnoteIdxs();
     SwRootFrame* pTmpRoot = getIDocumentLayoutAccess().GetCurrentLayout();
 
-    const SwPosition* pStt = rPam.Start(), *pEnd = rPam.End();
-    const SwNodeOffset nSttNd = pStt->nNode.GetIndex();
-    const sal_Int32 nSttCnt = pStt->nContent.GetIndex();
-    const SwNodeOffset nEndNd = pEnd->nNode.GetIndex();
-    const sal_Int32 nEndCnt = pEnd->nContent.GetIndex();
+    auto [pStt, pEnd] = rPam.StartEnd(); // SwPosition*
+    const SwNodeOffset nSttNd = pStt->GetNodeIndex();
+    const sal_Int32 nSttCnt = pStt->GetContentIndex();
+    const SwNodeOffset nEndNd = pEnd->GetNodeIndex();
+    const sal_Int32 nEndCnt = pEnd->GetContentIndex();
 
     size_t nPos = 0;
-    rFootnoteArr.SeekEntry( pStt->nNode, &nPos );
+    rFootnoteArr.SeekEntry( pStt->GetNode(), &nPos );
 
     std::unique_ptr<SwUndoChangeFootNote> pUndo;
     if (GetIDocumentUndoRedo().DoesUndo())

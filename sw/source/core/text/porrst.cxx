@@ -41,13 +41,16 @@
 #include "redlnitr.hxx"
 #include "atrhndl.hxx"
 #include <rootfrm.hxx>
-#include <textlinebreak.hxx>
+#include <formatlinebreak.hxx>
+#include <txatbase.hxx>
 
 #include <IDocumentRedlineAccess.hxx>
 #include <IDocumentSettingAccess.hxx>
 #include <IDocumentDeviceAccess.hxx>
 
 #include <crsrsh.hxx>
+#include <swtypes.hxx>
+#include <strings.hrc>
 
 SwTmpEndPortion::SwTmpEndPortion( const SwLinePortion &rPortion,
                 const FontLineStyle eUL,
@@ -221,13 +224,15 @@ void SwBreakPortion::HandlePortion( SwPortionHandler& rPH ) const
     rPH.Text( GetLen(), GetWhichPor() );
 }
 
-void SwBreakPortion::dumpAsXml(xmlTextWriterPtr pWriter) const
+void SwBreakPortion::dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText, TextFrameIndex&
+        nOffset) const
 {
     (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwBreakPortion"));
+    dumpAsXmlAttributes(pWriter, rText, nOffset);
+    nOffset += GetLen();
+
     (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("text-height"),
                                       BAD_CAST(OString::number(m_nTextHeight).getStr()));
-
-    SwLinePortion::dumpAsXml(pWriter);
 
     (void)xmlTextWriterEndElement(pWriter);
 }
@@ -405,7 +410,10 @@ bool SwTextFrame::FormatEmpty()
     bool bCollapse = EmptyHeight( ) == 1 && IsCollapse( );
 
     // sw_redlinehide: just disable FormatEmpty optimisation for now
-    if (HasFollow() || GetMergedPara() || GetTextNodeFirst()->GetpSwpHints() ||
+    // Split fly frames: non-last parts of the anchor want this optimization to clear the old
+    // content.
+    bool bHasNonLastSplitFlyDrawObj = HasNonLastSplitFlyDrawObj();
+    if ((HasFollow() && !bHasNonLastSplitFlyDrawObj) || GetMergedPara() || GetTextNodeFirst()->GetpSwpHints() ||
         nullptr != GetTextNodeForParaProps()->GetNumRule() ||
         GetTextNodeFirst()->HasHiddenCharAttribute(true) ||
          IsInFootnote() || ( HasPara() && GetPara()->IsPrepMustFit() ) )
@@ -426,11 +434,11 @@ bool SwTextFrame::FormatEmpty()
     SwRect aRect;
     bool bFirstFlyCheck = 0 != getFramePrintArea().Height();
     if ( !bCollapse && bFirstFlyCheck &&
-            aTextFly.IsOn() && aTextFly.IsAnyObj( aRect ) )
+            aTextFly.IsOn() && aTextFly.IsAnyObj( aRect ) && !bHasNonLastSplitFlyDrawObj )
         return false;
 
     // only need to check one node because of early return on GetMerged()
-    for (SwIndex const* pIndex = GetTextNodeFirst()->GetFirstIndex();
+    for (SwContentIndex const* pIndex = GetTextNodeFirst()->GetFirstIndex();
          pIndex; pIndex = pIndex->GetNext())
     {
         sw::mark::IMark const*const pMark = pIndex->GetMark();
@@ -594,7 +602,7 @@ void SwHiddenTextPortion::Paint( const SwTextPaintInfo & rInf) const
 {
 #ifdef DBG_UTIL
     OutputDevice* pOut = const_cast<OutputDevice*>(rInf.GetOut());
-    Color aCol( SwViewOption::GetFieldShadingsColor() );
+    Color aCol( rInf.GetOpt().GetFieldShadingsColor() );
     Color aOldColor( pOut->GetFillColor() );
     pOut->SetFillColor( aCol );
     Point aPos( rInf.GetPos() );
@@ -616,10 +624,10 @@ bool SwHiddenTextPortion::Format( SwTextFormatInfo &rInf )
     return false;
 };
 
-bool SwControlCharPortion::DoPaint(SwTextPaintInfo const&,
+bool SwControlCharPortion::DoPaint(SwTextPaintInfo const& rTextPaintInfo,
         OUString & rOutString, SwFont & rTmpFont, int &) const
 {
-    if (mcChar == CHAR_WJ || !SwViewOption::IsFieldShadings())
+    if (mcChar == CHAR_WJ || !rTextPaintInfo.GetOpt().IsFieldShadings())
     {
         return false;
     }
@@ -647,6 +655,7 @@ bool SwControlCharPortion::DoPaint(SwTextPaintInfo const&,
 bool SwBookmarkPortion::DoPaint(SwTextPaintInfo const& rTextPaintInfo,
         OUString & rOutString, SwFont & rFont, int & rDeltaY) const
 {
+    // custom color is visible without field shading, too
     if (!rTextPaintInfo.GetOpt().IsShowBookmarks())
     {
         return false;
@@ -661,10 +670,11 @@ bool SwBookmarkPortion::DoPaint(SwTextPaintInfo const& rTextPaintInfo,
     Size aSize(rFont.GetSize(rFont.GetActual()));
     // use also the external leading (line gap) of the portion, but don't use
     // 100% of it because i can't figure out how to baseline align that
+    assert(aSize.Height() != 0);
     auto const nFactor = aSize.Height() > 0 ? (Height() * 95) / aSize.Height() : Height();
     rFont.SetProportion(nFactor);
     rFont.SetWeight(WEIGHT_THIN, rFont.GetActual());
-    rFont.SetColor(SwViewOption::GetFieldShadingsColor());
+    rFont.SetColor(rTextPaintInfo.GetOpt().GetFieldShadingsColor());
     // reset these to default...
     rFont.SetAlign(ALIGN_BASELINE);
     rFont.SetUnderline(LINESTYLE_NONE);
@@ -733,6 +743,151 @@ void SwControlCharPortion::Paint( const SwTextPaintInfo &rInf ) const
     rInf.DrawText( aOutString, *this );
 
     const_cast< SwTextPaintInfo& >( rInf ).SetPos( aOldPos );
+}
+
+void SwBookmarkPortion::Paint( const SwTextPaintInfo &rInf ) const
+{
+    if ( !Width() )  // is only set during prepaint mode
+        return;
+
+    rInf.DrawViewOpt(*this, GetWhichPor());
+
+    int deltaY(0);
+    SwFont aTmpFont( *rInf.GetFont() );
+    OUString aOutString;
+
+    if (!(rInf.OnWin()
+        && !rInf.GetOpt().IsPagePreview()
+        && !rInf.GetOpt().IsReadonly()
+        && DoPaint(rInf, aOutString, aTmpFont, deltaY)))
+        return;
+
+    SwFontSave aFontSave( rInf, &aTmpFont );
+
+    if ( !mnHalfCharWidth )
+        mnHalfCharWidth = rInf.GetTextSize( aOutString ).Width() / 2;
+
+    Point aOldPos = rInf.GetPos();
+    Point aNewPos( aOldPos );
+    auto const deltaX((Width() / 2) - mnHalfCharWidth);
+    switch (rInf.GetFont()->GetOrientation(rInf.GetTextFrame()->IsVertical()).get())
+    {
+        case 0:
+            aNewPos.AdjustX(deltaX);
+            aNewPos.AdjustY(deltaY);
+            break;
+        case 900:
+            aNewPos.AdjustY(-deltaX);
+            aNewPos.AdjustX(deltaY);
+            break;
+        case 2700:
+            aNewPos.AdjustY(deltaX);
+            aNewPos.AdjustX(-deltaY);
+            break;
+        default:
+            assert(false);
+            break;
+    }
+
+    // draw end marks before the character position
+    if ( m_nStart == 0 || m_nEnd == 0 )
+    {
+        // single type boundary marks are there outside of the bookmark text
+        // some |text| here
+        //     [[    ]]
+        if (m_nStart > 1)
+            aNewPos.AdjustX(static_cast<tools::Long>(mnHalfCharWidth) * -2 * (m_oColors.size() - 1));
+    }
+    else if ( m_nStart != 0 && m_nEnd != 0 )
+        // both end and start boundary marks: adjust them around the bookmark position
+        // |te|xt|
+        //  ]] [[
+        aNewPos.AdjustX(static_cast<tools::Long>(mnHalfCharWidth) * -(2 * m_nEnd - 1 + m_nPoint) );
+
+    const_cast< SwTextPaintInfo& >( rInf ).SetPos( aNewPos );
+
+    for ( const auto& it : m_oColors )
+    {
+        // set bold for custom colored bookmark symbol
+        // and draw multiple symbols showing all custom colors
+        aTmpFont.SetWeight( COL_TRANSPARENT == std::get<1>(it) ? WEIGHT_THIN : WEIGHT_BOLD, aTmpFont.GetActual() );
+        aTmpFont.SetColor( COL_TRANSPARENT == std::get<1>(it) ? rInf.GetOpt().GetFieldShadingsColor() : std::get<1>(it) );
+        aOutString = OUString(std::get<0>(it) == SwScriptInfo::MarkKind::Start ? '[' : ']');
+
+        // MarkKind::Point: drawn I-beam (e.g. U+2336) as overlapping ][
+        if ( std::get<0>(it) == SwScriptInfo::MarkKind::Point )
+        {
+            aNewPos.AdjustX(-mnHalfCharWidth * 5/16);
+            const_cast< SwTextPaintInfo& >( rInf ).SetPos( aNewPos );
+            rInf.DrawText( aOutString, *this );
+
+            // when the overlapping vertical lines are 50 pixel width on the screen,
+            // this distance (half width * 5/8) still results precise overlapping
+            aNewPos.AdjustX(mnHalfCharWidth * 5/8);
+            const_cast< SwTextPaintInfo& >( rInf ).SetPos( aNewPos );
+            aOutString = OUString('[');
+        }
+        rInf.DrawText( aOutString, *this );
+        // place the next symbol after the previous one
+        // TODO: fix orientation and start/end
+        aNewPos.AdjustX(mnHalfCharWidth * 2);
+        const_cast< SwTextPaintInfo& >( rInf ).SetPos( aNewPos );
+    }
+
+    const_cast< SwTextPaintInfo& >( rInf ).SetPos( aOldPos );
+}
+
+void SwBookmarkPortion::HandlePortion( SwPortionHandler& rPH ) const
+{
+    OUStringBuffer aStr;
+    for ( const auto& it : m_oColors )
+    {
+        aStr.append("#" + std::get<2>(it) + " " + SwResId(STR_BOOKMARK_DEF_NAME));
+        switch (std::get<0>(it))
+        {
+            case SwScriptInfo::MarkKind::Point:
+                break;
+            case SwScriptInfo::MarkKind::Start:
+                aStr.append(" " + SwResId(STR_CAPTION_BEGINNING));
+                break;
+            case SwScriptInfo::MarkKind::End:
+                aStr.append(" " + SwResId(STR_CAPTION_END));
+                break;
+        }
+    }
+
+    rPH.Special( GetLen(), aStr.makeStringAndClear(), GetWhichPor() );
+}
+
+void SwBookmarkPortion::dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText, TextFrameIndex& nOffset) const
+{
+    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwBookmarkPortion"));
+    dumpAsXmlAttributes(pWriter, rText, nOffset);
+    nOffset += GetLen();
+
+    if (!m_oColors.empty())
+    {
+        OUStringBuffer aStr;
+        for (const auto& rColor : m_oColors)
+        {
+            aStr.append("#" + std::get<2>(rColor) + " " + SwResId(STR_BOOKMARK_DEF_NAME));
+            switch (std::get<0>(rColor))
+            {
+                case SwScriptInfo::MarkKind::Point:
+                    break;
+                case SwScriptInfo::MarkKind::Start:
+                    aStr.append(" " + SwResId(STR_CAPTION_BEGINNING));
+                    break;
+                case SwScriptInfo::MarkKind::End:
+                    aStr.append(" " + SwResId(STR_CAPTION_END));
+                    break;
+            }
+        }
+        (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("colors"),
+                                          BAD_CAST(aStr.makeStringAndClear().toUtf8().getStr()));
+    }
+
+    (void)xmlTextWriterEndElement(pWriter);
 }
 
 bool SwControlCharPortion::Format( SwTextFormatInfo &rInf )

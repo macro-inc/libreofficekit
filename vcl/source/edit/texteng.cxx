@@ -96,7 +96,7 @@ TextEngine::TextEngine()
 
     ImpInitDoc();
 
-    vcl::Font aFont;
+    vcl::Font aFont(mpRefDev->GetFont().GetFamilyName(), Size(0, 0));
     aFont.SetTransparent( false );
     Color aFillColor( aFont.GetFillColor() );
     aFillColor.SetAlpha( 255 );
@@ -1382,6 +1382,8 @@ void TextEngine::SeekCursor( sal_uInt32 nPara, sal_Int32 nPos, vcl::Font& rFont,
     ExtTextInputAttr nAttr = mpIMEInfos->pAttribs[ nPos - mpIMEInfos->aPos.GetIndex() - 1 ];
     if ( nAttr & ExtTextInputAttr::Underline )
         rFont.SetUnderline( LINESTYLE_SINGLE );
+    else if ( nAttr & ExtTextInputAttr::DoubleUnderline )
+        rFont.SetUnderline( LINESTYLE_DOUBLE );
     else if ( nAttr & ExtTextInputAttr::BoldUnderline )
         rFont.SetUnderline( LINESTYLE_BOLD );
     else if ( nAttr & ExtTextInputAttr::DottedUnderline )
@@ -1682,7 +1684,7 @@ std::size_t TextEngine::SplitTextPortion( sal_uInt32 nPara, sal_Int32 nPos )
         }
     }
 
-    SAL_WARN_IF( !pTextPortion, "vcl", "SplitTextPortion: position outside of region!" );
+    assert(pTextPortion && "SplitTextPortion: position outside of region!");
 
     const sal_Int32 nOverlapp = nTmpPos - nPos;
     pTextPortion->GetLen() -= nOverlapp;
@@ -2189,6 +2191,8 @@ bool TextEngine::CreateLines( sal_uInt32 nPara )
         bool bFixedEnd = false;
         if ( nTmpWidth > nXWidth )
         {
+            assert(pPortion);
+
             nPortionEnd = nTmpPos;
             nTmpPos -= pPortion->GetLen();
             nPortionStart = nTmpPos;
@@ -2409,7 +2413,7 @@ bool TextEngine::Read( SvStream& rInput, const TextSelection* pSel )
     if ( aSel.HasRange() )
         aSel = ImpDeleteText( aSel );
 
-    OString aLine;
+    OStringBuffer aLine;
     bool bDone = rInput.ReadLine( aLine );
     OUString aTmpStr(OStringToOUString(aLine, rInput.GetStreamCharSet()));
     while ( bDone )

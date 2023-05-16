@@ -7,14 +7,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
-#include <test/xmltesttools.hxx>
+#include <test/unoapixml_test.hxx>
 
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/embed/XStorage.hpp>
 #include <com/sun/star/frame/XStorable.hpp>
-#include <com/sun/star/packages/zip/ZipFileAccess.hpp>
+#include <com/sun/star/util/XCloseable.hpp>
 
 #include <comphelper/embeddedobjectcontainer.hxx>
 #include <comphelper/propertyvalue.hxx>
@@ -33,32 +31,16 @@ using namespace ::com::sun::star;
 namespace
 {
 /// Covers embeddedobj/source/msole/ fixes.
-class Test : public test::BootstrapFixture, public unotest::MacrosTest, public XmlTestTools
+class Test : public UnoApiXmlTest
 {
-private:
-    uno::Reference<lang::XComponent> mxComponent;
-
 public:
-    void setUp() override;
-    void tearDown() override;
-    uno::Reference<lang::XComponent>& getComponent() { return mxComponent; }
+    Test()
+        : UnoApiXmlTest("/embeddedobj/qa/cppunit/data/")
+    {
+    }
+
     void registerNamespaces(xmlXPathContextPtr& pXmlXpathCtx) override;
 };
-}
-
-void Test::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set(frame::Desktop::create(mxComponentContext));
-}
-
-void Test::tearDown()
-{
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
 }
 
 void Test::registerNamespaces(xmlXPathContextPtr& pXmlXpathCtx)
@@ -104,17 +86,15 @@ CPPUNIT_TEST_FIXTURE(Test, testSaveOnThread)
     }
 
     DBG_TESTSOLARMUTEX();
-    OUString aURL = m_directories.getURLFromSrc(u"embeddedobj/qa/cppunit/data/reqif-ole2.xhtml");
+    OUString aURL = createFileURL(u"reqif-ole2.xhtml");
     uno::Sequence<beans::PropertyValue> aLoadProperties = {
         comphelper::makePropertyValue("FilterName", OUString("HTML (StarWriter)")),
         comphelper::makePropertyValue("FilterOptions", OUString("xhtmlns=reqif-xhtml")),
     };
-    getComponent().set(loadFromDesktop(aURL, "com.sun.star.text.TextDocument", aLoadProperties));
+    mxComponent = loadFromDesktop(aURL, "com.sun.star.text.TextDocument", aLoadProperties);
 
     // When saving that document on a thread:
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    OdtExportThread aThread(getComponent(), aTempFile.GetURL());
+    OdtExportThread aThread(mxComponent, maTempFile.GetURL());
     aThread.create();
     {
         SolarMutexReleaser r;
@@ -126,12 +106,7 @@ CPPUNIT_TEST_FIXTURE(Test, testSaveOnThread)
     }
 
     // Then make sure its visible area's width is correct.
-    uno::Reference<packages::zip::XZipFileAccess2> xNameAccess
-        = packages::zip::ZipFileAccess::createWithURL(mxComponentContext, aTempFile.GetURL());
-    uno::Reference<io::XInputStream> xInputStream(xNameAccess->getByName("content.xml"),
-                                                  uno::UNO_QUERY);
-    std::unique_ptr<SvStream> pStream(utl::UcbStreamHelper::CreateStream(xInputStream, true));
-    xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
     // 16 pixels, assuming 96 DPI.
     // Without the accompanying fix in place, this test would have failed with:
     // - Expected: 0.1665in

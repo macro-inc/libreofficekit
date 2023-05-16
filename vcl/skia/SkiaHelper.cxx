@@ -36,13 +36,17 @@ bool isVCLSkiaEnabled() { return false; }
 #include <osl/file.hxx>
 #include <tools/stream.hxx>
 #include <list>
+#include <o3tl/lru_map.hxx>
 
+#include <SkBitmap.h>
 #include <SkCanvas.h>
+#include <SkEncodedImageFormat.h>
 #include <SkPaint.h>
 #include <SkSurface.h>
 #include <SkGraphics.h>
 #include <GrDirectContext.h>
 #include <SkRuntimeEffect.h>
+#include <SkOpts_spi.h>
 #include <skia_compiler.hxx>
 #include <skia_opts.hxx>
 #include <tools/sk_app/VulkanWindowContext.h>
@@ -269,6 +273,8 @@ static bool supportsVCLSkia()
     return getenv("SAL_DISABLESKIA") == nullptr;
 }
 
+static void initInternal();
+
 bool isVCLSkiaEnabled()
 {
     /**
@@ -304,8 +310,7 @@ bool isVCLSkiaEnabled()
     if (bForceSkia && bSupportsVCLSkia)
     {
         bRet = true;
-        SkGraphics::Init();
-        SkLoOpts::Init();
+        initInternal();
         // don't actually block if denylisted, but log it if enabled, and also get the vendor id
         checkDeviceDenylisted(true);
     }
@@ -330,8 +335,7 @@ bool isVCLSkiaEnabled()
 
         if (bEnable)
         {
-            SkGraphics::Init();
-            SkLoOpts::Init();
+            initInternal();
             checkDeviceDenylisted(); // switch to raster if driver is denylisted
         }
 
@@ -465,12 +469,25 @@ static std::unique_ptr<sk_app::WindowContext> getTemporaryWindowContext()
 }
 #endif
 
+static RenderMethod renderMethodToUseForSize(const SkISize& size)
+{
+    // Do not use GPU for small surfaces. The problem is that due to the separate alpha hack
+    // we quite often may call GetBitmap() on VirtualDevice, which is relatively slow
+    // when the pixels need to be fetched from the GPU. And there are documents that use
+    // many tiny surfaces (bsc#1183308 for example), where this slowness adds up too much.
+    // This should be re-evaluated once the separate alpha hack is removed (SKIA_USE_BITMAP32)
+    // and we no longer (hopefully) fetch pixels that often.
+    if (size.width() <= 32 && size.height() <= 32)
+        return RenderRaster;
+    return renderMethodToUse();
+}
+
 sk_sp<SkSurface> createSkSurface(int width, int height, SkColorType type, SkAlphaType alpha)
 {
     SkiaZone zone;
     assert(type == kN32_SkColorType || type == kAlpha_8_SkColorType);
     sk_sp<SkSurface> surface;
-    switch (renderMethodToUse())
+    switch (renderMethodToUseForSize({ width, height }))
     {
         case RenderVulkan:
         case RenderMetal:
@@ -516,7 +533,7 @@ sk_sp<SkImage> createSkImage(const SkBitmap& bitmap)
 {
     SkiaZone zone;
     assert(bitmap.colorType() == kN32_SkColorType || bitmap.colorType() == kAlpha_8_SkColorType);
-    switch (renderMethodToUse())
+    switch (renderMethodToUseForSize(bitmap.dimensions()))
     {
         case RenderVulkan:
         case RenderMetal:
@@ -581,7 +598,7 @@ struct ImageCacheItem
 } //namespace
 
 // LRU cache, last item is the least recently used. Hopefully there won't be that many items
-// to require a hash/map. Using o3tl::lru_cache would be simpler, but it doesn't support
+// to require a hash/map. Using o3tl::lru_map would be simpler, but it doesn't support
 // calculating cost of each item.
 static std::list<ImageCacheItem> imageCache;
 static tools::Long imageCacheSize = 0; // sum of all ImageCacheItem.size
@@ -644,25 +661,51 @@ tools::Long maxImageCacheSize()
     return officecfg::Office::Common::Cache::Skia::ImageCacheSize::get();
 }
 
-static sk_sp<SkBlender> differenceBlender;
+static o3tl::lru_map<uint32_t, uint32_t> checksumCache(256);
 
-void setBlendModeDifference(SkPaint* paint)
+static uint32_t computeSkPixmapChecksum(const SkPixmap& pixmap)
 {
-    // This should normally do 'paint->setBlendMode(SkBlendMode::kDifference);'.
-    // But some drivers have a problem with this, namely currently AMD on Windows
-    // (e.g. 'Vulkan API version: 1.2.170, driver version: 2.0.179, vendor: 0x1002 (AMD),
-    // device: 0x15dd, type: integrated, name: AMD Radeon(TM) Vega 8 Graphics')
-    // simply crashes when kDifference is used.
-    // Intel also had repaint problems with kDifference (tdf#130430), but it seems
-    // those do not(?) exist anymore.
-    // Interestingly, explicitly writing a shader that does exactly the same works fine,
-    // so do that.
-    if (!differenceBlender)
+    // Use uint32_t because that's what SkOpts::hash_fn() returns.
+    static_assert(std::is_same_v<uint32_t, decltype(SkOpts::hash_fn(nullptr, 0, 0))>);
+    const size_t dataRowBytes = pixmap.width() << pixmap.shiftPerPixel();
+    if (dataRowBytes == pixmap.rowBytes())
+        return SkOpts::hash_fn(pixmap.addr(), pixmap.height() * dataRowBytes, 0);
+    uint32_t sum = 0;
+    for (int row = 0; row < pixmap.height(); ++row)
+        sum = SkOpts::hash_fn(pixmap.addr(0, row), dataRowBytes, sum);
+    return sum;
+}
+
+uint32_t getSkImageChecksum(sk_sp<SkImage> image)
+{
+    // Cache the checksums based on the uniqueID() (which should stay the same
+    // for the same image), because it may be still somewhat expensive.
+    uint32_t id = image->uniqueID();
+    auto it = checksumCache.find(id);
+    if (it != checksumCache.end())
+        return it->second;
+    SkPixmap pixmap;
+    if (!image->peekPixels(&pixmap))
+        abort(); // Fetching of GPU-based pixels is expensive, and shouldn't(?) be needed anyway.
+    uint32_t checksum = computeSkPixmapChecksum(pixmap);
+    checksumCache.insert({ id, checksum });
+    return checksum;
+}
+
+static sk_sp<SkBlender> invertBlender;
+static sk_sp<SkBlender> xorBlender;
+
+// This does the invert operation, i.e. result = color(255-R,255-G,255-B,A).
+void setBlenderInvert(SkPaint* paint)
+{
+    if (!invertBlender)
     {
+        // Note that the colors are premultiplied, so '1 - dst.r' must be
+        // written as 'dst.a - dst.r', since premultiplied R is in the range (0-A).
         const char* const diff = R"(
             vec4 main( vec4 src, vec4 dst )
             {
-                return vec4(abs( src.r - dst.r ), abs( src.g - dst.g ), abs( src.b - dst.b ), dst.a );
+                return vec4( dst.a - dst.r, dst.a - dst.g, dst.a - dst.b, dst.a );
             }
         )";
         auto effect = SkRuntimeEffect::MakeForBlender(SkString(diff));
@@ -672,9 +715,50 @@ void setBlendModeDifference(SkPaint* paint)
                      "SKRuntimeEffect::MakeForBlender failed: " << effect.errorText.c_str());
             abort();
         }
-        differenceBlender = effect.effect->makeBlender(nullptr);
+        invertBlender = effect.effect->makeBlender(nullptr);
     }
-    paint->setBlender(differenceBlender);
+    paint->setBlender(invertBlender);
+}
+
+// This does the xor operation, i.e. bitwise xor of RGB values of both colors.
+void setBlenderXor(SkPaint* paint)
+{
+    if (!xorBlender)
+    {
+        // Note that the colors are premultiplied, converting to 0-255 range
+        // must also unpremultiply.
+        const char* const diff = R"(
+            vec4 main( vec4 src, vec4 dst )
+            {
+                return vec4(
+                    float(int(src.r * src.a * 255.0) ^ int(dst.r * dst.a * 255.0)) / 255.0 / dst.a,
+                    float(int(src.g * src.a * 255.0) ^ int(dst.g * dst.a * 255.0)) / 255.0 / dst.a,
+                    float(int(src.b * src.a * 255.0) ^ int(dst.b * dst.a * 255.0)) / 255.0 / dst.a,
+                    dst.a );
+            }
+        )";
+        SkRuntimeEffect::Options opts;
+        // Skia does not allow binary operators in the default ES2Strict mode, but that's only
+        // because of OpenGL support. We don't use OpenGL, and it's safe for all modes that we do use.
+        // https://groups.google.com/g/skia-discuss/c/EPLuQbg64Kc/m/2uDXFIGhAwAJ
+        opts.enforceES2Restrictions = false;
+        auto effect = SkRuntimeEffect::MakeForBlender(SkString(diff), opts);
+        if (!effect.effect)
+        {
+            SAL_WARN("vcl.skia",
+                     "SKRuntimeEffect::MakeForBlender failed: " << effect.errorText.c_str());
+            abort();
+        }
+        xorBlender = effect.effect->makeBlender(nullptr);
+    }
+    paint->setBlender(xorBlender);
+}
+
+static void initInternal()
+{
+    // Set up all things needed for using Skia.
+    SkGraphics::Init();
+    SkLoOpts::Init();
 }
 
 void cleanup()
@@ -682,7 +766,8 @@ void cleanup()
     sharedWindowContext.reset();
     imageCache.clear();
     imageCacheSize = 0;
-    differenceBlender.reset();
+    invertBlender.reset();
+    xorBlender.reset();
 }
 
 static SkSurfaceProps commonSurfaceProps;

@@ -21,7 +21,7 @@
 
 #include <svtools/editbrowsebox.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <TableConnectionData.hxx>
 #include <TableConnection.hxx>
@@ -184,9 +184,9 @@ namespace dbaui
 
     bool ORelationControl::PreNotify(NotifyEvent& rNEvt)
     {
-        if (rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS && !HasChildPathFocus() && !ControlHasFocus())
+        if (rNEvt.GetType() == NotifyEventType::LOSEFOCUS && !HasChildPathFocus() && !ControlHasFocus())
             PostUserEvent(LINK(this, ORelationControl, AsynchDeactivate), nullptr, true);
-        else if (rNEvt.GetType() == MouseNotifyEvent::GETFOCUS)
+        else if (rNEvt.GetType() == NotifyEventType::GETFOCUS)
             PostUserEvent(LINK(this, ORelationControl, AsynchActivate), nullptr, true);
 
         return EditBrowseBox::PreNotify(rNEvt);

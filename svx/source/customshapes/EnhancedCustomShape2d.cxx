@@ -541,13 +541,15 @@ bool EnhancedCustomShape2d::ConvertSequenceToEnhancedCustomShape2dHandle(
 void EnhancedCustomShape2d::ApplyShapeAttributes( const SdrCustomShapeGeometryItem& rGeometryItem )
 {
     // AdjustmentValues
-    const Any* pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( "AdjustmentValues" );
+    static constexpr OUStringLiteral sAdjustmentValues( u"AdjustmentValues" );
+    const Any* pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sAdjustmentValues );
     if ( pAny )
         *pAny >>= seqAdjustmentValues;
 
 
     // Coordsize
-    const Any* pViewBox = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( "ViewBox" );
+    static constexpr OUStringLiteral sViewBox( u"ViewBox" );
+    const Any* pViewBox = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sViewBox );
     css::awt::Rectangle aViewBox;
     if ( pViewBox && (*pViewBox >>= aViewBox ) )
     {
@@ -556,35 +558,44 @@ void EnhancedCustomShape2d::ApplyShapeAttributes( const SdrCustomShapeGeometryIt
         nCoordWidthG  = std::abs( aViewBox.Width );
         nCoordHeightG = std::abs( aViewBox.Height);
     }
-    static const OUStringLiteral sPath( u"Path" );
+    static constexpr OUStringLiteral sPath( u"Path" );
+    static constexpr OUStringLiteral sCoordinates( u"Coordinates" );
+    static constexpr OUStringLiteral sGluePoints( u"GluePoints" );
+    static constexpr OUStringLiteral sSegments( u"Segments" );
+    static constexpr OUStringLiteral sSubViewSize( u"SubViewSize" );
+    static constexpr OUStringLiteral sStretchX( u"StretchX" );
+    static constexpr OUStringLiteral sStretchY( u"StretchY" );
+    static constexpr OUStringLiteral sTextFrames( u"TextFrames" );
+    static constexpr OUStringLiteral sEquations( u"Equations" );
+    static constexpr OUStringLiteral sHandles( u"Handles" );
 
 
     // Path/Coordinates
-    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, "Coordinates" );
+    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, sCoordinates );
     if ( pAny )
         *pAny >>= seqCoordinates;
 
 
     // Path/GluePoints
-    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, "GluePoints" );
+    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, sGluePoints );
     if ( pAny )
         *pAny >>= seqGluePoints;
 
 
     // Path/Segments
-    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, "Segments" );
+    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, sSegments );
     if ( pAny )
         *pAny >>= seqSegments;
 
 
     // Path/SubViewSize
-    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, "SubViewSize" );
+    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, sSubViewSize );
     if ( pAny )
         *pAny >>= seqSubViewSize;
 
 
     // Path/StretchX
-    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, "StretchX" );
+    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, sStretchX );
     if ( pAny )
     {
         sal_Int32 nStretchX = 0;
@@ -594,7 +605,7 @@ void EnhancedCustomShape2d::ApplyShapeAttributes( const SdrCustomShapeGeometryIt
 
 
     // Path/StretchY
-    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, "StretchY" );
+    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, sStretchY );
     if ( pAny )
     {
         sal_Int32 nStretchY = 0;
@@ -604,19 +615,19 @@ void EnhancedCustomShape2d::ApplyShapeAttributes( const SdrCustomShapeGeometryIt
 
 
     // Path/TextFrames
-    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, "TextFrames" );
+    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sPath, sTextFrames );
     if ( pAny )
         *pAny >>= seqTextFrames;
 
 
     // Equations
-    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( "Equations" );
+    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sEquations );
     if ( pAny )
         *pAny >>= seqEquations;
 
 
     // Handles
-    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( "Handles" );
+    pAny = const_cast<SdrCustomShapeGeometryItem&>(rGeometryItem).GetPropertyValueByName( sHandles );
     if ( pAny )
         *pAny >>= seqHandles;
 }
@@ -736,7 +747,8 @@ EnhancedCustomShape2d::EnhancedCustomShape2d(SdrObjCustomShape& rSdrObjCustomSha
 
     OUString sShapeType;
     const SdrCustomShapeGeometryItem& rGeometryItem(mrSdrObjCustomShape.GetMergedItem( SDRATTR_CUSTOMSHAPE_GEOMETRY ));
-    const Any* pAny = rGeometryItem.GetPropertyValueByName( "Type" );
+    static constexpr OUStringLiteral sType = u"Type";
+    const Any* pAny = rGeometryItem.GetPropertyValueByName( sType );
     if ( pAny ) {
         *pAny >>= sShapeType;
         bOOXMLShape = sShapeType.startsWith("ooxml-");
@@ -744,10 +756,12 @@ EnhancedCustomShape2d::EnhancedCustomShape2d(SdrObjCustomShape& rSdrObjCustomSha
     }
     eSpType = EnhancedCustomShapeTypeNames::Get( sShapeType );
 
-    pAny = rGeometryItem.GetPropertyValueByName( "MirroredX" );
+    static constexpr OUStringLiteral sMirroredX = u"MirroredX";
+    static constexpr OUStringLiteral sMirroredY = u"MirroredY";
+    pAny = rGeometryItem.GetPropertyValueByName( sMirroredX );
     if ( pAny )
         *pAny >>= bFlipH;
-    pAny = rGeometryItem.GetPropertyValueByName( "MirroredY" );
+    pAny = rGeometryItem.GetPropertyValueByName( sMirroredY );
     if ( pAny )
         *pAny >>= bFlipV;
 
@@ -791,7 +805,7 @@ EnhancedCustomShape2d::EnhancedCustomShape2d(SdrObjCustomShape& rSdrObjCustomSha
             }
             else if (sShapeType.getLength() > 4 && sShapeType.match( "col-" ))
             {
-                nColorData = sShapeType.copy( 4 ).toUInt32( 16 );
+                nColorData = o3tl::toUInt32(sShapeType.subView( 4 ), 16);
             }
         }
         break;
@@ -1125,7 +1139,7 @@ tools::Rectangle EnhancedCustomShape2d::GetTextRect() const
     if( aRect.GetWidth() <= 1 || aRect.GetHeight() <= 1 )
         return aLogicRect;
     aRect.Move( aLogicRect.Left(), aLogicRect.Top() );
-    aRect.Justify();
+    aRect.Normalize();
     return aRect;
 }
 
@@ -1450,7 +1464,7 @@ static double lcl_getRadiusDistance(double fWR, double fHR, double fX, double fY
     else if (fY == 0.0)
         return std::min(fWR - fX, fHR);
 
-    double fD = std::min(fWR, fHR) - sqrt(fX * fX + fY * fY); // iteration start value
+    double fD = std::min(fWR, fHR) - std::hypot(fX, fY); // iteration start value
     sal_uInt8 nIter(0);
     bool bFound(false);
     do
@@ -1659,8 +1673,8 @@ bool EnhancedCustomShape2d::SetHandleControllerPosition( const sal_uInt32 nIndex
                             double fHelpAngle = atan2(fHelpY, fHelpX);
                             double fOuterX = fWidth / 2.0 * cos(fHelpAngle);
                             double fOuterY = fHeight / 2.0 * sin(fHelpAngle);
-                            double fOuterRadius = sqrt(fOuterX * fOuterX + fOuterY * fOuterY);
-                            double fHandleRadius = sqrt(fDX * fDX + fDY * fDY);
+                            double fOuterRadius = std::hypot(fOuterX, fOuterY);
+                            double fHandleRadius = std::hypot(fDX, fDY);
                             fRadius = (fOuterRadius - fHandleRadius) / 2.0;
                             double fss(std::min(fWidth, fHeight));
                             if (fss != 0.0)
@@ -1687,7 +1701,7 @@ bool EnhancedCustomShape2d::SetHandleControllerPosition( const sal_uInt32 nIndex
                         // no special meaning of radius or angle, suitable for "ooxml-arc",
                         // "ooxml-chord", "ooxml-pie" and circular arrows value adj4.
                         fAngle = lcl_getAngleInOOXMLUnit(fDY, fDX);
-                        fRadius = sqrt(fDX * fDX + fDY * fDY);
+                        fRadius = std::hypot(fDX, fDY);
                         double fss(std::min(fWidth, fHeight));
                         if (fss != 0.0)
                             fRadius = fRadius * 100000.0 / fss;
@@ -1713,7 +1727,7 @@ bool EnhancedCustomShape2d::SetHandleControllerPosition( const sal_uInt32 nIndex
                     // ToDo: Angle unit is degree, but range ]-180;180] or [0;360[? Assume ]-180;180].
                     if (fDX != 0.0 || fDY != 0.0)
                     {
-                        fRadius = sqrt(fDX * fDX + fDY * fDY);
+                        fRadius = std::hypot(fDX, fDY);
                         fAngle = basegfx::rad2deg(atan2(fDY, fDX));
                     }
                 }
@@ -1975,7 +1989,7 @@ static basegfx::B2DPolygon CreateArc( const tools::Rectangle& rRect, const Point
         bSwapStartEndAngle ^= 0x11;
     if ( bSwapStartEndAngle )
     {
-        aRect.Justify();
+        aRect.Normalize();
         if ( bSwapStartEndAngle & 1 )
         {
             Point aTmp( aStart );
@@ -2035,7 +2049,7 @@ static double lcl_getNormalizedAngleRad(const double fCircleAngleDeg)
 void EnhancedCustomShape2d::CreateSubPath(
     sal_Int32& rSrcPt,
     sal_Int32& rSegmentInd,
-    std::vector< std::pair< SdrPathObjUniquePtr, double> >& rObjectList,
+    std::vector< std::pair< rtl::Reference<SdrPathObj>, double> >& rObjectList,
     const bool bLineGeometryNeededOnly,
     const bool bSortFilledObjectsToBack,
     sal_Int32 nIndex)
@@ -2337,26 +2351,26 @@ void EnhancedCustomShape2d::CreateSubPath(
 
                 case ARC :
                 case CLOCKWISEARC :
-                {
-                    if(aNewB2DPolygon.count() > 1)
-                    {
-                        // #i76201# Add conversion to closed polygon when first and last points are equal
-                        basegfx::utils::checkClosed(aNewB2DPolygon);
-                        aNewB2DPolyPolygon.append(aNewB2DPolygon);
-                    }
-
-                    aNewB2DPolygon.clear();
-
-                    [[fallthrough]];
-                }
                 case ARCTO :
                 case CLOCKWISEARCTO :
                 {
                     bool bClockwise = ( nCommand == CLOCKWISEARC ) || ( nCommand == CLOCKWISEARCTO );
+                    bool bImplicitMoveTo = (nCommand == ARC) || (nCommand == CLOCKWISEARC);
                     sal_uInt32 nXor = bClockwise ? 3 : 2;
                     for ( sal_uInt16 i = 0; ( i < nPntCount ) && ( ( rSrcPt + 3 ) < nCoordSize ); i++ )
                     {
-                        tools::Rectangle aRect = tools::Rectangle::Justify( GetPoint( seqCoordinates[ rSrcPt ], true, true ), GetPoint( seqCoordinates[ rSrcPt + 1 ], true, true ) );
+                        if (bImplicitMoveTo)
+                        {
+                            if (aNewB2DPolygon.count() > 1)
+                            {
+                                // #i76201# Add conversion to closed polygon when first and last
+                                // points are equal
+                                basegfx::utils::checkClosed(aNewB2DPolygon);
+                                aNewB2DPolyPolygon.append(aNewB2DPolygon);
+                            }
+                            aNewB2DPolygon.clear();
+                        }
+                        tools::Rectangle aRect = tools::Rectangle::Normalize( GetPoint( seqCoordinates[ rSrcPt ], true, true ), GetPoint( seqCoordinates[ rSrcPt + 1 ], true, true ) );
                         if ( aRect.GetWidth() && aRect.GetHeight() )
                         {
                             Point aStart( GetPoint( seqCoordinates[ static_cast<sal_uInt16>( rSrcPt + nXor ) ], true, true ) );
@@ -2594,15 +2608,15 @@ void EnhancedCustomShape2d::CreateSubPath(
         {
             basegfx::B2DPolyPolygon aClosedPolyPolygon(aNewB2DPolyPolygon);
             aClosedPolyPolygon.setClosed(true);
-            SdrPathObjUniquePtr pFill(new SdrPathObj(
+            rtl::Reference<SdrPathObj> pFill(new SdrPathObj(
                 mrSdrObjCustomShape.getSdrModelFromSdrObject(),
-                OBJ_POLY,
-                aClosedPolyPolygon));
+                SdrObjKind::Polygon,
+                std::move(aClosedPolyPolygon)));
             SfxItemSet aTempSet(*this);
             aTempSet.Put(makeSdrShadowItem(false));
             aTempSet.Put(XLineStyleItem(drawing::LineStyle_NONE));
             pFill->SetMergedItemSet(aTempSet);
-            rObjectList.push_back(std::pair< SdrPathObjUniquePtr, double >(std::move(pFill), dBrightness));
+            rObjectList.push_back(std::pair< rtl::Reference<SdrPathObj>, double >(std::move(pFill), dBrightness));
         }
 
         if(!bNoStroke)
@@ -2611,39 +2625,39 @@ void EnhancedCustomShape2d::CreateSubPath(
             // the non-fill is defined by XFILL_NONE. Since SdrPathObj::ImpForceKind() needs
             // to correct the polygon (here: open it) using the type, the last edge may get lost.
             // Thus, use a type that fits the polygon
-            SdrPathObjUniquePtr pStroke(new SdrPathObj(
+            rtl::Reference<SdrPathObj> pStroke(new SdrPathObj(
                 mrSdrObjCustomShape.getSdrModelFromSdrObject(),
-                aNewB2DPolyPolygon.isClosed() ? OBJ_POLY : OBJ_PLIN,
+                aNewB2DPolyPolygon.isClosed() ? SdrObjKind::Polygon : SdrObjKind::PolyLine,
                 aNewB2DPolyPolygon));
             SfxItemSet aTempSet(*this);
             aTempSet.Put(makeSdrShadowItem(false));
             aTempSet.Put(XFillStyleItem(drawing::FillStyle_NONE));
             pStroke->SetMergedItemSet(aTempSet);
-            rObjectList.push_back(std::pair< SdrPathObjUniquePtr, double >(std::move(pStroke), dBrightness));
+            rObjectList.push_back(std::pair< rtl::Reference<SdrPathObj>, double >(std::move(pStroke), dBrightness));
         }
     }
     else
     {
-        SdrPathObjUniquePtr pObj;
+        rtl::Reference<SdrPathObj> pObj;
         SfxItemSet aTempSet(*this);
         aTempSet.Put(makeSdrShadowItem(false));
 
         if(bNoFill)
         {
             // see comment above about OBJ_PLIN
-            pObj.reset(new SdrPathObj(
+            pObj = new SdrPathObj(
                 mrSdrObjCustomShape.getSdrModelFromSdrObject(),
-                aNewB2DPolyPolygon.isClosed() ? OBJ_POLY : OBJ_PLIN,
-                aNewB2DPolyPolygon));
+                aNewB2DPolyPolygon.isClosed() ? SdrObjKind::Polygon : SdrObjKind::PolyLine,
+                aNewB2DPolyPolygon);
             aTempSet.Put(XFillStyleItem(drawing::FillStyle_NONE));
         }
         else
         {
             aNewB2DPolyPolygon.setClosed(true);
-            pObj.reset(new SdrPathObj(
+            pObj = new SdrPathObj(
                 mrSdrObjCustomShape.getSdrModelFromSdrObject(),
-                OBJ_POLY,
-                aNewB2DPolyPolygon));
+                SdrObjKind::Polygon,
+                aNewB2DPolyPolygon);
         }
 
         if(bNoStroke)
@@ -2652,14 +2666,14 @@ void EnhancedCustomShape2d::CreateSubPath(
         }
 
         pObj->SetMergedItemSet(aTempSet);
-        rObjectList.push_back(std::pair< SdrPathObjUniquePtr, double >(std::move(pObj), dBrightness));
+        rObjectList.push_back(std::pair< rtl::Reference<SdrPathObj>, double >(std::move(pObj), dBrightness));
     }
 }
 
 static void CorrectCalloutArrows(
     MSO_SPT eSpType,
     sal_uInt32 nLineObjectCount,
-    std::vector< std::pair< SdrPathObjUniquePtr, double> >& vObjectList )
+    std::vector< std::pair< rtl::Reference<SdrPathObj>, double> >& vObjectList )
 {
     bool bAccent = false;
     switch( eSpType )
@@ -2678,7 +2692,7 @@ static void CorrectCalloutArrows(
         {
             sal_uInt32 nLine = 0;
 
-            for ( const std::pair< SdrPathObjUniquePtr, double >& rCandidate : vObjectList )
+            for ( const std::pair< rtl::Reference<SdrPathObj>, double >& rCandidate : vObjectList )
             {
                 SdrPathObj* pObj(rCandidate.first.get());
 
@@ -2705,7 +2719,7 @@ static void CorrectCalloutArrows(
         {
             sal_uInt32 nLine = 0;
 
-            for ( const std::pair< SdrPathObjUniquePtr, double >& rCandidate : vObjectList )
+            for ( const std::pair< rtl::Reference<SdrPathObj>, double >& rCandidate : vObjectList )
             {
                 SdrPathObj* pObj(rCandidate.first.get());
 
@@ -2733,7 +2747,7 @@ static void CorrectCalloutArrows(
         {
             sal_uInt32 nLine = 0;
 
-            for ( const std::pair< SdrPathObjUniquePtr, double >& rCandidate : vObjectList )
+            for ( const std::pair< rtl::Reference<SdrPathObj>, double >& rCandidate : vObjectList )
             {
                 SdrPathObj* pObj(rCandidate.first.get());
 
@@ -2790,16 +2804,17 @@ void EnhancedCustomShape2d::AdaptObjColor(
 
             if ( nColorCount || 0.0 != dBrightness )
             {
-                aXGradient.SetStartColor(
-                    GetColorData(
-                        aXGradient.GetStartColor(),
-                        std::min(nColorIndex, nColorCount-1),
-                        dBrightness ));
-                aXGradient.SetEndColor(
-                    GetColorData(
-                        aXGradient.GetEndColor(),
-                        std::min(nColorIndex, nColorCount-1),
-                        dBrightness ));
+                basegfx::ColorStops aColorStops(aXGradient.GetColorStops());
+                for (auto& candidate : aColorStops)
+                {
+                    candidate = basegfx::ColorStop(
+                        candidate.getStopOffset(),
+                        GetColorData(
+                            Color(candidate.getStopColor()),
+                            std::min(nColorIndex, nColorCount-1),
+                            dBrightness ).getBColor());
+                }
+                aXGradient.SetColorStops(aColorStops);
             }
 
             rObj.SetMergedItem( XFillGradientItem( "", aXGradient ) );
@@ -2842,19 +2857,19 @@ void EnhancedCustomShape2d::AdaptObjColor(
         nColorIndex++;
 }
 
-SdrObjectUniquePtr EnhancedCustomShape2d::CreatePathObj( bool bLineGeometryNeededOnly )
+rtl::Reference<SdrObject> EnhancedCustomShape2d::CreatePathObj( bool bLineGeometryNeededOnly )
 {
     if ( !seqCoordinates.hasElements() )
     {
         return nullptr;
     }
 
-    std::vector< std::pair< SdrPathObjUniquePtr, double > > vObjectList;
+    std::vector< std::pair< rtl::Reference<SdrPathObj>, double > > vObjectList;
     const bool bSortFilledObjectsToBack(SortFilledObjectsToBackByDefault(eSpType));
     sal_Int32 nSubPathIndex(0);
     sal_Int32 nSrcPt(0);
     sal_Int32 nSegmentInd(0);
-    SdrObjectUniquePtr pRet;
+    rtl::Reference<SdrObject> pRet;
 
     while( nSegmentInd <= seqSegments.getLength() )
     {
@@ -2875,9 +2890,9 @@ SdrObjectUniquePtr EnhancedCustomShape2d::CreatePathObj( bool bLineGeometryNeede
         sal_uInt32 nColorIndex(0);
 
         // #i37011# remove invisible objects
-        std::vector< std::pair< SdrPathObjUniquePtr, double> > vNewList;
+        std::vector< std::pair< rtl::Reference<SdrPathObj>, double> > vNewList;
 
-        for ( std::pair< SdrPathObjUniquePtr, double >& rCandidate : vObjectList )
+        for ( std::pair< rtl::Reference<SdrPathObj>, double >& rCandidate : vObjectList )
         {
             SdrPathObj* pObj(rCandidate.first.get());
             const drawing::LineStyle eLineStyle(pObj->GetMergedItem(XATTR_LINESTYLE).GetValue());
@@ -2906,7 +2921,7 @@ SdrObjectUniquePtr EnhancedCustomShape2d::CreatePathObj( bool bLineGeometryNeede
             sal_Int32 nLineObjectCount(0);
 
             // correct some values and collect content data
-            for ( const std::pair< SdrPathObjUniquePtr, double >& rCandidate : vObjectList )
+            for ( const std::pair< rtl::Reference<SdrPathObj>, double >& rCandidate : vObjectList )
             {
                 SdrPathObj* pObj(rCandidate.first.get());
 
@@ -2945,17 +2960,17 @@ SdrObjectUniquePtr EnhancedCustomShape2d::CreatePathObj( bool bLineGeometryNeede
             // for some strange objects
             if(bSortFilledObjectsToBack)
             {
-                std::vector< std::pair< SdrPathObjUniquePtr, double> > vTempList;
+                std::vector< std::pair< rtl::Reference<SdrPathObj>, double> > vTempList;
                 vTempList.reserve(vObjectList.size());
 
-                for ( std::pair< SdrPathObjUniquePtr, double >& rCandidate : vObjectList )
+                for ( std::pair< rtl::Reference<SdrPathObj>, double >& rCandidate : vObjectList )
                 {
                     SdrPathObj* pObj(rCandidate.first.get());
                     if ( !pObj->IsLine() )
                         vTempList.push_back(std::move(rCandidate));
                 }
 
-                for ( std::pair< SdrPathObjUniquePtr, double >& rCandidate : vObjectList )
+                for ( std::pair< rtl::Reference<SdrPathObj>, double >& rCandidate : vObjectList )
                 {
                     if ( rCandidate.first )
                         vTempList.push_back(std::move(rCandidate));
@@ -2972,16 +2987,16 @@ SdrObjectUniquePtr EnhancedCustomShape2d::CreatePathObj( bool bLineGeometryNeede
         // copy remaining objects to pRet
         if(vObjectList.size() > 1)
         {
-            pRet.reset(new SdrObjGroup(mrSdrObjCustomShape.getSdrModelFromSdrObject()));
+            pRet = new SdrObjGroup(mrSdrObjCustomShape.getSdrModelFromSdrObject());
 
-            for ( std::pair< SdrPathObjUniquePtr, double >& rCandidate : vObjectList )
+            for ( std::pair< rtl::Reference<SdrPathObj>, double >& rCandidate : vObjectList )
             {
-                pRet->GetSubList()->NbcInsertObject(rCandidate.first.release());
+                pRet->GetSubList()->NbcInsertObject(rCandidate.first.get());
             }
         }
         else if(1 == vObjectList.size())
         {
-            pRet.reset(vObjectList.begin()->first.release());
+            pRet = vObjectList.begin()->first;
         }
 
         if(pRet)
@@ -2996,13 +3011,13 @@ SdrObjectUniquePtr EnhancedCustomShape2d::CreatePathObj( bool bLineGeometryNeede
     return pRet;
 }
 
-SdrObjectUniquePtr EnhancedCustomShape2d::CreateObject( bool bLineGeometryNeededOnly )
+rtl::Reference<SdrObject> EnhancedCustomShape2d::CreateObject( bool bLineGeometryNeededOnly )
 {
-    SdrObjectUniquePtr pRet;
+    rtl::Reference<SdrObject> pRet;
 
     if ( eSpType == mso_sptRectangle )
     {
-        pRet.reset(new SdrRectObj(mrSdrObjCustomShape.getSdrModelFromSdrObject(), aLogicRect));
+        pRet = new SdrRectObj(mrSdrObjCustomShape.getSdrModelFromSdrObject(), aLogicRect);
         pRet->SetMergedItemSet( *this );
     }
     if ( !pRet )
@@ -3030,7 +3045,7 @@ void EnhancedCustomShape2d::ApplyGluePoints( SdrObject* pObj )
     }
 }
 
-SdrObjectUniquePtr EnhancedCustomShape2d::CreateLineGeometry()
+rtl::Reference<SdrObject> EnhancedCustomShape2d::CreateLineGeometry()
 {
     return CreateObject( true );
 }

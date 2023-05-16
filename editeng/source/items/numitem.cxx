@@ -24,6 +24,7 @@
 #include <editeng/numitem.hxx>
 
 #include <com/sun/star/text/VertOrientation.hpp>
+#include <comphelper/propertyvalue.hxx>
 #include <editeng/brushitem.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <vcl/font.hxx>
@@ -45,7 +46,6 @@
 #include <tools/stream.hxx>
 #include <tools/debug.hxx>
 #include <tools/GenericTypeSerializer.hxx>
-#include <tools/UnitConversion.hxx>
 #include <unotools/configmgr.hxx>
 #include <libxml/xmlwriter.h>
 #include <editeng/unonrule.hxx>
@@ -53,11 +53,11 @@
 #include <i18nlangtag/languagetag.hxx>
 #include <editeng/legacyitem.hxx>
 
-#define DEF_WRITER_LSPACE   500     //Standard Indentation
-#define DEF_DRAW_LSPACE     800     //Standard Indentation
+constexpr sal_Int32 DEF_WRITER_LSPACE = 500; //Standard Indentation
+constexpr sal_Int32 DEF_DRAW_LSPACE = 800; //Standard Indentation
 
-#define NUMITEM_VERSION_03        0x03
-#define NUMITEM_VERSION_04        0x04
+constexpr sal_uInt16 NUMITEM_VERSION_03 = 0x03;
+constexpr sal_uInt16 NUMITEM_VERSION_04 = 0x04;
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::lang;
@@ -133,12 +133,13 @@ OUString SvxNumberType::GetNumStr( sal_Int32 nNo, const css::lang::Locale& rLoca
                         return OUString('0');
                     else
                     {
-                        Sequence< PropertyValue > aProperties(2);
-                        PropertyValue* pValues = aProperties.getArray();
-                        pValues[0].Name = "NumberingType";
-                        pValues[0].Value <<= static_cast<sal_uInt16>(nNumType);
-                        pValues[1].Name = "Value";
-                        pValues[1].Value <<= nNo;
+                        static constexpr OUStringLiteral sNumberingType = u"NumberingType";
+                        static constexpr OUStringLiteral sValue = u"Value";
+                        Sequence< PropertyValue > aProperties
+                        {
+                            comphelper::makePropertyValue(sNumberingType, static_cast<sal_uInt16>(nNumType)),
+                            comphelper::makePropertyValue(sValue, nNo)
+                        };
 
                         try
                         {
@@ -540,48 +541,40 @@ Size SvxNumberFormat::GetGraphicSizeMM100(const Graphic* pGraphic)
 
 OUString SvxNumberFormat::CreateRomanString( sal_Int32 nNo, bool bUpper )
 {
-    nNo %= 4000;            // more can not be displayed
-//      i, ii, iii, iv, v, vi, vii, vii, viii, ix
-//                          (Dummy),1000,500,100,50,10,5,1
-    const char *cRomanArr = bUpper
-                        ? "MDCLXVI--"   // +2 Dummy entries!
-                        : "mdclxvi--";  // +2 Dummy entries!
-
     OUStringBuffer sRet;
-    sal_uInt16 nMask = 1000;
-    while( nMask )
+
+    constexpr char romans[][13] = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+    constexpr sal_Int32 values[] = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+
+    for (size_t i = 0; i < std::size(romans); ++i)
     {
-        sal_uInt8 nNumber = sal_uInt8(nNo / nMask);
-        sal_uInt8 nDiff = 1;
-        nNo %= nMask;
-
-        if( 5 < nNumber )
+        while(nNo - values[i] >= 0)
         {
-            if( nNumber < 9 )
-                sRet.append(*(cRomanArr-1));
-            ++nDiff;
-            nNumber -= 5;
+            sRet.appendAscii(romans[i]);
+            nNo -= values[i];
         }
-        switch( nNumber )
-        {
-        case 3:     { sRet.append(*cRomanArr); [[fallthrough]]; }
-        case 2:     { sRet.append(*cRomanArr); [[fallthrough]]; }
-        case 1:     { sRet.append(*cRomanArr); }
-                    break;
-
-        case 4:     {
-                        sRet.append(*cRomanArr);
-                        sRet.append(*(cRomanArr-nDiff));
-                    }
-                    break;
-        case 5:     { sRet.append(*(cRomanArr-nDiff)); }
-                    break;
-        }
-
-        nMask /= 10;            // for the next decade
-        cRomanArr += 2;
     }
-    return sRet.makeStringAndClear();
+
+    return bUpper ? sRet.makeStringAndClear()
+                  : sRet.makeStringAndClear().toAsciiLowerCase();
+}
+
+void SvxNumberFormat::SetPrefix(const OUString& rSet)
+{
+    // ListFormat manages the prefix. If badly changed via this function, sListFormat is invalidated
+    if (sListFormat && rSet.getLength() != sPrefix.getLength())
+        sListFormat.reset();
+
+    sPrefix = rSet;
+}
+
+void SvxNumberFormat::SetSuffix(const OUString& rSet)
+{
+    // ListFormat manages the suffix. If badly changed via this function, sListFormat is invalidated
+    if (sListFormat && rSet.getLength() != sSuffix.getLength())
+        sListFormat.reset();
+
+    sSuffix = rSet;
 }
 
 void SvxNumberFormat::SetListFormat(const OUString& rPrefix, const OUString& rSuffix, int nLevel)
@@ -614,12 +607,12 @@ void SvxNumberFormat::SetListFormat(std::optional<OUString> oSet)
     sPrefix.clear();
     sSuffix.clear();
 
+    sListFormat = oSet;
+
     if (!oSet.has_value())
     {
         return;
     }
-
-    sListFormat = oSet;
 
     // For backward compatibility and UI we should create something looking like
     // a prefix, suffix and included levels also. This is not possible in general case

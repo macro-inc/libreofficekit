@@ -17,9 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <config_features.h>
-#include <config_fuzzers.h>
-
 #include <sal/config.h>
 
 #include <string_view>
@@ -27,9 +24,12 @@
 #include <hintids.hxx>
 #include <comphelper/documentinfo.hxx>
 #include <comphelper/string.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <tools/UnitConversion.hxx>
 
+#include <o3tl/string_view.hxx>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/unohelp.hxx>
 #include <svtools/htmlkywd.hxx>
 #include <svtools/htmltokn.h>
@@ -67,7 +67,6 @@
 #include <com/sun/star/awt/XImageConsumer.hpp>
 #include <com/sun/star/awt/ImageStatus.hpp>
 #include <com/sun/star/form/XImageProducerSupplier.hpp>
-#include <com/sun/star/lang/ServiceNotRegisteredException.hpp>
 #include <com/sun/star/form/XForm.hpp>
 #include <doc.hxx>
 #include <IDocumentLayoutAccess.hxx>
@@ -384,7 +383,7 @@ class SwHTMLImageWatcher :
     void clear();
 
 public:
-    SwHTMLImageWatcher( const uno::Reference< drawing::XShape > & rShape,
+    SwHTMLImageWatcher( uno::Reference< drawing::XShape > xShape,
                         bool bWidth, bool bHeight );
 
     // startProduction can not be called in the constructor because it can
@@ -418,9 +417,9 @@ public:
 }
 
 SwHTMLImageWatcher::SwHTMLImageWatcher(
-        const uno::Reference< drawing::XShape >& rShape,
+        uno::Reference< drawing::XShape > xShape,
         bool bWidth, bool bHeight ) :
-    m_xShape( rShape ),
+    m_xShape(std::move( xShape )),
     m_bSetWidth( bWidth ), m_bSetHeight( bHeight )
 {
     // Remember the source of the image
@@ -516,9 +515,9 @@ void SwHTMLImageWatcher::init( sal_Int32 Width, sal_Int32 Height )
             SwFrameFormat *pFrameFormat = pSwShape->GetFrameFormat();
 
             const SwDoc *pDoc = pFrameFormat->GetDoc();
-            const SwPosition* pAPos = pFrameFormat->GetAnchor().GetContentAnchor();
+            SwNode* pAnchorNode = pFrameFormat->GetAnchor().GetAnchorNode();
             SwTableNode *pTableNd;
-            if (pAPos && nullptr != (pTableNd = pAPos->nNode.GetNode().FindTableNode()))
+            if (pAnchorNode && nullptr != (pTableNd = pAnchorNode->FindTableNode()))
             {
                 const bool bLastGrf = !pTableNd->GetTable().DecGrfsThatResize();
                 SwHTMLTableLayout *pLayout =
@@ -756,9 +755,9 @@ static bool lcl_html_setEvents(
     for( const auto &rStr : rUnoMacroTable )
     {
         sal_Int32 nIndex = 0;
-        if( rStr.getToken( 0, '-', nIndex ).isEmpty() || -1 == nIndex )
+        if( o3tl::getToken(rStr, 0, '-', nIndex ).empty() || -1 == nIndex )
             continue;
-        if( rStr.getToken( 0, '-', nIndex ).isEmpty() || -1 == nIndex )
+        if( o3tl::getToken(rStr, 0, '-', nIndex ).empty() || -1 == nIndex )
             continue;
         if( nIndex < rStr.getLength() )
             nEvents++;
@@ -887,12 +886,9 @@ uno::Reference< drawing::XShape > SwHTMLParser::InsertControl(
         uno::Reference< beans::XPropertySet > xShapePropSet( xCreate, UNO_QUERY );
 
         // set left/right border
-        const SfxPoolItem *pItem;
-        if( SfxItemState::SET==rCSS1ItemSet.GetItemState( RES_LR_SPACE, true,
-                                                     &pItem ) )
+        if( const SvxLRSpaceItem* pLRItem = rCSS1ItemSet.GetItemIfSet( RES_LR_SPACE ) )
         {
             // Flatten first line indent
-            const SvxLRSpaceItem *pLRItem = static_cast<const SvxLRSpaceItem *>(pItem);
             SvxLRSpaceItem aLRItem( *pLRItem );
             aLRItem.SetTextFirstLineOffset( 0 );
             if( rCSS1PropInfo.m_bLeftMargin )
@@ -918,11 +914,9 @@ uno::Reference< drawing::XShape > SwHTMLParser::InsertControl(
         }
 
         // set upper/lower border
-        if( SfxItemState::SET==rCSS1ItemSet.GetItemState( RES_UL_SPACE, true,
-                                                     &pItem ) )
+        if( const SvxULSpaceItem *pULItem = rCSS1ItemSet.GetItemIfSet( RES_UL_SPACE ) )
         {
             // Flatten first line indent
-            const SvxULSpaceItem *pULItem = static_cast<const SvxULSpaceItem *>(pItem);
             if( rCSS1PropInfo.m_bTopMargin )
             {
                 nUpperSpace = convertTwipToMm100( pULItem->GetUpper() );
@@ -949,11 +943,10 @@ uno::Reference< drawing::XShape > SwHTMLParser::InsertControl(
         uno::Reference< beans::XPropertySetInfo > xPropSetInfo =
             rFCompPropSet->getPropertySetInfo();
         OUString sPropName = "BackgroundColor";
-        if( SfxItemState::SET==rCSS1ItemSet.GetItemState( RES_BACKGROUND, true,
-                                                     &pItem ) &&
-            xPropSetInfo->hasPropertyByName( sPropName ) )
+        const SvxBrushItem* pBrushItem = rCSS1ItemSet.GetItemIfSet( RES_BACKGROUND );
+        if( pBrushItem && xPropSetInfo->hasPropertyByName( sPropName ) )
         {
-            const Color &rColor = static_cast<const SvxBrushItem *>(pItem)->GetColor();
+            const Color &rColor = pBrushItem->GetColor();
             /// copy color, if color is not "no fill"/"auto fill"
             if( rColor != COL_TRANSPARENT )
             {
@@ -965,30 +958,24 @@ uno::Reference< drawing::XShape > SwHTMLParser::InsertControl(
         }
 
         sPropName = "TextColor";
-        if( SfxItemState::SET==rCSS1ItemSet.GetItemState( RES_CHRATR_COLOR, true,
-                                                     &pItem ) &&
-            xPropSetInfo->hasPropertyByName( sPropName ) )
+        const SvxColorItem* pColorItem = rCSS1ItemSet.GetItemIfSet( RES_CHRATR_COLOR );
+        if( pColorItem && xPropSetInfo->hasPropertyByName( sPropName ) )
         {
-            aTmp <<= static_cast<sal_Int32>(static_cast<const SvxColorItem *>(pItem)->GetValue()
-                                                         .GetRGBColor());
+            aTmp <<= static_cast<sal_Int32>(pColorItem->GetValue().GetRGBColor());
             rFCompPropSet->setPropertyValue( sPropName, aTmp );
         }
 
         sPropName = "FontHeight";
-        if( SfxItemState::SET==rCSS1ItemSet.GetItemState( RES_CHRATR_FONTSIZE,
-                                                     true, &pItem ) &&
-            xPropSetInfo->hasPropertyByName( sPropName ) )
+        const SvxFontHeightItem* pFontHeightItem = rCSS1ItemSet.GetItemIfSet( RES_CHRATR_FONTSIZE );
+        if( pFontHeightItem && xPropSetInfo->hasPropertyByName( sPropName ) )
         {
-            float fVal = static_cast< float >(
-                (static_cast<const SvxFontHeightItem *>(pItem)->GetHeight()) / 20.0 );
+            float fVal = static_cast< float >( pFontHeightItem->GetHeight() / 20.0 );
             aTmp <<= fVal;
             rFCompPropSet->setPropertyValue( sPropName, aTmp );
         }
 
-        if( SfxItemState::SET==rCSS1ItemSet.GetItemState( RES_CHRATR_FONT, true,
-                                                     &pItem ) )
+        if( const SvxFontItem* pFontItem = rCSS1ItemSet.GetItemIfSet( RES_CHRATR_FONT ) )
         {
-            const SvxFontItem *pFontItem = static_cast<const SvxFontItem *>(pItem);
             sPropName = "FontName";
             if( xPropSetInfo->hasPropertyByName( sPropName ) )
             {
@@ -1022,40 +1009,36 @@ uno::Reference< drawing::XShape > SwHTMLParser::InsertControl(
         }
 
         sPropName = "FontWeight";
-        if( SfxItemState::SET==rCSS1ItemSet.GetItemState( RES_CHRATR_WEIGHT,
-                                                     true, &pItem ) &&
-            xPropSetInfo->hasPropertyByName( sPropName ) )
+        const SvxWeightItem* pWeightItem = rCSS1ItemSet.GetItemIfSet( RES_CHRATR_WEIGHT );
+        if( pWeightItem && xPropSetInfo->hasPropertyByName( sPropName ) )
         {
             float fVal = vcl::unohelper::ConvertFontWeight(
-                    static_cast<const SvxWeightItem *>(pItem)->GetWeight() );
+                    pWeightItem->GetWeight() );
             aTmp <<= fVal;
             rFCompPropSet->setPropertyValue( sPropName, aTmp );
         }
 
         sPropName = "FontSlant";
-        if( SfxItemState::SET==rCSS1ItemSet.GetItemState( RES_CHRATR_POSTURE,
-                                                     true, &pItem ) &&
-            xPropSetInfo->hasPropertyByName( sPropName ) )
+        const SvxPostureItem* pPostureItem = rCSS1ItemSet.GetItemIfSet( RES_CHRATR_POSTURE );
+        if( pPostureItem && xPropSetInfo->hasPropertyByName( sPropName ) )
         {
-            aTmp <<= static_cast<sal_Int16>(static_cast<const SvxPostureItem *>(pItem)->GetPosture());
+            aTmp <<= static_cast<sal_Int16>(pPostureItem->GetPosture());
             rFCompPropSet->setPropertyValue( sPropName, aTmp );
         }
 
         sPropName = "FontUnderline";
-        if( SfxItemState::SET==rCSS1ItemSet.GetItemState( RES_CHRATR_UNDERLINE,
-                                                     true, &pItem ) &&
-            xPropSetInfo->hasPropertyByName( sPropName ) )
+        const SvxUnderlineItem* pUnderlineItem = rCSS1ItemSet.GetItemIfSet( RES_CHRATR_UNDERLINE );
+        if( pUnderlineItem && xPropSetInfo->hasPropertyByName( sPropName ) )
         {
-            aTmp <<= static_cast<sal_Int16>(static_cast<const SvxUnderlineItem *>(pItem)->GetLineStyle());
+            aTmp <<= static_cast<sal_Int16>(pUnderlineItem->GetLineStyle());
             rFCompPropSet->setPropertyValue( sPropName, aTmp );
         }
 
         sPropName = "FontStrikeout";
-        if( SfxItemState::SET==rCSS1ItemSet.GetItemState( RES_CHRATR_CROSSEDOUT,
-                                                     true, &pItem ) &&
-            xPropSetInfo->hasPropertyByName( sPropName ) )
+        const SvxCrossedOutItem* pCrossedOutItem = rCSS1ItemSet.GetItemIfSet( RES_CHRATR_CROSSEDOUT );
+        if( pCrossedOutItem && xPropSetInfo->hasPropertyByName( sPropName ) )
         {
-            aTmp <<= static_cast<sal_Int16>(static_cast<const SvxCrossedOutItem *>(pItem)->GetStrikeout());
+            aTmp <<= static_cast<sal_Int16>(pCrossedOutItem->GetStrikeout());
             rFCompPropSet->setPropertyValue( sPropName, aTmp );
         }
 
@@ -1069,7 +1052,7 @@ uno::Reference< drawing::XShape > SwHTMLParser::InsertControl(
             SVX_CSS1_LTYPE_TWIP == rCSS1PropInfo.m_eTopType )
         {
             const SwStartNode *pFlySttNd =
-                m_pPam->GetPoint()->nNode.GetNode().FindFlyStartNode();
+                m_pPam->GetPoint()->GetNode().FindFlyStartNode();
 
             if( pFlySttNd )
             {
@@ -1215,7 +1198,7 @@ void SwHTMLParser::NewForm( bool bAppend )
 
     if( bAppend )
     {
-        if( m_pPam->GetPoint()->nContent.GetIndex() )
+        if( m_pPam->GetPoint()->GetContentIndex() )
             AppendTextNode( AM_SPACE );
         else
             AddParSpace();
@@ -1298,25 +1281,28 @@ void SwHTMLParser::NewForm( bool bAppend )
         }
     }
 
-#if HAVE_FEATURE_DBCONNECTIVITY && !ENABLE_FUZZERS
     const uno::Reference< XMultiServiceFactory > & rSrvcMgr =
         m_pFormImpl->GetServiceFactory();
     if( !rSrvcMgr.is() )
         return;
 
     uno::Reference< XInterface > xInt;
+    uno::Reference<XForm> xForm;
     try
     {
         xInt = rSrvcMgr->createInstance("com.sun.star.form.component.Form");
+        if (!xInt.is())
+            return;
+        xForm.set(xInt, UNO_QUERY);
+        SAL_WARN_IF(!xForm.is(), "sw", "no XForm for com.sun.star.form.component.Form?");
+        if (!xForm.is())
+            return;
     }
-    catch (const css::lang::ServiceNotRegisteredException&)
+    catch (...)
     {
-    }
-    if( !xInt.is() )
+        TOOLS_WARN_EXCEPTION("sw", "");
         return;
-
-    uno::Reference< XForm >  xForm( xInt, UNO_QUERY );
-    OSL_ENSURE( xForm.is(), "no Form?" );
+    }
 
     uno::Reference< container::XIndexContainer > xFormComps( xForm, UNO_QUERY );
     m_pFormImpl->SetFormComps( xFormComps );
@@ -1367,7 +1353,6 @@ void SwHTMLParser::NewForm( bool bAppend )
         if (bHasEvents)
             NotifyMacroEventRead();
     }
-#endif
 }
 
 void SwHTMLParser::EndForm( bool bAppend )
@@ -1376,7 +1361,7 @@ void SwHTMLParser::EndForm( bool bAppend )
     {
         if( bAppend )
         {
-            if( m_pPam->GetPoint()->nContent.GetIndex() )
+            if( m_pPam->GetPoint()->GetContentIndex() )
                 AppendTextNode( AM_SPACE );
             else
                 AddParSpace();
@@ -1633,7 +1618,7 @@ void SwHTMLParser::InsertInput()
 
         if( bDisabled )
         {
-            xPropSet->setPropertyValue("Enabled", makeAny(false) );
+            xPropSet->setPropertyValue("Enabled", Any(false) );
         }
     }
 
@@ -2027,7 +2012,7 @@ void SwHTMLParser::NewTextArea()
 
     if( bDisabled )
     {
-        xPropSet->setPropertyValue("Enabled", makeAny(false) );
+        xPropSet->setPropertyValue("Enabled", Any(false) );
     }
 
     OSL_ENSURE( m_pFormImpl->GetText().isEmpty(), "Text is not empty!" );
@@ -2284,14 +2269,14 @@ void SwHTMLParser::NewSelect()
 
     if( bDisabled )
     {
-        xPropSet->setPropertyValue("Enabled", makeAny(false) );
+        xPropSet->setPropertyValue("Enabled", Any(false) );
     }
 
     Size aTextSz( 0, 0 );
     bool bMinWidth = true, bMinHeight = true;
     if( !bMultiple && 1==m_nSelectEntryCnt )
     {
-        xPropSet->setPropertyValue("Dropdown", makeAny(true) );
+        xPropSet->setPropertyValue("Dropdown", Any(true) );
     }
     else
     {
@@ -2300,7 +2285,7 @@ void SwHTMLParser::NewSelect()
 
         if( bMultiple )
         {
-            xPropSet->setPropertyValue("MultiSelection", makeAny(true) );
+            xPropSet->setPropertyValue("MultiSelection", Any(true) );
         }
         aTextSz.setHeight( m_nSelectEntryCnt );
         bMinHeight = false;
@@ -2484,7 +2469,7 @@ void SwHTMLParser::InsertSelectText()
     {
         sal_Int32 nLen = rText.getLength();
         if( !nLen || ' '==rText[nLen-1])
-            aToken = aToken.replaceAt( 0, 1, u"" );
+            aToken.remove( 0, 1 );
     }
     if( !aToken.isEmpty() )
         rText += aToken;

@@ -348,6 +348,15 @@ class GtkSalFrame final : public SalFrame
 
     static gboolean     signalWindowState( GtkWidget*, GdkEvent*, gpointer );
 #endif
+
+    static bool         signalZoomBegin(GtkGesture*, GdkEventSequence*, gpointer);
+    static bool         signalZoomUpdate(GtkGesture*, GdkEventSequence*, gpointer);
+    static bool         signalZoomEnd(GtkGesture*, GdkEventSequence*, gpointer);
+
+    static bool         signalRotateBegin(GtkGesture*, GdkEventSequence*, gpointer);
+    static bool         signalRotateUpdate(GtkGesture*, GdkEventSequence*, gpointer);
+    static bool         signalRotateEnd(GtkGesture*, GdkEventSequence*, gpointer);
+
 #if !GTK_CHECK_VERSION(4, 0, 0)
     static gboolean     signalConfigure( GtkWidget*, GdkEventConfigure*, gpointer );
 #endif
@@ -416,6 +425,8 @@ class GtkSalFrame final : public SalFrame
 
     void ListenPortalSettings();
 
+    void UpdateGeometryFromEvent(int x_root, int y_root, int nEventX, int nEventY);
+
 public:
     cairo_surface_t*                m_pSurface;
     basegfx::B2IVector              m_aFrameSize;
@@ -443,7 +454,7 @@ public:
     GtkWidget*  getMouseEventWidget() const;
     GtkGrid*    getTopLevelGridWidget() const { return m_pTopLevelGrid; }
     const SalX11Screen& getXScreenNumber() const { return m_nXScreen; }
-    int          GetDisplayScreen() const { return maGeometry.nDisplayScreenNumber; }
+    int GetDisplayScreen() const { return maGeometry.screen(); }
     void updateScreenNumber();
 
     cairo_t* getCairoContext() const;
@@ -506,7 +517,6 @@ public:
     virtual void                SetIcon( sal_uInt16 nIcon ) override;
     virtual void                SetMenu( SalMenu *pSalMenu ) override;
     SalMenu*                    GetMenu();
-    virtual void                DrawMenuBar() override;
     void                        EnsureAppMenuWatch();
 
     virtual void                SetExtendedFrameStyle( SalExtStyle nExtStyle ) override;
@@ -521,8 +531,8 @@ public:
     virtual void                GetClientSize( tools::Long& rWidth, tools::Long& rHeight ) override;
     virtual void                GetWorkArea( tools::Rectangle& rRect ) override;
     virtual SalFrame*           GetParent() const override;
-    virtual void                SetWindowState( const SalFrameState* pState ) override;
-    virtual bool                GetWindowState( SalFrameState* pState ) override;
+    virtual void SetWindowState(const vcl::WindowData*) override;
+    virtual bool GetWindowState(vcl::WindowData*) override;
     virtual void                ShowFullScreen( bool bFullScreen, sal_Int32 nDisplay ) override;
     // Enable/Disable ScreenSaver, SystemAgents, ...
     virtual void                StartPresentation( bool bStart ) override;
@@ -601,6 +611,7 @@ public:
     virtual bool                UpdatePopover(void* nId, const OUString& rHelpText, vcl::Window* pParent, const tools::Rectangle& rHelpArea) override;
     virtual bool                HidePopover(void* nId) override;
     virtual weld::Window*       GetFrameWeld() const override;
+    virtual void                UpdateDarkMode() override;
 
     static GtkSalFrame         *getFromWindow( GtkWidget *pWindow );
 
@@ -633,7 +644,10 @@ public:
         GdkModifierType, gpointer pFrame);
 #endif
     static OUString             GetPreeditDetails(GtkIMContext* pIMContext, std::vector<ExtTextInputAttr>& rInputFlags, sal_Int32& rCursorPos, sal_uInt8& rCursorFlags);
-    static Selection            CalcDeleteSurroundingSelection(const OUString& rSurroundingText, sal_Int32 nCursorIndex, int nOffset, int nChars);
+
+#if GTK_CHECK_VERSION(4, 0, 0)
+    gboolean                    event_controller_scroll_forward(GtkEventControllerScroll* pController, double delta_x, double delta_y);
+#endif
 
     const cairo_font_options_t* get_font_options();
 

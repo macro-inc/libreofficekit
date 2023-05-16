@@ -8,6 +8,7 @@
  */
 
 #include <jsdialog/jsdialogbuilder.hxx>
+#include <o3tl/string_view.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/jsdialog/executor.hxx>
 #include <sal/log.hxx>
@@ -88,8 +89,7 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
             {
                 if (sAction == "selecttab")
                 {
-                    OString pageId = OUStringToOString(rData["data"], RTL_TEXTENCODING_ASCII_US);
-                    int page = std::atoi(pageId.getStr());
+                    sal_Int32 page = o3tl::toInt32(rData["data"]);
 
                     OString aCurrentPage = pNotebook->get_current_page_ident();
                     LOKTrigger::leave_page(*pNotebook, aCurrentPage);
@@ -107,12 +107,12 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
             {
                 if (sAction == "selected")
                 {
-                    int separatorPos = rData["data"].indexOf(';');
+                    OUString sSelectedData = rData["data"];
+                    int separatorPos = sSelectedData.indexOf(';');
                     if (separatorPos > 0)
                     {
-                        OUString entryPos = rData["data"].copy(0, separatorPos);
-                        OString posString = OUStringToOString(entryPos, RTL_TEXTENCODING_ASCII_US);
-                        int pos = std::atoi(posString.getStr());
+                        std::u16string_view entryPos = sSelectedData.subView(0, separatorPos);
+                        sal_Int32 pos = o3tl::toInt32(entryPos);
                         pCombobox->set_active(pos);
                         LOKTrigger::trigger_changed(*pCombobox);
                         return true;
@@ -141,6 +141,11 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                     pButton->clicked();
                     return true;
                 }
+                else if (sAction == "toggle")
+                {
+                    LOKTrigger::trigger_toggled(*dynamic_cast<weld::Toggleable*>(pWidget));
+                    return true;
+                }
             }
         }
         else if (sControlType == "menubutton")
@@ -159,6 +164,12 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                     if (pMenuButton)
                         pMenuButton->sendUpdate(true);
 
+                    return true;
+                }
+                else if (sAction == "select")
+                {
+                    LOKTrigger::trigger_selected(
+                        *pButton, OUStringToOString(rData["data"], RTL_TEXTENCODING_ASCII_US));
                     return true;
                 }
             }
@@ -182,61 +193,65 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
             auto pArea = dynamic_cast<weld::DrawingArea*>(pWidget);
             if (pArea)
             {
-                if (sAction == "click")
+                if (sAction == "click" || sAction == "dblclick" || sAction == "mousemove"
+                    || sAction == "mousedown" || sAction == "mouseup")
                 {
-                    int nSeparatorPos = rData["data"].indexOf(';');
+                    OUString sClickData = rData["data"];
+                    int nSeparatorPos = sClickData.indexOf(';');
                     if (nSeparatorPos > 0)
                     {
                         // x;y
-                        std::u16string_view nClickPosX = rData["data"].subView(0, nSeparatorPos);
-                        std::u16string_view nClickPosY = rData["data"].subView(nSeparatorPos + 1);
+                        std::u16string_view nClickPosX = sClickData.subView(0, nSeparatorPos);
+                        std::u16string_view nClickPosY = sClickData.subView(nSeparatorPos + 1);
 
                         if (nClickPosX.empty() || nClickPosY.empty())
                             return true;
 
-                        double posX = std::atof(
-                            OUStringToOString(nClickPosX.data(), RTL_TEXTENCODING_ASCII_US)
-                                .getStr());
-                        double posY = std::atof(
-                            OUStringToOString(nClickPosY.data(), RTL_TEXTENCODING_ASCII_US)
-                                .getStr());
+                        double fPosX = o3tl::toDouble(nClickPosX);
+                        double fPosY = o3tl::toDouble(nClickPosY);
                         OutputDevice& rRefDevice = pArea->get_ref_device();
                         // We send OutPutSize for the drawing area bitmap
                         // get_size_request is not necessarily updated
                         // therefore it may be incorrect.
-                        Size size = rRefDevice.GetOutputSize();
-                        posX = posX * size.Width();
-                        posY = posY * size.Height();
-                        LOKTrigger::trigger_click(*pArea, Point(posX, posY));
-                        return true;
+                        Size size = rRefDevice.GetOutputSizePixel();
+                        fPosX = fPosX * size.Width();
+                        fPosY = fPosY * size.Height();
+
+                        if (sAction == "click")
+                            LOKTrigger::trigger_click(*pArea, Point(fPosX, fPosY));
+                        else if (sAction == "dblclick")
+                            LOKTrigger::trigger_dblclick(*pArea, Point(fPosX, fPosY));
+                        else if (sAction == "mouseup")
+                            LOKTrigger::trigger_mouse_up(*pArea, Point(fPosX, fPosY));
+                        else if (sAction == "mousedown")
+                            LOKTrigger::trigger_mouse_down(*pArea, Point(fPosX, fPosY));
+                        else if (sAction == "mousemove")
+                            LOKTrigger::trigger_mouse_move(*pArea, Point(fPosX, fPosY));
                     }
 
-                    LOKTrigger::trigger_click(*pArea, Point(10, 10));
                     return true;
                 }
                 else if (sAction == "keypress")
                 {
-                    LOKTrigger::trigger_key_press(
-                        *pArea,
-                        KeyEvent(rData["data"].toUInt32(), vcl::KeyCode(rData["data"].toUInt32())));
-                    LOKTrigger::trigger_key_release(
-                        *pArea,
-                        KeyEvent(rData["data"].toUInt32(), vcl::KeyCode(rData["data"].toUInt32())));
+                    sal_uInt32 nKeyNo = rData["data"].toUInt32();
+                    LOKTrigger::trigger_key_press(*pArea, KeyEvent(nKeyNo, vcl::KeyCode(nKeyNo)));
+                    LOKTrigger::trigger_key_release(*pArea, KeyEvent(nKeyNo, vcl::KeyCode(nKeyNo)));
                     return true;
                 }
                 else if (sAction == "textselection")
                 {
-                    int nSeparatorPos = rData["data"].indexOf(';');
+                    OUString sTextData = rData["data"];
+                    int nSeparatorPos = sTextData.indexOf(';');
                     if (nSeparatorPos <= 0)
                         return true;
 
-                    int nSeparator2Pos = rData["data"].indexOf(';', nSeparatorPos + 1);
+                    int nSeparator2Pos = sTextData.indexOf(';', nSeparatorPos + 1);
                     int nSeparator3Pos = 0;
 
                     if (nSeparator2Pos > 0)
                     {
                         // start;end;startPara;endPara
-                        nSeparator3Pos = rData["data"].indexOf(';', nSeparator2Pos + 1);
+                        nSeparator3Pos = sTextData.indexOf(';', nSeparator2Pos + 1);
                         if (nSeparator3Pos <= 0)
                             return true;
                     }
@@ -247,35 +262,30 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                         nSeparator3Pos = 0;
                     }
 
-                    std::u16string_view aStartPos = rData["data"].subView(0, nSeparatorPos);
-                    std::u16string_view aEndPos = rData["data"].subView(
-                        nSeparatorPos + 1, nSeparator2Pos - nSeparatorPos + 1);
+                    std::u16string_view aStartPos = sTextData.subView(0, nSeparatorPos);
+                    std::u16string_view aEndPos
+                        = sTextData.subView(nSeparatorPos + 1, nSeparator2Pos - nSeparatorPos + 1);
 
                     if (aStartPos.empty() || aEndPos.empty())
                         return true;
 
-                    int nStart = std::atoi(
-                        OUStringToOString(aStartPos.data(), RTL_TEXTENCODING_ASCII_US).getStr());
-                    int nEnd = std::atoi(
-                        OUStringToOString(aEndPos.data(), RTL_TEXTENCODING_ASCII_US).getStr());
-                    int nStartPara = 0;
-                    int nEndPara = 0;
+                    sal_Int32 nStart = o3tl::toInt32(aStartPos);
+                    sal_Int32 nEnd = o3tl::toInt32(aEndPos);
+                    sal_Int32 nStartPara = 0;
+                    sal_Int32 nEndPara = 0;
 
                     // multiline case
                     if (nSeparator2Pos && nSeparator3Pos)
                     {
-                        std::u16string_view aStartPara = rData["data"].subView(
+                        std::u16string_view aStartPara = sTextData.subView(
                             nSeparator2Pos + 1, nSeparator3Pos - nSeparator2Pos + 1);
-                        std::u16string_view aEndPara = rData["data"].subView(nSeparator3Pos + 1);
+                        std::u16string_view aEndPara = sTextData.subView(nSeparator3Pos + 1);
 
                         if (aStartPara.empty() || aEndPara.empty())
                             return true;
 
-                        nStartPara = std::atoi(
-                            OUStringToOString(aStartPara.data(), RTL_TEXTENCODING_ASCII_US)
-                                .getStr());
-                        nEndPara = std::atoi(
-                            OUStringToOString(aEndPara.data(), RTL_TEXTENCODING_ASCII_US).getStr());
+                        nStartPara = o3tl::toInt32(aStartPara);
+                        nEndPara = o3tl::toInt32(aEndPara);
                     }
 
                     // pass information about paragraph number in the additional data
@@ -301,8 +311,11 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                     if (rData["data"] == "undefined")
                         return true;
 
-                    OString sValue = OUStringToOString(rData["data"], RTL_TEXTENCODING_ASCII_US);
-                    double nValue = std::atof(sValue.getStr());
+                    // The Document will not scroll if that is in focus
+                    // maybe we could send a message with: sAction == "grab_focus"
+                    pWidget->grab_focus();
+
+                    double nValue = o3tl::toDouble(rData["data"]);
                     pSpinField->set_value(nValue
                                           * weld::SpinButton::Power10(pSpinField->get_digits()));
                     LOKTrigger::trigger_value_changed(*pSpinField);
@@ -367,13 +380,38 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                 }
             }
 
-            auto pTextView = dynamic_cast<weld::TextView*>(pWidget);
+            auto pTextView = dynamic_cast<JSTextView*>(pWidget);
             if (pTextView)
             {
                 if (sAction == "change")
                 {
-                    pTextView->set_text(rData["data"]);
+                    int rStartPos, rEndPos;
+                    pTextView->get_selection_bounds(rStartPos, rEndPos);
+                    pTextView->set_text_without_notify(rData["data"]);
+                    pTextView->select_region(rStartPos, rEndPos);
                     LOKTrigger::trigger_changed(*pTextView);
+                    return true;
+                }
+                else if (sAction == "textselection")
+                {
+                    // start;end
+                    OUString sTextData = rData["data"];
+                    int nSeparatorPos = sTextData.indexOf(';');
+                    if (nSeparatorPos <= 0)
+                        return true;
+
+                    std::u16string_view aStartPos = sTextData.subView(0, nSeparatorPos);
+                    std::u16string_view aEndPos = sTextData.subView(nSeparatorPos + 1);
+
+                    if (aStartPos.empty() || aEndPos.empty())
+                        return true;
+
+                    sal_Int32 nStart = o3tl::toInt32(aStartPos);
+                    sal_Int32 nEnd = o3tl::toInt32(aEndPos);
+
+                    pTextView->select_region(nStart, nEnd);
+                    LOKTrigger::trigger_changed(*pTextView);
+
                     return true;
                 }
             }
@@ -391,8 +429,7 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                     StringMap aMap(jsonToStringMap(
                         OUStringToOString(sDataJSON, RTL_TEXTENCODING_ASCII_US).getStr()));
 
-                    OString nRowString = OUStringToOString(aMap["row"], RTL_TEXTENCODING_ASCII_US);
-                    int nRow = std::atoi(nRowString.getStr());
+                    sal_Int32 nRow = o3tl::toInt32(aMap["row"]);
                     bool bValue = aMap["value"] == "true";
 
                     pTreeView->set_toggle(nRow, bValue ? TRISTATE_TRUE : TRISTATE_FALSE);
@@ -401,48 +438,45 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                 }
                 else if (sAction == "select")
                 {
-                    OString nRowString
-                        = OUStringToOString(rData["data"], RTL_TEXTENCODING_ASCII_US);
+                    sal_Int32 nAbsPos = o3tl::toInt32(rData["data"]);
 
                     pTreeView->unselect_all();
-
-                    int nAbsPos = std::atoi(nRowString.getStr());
 
                     std::unique_ptr<weld::TreeIter> itEntry(pTreeView->make_iterator());
                     pTreeView->get_iter_abs_pos(*itEntry, nAbsPos);
                     pTreeView->select(*itEntry);
-                    pTreeView->set_cursor(*itEntry);
+                    pTreeView->set_cursor_without_notify(*itEntry);
+                    pTreeView->grab_focus();
                     LOKTrigger::trigger_changed(*pTreeView);
                     return true;
                 }
                 else if (sAction == "activate")
                 {
-                    OString nRowString
-                        = OUStringToOString(rData["data"], RTL_TEXTENCODING_ASCII_US);
-                    int nRow = std::atoi(nRowString.getStr());
+                    sal_Int32 nRow = o3tl::toInt32(rData["data"]);
 
                     pTreeView->unselect_all();
+                    std::unique_ptr<weld::TreeIter> itEntry(pTreeView->make_iterator());
+                    pTreeView->get_iter_abs_pos(*itEntry, nRow);
                     pTreeView->select(nRow);
-                    pTreeView->set_cursor(nRow);
+                    pTreeView->set_cursor_without_notify(*itEntry);
+                    pTreeView->grab_focus();
                     LOKTrigger::trigger_changed(*pTreeView);
                     LOKTrigger::trigger_row_activated(*pTreeView);
                     return true;
                 }
                 else if (sAction == "expand")
                 {
-                    OString nRowString
-                        = OUStringToOString(rData["data"], RTL_TEXTENCODING_ASCII_US);
-                    int nAbsPos = std::atoi(nRowString.getStr());
+                    sal_Int32 nAbsPos = o3tl::toInt32(rData["data"]);
                     std::unique_ptr<weld::TreeIter> itEntry(pTreeView->make_iterator());
                     pTreeView->get_iter_abs_pos(*itEntry, nAbsPos);
+                    pTreeView->set_cursor_without_notify(*itEntry);
+                    pTreeView->grab_focus();
                     pTreeView->expand_row(*itEntry);
                     return true;
                 }
                 else if (sAction == "dragstart")
                 {
-                    OString nRowString
-                        = OUStringToOString(rData["data"], RTL_TEXTENCODING_ASCII_US);
-                    int nRow = std::atoi(nRowString.getStr());
+                    sal_Int32 nRow = o3tl::toInt32(rData["data"]);
 
                     pTreeView->select(nRow);
                     pTreeView->drag_start();
@@ -463,9 +497,7 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
             {
                 if (sAction == "select")
                 {
-                    OString nPosString
-                        = OUStringToOString(rData["data"], RTL_TEXTENCODING_ASCII_US);
-                    int nPos = std::atoi(nPosString.getStr());
+                    sal_Int32 nPos = o3tl::toInt32(rData["data"]);
 
                     pIconView->select(nPos);
                     LOKTrigger::trigger_changed(*pIconView);
@@ -474,9 +506,7 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                 }
                 else if (sAction == "activate")
                 {
-                    OString nPosString
-                        = OUStringToOString(rData["data"], RTL_TEXTENCODING_ASCII_US);
-                    int nPos = std::atoi(nPosString.getStr());
+                    sal_Int32 nPos = o3tl::toInt32(rData["data"]);
 
                     pIconView->select(nPos);
                     LOKTrigger::trigger_changed(*pIconView);
@@ -510,9 +540,7 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                 }
                 else if (sAction == "response")
                 {
-                    OString nResponseString
-                        = OUStringToOString(rData["data"], RTL_TEXTENCODING_ASCII_US);
-                    int nResponse = std::atoi(nResponseString.getStr());
+                    sal_Int32 nResponse = o3tl::toInt32(rData["data"]);
                     pDialog->response(nResponse);
                     return true;
                 }
@@ -540,6 +568,27 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                     bool bChecked = rData["data"] == "true";
                     pRadioButton->set_state(bChecked ? TRISTATE_TRUE : TRISTATE_FALSE);
                     LOKTrigger::trigger_toggled(*static_cast<weld::Toggleable*>(pRadioButton));
+                    return true;
+                }
+            }
+        }
+        else if (sControlType == "scrolledwindow")
+        {
+            auto pScrolledWindow = dynamic_cast<JSScrolledWindow*>(pWidget);
+            if (pScrolledWindow)
+            {
+                if (sAction == "scrollv")
+                {
+                    sal_Int32 nValue = o3tl::toInt32(rData["data"]);
+                    pScrolledWindow->vadjustment_set_value_no_notification(nValue);
+                    LOKTrigger::trigger_scrollv(*pScrolledWindow);
+                    return true;
+                }
+                else if (sAction == "scrollh")
+                {
+                    sal_Int32 nValue = o3tl::toInt32(rData["data"]);
+                    pScrolledWindow->hadjustment_set_value_no_notification(nValue);
+                    LOKTrigger::trigger_scrollh(*pScrolledWindow);
                     return true;
                 }
             }

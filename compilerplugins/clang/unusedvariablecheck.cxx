@@ -16,6 +16,7 @@
 #include "compat.hxx"
 #include "check.hxx"
 #include "unusedvariablecheck.hxx"
+#include "plugin.hxx"
 
 namespace loplugin
 {
@@ -57,6 +58,10 @@ bool UnusedVariableCheck::VisitVarDecl( const VarDecl* var )
     auto type = var->getType();
     bool check = loplugin::isExtraWarnUnusedType(type);
 
+    if (!check)
+        check = isUnusedSmartPointer(var);
+
+
     // this chunk of logic generates false+, which is why we don't leave it on
 /*
     if (!check && type->isRecordType())
@@ -75,9 +80,15 @@ bool UnusedVariableCheck::VisitVarDecl( const VarDecl* var )
                     return true; // unnamed parameter -> unused
                 // If this declaration does not have a body, then the parameter is indeed not used,
                 // so ignore.
-                if( const FunctionDecl* func = dyn_cast_or_null< FunctionDecl >( param->getParentFunctionOrMethod()))
+                auto const parent = param->getParentFunctionOrMethod();
+                if( const FunctionDecl* func = dyn_cast_or_null< FunctionDecl >( parent))
                     if( !func->doesThisDeclarationHaveABody() || func->getBody() == nullptr)
                         return true;
+                if (auto const d = dyn_cast_or_null<ObjCMethodDecl>(parent)) {
+                    if (!d->hasBody()) {
+                        return true;
+                    }
+                }
                 report( DiagnosticsEngine::Warning, "unused parameter %0",
                     var->getLocation()) << var->getDeclName();
                 }
@@ -86,6 +97,23 @@ bool UnusedVariableCheck::VisitVarDecl( const VarDecl* var )
                     var->getLocation()) << var->getDeclName();
         }
     return true;
+    }
+
+bool UnusedVariableCheck::isUnusedSmartPointer( const VarDecl* var )
+    {
+        // if we have a var of smart-pointer type, and that var is both uninitialised and
+        // not referenced, then we can remove it
+        if (!isSmartPointerType(var->getType()))
+            return false;
+
+        if (!var->hasInit())
+            return true;
+
+        auto cxxConstructExpr = dyn_cast<CXXConstructExpr>(var->getInit());
+        if (!cxxConstructExpr)
+            return false;
+        return
+            cxxConstructExpr->getNumArgs() == 0 || cxxConstructExpr->getArg(0)->isDefaultArgument();
     }
 
 static Plugin::Registration< UnusedVariableCheck > unusedvariablecheck( "unusedvariablecheck" );

@@ -24,6 +24,7 @@
 #include <com/sun/star/graphic/XGraphicMapper.hpp>
 
 #include <oox/drawingml/drawingmltypes.hxx>
+#include <oox/drawingml/ThemeFilterBase.hxx>
 
 #include "OOXMLPropertySet.hxx"
 
@@ -73,6 +74,7 @@ class OOXMLDocumentImpl : public OOXMLDocument
     // and the same is used by header and footer as well.
     oox::drawingml::ThemePtr mpTheme;
     rtl::Reference<oox::shape::ShapeFilterBase> mxShapeFilterBase;
+    rtl::Reference<oox::drawingml::ThemeFilterBase> mxThemeFilterBase;
 
     bool mbCommentsExtendedResolved = false;
 
@@ -100,7 +102,7 @@ private:
     void resolveCommentsExtendedStream(Stream & rStream);
 
 public:
-    OOXMLDocumentImpl(OOXMLStream::Pointer_t const & pStream, const css::uno::Reference<css::task::XStatusIndicator>& xStatusIndicator, bool bSkipImages, const css::uno::Sequence<css::beans::PropertyValue>& rDescriptor);
+    OOXMLDocumentImpl(OOXMLStream::Pointer_t  pStream, css::uno::Reference<css::task::XStatusIndicator> xStatusIndicator, bool bSkipImages, const css::uno::Sequence<css::beans::PropertyValue>& rDescriptor);
     virtual ~OOXMLDocumentImpl() override;
 
     virtual void resolve(Stream & rStream) override;
@@ -135,6 +137,10 @@ public:
     virtual const OUString & getTarget() const override;
     virtual rtl::Reference<oox::shape::ShapeContextHandler> getShapeContext( ) override;
     virtual void setShapeContext( rtl::Reference<oox::shape::ShapeContextHandler> xContext ) override;
+    virtual const oox::drawingml::ThemePtr & getTheme() const override
+    {
+        return mpTheme;
+    }
     void pushShapeContext() override;
     void popShapeContext() override;
     virtual css::uno::Reference<css::xml::dom::XDocument> getThemeDom() override;
@@ -154,11 +160,10 @@ public:
         return mxGraphicMapper;
     }
 
-    const oox::drawingml::ThemePtr & getTheme() const { return mpTheme; }
     void setTheme(const oox::drawingml::ThemePtr& pTheme) { mpTheme = pTheme; }
 
     const rtl::Reference<oox::shape::ShapeFilterBase> & getShapeFilterBase();
-
+    const rtl::Reference<oox::drawingml::ThemeFilterBase> & getThemeFilterBase();
 };
 
 }

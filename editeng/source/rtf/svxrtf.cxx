@@ -19,7 +19,7 @@
 
 #include <memory>
 #include <queue>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/tencinfo.h>
 #include <svl/itemiter.hxx>
 #include <svl/whiter.hxx>
@@ -166,7 +166,7 @@ void SvxRTFParser::NextToken( int nToken )
     case RTF_LDBLQUOTE:     cCh = 0x201C;   goto INSINGLECHAR;
     case RTF_RDBLQUOTE:     cCh = 0x201D;   goto INSINGLECHAR;
 INSINGLECHAR:
-        aToken = OUString(cCh);
+        aToken = OUStringChar(cCh);
         [[fallthrough]]; // aToken is set as Text
     case RTF_TEXTTOKEN:
         {
@@ -324,7 +324,8 @@ void SvxRTFParser::ReadStyleTable()
         case RTF_TEXTTOKEN:
             if (bHasStyleNo)
             {
-                xStyle->sName = DelCharAtEnd( aToken, ';' );
+                DelCharAtEnd( aToken, ';' );
+                xStyle->sName = aToken.toString();
 
                 if (!m_StyleTable.empty())
                 {
@@ -581,15 +582,11 @@ void SvxRTFParser::ClearAttrStack()
     aAttrStack.clear();
 }
 
-OUString& SvxRTFParser::DelCharAtEnd( OUString& rStr, const sal_Unicode cDel )
+void SvxRTFParser::DelCharAtEnd( OUStringBuffer& rStr, const sal_Unicode cDel )
 {
-    if( !rStr.isEmpty() && ' ' == rStr[ 0 ])
-        rStr = comphelper::string::stripStart(rStr, ' ');
-    if( !rStr.isEmpty() && ' ' == rStr[ rStr.getLength()-1 ])
-        rStr = comphelper::string::stripEnd(rStr, ' ');
+    rStr.strip(' ');
     if( !rStr.isEmpty() && cDel == rStr[ rStr.getLength()-1 ])
-        rStr = rStr.copy( 0, rStr.getLength()-1 );
-    return rStr;
+        rStr.setLength( rStr.getLength()-1 );
 }
 
 
@@ -632,7 +629,7 @@ SvxRTFItemStackType* SvxRTFParser::GetAttrSet_()
 
     aAttrStack.push_back( std::move(xNew) );
 
-    if (aAttrStack.size() > 256 && utl::ConfigManager::IsFuzzing())
+    if (aAttrStack.size() > 96 && utl::ConfigManager::IsFuzzing())
         throw std::range_error("ecStackOverflow");
 
     bNewGroup = false;
@@ -655,9 +652,9 @@ void SvxRTFParser::ClearStyleAttr_( SvxRTFItemStackType& rStkType )
         for( sal_uInt16 nWhich = aIter.GetCurWhich(); nWhich; nWhich = aIter.NextWhich() )
         {
             if (SfxItemPool::IsWhich(nWhich) &&
-                SfxItemState::SET == rSet.GetItemState( nWhich, false, &pItem ) &&
+                SfxItemState::SET == aIter.GetItemState( false, &pItem ) &&
                      rPool.GetDefaultItem( nWhich ) == *pItem )
-                rSet.ClearItem( nWhich );       // delete
+                aIter.ClearItem();       // delete
         }
     }
     else
@@ -671,12 +668,12 @@ void SvxRTFParser::ClearStyleAttr_( SvxRTFItemStackType& rStkType )
         {
             if( SfxItemState::SET == rStyleSet.GetItemState( nWhich, true, &pSItem ))
             {
-                if( SfxItemState::SET == rSet.GetItemState( nWhich, false, &pItem )
+                if( SfxItemState::SET == aIter.GetItemState( false, &pItem )
                     && *pItem == *pSItem )
                     rSet.ClearItem( nWhich );       // delete
             }
             else if (SfxItemPool::IsWhich(nWhich) &&
-                    SfxItemState::SET == rSet.GetItemState( nWhich, false, &pItem ) &&
+                    SfxItemState::SET == aIter.GetItemState( false, &pItem ) &&
                      rPool.GetDefaultItem( nWhich ) == *pItem )
                 rSet.ClearItem( nWhich );       // delete
         }
@@ -710,7 +707,7 @@ void SvxRTFParser::AttrGroupEnd()   // process the current, delete from Stack
                 if( SfxItemState::SET == pCurrent->aAttrSet.GetItemState(
                     pItem->Which(), false, &pGet ) &&
                     *pItem == *pGet )
-                    pOld->aAttrSet.ClearItem( pItem->Which() );
+                    aIter.ClearItem();
 
                 pItem = aIter.NextItem();
             } while (pItem);
@@ -899,7 +896,7 @@ void SvxRTFParser::BuildWhichTable()
     // Here are the IDs for all paragraph attributes, which can be detected by
     // SvxParser and can be set in a SfxItemSet. The IDs are set correctly through
     // the SlotIds from POOL.
-    for (sal_uInt16 nWid : {
+    static constexpr sal_uInt16 WIDS1[] {
              SID_ATTR_PARA_LINESPACE,
              SID_ATTR_PARA_ADJUST,
              SID_ATTR_TABSTOP,
@@ -917,7 +914,8 @@ void SvxRTFParser::BuildWhichTable()
              SID_ATTR_PARA_HANGPUNCTUATION,
              SID_ATTR_PARA_FORBIDDEN_RULES,
              SID_ATTR_FRAMEDIRECTION,
-         })
+         };
+    for (sal_uInt16 nWid : WIDS1)
     {
         sal_uInt16 nTrueWid = pAttrPool->GetTrueWhich(nWid, false);
         aPardMap[nWid] = nTrueWid;
@@ -929,19 +927,20 @@ void SvxRTFParser::BuildWhichTable()
     // Here are the IDs for all character attributes, which can be detected by
     // SvxParser and can be set in a SfxItemSet. The IDs are set correctly through
     // the SlotIds from POOL.
-    for (sal_uInt16 nWid : {
+    static constexpr sal_uInt16 WIDS[] {
              SID_ATTR_CHAR_CASEMAP,        SID_ATTR_BRUSH_CHAR,        SID_ATTR_CHAR_COLOR,
              SID_ATTR_CHAR_CONTOUR,        SID_ATTR_CHAR_STRIKEOUT,    SID_ATTR_CHAR_ESCAPEMENT,
              SID_ATTR_CHAR_FONT,           SID_ATTR_CHAR_FONTHEIGHT,   SID_ATTR_CHAR_KERNING,
              SID_ATTR_CHAR_LANGUAGE,       SID_ATTR_CHAR_POSTURE,      SID_ATTR_CHAR_SHADOWED,
              SID_ATTR_CHAR_UNDERLINE,      SID_ATTR_CHAR_OVERLINE,     SID_ATTR_CHAR_WEIGHT,
              SID_ATTR_CHAR_WORDLINEMODE,   SID_ATTR_CHAR_AUTOKERN,     SID_ATTR_CHAR_CJK_FONT,
-             SID_ATTR_CHAR_CJK_FONTHEIGHT, SID_ATTR_CHAR_CJK_LANGUAGE, SID_ATTR_CHAR_CJK_POSTURE,
+             SID_ATTR_CHAR_CJK_FONTHEIGHT, sal_uInt16(SID_ATTR_CHAR_CJK_LANGUAGE), SID_ATTR_CHAR_CJK_POSTURE,
              SID_ATTR_CHAR_CJK_WEIGHT,     SID_ATTR_CHAR_CTL_FONT,     SID_ATTR_CHAR_CTL_FONTHEIGHT,
              SID_ATTR_CHAR_CTL_LANGUAGE,   SID_ATTR_CHAR_CTL_POSTURE,  SID_ATTR_CHAR_CTL_WEIGHT,
              SID_ATTR_CHAR_EMPHASISMARK,   SID_ATTR_CHAR_TWO_LINES,    SID_ATTR_CHAR_SCALEWIDTH,
              SID_ATTR_CHAR_ROTATED,        SID_ATTR_CHAR_RELIEF,       SID_ATTR_CHAR_HIDDEN,
-         })
+         };
+    for (sal_uInt16 nWid : WIDS)
     {
         sal_uInt16 nTrueWid = pAttrPool->GetTrueWhich(nWid, false);
         aPlainMap[nWid] = nTrueWid;
@@ -1110,7 +1109,7 @@ void SvxRTFItemStackType::Compress( const SvxRTFParser& rParser )
                 sal_uInt16 nWhich = pIterItem->Which();
                 if( SfxItemState::SET != pTmp->aAttrSet.GetItemState( nWhich,
                       false, &pItem ) || *pItem != *pIterItem)
-                    aMrgSet.ClearItem( nWhich );
+                    aIter.ClearItem();
 
                 pIterItem = aIter.NextItem();
             } while(pIterItem);

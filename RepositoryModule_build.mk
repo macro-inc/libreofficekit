@@ -63,6 +63,7 @@ $(eval $(call gb_Module_add_moduledirs,cross_toolset,\
 		configmgr \
 		connectivity \
 		cppcanvas \
+		docmodel \
 		drawinglayer \
 		editeng \
 		emfio \
@@ -70,6 +71,7 @@ $(eval $(call gb_Module_add_moduledirs,cross_toolset,\
 		framework \
 		linguistic \
 		officecfg \
+		oox \
 		package \
 		postprocess \
 		sfx2 \

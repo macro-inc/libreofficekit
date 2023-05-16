@@ -14,12 +14,12 @@
 
 #include "ChartWindow.hxx"
 
-class ChartUIObject : public UIObject
+class ChartUIObject final : public UIObject
 {
 public:
 
     ChartUIObject(const VclPtr<chart::ChartWindow>& xChartWindow,
-            const OUString& rCID);
+            OUString aCID);
 
     StringMap get_state() override;
 
@@ -41,7 +41,7 @@ private:
     DECL_LINK(PostCommand, void*, void);
 };
 
-class ChartWindowUIObject : public WindowUIObject
+class ChartWindowUIObject final : public WindowUIObject
 {
     VclPtr<chart::ChartWindow> mxChartWindow;
 

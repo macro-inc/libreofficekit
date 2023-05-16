@@ -19,8 +19,6 @@
 
 #include <com/sun/star/chart2/LegendPosition.hpp>
 #include <com/sun/star/chart/ChartLegendExpansion.hpp>
-#include <com/sun/star/chart2/XChartTypeContainer.hpp>
-#include <com/sun/star/chart2/XCoordinateSystemContainer.hpp>
 
 #include <vcl/svapp.hxx>
 
@@ -28,13 +26,16 @@
 #include <ChartController.hxx>
 #include <comphelper/processfactory.hxx>
 
+#include <Legend.hxx>
 #include <LegendHelper.hxx>
 #include <ChartModelHelper.hxx>
 #include <AxisHelper.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
+#include <ChartType.hxx>
 #include <ChartTypeHelper.hxx>
-
 #include <ChartModel.hxx>
+#include <BaseCoordinateSystem.hxx>
 
 
 using namespace css;
@@ -74,7 +75,7 @@ bool isLegendVisible(const css::uno::Reference<css::frame::XModel>& xModel)
     if (!pModel)
         return false;
 
-    Reference< beans::XPropertySet > xLegendProp( LegendHelper::getLegend(*pModel), uno::UNO_QUERY );
+    rtl::Reference< Legend > xLegendProp = LegendHelper::getLegend(*pModel);
     if( xLegendProp.is())
     {
         try
@@ -111,7 +112,7 @@ bool isLegendOverlay(const css::uno::Reference<css::frame::XModel>& xModel)
     if (!pModel)
         return false;
 
-    Reference< beans::XPropertySet > xLegendProp(LegendHelper::getLegend(*pModel), uno::UNO_QUERY);
+    rtl::Reference< Legend > xLegendProp = LegendHelper::getLegend(*pModel);
     if( xLegendProp.is())
     {
         try
@@ -136,14 +137,14 @@ void setLegendOverlay(const css::uno::Reference<css::frame::XModel>& xModel, boo
     if (!pModel)
         return;
 
-    Reference<beans::XPropertySet> xLegendProp(LegendHelper::getLegend(*pModel), uno::UNO_QUERY);
+    rtl::Reference<Legend> xLegendProp = LegendHelper::getLegend(*pModel);
     if (!xLegendProp.is())
         return;
 
     xLegendProp->setPropertyValue("Overlay", css::uno::Any(bOverlay));
 }
 
-bool isTitleVisible(const css::uno::Reference<css::frame::XModel>& xModel, TitleHelper::eTitleType eTitle)
+bool isTitleVisible(const rtl::Reference<::chart::ChartModel>& xModel, TitleHelper::eTitleType eTitle)
 {
     css::uno::Reference<css::uno::XInterface> xTitle = TitleHelper::getTitle(eTitle, xModel);
     if (!xTitle.is())
@@ -155,9 +156,9 @@ bool isTitleVisible(const css::uno::Reference<css::frame::XModel>& xModel, Title
     return bVisible;
 }
 
-bool isGridVisible(const css::uno::Reference<css::frame::XModel>& xModel, GridType eType)
+bool isGridVisible(const rtl::Reference<::chart::ChartModel>& xModel, GridType eType)
 {
-    Reference< chart2::XDiagram > xDiagram(ChartModelHelper::findDiagram(xModel));
+    rtl::Reference< Diagram > xDiagram(ChartModelHelper::findDiagram(xModel));
     if(xDiagram.is())
     {
         sal_Int32 nDimensionIndex = 0;
@@ -172,9 +173,9 @@ bool isGridVisible(const css::uno::Reference<css::frame::XModel>& xModel, GridTy
     return false;
 }
 
-void setGridVisible(const css::uno::Reference<css::frame::XModel>& xModel, GridType eType, bool bVisible)
+void setGridVisible(const rtl::Reference<::chart::ChartModel>& xModel, GridType eType, bool bVisible)
 {
-    Reference< chart2::XDiagram > xDiagram(ChartModelHelper::findDiagram(xModel));
+    rtl::Reference< Diagram > xDiagram(ChartModelHelper::findDiagram(xModel));
     if(!xDiagram.is())
         return;
 
@@ -192,9 +193,9 @@ void setGridVisible(const css::uno::Reference<css::frame::XModel>& xModel, GridT
         AxisHelper::hideGrid(nDimensionIndex, nCooSysIndex, bMajor, xDiagram);
 }
 
-bool isAxisVisible(const css::uno::Reference<css::frame::XModel>& xModel, AxisType eType)
+bool isAxisVisible(const rtl::Reference<::chart::ChartModel>& xModel, AxisType eType)
 {
-    Reference< chart2::XDiagram > xDiagram(ChartModelHelper::findDiagram(xModel));
+    rtl::Reference< Diagram > xDiagram(ChartModelHelper::findDiagram(xModel));
     if(xDiagram.is())
     {
         sal_Int32 nDimensionIndex = 0;
@@ -211,9 +212,9 @@ bool isAxisVisible(const css::uno::Reference<css::frame::XModel>& xModel, AxisTy
     return false;
 }
 
-void setAxisVisible(const css::uno::Reference<css::frame::XModel>& xModel, AxisType eType, bool bVisible)
+void setAxisVisible(const rtl::Reference<::chart::ChartModel>& xModel, AxisType eType, bool bVisible)
 {
-    Reference< chart2::XDiagram > xDiagram(ChartModelHelper::findDiagram(xModel));
+    rtl::Reference< Diagram > xDiagram(ChartModelHelper::findDiagram(xModel));
     if(!xDiagram.is())
         return;
 
@@ -237,7 +238,7 @@ sal_Int32 getLegendPos(const css::uno::Reference<css::frame::XModel>& xModel)
     if (!pModel)
         return -1;
 
-    Reference< beans::XPropertySet > xLegendProp( LegendHelper::getLegend(*pModel), uno::UNO_QUERY );
+    rtl::Reference< Legend > xLegendProp = LegendHelper::getLegend(*pModel);
     if (!xLegendProp.is())
         return -1;
 
@@ -264,7 +265,7 @@ void setLegendPos(const css::uno::Reference<css::frame::XModel>& xModel, sal_Int
     if (!pModel)
         return;
 
-    Reference< beans::XPropertySet > xLegendProp( LegendHelper::getLegend(*pModel), uno::UNO_QUERY );
+    rtl::Reference< Legend > xLegendProp = LegendHelper::getLegend(*pModel);
     if (!xLegendProp.is())
         return;
 
@@ -326,7 +327,7 @@ ChartElementsPanel::ChartElementsPanel(
     , mxLBGrid(m_xBuilder->weld_label("label_gri"))
     , mxLBLegendPosition(m_xBuilder->weld_combo_box("comboboxtext_legend"))
     , mxBoxLegend(m_xBuilder->weld_widget("box_legend"))
-    , mxModel(pController->getModel())
+    , mxModel(pController->getChartModel())
     , mxListener(new ChartSidebarModifyListener(this))
     , mbModelValid(true)
 {
@@ -373,8 +374,7 @@ ChartElementsPanel::~ChartElementsPanel()
 
 void ChartElementsPanel::Initialize()
 {
-    css::uno::Reference<css::util::XModifyBroadcaster> xBroadcaster(mxModel, css::uno::UNO_QUERY_THROW);
-    xBroadcaster->addModifyListener(mxListener);
+    mxModel->addModifyListener(mxListener);
     updateData();
 
     Link<weld::Toggleable&,void> aLink = LINK(this, ChartElementsPanel, CheckBoxHdl);
@@ -406,27 +406,21 @@ void ChartElementsPanel::Initialize()
 
 namespace {
 
-css::uno::Reference<css::chart2::XChartType> getChartType(const css::uno::Reference<css::frame::XModel>& xModel)
+rtl::Reference<ChartType> getChartType(const rtl::Reference<ChartModel>& xModel)
 {
-    css::uno::Reference<css::chart2::XChartDocument> xChartDoc(xModel, css::uno::UNO_QUERY_THROW);
-    css::uno::Reference<chart2::XDiagram > xDiagram = xChartDoc->getFirstDiagram();
-    if (!xDiagram.is()) {
-        return css::uno::Reference<css::chart2::XChartType>();
-    }
+    rtl::Reference<Diagram > xDiagram = xModel->getFirstChartDiagram();
+    if (!xDiagram.is())
+        return nullptr;
 
-    css::uno::Reference<css::chart2::XCoordinateSystemContainer > xCooSysContainer( xDiagram, css::uno::UNO_QUERY_THROW );
+    const std::vector<rtl::Reference<BaseCoordinateSystem>> & xCooSysSequence(xDiagram->getBaseCoordinateSystems());
 
-    css::uno::Sequence<css::uno::Reference<css::chart2::XCoordinateSystem>> xCooSysSequence(xCooSysContainer->getCoordinateSystems());
+    if (xCooSysSequence.empty())
+        return nullptr;
 
-    if (!xCooSysSequence.hasElements())
-        return css::uno::Reference<css::chart2::XChartType>();
+    const std::vector<rtl::Reference<ChartType>> & xChartTypeSequence(xCooSysSequence[0]->getChartTypes2());
 
-    css::uno::Reference<css::chart2::XChartTypeContainer> xChartTypeContainer(xCooSysSequence[0], css::uno::UNO_QUERY_THROW);
-
-    css::uno::Sequence<css::uno::Reference<css::chart2::XChartType>> xChartTypeSequence(xChartTypeContainer->getChartTypes());
-
-    if (!xChartTypeSequence.hasElements())
-        return css::uno::Reference<css::chart2::XChartType>();
+    if (xChartTypeSequence.empty())
+        return nullptr;
 
     return xChartTypeSequence[0];
 }
@@ -438,7 +432,7 @@ void ChartElementsPanel::updateData()
     if (!mbModelValid)
         return;
 
-    Reference< chart2::XDiagram > xDiagram(ChartModelHelper::findDiagram(mxModel));
+    rtl::Reference< Diagram > xDiagram(ChartModelHelper::findDiagram(mxModel));
     sal_Int32 nDimension = DiagramHelper::getDimension(xDiagram);
     SolarMutexGuard aGuard;
 
@@ -562,12 +556,11 @@ void ChartElementsPanel::modelInvalid()
     mbModelValid = false;
 }
 
-void ChartElementsPanel::doUpdateModel(css::uno::Reference<css::frame::XModel> xModel)
+void ChartElementsPanel::doUpdateModel(rtl::Reference<::chart::ChartModel> xModel)
 {
     if (mbModelValid)
     {
-        css::uno::Reference<css::util::XModifyBroadcaster> xBroadcaster(mxModel, css::uno::UNO_QUERY_THROW);
-        xBroadcaster->removeModifyListener(mxListener);
+        mxModel->removeModifyListener(mxListener);
     }
 
     mxModel = xModel;
@@ -576,13 +569,14 @@ void ChartElementsPanel::doUpdateModel(css::uno::Reference<css::frame::XModel> x
     if (!mbModelValid)
         return;
 
-    css::uno::Reference<css::util::XModifyBroadcaster> xBroadcasterNew(mxModel, css::uno::UNO_QUERY_THROW);
-    xBroadcasterNew->addModifyListener(mxListener);
+    mxModel->addModifyListener(mxListener);
 }
 
 void ChartElementsPanel::updateModel(css::uno::Reference<css::frame::XModel> xModel)
 {
-    doUpdateModel(xModel);
+    ::chart::ChartModel* pModel = dynamic_cast<::chart::ChartModel*>(xModel.get());
+    assert(!xModel || pModel);
+    doUpdateModel(pModel);
 }
 
 IMPL_LINK(ChartElementsPanel, CheckBoxHdl, weld::Toggleable&, rCheckBox, void)

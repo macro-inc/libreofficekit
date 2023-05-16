@@ -106,7 +106,7 @@ ModelToViewHelper::ModelToViewHelper(const SwTextNode &rNode,
     if (eMode & ExpandMode::HideDeletions)
         SwScriptInfo::selectRedLineDeleted(rNode, aHiddenMulti);
 
-    if (eMode & ExpandMode::ExpandFields)
+    if (eMode & ExpandMode::HideFieldmarkCommands)
     {
         // hide fieldmark commands
         IDocumentMarkAccess const& rIDMA(*rNode.GetDoc().getIDocumentMarkAccess());
@@ -119,8 +119,8 @@ ModelToViewHelper::ModelToViewHelper(const SwTextNode &rNode,
             {
                 pFieldMark = rIDMA.getFieldmarkFor(*cursor.GetPoint());
                 if (pFieldMark == nullptr
-                    || pFieldMark->GetMarkStart().nNode.GetNode().GetTextNode()->GetText()[
-                            pFieldMark->GetMarkStart().nContent.GetIndex()]
+                    || pFieldMark->GetMarkStart().GetNode().GetTextNode()->GetText()[
+                            pFieldMark->GetMarkStart().GetContentIndex()]
                         != CH_TXT_ATR_FORMELEMENT)
                 {
                     break;
@@ -135,20 +135,20 @@ ModelToViewHelper::ModelToViewHelper(const SwTextNode &rNode,
             {
                 break;
             }
-            assert(pFieldMark->GetMarkStart().nNode.GetNode().GetTextNode()->GetText()[pFieldMark->GetMarkStart().nContent.GetIndex()] != CH_TXT_ATR_FORMELEMENT);
+            assert(pFieldMark->GetMarkStart().GetNode().GetTextNode()->GetText()[pFieldMark->GetMarkStart().GetContentIndex()] != CH_TXT_ATR_FORMELEMENT);
             // getFieldmarkFor may also return one that starts at rNode,0 -
             // skip it, must be handled in loop below
-            if (pFieldMark->GetMarkStart().nNode < rNode)
+            if (pFieldMark->GetMarkStart().GetNode() < rNode)
             {
                 // this can be a nested field's end - skip over those!
-                if (pFieldMark->GetMarkEnd().nNode < rNode)
+                if (pFieldMark->GetMarkEnd().GetNode() < rNode)
                 {
-                    assert(cursor.GetPoint()->nNode.GetNode().GetTextNode()->GetText()[cursor.GetPoint()->nContent.GetIndex()] == CH_TXT_ATR_FIELDEND);
+                    assert(cursor.GetPoint()->GetNode().GetTextNode()->GetText()[cursor.GetPoint()->GetContentIndex()] == CH_TXT_ATR_FIELDEND);
                 }
                 else
                 {
                     SwPosition const sepPos(::sw::mark::FindFieldSep(*pFieldMark));
-                    startedFields.emplace_front(pFieldMark, sepPos.nNode < rNode);
+                    startedFields.emplace_front(pFieldMark, sepPos.GetNode() < rNode);
                 }
                 *cursor.GetPoint() = pFieldMark->GetMarkStart();
             }
@@ -169,7 +169,7 @@ ModelToViewHelper::ModelToViewHelper(const SwTextNode &rNode,
             {
                 case CH_TXT_ATR_FIELDSTART:
                 {
-                    auto const pFieldMark(rIDMA.getFieldmarkAt(SwPosition(const_cast<SwTextNode&>(rNode), i)));
+                    auto const pFieldMark(rIDMA.getFieldmarkAt(SwPosition(rNode, i)));
                     assert(pFieldMark);
                     startedFields.emplace_back(pFieldMark, false);
                     if (!oStartHidden)
@@ -180,21 +180,29 @@ ModelToViewHelper::ModelToViewHelper(const SwTextNode &rNode,
                 }
                 case CH_TXT_ATR_FIELDSEP:
                 {
-                    assert(startedFields.back().first->IsCoveringPosition(SwPosition(const_cast<SwTextNode&>(rNode), i)));
+                    assert(startedFields.back().first->IsCoveringPosition(SwPosition(rNode, i)));
                     startedFields.back().second = true;
                     assert(oStartHidden);
                     if (::std::all_of(startedFields.begin(), startedFields.end(),
                             [](auto const& it) { return it.second; }))
                     {
+// prevent -Werror=maybe-uninitialized under gcc 11.2.0
+#if defined __GNUC__ && !defined __clang__ && __GNUC__ >= 11 && __GNUC__ <= 12
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
                         // i is still hidden but the Range end is oddly "-1"
                         aHiddenMulti.Select({*oStartHidden, i}, true);
                         oStartHidden.reset();
+#if defined __GNUC__ && !defined __clang__ && __GNUC__ >= 11 && __GNUC__ <= 12
+#pragma GCC diagnostic pop
+#endif
                     }
                     break;
                 }
                 case CH_TXT_ATR_FIELDEND:
                 {
-                    assert(startedFields.back().first == rIDMA.getFieldmarkAt(SwPosition(const_cast<SwTextNode&>(rNode), i)));
+                    assert(startedFields.back().first == rIDMA.getFieldmarkAt(SwPosition(rNode, i)));
                     startedFields.pop_back();
                     aHiddenMulti.Select({i, i}, true);
                     break;
@@ -204,6 +212,22 @@ ModelToViewHelper::ModelToViewHelper(const SwTextNode &rNode,
         if (oStartHidden && rNode.Len() != 0)
         {
             aHiddenMulti.Select({*oStartHidden, rNode.Len() - 1}, true);
+        }
+    }
+    else if (eMode & ExpandMode::ExpandFields) // subset: only hide dummy chars
+    {
+        for (sal_Int32 i = 0; i < rNode.GetText().getLength(); ++i)
+        {
+            switch (rNode.GetText()[i])
+            {
+                case CH_TXT_ATR_FIELDSTART:
+                case CH_TXT_ATR_FIELDSEP:
+                case CH_TXT_ATR_FIELDEND:
+                {
+                    aHiddenMulti.Select({i, i}, true);
+                    break;
+                }
+            }
         }
     }
 
@@ -253,8 +277,14 @@ ModelToViewHelper::ModelToViewHelper(const SwTextNode &rNode,
                     FieldResult aFieldResult(nDummyCharPos);
                     switch (pAttr->Which())
                     {
-                        case RES_TXTATR_FIELD:
                         case RES_TXTATR_ANNOTATION:
+                            if (eMode & ExpandMode::ExpandFields)
+                            {
+                                // this uses CH_TXTATR_INWORD so replace with nothing
+                                aFieldResult.m_eType = FieldResult::FIELD;
+                            }
+                            break;
+                        case RES_TXTATR_FIELD:
                             if (eMode & ExpandMode::ExpandFields)
                             {
                                 // add a ZWSP before the expanded field in replace mode
@@ -294,7 +324,7 @@ ModelToViewHelper::ModelToViewHelper(const SwTextNode &rNode,
 
             for (sw::mark::IFieldmark *const pMark : aNoTextFieldmarks)
             {
-                const sal_Int32 nDummyCharPos = pMark->GetMarkStart().nContent.GetIndex();
+                const sal_Int32 nDummyCharPos = pMark->GetMarkStart().GetContentIndex();
                 if (aHiddenMulti.IsSelected(nDummyCharPos))
                     continue;
                 std::vector<block>::iterator aFind = std::find_if(aBlocks.begin(), aBlocks.end(),

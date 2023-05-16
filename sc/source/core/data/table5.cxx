@@ -75,7 +75,6 @@ void ScTable::UpdatePageBreaks(const ScRange* pUserArea)
         return;
     }
     SfxItemSet* pStyleSet = &pStyle->GetItemSet();
-    const SfxPoolItem* pItem;
 
     SCCOL nStartCol = 0;
     SCROW nStartRow = 0;
@@ -124,18 +123,15 @@ void ScTable::UpdatePageBreaks(const ScRange* pUserArea)
 
     if (!mbForceBreaks)
     {
-        if (pStyleSet->GetItemState(ATTR_PAGE_SCALETOPAGES, false, &pItem) == SfxItemState::SET)
+        if (const SfxUInt16Item* pItem = pStyleSet->GetItemIfSet(ATTR_PAGE_SCALETOPAGES, false))
         {
-            assert(dynamic_cast<const SfxUInt16Item*>(pItem) && "invalid Item");
-            bSkipColBreaks = bSkipRowBreaks
-                = static_cast<const SfxUInt16Item*>(pItem)->GetValue() > 0;
+            bSkipColBreaks = bSkipRowBreaks = pItem->GetValue() > 0;
         }
 
-        if (!bSkipColBreaks
-            && pStyleSet->GetItemState(ATTR_PAGE_SCALETO, false, &pItem) == SfxItemState::SET)
+        const ScPageScaleToItem* pScaleToItem;
+        if (!bSkipColBreaks && (pScaleToItem = pStyleSet->GetItemIfSet(ATTR_PAGE_SCALETO, false)))
         {
             // #i54993# when fitting to width or height, ignore only manual breaks in that direction
-            const ScPageScaleToItem* pScaleToItem = static_cast<const ScPageScaleToItem*>(pItem);
             if (pScaleToItem->GetWidth() > 0)
                 bSkipColBreaks = true;
             if (pScaleToItem->GetHeight() > 0)
@@ -773,6 +769,27 @@ SCROW ScTable::CountVisibleRows(SCROW nStartRow, SCROW nEndRow) const
     return nCount;
 }
 
+SCROW ScTable::CountHiddenRows(SCROW nStartRow, SCROW nEndRow) const
+{
+    SCROW nCount = 0;
+    SCROW nRow = nStartRow;
+    ScFlatBoolRowSegments::RangeData aData;
+    while (nRow <= nEndRow)
+    {
+        if (!mpHiddenRows->getRangeData(nRow, aData))
+            break;
+
+        if (aData.mnRow2 > nEndRow)
+            aData.mnRow2 = nEndRow;
+
+        if (aData.mbValue)
+            nCount += aData.mnRow2 - nRow + 1;
+
+        nRow = aData.mnRow2 + 1;
+    }
+    return nCount;
+}
+
 tools::Long ScTable::GetTotalRowHeight(SCROW nStartRow, SCROW nEndRow, bool bHiddenAsZero) const
 {
     tools::Long nHeight = 0;
@@ -794,6 +811,49 @@ tools::Long ScTable::GetTotalRowHeight(SCROW nStartRow, SCROW nEndRow, bool bHid
     }
 
     return nHeight;
+}
+
+SCCOL ScTable::CountVisibleCols(SCCOL nStartCol, SCCOL nEndCol) const
+{
+    assert(nStartCol <= nEndCol);
+    SCCOL nCount = 0;
+    SCCOL nCol = nStartCol;
+    ScFlatBoolColSegments::RangeData aData;
+    while (nCol <= nEndCol)
+    {
+        if (!mpHiddenCols->getRangeData(nCol, aData))
+            break;
+
+        if (aData.mnCol2 > nEndCol)
+            aData.mnCol2 = nEndCol;
+
+        if (!aData.mbValue)
+            nCount += aData.mnCol2 - nCol + 1;
+
+        nCol = aData.mnCol2 + 1;
+    }
+    return nCount;
+}
+
+SCCOL ScTable::CountHiddenCols(SCCOL nStartCol, SCCOL nEndCol) const
+{
+    SCCOL nCount = 0;
+    SCCOL nCol = nStartCol;
+    ScFlatBoolColSegments::RangeData aData;
+    while (nCol <= nEndCol)
+    {
+        if (!mpHiddenCols->getRangeData(nCol, aData))
+            break;
+
+        if (aData.mnCol2 > nEndCol)
+            aData.mnCol2 = nEndCol;
+
+        if (aData.mbValue)
+            nCount += aData.mnCol2 - nCol + 1;
+
+        nCol = aData.mnCol2 + 1;
+    }
+    return nCount;
 }
 
 SCCOLROW ScTable::LastHiddenColRow(SCCOLROW nPos, bool bCol) const
@@ -1214,13 +1274,13 @@ void ScTable::InvalidateTextWidth(const ScAddress* pAdrFrom, const ScAddress* pA
 
         if (bBroadcast)
         { // Only with CalcAsShown
-            switch (aCell.meType)
+            switch (aCell.getType())
             {
                 case CELLTYPE_VALUE:
                     rCol.Broadcast(nRow);
                     break;
                 case CELLTYPE_FORMULA:
-                    aCell.mpFormula->SetDirty();
+                    aCell.getFormula()->SetDirty();
                     break;
                 default:
                 {
@@ -1256,13 +1316,13 @@ void ScTable::InvalidateTextWidth(const ScAddress* pAdrFrom, const ScAddress* pA
 
             if (bBroadcast)
             { // Only with CalcAsShown
-                switch (aCell.meType)
+                switch (aCell.getType())
                 {
                     case CELLTYPE_VALUE:
                         aCol[nCol].Broadcast(nRow);
                         break;
                     case CELLTYPE_FORMULA:
-                        aCell.mpFormula->SetDirty();
+                        aCell.getFormula()->SetDirty();
                         break;
                     default:
                     {

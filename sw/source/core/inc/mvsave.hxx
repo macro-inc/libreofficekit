@@ -21,8 +21,10 @@
 
 #include <vcl/keycod.hxx>
 #include <IDocumentMarkAccess.hxx>
-#include <vector>
+#include <ndindex.hxx>
 #include <deque>
+#include <optional>
+#include <vector>
 #include <o3tl/typed_flags_set.hxx>
 
 namespace sfx2 {
@@ -33,8 +35,7 @@ class SvNumberFormatter;
 class SwDoc;
 class SwFormatAnchor;
 class SwFrameFormat;
-class SwIndex;
-class SwNodeIndex;
+class SwContentIndex;
 class SwNodeRange;
 class SwPaM;
 class SwNode;
@@ -49,11 +50,11 @@ namespace sw::mark
     public:
             SaveBookmark(
                 const ::sw::mark::IMark& rBkmk,
-                const SwNodeIndex& rMvPos,
-                const SwIndex* pIdx);
+                const SwNode& rMvPos,
+                std::optional<sal_Int32> oContentIdx);
             void SetInDoc(SwDoc* pDoc,
-                const SwNodeIndex&,
-                const SwIndex* pIdx =nullptr);
+                const SwNode&,
+                std::optional<sal_Int32> oContentIdx = std::nullopt);
 
     private:
             OUString m_aName;
@@ -90,11 +91,11 @@ namespace o3tl {
     template<> struct typed_flags<sw::mark::RestoreMode> : is_typed_flags<sw::mark::RestoreMode, 3> {};
 }
 
-void DelBookmarks(const SwNodeIndex& rStt,
-    const SwNodeIndex& rEnd,
+void DelBookmarks(SwNode& rStt,
+    const SwNode& rEnd,
     std::vector< ::sw::mark::SaveBookmark> * SaveBkmk =nullptr,
-    const SwIndex* pSttIdx =nullptr,
-    const SwIndex* pEndIdx =nullptr);
+    std::optional<sal_Int32> oStartContentIdx = std::nullopt,
+    std::optional<sal_Int32> oEndContentIdx = std::nullopt);
 
 /** data structure to temporarily hold fly anchor positions relative to some
  *  location. */
@@ -116,15 +117,15 @@ struct SaveFly
 typedef std::deque< SaveFly > SaveFlyArr;
 
 void RestFlyInRange( SaveFlyArr& rArr, const SwPosition& rSttIdx,
-                     const SwNodeIndex* pInsPos, bool isForceToStartPos = false);
+                     const SwNode* pInsPos, bool isForceToStartPos = false);
 void SaveFlyInRange( const SwNodeRange& rRg, SaveFlyArr& rArr );
 void SaveFlyInRange( const SwPaM& rPam, const SwPosition& rInsPos,
         SaveFlyArr& rArr, bool bMoveAllFlys, SwHistory * pHistory = nullptr);
 
-void DelFlyInRange( const SwNodeIndex& rMkNdIdx,
-                    const SwNodeIndex& rPtNdIdx,
-                    SwIndex const* pMkIdx = nullptr,
-                    SwIndex const* pPtIdx = nullptr);
+void DelFlyInRange( SwNode& rMkNd,
+                    SwNode& rPtNd,
+                    std::optional<sal_Int32> nMkContentIdx = std::nullopt,
+                    std::optional<sal_Int32> pPtContentIdx = std::nullopt);
 
 class SwDataChanged
 {
@@ -150,7 +151,7 @@ void PaMCorrAbs( const SwPaM& rRange,
                  const SwPosition& rNewPos );
 
 /// Sets all PaMs in OldNode to relative Pos
-void PaMCorrRel( const SwNodeIndex &rOldNode,
+void PaMCorrRel( const SwNode &rOldNode,
                  const SwPosition &rNewPos,
                  const sal_Int32 nOffset = 0 );
 
@@ -187,11 +188,11 @@ public:
 class SaveRedlEndPosForRestore
 {
     std::vector<SwPosition*> mvSavArr;
-    std::unique_ptr<SwNodeIndex> mpSaveIndex;
+    std::optional<SwNodeIndex> moSaveIndex;
     sal_Int32 mnSaveContent;
 
 public:
-    SaveRedlEndPosForRestore( const SwNodeIndex& rInsIdx, sal_Int32 nContent );
+    SaveRedlEndPosForRestore( const SwNode& rInsIdx, sal_Int32 nContent );
     ~SaveRedlEndPosForRestore();
     void Restore();
 };

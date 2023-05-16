@@ -64,6 +64,13 @@ public:
     virtual bool ConvertToGreyscale() override;
     virtual bool Erase(const Color& color) override;
     virtual bool AlphaBlendWith(const SalBitmap& rSalBmp) override;
+#if defined MACOSX || defined IOS
+    virtual CGImageRef CreateWithMask(const SalBitmap& rMask, int nX, int nY, int nWidth,
+                                      int nHeight) const override;
+    virtual CGImageRef CreateColorMask(int nX, int nY, int nWidth, int nHeight,
+                                       Color nMaskColor) const override;
+    virtual CGImageRef CreateCroppedImage(int nX, int nY, int nWidth, int nHeight) const override;
+#endif
 
     const BitmapPalette& Palette() const { return mPalette; }
 
@@ -107,8 +114,12 @@ public:
     const sal_uInt8* unittestGetBuffer() const { return mBuffer.get(); }
     const SkImage* unittestGetImage() const { return mImage.get(); }
     const SkImage* unittestGetAlphaImage() const { return mAlphaImage.get(); }
+    void unittestResetToImage() { ResetToSkImage(GetSkImage()); }
 
 private:
+    // This should be called whenever the contents have (possibly) changed.
+    // It may reset some cached data such as the checksum.
+    void DataChanged();
     // Reset the state to pixel data (resets cached images allocated in GetSkImage()/GetAlphaSkImage()).
     void ResetToBuffer();
     // Sets the data only as SkImage (will be converted as needed).
@@ -207,7 +218,7 @@ private:
     // Erase() is delayed, just sets these two instead of filling the buffer.
     bool mEraseColorSet = false;
     Color mEraseColor;
-    int mAnyAccessCount = 0; // number of any kind of AcquireAccess() that have not been released
+    int mReadAccessCount = 0; // number of read AcquireAccess() that have not been released
 #ifdef DBG_UTIL
     int mWriteAccessCount = 0; // number of write AcquireAccess() that have not been released
 #endif

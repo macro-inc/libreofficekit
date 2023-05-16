@@ -23,8 +23,9 @@
 #include <com/sun/star/configuration/theDefaultProvider.hpp>
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/util/XChangesBatch.hpp>
+#include <utility>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace framework{
 
@@ -39,10 +40,10 @@ namespace framework{
     @param  eMode
                 force opening of the configuration access in readonly or in read/write mode
  */
-ConfigAccess::ConfigAccess( /*IN*/ const css::uno::Reference< css::uno::XComponentContext >& rxContext,
-                            /*IN*/ const OUString&                                    sRoot )
-    : m_xContext    ( rxContext)
-    , m_sRoot       ( sRoot    )
+ConfigAccess::ConfigAccess( /*IN*/ css::uno::Reference< css::uno::XComponentContext > xContext,
+                            /*IN*/ OUString                                     sRoot )
+    : m_xContext    (std::move( xContext))
+    , m_sRoot       (std::move( sRoot    ))
     , m_eMode       ( E_CLOSED )
 {
 }

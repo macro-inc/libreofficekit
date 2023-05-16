@@ -84,6 +84,8 @@ template<typename T1, typename T2>
 Any::Any(rtl::OUStringConcat<T1, T2> && value):
     Any(rtl::OUString(std::move(value)))
 {}
+template<typename T>
+Any::Any(rtl::OUStringNumber<T> && value): Any(rtl::OUString(std::move(value))) {}
 template <std::size_t N>
 Any::Any(const rtl::OUStringLiteral<N>& value): Any(rtl::OUString(value)) {}
 #endif
@@ -131,31 +133,30 @@ inline Any & Any::operator = ( const Any & rAny )
 
 #if defined LIBO_INTERNAL_ONLY
 
-namespace detail {
-
-inline void moveAnyInternals(Any & from, Any & to) noexcept {
-    uno_any_construct(&to, nullptr, nullptr, &cpp_acquire);
-    std::swap(from.pType, to.pType);
-    std::swap(from.pData, to.pData);
-    std::swap(from.pReserved, to.pReserved);
-    if (to.pData == &from.pReserved) {
-        to.pData = &to.pReserved;
+Any::Any(Any && other) noexcept {
+    uno_any_construct(this, nullptr, nullptr, &cpp_acquire);
+    std::swap(other.pType, pType);
+    std::swap(other.pData, pData);
+    std::swap(other.pReserved, pReserved);
+    if (pData == &other.pReserved) {
+        pData = &pReserved;
     }
-    // This leaves from.pData (where "from" is now VOID) dangling to somewhere (cf.
+    // This leaves other.pData (where "other" is now VOID) dangling to somewhere (cf.
     // CONSTRUCT_EMPTY_ANY, cppu/source/uno/prim.hxx), but what's relevant is
     // only that it isn't a nullptr (as e.g. >>= -> uno_type_assignData ->
     // _assignData takes a null pSource to mean "construct a default value").
 }
 
-}
-
-Any::Any(Any && other) noexcept {
-    detail::moveAnyInternals(other, *this);
-}
-
 Any & Any::operator =(Any && other) noexcept {
-    uno_any_destruct(this, &cpp_release);
-    detail::moveAnyInternals(other, *this);
+    std::swap(other.pType, pType);
+    std::swap(other.pData, pData);
+    std::swap(other.pReserved, pReserved);
+    if (pData == &other.pReserved) {
+        pData = &pReserved;
+    }
+    if (other.pData == &pReserved) {
+        other.pData = &other.pReserved;
+    }
     return *this;
 }
 
@@ -204,7 +205,7 @@ inline bool Any::isExtractableTo( const Type & rType ) const
 template <typename T>
 inline bool Any::has() const
 {
-    Type const & rType = ::cppu::getTypeFavourUnsigned(static_cast< T * >(0));
+    Type const & rType = ::cppu::getTypeFavourUnsigned(static_cast< T * >(NULL));
     return ::uno_type_isAssignableFromData(
         rType.getTypeLibType(), pData, pType,
         cpp_queryInterface,
@@ -230,38 +231,32 @@ inline bool Any::operator != ( const Any & rAny ) const
 }
 
 
+#if !defined LIBO_INTERNAL_ONLY
 template< class C >
 inline Any SAL_CALL makeAny( const C & value )
 {
     return Any(value);
 }
 
-#if !defined LIBO_INTERNAL_ONLY
 template<> Any makeAny(sal_uInt16 const & value)
 { return Any(&value, cppu::UnoType<cppu::UnoUnsignedShortType>::get()); }
 #endif
 
-template<typename T> Any toAny(T const & value) { return makeAny(value); }
+template<typename T> Any toAny(T const & value) {
+    return Any(value);
+}
 
 template<> Any toAny(Any const & value) { return value; }
 
 #if defined LIBO_INTERNAL_ONLY
 
 template<typename T1, typename T2>
-Any makeAny(rtl::OUStringConcat<T1, T2> && value)
-{ return Any(std::move(value)); }
-
-template<typename T1, typename T2>
 Any toAny(rtl::OUStringConcat<T1, T2> && value)
-{ return makeAny(std::move(value)); }
-
-template<typename T>
-Any makeAny(rtl::OUStringNumber<T> && value)
-{ return Any(OUString(std::move(value))); }
+{ return Any(std::move(value)); }
 
 template<typename T>
 Any toAny(rtl::OUStringNumber<T> && value)
-{ return makeAny(std::move(value)); }
+{ return Any(std::move(value)); }
 
 template<typename T> bool fromAny(Any const & any, T * value) {
     assert(value != nullptr);
@@ -299,7 +294,7 @@ inline void SAL_CALL operator <<= ( Any & rAny, bool const & value )
 
 #ifdef LIBO_INTERNAL_ONLY // "RTL_FAST_STRING"
 template< class C1, class C2 >
-inline void SAL_CALL operator <<= ( Any & rAny, rtl::OUStringConcat< C1, C2 >&& value )
+inline void operator <<= ( Any & rAny, rtl::OUStringConcat< C1, C2 >&& value )
 {
     const rtl::OUString str( std::move(value) );
     const Type & rType = ::cppu::getTypeFavourUnsigned(&str);
@@ -310,7 +305,7 @@ inline void SAL_CALL operator <<= ( Any & rAny, rtl::OUStringConcat< C1, C2 >&& 
 template<typename T1, typename T2>
 void operator <<=(Any &, rtl::OUStringConcat<T1, T2> const &) = delete;
 template< class C >
-inline void SAL_CALL operator <<= ( Any & rAny, rtl::OUStringNumber< C >&& value )
+inline void operator <<= ( Any & rAny, rtl::OUStringNumber< C >&& value )
 {
     const rtl::OUString str( std::move(value) );
     const Type & rType = ::cppu::getTypeFavourUnsigned(&str);
@@ -605,6 +600,14 @@ inline bool SAL_CALL operator == ( const Any & rAny, const ::rtl::OUString & val
     return (typelib_TypeClass_STRING == rAny.pType->eTypeClass &&
             value == * static_cast< const ::rtl::OUString * >( rAny.pData ) );
 }
+
+#if defined LIBO_INTERNAL_ONLY
+template<std::size_t N>
+inline bool SAL_CALL operator == (const Any& rAny, const rtl::OUStringLiteral<N>& value)
+{
+    return operator ==(rAny, rtl::OUString(value));
+}
+#endif
 // type
 
 template<>

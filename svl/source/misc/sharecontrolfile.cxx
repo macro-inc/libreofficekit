@@ -44,7 +44,7 @@ using namespace ::com::sun::star;
 namespace svt {
 
 
-ShareControlFile::ShareControlFile( const OUString& aOrigURL )
+ShareControlFile::ShareControlFile( std::u16string_view aOrigURL )
     : LockFileCommon(GenerateOwnLockFileURL(aOrigURL, u".~sharing."))
 {
     if ( !m_xStream.is() && !GetURL().isEmpty() )
@@ -76,11 +76,11 @@ ShareControlFile::ShareControlFile( const OUString& aOrigURL )
                 ucb::InsertCommandArgument aInsertArg;
                 aInsertArg.Data = xInput;
                 aInsertArg.ReplaceExisting = false;
-                aContent.executeCommand( "insert", uno::makeAny( aInsertArg ) );
+                aContent.executeCommand( "insert", uno::Any( aInsertArg ) );
 
                 // try to let the file be hidden if possible
                 try {
-                    aContent.setPropertyValue("IsHidden", uno::makeAny( true ) );
+                    aContent.setPropertyValue("IsHidden", uno::Any( true ) );
                 } catch( uno::Exception& ) {}
 
                 // Try to open one more time
@@ -201,7 +201,7 @@ void ShareControlFile::SetUsersDataAndStore( std::vector< LockFileEntry >&& aUse
         }
     }
 
-    OString aStringData( OUStringToOString( aBuffer.makeStringAndClear(), RTL_TEXTENCODING_UTF8 ) );
+    OString aStringData( OUStringToOString( aBuffer, RTL_TEXTENCODING_UTF8 ) );
     uno::Sequence< sal_Int8 > aData( reinterpret_cast<sal_Int8 const *>(aStringData.getStr()), aStringData.getLength() );
     m_xOutputStream->writeBytes( aData );
     m_aUsersData = aUsersData;

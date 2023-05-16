@@ -27,12 +27,11 @@
 #include <svx/ImageMapInfo.hxx>
 #include <vcl/svapp.hxx>
 #include <sfx2/event.hxx>
-#include <svx/unoshape.hxx>
 #include <editeng/unofield.hxx>
 #include <toolkit/helper/convert.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/drawing/XShape.hpp>
 #include <com/sun/star/lang/NoSupportException.hpp>
@@ -48,19 +47,18 @@
 
 using namespace ::com::sun::star;
 
-static const SfxItemPropertyMapEntry* lcl_GetShapeMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetShapeMap()
 {
     static const SfxItemPropertyMapEntry aShapeMap_Impl[] =
     {
-        {u"" SC_UNONAME_ANCHOR, 0, cppu::UnoType<uno::XInterface>::get(), 0, 0 },
-        {u"" SC_UNONAME_RESIZE_WITH_CELL, 0, cppu::UnoType<sal_Bool>::get(), 0, 0 },
-        {u"" SC_UNONAME_HORIPOS, 0, cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_IMAGEMAP, 0, cppu::UnoType<container::XIndexContainer>::get(), 0, 0 },
-        {u"" SC_UNONAME_VERTPOS, 0, cppu::UnoType<sal_Int32>::get(), 0, 0 },
-        {u"" SC_UNONAME_MOVEPROTECT, 0, cppu::UnoType<sal_Bool>::get(), 0, 0 },
-        {u"" SC_UNONAME_HYPERLINK, 0, cppu::UnoType<OUString>::get(), 0, 0 },
-        {u"" SC_UNONAME_URL, 0, cppu::UnoType<OUString>::get(), 0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_ANCHOR, 0, cppu::UnoType<uno::XInterface>::get(), 0, 0 },
+        { SC_UNONAME_RESIZE_WITH_CELL, 0, cppu::UnoType<sal_Bool>::get(), 0, 0 },
+        { SC_UNONAME_HORIPOS, 0, cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_IMAGEMAP, 0, cppu::UnoType<container::XIndexContainer>::get(), 0, 0 },
+        { SC_UNONAME_VERTPOS, 0, cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { SC_UNONAME_MOVEPROTECT, 0, cppu::UnoType<sal_Bool>::get(), 0, 0 },
+        { SC_UNONAME_HYPERLINK, 0, cppu::UnoType<OUString>::get(), 0, 0 },
+        { SC_UNONAME_URL, 0, cppu::UnoType<OUString>::get(), 0, 0 },
     };
     return aShapeMap_Impl;
 }
@@ -996,8 +994,6 @@ uno::Any SAL_CALL ScShapeObj::getPropertyDefault( const OUString& aPropertyName 
 
 void SAL_CALL ScShapeObj::attach( const uno::Reference<text::XTextRange>& /* xTextRange */ )
 {
-    SolarMutexGuard aGuard;
-
     throw lang::IllegalArgumentException();     // anchor cannot be changed
 }
 
@@ -1070,9 +1066,8 @@ void SAL_CALL ScShapeObj::removeEventListener(
 // XText
 // (special handling for ScCellFieldObj)
 
-static void lcl_CopyOneProperty( beans::XPropertySet& rDest, beans::XPropertySet& rSource, const char* pName )
+static void lcl_CopyOneProperty( beans::XPropertySet& rDest, beans::XPropertySet& rSource, const OUString& aNameStr )
 {
-    OUString aNameStr(OUString::createFromAscii(pName));
     try
     {
         rDest.setPropertyValue( aNameStr, rSource.getPropertyValue( aNameStr ) );

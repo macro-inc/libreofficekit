@@ -2,12 +2,13 @@ package org.libreoffice;
 
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -23,12 +24,15 @@ import java.util.Iterator;
 
 public class FontController implements AdapterView.OnItemSelectedListener {
 
+    /** -1 as value in ".uno:Color" et al. means "automatic color"/no color set. */
+    private static final int COLOR_AUTO = -1;
+
     private boolean mFontNameSpinnerSet = false;
     private boolean mFontSizeSpinnerSet = false;
     private final LibreOfficeMainActivity mActivity;
-    private final ArrayList<String> mFontList = new ArrayList<String>();
-    private final ArrayList<String> mFontSizes = new ArrayList<String>();
-    private final HashMap<String, ArrayList<String>> mAllFontSizes = new HashMap<String, ArrayList<String>>();
+    private final ArrayList<String> mFontList = new ArrayList<>();
+    private final ArrayList<String> mFontSizes = new ArrayList<>();
+    private final HashMap<String, ArrayList<String>> mAllFontSizes = new HashMap<>();
 
     private String mCurrentFontSelected = null;
     private String mCurrentFontSizeSelected = null;
@@ -45,29 +49,44 @@ public class FontController implements AdapterView.OnItemSelectedListener {
     final ColorPaletteListener colorPaletteListener = new ColorPaletteListener() {
         @Override
         public void applyColor(int color) {
-            sendFontColorChange(color);
+            sendFontColorChange(color, false);
         }
 
         @Override
         public void updateColorPickerPosition(int color) {
-            if (null == colorPickerAdapter) return;
-            colorPickerAdapter.findSelectedTextColor(color + 0xFF000000);
-            changeFontColorBoxColor(color + 0xFF000000);
+            if (colorPickerAdapter == null) {
+                return;
+            }
+            if (color == COLOR_AUTO) {
+                colorPickerAdapter.unselectColors();
+                changeFontColorBoxColor(Color.TRANSPARENT);
+                return;
+            }
+            final int colorWithAlpha = color | 0xFF000000;
+            colorPickerAdapter.findSelectedTextColor(colorWithAlpha);
+            changeFontColorBoxColor(colorWithAlpha);
         }
     };
 
     final ColorPaletteListener backColorPaletteListener = new ColorPaletteListener() {
         @Override
         public void applyColor(int color) {
-            sendFontBackColorChange(color);
+            sendFontBackColorChange(color, false);
         }
 
         @Override
         public void updateColorPickerPosition(int color) {
-            if(backColorPickerAdapter != null)
-            backColorPickerAdapter.findSelectedTextColor(color + 0xFF000000);
-            changeFontBackColorBoxColor(color + 0xFF000000);
-
+            if (backColorPickerAdapter == null) {
+                return;
+            }
+            if (color == COLOR_AUTO) {
+                backColorPickerAdapter.unselectColors();
+                changeFontBackColorBoxColor(Color.TRANSPARENT);
+                return;
+            }
+            final int colorWithAlpha = color | 0xFF000000;
+            backColorPickerAdapter.findSelectedTextColor(colorWithAlpha);
+            changeFontBackColorBoxColor(colorWithAlpha);
         }
     };
 
@@ -77,11 +96,7 @@ public class FontController implements AdapterView.OnItemSelectedListener {
         LOKitShell.getMainHandler().post(new Runnable() {
             @Override
             public void run() {
-                if(color == -1){ //Libreoffice recognizes -1 as black
-                    fontColorPickerButton.setBackgroundColor(Color.BLACK);
-                }else{
-                    fontColorPickerButton.setBackgroundColor(color);
-                }
+                fontColorPickerButton.setBackgroundColor(color);
             }
         });
     }
@@ -92,12 +107,7 @@ public class FontController implements AdapterView.OnItemSelectedListener {
         LOKitShell.getMainHandler().post(new Runnable() {
             @Override
             public void run() {
-                if(color == -1){ //Libreoffice recognizes -1 as black
-                    fontBackColorPickerButton.setBackgroundColor(Color.BLACK);
-                }else{
-                    fontBackColorPickerButton.setBackgroundColor(color);
-
-                }
+                fontBackColorPickerButton.setBackgroundColor(color);
             }
         });
     }
@@ -132,12 +142,12 @@ public class FontController implements AdapterView.OnItemSelectedListener {
         }
     }
 
-    private void sendFontColorChange(int color){
+    private void sendFontColorChange(int color, boolean keepAlpha){
         try {
             JSONObject json = new JSONObject();
             JSONObject valueJson = new JSONObject();
             valueJson.put("type", "long");
-            valueJson.put("value", 0x00FFFFFF & color);
+            valueJson.put("value", keepAlpha ? color : 0x00FFFFFF & color);
             json.put("Color", valueJson);
 
             LOKitShell.sendEvent(new LOEvent(LOEvent.UNO_COMMAND, ".uno:Color", json.toString()));
@@ -152,12 +162,12 @@ public class FontController implements AdapterView.OnItemSelectedListener {
      * 0x00FFFFFF & color operation removes the alpha which is FF,
      * if we don't remove it, the color value becomes negative which is not recognized by LOK
      */
-    private void sendFontBackColorChange(int color){
+    private void sendFontBackColorChange(int color, boolean keepAlpha) {
         try {
             JSONObject json = new JSONObject();
             JSONObject valueJson = new JSONObject();
             valueJson.put("type", "long");
-            valueJson.put("value", 0x00FFFFFF & color);
+            valueJson.put("value", keepAlpha ? color : 0x00FFFFFF & color);
             if(mActivity.getTileProvider().isSpreadsheet()){
                 json.put("BackgroundColor", valueJson);
                 LOKitShell.sendEvent(new LOEvent(LOEvent.UNO_COMMAND, ".uno:BackgroundColor", json.toString()));
@@ -213,7 +223,7 @@ public class FontController implements AdapterView.OnItemSelectedListener {
                 String key = keys.next();
                 mFontList.add(key);
                 JSONArray array = jObject2.getJSONArray(key);
-                fontSizes = new ArrayList<String>();
+                fontSizes = new ArrayList<>();
                 for (int i = 0; i < array.length(); i++) {
                     fontSizes.add(array.getString(i));
                 }
@@ -237,14 +247,14 @@ public class FontController implements AdapterView.OnItemSelectedListener {
 
     private void setupFontNameSpinner() {
         Spinner fontSpinner = mActivity.findViewById(R.id.font_name_spinner);
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_item, mFontList);
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(mActivity, android.R.layout.simple_spinner_item, mFontList);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         fontSpinner.setAdapter(dataAdapter);
     }
 
     private void setupFontSizeSpinner() {
         Spinner fontSizeSpinner = mActivity.findViewById(R.id.font_size_spinner);
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_item, mFontSizes);
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(mActivity, android.R.layout.simple_spinner_item, mFontSizes);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         fontSizeSpinner.setAdapter(dataAdapter);
     }
@@ -306,6 +316,10 @@ public class FontController implements AdapterView.OnItemSelectedListener {
         fontColorPicker.setOnClickListener(clickListener);
         fontColorPickerButton.setOnClickListener(clickListener);
 
+        final Button autoColorButton = colorPickerLayout.findViewById(R.id.button_auto_color);
+        autoColorButton.setOnClickListener(view -> {
+            sendFontColorChange(COLOR_AUTO, true);
+        });
     }
 
     private void setupBackColorPicker(){
@@ -365,6 +379,10 @@ public class FontController implements AdapterView.OnItemSelectedListener {
         fontColorPicker.setOnClickListener(clickListener);
         fontColorPickerButton.setOnClickListener(clickListener);
 
+        final Button autoColorButton = backColorPickerLayout.findViewById(R.id.button_auto_color);
+        autoColorButton.setOnClickListener(view -> {
+            sendFontBackColorChange(COLOR_AUTO, true);
+        });
     }
 
     public void selectFont(final String fontName) {

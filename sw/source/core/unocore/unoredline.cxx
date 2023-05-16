@@ -20,6 +20,7 @@
 #include <sal/config.h>
 #include <sal/log.hxx>
 #include <com/sun/star/text/XTextSection.hpp>
+#include <comphelper/propertyvalue.hxx>
 #include <cppuhelper/typeprovider.hxx>
 #include <vcl/svapp.hxx>
 
@@ -89,6 +90,11 @@ uno::Sequence<sal_Int8> SwXRedlineText::getImplementationId()
     return css::uno::Sequence<sal_Int8>();
 }
 
+uno::Reference<text::XTextCursor> SwXRedlineText::CreateCursor()
+{
+    return createTextCursor();
+}
+
 uno::Reference<text::XTextCursor> SwXRedlineText::createTextCursor()
 {
     SolarMutexGuard aGuard;
@@ -104,18 +110,15 @@ uno::Reference<text::XTextCursor> SwXRedlineText::createTextCursor()
     // Patterned after SwXTextFrame::createTextCursor().
 
     // skip all tables at the beginning
-    SwTableNode* pTableNode = rUnoCursor.GetNode().FindTableNode();
-    SwContentNode* pContentNode = nullptr;
+    SwTableNode* pTableNode = rUnoCursor.GetPointNode().FindTableNode();
     bool bTable = pTableNode != nullptr;
     while( pTableNode != nullptr )
     {
-        rUnoCursor.GetPoint()->nNode = *(pTableNode->EndOfSectionNode());
-        pContentNode = GetDoc()->GetNodes().GoNext(&rUnoCursor.GetPoint()->nNode);
+        rUnoCursor.GetPoint()->Assign( *pTableNode->EndOfSectionNode() );
+        SwContentNode* pContentNode = GetDoc()->GetNodes().GoNext(rUnoCursor.GetPoint());
         pTableNode = pContentNode->FindTableNode();
     }
-    if( pContentNode != nullptr )
-        rUnoCursor.GetPoint()->nContent.Assign( pContentNode, 0 );
-    if( bTable && rUnoCursor.GetNode().FindSttNodeByType( SwNormalStartNode )
+    if( bTable && rUnoCursor.GetPointNode().FindSttNodeByType( SwNormalStartNode )
                                                             != GetStartNode() )
     {
         // We have gone too far and have left our own redline. This means that
@@ -175,24 +178,20 @@ SwXRedlinePortion::~SwXRedlinePortion()
 
 static uno::Sequence<beans::PropertyValue> lcl_GetSuccessorProperties(const SwRangeRedline& rRedline)
 {
-    uno::Sequence<beans::PropertyValue> aValues(4);
-
     const SwRedlineData* pNext = rRedline.GetRedlineData().Next();
     if(pNext)
     {
-        beans::PropertyValue* pValues = aValues.getArray();
-        pValues[0].Name = UNO_NAME_REDLINE_AUTHOR;
-        // GetAuthorString(n) walks the SwRedlineData* chain;
-        // here we always need element 1
-        pValues[0].Value <<= rRedline.GetAuthorString(1);
-        pValues[1].Name = UNO_NAME_REDLINE_DATE_TIME;
-        pValues[1].Value <<= pNext->GetTimeStamp().GetUNODateTime();
-        pValues[2].Name = UNO_NAME_REDLINE_COMMENT;
-        pValues[2].Value <<= pNext->GetComment();
-        pValues[3].Name = UNO_NAME_REDLINE_TYPE;
-        pValues[3].Value <<= SwRedlineTypeToOUString(pNext->GetType());
+        return
+        {
+            // GetAuthorString(n) walks the SwRedlineData* chain;
+            // here we always need element 1
+            comphelper::makePropertyValue(UNO_NAME_REDLINE_AUTHOR, rRedline.GetAuthorString(1)),
+            comphelper::makePropertyValue(UNO_NAME_REDLINE_DATE_TIME, pNext->GetTimeStamp().GetUNODateTime()),
+            comphelper::makePropertyValue(UNO_NAME_REDLINE_COMMENT, pNext->GetComment()),
+            comphelper::makePropertyValue(UNO_NAME_REDLINE_TYPE, SwRedlineTypeToOUString(pNext->GetType()))
+        };
     }
-    return aValues;
+    return uno::Sequence<beans::PropertyValue>(4);
 }
 
 uno::Any SwXRedlinePortion::getPropertyValue( const OUString& rPropertyName )
@@ -205,7 +204,7 @@ uno::Any SwXRedlinePortion::getPropertyValue( const OUString& rPropertyName )
     uno::Any aRet;
     if(rPropertyName == UNO_NAME_REDLINE_TEXT)
     {
-        SwNodeIndex* pNodeIdx = m_rRedline.GetContentIdx();
+        const SwNodeIndex* pNodeIdx = m_rRedline.GetContentIdx();
         if(pNodeIdx )
         {
             if ( SwNodeOffset(1) < ( pNodeIdx->GetNode().EndOfSectionIndex() - pNodeIdx->GetNode().GetIndex() ) )
@@ -252,35 +251,35 @@ uno::Sequence< sal_Int8 > SAL_CALL SwXRedlinePortion::getImplementationId(  )
 uno::Any  SwXRedlinePortion::GetPropertyValue( std::u16string_view rPropertyName, const SwRangeRedline& rRedline )
 {
     uno::Any aRet;
-    if(rPropertyName == u"" UNO_NAME_REDLINE_AUTHOR)
+    if(rPropertyName == UNO_NAME_REDLINE_AUTHOR)
         aRet <<= rRedline.GetAuthorString();
-    else if(rPropertyName == u"" UNO_NAME_REDLINE_DATE_TIME)
+    else if(rPropertyName == UNO_NAME_REDLINE_DATE_TIME)
     {
         aRet <<= rRedline.GetTimeStamp().GetUNODateTime();
     }
-    else if(rPropertyName == u"" UNO_NAME_REDLINE_COMMENT)
+    else if(rPropertyName == UNO_NAME_REDLINE_COMMENT)
         aRet <<= rRedline.GetComment();
-    else if(rPropertyName == u"" UNO_NAME_REDLINE_DESCRIPTION)
+    else if(rPropertyName == UNO_NAME_REDLINE_DESCRIPTION)
         aRet <<= const_cast<SwRangeRedline&>(rRedline).GetDescr();
-    else if(rPropertyName == u"" UNO_NAME_REDLINE_TYPE)
+    else if(rPropertyName == UNO_NAME_REDLINE_TYPE)
     {
         aRet <<= SwRedlineTypeToOUString(rRedline.GetType());
     }
-    else if(rPropertyName == u"" UNO_NAME_REDLINE_SUCCESSOR_DATA)
+    else if(rPropertyName == UNO_NAME_REDLINE_SUCCESSOR_DATA)
     {
         if(rRedline.GetRedlineData().Next())
             aRet <<= lcl_GetSuccessorProperties(rRedline);
     }
-    else if (rPropertyName == u"" UNO_NAME_REDLINE_IDENTIFIER)
+    else if (rPropertyName == UNO_NAME_REDLINE_IDENTIFIER)
     {
         aRet <<= OUString::number(
             sal::static_int_cast< sal_Int64 >( reinterpret_cast< sal_IntPtr >(&rRedline) ) );
     }
-    else if (rPropertyName == u"" UNO_NAME_IS_IN_HEADER_FOOTER)
+    else if (rPropertyName == UNO_NAME_IS_IN_HEADER_FOOTER)
     {
-        aRet <<= rRedline.GetDoc().IsInHeaderFooter( rRedline.GetPoint()->nNode );
+        aRet <<= rRedline.GetDoc().IsInHeaderFooter( rRedline.GetPoint()->GetNode() );
     }
-    else if (rPropertyName == u"" UNO_NAME_MERGE_LAST_PARA)
+    else if (rPropertyName == UNO_NAME_MERGE_LAST_PARA)
     {
         aRet <<= !rRedline.IsDelLastPara();
     }
@@ -317,7 +316,7 @@ uno::Sequence< beans::PropertyValue > SwXRedlinePortion::CreateRedlineProperties
     pRet[nPropIdx].Name = UNO_NAME_MERGE_LAST_PARA;
     pRet[nPropIdx++].Value <<= !rRedline.IsDelLastPara();
 
-    SwNodeIndex* pNodeIdx = rRedline.GetContentIdx();
+    const SwNodeIndex* pNodeIdx = rRedline.GetContentIdx();
     if(pNodeIdx )
     {
         if ( SwNodeOffset(1) < ( pNodeIdx->GetNode().EndOfSectionIndex() - pNodeIdx->GetNode().GetIndex() ) )
@@ -408,9 +407,9 @@ uno::Any SwXRedline::getPropertyValue( const OUString& rPropertyName )
         rPropertyName == UNO_NAME_REDLINE_END)
     {
         uno::Reference<XInterface> xRet;
-        SwNode* pNode = &m_pRedline->GetNode();
+        SwNode* pNode = &m_pRedline->GetPointNode();
         if(!bStart && m_pRedline->HasMark())
-            pNode = &m_pRedline->GetNode(false);
+            pNode = &m_pRedline->GetMarkNode();
         switch(pNode->GetNodeType())
         {
             case SwNodeType::Section:
@@ -436,9 +435,9 @@ uno::Any SwXRedline::getPropertyValue( const OUString& rPropertyName )
                     pPoint = m_pRedline->GetPoint();
                 else
                     pPoint = m_pRedline->GetMark();
-                const uno::Reference<text::XTextRange> xRange =
+                const rtl::Reference<SwXTextRange> xRange =
                     SwXTextRange::CreateXTextRange(*m_pDoc, *pPoint, nullptr);
-                xRet = xRange.get();
+                xRet = uno::Reference<text::XTextRange>(xRange);
             }
             break;
             default:
@@ -448,7 +447,7 @@ uno::Any SwXRedline::getPropertyValue( const OUString& rPropertyName )
     }
     else if(rPropertyName == UNO_NAME_REDLINE_TEXT)
     {
-        SwNodeIndex* pNodeIdx = m_pRedline->GetContentIdx();
+        const SwNodeIndex* pNodeIdx = m_pRedline->GetContentIdx();
         if( pNodeIdx )
         {
             if ( SwNodeOffset(1) < ( pNodeIdx->GetNode().EndOfSectionIndex() - pNodeIdx->GetNode().GetIndex() ) )
@@ -505,7 +504,7 @@ uno::Reference< container::XEnumeration >  SwXRedline::createEnumeration()
     if(!m_pDoc)
         throw uno::RuntimeException();
 
-    SwNodeIndex* pNodeIndex = m_pRedline->GetContentIdx();
+    const SwNodeIndex* pNodeIndex = m_pRedline->GetContentIdx();
     if(!pNodeIndex)
         return nullptr;
     SwPaM aPam(*pNodeIndex);
@@ -532,7 +531,7 @@ uno::Reference< text::XTextCursor >  SwXRedline::createTextCursor()
     if(!m_pDoc)
         throw uno::RuntimeException();
 
-    SwNodeIndex* pNodeIndex = m_pRedline->GetContentIdx();
+    const SwNodeIndex* pNodeIndex = m_pRedline->GetContentIdx();
     if(!pNodeIndex)
     {
         throw uno::RuntimeException();
@@ -545,16 +544,13 @@ uno::Reference< text::XTextCursor >  SwXRedline::createTextCursor()
     rUnoCursor.Move(fnMoveForward, GoInNode);
 
     // is here a table?
-    SwTableNode* pTableNode = rUnoCursor.GetNode().FindTableNode();
-    SwContentNode* pCont = nullptr;
+    SwTableNode* pTableNode = rUnoCursor.GetPointNode().FindTableNode();
     while( pTableNode )
     {
-        rUnoCursor.GetPoint()->nNode = *pTableNode->EndOfSectionNode();
-        pCont = GetDoc()->GetNodes().GoNext(&rUnoCursor.GetPoint()->nNode);
+        rUnoCursor.GetPoint()->Assign( *pTableNode->EndOfSectionNode() );
+        SwContentNode* pCont = GetDoc()->GetNodes().GoNext(rUnoCursor.GetPoint());
         pTableNode = pCont->FindTableNode();
     }
-    if(pCont)
-        rUnoCursor.GetPoint()->nContent.Assign(pCont, 0);
 
     return static_cast<text::XWordCursor*>(pXCursor.get());
 }

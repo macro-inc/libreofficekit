@@ -144,6 +144,7 @@ class AddressMultiLineEdit : public WeldEditView
     virtual css::uno::Reference<css::datatransfer::dnd::XDropTarget> GetDropTarget() override;
 
     virtual bool KeyInput(const KeyEvent& rKEvt) override;
+    virtual bool Command(const CommandEvent& rCEvt) override;
     virtual bool MouseButtonDown(const MouseEvent& rMEvt) override;
 
 public:
@@ -260,10 +261,6 @@ class SwAssignFieldsDialog : public SfxDialogController
     std::unique_ptr<weld::CustomWeld> m_xPreviewWin;
     std::unique_ptr<SwAssignFieldsControl> m_xFieldsControl;
 
-    std::unique_ptr<weld::SizeGroup> m_xLabelGroup;
-    std::unique_ptr<weld::SizeGroup> m_xComboGroup;
-    std::unique_ptr<weld::SizeGroup> m_xPreviewGroup;
-
     css::uno::Sequence< OUString > CreateAssignments();
     DECL_LINK(OkHdl_Impl, weld::Button&, void);
     DECL_LINK(AssignmentModifyHdl_Impl, LinkParamNone*, void);
@@ -271,7 +268,7 @@ class SwAssignFieldsDialog : public SfxDialogController
 public:
     SwAssignFieldsDialog(weld::Window* pParent,
                 SwMailMergeConfigItem& rConfigItem,
-                const OUString& rPreview,
+                OUString aPreview,
                 bool bIsAddressBlock);
 
     void ConnectSizeGroups(int nLabelWidth, int nComboBoxWidth, int nPreviewWidth);

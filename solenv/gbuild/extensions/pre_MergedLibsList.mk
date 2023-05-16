@@ -8,7 +8,7 @@
 #
 
 # we link all object files from these libraries into one, merged library
-MERGE_LIBRARY_LIST := \
+gb_MERGE_LIBRARY_LIST := \
 	avmedia \
 	$(if $(filter WNT,$(OS)),avmediawin) \
 	$(call gb_Helper_optional,SCRIPTING, \
@@ -27,8 +27,9 @@ MERGE_LIBRARY_LIST := \
 	deployment \
 	deploymentmisc \
 	$(if $(filter-out MACOSX WNT,$(OS)),desktopbe1) \
-	$(if $(USING_X11),desktop_detector) \
 	$(if $(filter WNT,$(OS)),directx9canvas) \
+	docmodel \
+	drawinglayercore \
 	drawinglayer \
 	editeng \
 	emfio \
@@ -48,9 +49,6 @@ MERGE_LIBRARY_LIST := \
 	i18nsearch \
 	i18npool \
 	i18nutil \
-	io \
-	$(if $(ENABLE_JAVA),javaloader) \
-	$(if $(ENABLE_JAVA),javavm) \
 	lng \
 	lnth \
 	localebe1 \
@@ -70,7 +68,7 @@ MERGE_LIBRARY_LIST := \
 	sofficeapp \
 	sot \
 	spell \
-	$(if $(DISABLE_GUI),,spl) \
+	$(if $(or $(DISABLE_GUI),$(ENABLE_WASM_STRIP_SPLASH)),,spl) \
 	srtrs1 \
 	$(call gb_Helper_optional,SCRIPTING,stringresource) \
 	svgio \
@@ -112,13 +110,13 @@ MERGE_LIBRARY_LIST := \
 # allow module-deps.pl to color based on this.
 ifneq ($(ENABLE_PRINT_DEPS),)
 
-$(info MergeLibContents: $(MERGE_LIBRARY_LIST))
+$(info MergeLibContents: $(gb_MERGE_LIBRARY_LIST))
 
 endif
 
 ifneq ($(MERGELIBS),)
 
-gb_MERGEDLIBS := $(MERGE_LIBRARY_LIST)
+gb_MERGEDLIBS := $(gb_MERGE_LIBRARY_LIST)
 
 endif
 

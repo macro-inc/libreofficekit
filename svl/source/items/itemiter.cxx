@@ -45,8 +45,6 @@ SfxItemIter::SfxItemIter(const SfxItemSet& rItemSet)
     m_nCurrent = m_nStart;
 }
 
-SfxItemIter::~SfxItemIter() {}
-
 // Precondition : m_nCurrent < m_nEnd
 const SfxPoolItem* SfxItemIter::ImplNextItem()
 {
@@ -56,6 +54,18 @@ const SfxPoolItem* SfxItemIter::ImplNextItem()
         m_nCurrent++;
     } while (m_nCurrent < m_nEnd && !*(ppFnd + m_nCurrent));
     return *(ppFnd + m_nCurrent);
+}
+
+SfxItemState SfxItemIter::GetItemState(bool bSrchInParent, const SfxPoolItem** ppItem) const
+{
+    sal_uInt16 nWhich = (*(m_rSet.m_ppItems + m_nCurrent))->Which();
+    return m_rSet.GetItemStateImpl(nWhich, bSrchInParent, ppItem, m_nCurrent);
+}
+
+void SfxItemIter::ClearItem()
+{
+    sal_uInt16 nWhich = (*(m_rSet.m_ppItems + m_nCurrent))->Which();
+    const_cast<SfxItemSet&>(m_rSet).ClearSingleItemImpl(nWhich, m_nCurrent);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

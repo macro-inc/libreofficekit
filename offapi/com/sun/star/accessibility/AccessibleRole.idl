@@ -17,9 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef __com_sun_star_accessibility_AccessibleRole_idl__
-#define __com_sun_star_accessibility_AccessibleRole_idl__
-
 module com { module sun { module star { module accessibility {
 
 /** Collection of roles.
@@ -737,13 +734,22 @@ constants AccessibleRole
            label.</p>
 
         <p>See also LABEL and TEXT.</p>
+
+        @since LibreOffice 6.2
     */
     const short STATIC = 86;
+
+    /** Notification text role.
+
+        <p>An object that presents information to the user when the SHOWING state change event is
+           fired for the object.</p>
+
+        @since LibreOffice 7.5
+    */
+    const short NOTIFICATION = 87;
 
 };
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

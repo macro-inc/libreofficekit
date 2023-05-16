@@ -21,7 +21,7 @@
 
 #include <sal/types.h>
 #include "ring.hxx"
-#include "index.hxx"
+#include "contentindex.hxx"
 #include "ndindex.hxx"
 #include "swdllapi.h"
 #include "nodeoffset.hxx"
@@ -36,12 +36,27 @@ class Point;
 struct SAL_WARN_UNUSED SW_DLLPUBLIC SwPosition
 {
     SwNodeIndex nNode;
-    SwIndex nContent;
+    SwContentIndex nContent;
 
-    SwPosition( const SwNodeIndex &rNode, const SwIndex &rContent );
-    explicit SwPosition( const SwNodeIndex &rNode );
-    explicit SwPosition( const SwNode& rNode );
-    explicit SwPosition( SwContentNode& rNode, const sal_Int32 nOffset = 0 );
+    SwPosition( const SwNodeIndex &rNode, const SwContentIndex &rContent );
+    SwPosition( const SwNode &rNode, const SwContentIndex &rContent );
+    explicit SwPosition( SwNodes& rNodes, SwNodeOffset nIndex = SwNodeOffset(0) );
+    explicit SwPosition( const SwNodeIndex &rNode, SwNodeOffset nDiff = SwNodeOffset(0) );
+    explicit SwPosition( const SwNode& rNode, SwNodeOffset nDiff = SwNodeOffset(0) );
+    explicit SwPosition( const SwContentNode& rNode, sal_Int32 nContentOffset = 0 );
+    SwPosition( const SwNodeIndex &rNode, const SwContentNode*, sal_Int32 nContentOffset );
+    SwPosition( const SwNode &rNode, const SwContentNode*, sal_Int32 nContentOffset );
+    SwPosition( const SwNodeIndex &rNode, SwNodeOffset nDiff, const SwContentNode*, sal_Int32 nContentOffset );
+    SwPosition( const SwNode &rNode, SwNodeOffset nDiff, const SwContentNode*, sal_Int32 nContentOffset );
+    SwPosition( const SwContentIndex &, short nDiff );
+
+    // callers should be using one of the other constructors to avoid creating a temporary
+    SwPosition( SwNodeIndex && ) = delete;
+    SwPosition( const SwNodeIndex &, SwContentIndex && ) = delete;
+    SwPosition( SwNodeIndex &&, SwContentIndex && ) = delete;
+    SwPosition( SwNodeIndex &&, const SwContentNode*, sal_Int32 ) = delete;
+    SwPosition( SwNodeIndex &&, SwNodeOffset ) = delete;
+    SwPosition( SwContentIndex &&, short ) = delete;
 
     /**
        Returns the document this position is in.
@@ -58,8 +73,34 @@ struct SAL_WARN_UNUSED SW_DLLPUBLIC SwPosition
     bool operator !=(const SwPosition &) const;
     void dumpAsXml(xmlTextWriterPtr pWriter) const;
 
+
     SwNodeOffset GetNodeIndex() const { return nNode.GetIndex(); }
+    const SwNodes& GetNodes() const { return nNode.GetNodes(); }
+    SwNodes& GetNodes() { return nNode.GetNodes(); }
     SwNode& GetNode() const { return nNode.GetNode(); }
+
+
+    const SwContentNode* GetContentNode() const { return nContent.GetContentNode(); }
+    sal_Int32 GetContentIndex() const { return nContent.GetIndex(); }
+    void SetMark(const sw::mark::IMark* pMark) { nContent.SetMark(pMark); }
+    void SetRedline(SwRangeRedline* pRangeRedline) { nContent.SetRedline(pRangeRedline); }
+
+    /// These all set both nNode and nContent
+    void Assign( const SwNode& rNd, SwNodeOffset nDelta, sal_Int32 nContentOffset = 0 );
+    void Assign( SwNodeOffset nNodeOffset, sal_Int32 nContentOffset = 0 );
+    void Assign( const SwContentNode& rNode, sal_Int32 nContentOffset = 0 );
+    void Assign( const SwNode& rNd, sal_Int32 nContentOffset = 0 );
+    void Assign( const SwNodeIndex& rNdIdx, sal_Int32 nContentOffset = 0 );
+    /// Set nNode to rNd, and nContent to the beginning of rNd
+    void AssignStartIndex( const SwContentNode& rNd );
+    /// Set nNode to rNd, and nContent to the end of rNd
+    void AssignEndIndex( const SwContentNode& rNd );
+    /// Adjust node position, and resets content position to zero
+    void Adjust( SwNodeOffset nDelta );
+    /// Adjust content index, only valid to call this if the position points to a SwContentNode subclass
+    void AdjustContent( sal_Int32 nDelta );
+    /// Set content index, only valid to call this if the position points to a SwContentNode subclass
+    void SetContent( sal_Int32 nContentIndex );
 };
 
 SW_DLLPUBLIC std::ostream &operator <<(std::ostream& s, const SwPosition& position);
@@ -136,7 +177,12 @@ bool GoInContentCells( SwPaM&, SwMoveFnCollection const &);
 bool GoInContentSkipHidden( SwPaM&, SwMoveFnCollection const &);
 bool GoInContentCellsSkipHidden( SwPaM&, SwMoveFnCollection const &);
 
-/// PaM is Point and Mark: a selection of the document model.
+/**
+ * PaM is Point and Mark: a selection of the document model.
+ *
+ * The reason for the distinction is that the point moves around during adjusting the selection with
+ * shift-arrow keys, while the mark remains where it is.
+ */
 class SAL_WARN_UNUSED SW_DLLPUBLIC SwPaM : public sw::Ring<SwPaM>
 {
     SwPosition   m_Bound1;
@@ -158,8 +204,12 @@ public:
             const SwNodeIndex& rPt, sal_Int32 nPtContent, SwPaM* pRing = nullptr );
     SwPaM(  const SwNode& rMk, sal_Int32 nMkContent,
             const SwNode& rPt, sal_Int32 nPtContent, SwPaM* pRing = nullptr );
-    SwPaM( const SwNode& rNd, sal_Int32 nContent = 0, SwPaM* pRing = nullptr );
-    SwPaM( const SwNodeIndex& rNd, sal_Int32 nContent = 0, SwPaM* pRing = nullptr );
+    SwPaM(  const SwNode& rMk, SwNodeOffset nMkOffset, sal_Int32 nMkContent,
+            const SwNode& rPt, SwNodeOffset nPtOffset, sal_Int32 nPtContent, SwPaM* pRing = nullptr );
+    SwPaM( const SwNode& rNd, SwNodeOffset nNdOffset, sal_Int32 nContent = 0, SwPaM* pRing = nullptr );
+    explicit SwPaM( const SwNode& rNd, sal_Int32 nContent = 0, SwPaM* pRing = nullptr );
+    explicit SwPaM( const SwNodeIndex& rNd, sal_Int32 nContent = 0, SwPaM* pRing = nullptr );
+    explicit SwPaM( SwNodes& rNds, SwNodeOffset nMkOffset = SwNodeOffset(0), SwPaM* pRing = nullptr );
     virtual ~SwPaM() override;
 
     /// this takes a second parameter, which indicates the Ring that
@@ -182,9 +232,9 @@ public:
     {
         if (m_pMark != m_pPoint)
         {
-            /** clear the mark position; this helps if mark's SwIndex is
+            /** clear the mark position; this helps if mark's SwContentIndex is
                registered at some node, and that node is then deleted */
-            *m_pMark = SwPosition( SwNodeIndex( GetNode().GetNodes() ) );
+            m_pMark->Assign( *GetPointNode().GetNodes()[SwNodeOffset(0)] );
             m_pMark = m_pPoint;
         }
     }
@@ -223,17 +273,19 @@ public:
           SwPosition *End()
                 { return (*m_pPoint) >  (*m_pMark) ? m_pPoint : m_pMark; }
 
+    /// Because sometimes the cost of the operator<= can add up
+    std::pair<const SwPosition *, const SwPosition *> StartEnd() const
+                { if ((*m_pPoint) <= (*m_pMark)) return { m_pPoint, m_pMark }; else return { m_pMark, m_pPoint }; }
+    std::pair<SwPosition *, SwPosition *> StartEnd()
+                { if ((*m_pPoint) <= (*m_pMark)) return { m_pPoint, m_pMark }; else return { m_pMark, m_pPoint }; }
+
     /// @return current Node at Point/Mark
-    SwNode    & GetNode      ( bool bPoint = true ) const
-    {
-        return ( bPoint ? m_pPoint->nNode : m_pMark->nNode ).GetNode();
-    }
+    SwNode& GetPointNode() const { return m_pPoint->nNode.GetNode(); }
+    SwNode& GetMarkNode() const { return m_pMark->nNode.GetNode(); }
 
     /// @return current ContentNode at Point/Mark
-    SwContentNode* GetContentNode( bool bPoint = true ) const
-    {
-        return GetNode(bPoint).GetContentNode();
-    }
+    SwContentNode* GetPointContentNode() const { return m_pPoint->nNode.GetNode().GetContentNode(); }
+    SwContentNode* GetMarkContentNode() const { return m_pMark->nNode.GetNode().GetContentNode(); }
 
     /**
        Normalizes PaM, i.e. sort point and mark.
@@ -256,7 +308,7 @@ public:
 
     /** Is in something protected (readonly) or selection contains
        something protected. */
-    bool HasReadonlySel( bool bFormView ) const;
+    bool HasReadonlySel(bool bFormView, bool isReplace) const;
 
     bool ContainsPosition(const SwPosition & rPos) const
     {
@@ -281,7 +333,7 @@ public:
 
 SW_DLLPUBLIC std::ostream &operator <<(std::ostream& s, const SwPaM& pam);
 
-bool CheckNodesRange(const SwNodeIndex&, const SwNodeIndex&, bool bChkSection);
+bool CheckNodesRange(const SwNode&, const SwNode&, bool bChkSection);
 
 #endif // INCLUDED_SW_INC_PAM_HXX
 

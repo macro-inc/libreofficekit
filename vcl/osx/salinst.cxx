@@ -60,6 +60,7 @@
 #include <osx/runinmain.hxx>
 
 #include <print.h>
+#include <strings.hrc>
 
 #include <comphelper/processfactory.hxx>
 
@@ -123,6 +124,20 @@ public:
     }
 };
 
+}
+
+static OUString& getFallbackPrinterName()
+{
+    static OUString aFallbackPrinter;
+
+    if ( aFallbackPrinter.isEmpty() )
+    {
+        aFallbackPrinter = VclResId( SV_PRINT_DEFPRT_TXT );
+        if ( aFallbackPrinter.isEmpty() )
+            aFallbackPrinter = "Printer";
+    }
+
+    return aFallbackPrinter;
 }
 
 void AquaSalInstance::delayedSettingsChanged( bool bInvalidate )
@@ -190,6 +205,28 @@ void AquaSalInstance::AfterAppInit()
                                            name: @"AppleRemoteWillResignActive"
                                            object: nil ];
 #endif
+
+    // HACK: When the first call to [NSSpellChecker sharedSpellChecker] (in
+    // lingucomponent/source/spellcheck/macosxspell/macspellimp.mm) is done both on a thread other
+    // than the main thread and with the SolarMutex erroneously locked, then that can lead to
+    // deadlock as [NSSpellChecker sharedSpellChecker] internally calls
+    //   AppKit`-[NSSpellChecker init] ->
+    //   AppKit`-[NSSpellChecker _fillSpellCheckerPopupButton:] ->
+    //   AppKit`-[NSApplication(NSServicesMenuPrivate) _fillSpellCheckerPopupButton:] ->
+    //   AppKit`-[NSMenu insertItem:atIndex:] ->
+    //   Foundation`-[NSNotificationCenter postNotificationName:object:userInfo:] ->
+    //   CoreFoundation`_CFXNotificationPost ->
+    //   Foundation`-[NSOperation waitUntilFinished]
+    // waiting for work to be done on the main thread, but the main thread is typically already
+    // blocked (in some event handling loop) waiting to acquire the SolarMutex.  The real solution
+    // would be to fix all the cases where a call to [NSSpellChecker sharedSpellChecker] in
+    // lingucomponent/source/spellcheck/macosxspell/macspellimp.mm is done while the SolarMutex is
+    // locked (somewhere up the call chain), but that appears to be rather difficult (see e.g.
+    // <https://bugs.documentfoundation.org/show_bug.cgi?id=151894> "FILEOPEN a Base Document with
+    // customized event for open a startform by 'open document' LO stuck").  So, at least for now,
+    // chicken out and do that first call to [NSSpellChecker sharedSpellChecker] upfront in a
+    // controlled environment:
+    [NSSpellChecker sharedSpellChecker];
 }
 
 SalYieldMutex::SalYieldMutex()
@@ -308,23 +345,6 @@ VCLPLUG_OSX_PUBLIC SalInstance* create_SalInstance()
     // put cocoa into multithreaded mode
     [NSThread detachNewThreadSelector:@selector(enableCocoaThreads:) toTarget:[[CocoaThreadEnabler alloc] init] withObject:nil];
 
-    // Dark mode is disabled as long as it is not implemented completely. For development purposes, it may be controlled by
-    // environment variables: VCL_MACOS_FORCE_DARK_MODE enable dark mode independent of system settings,
-    // VCL_MACOS_USE_SYSTEM_APPEARANCE to use system settings (light mode or the dark mode as configured within system preferences).
-
-    // TODO: After implementation of dark mode, this code has to be removed.
-
-    if (@available(macOS 10.14, iOS 13, *))
-    {
-        if (getenv("VCL_MACOS_FORCE_DARK_MODE"))
-        {
-            [NSApp setAppearance: [NSAppearance appearanceNamed: NSAppearanceNameDarkAqua]];
-        }
-        else
-            if (!getenv("VCL_MACOS_USE_SYSTEM_APPEARANCE"))
-                [NSApp setAppearance: [NSAppearance appearanceNamed: NSAppearanceNameAqua]];
-    }
-
     // activate our delegate methods
     [NSApp setDelegate: NSApp];
 
@@ -348,7 +368,6 @@ VCLPLUG_OSX_PUBLIC SalInstance* create_SalInstance()
 AquaSalInstance::AquaSalInstance()
     : SalInstance(std::make_unique<SalYieldMutex>())
     , mnActivePrintJobs( 0 )
-    , mbIsLiveResize( false )
     , mbNoYieldLock( false )
     , mbTimerProcessed( false )
 {
@@ -357,6 +376,15 @@ AquaSalInstance::AquaSalInstance()
     ImplSVData* pSVData = ImplGetSVData();
     pSVData->maAppData.mxToolkitName = OUString("osx");
     m_bSupportsOpenGL = true;
+
+    mpButtonCell = [[NSButtonCell alloc] init];
+    mpCheckCell = [[NSButtonCell alloc] init];
+    mpRadioCell = [[NSButtonCell alloc] init];
+    mpTextFieldCell = [[NSTextFieldCell alloc] initTextCell:@""];
+    mpComboBoxCell = [[NSComboBoxCell alloc] initTextCell:@""];
+    mpPopUpButtonCell = [[NSPopUpButtonCell alloc] init];
+    mpStepperCell = [[NSStepperCell alloc] init];
+    mpListNodeCell = [[NSButtonCell alloc] init];
 
 #if HAVE_FEATURE_SKIA
     AquaSkiaSalGraphicsImpl::prepareSkia();
@@ -372,6 +400,15 @@ AquaSalInstance::~AquaSalInstance()
         [pDockMenu release];
         pDockMenu = nil;
     }
+
+    [mpListNodeCell release];
+    [mpStepperCell release];
+    [mpPopUpButtonCell release];
+    [mpComboBoxCell release];
+    [mpTextFieldCell release];
+    [mpRadioCell release];
+    [mpCheckCell release];
+    [mpButtonCell release];
 
 #if HAVE_FEATURE_SKIA
     SkiaHelper::cleanup();
@@ -478,7 +515,7 @@ void AquaSalInstance::handleAppDefinedEvent( NSEvent* pEvent )
             const Point aPoint;
             CommandMediaData aMediaData(nCommand);
             CommandEvent aCEvt( aPoint, CommandEventId::Media, false, &aMediaData );
-            NotifyEvent aNCmdEvt( MouseNotifyEvent::COMMAND, pWindow, &aCEvt );
+            NotifyEvent aNCmdEvt( NotifyEventType::COMMAND, pWindow, &aCEvt );
 
             if ( !ImplCallPreNotify( aNCmdEvt ) )
                 pWindow->Command( aCEvt );
@@ -501,7 +538,11 @@ void AquaSalInstance::handleAppDefinedEvent( NSEvent* pEvent )
 bool AquaSalInstance::RunInMainYield( bool bHandleAllCurrentEvents )
 {
     OSX_SALDATA_RUNINMAIN_UNION( DoYield( false, bHandleAllCurrentEvents), boolean )
-    assert( false && "Don't call this from the main thread!" );
+
+    // PrinterController::removeTransparencies() calls this frequently on the
+    // main thread so reduce the severity from an assert so that printing still
+    // works in a debug builds
+    SAL_WARN_IF( true, "vcl", "Don't call this from the main thread!" );
     return false;
 
 }
@@ -514,6 +555,13 @@ static bool isWakeupEvent( NSEvent *pEvent )
 
 bool AquaSalInstance::DoYield(bool bWait, bool bHandleAllCurrentEvents)
 {
+    // Related: tdf#152703 Eliminate potential blocking during live resize
+    // Some events and timers call Application::Reschedule() or
+    // Application::Yield() so don't block and wait for events when a
+    // window is in live resize
+    if ( ImplGetSVData()->mpWinData->mbIsLiveResize )
+        bWait = false;
+
     // ensure that the per thread autorelease pool is top level and
     // will therefore not be destroyed by cocoa implicitly
     SalData::ensureThreadAutoreleasePool();
@@ -523,7 +571,11 @@ bool AquaSalInstance::DoYield(bool bWait, bool bHandleAllCurrentEvents)
     ReleasePoolHolder aReleasePool;
 
     // first, process current user events
-    bool bHadEvent = DispatchUserEvents( bHandleAllCurrentEvents );
+    // Related: tdf#152703 Eliminate potential blocking during live resize
+    // Only native events and timers need to be dispatched to redraw
+    // the window so skip dispatching user events when a window is in
+    // live resize
+    bool bHadEvent = ( !ImplGetSVData()->mpWinData->mbIsLiveResize && DispatchUserEvents( bHandleAllCurrentEvents ) );
     if ( !bHandleAllCurrentEvents && bHadEvent )
         return true;
 
@@ -738,6 +790,20 @@ void AquaSalInstance::GetPrinterQueueInfo( ImplPrnQueueList* pList )
             pList->Add( std::move(pInfo) );
         }
     }
+
+    // tdf#151700 Prevent the non-native LibreOffice PrintDialog from
+    // displaying by creating a fake printer if there are no printers. This
+    // will allow the LibreOffice printing code to proceed with native
+    // NSPrintOperation which will display the native print panel.
+    if ( !nNameCount )
+    {
+        std::unique_ptr<SalPrinterQueueInfo> pInfo(new SalPrinterQueueInfo);
+        pInfo->maPrinterName    = getFallbackPrinterName();
+        pInfo->mnStatus         = PrintQueueFlags::NONE;
+        pInfo->mnJobs           = 0;
+
+        pList->Add( std::move(pInfo) );
+    }
 }
 
 void AquaSalInstance::GetPrinterQueueState( SalPrinterQueueInfo* )
@@ -749,7 +815,9 @@ OUString AquaSalInstance::GetDefaultPrinter()
     // #i113170# may not be the main thread if called from UNO API
     SalData::ensureThreadAutoreleasePool();
 
-    if( maDefaultPrinter.isEmpty() )
+    // WinSalInstance::GetDefaultPrinter() fetches current default printer
+    // on every call so do the same here
+    OUString aDefaultPrinter;
     {
         NSPrintInfo* pPI = [NSPrintInfo sharedPrintInfo];
         SAL_WARN_IF( !pPI, "vcl", "no print info" );
@@ -759,13 +827,20 @@ OUString AquaSalInstance::GetDefaultPrinter()
             SAL_WARN_IF( !pPr, "vcl", "no printer in default info" );
             if( pPr )
             {
+                // Related: tdf#151700 Return the name of the fake printer if
+                // there are no printers so that the LibreOffice printing code
+                // will be able to find the the fake printer returned by
+                // AquaSalInstance::GetPrinterQueueInfo()
                 NSString* pDefName = [pPr name];
                 SAL_WARN_IF( !pDefName, "vcl", "printer has no name" );
-                maDefaultPrinter = GetOUString( pDefName );
+                if ( pDefName && [pDefName length])
+                    aDefaultPrinter = GetOUString( pDefName );
+                else
+                    aDefaultPrinter = getFallbackPrinterName();
             }
         }
     }
-    return maDefaultPrinter;
+    return aDefaultPrinter;
 }
 
 SalInfoPrinter* AquaSalInstance::CreateInfoPrinter( SalPrinterQueueInfo* pQueueInfo,

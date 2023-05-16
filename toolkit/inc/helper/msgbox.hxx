@@ -20,6 +20,7 @@
 #include <o3tl/typed_flags_set.hxx>
 #include <helper/btndlg.hxx>
 #include <vcl/toolkit/fixed.hxx>
+#include <vcl/toolkit/vclmedit.hxx>
 
 // Window-Bits for MessageBoxen
 enum class MessBoxStyle
@@ -52,16 +53,15 @@ class MessBox : public ButtonDialog
     Image maImage;
     bool mbHelpBtn;
     MessBoxStyle mnMessBoxStyle;
-
-protected:
     OUString maMessText;
 
+protected:
     void ImplInitButtons();
     void ImplPosControls();
 
 public:
     MessBox(vcl::Window* pParent, MessBoxStyle nMessBoxStyle, WinBits n, const OUString& rTitle,
-            const OUString& rMessage);
+            OUString rMessage);
     virtual ~MessBox() override;
     virtual void dispose() override;
 

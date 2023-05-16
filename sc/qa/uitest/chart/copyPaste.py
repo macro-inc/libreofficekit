@@ -1,20 +1,20 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
-import unittest
-import platform
 from uitest.framework import UITestCase
-from libreoffice.calc.document import get_cell_by_position
-from libreoffice.uno.propertyvalue import mkPropertyValues
 from uitest.uihelper.common import get_url_for_data_file
+
+from libreoffice.uno.propertyvalue import mkPropertyValues
+
 
 class CopyPaste(UITestCase):
 
-  @unittest.skipIf(platform.system() == "Windows", "Fails on Windows: tdf#142635")
   def test_copy_paste_chart_with_dot_in_sheet_name(self):
     with self.ui_test.load_file(get_url_for_data_file("chartWithDotInSheetName.ods")) as calc_doc:
 

@@ -12,6 +12,7 @@
 #include <com/sun/star/embed/XEmbeddedObject.hpp>
 #include <svx/svdoole2.hxx>
 #include <svtools/embedhlp.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <miscuno.hxx>
@@ -27,11 +28,10 @@ namespace sc
 
 SC_SIMPLE_SERVICE_INFO(TablePivotChart, "TablePivotChart", "com.sun.star.table.TablePivotChart")
 
-TablePivotChart::TablePivotChart(ScDocShell* pDocShell, SCTAB nTab, const OUString& rName)
-    : TablePivotChart_Base(m_aMutex)
-    , m_pDocShell(pDocShell)
+TablePivotChart::TablePivotChart(ScDocShell* pDocShell, SCTAB nTab, OUString aName)
+    : m_pDocShell(pDocShell)
     , m_nTab(nTab)
-    , m_aChartName(rName)
+    , m_aChartName(std::move(aName))
 {
     if (m_pDocShell)
         m_pDocShell->GetDocument().AddUnoObject(*this);
@@ -66,13 +66,11 @@ uno::Reference<lang::XComponent> SAL_CALL TablePivotChart::getEmbeddedObject()
 
 OUString SAL_CALL TablePivotChart::getName()
 {
-    SolarMutexGuard aGuard;
     return m_aChartName;
 }
 
 void SAL_CALL TablePivotChart::setName(OUString const & /* aName */)
 {
-    SolarMutexGuard aGuard;
     throw uno::RuntimeException(); // name cannot be changed
 }
 

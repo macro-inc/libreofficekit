@@ -17,7 +17,9 @@ $(eval $(call gb_Module_add_subsequentcheck_targets,unotools,\
     JunitTest_unotools_complex \
 ))
 $(eval $(call gb_Module_add_check_targets,unotools,\
+    CppunitTest_unotools_configpaths \
     CppunitTest_unotools_fontdefs \
+    CppunitTest_unotools_fontcvt \
 ))
 
 # vim: set noet sw=4 ts=4:

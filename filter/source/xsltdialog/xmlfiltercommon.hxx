@@ -20,7 +20,6 @@
 
 #include <com/sun/star/io/XInputStream.hpp>
 #include <com/sun/star/io/XOutputStream.hpp>
-#include <unotools/resmgr.hxx>
 
 #include <string_view>
 #include <vector>
@@ -30,7 +29,7 @@ extern OUString string_encode( const OUString & rText );
 extern OUString string_decode( const OUString & rText );
 
 bool copyStreams( const css::uno::Reference< css::io::XInputStream >& xIS, const css::uno::Reference< css::io::XOutputStream >& xOS );
-bool createDirectory( OUString const & rURL );
+bool createDirectory( std::u16string_view rURL );
 
 
 class filter_info_impl
@@ -78,6 +77,5 @@ struct application_info_impl
 extern std::vector< application_info_impl > const & getApplicationInfos();
 extern OUString getApplicationUIName( std::u16string_view rServiceName );
 extern const application_info_impl* getApplicationInfo( std::u16string_view rServiceName );
-OUString XsltResId(TranslateId pId);
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

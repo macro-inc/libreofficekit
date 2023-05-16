@@ -13,18 +13,19 @@
 #include "scdllapi.h"
 #include "Sparkline.hxx"
 #include <memory>
+#include <utility>
 
 namespace sc
 {
-/** Hodler of a sparkline, that is connected to a cell specific */
+/** Holder of a sparkline, that is connected to a cell specific */
 class SC_DLLPUBLIC SparklineCell
 {
 private:
     std::shared_ptr<Sparkline> m_pSparkline;
 
 public:
-    SparklineCell(std::shared_ptr<Sparkline> const& pSparkline)
-        : m_pSparkline(pSparkline)
+    SparklineCell(std::shared_ptr<Sparkline> pSparkline)
+        : m_pSparkline(std::move(pSparkline))
     {
     }
 

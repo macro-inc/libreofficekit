@@ -35,15 +35,6 @@
 #include <tools/helpers.hxx>
 #include <map>
 
-#if defined _MSC_VER
-#ifndef min
-#define min(a,b)    (((a) < (b)) ? (a) : (b))
-#endif
-#ifndef max
-#define max(a,b)    (((a) > (b)) ? (a) : (b))
-#endif
-#endif
-
 #include <prewin.h>
 #include <gdiplus.h>
 #include <postwin.h>
@@ -89,7 +80,6 @@ private:
 
 public:
     SystemDependentData_GdiPlusBitmap(
-        basegfx::SystemDependentDataManager& rSystemDependentDataManager,
         const std::shared_ptr<Gdiplus::Bitmap>& rGdiPlusBitmap,
         const WinSalBitmap* pAssociatedAlpha);
 
@@ -102,10 +92,9 @@ public:
 }
 
 SystemDependentData_GdiPlusBitmap::SystemDependentData_GdiPlusBitmap(
-    basegfx::SystemDependentDataManager& rSystemDependentDataManager,
     const std::shared_ptr<Gdiplus::Bitmap>& rGdiPlusBitmap,
     const WinSalBitmap* pAssociatedAlpha)
-:   basegfx::SystemDependentData(rSystemDependentDataManager),
+:   basegfx::SystemDependentData(Application::GetSystemDependentDataManager()),
     mpGdiPlusBitmap(rGdiPlusBitmap),
     mpAssociatedAlpha(pAssociatedAlpha)
 {
@@ -209,7 +198,6 @@ std::shared_ptr< Gdiplus::Bitmap > WinSalBitmap::ImplGetGdiPlusBitmap(const WinS
 
         // add to buffering mechanism
         addOrReplaceSystemDependentData<SystemDependentData_GdiPlusBitmap>(
-            ImplGetSystemDependentDataManager(),
             aRetval,
             pAssociatedAlpha);
     }
@@ -912,6 +900,11 @@ bool WinSalBitmap::Scale( const double& /*rScaleX*/, const double& /*rScaleY*/, 
 bool WinSalBitmap::Replace( const Color& /*rSearchColor*/, const Color& /*rReplaceColor*/, sal_uInt8 /*nTol*/ )
 {
     return false;
+}
+
+const basegfx::SystemDependentDataHolder* WinSalBitmap::accessSystemDependentDataHolder() const
+{
+    return this;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

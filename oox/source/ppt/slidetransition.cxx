@@ -23,10 +23,9 @@
 #include <com/sun/star/animations/TransitionSubType.hpp>
 #include <com/sun/star/animations/XTransitionFilter.hpp>
 
-#include <osl/diagnose.h>
 #include <sal/log.hxx>
 #include <tools/color.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <oox/helper/propertymap.hxx>
 #include <oox/token/namespaces.hxx>
@@ -53,7 +52,7 @@ namespace oox::ppt {
 
     }
 
-    SlideTransition::SlideTransition(const OUString & sFilterName)
+    SlideTransition::SlideTransition(std::u16string_view sFilterName)
         : mnTransitionType( 0 )
         , mnTransitionSubType( 0 )
         , mbTransitionDirectionNormal( true )

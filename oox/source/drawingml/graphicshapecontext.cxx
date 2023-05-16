@@ -80,7 +80,7 @@ ContextHandlerRef GraphicShapeContext::onCreateContext( sal_Int32 aElementToken,
     case XML_xfrm:
         return new Transform2DContext( *this, rAttribs, *mpShapePtr );
     case XML_blipFill:
-        return new BlipFillContext( *this, rAttribs, mpShapePtr->getGraphicProperties().maBlipProps );
+        return new BlipFillContext(*this, rAttribs, mpShapePtr->getGraphicProperties().maBlipProps, nullptr);
     case XML_wavAudioFile:
         {
             OUString const path(getEmbeddedWAVAudioFile(getRelations(), rAttribs));
@@ -96,7 +96,7 @@ ContextHandlerRef GraphicShapeContext::onCreateContext( sal_Int32 aElementToken,
     case XML_videoFile:
         {
             OUString rPath = getRelations().getFragmentPathFromRelId(
-                    rAttribs.getString(R_TOKEN(link)).get() );
+                    rAttribs.getStringDefaulted(R_TOKEN(link)) );
             if (!rPath.isEmpty())
             {
                 Reference<XInputStream> xMediaStream = lcl_GetMediaStream(rPath, getFilter());
@@ -110,7 +110,7 @@ ContextHandlerRef GraphicShapeContext::onCreateContext( sal_Int32 aElementToken,
             else
             {
                 rPath = getRelations().getExternalTargetFromRelId(
-                    rAttribs.getString(R_TOKEN(link)).get());
+                    rAttribs.getStringDefaulted(R_TOKEN(link)));
                 if (!rPath.isEmpty()) // linked media file
                     mpShapePtr->getGraphicProperties().m_sMediaPackageURL
                         = getFilter().getAbsoluteUrl(rPath);
@@ -154,7 +154,7 @@ ContextHandlerRef GraphicalObjectFrameContext::onCreateContext( sal_Int32 aEleme
 
         case XML_graphicData :          // CT_GraphicalObjectData
         {
-            OUString sUri( rAttribs.getString( XML_uri ).get() );
+            OUString sUri( rAttribs.getStringDefaulted( XML_uri ) );
             if ( sUri == "http://schemas.openxmlformats.org/presentationml/2006/ole" ||
                     sUri == "http://purl.oclc.org/ooxml/presentationml/ole" )
                 return new OleObjectGraphicDataContext( *this, mpShapePtr );
@@ -211,7 +211,7 @@ ContextHandlerRef OleObjectGraphicDataContext::onCreateContext( sal_Int32 nEleme
         case PPT_TOKEN( oleObj ):
         {
             mrOleObjectInfo.maShapeId = rAttribs.getXString( XML_spid, OUString() );
-            const Relation* pRelation = getRelations().getRelationFromRelId( rAttribs.getString( R_TOKEN( id ), OUString() ) );
+            const Relation* pRelation = getRelations().getRelationFromRelId( rAttribs.getStringDefaulted( R_TOKEN( id )) );
             OSL_ENSURE( pRelation, "OleObjectGraphicDataContext::createFastChildContext - missing relation for OLE object" );
             if( pRelation )
             {
@@ -256,7 +256,8 @@ void OleObjectGraphicDataContext::onEndElement()
 {
     if( getCurrentElement() == PPT_TOKEN( oleObj ) && !isMCEStateEmpty() )
     {
-        if( getMCEState() == MCE_STATE::FoundChoice && !mrOleObjectInfo.mbHasPicture )
+        if (getMCEState() == MCE_STATE::FoundChoice && !mrOleObjectInfo.mbHasPicture
+            && mrOleObjectInfo.maShapeId.isEmpty())
             setMCEState( MCE_STATE::Started );
     }
 }
@@ -277,10 +278,10 @@ ContextHandlerRef DiagramGraphicDataContext::onCreateContext( ::sal_Int32 aEleme
     {
     case DGM_TOKEN( relIds ):
     {
-        msDm = rAttribs.getString( R_TOKEN( dm ) ).get();
-        msLo = rAttribs.getString( R_TOKEN( lo ) ).get();
-        msQs = rAttribs.getString( R_TOKEN( qs ) ).get();
-        msCs = rAttribs.getString( R_TOKEN( cs ) ).get();
+        msDm = rAttribs.getStringDefaulted( R_TOKEN( dm ) );
+        msLo = rAttribs.getStringDefaulted( R_TOKEN( lo ) );
+        msQs = rAttribs.getStringDefaulted( R_TOKEN( qs ) );
+        msCs = rAttribs.getStringDefaulted( R_TOKEN( cs ) );
         loadDiagram(mpShapePtr,
                     getFilter(),
                     getFragmentPathFromRelId( msDm ),
@@ -330,7 +331,7 @@ ContextHandlerRef ChartGraphicDataContext::onCreateContext( ::sal_Int32 nElement
 {
     if( nElement == C_TOKEN( chart ) )
     {
-        mrChartShapeInfo.maFragmentPath = getFragmentPathFromRelId( rAttribs.getString( R_TOKEN( id ), OUString() ) );
+        mrChartShapeInfo.maFragmentPath = getFragmentPathFromRelId( rAttribs.getStringDefaulted( R_TOKEN( id )) );
     }
     return nullptr;
 }

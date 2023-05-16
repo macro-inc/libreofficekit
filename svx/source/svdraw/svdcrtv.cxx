@@ -101,7 +101,7 @@ ImplConnectMarkerOverlay::ImplConnectMarkerOverlay(const SdrCreateView& rView, S
                 aTempPolyPoly.append(aTempPoly);
 
                 std::unique_ptr<sdr::overlay::OverlayPolyPolygonStripedAndFilled> pNew2(new sdr::overlay::OverlayPolyPolygonStripedAndFilled(
-                    aTempPolyPoly));
+                    std::move(aTempPolyPoly)));
                 xTargetOverlay->add(*pNew2);
                 maObjects.append(std::move(pNew2));
             }
@@ -143,8 +143,9 @@ void ImpSdrCreateViewExtraData::CreateAndShowOverlay(const SdrCreateView& rView,
             if(pObject)
             {
                 const sdr::contact::ViewContact& rVC = pObject->GetViewContact();
-                const drawinglayer::primitive2d::Primitive2DContainer& aSequence = rVC.getViewIndependentPrimitive2DContainer();
-                std::unique_ptr<sdr::overlay::OverlayObject> pNew(new sdr::overlay::OverlayPrimitive2DSequenceObject(drawinglayer::primitive2d::Primitive2DContainer(aSequence)));
+                drawinglayer::primitive2d::Primitive2DContainer aSequence;
+                rVC.getViewIndependentPrimitive2DContainer(aSequence);
+                std::unique_ptr<sdr::overlay::OverlayObject> pNew(new sdr::overlay::OverlayPrimitive2DSequenceObject(std::move(aSequence)));
 
                 xOverlayManager->add(*pNew);
                 maObjects.append(std::move(pNew));
@@ -179,14 +180,13 @@ void SdrCreateView::ImpClearConnectMarker()
 
 SdrCreateView::SdrCreateView(SdrModel& rSdrModel, OutputDevice* pOut)
     : SdrDragView(rSdrModel, pOut)
-    , mpCurrentCreate(nullptr)
     , mpCreatePV(nullptr)
     , mpCreateViewExtraData(new ImpSdrCreateViewExtraData())
     , maCurrentCreatePointer(PointerStyle::Cross)
     , mnAutoCloseDistPix(5)
     , mnFreeHandMinDistPix(10)
     , mnCurrentInvent(SdrInventor::Default)
-    , mnCurrentIdent(OBJ_NONE)
+    , mnCurrentIdent(SdrObjKind::NONE)
     , mb1stPointAsCenter(false)
     , mbUseIncompatiblePathCreateInterface(false)
 {
@@ -196,7 +196,6 @@ SdrCreateView::~SdrCreateView()
 {
     ImpClearConnectMarker();
     mpCreateViewExtraData.reset();
-    SdrObject::Free(mpCurrentCreate);
 }
 
 bool SdrCreateView::IsAction() const
@@ -251,10 +250,10 @@ bool SdrCreateView::CheckEdgeMode()
     if (mpCurrentCreate != nullptr)
     {
         // is managed by EdgeObj
-        if (mnCurrentInvent==SdrInventor::Default && mnCurrentIdent==OBJ_EDGE) return false;
+        if (mnCurrentInvent==SdrInventor::Default && mnCurrentIdent==SdrObjKind::Edge) return false;
     }
 
-    if (!IsCreateMode() || mnCurrentInvent!=SdrInventor::Default || mnCurrentIdent!=OBJ_EDGE)
+    if (!IsCreateMode() || mnCurrentInvent!=SdrInventor::Default || mnCurrentIdent!=SdrObjKind::Edge)
     {
         ImpClearConnectMarker();
         return false;
@@ -315,17 +314,21 @@ bool SdrCreateView::MouseMove(const MouseEvent& rMEvt, OutputDevice* pWin)
 
 bool SdrCreateView::IsTextTool() const
 {
-    return meEditMode==SdrViewEditMode::Create && mnCurrentInvent==SdrInventor::Default && (mnCurrentIdent==OBJ_TEXT || mnCurrentIdent==OBJ_TITLETEXT || mnCurrentIdent==OBJ_OUTLINETEXT);
+    return meEditMode==SdrViewEditMode::Create
+        && mnCurrentInvent==SdrInventor::Default
+        && (mnCurrentIdent==SdrObjKind::Text
+            || mnCurrentIdent==SdrObjKind::TitleText
+            || mnCurrentIdent==SdrObjKind::OutlineText);
 }
 
 bool SdrCreateView::IsEdgeTool() const
 {
-    return meEditMode==SdrViewEditMode::Create && mnCurrentInvent==SdrInventor::Default && (mnCurrentIdent==OBJ_EDGE);
+    return meEditMode==SdrViewEditMode::Create && mnCurrentInvent==SdrInventor::Default && (mnCurrentIdent==SdrObjKind::Edge);
 }
 
 bool SdrCreateView::IsMeasureTool() const
 {
-    return meEditMode==SdrViewEditMode::Create && mnCurrentInvent==SdrInventor::Default && (mnCurrentIdent==OBJ_MEASURE);
+    return meEditMode==SdrViewEditMode::Create && mnCurrentInvent==SdrInventor::Default && (mnCurrentIdent==SdrObjKind::Measure);
 }
 
 void SdrCreateView::SetCurrentObj(SdrObjKind nIdent, SdrInventor nInvent)
@@ -334,7 +337,7 @@ void SdrCreateView::SetCurrentObj(SdrObjKind nIdent, SdrInventor nInvent)
     {
         mnCurrentInvent=nInvent;
         mnCurrentIdent=nIdent;
-        SdrObject * pObj = (nIdent == OBJ_NONE) ? nullptr :
+        rtl::Reference<SdrObject> pObj = (nIdent == SdrObjKind::NONE) ? nullptr :
             SdrObjFactory::MakeNewObject(
                 *GetModel(),
                 nInvent,
@@ -352,8 +355,6 @@ void SdrCreateView::SetCurrentObj(SdrObjKind nIdent, SdrInventor nInvent)
             }
             else
                 maCurrentCreatePointer = pObj->GetCreatePointer();
-
-            SdrObject::Free( pObj );
         }
         else
         {
@@ -380,7 +381,7 @@ bool SdrCreateView::ImpBegCreateObj(SdrInventor nInvent, SdrObjKind nIdent, cons
     { // otherwise no side registered!
         OUString aLay(maActualLayer);
 
-        if(nInvent == SdrInventor::Default && nIdent == OBJ_MEASURE && !maMeasureLayer.isEmpty())
+        if(nInvent == SdrInventor::Default && nIdent == SdrObjKind::Measure && !maMeasureLayer.isEmpty())
         {
             aLay = maMeasureLayer;
         }
@@ -402,9 +403,9 @@ bool SdrCreateView::ImpBegCreateObj(SdrInventor nInvent, SdrObjKind nIdent, cons
             }
 
             Point aPnt(rPnt);
-            if (mnCurrentInvent!=SdrInventor::Default || (mnCurrentIdent!=sal_uInt16(OBJ_EDGE) &&
-                                            mnCurrentIdent!=sal_uInt16(OBJ_FREELINE) &&
-                                            mnCurrentIdent!=sal_uInt16(OBJ_FREEFILL) )) { // no snapping for Edge and Freehand
+            if (mnCurrentInvent != SdrInventor::Default || (mnCurrentIdent != SdrObjKind::Edge &&
+                                            mnCurrentIdent != SdrObjKind::FreehandLine &&
+                                            mnCurrentIdent != SdrObjKind::FreehandFill )) { // no snapping for Edge and Freehand
                 aPnt=GetSnapPos(aPnt, mpCreatePV);
             }
             if (mpCurrentCreate!=nullptr)
@@ -415,12 +416,12 @@ bool SdrCreateView::ImpBegCreateObj(SdrInventor nInvent, SdrObjKind nIdent, cons
                 // object should not be created. Since it is possible to use it as a helper
                 // object (e.g. in letting the user define an area with the interactive
                 // construction) at least no items should be set at that object.
-                if(nInvent != SdrInventor::Default || nIdent != OBJ_NONE)
+                if(nInvent != SdrInventor::Default || nIdent != SdrObjKind::NONE)
                 {
                     mpCurrentCreate->SetMergedItemSet(maDefaultAttr);
                 }
 
-                if (mpModel && dynamic_cast<const SdrCaptionObj *>(mpCurrentCreate) != nullptr)
+                if (mpModel && dynamic_cast<const SdrCaptionObj *>(mpCurrentCreate.get()) != nullptr)
                 {
                     SfxItemSet aSet(mpModel->GetItemPool());
                     aSet.Put(XFillColorItem(OUString(),COL_WHITE)); // in case someone turns on Solid
@@ -428,8 +429,8 @@ bool SdrCreateView::ImpBegCreateObj(SdrInventor nInvent, SdrObjKind nIdent, cons
 
                     mpCurrentCreate->SetMergedItemSet(aSet);
                 }
-                if (mpModel && nInvent==SdrInventor::Default && (nIdent==OBJ_TEXT ||
-                    nIdent==OBJ_TITLETEXT || nIdent==OBJ_OUTLINETEXT))
+                if (mpModel && nInvent==SdrInventor::Default && (nIdent==SdrObjKind::Text ||
+                    nIdent==SdrObjKind::TitleText || nIdent==SdrObjKind::OutlineText))
                 {
                     // default for all text frames: no background, no border
                     SfxItemSet aSet(mpModel->GetItemPool());
@@ -480,7 +481,6 @@ bool SdrCreateView::ImpBegCreateObj(SdrInventor nInvent, SdrObjKind nIdent, cons
                 }
                 else
                 {
-                    SdrObject::Free(mpCurrentCreate);
                     mpCurrentCreate = nullptr;
                     mpCreatePV = nullptr;
                 }
@@ -512,7 +512,7 @@ bool SdrCreateView::BegCreatePreparedObject(const Point& rPnt, sal_Int16 nMinMov
 bool SdrCreateView::BegCreateCaptionObj(const Point& rPnt, const Size& rObjSiz,
     OutputDevice* pOut, short nMinMov)
 {
-    return ImpBegCreateObj(SdrInventor::Default,OBJ_CAPTION,rPnt,pOut,nMinMov,
+    return ImpBegCreateObj(SdrInventor::Default,SdrObjKind::Caption,rPnt,pOut,nMinMov,
         tools::Rectangle(rPnt,Size(rObjSiz.Width()+1,rObjSiz.Height()+1)), nullptr);
 }
 
@@ -587,7 +587,7 @@ void SdrCreateView::SetupObjLayer(const SdrPageView* pPageView, const OUString& 
 bool SdrCreateView::EndCreateObj(SdrCreateCmd eCmd)
 {
     bool bRet=false;
-    SdrObject* pObjCreated=mpCurrentCreate;
+    SdrObject* pObjCreated=mpCurrentCreate.get();
 
     if (mpCurrentCreate!=nullptr)
     {
@@ -611,16 +611,15 @@ bool SdrCreateView::EndCreateObj(SdrCreateCmd eCmd)
             if (!bPntsEq)
             {
                 // otherwise Brk, because all points are equal
-                SdrObject* pObj=mpCurrentCreate;
-                mpCurrentCreate=nullptr;
+                rtl::Reference<SdrObject> pObj = std::move(mpCurrentCreate);
 
-                SetupObjLayer(mpCreatePV, maActualLayer, pObj);
+                SetupObjLayer(mpCreatePV, maActualLayer, pObj.get());
 
                 // recognize creation of a new 3D object inside a 3D scene
                 bool bSceneIntoScene(false);
 
-                E3dScene* pObjScene = dynamic_cast<E3dScene*>(pObjCreated);
-                E3dScene* pCurrentScene = pObjScene ? dynamic_cast<E3dScene*>(mpCreatePV->GetCurrentGroup()) : nullptr;
+                E3dScene* pObjScene = DynCastE3dScene(pObjCreated);
+                E3dScene* pCurrentScene = pObjScene ? DynCastE3dScene(mpCreatePV->GetCurrentGroup()) : nullptr;
                 if (pCurrentScene)
                 {
                     bool bDidInsert = static_cast<E3dView*>(this)->ImpCloneAll3DObjectsToDestScene(
@@ -628,8 +627,6 @@ bool SdrCreateView::EndCreateObj(SdrCreateCmd eCmd)
 
                     if(bDidInsert)
                     {
-                        // delete object, its content is cloned and inserted
-                        SdrObject::Free( pObjCreated );
                         pObjCreated = nullptr;
                         bSceneIntoScene = true;
                     }
@@ -653,7 +650,7 @@ bool SdrCreateView::EndCreateObj(SdrCreateCmd eCmd)
                     // created objects, see InsertObjectAtView below that calls
                     // CreateUndoNewObject.
                     basegfx::B2DVector aGridOffset(0.0, 0.0);
-                    if(getPossibleGridOffsetForSdrObject(aGridOffset, pObj, mpCreatePV))
+                    if(getPossibleGridOffsetForSdrObject(aGridOffset, pObj.get(), mpCreatePV))
                     {
                         const Size aOffset(
                             basegfx::fround(-aGridOffset.getX()),
@@ -663,7 +660,7 @@ bool SdrCreateView::EndCreateObj(SdrCreateCmd eCmd)
                     }
 
                     // do the same as before
-                    InsertObjectAtView(pObj, *mpCreatePV);
+                    InsertObjectAtView(pObj.get(), *mpCreatePV);
                 }
 
                 mpCreatePV = nullptr;
@@ -724,7 +721,6 @@ void SdrCreateView::BrkCreateObj()
     {
         HideCreateObj();
         mpCurrentCreate->BrkCreate(maDragStat);
-        SdrObject::Free( mpCurrentCreate );
         mpCurrentCreate = nullptr;
         mpCreatePV = nullptr;
     }
@@ -745,7 +741,7 @@ void SdrCreateView::ShowCreateObj(/*OutputDevice* pOut, sal_Bool bFull*/)
         // a derivation). This is e.g. used in SW Frame construction
         // as placeholder. Do not use SolidDragging for naked SdrObjects,
         // they cannot have a valid optical representation
-        if(bUseSolidDragging && OBJ_NONE == mpCurrentCreate->GetObjIdentifier())
+        if(bUseSolidDragging && SdrObjKind::NONE == mpCurrentCreate->GetObjIdentifier())
         {
             bUseSolidDragging = false;
         }
@@ -766,7 +762,7 @@ void SdrCreateView::ShowCreateObj(/*OutputDevice* pOut, sal_Bool bFull*/)
         // check for form controls
         if(bUseSolidDragging)
         {
-            if (dynamic_cast<const SdrUnoObj*>(mpCurrentCreate) != nullptr)
+            if (dynamic_cast<const SdrUnoObj*>(mpCurrentCreate.get()) != nullptr)
             {
                 bUseSolidDragging = false;
             }
@@ -775,9 +771,9 @@ void SdrCreateView::ShowCreateObj(/*OutputDevice* pOut, sal_Bool bFull*/)
           // #i101781# force to non-solid dragging when not creating a full circle
         if(bUseSolidDragging)
         {
-            SdrCircObj* pCircObj = dynamic_cast<SdrCircObj*>(mpCurrentCreate);
+            SdrCircObj* pCircObj = dynamic_cast<SdrCircObj*>(mpCurrentCreate.get());
 
-            if(pCircObj && OBJ_CIRC != pCircObj->GetObjIdentifier())
+            if(pCircObj && SdrObjKind::CircleOrEllipse != pCircObj->GetObjIdentifier())
             {
                 // #i103058# Allow SolidDragging with four points
                 if(maDragStat.GetPointCount() < 4)
@@ -791,7 +787,7 @@ void SdrCreateView::ShowCreateObj(/*OutputDevice* pOut, sal_Bool bFull*/)
         {
             basegfx::B2DPolyPolygon aDragPolyPolygon;
 
-            if (dynamic_cast<const SdrRectObj*>(mpCurrentCreate) != nullptr)
+            if (dynamic_cast<const SdrRectObj*>(mpCurrentCreate.get()) != nullptr)
             {
                 // ensure object has some size, necessary for SdrTextObj because
                 // there are still untested divisions by that sizes
@@ -804,7 +800,7 @@ void SdrCreateView::ShowCreateObj(/*OutputDevice* pOut, sal_Bool bFull*/)
                 }
             }
 
-            if (auto pPathObj = dynamic_cast<SdrPathObj*>(mpCurrentCreate))
+            if (auto pPathObj = dynamic_cast<SdrPathObj*>(mpCurrentCreate.get()))
             {
                 // The up-to-now created path needs to be set at the object to have something
                 // that can be visualized
@@ -819,7 +815,7 @@ void SdrCreateView::ShowCreateObj(/*OutputDevice* pOut, sal_Bool bFull*/)
             }
 
             // use the SdrObject directly for overlay
-            mpCreateViewExtraData->CreateAndShowOverlay(*this, mpCurrentCreate, aDragPolyPolygon);
+            mpCreateViewExtraData->CreateAndShowOverlay(*this, mpCurrentCreate.get(), aDragPolyPolygon);
         }
         else
         {

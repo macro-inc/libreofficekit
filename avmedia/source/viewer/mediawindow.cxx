@@ -23,18 +23,25 @@
 #include <bitmaps.hlst>
 #include <strings.hrc>
 #include <tools/urlobj.hxx>
+#include <utility>
 #include <vcl/graph.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <sfx2/filedlghelper.hxx>
 #include <com/sun/star/awt/Size.hpp>
+#include <com/sun/star/frame/XDispatchHelper.hpp>
 #include <com/sun/star/media/XPlayer.hpp>
+#include <com/sun/star/media/XPlayerNotifier.hpp>
 #include <com/sun/star/ui/dialogs/ExtendedFilePickerElementIds.hpp>
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
 #include <com/sun/star/ui/dialogs/XFilePicker3.hpp>
 #include <com/sun/star/ui/dialogs/XFilePickerControlAccess.hpp>
+#include <com/sun/star/util/URLTransformer.hpp>
+#include <comphelper/processfactory.hxx>
+#include <comphelper/propertysequence.hxx>
 #include <memory>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 
 #define AVMEDIA_FRAMEGRABBER_DEFAULTFRAME_MEDIATIME 3.0
 
@@ -142,30 +149,30 @@ bool MediaWindow::start()
     return mpImpl->start();
 }
 
-
 void MediaWindow::updateMediaItem( MediaItem& rItem ) const
 {
     mpImpl->updateMediaItem( rItem );
 }
-
 
 void MediaWindow::executeMediaItem( const MediaItem& rItem )
 {
     mpImpl->executeMediaItem( rItem );
 }
 
-
 void MediaWindow::show()
 {
     mpImpl->Show();
 }
-
 
 void MediaWindow::hide()
 {
     mpImpl->Hide();
 }
 
+bool MediaWindow::isVisible() const
+{
+    return mpImpl->IsVisible();
+}
 
 vcl::Window* MediaWindow::getWindow() const
 {
@@ -219,21 +226,21 @@ bool MediaWindow::executeMediaURLDialog(weld::Window* pParent, OUString& rURL, b
     aDlg.SetTitle( AvmResId( o_pbLink != nullptr
                 ? AVMEDIA_STR_INSERTMEDIA_DLG : AVMEDIA_STR_OPENMEDIA_DLG ) );
 
-    for( FilterNameVector::size_type i = 0; i < aFilters.size(); ++i )
+    for( const auto &filter : aFilters )
     {
         for( sal_Int32 nIndex = 0; nIndex >= 0; )
         {
             if( !aAllTypes.isEmpty() )
                 aAllTypes.append(aSeparator);
 
-            aAllTypes.append(aWildcard + aFilters[ i ].second.getToken( 0, ';', nIndex ));
+            aAllTypes.append(OUString::Concat(aWildcard) + o3tl::getToken(filter.second, 0, ';', nIndex ));
         }
     }
 
     // add filter for all media types
     aDlg.AddFilter( AvmResId( AVMEDIA_STR_ALL_MEDIAFILES ), aAllTypes.makeStringAndClear() );
 
-    for( FilterNameVector::size_type i = 0; i < aFilters.size(); ++i )
+    for( const auto &filter : aFilters )
     {
         OUStringBuffer aTypes;
 
@@ -242,11 +249,11 @@ bool MediaWindow::executeMediaURLDialog(weld::Window* pParent, OUString& rURL, b
             if( !aTypes.isEmpty() )
                 aTypes.append(aSeparator);
 
-            aTypes.append(aWildcard + aFilters[ i ].second.getToken( 0, ';', nIndex ));
+            aTypes.append(OUString::Concat(aWildcard) + o3tl::getToken(filter.second, 0, ';', nIndex ));
         }
 
         // add single filters
-        aDlg.AddFilter( aFilters[ i ].first, aTypes.makeStringAndClear() );
+        aDlg.AddFilter( filter.first, aTypes.makeStringAndClear() );
     }
 
     // add filter for all types
@@ -296,49 +303,55 @@ void MediaWindow::executeFormatErrorBox(weld::Window* pParent)
     xBox->run();
 }
 
-bool MediaWindow::isMediaURL( const OUString& rURL, const OUString& rReferer, bool bDeep, Size* pPreferredSizePixel )
+bool MediaWindow::isMediaURL(std::u16string_view rURL, const OUString& rReferer, bool bDeep, rtl::Reference<PlayerListener> xPreferredPixelSizeListener)
 {
     const INetURLObject aURL( rURL );
 
-    if( aURL.GetProtocol() != INetProtocol::NotValid )
+    if( aURL.GetProtocol() == INetProtocol::NotValid )
+        return false;
+
+    if (bDeep || xPreferredPixelSizeListener)
     {
-        if( bDeep || pPreferredSizePixel )
+        try
         {
-            try
-            {
-                uno::Reference< media::XPlayer > xPlayer( priv::MediaWindowImpl::createPlayer(
-                                                            aURL.GetMainURL( INetURLObject::DecodeMechanism::Unambiguous ),
-                                                            rReferer, nullptr ) );
+            uno::Reference< media::XPlayer > xPlayer( priv::MediaWindowImpl::createPlayer(
+                                                        aURL.GetMainURL( INetURLObject::DecodeMechanism::Unambiguous ),
+                                                        rReferer, nullptr ) );
 
-                if( xPlayer.is() )
+            if( xPlayer.is() )
+            {
+                if (xPreferredPixelSizeListener)
                 {
-                    if( pPreferredSizePixel )
+                    uno::Reference<media::XPlayerNotifier> xPlayerNotifier(xPlayer, css::uno::UNO_QUERY);
+                    if (xPlayerNotifier)
                     {
-                        const awt::Size aAwtSize( xPlayer->getPreferredPlayerWindowSize() );
-
-                        pPreferredSizePixel->setWidth( aAwtSize.Width );
-                        pPreferredSizePixel->setHeight( aAwtSize.Height );
+                        // wait until it's possible to query this to get a sensible answer
+                        xPreferredPixelSizeListener->startListening(xPlayerNotifier);
                     }
-
-                    return true;
+                    else
+                    {
+                        // assume the size is possible to query immediately
+                        xPreferredPixelSizeListener->callPlayerWindowSizeAvailable(xPlayer);
+                    }
                 }
-            }
-            catch( ... )
-            {
+                return true;
             }
         }
-        else
+        catch( ... )
         {
-            FilterNameVector        aFilters = getMediaFilters();
-            const OUString          aExt( aURL.getExtension() );
+        }
+    }
+    else
+    {
+        FilterNameVector        aFilters = getMediaFilters();
+        const OUString          aExt( aURL.getExtension() );
 
-            for( FilterNameVector::size_type i = 0; i < aFilters.size(); ++i )
+        for( const auto &filter : aFilters )
+        {
+            for( sal_Int32 nIndex = 0; nIndex >= 0; )
             {
-                for( sal_Int32 nIndex = 0; nIndex >= 0; )
-                {
-                    if( aExt.equalsIgnoreAsciiCase( aFilters[ i ].second.getToken( 0, ';', nIndex ) ) )
-                        return true;
-                }
+                if( aExt.equalsIgnoreAsciiCase( o3tl::getToken(filter.second, 0, ';', nIndex ) ) )
+                    return true;
             }
         }
     }
@@ -346,20 +359,17 @@ bool MediaWindow::isMediaURL( const OUString& rURL, const OUString& rReferer, bo
     return false;
 }
 
-
 uno::Reference< media::XPlayer > MediaWindow::createPlayer( const OUString& rURL, const OUString& rReferer, const OUString* pMimeType )
 {
     return priv::MediaWindowImpl::createPlayer( rURL, rReferer, pMimeType );
 }
 
-uno::Reference< graphic::XGraphic > MediaWindow::grabFrame( const OUString& rURL,
-                                                            const OUString& rReferer,
-                                                            const OUString& sMimeType,
-                                                            const uno::Reference<graphic::XGraphic>& rGraphic)
+uno::Reference<graphic::XGraphic>
+MediaWindow::grabFrame(const uno::Reference<media::XPlayer>& xPlayer,
+                       const uno::Reference<graphic::XGraphic>& rGraphic)
 {
-    uno::Reference< media::XPlayer >    xPlayer( createPlayer( rURL, rReferer, &sMimeType ) );
     uno::Reference< graphic::XGraphic > xRet;
-    std::unique_ptr< Graphic > xGraphic;
+    std::optional< Graphic > oGraphic;
 
     if( xPlayer.is() )
     {
@@ -382,27 +392,120 @@ uno::Reference< graphic::XGraphic > MediaWindow::grabFrame( const OUString& rURL
             if( !aPrefSize.Width && !aPrefSize.Height )
             {
                 const BitmapEx aBmpEx(AVMEDIA_BMP_AUDIOLOGO);
-                xGraphic.reset( new Graphic( aBmpEx ) );
+                oGraphic.emplace( aBmpEx );
             }
         }
     }
 
-    if (!xRet.is() && !xGraphic)
+    if (!xRet.is() && !oGraphic)
     {
         const BitmapEx aBmpEx(AVMEDIA_BMP_EMPTYLOGO);
-        xGraphic.reset( new Graphic( aBmpEx ) );
+        oGraphic.emplace( aBmpEx );
     }
 
-    if (xGraphic)
+    if (oGraphic)
     {
         if (rGraphic)
-            xGraphic.reset(new Graphic(rGraphic));
-        xRet = xGraphic->GetXGraphic();
+            oGraphic.emplace(rGraphic);
+        xRet = oGraphic->GetXGraphic();
     }
 
     return xRet;
 }
 
+uno::Reference< graphic::XGraphic > MediaWindow::grabFrame(const OUString& rURL,
+                                                           const OUString& rReferer,
+                                                           const OUString& sMimeType,
+                                                           rtl::Reference<PlayerListener> xPreferredPixelSizeListener)
+{
+    uno::Reference<media::XPlayer> xPlayer(createPlayer(rURL, rReferer, &sMimeType));
+
+    if (xPreferredPixelSizeListener)
+    {
+        uno::Reference<media::XPlayerNotifier> xPlayerNotifier(xPlayer, css::uno::UNO_QUERY);
+        if (xPlayerNotifier)
+        {
+            // set a callback to call when a more sensible result is available, which
+            // might be called immediately if already available
+            xPreferredPixelSizeListener->startListening(xPlayerNotifier);
+        }
+        else
+        {
+            // assume the size is possible to query immediately
+            xPreferredPixelSizeListener->callPlayerWindowSizeAvailable(xPlayer);
+        }
+
+        return nullptr;
+    }
+
+    return grabFrame(xPlayer);
+}
+
+void MediaWindow::dispatchInsertAVMedia(const css::uno::Reference<css::frame::XDispatchProvider>& rDispatchProvider,
+                                        const css::awt::Size& rSize, const OUString& rURL, bool bLink)
+{
+    util::URL aDispatchURL;
+    aDispatchURL.Complete = ".uno:InsertAVMedia";
+
+    css::uno::Reference<css::util::XURLTransformer> xTrans(css::util::URLTransformer::create(::comphelper::getProcessComponentContext()));
+    xTrans->parseStrict(aDispatchURL);
+
+    css::uno::Reference<css::frame::XDispatch> xDispatch = rDispatchProvider->queryDispatch(aDispatchURL, "", 0);
+    css::uno::Sequence<css::beans::PropertyValue> aArgs(comphelper::InitPropertySequence({
+        { "URL", css::uno::Any(rURL) },
+        { "Size.Width", uno::Any(rSize.Width)},
+        { "Size.Height", uno::Any(rSize.Height)},
+        { "IsLink", css::uno::Any(bLink) },
+    }));
+    xDispatch->dispatch(aDispatchURL, aArgs);
+}
+
+PlayerListener::PlayerListener(std::function<void(const css::uno::Reference<css::media::XPlayer>&)> fn)
+    : PlayerListener_BASE(m_aMutex)
+    , m_aFn(std::move(fn))
+{
+}
+
+void PlayerListener::dispose()
+{
+    stopListening();
+    PlayerListener_BASE::dispose();
+}
+
+void PlayerListener::startListening(const css::uno::Reference<media::XPlayerNotifier>& rNotifier)
+{
+    osl::MutexGuard aGuard(m_aMutex);
+
+    m_xNotifier = rNotifier;
+    m_xNotifier->addPlayerListener(this);
+}
+
+void PlayerListener::stopListening()
+{
+    osl::MutexGuard aGuard(m_aMutex);
+    if (!m_xNotifier)
+        return;
+    m_xNotifier->removePlayerListener(this);
+    m_xNotifier.clear();
+}
+
+void SAL_CALL PlayerListener::preferredPlayerWindowSizeAvailable(const css::lang::EventObject&)
+{
+    osl::MutexGuard aGuard(m_aMutex);
+
+    css::uno::Reference<media::XPlayer> xPlayer(m_xNotifier, css::uno::UNO_QUERY_THROW);
+    callPlayerWindowSizeAvailable(xPlayer);
+
+    stopListening();
+}
+
+void SAL_CALL PlayerListener::disposing(const css::lang::EventObject&)
+{
+}
+
+PlayerListener::~PlayerListener()
+{
+}
 
 } // namespace avmedia
 

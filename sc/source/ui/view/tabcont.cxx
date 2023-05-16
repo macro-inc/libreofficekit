@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <osl/diagnose.h>
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/docfile.hxx>
@@ -39,7 +40,7 @@
 #include <comphelper/lok.hxx>
 
 ScTabControl::ScTabControl( vcl::Window* pParent, ScViewData* pData )
-    : TabBar(pParent, WB_3DLOOK | WB_MINSCROLL | WB_SCROLL | WB_RANGESELECT | WB_MULTISELECT | WB_DRAG)
+    : TabBar(pParent, WB_3DLOOK | WB_MINSCROLL | WB_SCROLL | WB_RANGESELECT | WB_MULTISELECT | WB_DRAG, true)
     , DropTargetHelper(this)
     , DragSourceHelper(this)
     , pViewData(pData)
@@ -233,6 +234,11 @@ void ScTabControl::AddTabClick()
     ScModule* pScMod = SC_MOD();
     if (!rDoc.IsDocEditable() || pScMod->IsTableLocked())
         return;
+
+    // auto-accept any in-process input - which would otherwise end up on the new sheet
+    if (!pScMod->IsFormulaMode())
+        pScMod->InputEnterHandler();
+
     OUString aName;
     rDoc.CreateValidTabName(aName);
     SCTAB nTabCount = rDoc.GetTableCount();
@@ -299,6 +305,7 @@ void ScTabControl::Select()
     rBind.Invalidate( FID_INS_TABLE );
     rBind.Invalidate( FID_TAB_APPEND );
     rBind.Invalidate( FID_TAB_MOVE );
+    rBind.Invalidate( FID_TAB_DUPLICATE );
     rBind.Invalidate( FID_TAB_RENAME );
     rBind.Invalidate( FID_DELETE_TABLE );
     rBind.Invalidate( FID_TABLE_SHOW );
@@ -497,7 +504,7 @@ void ScTabControl::DoDrag()
     aObjDesc.maDisplayName = pDocSh->GetMedium()->GetURLObject().GetURLNoPass();
     // maSize is set in ScTransferObj ctor
 
-    rtl::Reference<ScTransferObj> pTransferObj = new ScTransferObj( std::move(pClipDoc), aObjDesc );
+    rtl::Reference<ScTransferObj> pTransferObj = new ScTransferObj( std::move(pClipDoc), std::move(aObjDesc) );
 
     pTransferObj->SetDragSourceFlags(ScDragSrc::Table);
 

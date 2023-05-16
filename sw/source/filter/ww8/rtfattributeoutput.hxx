@@ -29,6 +29,7 @@
 #include <wrtswtbl.hxx>
 
 #include <rtl/strbuf.hxx>
+#include <editeng/boxitem.hxx>
 
 #include <optional>
 
@@ -124,6 +125,7 @@ public:
     void TableInfoCell(ww8::WW8TableNodeInfoInner::Pointer_t pTableTextNodeInfoInner) override;
     void TableInfoRow(ww8::WW8TableNodeInfoInner::Pointer_t pTableTextNodeInfoInner) override;
     void TableDefinition(ww8::WW8TableNodeInfoInner::Pointer_t pTableTextNodeInfoInner) override;
+    void TablePositioning(SwFrameFormat* pFlyFormat);
     void
     TableDefaultBorders(ww8::WW8TableNodeInfoInner::Pointer_t pTableTextNodeInfoInner) override;
     void TableBackgrounds(ww8::WW8TableNodeInfoInner::Pointer_t pTableTextNodeInfoInner) override;
@@ -149,7 +151,8 @@ public:
 
     /// Start of a style in the styles table.
     void StartStyle(const OUString& rName, StyleType eType, sal_uInt16 nBase, sal_uInt16 nNext,
-                    sal_uInt16 nLink, sal_uInt16 nWwId, sal_uInt16 nId, bool bAutoUpdate) override;
+                    sal_uInt16 nLink, sal_uInt16 nWwId, sal_uInt16 nSlot,
+                    bool bAutoUpdate) override;
 
     /// End of a style in the styles table.
     void EndStyle() override;
@@ -641,6 +644,8 @@ private:
     bool m_bParaAfterAutoSpacing;
     /// If m_bParaBeforeAutoSpacing is set, value of \sa.
     sal_Int32 m_nParaAfterSpacing;
+
+    editeng::WordPageMargins m_aPageMargins;
 
 public:
     explicit RtfAttributeOutput(RtfExport& rExport);

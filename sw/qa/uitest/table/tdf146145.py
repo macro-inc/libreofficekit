@@ -8,7 +8,7 @@
 #
 
 from uitest.framework import UITestCase
-from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
+from uitest.uihelper.common import get_url_for_data_file
 import time
 
 from com.sun.star.accessibility.AccessibleStateType import ENABLED
@@ -21,7 +21,7 @@ class tdf146145(UITestCase):
 
        for i in xFrame.getPropertyValue("LayoutManager").getElements():
            if i.getPropertyValue('ResourceURL') == 'private:resource/toolbar/changes':
-               return ENABLED in i.getRealInterface().getAccessibleContext().getAccessibleChild(5).getAccessibleStateSet().getStates()
+               return (ENABLED & i.getRealInterface().getAccessibleContext().getAccessibleChild(5).getAccessibleStateSet()) == ENABLED
 
        return False
 

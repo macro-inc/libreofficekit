@@ -27,10 +27,9 @@
 #include <optional>
 #include <unordered_map>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <rtl/ref.hxx>
-#include <cppuhelper/interfacecontainer.hxx>
 #include <comphelper/interfacecontainer2.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <com/sun/star/beans/IllegalTypeException.hpp>
@@ -44,9 +43,10 @@
 #include <com/sun/star/container/XNameReplace.hpp>
 #include <com/sun/star/util/XChangesBatch.hpp>
 #include <com/sun/star/lang/XSingleServiceFactory.hpp>
+#include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/weak.hxx>
-#include <ucbhelper/macros.hxx>
+#include <utility>
 #include "ucbstore.hxx"
 
 using namespace com::sun::star::beans;
@@ -59,13 +59,13 @@ using namespace com::sun::star::util;
 using namespace comphelper;
 using namespace cppu;
 
-static OUString makeHierarchalNameSegment( const OUString & rIn  )
+static OUString makeHierarchalNameSegment( std::u16string_view rIn  )
 {
     OUStringBuffer aBuffer;
     aBuffer.append( "['" );
 
-    sal_Int32 nCount = rIn.getLength();
-    for ( sal_Int32 n = 0; n < nCount; ++n )
+    size_t nCount = rIn.size();
+    for ( size_t n = 0; n < nCount; ++n )
     {
         const sal_Unicode c = rIn[ n ];
         switch ( c )
@@ -128,8 +128,7 @@ public:
 
 
 UcbStore::UcbStore( const Reference< XComponentContext >& xContext )
-: UcbStore_Base(m_aMutex),
-  m_xContext( xContext )
+: m_xContext( xContext )
 {
 }
 
@@ -174,7 +173,7 @@ UcbStore::createPropertySetRegistry( const OUString& )
 
     if ( !m_xTheRegistry.is() )
     {
-        osl::Guard< osl::Mutex > aGuard( m_aMutex );
+        std::unique_lock aGuard( m_aMutex );
         if ( !m_xTheRegistry.is() )
             m_xTheRegistry = new PropertySetRegistry( m_xContext, m_aInitArgs );
     }
@@ -189,7 +188,7 @@ UcbStore::createPropertySetRegistry( const OUString& )
 // virtual
 void SAL_CALL UcbStore::initialize( const Sequence< Any >& aArguments )
 {
-    osl::Guard< osl::Mutex > aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
     m_aInitArgs = aArguments;
 }
 
@@ -303,7 +302,7 @@ PropertySetRegistry::openPropertySet( const OUString& key, sal_Bool create )
 
                                 // Insert new item.
                                 xContainer->insertByName(
-                                        key, makeAny( xNameReplace ) );
+                                        key, Any( xNameReplace ) );
                                 // Commit changes.
                                 xBatch->commitChanges();
 
@@ -588,7 +587,7 @@ void PropertySetRegistry::renamePropertySet( const OUString& rOldKey,
                     {
                         // Insert new item.
                         xContainer->insertByName(
-                                    rNewKey, makeAny( xNameReplace ) );
+                                    rNewKey, Any( xNameReplace ) );
                         // Commit changes.
                         xBatch->commitChanges();
                     }
@@ -745,7 +744,7 @@ void PropertySetRegistry::renamePropertySet( const OUString& rOldKey,
 
                             // Insert new item.
                             xNewContainer->insertByName(
-                                rPropName, makeAny( xNewPropNameReplace ) );
+                                rPropName, Any( xNewPropNameReplace ) );
 
                             // Commit changes.
                             xBatch->commitChanges();
@@ -1016,8 +1015,8 @@ Reference< XInterface > PropertySetRegistry::getConfigWriteAccess(
 
 PersistentPropertySet::PersistentPropertySet(
                         PropertySetRegistry& rCreator,
-                        const OUString& rKey )
-: m_pCreator( &rCreator ), m_aKey( rKey )
+                        OUString aKey )
+: m_pCreator( &rCreator ), m_aKey(std::move( aKey ))
 {
     // register at creator.
     rCreator.add( this );
@@ -1086,7 +1085,7 @@ void SAL_CALL PersistentPropertySet::addEventListener(
 {
     if ( !m_pDisposeEventListeners )
         m_pDisposeEventListeners.reset(
-                    new OInterfaceContainerHelper2( m_aMutex ) );
+                    new OInterfaceContainerHelper3<css::lang::XEventListener>( m_aMutex ) );
 
     m_pDisposeEventListeners->addInterface( Listener );
 }
@@ -1164,7 +1163,7 @@ void SAL_CALL PersistentPropertySet::setPropertyValue( const OUString& aProperty
                     // Write state ( Now it is a directly set value )
                     xNameReplace->replaceByName(
                                     "State",
-                                    makeAny(
+                                    Any(
                                         sal_Int32(
                                             PropertyState_DIRECT_VALUE ) ) );
 
@@ -1402,7 +1401,7 @@ void SAL_CALL PersistentPropertySet::addProperty(
                 // Set handle
                 xNameReplace->replaceByName(
                                     "Handle",
-                                    makeAny( sal_Int32( -1 ) ) );
+                                    Any( sal_Int32( -1 ) ) );
 
                 // Set default value
                 xNameReplace->replaceByName(
@@ -1412,17 +1411,17 @@ void SAL_CALL PersistentPropertySet::addProperty(
                 // Set state ( always "default" )
                 xNameReplace->replaceByName(
                                     "State",
-                                    makeAny(
+                                    Any(
                                         sal_Int32(
                                             PropertyState_DEFAULT_VALUE ) ) );
 
                 // Set attributes
                 xNameReplace->replaceByName(
                                     "Attributes",
-                                    makeAny( sal_Int32( Attributes ) ) );
+                                    Any( sal_Int32( Attributes ) ) );
 
                 // Insert new item.
-                xContainer->insertByName( Name, makeAny( xNameReplace ) );
+                xContainer->insertByName( Name, Any( xNameReplace ) );
 
                 // Commit changes.
                 xBatch->commitChanges();
@@ -1636,7 +1635,7 @@ void SAL_CALL PersistentPropertySet::addPropertySetInfoChangeListener(
 {
     if ( !m_pPropSetChangeListeners )
         m_pPropSetChangeListeners.reset(
-                    new OInterfaceContainerHelper2( m_aMutex ) );
+                    new OInterfaceContainerHelper3<XPropertySetInfoChangeListener>( m_aMutex ) );
 
     m_pPropSetChangeListeners->addInterface( Listener );
 }
@@ -1825,7 +1824,7 @@ void SAL_CALL PersistentPropertySet::setPropertyValues(
                         // Write handle
                         xNameReplace->replaceByName(
                                     "Handle",
-                                    makeAny( rNewValue.Handle ) );
+                                    Any( rNewValue.Handle ) );
 
                         // Save old value
                         OUString aValueName = aFullPropName +"/Value";
@@ -1840,7 +1839,7 @@ void SAL_CALL PersistentPropertySet::setPropertyValues(
                         // Write state ( Now it is a directly set value )
                         xNameReplace->replaceByName(
                                     "State",
-                                    makeAny(
+                                    Any(
                                         sal_Int32(
                                             PropertyState_DIRECT_VALUE ) ) );
 
@@ -1902,30 +1901,19 @@ void PersistentPropertySet::notifyPropertyChangeEvent(
                                     const PropertyChangeEvent& rEvent ) const
 {
     // Get "normal" listeners for the property.
-    OInterfaceContainerHelper2* pContainer =
-            m_pPropertyChangeListeners->getContainer(
-                                                    rEvent.PropertyName );
+    OInterfaceContainerHelper3<XPropertyChangeListener>* pContainer =
+            m_pPropertyChangeListeners->getContainer( rEvent.PropertyName );
     if ( pContainer && pContainer->getLength() )
     {
-        OInterfaceIteratorHelper2 aIter( *pContainer );
-        while ( aIter.hasMoreElements() )
-        {
-            // Propagate event.
-            static_cast< XPropertyChangeListener* >( aIter.next() )->propertyChange( rEvent );
-        }
+        pContainer->notifyEach( &XPropertyChangeListener::propertyChange, rEvent );
     }
 
     // Get "normal" listeners for all properties.
-    OInterfaceContainerHelper2* pNoNameContainer =
+    OInterfaceContainerHelper3<XPropertyChangeListener>* pNoNameContainer =
             m_pPropertyChangeListeners->getContainer( OUString() );
     if ( pNoNameContainer && pNoNameContainer->getLength() )
     {
-        OInterfaceIteratorHelper2 aIter( *pNoNameContainer );
-        while ( aIter.hasMoreElements() )
-        {
-            // Propagate event.
-            static_cast< XPropertyChangeListener* >( aIter.next() )->propertyChange( rEvent );
-        }
+        pNoNameContainer->notifyEach( &XPropertyChangeListener::propertyChange, rEvent );
     }
 }
 
@@ -1937,15 +1925,7 @@ void PersistentPropertySet::notifyPropertySetInfoChange(
         return;
 
     // Notify event listeners.
-    OInterfaceIteratorHelper2 aIter( *m_pPropSetChangeListeners );
-    while ( aIter.hasMoreElements() )
-    {
-        // Propagate event.
-        Reference< XPropertySetInfoChangeListener >
-                            xListener( aIter.next(), UNO_QUERY );
-        if ( xListener.is() )
-            xListener->propertySetInfoChange( evt );
-    }
+    m_pPropSetChangeListeners->notifyEach( &XPropertySetInfoChangeListener::propertySetInfoChange, evt );
 }
 
 

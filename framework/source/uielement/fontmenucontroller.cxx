@@ -26,8 +26,6 @@
 #include <com/sun/star/frame/XFrame.hpp>
 #include <com/sun/star/util/XURLTransformer.hpp>
 
-#include <toolkit/awt/vclxmenu.hxx>
-#include <vcl/menu.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/i18nhelp.hxx>
@@ -82,17 +80,9 @@ FontMenuController::~FontMenuController()
 // private function
 void FontMenuController::fillPopupMenu( const Sequence< OUString >& rFontNameSeq, Reference< css::awt::XPopupMenu > const & rPopupMenu )
 {
-    VCLXPopupMenu*     pPopupMenu = static_cast<VCLXPopupMenu *>(comphelper::getFromUnoTunnel<VCLXMenu>( rPopupMenu ));
-    PopupMenu*         pVCLPopupMenu = nullptr;
-
     SolarMutexGuard aSolarMutexGuard;
 
     resetPopupMenu( rPopupMenu );
-    if ( pPopupMenu )
-        pVCLPopupMenu = static_cast<PopupMenu *>(pPopupMenu->GetMenu());
-
-    if ( !pVCLPopupMenu )
-        return;
 
     std::vector<OUString> aVector;
     aVector.reserve(rFontNameSeq.getLength());
@@ -110,9 +100,8 @@ void FontMenuController::fillPopupMenu( const Sequence< OUString >& rFontNameSeq
         m_xPopupMenu->insertItem( i+1, rName, css::awt::MenuItemStyle::RADIOCHECK | css::awt::MenuItemStyle::AUTOCHECK, i );
         if ( rName == m_aFontFamilyName )
             m_xPopupMenu->checkItem( i+1, true );
-        // use VCL popup menu pointer to set vital information that are not part of the awt implementation
         OUString aFontNameCommand = aFontNameCommandPrefix + INetURLObject::encode( rName, INetURLObject::PART_HTTP_QUERY, INetURLObject::EncodeMechanism::All );
-        pVCLPopupMenu->SetItemCommand( i+1, aFontNameCommand ); // Store font name into item command.
+        m_xPopupMenu->setCommand(i + 1, aFontNameCommand); // Store font name into item command.
     }
 }
 

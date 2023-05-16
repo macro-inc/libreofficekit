@@ -26,7 +26,6 @@
 #include <vcl/jobset.hxx>
 #include <svl/numformat.hxx>
 #include <svl/whiter.hxx>
-#include <svl/zforlist.hxx>
 #include <svl/eitem.hxx>
 #include <svl/stritem.hxx>
 #include <svl/PasswordHelper.hxx>
@@ -80,7 +79,6 @@
 #include <strings.hrc>
 
 #include <unotools/fltrcfg.hxx>
-#include <svtools/htmlcfg.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/objface.hxx>
 
@@ -141,11 +139,11 @@ Reader* SwDocShell::StartConvertFrom(SfxMedium& rMedium, SwReaderPtr& rpRdr,
                                     SwPaM* pPaM )
 {
     bool bAPICall = false;
-    const SfxPoolItem* pApiItem;
-    const SfxItemSet* pMedSet;
-    if( nullptr != ( pMedSet = rMedium.GetItemSet() ) && SfxItemState::SET ==
-            pMedSet->GetItemState( FN_API_CALL, true, &pApiItem ) )
-            bAPICall = static_cast<const SfxBoolItem*>(pApiItem)->GetValue();
+    const SfxBoolItem* pApiItem;
+    const SfxItemSet* pMedSet = rMedium.GetItemSet();
+    if( pMedSet &&
+        (pApiItem = pMedSet->GetItemIfSet( FN_API_CALL )) )
+        bAPICall = pApiItem->GetValue();
 
     std::shared_ptr<const SfxFilter> pFlt = rMedium.GetFilter();
     if( !pFlt )
@@ -189,11 +187,11 @@ Reader* SwDocShell::StartConvertFrom(SfxMedium& rMedium, SwReaderPtr& rpRdr,
         pFlt->GetUserData() == FILTER_TEXT_DLG )
     {
         SwAsciiOptions aOpt;
-        const SfxItemSet* pSet;
-        const SfxPoolItem* pItem;
-        if( nullptr != ( pSet = rMedium.GetItemSet() ) && SfxItemState::SET ==
-            pSet->GetItemState( SID_FILE_FILTEROPTIONS, true, &pItem ) )
-            aOpt.ReadUserData( static_cast<const SfxStringItem*>(pItem)->GetValue() );
+        const SfxItemSet* pSet = rMedium.GetItemSet();
+        const SfxStringItem* pItem;
+        if( pSet &&
+            (pItem = pSet->GetItemIfSet( SID_FILE_FILTEROPTIONS )) )
+            aOpt.ReadUserData( pItem->GetValue() );
 
         pRead->GetReaderOpt().SetASCIIOpts( aOpt );
     }
@@ -293,7 +291,7 @@ bool SwDocShell::Save()
         case SfxObjectCreateMode::ORGANIZER:
             {
                 WriterRef xWrt;
-                ::GetXMLWriter(OUString(), GetMedium()->GetBaseURL(true), xWrt);
+                ::GetXMLWriter(std::u16string_view(), GetMedium()->GetBaseURL(true), xWrt);
                 xWrt->SetOrganizerMode( true );
                 SwWriter aWrt( *GetMedium(), *m_xDoc );
                 nErr = aWrt.Write( xWrt );
@@ -321,7 +319,7 @@ bool SwDocShell::Save()
                     m_pWrtShell->EndAllTableBoxEdit();
 
                 WriterRef xWrt;
-                ::GetXMLWriter(OUString(), GetMedium()->GetBaseURL(true), xWrt);
+                ::GetXMLWriter(std::u16string_view(), GetMedium()->GetBaseURL(true), xWrt);
 
                 bool bLockedView(false);
                 if (m_pWrtShell)
@@ -535,7 +533,7 @@ bool SwDocShell::SaveAs( SfxMedium& rMedium )
                             SfxObjectCreateMode::EMBEDDED == GetCreateMode() );
 
         WriterRef xWrt;
-        ::GetXMLWriter(OUString(), rMedium.GetBaseURL(true), xWrt);
+        ::GetXMLWriter(std::u16string_view(), rMedium.GetBaseURL(true), xWrt);
 
         bool bLockedView(false);
         if (m_pWrtShell)
@@ -722,7 +720,7 @@ bool SwDocShell::ConvertTo( SfxMedium& rMedium )
                 // TODO/MBA: testing
                 uno::Reference < beans::XPropertySet > xSet( rMedium.GetStorage(), uno::UNO_QUERY );
                 if ( xSet.is() )
-                    xSet->setPropertyValue("MediaType", uno::makeAny( SotExchange::GetFormatMimeType( nSaveClipId ) ) );
+                    xSet->setPropertyValue("MediaType", uno::Any( SotExchange::GetFormatMimeType( nSaveClipId ) ) );
             }
             catch (const uno::Exception&)
             {
@@ -750,10 +748,8 @@ bool SwDocShell::ConvertTo( SfxMedium& rMedium )
         const SfxItemSet* pSet = rMedium.GetItemSet();
         if( nullptr != pSet )
         {
-            const SfxPoolItem* pItem;
-            if( SfxItemState::SET == pSet->GetItemState( SID_FILE_FILTEROPTIONS,
-                                                    true, &pItem ) )
-                sItemOpt = static_cast<const SfxStringItem*>(pItem)->GetValue();
+            if( const SfxStringItem* pItem = pSet->GetItemIfSet( SID_FILE_FILTEROPTIONS ) )
+                sItemOpt = pItem->GetValue();
         }
         if(!sItemOpt.isEmpty())
             aOpt.ReadUserData( sItemOpt );
@@ -1139,7 +1135,7 @@ IMPL_LINK( SwDocShell, Ole2ModifiedHdl, bool, bNewStatus, void )
         SwOLENode* pOLENode = nullptr;
         if (!m_pWrtShell->IsTableMode())
         {
-            pOLENode = m_pWrtShell->GetCursor()->GetNode().GetOLENode();
+            pOLENode = m_pWrtShell->GetCursor()->GetPointNode().GetOLENode();
         }
         if (pOLENode)
         {
@@ -1290,7 +1286,7 @@ void SwDocShell::UpdateLinks()
     // #i50703# Update footnote numbers
     SwTextFootnote::SetUniqueSeqRefNo( *GetDoc() );
     SwNodeIndex aTmp( GetDoc()->GetNodes() );
-    GetDoc()->GetFootnoteIdxs().UpdateFootnote( aTmp );
+    GetDoc()->GetFootnoteIdxs().UpdateFootnote( aTmp.GetNode() );
 }
 
 uno::Reference< frame::XController >
@@ -1377,12 +1373,12 @@ void SwDocShell::SetChangeRecording( bool bActivate, bool bLockAllViews )
 void SwDocShell::SetProtectionPassword( const OUString &rNewPassword )
 {
     const SfxAllItemSet aSet( GetPool() );
-    const SfxPoolItem*  pItem = nullptr;
 
     IDocumentRedlineAccess& rIDRA = m_pWrtShell->getIDocumentRedlineAccess();
     Sequence< sal_Int8 > aPasswd = rIDRA.GetRedlinePassword();
-    if (SfxItemState::SET == aSet.GetItemState(FN_REDLINE_PROTECT, false, &pItem)
-        && static_cast<const SfxBoolItem*>(pItem)->GetValue() == aPasswd.hasElements())
+    const SfxBoolItem* pRedlineProtectItem = aSet.GetItemIfSet(FN_REDLINE_PROTECT, false);
+    if (pRedlineProtectItem
+        && pRedlineProtectItem->GetValue() == aPasswd.hasElements())
         return;
 
     if (!rNewPassword.isEmpty())
@@ -1405,12 +1401,12 @@ bool SwDocShell::GetProtectionHash( /*out*/ css::uno::Sequence< sal_Int8 > &rPas
     bool bRes = false;
 
     const SfxAllItemSet aSet( GetPool() );
-    const SfxPoolItem*  pItem = nullptr;
 
     IDocumentRedlineAccess& rIDRA = m_pWrtShell->getIDocumentRedlineAccess();
     const Sequence< sal_Int8 >& aPasswdHash( rIDRA.GetRedlinePassword() );
-    if (SfxItemState::SET == aSet.GetItemState(FN_REDLINE_PROTECT, false, &pItem)
-        && static_cast<const SfxBoolItem*>(pItem)->GetValue() == aPasswdHash.hasElements())
+    const SfxBoolItem* pRedlineProtectItem = aSet.GetItemIfSet(FN_REDLINE_PROTECT, false);
+    if (pRedlineProtectItem
+        && pRedlineProtectItem->GetValue() == aPasswdHash.hasElements())
         return false;
     rPasswordHash = aPasswdHash;
     bRes = true;

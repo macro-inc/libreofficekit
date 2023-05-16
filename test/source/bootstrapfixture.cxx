@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <config_features.h>
+#include <config_validation.h>
 
 #include <test/bootstrapfixture.hxx>
 #include <vcl/errinf.hxx>
@@ -29,6 +29,7 @@
 #include <vcl/salgtype.hxx>
 #include <vcl/scheduler.hxx>
 #include <vcl/virdev.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <memory>
 #include <cstring>
@@ -186,7 +187,7 @@ void test::BootstrapFixture::validate(const OUString& rPath, test::ValidationFor
             + m_directories.getPathFromSrc(u"/schema/mathml2/mathml2.xsd");
     }
 
-    utl::TempFile aOutput;
+    utl::TempFileNamed aOutput;
     aOutput.EnableKillingFile();
     OUString aOutputFile = aOutput.GetFileName();
     OUString aCommand = aValidator + " " + rPath + " > " + aOutputFile + " 2>&1";
@@ -223,8 +224,8 @@ void test::BootstrapFixture::validate(const OUString& rPath, test::ValidationFor
         else
         {
             sal_Int32 nStartOfNumber = nIndex + std::strlen("Grand total of errors in submitted package: ");
-            OUString aNumber = aContentOUString.copy(nStartOfNumber);
-            sal_Int32 nErrors = aNumber.toInt32();
+            std::u16string_view aNumber = aContentOUString.subView(nStartOfNumber);
+            sal_Int32 nErrors = o3tl::toInt32(aNumber);
             OString aMsg = "validation error in OOXML export: Errors: " + OString::number(nErrors);
             if(nErrors)
             {
@@ -262,6 +263,12 @@ bool test::BootstrapFixture::IsDefaultDPI()
 {
     return (Application::GetDefaultDevice()->GetDPIX() == 96
             && Application::GetDefaultDevice()->GetDPIY() == 96);
+}
+
+std::pair<double, double> test::BootstrapFixture::getDPIScaling()
+{
+    return { Application::GetDefaultDevice()->GetDPIX() / 96.0,
+             Application::GetDefaultDevice()->GetDPIY() / 96.0 };
 }
 
 sal_uInt16 test::BootstrapFixture::getDefaultDeviceBitCount()

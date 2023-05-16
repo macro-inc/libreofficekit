@@ -48,7 +48,7 @@ private:
     OUString m_aType;    // filter wildcard - if empty, the entry marks a group
 
 public:
-    SvtFileDialogFilter_Impl( const OUString& rName, const OUString& rType );
+    SvtFileDialogFilter_Impl( OUString aName, OUString aType );
     ~SvtFileDialogFilter_Impl();
 
     const OUString&     GetName() const     { return m_aName; }
@@ -185,7 +185,7 @@ public:
     SvtFileDialogFilter_Impl* GetSelectedFilterEntry( OUString& rDisplayName ) const
     {
         rDisplayName = m_xLbFilter->get_active_text();
-        return reinterpret_cast<SvtFileDialogFilter_Impl*>(m_xLbFilter->get_active_id().toInt64());
+        return weld::fromId<SvtFileDialogFilter_Impl*>(m_xLbFilter->get_active_id());
     }
 
     // access to the current filter via methods only - need to care for consistency between m_pCurFilter and m_sCurrentFilterDisplayName

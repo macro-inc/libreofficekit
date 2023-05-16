@@ -191,14 +191,14 @@ bool MsLangId::usesHyphenation(LanguageType nLang)
 
 // static
 css::lang::Locale MsLangId::Conversion::convertLanguageToLocale(
-        LanguageType nLang )
+        LanguageType nLang, bool bIgnoreOverride )
 {
     css::lang::Locale aLocale;
     // Still resolve LANGUAGE_DONTKNOW if resolving is not requested,
     // but not LANGUAGE_SYSTEM or others.
     LanguageType nOrigLang = nLang;
     nLang = MsLangId::getRealLanguage(nLang);
-    convertLanguageToLocaleImpl( nLang, aLocale, true );
+    convertLanguageToLocaleImpl( nLang, aLocale, bIgnoreOverride );
     if (aLocale.Language.isEmpty() && simplifySystemLanguages(nOrigLang) == LANGUAGE_SYSTEM)
     {
         // None found but resolve requested, last resort is "en-US".
@@ -228,30 +228,25 @@ css::lang::Locale MsLangId::getFallbackLocale(
 {
     // empty language => LANGUAGE_SYSTEM
     if (rLocale.Language.isEmpty())
-        return Conversion::lookupFallbackLocale( Conversion::convertLanguageToLocale( LANGUAGE_SYSTEM ));
+        return Conversion::lookupFallbackLocale( Conversion::convertLanguageToLocale( LANGUAGE_SYSTEM, false));
     else
         return Conversion::lookupFallbackLocale( rLocale);
-}
-
-static constexpr bool equalsPrimary(LanguageType lhs, LanguageType rhs)
-{
-    return (sal_uInt16(lhs) & LANGUAGE_MASK_PRIMARY )
-        == (sal_uInt16(rhs) & LANGUAGE_MASK_PRIMARY );
 }
 
 // static
 bool MsLangId::isRightToLeft( LanguageType nLang )
 {
-    if( equalsPrimary(nLang, LANGUAGE_ARABIC_SAUDI_ARABIA)
-        || equalsPrimary(nLang, LANGUAGE_HEBREW)
-        || equalsPrimary(nLang, LANGUAGE_YIDDISH)
-        || equalsPrimary(nLang, LANGUAGE_URDU_PAKISTAN)
-        || equalsPrimary(nLang, LANGUAGE_FARSI)
-        || equalsPrimary(nLang, LANGUAGE_KASHMIRI)
-        || equalsPrimary(nLang, LANGUAGE_SINDHI)
-        || equalsPrimary(nLang, LANGUAGE_UIGHUR_CHINA)
-        || equalsPrimary(nLang, LANGUAGE_USER_KYRGYZ_CHINA)
-        || equalsPrimary(nLang, LANGUAGE_USER_NKO) )
+    if (primary(nLang).anyOf(
+                primary(LANGUAGE_ARABIC_SAUDI_ARABIA),
+                primary(LANGUAGE_HEBREW),
+                primary(LANGUAGE_YIDDISH),
+                primary(LANGUAGE_URDU_PAKISTAN),
+                primary(LANGUAGE_FARSI),
+                primary(LANGUAGE_KASHMIRI),
+                primary(LANGUAGE_SINDHI),
+                primary(LANGUAGE_UIGHUR_CHINA),
+                primary(LANGUAGE_USER_KYRGYZ_CHINA),
+                primary(LANGUAGE_USER_NKO)))
     {
         return true;
     }
@@ -399,15 +394,6 @@ sal_Int16 MsLangId::getScriptType( LanguageType nLang )
     {
             nScript = css::i18n::ScriptType::LATIN;
     }
-// currently not knowing scripttype - defaulted to LATIN:
-/*
-#define LANGUAGE_ARMENIAN                   0x042B
-#define LANGUAGE_INDONESIAN                 0x0421
-#define LANGUAGE_KAZAKH                     0x043F
-#define LANGUAGE_KONKANI                    0x0457
-#define LANGUAGE_MACEDONIAN                 0x042F
-#define LANGUAGE_TATAR                      0x0444
-*/
             // CJK catcher
     else if ( primary(nLang).anyOf(
         primary(LANGUAGE_CHINESE              ),
@@ -433,6 +419,7 @@ sal_Int16 MsLangId::getScriptType( LanguageType nLang )
         primary(LANGUAGE_KANNADA             ),
         primary(LANGUAGE_KASHMIRI            ),
         primary(LANGUAGE_KHMER               ),
+        primary(LANGUAGE_KONKANI             ),
         primary(LANGUAGE_LAO                 ),
         primary(LANGUAGE_MALAYALAM           ),
         primary(LANGUAGE_MANIPURI            ),
@@ -580,6 +567,8 @@ LanguageType MsLangId::getReplacementForObsoleteLanguage( LanguageType nLang )
         nLang = LANGUAGE_KURDISH_ARABIC_IRAQ;
     else if (nLang == LANGUAGE_OBSOLETE_USER_SPANISH_CUBA)
         nLang = LANGUAGE_SPANISH_CUBA;
+    else if (nLang == LANGUAGE_OBSOLETE_USER_SPANISH_LATIN_AMERICA)
+        nLang = LANGUAGE_SPANISH_LATIN_AMERICA;
 
     // The following are not strictly obsolete but should be mapped to a
     // replacement locale when encountered.

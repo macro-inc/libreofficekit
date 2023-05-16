@@ -26,11 +26,13 @@
 
  *************************************************************************/
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/io/IOException.hpp>
 #include <com/sun/star/lang/DisposedException.hpp>
 #include <com/sun/star/reflection/ProxyFactory.hpp>
+#include <utility>
 
+#include "tdoc_docmgr.hxx"
 #include "tdoc_uri.hxx"
 
 #include "tdoc_stgelems.hxx"
@@ -43,9 +45,9 @@ using namespace tdoc_ucp;
 
 
 ParentStorageHolder::ParentStorageHolder(
-            const uno::Reference< embed::XStorage > & xParentStorage,
+            uno::Reference< embed::XStorage > xParentStorage,
             const OUString & rUri )
-: m_xParentStorage( xParentStorage ),
+: m_xParentStorage(std::move( xParentStorage )),
   m_bParentIsRootStorage( false )
 {
     Uri aUri( rUri );
@@ -58,12 +60,12 @@ ParentStorageHolder::ParentStorageHolder(
 
 
 Storage::Storage( const uno::Reference< uno::XComponentContext > & rxContext,
-                  const rtl::Reference< StorageElementFactory > & xFactory,
+                  rtl::Reference< StorageElementFactory > xFactory,
                   const OUString & rUri,
                   const uno::Reference< embed::XStorage > & xParentStorage,
                   const uno::Reference< embed::XStorage > & xStorageToWrap )
 : ParentStorageHolder( xParentStorage, Uri( rUri ).getParentUri() ),
-  m_xFactory( xFactory ),
+  m_xFactory(std::move( xFactory )),
   m_xWrappedStorage( xStorageToWrap ),
   m_xWrappedTransObj( xStorageToWrap, uno::UNO_QUERY ), // optional interface
   m_xWrappedComponent( xStorageToWrap ),
@@ -614,10 +616,13 @@ OutputStream::removeEventListener(
 
 Stream::Stream(
             const uno::Reference< uno::XComponentContext > & rxContext,
+            rtl::Reference<OfficeDocumentsManager> const & docsMgr,
             const OUString & rUri,
             const uno::Reference< embed::XStorage >  & xParentStorage,
             const uno::Reference< io::XStream > & xStreamToWrap )
 : ParentStorageHolder( xParentStorage, Uri( rUri ).getParentUri() ),
+  m_docsMgr(docsMgr),
+  m_uri(rUri),
   m_xWrappedStream( xStreamToWrap ),
   m_xWrappedOutputStream( xStreamToWrap->getOutputStream() ), // might be empty
   m_xWrappedTruncate( m_xWrappedOutputStream, uno::UNO_QUERY ), // might be empty
@@ -871,6 +876,7 @@ void Stream::commitChanges()
             throw io::IOException(); // @@@
         }
     }
+    m_docsMgr->updateStreamDateModified(m_uri);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

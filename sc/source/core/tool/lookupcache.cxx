@@ -68,17 +68,6 @@ ScLookupCache::QueryCriteria::~QueryCriteria()
     deleteString();
 }
 
-ScLookupCache::ScLookupCache( ScDocument * pDoc, const ScRange & rRange, ScLookupCacheMap & cacheMap ) :
-    maRange( rRange),
-    mpDoc( pDoc),
-    mCacheMap(cacheMap)
-{
-}
-
-ScLookupCache::~ScLookupCache()
-{
-}
-
 ScLookupCache::Result ScLookupCache::lookup( ScAddress & o_rResultAddress,
         const QueryCriteria & rCriteria, const ScAddress & rQueryAddress ) const
 {
@@ -127,11 +116,10 @@ void ScLookupCache::Notify( const SfxHint& rHint )
 {
     if (!mpDoc->IsInDtorClear())
     {
-        const ScHint* p = dynamic_cast<const ScHint*>(&rHint);
-        if ((p && (p->GetId() == SfxHintId::ScDataChanged)) || dynamic_cast<const ScAreaChangedHint*>(&rHint))
+        if (rHint.GetId() == SfxHintId::ScDataChanged || rHint.GetId() == SfxHintId::ScAreaChanged)
         {
             mpDoc->RemoveLookupCache( *this);
-            delete this;
+            // this ScLookupCache is deleted by RemoveLookupCache
         }
     }
 }

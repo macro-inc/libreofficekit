@@ -48,7 +48,7 @@ typedef ::cppu::ImplInheritanceHelper<
     AccessibleChartView_Base;
 }
 
-class AccessibleChartView :
+class AccessibleChartView final :
         public impl::AccessibleChartView_Base
 {
 public:
@@ -79,7 +79,7 @@ public:
     // ________ XAccessibleContext ________
     virtual OUString SAL_CALL getAccessibleDescription() override;
     virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleParent() override;
-    virtual sal_Int32 SAL_CALL getAccessibleIndexInParent() override;
+    virtual sal_Int64 SAL_CALL getAccessibleIndexInParent() override;
     virtual OUString SAL_CALL getAccessibleName() override;
     virtual sal_Int16 SAL_CALL getAccessibleRole() override;
 
@@ -102,7 +102,7 @@ private: // methods
 
 private: // members
     css::uno::WeakReference< css::view::XSelectionSupplier >        m_xSelectionSupplier;
-    css::uno::WeakReference< css::frame::XModel >                   m_xChartModel;
+    unotools::WeakReference<::chart::ChartModel>                    m_xChartModel;
     css::uno::WeakReference< css::uno::XInterface >                 m_xChartView;
     css::uno::WeakReference< css::awt::XWindow >                    m_xWindow;
     css::uno::WeakReference< css::accessibility::XAccessible >      m_xParent;

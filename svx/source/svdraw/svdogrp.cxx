@@ -30,10 +30,14 @@
 #include <sdr/contact/viewcontactofgroup.hxx>
 #include <basegfx/range/b2drange.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
-#include <basegfx/polygon/b2dpolygon.hxx>
 #include <libxml/xmlwriter.h>
-#include <rtl/ustrbuf.hxx>
 #include <vcl/canvastools.hxx>
+#include <svx/diagram/IDiagramHelper.hxx>
+
+const std::shared_ptr< svx::diagram::IDiagramHelper >& SdrObjGroup::getDiagramHelper() const
+{
+    return mp_DiagramHelper;
+}
 
 // BaseProperties section
 std::unique_ptr<sdr::properties::BaseProperties> SdrObjGroup::CreateObjectSpecificProperties()
@@ -48,14 +52,19 @@ std::unique_ptr<sdr::contact::ViewContact> SdrObjGroup::CreateObjectSpecificView
 }
 
 SdrObjGroup::SdrObjGroup(SdrModel& rSdrModel)
-:   SdrObject(rSdrModel),
-    maRefPoint(0, 0)
+: SdrObject(rSdrModel)
+, SdrObjList()
+, maRefPoint(0, 0)
+, mp_DiagramHelper()
 {
     m_bClosedObj=false;
 }
 
 SdrObjGroup::SdrObjGroup(SdrModel& rSdrModel, SdrObjGroup const & rSource)
-:   SdrObject(rSdrModel, rSource)
+: SdrObject(rSdrModel, rSource)
+, SdrObjList()
+, maRefPoint(0, 0)
+, mp_DiagramHelper()
 {
     m_bClosedObj=false;
 
@@ -75,6 +84,15 @@ SdrObjGroup::SdrObjGroup(SdrModel& rSdrModel, SdrObjGroup const & rSource)
 
     // copy local parameters
     maRefPoint  = rSource.maRefPoint;
+}
+
+void SdrObjGroup::AddToHdlList(SdrHdlList& rHdlList) const
+{
+    // only for diagram, so do nothing for just groups
+    if(!isDiagram())
+        return;
+
+    svx::diagram::IDiagramHelper::AddAdditionalVisualization(*this, rHdlList);
 }
 
 SdrObjGroup::~SdrObjGroup()
@@ -151,7 +169,7 @@ void SdrObjGroup::SetBoundRectDirty()
 
 SdrObjKind SdrObjGroup::GetObjIdentifier() const
 {
-    return OBJ_GRUP;
+    return SdrObjKind::Group;
 }
 
 SdrLayerID SdrObjGroup::GetLayer() const
@@ -192,12 +210,44 @@ SdrObjList* SdrObjGroup::GetSubList() const
     return const_cast< SdrObjGroup* >(this);
 }
 
+static bool containsOOXData(const css::uno::Any& rVal)
+{
+    const css::uno::Sequence<css::beans::PropertyValue>& propList(rVal.get< css::uno::Sequence<css::beans::PropertyValue> >());
+    for (const auto& rProp : std::as_const(propList))
+    {
+        if(rProp.Name.startsWith("OOX"))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void SdrObjGroup::SetGrabBagItem(const css::uno::Any& rVal)
+{
+    // detect if the intention is to disable Diagram functionality
+    if(isDiagram() && !containsOOXData(rVal))
+    {
+        css::uno::Any aOld;
+        GetGrabBagItem(aOld);
+
+        if(containsOOXData(aOld))
+        {
+            mp_DiagramHelper.reset();
+        }
+    }
+
+    // call parent
+    SdrObject::SetGrabBagItem(rVal);
+}
+
 const tools::Rectangle& SdrObjGroup::GetCurrentBoundRect() const
 {
     // <aOutRect> has to contain the bounding rectangle
     if(0 != GetObjCount())
     {
-        m_aOutRect = GetAllObjBoundRect();
+        setOutRectangleConst(GetAllObjBoundRect());
     }
 
     return m_aOutRect;
@@ -216,7 +266,7 @@ const tools::Rectangle& SdrObjGroup::GetSnapRect() const
     }
 }
 
-SdrObjGroup* SdrObjGroup::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> SdrObjGroup::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new SdrObjGroup(rTargetModel, *this);
 }
@@ -231,7 +281,10 @@ OUString SdrObjGroup::TakeObjNameSingul() const
     }
     else
     {
-        sName = SvxResId(STR_ObjNameSingulGRUP);
+        if(isDiagram())
+            sName = SvxResId(STR_ObjNameSingulDIAGRAM);
+        else
+            sName = SvxResId(STR_ObjNameSingulGRUP);
     }
 
     const OUString aName(GetName());
@@ -247,6 +300,8 @@ OUString SdrObjGroup::TakeObjNamePlural() const
 {
     if(0 == GetObjCount())
         return SvxResId(STR_ObjNamePluralGRUPEMPTY);
+    if(isDiagram())
+        return SvxResId(RID_GALLERYSTR_THEME_DIAGRAMS);
     return SvxResId(STR_ObjNamePluralGRUP);
 }
 
@@ -269,7 +324,7 @@ basegfx::B2DPolyPolygon SdrObjGroup::TakeXorPoly() const
 
     if(!aRetval.count())
     {
-        const basegfx::B2DRange aRange = vcl::unotools::b2DRectangleFromRectangle(m_aOutRect);
+        const basegfx::B2DRange aRange = vcl::unotools::b2DRectangleFromRectangle(getOutRectangle());
         aRetval.append(basegfx::utils::createPolygonFromRect(aRange));
     }
 
@@ -344,9 +399,9 @@ void SdrObjGroup::NbcSetLogicRect(const tools::Rectangle& rRect)
 }
 
 
-void SdrObjGroup::NbcMove(const Size& rSiz)
+void SdrObjGroup::NbcMove(const Size& rSize)
 {
-    maRefPoint.Move(rSiz);
+    maRefPoint.Move(rSize);
     const size_t nObjCount(GetObjCount());
 
     if(0 != nObjCount)
@@ -354,12 +409,12 @@ void SdrObjGroup::NbcMove(const Size& rSiz)
         for (size_t i=0; i<nObjCount; ++i)
         {
             SdrObject* pObj(GetObj(i));
-            pObj->NbcMove(rSiz);
+            pObj->NbcMove(rSize);
         }
     }
     else
     {
-        m_aOutRect.Move(rSiz);
+        moveOutRectangle(rSize.Width(), rSize.Height());
         SetBoundAndSnapRectsDirty();
     }
 }
@@ -396,7 +451,10 @@ void SdrObjGroup::NbcResize(const Point& rRef, const Fraction& xFact, const Frac
     }
     else
     {
-        ResizeRect(m_aOutRect,rRef,xFact,yFact);
+        auto aRectangle = getOutRectangle();
+        ResizeRect(aRectangle, rRef, xFact, yFact);
+        setOutRectangle(aRectangle);
+
         SetBoundAndSnapRectsDirty();
     }
 }
@@ -536,7 +594,7 @@ void SdrObjGroup::Move(const Size& rSiz)
     }
     else
     {
-        m_aOutRect.Move(rSiz);
+        moveOutRectangle(rSiz.Width(), rSiz.Height());
         SetBoundAndSnapRectsDirty();
     }
 
@@ -589,7 +647,10 @@ void SdrObjGroup::Resize(const Point& rRef, const Fraction& xFact, const Fractio
     }
     else
     {
-        ResizeRect(m_aOutRect,rRef,xFact,yFact);
+        auto aRectangle = getOutRectangle();
+        ResizeRect(aRectangle, rRef, xFact, yFact);
+        setOutRectangle(aRectangle);
+
         SetBoundAndSnapRectsDirty();
     }
 
@@ -748,19 +809,19 @@ void SdrObjGroup::NbcReformatText()
     NbcReformatAllTextObjects();
 }
 
-SdrObjectUniquePtr SdrObjGroup::DoConvertToPolyObj(bool bBezier, bool bAddText) const
+rtl::Reference<SdrObject> SdrObjGroup::DoConvertToPolyObj(bool bBezier, bool bAddText) const
 {
-    SdrObjectUniquePtr pGroup( new SdrObjGroup(getSdrModelFromSdrObject()) );
+    rtl::Reference<SdrObject> pGroup( new SdrObjGroup(getSdrModelFromSdrObject()) );
     const size_t nObjCount(GetObjCount());
 
     for(size_t a=0; a < nObjCount; ++a)
     {
         SdrObject* pIterObj(GetObj(a));
-        SdrObjectUniquePtr pResult(pIterObj->DoConvertToPolyObj(bBezier, bAddText));
+        rtl::Reference<SdrObject> pResult(pIterObj->DoConvertToPolyObj(bBezier, bAddText));
 
         // pResult can be NULL e.g. for empty objects
         if( pResult )
-            pGroup->GetSubList()->NbcInsertObject(pResult.release());
+            pGroup->GetSubList()->NbcInsertObject(pResult.get());
     }
 
     return pGroup;

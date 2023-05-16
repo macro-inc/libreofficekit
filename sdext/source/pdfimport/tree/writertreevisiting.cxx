@@ -31,11 +31,36 @@
 
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
 #include <osl/diagnose.h>
+#include <com/sun/star/i18n/CharacterClassification.hpp>
+#include <com/sun/star/i18n/DirectionProperty.hpp>
+#include <comphelper/string.hxx>
 
 using namespace ::com::sun::star;
+using namespace ::com::sun::star::lang;
+using namespace ::com::sun::star::i18n;
+using namespace ::com::sun::star::uno;
 
 namespace pdfi
 {
+
+const Reference<XBreakIterator>& WriterXmlOptimizer::GetBreakIterator()
+{
+    if (!mxBreakIter.is())
+    {
+        mxBreakIter = BreakIterator::create(m_rProcessor.m_xContext);
+    }
+    return mxBreakIter;
+}
+
+const Reference< XCharacterClassification >& WriterXmlEmitter::GetCharacterClassification()
+{
+    if ( !mxCharClass.is() )
+    {
+        Reference< XComponentContext > xContext( m_rEmitContext.m_xContext, uno::UNO_SET_THROW );
+        mxCharClass = CharacterClassification::create(xContext);
+    }
+    return mxCharClass;
+}
 
 void WriterXmlEmitter::visit( HyperlinkElement& elem, const std::list< std::unique_ptr<Element> >::const_iterator&   )
 {
@@ -65,15 +90,65 @@ void WriterXmlEmitter::visit( TextElement& elem, const std::list< std::unique_pt
     if( elem.Text.isEmpty() )
         return;
 
-    PropertyMap aProps;
+    PropertyMap aProps = {};
+    const sal_Unicode strSpace = 0x0020;
+    const sal_Unicode strNbSpace = 0x00A0;
+    const sal_Unicode tabSpace = 0x0009;
+
     if( elem.StyleId != -1 )
     {
         aProps[ OUString( "text:style-name" ) ] =
             m_rEmitContext.rStyles.getStyleName( elem.StyleId );
     }
 
+    OUString str(elem.Text.toString());
+
+    // Check for RTL
+    bool isRTL = false;
+    Reference< i18n::XCharacterClassification > xCC( GetCharacterClassification() );
+    if( xCC.is() )
+    {
+        for(int i=1; i< elem.Text.getLength(); i++)
+        {
+            i18n::DirectionProperty nType = static_cast<i18n::DirectionProperty>(xCC->getCharacterDirection( str, i ));
+            if ( nType == i18n::DirectionProperty_RIGHT_TO_LEFT           ||
+                 nType == i18n::DirectionProperty_RIGHT_TO_LEFT_ARABIC    ||
+                 nType == i18n::DirectionProperty_RIGHT_TO_LEFT_EMBEDDING ||
+                 nType == i18n::DirectionProperty_RIGHT_TO_LEFT_OVERRIDE
+                )
+                isRTL = true;
+        }
+    }
+
+    if (isRTL)  // If so, reverse string
+    {
+        // First, produce mirrored-image for each code point which has the Bidi_Mirrored property.
+        str = PDFIProcessor::SubstituteBidiMirrored(str);
+        // Then, reverse the code points in the string, in backward order.
+        str = ::comphelper::string::reverseCodePoints(str);
+    }
+
     m_rEmitContext.rEmitter.beginTag( "text:span", aProps );
-    m_rEmitContext.rEmitter.write( elem.Text.makeStringAndClear() );
+
+    sal_Unicode strToken;
+    for (int i = 0; i < elem.Text.getLength(); i++)
+    {
+        strToken = str[i];
+        if (strToken == strSpace || strToken == strNbSpace)
+        {
+            aProps["text:c"] = "1";
+            m_rEmitContext.rEmitter.beginTag("text:s", aProps);
+            m_rEmitContext.rEmitter.endTag("text:s");
+        }
+        else if (strToken == tabSpace)
+        {
+            m_rEmitContext.rEmitter.beginTag("text:tab", aProps);
+            m_rEmitContext.rEmitter.endTag("text:tab");
+        }
+        else
+            m_rEmitContext.rEmitter.write(OUString(strToken));
+    }
+
     auto this_it = elem.Children.begin();
     while( this_it != elem.Children.end() && this_it->get() != &elem )
     {
@@ -343,7 +418,7 @@ void WriterXmlEmitter::visit( DocumentElement& elem, const std::list< std::uniqu
     // only DrawElement types
     for( auto it = elem.Children.begin(); it != elem.Children.end(); ++it )
     {
-        if( dynamic_cast<DrawElement*>(it->get()) == nullptr )
+        if( dynamic_cast<DrawElement*>(it->get()) != nullptr )
             (*it)->visitedBy( *this, it );
     }
 
@@ -518,7 +593,7 @@ void WriterXmlOptimizer::visit( PageElement& elem, const std::list< std::unique_
             nCurLineElements = 0;
             for( const auto& rxChild : pCurPara->Children )
             {
-                TextElement* pTestText = dynamic_cast<TextElement*>(rxChild.get());
+                TextElement* pTestText = rxChild->dynCastAsTextElement();
                 if( pTestText )
                 {
                     fCurLineHeight = (fCurLineHeight*double(nCurLineElements) + pTestText->h)/double(nCurLineElements+1);
@@ -552,12 +627,12 @@ void WriterXmlOptimizer::visit( PageElement& elem, const std::list< std::unique_
             // or perhaps the draw element begins a new paragraph
             else if( next_page_element != elem.Children.end() )
             {
-                TextElement* pText = dynamic_cast<TextElement*>(next_page_element->get());
+                TextElement* pText = (*next_page_element)->dynCastAsTextElement();
                 if( ! pText )
                 {
                     ParagraphElement* pPara = dynamic_cast<ParagraphElement*>(next_page_element->get());
                     if( pPara && ! pPara->Children.empty() )
-                        pText = dynamic_cast<TextElement*>(pPara->Children.front().get());
+                        pText = pPara->Children.front()->dynCastAsTextElement();
                 }
                 if( pText && // check there is a text
                     pDraw->h < pText->h*1.5 && // and it is approx the same height
@@ -586,9 +661,9 @@ void WriterXmlOptimizer::visit( PageElement& elem, const std::list< std::unique_
             }
         }
 
-        TextElement* pText = dynamic_cast<TextElement*>(page_element->get());
+        TextElement* pText = (*page_element)->dynCastAsTextElement();
         if( ! pText && pLink && ! pLink->Children.empty() )
-            pText = dynamic_cast<TextElement*>(pLink->Children.front().get());
+            pText = pLink->Children.front()->dynCastAsTextElement();
         if( pText )
         {
             Element* pGeo = pLink ? static_cast<Element*>(pLink) :
@@ -745,10 +820,15 @@ void WriterXmlOptimizer::optimizeTextElements(Element& rParent)
     while( next != rParent.Children.end() )
     {
         bool bConcat = false;
-        TextElement* pCur = dynamic_cast<TextElement*>(it->get());
+        TextElement* pCur = (*it)->dynCastAsTextElement();
         if( pCur )
         {
             TextElement* pNext = dynamic_cast<TextElement*>(next->get());
+            OUString str;
+            bool bPara = strspn("ParagraphElement", typeid(rParent).name());
+            ParagraphElement* pPara = dynamic_cast<ParagraphElement*>(&rParent);
+            if (bPara && pPara && isComplex(GetBreakIterator(), pCur))
+                pPara->bRtl = true;
             if( pNext )
             {
                 const GraphicsContext& rCurGC = m_rProcessor.getGraphicsContext( pCur->GCId );
@@ -797,18 +877,61 @@ void WriterXmlOptimizer::optimizeTextElements(Element& rParent)
                     }
                 }
                 // concatenate consecutive text elements unless there is a
-                // font or text color or matrix change, leave a new span in that case
+                // font or text color change, leave a new span in that case
                 if( pCur->FontId == pNext->FontId &&
                     rCurGC.FillColor.Red == rNextGC.FillColor.Red &&
                     rCurGC.FillColor.Green == rNextGC.FillColor.Green &&
                     rCurGC.FillColor.Blue == rNextGC.FillColor.Blue &&
-                    rCurGC.FillColor.Alpha == rNextGC.FillColor.Alpha &&
-                    rCurGC.Transformation == rNextGC.Transformation
+                    rCurGC.FillColor.Alpha == rNextGC.FillColor.Alpha
                     )
                 {
                     pCur->updateGeometryWith( pNext );
-                    // append text to current element
-                    pCur->Text.append( pNext->Text );
+                    if (pPara && pPara->bRtl)
+                    {
+                        // Tdf#152083: If RTL, reverse the text in pNext so that its correct order is
+                        // restored when the combined text is reversed in WriterXmlEmitter::visit.
+                        OUString tempStr;
+                        bool bNeedReverse=false;
+                        str = pNext->Text.toString();
+                        for (sal_Int32 i=0; i < str.getLength(); i++)
+                        {
+                            if (str[i] == u' ')
+                            {   // Space char (e.g. the space as in " م") needs special treatment.
+                                //   First, append the space char to pCur.
+                                pCur->Text.append(OUStringChar(str[i]));
+                                //   Then, check whether the tmpStr needs reverse, if so then reverse and append.
+                                if (bNeedReverse)
+                                {
+                                    tempStr = ::comphelper::string::reverseCodePoints(tempStr);
+                                    pCur->Text.append(tempStr);
+                                    tempStr = u"";
+                                }
+                                bNeedReverse = false;
+                            }
+                            else
+                            {
+                                tempStr += OUStringChar(str[i]);
+                                bNeedReverse = true;
+                            }
+                        }
+                        // Do the last append
+                        if (bNeedReverse)
+                        {
+                            tempStr = ::comphelper::string::reverseCodePoints(tempStr);
+                            pCur->Text.append(tempStr);
+                        }
+                        else
+                        {
+                            pCur->Text.append(tempStr);
+                        }
+                    }
+                    else
+                    {
+                        // append text to current element directly without reverse
+                        pCur->Text.append(pNext->Text);
+                    }
+                    if (bPara && pPara && isComplex(GetBreakIterator(), pCur))
+                        pPara->bRtl = true;
                     // append eventual children to current element
                     // and clear children (else the children just
                     // appended to pCur would be destroyed)
@@ -911,7 +1034,7 @@ void WriterXmlFinalizer::visit( TextElement& elem, const std::list< std::unique_
     // TODO: tdf#143095: use system font name rather than PSName
     SAL_INFO("sdext.pdfimport", "The font used in xml is: " << rFont.familyName);
     aFontProps[ "fo:font-family" ] = rFont.familyName;
-    aFontProps[ "style:font-family-asia" ] = rFont.familyName;
+    aFontProps[ "style:font-family-asian" ] = rFont.familyName;
     aFontProps[ "style:font-family-complex" ] = rFont.familyName;
 
     // bold

@@ -24,10 +24,6 @@
 #include <cppuhelper/implbase2.hxx>
 #include <extended/accessibletabbarbase.hxx>
 
-namespace utl {
-class AccessibleStateSetHelper;
-}
-
 
 namespace accessibility
 {
@@ -62,7 +58,7 @@ namespace accessibility
 
         sal_uInt16              GetPageId() const { return m_nPageId; }
 
-        void                    FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet );
+        void                    FillAccessibleStateSet( sal_Int64& rStateSet );
 
         // OCommonAccessibleComponent
         virtual css::awt::Rectangle implGetBounds(  ) override;
@@ -89,15 +85,15 @@ namespace accessibility
         virtual css::uno::Reference< css::accessibility::XAccessibleContext > SAL_CALL getAccessibleContext(  ) override;
 
         // XAccessibleContext
-        virtual sal_Int32 SAL_CALL getAccessibleChildCount(  ) override;
-        virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int32 i ) override;
+        virtual sal_Int64 SAL_CALL getAccessibleChildCount(  ) override;
+        virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int64 i ) override;
         virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleParent(  ) override;
-        virtual sal_Int32 SAL_CALL getAccessibleIndexInParent(  ) override;
+        virtual sal_Int64 SAL_CALL getAccessibleIndexInParent(  ) override;
         virtual sal_Int16 SAL_CALL getAccessibleRole(  ) override;
         virtual OUString SAL_CALL getAccessibleDescription(  ) override;
         virtual OUString SAL_CALL getAccessibleName(  ) override;
         virtual css::uno::Reference< css::accessibility::XAccessibleRelationSet > SAL_CALL getAccessibleRelationSet(  ) override;
-        virtual css::uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL getAccessibleStateSet(  ) override;
+        virtual sal_Int64 SAL_CALL getAccessibleStateSet(  ) override;
         virtual css::lang::Locale SAL_CALL getLocale(  ) override;
 
         // XAccessibleComponent

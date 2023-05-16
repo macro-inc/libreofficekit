@@ -19,13 +19,11 @@
 #pragma once
 
 #include <com/sun/star/util/XCloneable.hpp>
-#include <com/sun/star/util/XModifyBroadcaster.hpp>
-#include <com/sun/star/util/XModifyListener.hpp>
-#include <MutexContainer.hxx>
 #include <OPropertySet.hxx>
 
 #include <cppuhelper/implbase.hxx>
 #include <comphelper/uno3.hxx>
+#include <ModifyListenerHelper.hxx>
 
 namespace chart
 {
@@ -40,7 +38,6 @@ typedef ::cppu::WeakImplHelper<
 }
 
 class StockBar final :
-        public MutexContainer,
         public impl::StockBar_Base,
         public ::property::OPropertySet
 {
@@ -54,8 +51,11 @@ public:
 private:
     explicit StockBar( const StockBar & rOther );
 
+    // ____ XTypeProvider ____
+    virtual css::uno::Sequence< css::uno::Type > SAL_CALL getTypes() override;
+
     // ____ OPropertySet ____
-    virtual css::uno::Any GetDefaultValue( sal_Int32 nHandle ) const override;
+    virtual void GetDefaultValue( sal_Int32 nHandle, css::uno::Any& rAny ) const override;
 
     virtual ::cppu::IPropertyArrayHelper & SAL_CALL getInfoHelper() override;
 
@@ -84,7 +84,7 @@ private:
     virtual void firePropertyChangeEvent() override;
     using OPropertySet::disposing;
 
-    css::uno::Reference< css::util::XModifyListener > m_xModifyEventForwarder;
+    rtl::Reference<ModifyEventForwarder> m_xModifyEventForwarder;
 };
 
 } //  namespace chart

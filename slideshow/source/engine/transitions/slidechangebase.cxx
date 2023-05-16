@@ -18,7 +18,7 @@
  */
 
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <cppcanvas/basegfxfactory.hxx>
 #include <cppcanvas/customsprite.hxx>
@@ -27,23 +27,24 @@
 #include <tools.hxx>
 
 #include <algorithm>
+#include <utility>
 
 using namespace com::sun::star;
 
 namespace slideshow::internal {
 
-SlideChangeBase::SlideChangeBase( std::optional<SlideSharedPtr> const & leavingSlide,
+SlideChangeBase::SlideChangeBase( std::optional<SlideSharedPtr>           leavingSlide,
                                   const SlideSharedPtr&                   pEnteringSlide,
-                                  const SoundPlayerSharedPtr&             pSoundPlayer,
+                                  SoundPlayerSharedPtr                    pSoundPlayer,
                                   const UnoViewContainer&                 rViewContainer,
                                   ScreenUpdater&                          rScreenUpdater,
                                   EventMultiplexer&                       rEventMultiplexer,
                                   bool                                    bCreateLeavingSprites,
                                   bool                                    bCreateEnteringSprites ) :
-      mpSoundPlayer( pSoundPlayer ),
+      mpSoundPlayer(std::move( pSoundPlayer )),
       mrEventMultiplexer(rEventMultiplexer),
       mrScreenUpdater(rScreenUpdater),
-      maLeavingSlide( leavingSlide ),
+      maLeavingSlide(std::move( leavingSlide )),
       mpEnteringSlide( pEnteringSlide ),
       maViewData(),
       mrViewContainer(rViewContainer),
@@ -92,7 +93,7 @@ SlideBitmapSharedPtr SlideChangeBase::createBitmap( const UnoViewSharedPtr&     
 
         // create empty, black-filled bitmap
         const basegfx::B2ISize slideSizePixel(
-            getSlideSizePixel( basegfx::B2DSize( mpEnteringSlide->getSlideSize() ),
+            getSlideSizePixel( basegfx::B2DVector( mpEnteringSlide->getSlideSize() ),
                                rView ));
 
         cppcanvas::CanvasSharedPtr pCanvas( rView->getCanvas() );
@@ -136,7 +137,7 @@ SlideBitmapSharedPtr SlideChangeBase::createBitmap( const UnoViewSharedPtr&     
 
 ::basegfx::B2ISize SlideChangeBase::getEnteringSlideSizePixel( const UnoViewSharedPtr& pView ) const
 {
-    return getSlideSizePixel( basegfx::B2DSize( mpEnteringSlide->getSlideSize() ),
+    return getSlideSizePixel( basegfx::B2DVector(mpEnteringSlide->getSlideSize().getX(), mpEnteringSlide->getSlideSize().getY()),
                               pView );
 }
 
@@ -486,7 +487,7 @@ void SlideChangeBase::addSprites( ViewEntry& rEntry )
     {
         // create entering sprite:
         const basegfx::B2ISize enteringSlideSizePixel(
-            getSlideSizePixel( basegfx::B2DSize( mpEnteringSlide->getSlideSize() ),
+            getSlideSizePixel( basegfx::B2DVector( mpEnteringSlide->getSlideSize() ),
                                rEntry.mpView ));
 
         rEntry.mpInSprite = createSprite( rEntry.mpView,

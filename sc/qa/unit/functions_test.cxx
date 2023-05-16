@@ -11,20 +11,11 @@
 #include "functions_test.hxx"
 #include <document.hxx>
 
-FunctionsTest::FunctionsTest(const OUString& rPath):
-    ScBootstrapFixture(rPath)
-{
-}
+#include <rtl/math.hxx>
 
-void FunctionsTest::setUp()
+FunctionsTest::FunctionsTest():
+    ScFilterTestBase()
 {
-    ScBootstrapFixture::setUp();
-
-    // This is a bit of a fudge, we do this to ensure that ScGlobals::ensure,
-    // which is a private symbol to us, gets called
-    m_xCalcComponent =
-        getMultiServiceFactory()->createInstance("com.sun.star.comp.Calc.SpreadsheetDocument");
-    CPPUNIT_ASSERT_MESSAGE("no calc component!", m_xCalcComponent.is());
 }
 
 bool FunctionsTest::load(const OUString& rFilter, const OUString& rURL,
@@ -32,7 +23,7 @@ bool FunctionsTest::load(const OUString& rFilter, const OUString& rURL,
         SotClipboardFormatId nClipboardID,
         unsigned int nFilterVersion)
 {
-    ScDocShellRef xDocShRef = ScBootstrapFixture::load(rURL, rFilter, rUserData,
+    ScDocShellRef xDocShRef = loadDoc(rURL, rFilter, rUserData,
         OUString(), nFilterFlags, nClipboardID, nFilterVersion );
     CPPUNIT_ASSERT(xDocShRef.is());
 
@@ -40,6 +31,28 @@ bool FunctionsTest::load(const OUString& rFilter, const OUString& rURL,
 
     ScDocument& rDoc = xDocShRef->GetDocument();
 
+    if(!rtl::math::approxEqual(1.0, rDoc.GetValue(1, 2, 0)))
+    {
+        // Cell B3 in Sheet1 has the cumulative success/failure result.
+        // Try to find the actual failure.
+        for(SCTAB tab = 1; tab <= rDoc.GetMaxTableNumber(); ++tab)
+        {
+            SCROW maxRow = rDoc.GetLastDataRow(tab, 2, 2, rDoc.MaxRow());
+            for(SCROW row = 0; row <= maxRow; ++row)
+            {
+                // Column C has the check result, column D has the formula text.
+                if(rDoc.HasStringData(2, row, tab))
+                    continue;
+                if(!rtl::math::approxEqual(1.0, rDoc.GetValue(2, row, 1)))
+                    CPPUNIT_FAIL( OUString( "Testing " + rURL + " failed, "
+                        + rDoc.GetAllTableNames()[tab] + ".A" + OUString::number(row+1)
+                        + " \'" + rDoc.GetString(3, row, 1) + "\'"
+                          " result: " + OUString::number(rDoc.GetValue(0, row, 1))
+                        + ", expected: " + OUString::number(rDoc.GetValue(1, row, 1)))
+                        .toUtf8().getStr());
+            }
+        }
+    }
     CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, rDoc.GetValue(1, 2, 0), 1e-14);
 
     xDocShRef->DoClose();

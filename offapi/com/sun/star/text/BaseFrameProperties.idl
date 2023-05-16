@@ -16,21 +16,6 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef __com_sun_star_text_BaseFrameProperties_idl__
-#define __com_sun_star_text_BaseFrameProperties_idl__
-
-#include <com/sun/star/style/GraphicLocation.idl>
-#include <com/sun/star/table/BorderLine.idl>
-#include <com/sun/star/table/ShadowFormat.idl>
-#include <com/sun/star/text/XTextFrame.idl>
-#include <com/sun/star/text/WrapTextMode.idl>
-#include <com/sun/star/awt/Size.idl>
-#include <com/sun/star/util/Color.idl>
-#include <com/sun/star/xml/UserDefinedAttributesSupplier.idl>
-#include <com/sun/star/drawing/FillStyle.idl>
-#include <com/sun/star/awt/Gradient.idl>
-#include <com/sun/star/drawing/TextVerticalAdjust.hpp>
-#include <com/sun/star/graphic/XGraphic.idl>
 
 module com {  module sun {  module star {  module text {
 
@@ -372,11 +357,31 @@ published service BaseFrameProperties
         @since LibreOffice 6.4
     */
     [optional, property] boolean AllowOverlap;
+
+    /** Contains popup text for the frame, used to for tooltip purposes if it's non-empty.
+
+        @since LibreOffice 7.4
+    */
+    [optional, property] string Tooltip;
+
+    /** Determines if the frame is purely decorative.
+
+        If `TRUE`, it is considered not part of the document content,
+        and may be ignored by assistive technologies.
+
+        @since LibreOffice 7.5
+    */
+    [optional, property] boolean Decorative;
+
+    /** If `TRUE`, the frame is allowed to be split at page breaks.
+
+        @since LibreOffice 7.6
+     */
+    [optional, property] boolean IsSplitAllowed;
+
 };
 
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

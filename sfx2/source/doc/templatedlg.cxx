@@ -28,13 +28,11 @@
 #include <templateviewitem.hxx>
 #include <sfx2/thumbnailviewitem.hxx>
 #include <sot/storage.hxx>
-#include <svtools/imagemgr.hxx>
 #include <tools/urlobj.hxx>
 #include <unotools/moduleoptions.hxx>
 #include <unotools/pathoptions.hxx>
 #include <unotools/viewoptions.hxx>
 #include <vcl/event.hxx>
-#include <vcl/mnemonic.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 
@@ -48,7 +46,7 @@
 #include <com/sun/star/frame/XStorable.hpp>
 #include <com/sun/star/ui/dialogs/ExecutableDialogResults.hpp>
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
-#include <com/sun/star/ui/dialogs/FolderPicker.hpp>
+#include <com/sun/star/ui/dialogs/XFolderPicker2.hpp>
 #include <com/sun/star/task/InteractionHandler.hpp>
 #include <comphelper/dispatchcommand.hxx>
 
@@ -63,7 +61,6 @@ constexpr OUStringLiteral TM_SETTING_VIEWMODE = u"ViewMode";
 #define MNI_ACTION_NEW_FOLDER "new"
 #define MNI_ACTION_RENAME_FOLDER "rename"
 #define MNI_ACTION_DELETE_FOLDER "delete"
-#define MNI_ACTION_REFRESH   "refresh"
 #define MNI_ACTION_DEFAULT   "default"
 #define MNI_ACTION_DEFAULT_WRITER   "default_writer"
 #define MNI_ACTION_DEFAULT_CALC   "default_calc"
@@ -178,7 +175,6 @@ SfxTemplateManagerDlg::SfxTemplateManagerDlg(weld::Window *pParent)
     mxActionBar->append_item(MNI_ACTION_RENAME_FOLDER, SfxResId(STR_CATEGORY_RENAME), BMP_ACTION_RENAME);
     mxActionBar->append_item(MNI_ACTION_DELETE_FOLDER, SfxResId(STR_CATEGORY_DELETE), BMP_ACTION_DELETE_CATEGORY);
     mxActionBar->append_separator("separator");
-    mxActionBar->append_item(MNI_ACTION_REFRESH, SfxResId(STR_ACTION_REFRESH), BMP_ACTION_REFRESH);
     mxActionBar->append_item(MNI_ACTION_DEFAULT, SfxResId(STR_ACTION_RESET_ALL_DEFAULT_TEMPLATES));
     mxActionBar->append_item(MNI_ACTION_DEFAULT_WRITER, SfxResId(STR_ACTION_RESET_WRITER_TEMPLATE), BMP_ACTION_DEFAULT_WRITER);
     mxActionBar->append_item(MNI_ACTION_DEFAULT_CALC, SfxResId(STR_ACTION_RESET_CALC_TEMPLATE), BMP_ACTION_DEFAULT_CALC);
@@ -206,6 +202,9 @@ SfxTemplateManagerDlg::SfxTemplateManagerDlg(weld::Window *pParent)
     mxLocalView->setExportTemplateHdl(LINK(this,SfxTemplateManagerDlg, ExportTemplateHdl));
 
     mxLocalView->ShowTooltips(true);
+
+    // Set width and height of the templates thumbnail viewer to accommodate 3 rows and 4 columns of items
+    mxLocalViewWeld->set_size_request(TEMPLATE_ITEM_MAX_WIDTH * 5, TEMPLATE_ITEM_MAX_HEIGHT_SUB * 3);
 
     mxOKButton->connect_clicked(LINK(this, SfxTemplateManagerDlg, OkClickHdl));
     // FIXME: rather than disabling make dispatchCommand(".uno:AdditionsDialog") work in start center
@@ -466,9 +465,9 @@ void SfxTemplateManagerDlg::writeSettings ()
     // last folder
     Sequence< NamedValue > aSettings
     {
-        { TM_SETTING_LASTFOLDER, css::uno::makeAny(aLastFolder) },
-        { TM_SETTING_LASTAPPLICATION,     css::uno::makeAny(sal_uInt16(mxCBApp->get_active())) },
-        { TM_SETTING_VIEWMODE, css::uno::makeAny(static_cast<sal_Int16>(getTemplateViewMode()))}
+        { TM_SETTING_LASTFOLDER, css::uno::Any(aLastFolder) },
+        { TM_SETTING_LASTAPPLICATION,     css::uno::Any(sal_uInt16(mxCBApp->get_active())) },
+        { TM_SETTING_VIEWMODE, css::uno::Any(static_cast<sal_Int16>(getTemplateViewMode()))}
     };
 
     // write
@@ -517,11 +516,6 @@ IMPL_LINK(SfxTemplateManagerDlg, MenuSelectHdl, const OString&, rIdent, void)
         OnCategoryRename();
     else if (rIdent == MNI_ACTION_DELETE_FOLDER)
         OnCategoryDelete();
-    else if (rIdent == MNI_ACTION_REFRESH)
-    {
-        mxLocalView->reload();
-        SearchUpdate();
-    }
     else if (rIdent == MNI_ACTION_DEFAULT)
     {
         DefaultTemplateMenuSelectHdl(MNI_ACTION_DEFAULT_WRITER);
@@ -1271,9 +1265,7 @@ SfxTemplateCategoryDialog::SfxTemplateCategoryDialog(weld::Window* pParent)
     : GenericDialogController(pParent, "sfx/ui/templatecategorydlg.ui", "TemplatesCategoryDialog")
     , mbIsNewCategory(false)
     , mxLBCategory(m_xBuilder->weld_tree_view("categorylb"))
-    , mxSelectLabel(m_xBuilder->weld_label("select_label"))
     , mxNewCategoryEdit(m_xBuilder->weld_entry("category_entry"))
-    , mxCreateLabel(m_xBuilder->weld_label("create_label"))
     , mxOKButton(m_xBuilder->weld_button("ok"))
 {
     mxLBCategory->append_text(SfxResId(STR_CATEGORY_NONE));

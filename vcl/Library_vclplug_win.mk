@@ -19,7 +19,9 @@
 
 $(eval $(call gb_Library_Library,vclplug_win))
 
-$(eval $(call gb_Library_set_componentfile,vclplug_win,vcl/vclplug_win))
+$(eval $(call gb_Library_set_plugin_for,vclplug_win,vcl))
+
+$(eval $(call gb_Library_set_componentfile,vclplug_win,vcl/vclplug_win,services))
 
 $(eval $(call gb_Library_set_include,vclplug_win,\
     $$(INCLUDE) \
@@ -53,7 +55,6 @@ $(eval $(call gb_Library_use_libraries,vclplug_win,\
     salhelper \
     tl \
     utl \
-    vcl \
 ))
 
 $(eval $(call gb_Library_use_externals,vclplug_win,\
@@ -117,6 +118,7 @@ $(eval $(call gb_Library_add_exception_objects,vclplug_win,\
 $(eval $(call gb_Library_use_system_win32_libs,vclplug_win,\
     advapi32 \
     d2d1 \
+    dwmapi \
     dwrite \
     gdi32 \
     gdiplus \
@@ -126,6 +128,7 @@ $(eval $(call gb_Library_use_system_win32_libs,vclplug_win,\
     shell32 \
     shlwapi \
     uuid \
+    uxtheme \
     version \
     winspool \
 ))

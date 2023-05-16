@@ -984,11 +984,11 @@ void SvmWriter::TextArrayHandler(const MetaTextArrayAction* pAction, const ImplM
 {
     mrStream.WriteUInt16(static_cast<sal_uInt16>(pAction->GetType()));
 
-    const std::vector<sal_Int32>& rDXArray = pAction->GetDXArray();
+    const KernArray& rDXArray = pAction->GetDXArray();
 
     const sal_Int32 nAryLen = !rDXArray.empty() ? pAction->GetLen() : 0;
 
-    VersionCompatWrite aCompat(mrStream, 2);
+    VersionCompatWrite aCompat(mrStream, 3);
     TypeSerializer aSerializer(mrStream);
     aSerializer.writePoint(pAction->GetPoint());
     mrStream.WriteUniOrByteString(pAction->GetText(), pData->meActualCharSet);
@@ -1000,6 +1000,12 @@ void SvmWriter::TextArrayHandler(const MetaTextArrayAction* pAction, const ImplM
         mrStream.WriteInt32(rDXArray[i]);
 
     write_uInt16_lenPrefixed_uInt16s_FromOUString(mrStream, pAction->GetText()); // version 2
+
+    // Version 3
+    const auto& rKashidaArray = pAction->GetKashidaArray();
+    mrStream.WriteUInt32(rKashidaArray.size());
+    for (const auto& val : rKashidaArray)
+        mrStream.WriteUChar(val);
 }
 
 void SvmWriter::StretchTextHandler(const MetaStretchTextAction* pAction,

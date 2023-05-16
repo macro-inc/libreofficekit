@@ -44,10 +44,9 @@
 
 #include <vcl/svapp.hxx>
 #include <vcl/window.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
 #include <svx/svdview.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <cppuhelper/queryinterface.hxx>
 #include <comphelper/sequence.hxx>
 #include "AccessibleEmptyEditSource.hxx"
@@ -153,7 +152,7 @@ void AccessibleShape::Init()
     if( !pSdrObject )
         return;
 
-    SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>( pSdrObject  );
+    SdrTextObj* pTextObj = DynCastSdrTextObj( pSdrObject  );
     const bool hasOutlinerParaObject = (pTextObj && pTextObj->CanCreateEditOutlinerParaObject()) || (pSdrObject->GetOutlinerParaObject() != nullptr);
 
     // create AccessibleTextHelper to handle this shape's text
@@ -176,11 +175,6 @@ void AccessibleShape::Init()
 
 void AccessibleShape::UpdateStates()
 {
-    ::utl::AccessibleStateSetHelper* pStateSet =
-        static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
-    if (pStateSet == nullptr)
-        return;
-
     // Set the opaque state for certain shape types when their fill style is
     // solid.
     bool bShapeIsOpaque = false;
@@ -207,9 +201,9 @@ void AccessibleShape::UpdateStates()
         }
     }
     if (bShapeIsOpaque)
-        pStateSet->AddState (AccessibleStateType::OPAQUE);
+        mnStateSet |= AccessibleStateType::OPAQUE;
     else
-        pStateSet->RemoveState (AccessibleStateType::OPAQUE);
+        mnStateSet &= ~AccessibleStateType::OPAQUE;
 
     // Set the selected state.
     bool bShapeIsSelected = false;
@@ -220,17 +214,17 @@ void AccessibleShape::UpdateStates()
     }
 
     if (bShapeIsSelected)
-        pStateSet->AddState (AccessibleStateType::SELECTED);
+        mnStateSet |= AccessibleStateType::SELECTED;
     else
-        pStateSet->RemoveState (AccessibleStateType::SELECTED);
+        mnStateSet &= ~AccessibleStateType::SELECTED;
 }
 
-OUString AccessibleShape::GetStyle()
+OUString AccessibleShape::GetStyle() const
 {
     return ShapeTypeHandler::CreateAccessibleBaseName( mxShape );
 }
 
-bool AccessibleShape::SetState (sal_Int16 aState)
+bool AccessibleShape::SetState (sal_Int64 aState)
 {
     bool bStateHasChanged = false;
 
@@ -249,7 +243,7 @@ bool AccessibleShape::SetState (sal_Int16 aState)
 }
 
 
-bool AccessibleShape::ResetState (sal_Int16 aState)
+bool AccessibleShape::ResetState (sal_Int64 aState)
 {
     bool bStateHasChanged = false;
 
@@ -268,7 +262,7 @@ bool AccessibleShape::ResetState (sal_Int16 aState)
 }
 
 
-bool AccessibleShape::GetState (sal_Int16 aState)
+bool AccessibleShape::GetState (sal_Int64 aState)
 {
     if (aState == AccessibleStateType::FOCUSED && mpText != nullptr)
     {
@@ -303,7 +297,7 @@ OUString SAL_CALL AccessibleShape::getAccessibleDescription()
 /** The children of this shape come from two sources: The children from
     group or scene shapes and the paragraphs of text.
 */
-sal_Int32 SAL_CALL
+sal_Int64 SAL_CALL
        AccessibleShape::getAccessibleChildCount ()
 {
     if (IsDisposed())
@@ -311,7 +305,7 @@ sal_Int32 SAL_CALL
         return 0;
     }
 
-    sal_Int32 nChildCount = 0;
+    sal_Int64 nChildCount = 0;
 
     // Add the number of shapes that are children of this shape.
     if (mpChildrenManager != nullptr)
@@ -328,7 +322,7 @@ sal_Int32 SAL_CALL
     an exception for a wrong index.
 */
 uno::Reference<XAccessible> SAL_CALL
-    AccessibleShape::getAccessibleChild (sal_Int32 nIndex)
+    AccessibleShape::getAccessibleChild (sal_Int64 nIndex)
 {
     ThrowIfDisposed ();
 
@@ -343,7 +337,7 @@ uno::Reference<XAccessible> SAL_CALL
     }
     else if (mpText != nullptr)
     {
-        sal_Int32 nI = nIndex;
+        sal_Int64 nI = nIndex;
         if (mpChildrenManager != nullptr)
             nI -= mpChildrenManager->GetChildCount();
         xChild = mpText->GetChild (nI);
@@ -381,7 +375,7 @@ uno::Reference<XAccessibleRelationSet> SAL_CALL
         SHOWING
         VISIBLE
 */
-uno::Reference<XAccessibleStateSet> SAL_CALL
+sal_Int64 SAL_CALL
     AccessibleShape::getAccessibleStateSet()
 {
     ::osl::MutexGuard aGuard (m_aMutex);
@@ -392,19 +386,13 @@ uno::Reference<XAccessibleStateSet> SAL_CALL
         return AccessibleContextBase::getAccessibleStateSet ();
     }
 
-    ::utl::AccessibleStateSetHelper* pStateSet =
-          static_cast<::utl::AccessibleStateSetHelper*>(mxStateSet.get());
-
-    if (!pStateSet)
-        return Reference<XAccessibleStateSet>();
-
     // Merge current FOCUSED state from edit engine.
     if (mpText)
     {
         if (mpText->HaveFocus())
-            pStateSet->AddState (AccessibleStateType::FOCUSED);
+            mnStateSet |= AccessibleStateType::FOCUSED;
         else
-            pStateSet->RemoveState (AccessibleStateType::FOCUSED);
+            mnStateSet &= ~AccessibleStateType::FOCUSED;
     }
     //Just when the document is not read-only,set states EDITABLE,RESIZABLE,MOVEABLE
     css::uno::Reference<XAccessible> xTempAcc = getAccessibleParent();
@@ -414,33 +402,24 @@ uno::Reference<XAccessibleStateSet> SAL_CALL
                                 xTempAccContext = xTempAcc->getAccessibleContext();
         if( xTempAccContext.is() )
         {
-            css::uno::Reference<XAccessibleStateSet> rState =
-                xTempAccContext->getAccessibleStateSet();
-            if (rState.is())
+            sal_Int64 nState = xTempAccContext->getAccessibleStateSet();
+            if (nState & AccessibleStateType::EDITABLE)
             {
-                const css::uno::Sequence<short> aStates = rState->getStates();
-                if (std::find(aStates.begin(), aStates.end(), AccessibleStateType::EDITABLE) != aStates.end())
-                {
-                    pStateSet->AddState (AccessibleStateType::EDITABLE);
-                    pStateSet->AddState (AccessibleStateType::RESIZABLE);
-                    pStateSet->AddState (AccessibleStateType::MOVEABLE);
-                }
+                mnStateSet |= AccessibleStateType::EDITABLE;
+                mnStateSet |= AccessibleStateType::RESIZABLE;
+                mnStateSet |= AccessibleStateType::MOVEABLE;
             }
         }
     }
 
-    // Create a copy of the state set that may be modified by the
-    // caller without affecting the current state set.
-    Reference<XAccessibleStateSet> xStateSet(new ::utl::AccessibleStateSetHelper(*pStateSet));
+    sal_Int64 nRetStateSet = mnStateSet;
 
     if (mpParent && mpParent->IsDocumentSelAll())
     {
-        ::utl::AccessibleStateSetHelper* pCopyStateSet =
-            static_cast<::utl::AccessibleStateSetHelper*>(xStateSet.get());
-        pCopyStateSet->AddState (AccessibleStateType::SELECTED);
+        nRetStateSet |= AccessibleStateType::SELECTED;
     }
 
-    return xStateSet;
+    return nRetStateSet;
 }
 
 // XAccessibleComponent
@@ -458,8 +437,8 @@ uno::Reference<XAccessible > SAL_CALL
 {
     ::osl::MutexGuard aGuard (m_aMutex);
 
-    sal_Int32 nChildCount = getAccessibleChildCount ();
-    for (sal_Int32 i=0; i<nChildCount; ++i)
+    sal_Int64 nChildCount = getAccessibleChildCount ();
+    for (sal_Int64 i = 0; i < nChildCount; ++i)
     {
         Reference<XAccessible> xChild (getAccessibleChild (i));
         if (xChild.is())
@@ -580,8 +559,8 @@ awt::Rectangle SAL_CALL AccessibleShape::getBounds()
             aBoundingBox = awt::Rectangle (
                 aBBox.Left(),
                 aBBox.Top(),
-                aBBox.getWidth(),
-                aBBox.getHeight());
+                aBBox.getOpenWidth(),
+                aBBox.getOpenHeight());
         }
         else
         {
@@ -756,12 +735,12 @@ void SAL_CALL
 }
 
 // XAccessibleSelection
-void SAL_CALL AccessibleShape::selectAccessibleChild( sal_Int32 )
+void SAL_CALL AccessibleShape::selectAccessibleChild( sal_Int64 )
 {
 }
 
 
-sal_Bool SAL_CALL AccessibleShape::isAccessibleChildSelected( sal_Int32 nChildIndex )
+sal_Bool SAL_CALL AccessibleShape::isAccessibleChildSelected( sal_Int64 nChildIndex )
 {
     uno::Reference<XAccessible> xAcc = getAccessibleChild( nChildIndex );
     uno::Reference<XAccessibleContext> xContext;
@@ -783,12 +762,9 @@ sal_Bool SAL_CALL AccessibleShape::isAccessibleChildSelected( sal_Int32 nChildIn
         }
         else if( xContext->getAccessibleRole() == AccessibleRole::SHAPE )
         {
-            Reference< XAccessibleStateSet > pRState = xContext->getAccessibleStateSet();
-            if( !pRState.is() )
-                return false;
+            sal_Int64 pRState = xContext->getAccessibleStateSet();
 
-            const uno::Sequence<short> aStates = pRState->getStates();
-            return std::find(aStates.begin(), aStates.end(), AccessibleStateType::SELECTED) != aStates.end();
+            return bool(pRState & AccessibleStateType::SELECTED);
         }
     }
 
@@ -806,23 +782,22 @@ void SAL_CALL AccessibleShape::selectAllAccessibleChildren(  )
 }
 
 
-sal_Int32 SAL_CALL AccessibleShape::getSelectedAccessibleChildCount()
+sal_Int64 SAL_CALL AccessibleShape::getSelectedAccessibleChildCount()
 {
-    sal_Int32 nCount = 0;
-    sal_Int32 TotalCount = getAccessibleChildCount();
-    for( sal_Int32 i = 0; i < TotalCount; i++ )
+    sal_Int64 nCount = 0;
+    sal_Int64 TotalCount = getAccessibleChildCount();
+    for( sal_Int64 i = 0; i < TotalCount; i++ )
         if( isAccessibleChildSelected(i) ) nCount++;
 
     return nCount;
 }
 
 
-Reference<XAccessible> SAL_CALL AccessibleShape::getSelectedAccessibleChild( sal_Int32 nSelectedChildIndex )
+Reference<XAccessible> SAL_CALL AccessibleShape::getSelectedAccessibleChild( sal_Int64 nSelectedChildIndex )
 {
     if ( nSelectedChildIndex > getSelectedAccessibleChildCount() )
         throw IndexOutOfBoundsException();
-    sal_Int32 i1, i2;
-    for( i1 = 0, i2 = 0; i1 < getAccessibleChildCount(); i1++ )
+    for (sal_Int64 i1 = 0, i2 = 0; i1 < getAccessibleChildCount(); i1++)
         if( isAccessibleChildSelected(i1) )
         {
             if( i2 == nSelectedChildIndex )
@@ -833,7 +808,7 @@ Reference<XAccessible> SAL_CALL AccessibleShape::getSelectedAccessibleChild( sal
 }
 
 
-void SAL_CALL AccessibleShape::deselectAccessibleChild( sal_Int32 )
+void SAL_CALL AccessibleShape::deselectAccessibleChild( sal_Int64 )
 {
 
 }
@@ -1015,10 +990,7 @@ void AccessibleShape::disposing()
 
     // Make sure to send an event that this object loses the focus in the
     // case that it has the focus.
-    ::utl::AccessibleStateSetHelper* pStateSet =
-          static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
-    if (pStateSet != nullptr)
-        pStateSet->RemoveState (AccessibleStateType::FOCUSED);
+    mnStateSet &= ~AccessibleStateType::FOCUSED;
 
     // Unregister from model.
     if (mxShape.is() && maShapeTreeInfo.GetModelBroadcaster().is())
@@ -1045,13 +1017,13 @@ void AccessibleShape::disposing()
     AccessibleContextBase::dispose ();
 }
 
-sal_Int32 SAL_CALL
+sal_Int64 SAL_CALL
        AccessibleShape::getAccessibleIndexInParent()
 {
     ThrowIfDisposed ();
     //  Use a simple but slow solution for now.  Optimize later.
 
-    sal_Int32 nIndex = m_nIndexInParent;
+    sal_Int64 nIndex = m_nIndexInParent;
     if ( -1 == nIndex )
         nIndex = AccessibleContextBase::getAccessibleIndexInParent();
     return nIndex;
@@ -1169,7 +1141,7 @@ AccessibleShape::getGroupPosition( const uno::Any& )
         Reference< XAccessibleGroupPosition > xGroupPosition( xParent,uno::UNO_QUERY );
         if ( xGroupPosition.is() )
         {
-            aRet = xGroupPosition->getGroupPosition( uno::makeAny( getAccessibleContext() ) );
+            aRet = xGroupPosition->getGroupPosition( uno::Any( getAccessibleContext() ) );
         }
         return aRet;
     }
@@ -1234,7 +1206,7 @@ OUString AccessibleShape::getObjectLink( const uno::Any& )
         Reference< XAccessibleGroupPosition > xGroupPosition( maShapeTreeInfo.GetDocumentWindow(), uno::UNO_QUERY );
         if (xGroupPosition.is())
         {
-            aRet = xGroupPosition->getObjectLink( uno::makeAny( getAccessibleContext() ) );
+            aRet = xGroupPosition->getObjectLink( uno::Any( getAccessibleContext() ) );
         }
     }
     return aRet;

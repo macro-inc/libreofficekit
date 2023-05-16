@@ -38,7 +38,7 @@
 
 using namespace ::com::sun::star;
 
-const WhichRangesContainer SwFootNotePage::aPageRg(svl::Items<FN_PARAM_FTN_INFO, FN_PARAM_FTN_INFO>);
+const WhichRangesContainer SwFootNotePage::s_aPageRg(svl::Items<FN_PARAM_FTN_INFO, FN_PARAM_FTN_INFO>);
 
 // handler to switch between the different possibilities how the footnote
 // region's height can be set.
@@ -60,19 +60,19 @@ IMPL_LINK_NOARG(SwFootNotePage, HeightMetric, weld::Toggleable&, void)
 // handler limit values
 IMPL_LINK_NOARG(SwFootNotePage, HeightModify, weld::MetricSpinButton&, void)
 {
-    m_xMaxHeightEdit->set_max(m_xMaxHeightEdit->normalize(lMaxHeight -
+    m_xMaxHeightEdit->set_max(m_xMaxHeightEdit->normalize(m_lMaxHeight -
             (m_xDistEdit->denormalize(m_xDistEdit->get_value(FieldUnit::TWIP)) +
             m_xLineDistEdit->denormalize(m_xLineDistEdit->get_value(FieldUnit::TWIP)))),
             FieldUnit::TWIP);
     if (m_xMaxHeightEdit->get_value(FieldUnit::NONE) < 0)
         m_xMaxHeightEdit->set_value(0, FieldUnit::NONE);
-    m_xDistEdit->set_max(m_xDistEdit->normalize(lMaxHeight -
+    m_xDistEdit->set_max(m_xDistEdit->normalize(m_lMaxHeight -
             (m_xMaxHeightEdit->denormalize(m_xMaxHeightEdit->get_value(FieldUnit::TWIP)) +
             m_xLineDistEdit->denormalize(m_xLineDistEdit->get_value(FieldUnit::TWIP)))),
             FieldUnit::TWIP);
     if (m_xDistEdit->get_value(FieldUnit::NONE) < 0)
         m_xDistEdit->set_value(0, FieldUnit::NONE);
-    m_xLineDistEdit->set_max(m_xLineDistEdit->normalize(lMaxHeight -
+    m_xLineDistEdit->set_max(m_xLineDistEdit->normalize(m_lMaxHeight -
             (m_xMaxHeightEdit->denormalize(m_xMaxHeightEdit->get_value(FieldUnit::TWIP)) +
             m_xDistEdit->denormalize(m_xDistEdit->get_value(FieldUnit::TWIP)))),
             FieldUnit::TWIP);
@@ -95,7 +95,7 @@ IMPL_LINK(SwFootNotePage, LineColorSelected_Impl, ColorListBox&, rColorBox, void
 
 SwFootNotePage::SwFootNotePage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet &rSet)
     : SfxTabPage(pPage, pController, "modules/swriter/ui/footnoteareapage.ui", "FootnoteAreaPage", &rSet)
-    , lMaxHeight(0)
+    , m_lMaxHeight(0)
     , m_xMaxHeightPageBtn(m_xBuilder->weld_radio_button("maxheightpage"))
     , m_xMaxHeightBtn(m_xBuilder->weld_radio_button("maxheight"))
     , m_xMaxHeightEdit(m_xBuilder->weld_metric_spin_button("maxheightsb", FieldUnit::CM))
@@ -211,7 +211,7 @@ void SwFootNotePage::Reset(const SfxItemSet *rSet)
 // stuff attributes into the set, when OK
 bool SwFootNotePage::FillItemSet(SfxItemSet *rSet)
 {
-    SwPageFootnoteInfoItem aItem(static_cast<const SwPageFootnoteInfoItem&>(GetItemSet().Get(FN_PARAM_FTN_INFO)));
+    SwPageFootnoteInfoItem aItem(GetItemSet().Get(FN_PARAM_FTN_INFO));
 
     // that's the original
     SwPageFootnoteInfo &rFootnoteInfo = aItem.GetPageFootnoteInfo();
@@ -260,45 +260,43 @@ bool SwFootNotePage::FillItemSet(SfxItemSet *rSet)
 void SwFootNotePage::ActivatePage(const SfxItemSet& rSet)
 {
     auto const & rSize = rSet.Get( RES_FRM_SIZE );
-    lMaxHeight = rSize.GetHeight();
+    m_lMaxHeight = rSize.GetHeight();
 
-    const SfxPoolItem* pItem;
-    if( SfxItemState::SET == rSet.GetItemState( rSet.GetPool()->GetWhich( SID_ATTR_PAGE_HEADERSET), false, &pItem ) )
+    if( const SvxSetItem* pHeaderSetItem = rSet.GetItemIfSet( rSet.GetPool()->GetWhich( SID_ATTR_PAGE_HEADERSET), false ) )
     {
-        const SfxItemSet& rHeaderSet = static_cast<const SvxSetItem*>(pItem)->GetItemSet();
+        const SfxItemSet& rHeaderSet = pHeaderSetItem->GetItemSet();
         const SfxBoolItem& rHeaderOn =
-            static_cast<const SfxBoolItem&>(rHeaderSet.Get( rSet.GetPool()->GetWhich( SID_ATTR_PAGE_ON ) ));
+            rHeaderSet.Get( rSet.GetPool()->GetWhich( SID_ATTR_PAGE_ON ) );
 
         if ( rHeaderOn.GetValue() )
         {
             const SvxSizeItem& rSizeItem =
-                static_cast<const SvxSizeItem&>(rHeaderSet.Get(rSet.GetPool()->GetWhich(SID_ATTR_PAGE_SIZE)));
-            lMaxHeight -= rSizeItem.GetSize().Height();
+                rHeaderSet.Get(rSet.GetPool()->GetWhich(SID_ATTR_PAGE_SIZE));
+            m_lMaxHeight -= rSizeItem.GetSize().Height();
         }
     }
 
-    if( SfxItemState::SET == rSet.GetItemState( rSet.GetPool()->GetWhich( SID_ATTR_PAGE_FOOTERSET),
-            false, &pItem ) )
+    if( const SvxSetItem* pFooterSetItem = rSet.GetItemIfSet( rSet.GetPool()->GetWhich( SID_ATTR_PAGE_FOOTERSET),
+            false ) )
     {
-        const SfxItemSet& rFooterSet = static_cast<const SvxSetItem*>(pItem)->GetItemSet();
+        const SfxItemSet& rFooterSet = pFooterSetItem->GetItemSet();
         const SfxBoolItem& rFooterOn = rFooterSet.Get( SID_ATTR_PAGE_ON );
 
         if ( rFooterOn.GetValue() )
         {
             const SvxSizeItem& rSizeItem =
-                static_cast<const SvxSizeItem&>(rFooterSet.Get( rSet.GetPool()->GetWhich( SID_ATTR_PAGE_SIZE ) ));
-            lMaxHeight -= rSizeItem.GetSize().Height();
+                rFooterSet.Get( rSet.GetPool()->GetWhich( SID_ATTR_PAGE_SIZE ) );
+            m_lMaxHeight -= rSizeItem.GetSize().Height();
         }
     }
 
-    if ( rSet.GetItemState( RES_UL_SPACE , false ) == SfxItemState::SET )
+    if ( const SvxULSpaceItem* pSpaceItem = rSet.GetItemIfSet( RES_UL_SPACE , false ) )
     {
-        const SvxULSpaceItem &rUL = rSet.Get( RES_UL_SPACE );
-        lMaxHeight -= rUL.GetUpper() + rUL.GetLower();
+        m_lMaxHeight -= pSpaceItem->GetUpper() + pSpaceItem->GetLower();
     }
 
-    lMaxHeight *= 8;
-    lMaxHeight /= 10;
+    m_lMaxHeight *= 8;
+    m_lMaxHeight /= 10;
 
     // set maximum values
     HeightModify(*m_xMaxHeightEdit);

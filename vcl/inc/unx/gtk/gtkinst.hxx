@@ -240,7 +240,7 @@ public:
     // For LibreOffice internal D&D we provide the Transferable without Gtk
     // intermediaries as a shortcut, see tdf#100097 for how dbaccess depends on this
     static GtkInstDragSource* g_ActiveDragSource;
-    css::uno::Reference<css::datatransfer::XTransferable> const & GetTransferrable() const { return m_xTrans; }
+    css::uno::Reference<css::datatransfer::XTransferable> const & GetTransferable() const { return m_xTrans; }
 };
 
 enum SelectionType { SELECTION_CLIPBOARD = 0, SELECTION_PRIMARY = 1 };
@@ -286,8 +286,8 @@ public:
         createFolderPicker( const css::uno::Reference< css::uno::XComponentContext >& ) override;
 
     virtual css::uno::Reference< css::uno::XInterface > CreateClipboard( const css::uno::Sequence< css::uno::Any >& i_rArguments ) override;
-    virtual css::uno::Reference< css::uno::XInterface > CreateDragSource() override;
-    virtual css::uno::Reference< css::uno::XInterface > CreateDropTarget() override;
+    virtual css::uno::Reference<css::uno::XInterface> ImplCreateDragSource(const SystemEnvData*) override;
+    virtual css::uno::Reference<css::uno::XInterface> ImplCreateDropTarget(const SystemEnvData*) override;
     virtual OpenGLContext* CreateOpenGLContext() override;
     virtual std::unique_ptr<weld::Builder> CreateBuilder(weld::Widget* pParent, const OUString& rUIRoot, const OUString& rUIFile) override;
     virtual std::unique_ptr<weld::Builder> CreateInterimBuilder(vcl::Window* pParent, const OUString& rUIRoot, const OUString& rUIFile,
@@ -310,6 +310,8 @@ private:
     bool                        bNeedsInit;
     cairo_font_options_t*       m_pLastCairoFontOptions;
 };
+
+inline GtkInstance* GetGtkInstance() { return static_cast<GtkInstance*>(GetSalInstance()); }
 
 class SalGtkXWindow final : public weld::TransportAsXWindow
 {

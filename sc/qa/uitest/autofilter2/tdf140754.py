@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -44,7 +46,15 @@ class tdf140754(UITestCase):
 
             xCheckListMenu = xFloatWindow.getChild("FilterDropDown")
             xList = xCheckListMenu.getChild("check_list_box")
-            self.assertEqual(25, len(xList.getChildren()))
+            # since tdf#117267, we are showing the hidden filter rows as inactive elements (25 active + 140 inactive)
+            self.assertEqual(165, len(xList.getChildren()))
+
+            for i in range(165):
+                xChild = xList.getChild(str(i))
+                if i < 25:
+                    self.assertEqual("true", get_state_as_dict(xChild)["IsChecked"])
+                else:
+                    self.assertEqual("false", get_state_as_dict(xChild)["IsChecked"])
 
             # Without the fix in place, this test would have crashed here
             xOkBtn = xFloatWindow.getChild("ok")
@@ -63,7 +73,15 @@ class tdf140754(UITestCase):
 
             xCheckListMenu = xFloatWindow.getChild("FilterDropDown")
             xList = xCheckListMenu.getChild("check_list_box")
-            self.assertEqual(10, len(xList.getChildren()))
+            # since tdf#117267, we are showing the hidden filter rows as inactive elements (10 active + 35 inactive)
+            self.assertEqual(45, len(xList.getChildren()))
+
+            for i in range(45):
+                xChild = xList.getChild(str(i))
+                if i < 10:
+                    self.assertEqual("true", get_state_as_dict(xChild)["IsChecked"])
+                else:
+                    self.assertEqual("false", get_state_as_dict(xChild)["IsChecked"])
 
             xOkBtn = xFloatWindow.getChild("ok")
             xOkBtn.executeAction("CLICK", tuple())

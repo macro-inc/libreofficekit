@@ -31,14 +31,14 @@
 #include <com/sun/star/container/ElementExistException.hpp>
 #include <ucbhelper/propertyvalueset.hxx>
 #include <ucbhelper/contentidentifier.hxx>
-#include <cppuhelper/interfacecontainer.hxx>
 #include <comphelper/servicehelper.hxx>
-#include <tools/diagnose_ex.h>
-#include <apitools.hxx>
+#include <comphelper/diagnose_ex.hxx>
 #include <sdbcoretools.hxx>
 #include <stringconstants.hxx>
+#include <strings.hxx>
 
 #include <map>
+#include <utility>
 
 namespace dbaccess
 {
@@ -64,13 +64,13 @@ OContentHelper_Impl::~OContentHelper_Impl()
 
 OContentHelper::OContentHelper(const Reference< XComponentContext >& _xORB
                                ,const Reference< XInterface >&  _xParentContainer
-                               ,const TContentPtr& _pImpl)
+                               ,TContentPtr _pImpl)
     : OContentHelper_COMPBASE(m_aMutex)
     ,m_aContentListeners(m_aMutex)
     ,m_aPropertyChangeListeners(m_aMutex)
     ,m_xParentContainer( _xParentContainer )
     ,m_aContext( _xORB )
-    ,m_pImpl(_pImpl)
+    ,m_pImpl(std::move(_pImpl))
     ,m_nCommandId(0)
 {
 }
@@ -105,7 +105,7 @@ css::uno::Sequence< OUString > SAL_CALL OContentHelper::getSupportedServiceNames
 }
 
 
-css::uno::Sequence<sal_Int8> OContentHelper::getUnoTunnelId()
+const css::uno::Sequence<sal_Int8> & OContentHelper::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit aId;
     return aId.getSeq();
@@ -194,7 +194,7 @@ Any SAL_CALL OContentHelper::execute( const Command& aCommand, sal_Int32 /*Comma
         {
             OSL_FAIL( "Wrong argument type!" );
             ucbhelper::cancelCommandExecution(
-                makeAny( IllegalArgumentException(
+                Any( IllegalArgumentException(
                                     OUString(),
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -212,7 +212,7 @@ Any SAL_CALL OContentHelper::execute( const Command& aCommand, sal_Int32 /*Comma
         {
             OSL_FAIL( "Wrong argument type!" );
             ucbhelper::cancelCommandExecution(
-                makeAny( IllegalArgumentException(
+                Any( IllegalArgumentException(
                                     OUString(),
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -224,7 +224,7 @@ Any SAL_CALL OContentHelper::execute( const Command& aCommand, sal_Int32 /*Comma
         {
             OSL_FAIL( "No properties!" );
             ucbhelper::cancelCommandExecution(
-                makeAny( IllegalArgumentException(
+                Any( IllegalArgumentException(
                                     OUString(),
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -250,7 +250,7 @@ Any SAL_CALL OContentHelper::execute( const Command& aCommand, sal_Int32 /*Comma
         OSL_FAIL( "Content::execute - unsupported command!" );
 
         ucbhelper::cancelCommandExecution(
-            makeAny( UnsupportedCommandException(
+            Any( UnsupportedCommandException(
                             OUString(),
                             static_cast< cppu::OWeakObject * >( this ) ) ),
             Environment );
@@ -503,16 +503,9 @@ void OContentHelper::notifyPropertiesChange( const Sequence< PropertyChangeEvent
         return;
 
     // First, notify listeners interested in changes of every property.
-    comphelper::OInterfaceContainerHelper2* pAllPropsContainer = m_aPropertyChangeListeners.getContainer( OUString() );
+    comphelper::OInterfaceContainerHelper3<XPropertiesChangeListener>* pAllPropsContainer = m_aPropertyChangeListeners.getContainer( OUString() );
     if ( pAllPropsContainer )
-    {
-        comphelper::OInterfaceIteratorHelper2 aIter( *pAllPropsContainer );
-        while ( aIter.hasMoreElements() )
-        {
-            // Propagate event.
-            static_cast< XPropertiesChangeListener* >( aIter.next() )->propertiesChange( evt );
-        }
-    }
+        pAllPropsContainer->notifyEach( &XPropertiesChangeListener::propertiesChange, evt );
 
     typedef std::map< XPropertiesChangeListener*, Sequence< PropertyChangeEvent > > PropertiesEventListenerMap;
     PropertiesEventListenerMap aListeners;
@@ -524,15 +517,15 @@ void OContentHelper::notifyPropertiesChange( const Sequence< PropertyChangeEvent
         const PropertyChangeEvent& rEvent = *propertyChangeEvent;
         const OUString& rName = rEvent.PropertyName;
 
-        comphelper::OInterfaceContainerHelper2* pPropsContainer = m_aPropertyChangeListeners.getContainer( rName );
+        comphelper::OInterfaceContainerHelper3<XPropertiesChangeListener>* pPropsContainer = m_aPropertyChangeListeners.getContainer( rName );
         if ( pPropsContainer )
         {
-            comphelper::OInterfaceIteratorHelper2 aIter( *pPropsContainer );
+            comphelper::OInterfaceIteratorHelper3 aIter( *pPropsContainer );
             while ( aIter.hasMoreElements() )
             {
                 Sequence< PropertyChangeEvent >* propertyEvents;
 
-                XPropertiesChangeListener* pListener = static_cast< XPropertiesChangeListener * >( aIter.next() );
+                XPropertiesChangeListener* pListener = aIter.next().get();
                 PropertiesEventListenerMap::iterator it = aListeners.find( pListener );
                 if ( it == aListeners.end() )
                 {

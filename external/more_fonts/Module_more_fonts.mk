@@ -17,20 +17,17 @@ $(eval $(call gb_Module_add_targets,more_fonts,\
 	$(if $(MPL_SUBSET),,ExternalPackage_culmus) \
 	ExternalPackage_dejavu \
 	ExternalPackage_gentium \
-	$(if $(MPL_SUBSET),,ExternalPackage_kacst) \
 	ExternalPackage_karla \
 	ExternalPackage_liberation \
 	ExternalPackage_liberation_narrow \
 	ExternalPackage_libertineg \
 	ExternalPackage_libre_hebrew \
-	ExternalPackage_sourcecode \
 	ExternalPackage_sourcesans \
-	ExternalPackage_sourceserif \
 	ExternalPackage_noto \
 	ExternalPackage_reem \
 	ExternalPackage_scheherazade \
-	ExternalPackage_EmojiOne_Color \
 	ExternalPackage_opendyslexic \
+	ExternalPackage_opensans \
 	UnpackedTarball_alef \
 	UnpackedTarball_amiri \
 	UnpackedTarball_caladea \
@@ -38,20 +35,17 @@ $(eval $(call gb_Module_add_targets,more_fonts,\
 	$(if $(MPL_SUBSET),,UnpackedTarball_culmus) \
 	UnpackedTarball_dejavu \
 	UnpackedTarball_gentium \
-	$(if $(MPL_SUBSET),,UnpackedTarball_kacst) \
 	UnpackedTarball_karla \
 	UnpackedTarball_liberation \
 	UnpackedTarball_liberation_narrow \
 	UnpackedTarball_libertineg \
 	UnpackedTarball_libre_hebrew \
-	UnpackedTarball_sourcecode \
 	UnpackedTarball_sourcesans \
-	UnpackedTarball_sourceserif \
 	UnpackedTarball_noto \
 	UnpackedTarball_reem \
 	UnpackedTarball_scheherazade \
-	UnpackedTarball_EmojiOne_Color \
 	UnpackedTarball_opendyslexic \
+	UnpackedTarball_opensans \
 ))
 
 # vim: set noet sw=4 ts=4:

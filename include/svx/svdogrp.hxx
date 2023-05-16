@@ -24,12 +24,13 @@
 #include <svx/svxdllapi.h>
 #include <svx/svdpage.hxx>
 
-// Forward declarations
-class SfxItemSet;
-
 //   SdrObjGroup
 class SVXCORE_DLLPUBLIC SdrObjGroup final : public SdrObject, public SdrObjList
 {
+public:
+    // Basic DiagramHelper support
+    virtual const std::shared_ptr< svx::diagram::IDiagramHelper >& getDiagramHelper() const override;
+
 private:
     virtual std::unique_ptr<sdr::contact::ViewContact> CreateObjectSpecificViewContact() override;
     virtual std::unique_ptr<sdr::properties::BaseProperties>
@@ -37,14 +38,16 @@ private:
 
     Point maRefPoint; // Reference point inside the object group
 
-private:
-    // protected destructor - due to final, make private
-    virtual ~SdrObjGroup() override;
+    // Allow *only* DiagramHelper itself to set this internal reference to
+    // tightly control usage
+    friend class svx::diagram::IDiagramHelper;
+    std::shared_ptr< svx::diagram::IDiagramHelper > mp_DiagramHelper;
 
 public:
     SdrObjGroup(SdrModel& rSdrModel);
     // Copy constructor
     SdrObjGroup(SdrModel& rSdrModel, SdrObjGroup const& rSource);
+    virtual ~SdrObjGroup() override;
 
     // derived from SdrObjList
     virtual SdrPage* getSdrPageFromSdrObjList() const override;
@@ -63,11 +66,12 @@ public:
     virtual void handlePageChange(SdrPage* pOldPage, SdrPage* pNewPage) override;
 
     virtual SdrObjList* GetSubList() const override;
+    virtual void SetGrabBagItem(const css::uno::Any& rVal) override;
 
     virtual const tools::Rectangle& GetCurrentBoundRect() const override;
     virtual const tools::Rectangle& GetSnapRect() const override;
 
-    virtual SdrObjGroup* CloneSdrObject(SdrModel& rTargetModel) const override;
+    virtual rtl::Reference<SdrObject> CloneSdrObject(SdrModel& rTargetModel) const override;
 
     virtual OUString TakeObjNameSingul() const override;
     virtual OUString TakeObjNamePlural() const override;
@@ -107,9 +111,11 @@ public:
 
     virtual void NbcReformatText() override;
 
-    virtual SdrObjectUniquePtr DoConvertToPolyObj(bool bBezier, bool bAddText) const override;
+    virtual rtl::Reference<SdrObject> DoConvertToPolyObj(bool bBezier,
+                                                         bool bAddText) const override;
 
     virtual void dumpAsXml(xmlTextWriterPtr pWriter) const override;
+    virtual void AddToHdlList(SdrHdlList& rHdlList) const override;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -24,7 +24,8 @@
 #include <strings.hrc>
 #include "formstrings.hxx"
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <connectivity/dbtools.hxx>
 #include <connectivity/dbexception.hxx>
@@ -136,14 +137,14 @@ namespace pcr
     FormLinkDialog::FormLinkDialog(weld::Window* _pParent, const Reference< XPropertySet >& _rxDetailForm,
             const Reference< XPropertySet >& _rxMasterForm, const Reference< XComponentContext >& _rxContext,
             const OUString& _sExplanation,
-            const OUString& _sDetailLabel,
-            const OUString& _sMasterLabel)
+            OUString _sDetailLabel,
+            OUString _sMasterLabel)
         : GenericDialogController(_pParent, "modules/spropctrlr/ui/formlinksdialog.ui", "FormLinks")
         , m_xContext    ( _rxContext )
         , m_xDetailForm( _rxDetailForm )
         , m_xMasterForm( _rxMasterForm )
-        , m_sDetailLabel(_sDetailLabel)
-        , m_sMasterLabel(_sMasterLabel)
+        , m_sDetailLabel(std::move(_sDetailLabel))
+        , m_sMasterLabel(std::move(_sMasterLabel))
         , m_xExplanation(m_xBuilder->weld_label("explanationLabel"))
         , m_xDetailLabel(m_xBuilder->weld_label("detailLabel"))
         , m_xMasterLabel(m_xBuilder->weld_label("masterLabel"))
@@ -209,8 +210,8 @@ namespace pcr
         {
             if ( m_xDetailForm.is() )
             {
-                m_xDetailForm->setPropertyValue( PROPERTY_DETAILFIELDS, makeAny( Sequence< OUString >( aDetailFields.data(), aDetailFields.size() ) ) );
-                m_xDetailForm->setPropertyValue( PROPERTY_MASTERFIELDS, makeAny( Sequence< OUString >( aMasterFields.data(), aMasterFields.size() ) ) );
+                m_xDetailForm->setPropertyValue( PROPERTY_DETAILFIELDS, Any( Sequence< OUString >( aDetailFields.data(), aDetailFields.size() ) ) );
+                m_xDetailForm->setPropertyValue( PROPERTY_MASTERFIELDS, Any( Sequence< OUString >( aMasterFields.data(), aMasterFields.size() ) ) );
             }
         }
         catch( const Exception& )

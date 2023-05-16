@@ -31,6 +31,7 @@
 #include <comphelper/processfactory.hxx>
 #include <ucbhelper/content.hxx>
 #include <com/sun/star/ucb/ContentCreationException.hpp>
+#include <o3tl/string_view.hxx>
 #include <unotools/configmgr.hxx>
 #include <unotools/ucbstreamhelper.hxx>
 #include <unotools/pathoptions.hxx>
@@ -52,7 +53,7 @@
 using namespace ::com::sun::star;
 
 
-const std::pair<sal_uInt16, const char*> aUnlocalized[] =
+const std::pair<sal_uInt16, rtl::OUStringConstExpr> aUnlocalized[] =
 {
     { GALLERY_THEME_HOMEPAGE, RID_GALLERYSTR_THEME_HTMLBUTTONS },
     { GALLERY_THEME_POWERPOINT, RID_GALLERYSTR_THEME_POWERPOINT },
@@ -140,7 +141,7 @@ GalleryThemeEntry::GalleryThemeEntry( bool bCreateUniqueURL,
         {
             if (aUnlocalized[i].first == nId)
             {
-                aName = OUString::createFromAscii(aUnlocalized[i].second);
+                aName = aUnlocalized[i].second;
                 break;
             }
         }
@@ -180,7 +181,7 @@ std::unique_ptr<GalleryBinaryEngine> GalleryThemeEntry::createGalleryStorageEngi
 void GalleryTheme::InsertAllThemes(weld::ComboBox& rListBox)
 {
     for (size_t i = 0; i < SAL_N_ELEMENTS(aUnlocalized); ++i)
-        rListBox.append_text(OUString::createFromAscii(aUnlocalized[i].second));
+        rListBox.append_text(aUnlocalized[i].second);
 
     for (size_t i = 0; i < SAL_N_ELEMENTS(aLocalized); ++i)
         rListBox.append_text(SvxResId(aLocalized[i].second));
@@ -225,7 +226,7 @@ public:
 };
 
 
-Gallery::Gallery( const OUString& rMultiPath )
+Gallery::Gallery( std::u16string_view rMultiPath )
 :       bMultiPath          ( false )
 {
     ImplLoad( rMultiPath );
@@ -245,11 +246,11 @@ Gallery* Gallery::GetGalleryInstance()
     return s_pGallery;
 }
 
-void Gallery::ImplLoad( const OUString& rMultiPath )
+void Gallery::ImplLoad( std::u16string_view rMultiPath )
 {
     bool bIsReadOnlyDir {false};
 
-    bMultiPath = !rMultiPath.isEmpty();
+    bMultiPath = !rMultiPath.empty();
 
     INetURLObject aCurURL(SvtPathOptions().GetConfigPath());
     ImplLoadSubDirs( aCurURL, bIsReadOnlyDir );
@@ -263,7 +264,7 @@ void Gallery::ImplLoad( const OUString& rMultiPath )
         sal_Int32 nIdx {0};
         do
         {
-            aCurURL = INetURLObject(rMultiPath.getToken(0, ';', nIdx));
+            aCurURL = INetURLObject(o3tl::getToken(rMultiPath, 0, ';', nIdx));
             if (bIsRelURL)
             {
                 aRelURL = aCurURL;
@@ -302,7 +303,7 @@ void Gallery::ImplLoadSubDirs( const INetURLObject& rBaseURL, bool& rbDirIsReadO
         {
             const char *appBundle = [[[NSBundle mainBundle] bundlePath] UTF8String];
             OUString path = rBaseURL.GetURLPath();
-            if( path.startsWith( OUStringConcatenation(OUString( appBundle, strlen( appBundle ), RTL_TEXTENCODING_UTF8 ) + "/") ) )
+            if( path.startsWith( Concat2View(OUString( appBundle, strlen( appBundle ), RTL_TEXTENCODING_UTF8 ) + "/") ) )
                 rbDirIsReadOnly = true;
         }
 #else

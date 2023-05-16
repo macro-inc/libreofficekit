@@ -49,12 +49,12 @@ $(call gb_ExternalProject_get_state_target,libetonyek,build) :
 				'LDFLAGS=-Wl$(COMMA)-z$(COMMA)origin \
 					-Wl$(COMMA)-rpath$(COMMA)\$$$$ORIGIN') \
 			CPPFLAGS="$(CPPFLAGS) $(BOOST_CPPFLAGS)" \
-			CXXFLAGS="$(gb_CXXFLAGS) $(if $(ENABLE_OPTIMIZED),$(gb_COMPILEROPTFLAGS),$(gb_COMPILERNOOPTFLAGS))" \
+			CXXFLAGS="$(gb_CXXFLAGS) $(call gb_ExternalProject_get_build_flags,libetonyek)" \
 			LANGTAG_CFLAGS="$(LIBLANGTAG_CFLAGS)" \
 			LANGTAG_LIBS="$(LIBLANGTAG_LIBS)" \
 			XML_CFLAGS="$(LIBXML_CFLAGS)" \
 			XML_LIBS="$(LIBXML_LIBS)" \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
+			$(gb_CONFIGURE_PLATFORMS) \
 			$(if $(filter MACOSX,$(OS)),--prefix=/@.__________________________________________________OOO) \
 		&& $(MAKE) \
 		$(if $(filter MACOSX,$(OS)),\

@@ -17,18 +17,16 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <cassert>
-
 #include <sal/types.h>
-
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/polygon/b2dlinegeometry.hxx>
-#include <vcl/gdimtf.hxx>
+
 #include <vcl/metaact.hxx>
-#include <vcl/outdev.hxx>
 #include <vcl/virdev.hxx>
 
 #include <salgdi.hxx>
+
+#include <cassert>
 
 void OutputDevice::DrawPolyLine( const tools::Polygon& rPoly )
 {
@@ -116,17 +114,28 @@ void OutputDevice::DrawPolyLine( const tools::Polygon& rPoly, const LineInfo& rL
         return;
     }
 
-    // #i101491#
-    // Try direct Fallback to B2D-Version of DrawPolyLine
-    if(LineStyle::Solid == rLineInfo.GetStyle())
+    if (IsDeviceOutputNecessary())
     {
-        DrawPolyLine(
-            rPoly.getB2DPolygon(),
-            rLineInfo.GetWidth(),
-            rLineInfo.GetLineJoin(),
-            rLineInfo.GetLineCap(),
-            basegfx::deg2rad(15.0) /* default fMiterMinimumAngle, value not available in LineInfo */);
-        return;
+        auto eLineStyle = rLineInfo.GetStyle();
+        switch (eLineStyle)
+        {
+            case LineStyle::NONE:
+            case LineStyle::Dash:
+                // use drawPolyLine for these
+                break;
+            case LineStyle::Solid:
+                // #i101491# Try direct Fallback to B2D-Version of DrawPolyLine
+                DrawPolyLine(
+                    rPoly.getB2DPolygon(),
+                    rLineInfo.GetWidth(),
+                    rLineInfo.GetLineJoin(),
+                    rLineInfo.GetLineCap(),
+                    basegfx::deg2rad(15.0) /* default fMiterMinimumAngle, value not available in LineInfo */);
+                return;
+            default:
+                SAL_WARN("vcl.gdi", "Unknown LineStyle: " << static_cast<int>(eLineStyle));
+                return;
+        }
     }
 
     if ( mpMetaFile )
@@ -152,8 +161,8 @@ void OutputDevice::DrawPolyLine( const basegfx::B2DPolygon& rB2DPolygon,
         aLineInfo.SetLineJoin(eLineJoin);
         aLineInfo.SetLineCap(eLineCap);
 
-        const tools::Polygon aToolsPolygon( rB2DPolygon );
-        mpMetaFile->AddAction( new MetaPolyLineAction( aToolsPolygon, aLineInfo ) );
+        tools::Polygon aToolsPolygon( rB2DPolygon );
+        mpMetaFile->AddAction( new MetaPolyLineAction( std::move(aToolsPolygon), std::move(aLineInfo) ) );
     }
 
     // Do not paint empty PolyPolygons
@@ -319,8 +328,8 @@ bool OutputDevice::DrawPolyLineDirect(
             aLineInfo.SetLineJoin(eLineJoin);
             aLineInfo.SetLineCap(eLineCap);
             // MiterMinimumAngle does not exist yet in LineInfo
-            const tools::Polygon aToolsPolygon( rB2DPolygon );
-            mpMetaFile->AddAction( new MetaPolyLineAction( aToolsPolygon, aLineInfo ) );
+            tools::Polygon aToolsPolygon( rB2DPolygon );
+            mpMetaFile->AddAction( new MetaPolyLineAction( std::move(aToolsPolygon), std::move(aLineInfo) ) );
         }
         return true;
     }

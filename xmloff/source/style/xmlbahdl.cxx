@@ -23,6 +23,7 @@
 #include <sal/log.hxx>
 #include <o3tl/any.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <sax/tools/converter.hxx>
 #include <xmloff/xmluconv.hxx>
 #include <com/sun/star/uno/Any.hxx>
@@ -218,7 +219,7 @@ bool XMLBoolFalsePropHdl::importXML( const OUString&, Any&, const SvXMLUnitConve
 
 bool XMLBoolFalsePropHdl::exportXML( OUString& rStrExpValue, const Any& /*rValue*/, const SvXMLUnitConverter& rCnv) const
 {
-    return XMLBoolPropHdl::exportXML( rStrExpValue, makeAny( false ), rCnv );
+    return XMLBoolPropHdl::exportXML( rStrExpValue, Any( false ), rCnv );
 }
 
 
@@ -472,15 +473,15 @@ bool XMLColorPropHdl::importXML( const OUString& rStrImpValue, Any& rValue, cons
 
         if( (nOpen != -1) && (nClose > nOpen) )
         {
-            const OUString aTmp( rStrImpValue.copy( nOpen+1, nClose - nOpen-1) );
+            const std::u16string_view aTmp( rStrImpValue.subView( nOpen+1, nClose - nOpen-1) );
 
             sal_Int32 nIndex = 0;
 
             Sequence< double > aHSL
             {
-                aTmp.getToken( 0, ',', nIndex ).toDouble(),
-                aTmp.getToken( 0, ',', nIndex ).toDouble() / 100.0,
-                aTmp.getToken( 0, ',', nIndex ).toDouble() / 100.0
+                o3tl::toDouble(o3tl::getToken(aTmp, 0, ',', nIndex )),
+                o3tl::toDouble(o3tl::getToken(aTmp, 0, ',', nIndex )) / 100.0,
+                o3tl::toDouble(o3tl::getToken(aTmp, 0, ',', nIndex )) / 100.0
             };
             rValue <<= aHSL;
             bRet = true;

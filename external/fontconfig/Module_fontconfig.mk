@@ -11,8 +11,9 @@ $(eval $(call gb_Module_Module,fontconfig))
 
 $(eval $(call gb_Module_add_targets,fontconfig,\
 	ExternalProject_fontconfig \
-	UnpackedTarball_fontconfig \
+	$(if $(filter EMSCRIPTEN,$(OS)),ExternalPackage_fontconfig_data) \
 	$(if $(filter LINUX,$(OS)),ExternalPackage_fontconfig) \
+	UnpackedTarball_fontconfig \
 ))
 
 # vim: set noet sw=4 ts=4:

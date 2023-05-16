@@ -16,7 +16,7 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-// MyEDITENG, due to exported EditEng
+
 #ifndef INCLUDED_EDITENG_EDITENG_HXX
 #define INCLUDED_EDITENG_EDITENG_HXX
 
@@ -40,11 +40,12 @@
 #include <tools/lineend.hxx>
 #include <tools/degree.hxx>
 #include <tools/long.hxx>
+#include <basegfx/tuple/b2dtuple.hxx>
 
 #include <editeng/eedata.hxx>
 #include <o3tl/typed_flags_set.hxx>
 #include <svl/languageoptions.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <functional>
 
 template <typename Arg, typename Ret> class Link;
@@ -253,8 +254,8 @@ public:
     EEHorizontalTextDirection   GetDefaultHorizontalTextDirection() const;
 
     SvtScriptType   GetScriptType( const ESelection& rSelection ) const;
-    LanguageType    GetLanguage(const EditPaM& rPaM) const;
-    LanguageType    GetLanguage( sal_Int32 nPara, sal_Int32 nPos ) const;
+    editeng::LanguageSpan GetLanguage(const EditPaM& rPaM) const;
+    editeng::LanguageSpan GetLanguage( sal_Int32 nPara, sal_Int32 nPos ) const;
 
     void            TransliterateText( const ESelection& rSelection, TransliterationFlags nTransliterationMode );
     EditSelection   TransliterateText( const EditSelection& rSelection, TransliterationFlags nTransliterationMode );
@@ -402,6 +403,8 @@ public:
     bool            IsFlatMode() const;
     void            SetFlatMode( bool bFlat );
 
+    void            SetSingleLine( bool bValue );
+
     void            SetControlWord( EEControlBits nWord );
     EEControlBits   GetControlWord() const;
 
@@ -414,8 +417,14 @@ public:
     void            QuickDelete( const ESelection& rSel );
     void            QuickMarkToBeRepainted( sal_Int32 nPara );
 
-    void            SetGlobalCharStretching( sal_uInt16 nX, sal_uInt16 nY );
-    void            GetGlobalCharStretching( sal_uInt16& rX, sal_uInt16& rY ) const;
+    void setGlobalScale(double fFontScaleX, double fFontScaleY, double fSpacingScaleX, double fSpacingScaleY);
+
+    void getGlobalSpacingScale(double& rX, double& rY) const;
+    basegfx::B2DTuple getGlobalSpacingScale() const;
+    void getGlobalFontScale(double& rX, double& rY) const;
+    basegfx::B2DTuple getGlobalFontScale() const;
+
+    void setRoundFontSizeToPt(bool bRound) const;
 
     void            SetEditTextObjectPool( SfxItemPool* pPool );
     SfxItemPool*    GetEditTextObjectPool() const;
@@ -498,7 +507,9 @@ public:
 
     virtual void DrawingText( const Point& rStartPos, const OUString& rText,
                               sal_Int32 nTextStart, sal_Int32 nTextLen,
-                              o3tl::span<const sal_Int32> pDXArray, const SvxFont& rFont,
+                              o3tl::span<const sal_Int32> pDXArray,
+                              o3tl::span<const sal_Bool> pKashidaArray,
+                              const SvxFont& rFont,
                               sal_Int32 nPara, sal_uInt8 nRightToLeft,
                               const EEngineData::WrongSpellVector* pWrongSpellVector,
                               const SvxFieldData* pFieldData,
@@ -637,6 +648,10 @@ public:
     // the same type expands the original instead of inserting another. But the
     // spell check dialog doesn't want that behaviour
     void DisableAttributeExpanding();
+
+    // Optimization, if set, formatting will be done only for text lines that fit
+    // in given paper size and exceeding lines will be ignored.
+    void EnableSkipOutsideFormat(bool set);
 
     void SetLOKSpecialPaperSize(const Size& rSize);
     const Size& GetLOKSpecialPaperSize() const;

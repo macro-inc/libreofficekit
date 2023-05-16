@@ -301,7 +301,7 @@ css::uno::Any Content::mapGIOError( GError *pError )
 
 css::uno::Any Content::getBadArgExcept()
 {
-    return css::uno::makeAny( css::lang::IllegalArgumentException(
+    return css::uno::Any( css::lang::IllegalArgumentException(
         "Wrong argument type!",
         static_cast< cppu::OWeakObject * >( this ), -1) );
 }
@@ -422,6 +422,8 @@ static css::util::DateTime getDateFromUnix (time_t t)
 {
     TimeValue tv;
     tv.Nanosec = 0;
+    // coverity[store_truncates_time_t] - TODO: sal_uInt32 TimeValue::Seconds is only large enough
+    // for integer time_t values < 2^32 representing dates until year 2106:
     tv.Seconds = t;
     oslDateTime dt;
 
@@ -536,7 +538,7 @@ css::uno::Reference< css::sdbc::XRow > Content::getPropertyValues(
         }
         else if ( rProp.Name == "CreatableContentsInfo" )
         {
-            xRow->appendObject( rProp, css::uno::makeAny( queryCreatableContentsInfo( xEnv ) ) );
+            xRow->appendObject( rProp, css::uno::Any( queryCreatableContentsInfo( xEnv ) ) );
         }
         else
         {
@@ -877,7 +879,7 @@ css::uno::Any Content::open(const css::ucb::OpenCommandArgument2 & rOpenCommand,
     {
         css::uno::Sequence< css::uno::Any > aArgs{ css::uno::Any(
             m_xIdentifier->getContentIdentifier()) };
-        css::uno::Any aErr = css::uno::makeAny(
+        css::uno::Any aErr(
             css::ucb::InteractiveAugmentedIOException(OUString(), static_cast< cppu::OWeakObject * >( this ),
                 css::task::InteractionClassification_ERROR,
                 bIsFolder ? css::ucb::IOErrorCode_NOT_EXISTING_PATH : css::ucb::IOErrorCode_NOT_EXISTING, aArgs)
@@ -908,7 +910,7 @@ css::uno::Any Content::open(const css::ucb::OpenCommandArgument2 & rOpenCommand,
            )
         {
             ucbhelper::cancelCommandExecution(
-                css::uno::makeAny ( css::ucb::UnsupportedOpenModeException
+                css::uno::Any ( css::ucb::UnsupportedOpenModeException
                     ( OUString(), static_cast< cppu::OWeakObject * >( this ),
                       sal_Int16( rOpenCommand.Mode ) ) ),
                     xEnv );
@@ -922,7 +924,7 @@ css::uno::Any Content::open(const css::ucb::OpenCommandArgument2 & rOpenCommand,
             SAL_WARN("ucb.ucp.gio", "Failed to load data from '" << m_xIdentifier->getContentIdentifier() << "'");
 
             ucbhelper::cancelCommandExecution(
-                css::uno::makeAny (css::ucb::UnsupportedDataSinkException
+                css::uno::Any (css::ucb::UnsupportedDataSinkException
                     ( OUString(), static_cast< cppu::OWeakObject * >( this ),
                       rOpenCommand.Sink ) ),
                     xEnv );
@@ -1012,7 +1014,7 @@ css::uno::Any SAL_CALL Content::execute(
         SAL_WARN("ucb.ucp.gio", "Unknown command " << aCommand.Name);
 
         ucbhelper::cancelCommandExecution
-            ( css::uno::makeAny( css::ucb::UnsupportedCommandException
+            ( css::uno::Any( css::ucb::UnsupportedCommandException
               ( OUString(),
                 static_cast< cppu::OWeakObject * >( this ) ) ),
               xEnv );
@@ -1054,7 +1056,7 @@ void Content::insert(const css::uno::Reference< css::io::XInputStream > &xInputS
 
     if ( !xInputStream.is() )
     {
-        ucbhelper::cancelCommandExecution( css::uno::makeAny
+        ucbhelper::cancelCommandExecution( css::uno::Any
             ( css::ucb::MissingInputStreamException
               ( OUString(), static_cast< cppu::OWeakObject * >( this ) ) ),
             xEnv );

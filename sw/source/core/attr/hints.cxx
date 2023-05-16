@@ -23,6 +23,7 @@
 #include <ndtxt.hxx>
 #include <swtypes.hxx>
 #include <svl/languageoptions.hxx>
+#include <utility>
 #include <vcl/outdev.hxx>
 #include <osl/diagnose.h>
 
@@ -31,28 +32,30 @@ SwFormatChg::SwFormatChg( SwFormat* pFormat )
 {
 }
 
-SwInsText::SwInsText(sal_Int32 const nP, sal_Int32 const nL, bool const isInFMCommand, bool const isInFMResult)
-    : SwMsgPoolItem( RES_INS_TXT )
+
+
+namespace sw {
+
+MoveText::MoveText(SwTextNode *const pD, sal_Int32 const nD, sal_Int32 const nS, sal_Int32 const nL)
+    : pDestNode(pD), nDestStart(nD), nSourceStart(nS), nLen(nL)
+{
+}
+
+InsertText::InsertText(const sal_Int32 nP, const sal_Int32 nL, const bool isInFMCommand, const bool isInFMResult)
+    : SfxHint( SfxHintId::SwInsertText )
     , nPos( nP ), nLen( nL )
     , isInsideFieldmarkCommand(isInFMCommand)
     , isInsideFieldmarkResult(isInFMResult)
 {
 }
 
-SwDelChr::SwDelChr( sal_Int32 nP )
-    : SwMsgPoolItem( RES_DEL_CHR ), nPos( nP )
+DeleteText::DeleteText( const sal_Int32 nS, const sal_Int32 nL )
+    : SfxHint( SfxHintId::SwDeleteText ), nStart( nS ), nLen( nL )
 {
 }
 
-SwDelText::SwDelText( sal_Int32 nS, sal_Int32 nL )
-    : SwMsgPoolItem( RES_DEL_TXT ), nStart( nS ), nLen( nL )
-{
-}
-
-namespace sw {
-
-MoveText::MoveText(SwTextNode *const pD, sal_Int32 const nD, sal_Int32 const nS, sal_Int32 const nL)
-    : pDestNode(pD), nDestStart(nD), nSourceStart(nS), nLen(nL)
+DeleteChar::DeleteChar( const sal_Int32 nPos )
+    : SfxHint( SfxHintId::SwDeleteChar ), m_nPos( nPos )
 {
 }
 
@@ -74,7 +77,7 @@ SwUpdateAttr::SwUpdateAttr( sal_Int32 nS, sal_Int32 nE, sal_uInt16 nW )
 }
 
 SwUpdateAttr::SwUpdateAttr( sal_Int32 nS, sal_Int32 nE, sal_uInt16 nW, std::vector<sal_uInt16> aW )
-    : SwMsgPoolItem( RES_UPDATE_ATTR ), m_nStart( nS ), m_nEnd( nE ), m_nWhichAttr( nW ), m_aWhichFmtAttrs( aW )
+    : SwMsgPoolItem( RES_UPDATE_ATTR ), m_nStart( nS ), m_nEnd( nE ), m_nWhichAttr( nW ), m_aWhichFmtAttrs(std::move( aW ))
 {
 }
 

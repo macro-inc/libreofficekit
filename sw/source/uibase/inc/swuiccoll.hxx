@@ -26,11 +26,11 @@
 class SwWrtShell;
 class SwFormat;
 
+/// The Condition tab on the paragraph style dialog for conditional styles, e.g. Text Body.
 class SwCondCollPage final : public SfxTabPage
 {
     std::vector<OUString> m_aStrArr;
 
-    SwWrtShell          &m_rSh;
     const CommandStruct*m_pCmds;
     SwFormat*              m_pFormat;
 
@@ -49,14 +49,14 @@ class SwCondCollPage final : public SfxTabPage
     void AssignRemove(const weld::Widget*);
     void SelectHdl(const weld::Widget*);
 
-    static const WhichRangesContainer m_aPageRg;
+    static const WhichRangesContainer s_aPageRg;
 
 public:
     SwCondCollPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet &rSet);
     virtual ~SwCondCollPage() override;
 
     static std::unique_ptr<SfxTabPage> Create(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet *rSet);
-    static WhichRangesContainer GetRanges() { return m_aPageRg; }
+    static WhichRangesContainer GetRanges() { return s_aPageRg; }
 
     virtual bool FillItemSet(      SfxItemSet *rSet) override;
     virtual void Reset      (const SfxItemSet *rSet) override;

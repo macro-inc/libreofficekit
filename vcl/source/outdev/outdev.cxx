@@ -18,19 +18,18 @@
  */
 
 #include <sal/config.h>
-#include <sal/log.hxx>
 
+#include <sal/log.hxx>
+#include <comphelper/processfactory.hxx>
 #include <tools/debug.hxx>
-#include <vcl/gdimtf.hxx>
+
 #include <vcl/graph.hxx>
+#include <vcl/lazydelete.hxx>
 #include <vcl/metaact.hxx>
-#include <vcl/virdev.hxx>
-#include <vcl/outdev.hxx>
 #include <vcl/toolkit/unowrap.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/sysdata.hxx>
-#include <vcl/lazydelete.hxx>
-#include <comphelper/processfactory.hxx>
+#include <vcl/virdev.hxx>
 
 #include <ImplOutDevData.hxx>
 #include <font/PhysicalFontFaceCollection.hxx>
@@ -61,7 +60,7 @@ OutputDevice::OutputDevice(OutDevType eOutDevType) :
     maRegion(true),
     maFillColor( COL_WHITE ),
     maTextLineColor( COL_TRANSPARENT ),
-    mxSettings( new AllSettings(Application::GetSettings()) )
+    moSettings( Application::GetSettings() )
 {
     mpGraphics                      = nullptr;
     mpUnoGraphicsList               = nullptr;
@@ -105,7 +104,6 @@ OutputDevice::OutputDevice(OutDevType eOutDevType) :
     meRasterOp                      = RasterOp::OverPaint;
     mnAntialiasing                  = AntialiasingFlags::NONE;
     meTextLanguage                  = LANGUAGE_SYSTEM;  // TODO: get default from configuration?
-    mbTextRenderModeForResolutionIndependentLayout = false;
     mbLineColor                     = true;
     mbFillColor                     = true;
     mbInitLineColor                 = true;
@@ -216,7 +214,7 @@ void OutputDevice::SetConnectMetaFile( GDIMetaFile* pMtf )
 
 void OutputDevice::SetSettings( const AllSettings& rSettings )
 {
-    *mxSettings = rSettings;
+    *moSettings = rSettings;
 
     if( mpAlphaVDev )
         mpAlphaVDev->SetSettings( rSettings );
@@ -291,7 +289,7 @@ css::uno::Any OutputDevice::GetSystemGfxDataAny() const
     css::uno::Sequence< sal_Int8 > aSeq( reinterpret_cast<sal_Int8 const *>(&aSysData),
                                                       aSysData.nSize );
 
-    return css::uno::makeAny(aSeq);
+    return css::uno::Any(aSeq);
 }
 
 void OutputDevice::SetRefPoint()
@@ -361,20 +359,6 @@ void OutputDevice::SetAntialiasing( AntialiasingFlags nMode )
 
     if( mpAlphaVDev )
         mpAlphaVDev->SetAntialiasing( nMode );
-}
-
-void OutputDevice::SetTextRenderModeForResolutionIndependentLayout(bool bMode)
-{
-    if (mbTextRenderModeForResolutionIndependentLayout!= bMode)
-    {
-        mbTextRenderModeForResolutionIndependentLayout = bMode;
-
-        if (mpGraphics)
-            mpGraphics->setTextRenderModeForResolutionIndependentLayout(bMode);
-    }
-
-    if (mpAlphaVDev)
-        mpAlphaVDev->SetTextRenderModeForResolutionIndependentLayout(bMode);
 }
 
 void OutputDevice::SetDrawMode(DrawModeFlags nDrawMode)
@@ -729,65 +713,6 @@ bool OutputDevice::ImplIsRecordLayout() const
     return mpOutDevData->mpRecordLayout;
 }
 
-// EPS public function
-
-bool OutputDevice::DrawEPS( const Point& rPoint, const Size& rSize,
-                            const GfxLink& rGfxLink, GDIMetaFile* pSubst )
-{
-    bool bDrawn(true);
-
-    if ( mpMetaFile )
-    {
-        GDIMetaFile aSubst;
-
-        if( pSubst )
-            aSubst = *pSubst;
-
-        mpMetaFile->AddAction( new MetaEPSAction( rPoint, rSize, rGfxLink, aSubst ) );
-    }
-
-    if ( !IsDeviceOutputNecessary() || ImplIsRecordLayout() )
-        return bDrawn;
-
-    if( mbOutputClipped )
-        return bDrawn;
-
-    tools::Rectangle aRect( ImplLogicToDevicePixel( tools::Rectangle( rPoint, rSize ) ) );
-
-    if( !aRect.IsEmpty() )
-    {
-        // draw the real EPS graphics
-        if( rGfxLink.GetData() && rGfxLink.GetDataSize() )
-        {
-            if( !mpGraphics && !AcquireGraphics() )
-                return bDrawn;
-            assert(mpGraphics);
-
-            if( mbInitClipRegion )
-                InitClipRegion();
-
-            aRect.Justify();
-            bDrawn = mpGraphics->DrawEPS( aRect.Left(), aRect.Top(), aRect.GetWidth(), aRect.GetHeight(),
-                         const_cast<sal_uInt8*>(rGfxLink.GetData()), rGfxLink.GetDataSize(), *this );
-        }
-
-        // else draw the substitution graphics
-        if( !bDrawn && pSubst )
-        {
-            GDIMetaFile* pOldMetaFile = mpMetaFile;
-
-            mpMetaFile = nullptr;
-            Graphic(*pSubst).Draw(*this, rPoint, rSize);
-            mpMetaFile = pOldMetaFile;
-        }
-    }
-
-    if( mpAlphaVDev )
-        mpAlphaVDev->DrawEPS( rPoint, rSize, rGfxLink, pSubst );
-
-    return bDrawn;
-}
-
 css::awt::DeviceInfo OutputDevice::GetCommonDeviceInfo(Size const& rDevSz) const
 {
     css::awt::DeviceInfo aInfo;
@@ -795,9 +720,9 @@ css::awt::DeviceInfo OutputDevice::GetCommonDeviceInfo(Size const& rDevSz) const
     aInfo.Width = rDevSz.Width();
     aInfo.Height = rDevSz.Height();
 
-    Size aTmpSz = LogicToPixel(Size(1000, 1000), MapMode(MapUnit::MapCM));
-    aInfo.PixelPerMeterX = aTmpSz.Width() / 10;
-    aInfo.PixelPerMeterY = aTmpSz.Height() / 10;
+    Size aTmpSz = LogicToPixel(Size(1000, 1000), MapMode(MapUnit::MapMM));
+    aInfo.PixelPerMeterX = aTmpSz.Width();
+    aInfo.PixelPerMeterY = aTmpSz.Height();
     aInfo.BitsPerPixel = GetBitCount();
 
     aInfo.Capabilities = css::awt::DeviceCapability::RASTEROPERATIONS |

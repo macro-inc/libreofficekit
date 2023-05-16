@@ -52,13 +52,16 @@
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <sal/log.hxx>
-#include <comphelper/multicontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/sequenceashashmap.hxx>
 #include <comphelper/servicehelper.hxx>
+#include <o3tl/string_view.hxx>
 #include <memory>
+#include <mutex>
 #include <string_view>
 
 using namespace css;
@@ -122,6 +125,7 @@ public:
     virtual void SAL_CALL insertSettings( const OUString& NewResourceURL, const css::uno::Reference< css::container::XIndexAccess >& aNewData ) override;
     virtual css::uno::Reference< css::uno::XInterface > SAL_CALL getImageManager() override;
     virtual css::uno::Reference< css::ui::XAcceleratorConfiguration > SAL_CALL getShortCutManager() override;
+    virtual css::uno::Reference< css::ui::XAcceleratorConfiguration > SAL_CALL createShortCutManager() override;
     virtual css::uno::Reference< css::uno::XInterface > SAL_CALL getEventsManager() override;
 
     // XModuleUIConfigurationManager
@@ -153,8 +157,8 @@ private:
 
     struct UIElementInfo
     {
-        UIElementInfo( const OUString& rResourceURL, const OUString& rUIName ) :
-            aResourceURL( rResourceURL), aUIName( rUIName ) {}
+        UIElementInfo( OUString _aResourceURL, OUString _aUIName ) :
+            aResourceURL(std::move( _aResourceURL)), aUIName(std::move( _aUIName )) {}
         OUString   aResourceURL;
         OUString   aUIName;
     };
@@ -212,8 +216,9 @@ private:
     OUString                                                  m_aModuleIdentifier;
     css::uno::Reference< css::embed::XTransactedObject >      m_xUserRootCommit;
     css::uno::Reference< css::uno::XComponentContext >        m_xContext;
-    osl::Mutex                                                m_mutex;
-    comphelper::OMultiTypeInterfaceContainerHelper2           m_aListenerContainer;   /// container for ALL Listener
+    std::mutex                                                m_mutex;
+    comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_aEventListeners;
+    comphelper::OInterfaceContainerHelper4<css::ui::XUIConfigurationListener> m_aConfigListeners;
     rtl::Reference< ImageManager >                            m_xModuleImageManager;
     css::uno::Reference< css::ui::XAcceleratorConfiguration > m_xModuleAcceleratorManager;
 };
@@ -232,20 +237,19 @@ std::u16string_view UIELEMENTTYPENAMES[] =
     u"" UIELEMENTTYPE_TOOLPANEL_NAME
 };
 
-const char       RESOURCEURL_PREFIX[] = "private:resource/";
-const sal_Int32  RESOURCEURL_PREFIX_SIZE = strlen(RESOURCEURL_PREFIX);
+constexpr std::u16string_view RESOURCEURL_PREFIX = u"private:resource/";
 
-sal_Int16 RetrieveTypeFromResourceURL( const OUString& aResourceURL )
+sal_Int16 RetrieveTypeFromResourceURL( std::u16string_view aResourceURL )
 {
 
-    if (( aResourceURL.startsWith( RESOURCEURL_PREFIX ) ) &&
-        ( aResourceURL.getLength() > RESOURCEURL_PREFIX_SIZE ))
+    if (( o3tl::starts_with(aResourceURL, RESOURCEURL_PREFIX ) ) &&
+        ( aResourceURL.size() > RESOURCEURL_PREFIX.size() ))
     {
-        OUString    aTmpStr     = aResourceURL.copy( RESOURCEURL_PREFIX_SIZE );
-        sal_Int32   nIndex      = aTmpStr.indexOf( '/' );
-        if (( nIndex > 0 ) &&  ( aTmpStr.getLength() > nIndex ))
+        std::u16string_view aTmpStr = aResourceURL.substr( RESOURCEURL_PREFIX.size() );
+        size_t nIndex = aTmpStr.find( '/' );
+        if (( nIndex > 0 ) &&  ( aTmpStr.size() > nIndex ))
         {
-            OUString aTypeStr( aTmpStr.copy( 0, nIndex ));
+            std::u16string_view aTypeStr( aTmpStr.substr( 0, nIndex ));
             for ( int i = 0; i < ui::UIElementType::COUNT; i++ )
             {
                 if ( aTypeStr == UIELEMENTTYPENAMES[i] )
@@ -257,14 +261,15 @@ sal_Int16 RetrieveTypeFromResourceURL( const OUString& aResourceURL )
     return ui::UIElementType::UNKNOWN;
 }
 
-OUString RetrieveNameFromResourceURL( const OUString& aResourceURL )
+OUString RetrieveNameFromResourceURL( std::u16string_view aResourceURL )
 {
-    if (( aResourceURL.startsWith( RESOURCEURL_PREFIX ) ) &&
-        ( aResourceURL.getLength() > RESOURCEURL_PREFIX_SIZE ))
+    if (( o3tl::starts_with(aResourceURL, RESOURCEURL_PREFIX ) ) &&
+        ( aResourceURL.size() > RESOURCEURL_PREFIX.size() ))
     {
-        sal_Int32 nIndex = aResourceURL.lastIndexOf( '/' );
-        if (( nIndex > 0 ) && (( nIndex+1 ) < aResourceURL.getLength()))
-            return aResourceURL.copy( nIndex+1 );
+        size_t nIndex = aResourceURL.rfind( '/' );
+
+        if ( nIndex > 0 && nIndex != std::u16string_view::npos && (( nIndex+1 ) < aResourceURL.size()) )
+            return OUString(aResourceURL.substr( nIndex+1 ));
     }
 
     return OUString();
@@ -281,8 +286,8 @@ void ModuleUIConfigurationManager::impl_fillSequenceWithElementTypeInfo( UIEleme
     OUString aCustomUrlPrefix( "custom_" );
     for (auto const& userElement : rUserElements)
     {
-        sal_Int32 nIndex = userElement.second.aResourceURL.indexOf( aCustomUrlPrefix, RESOURCEURL_PREFIX_SIZE );
-        if ( nIndex > RESOURCEURL_PREFIX_SIZE )
+        sal_Int32 nIndex = userElement.second.aResourceURL.indexOf( aCustomUrlPrefix, RESOURCEURL_PREFIX.size() );
+        if ( nIndex > static_cast<sal_Int32>(RESOURCEURL_PREFIX.size()) )
         {
             // Performance: Retrieve user interface name only for custom user interface elements.
             // It's only used by them!
@@ -317,8 +322,8 @@ void ModuleUIConfigurationManager::impl_fillSequenceWithElementTypeInfo( UIEleme
         UIElementInfoHashMap::const_iterator pIterInfo = aUIElementInfoCollection.find( defaultElement.second.aResourceURL );
         if ( pIterInfo == aUIElementInfoCollection.end() )
         {
-            sal_Int32 nIndex = defaultElement.second.aResourceURL.indexOf( aCustomUrlPrefix, RESOURCEURL_PREFIX_SIZE );
-            if ( nIndex > RESOURCEURL_PREFIX_SIZE )
+            sal_Int32 nIndex = defaultElement.second.aResourceURL.indexOf( aCustomUrlPrefix, RESOURCEURL_PREFIX.size() );
+            if ( nIndex > static_cast<sal_Int32>(RESOURCEURL_PREFIX.size()) )
             {
                 // Performance: Retrieve user interface name only for custom user interface elements.
                 // It's only used by them!
@@ -373,11 +378,11 @@ void ModuleUIConfigurationManager::impl_preloadUIElementTypeList( Layer eLayer, 
         sal_Int32 nIndex = rElementName.lastIndexOf( '.' );
         if (( nIndex > 0 ) && ( nIndex < rElementName.getLength() ))
         {
-            OUString aExtension( rElementName.copy( nIndex+1 ));
-            OUString aUIElementName( rElementName.copy( 0, nIndex ));
+            std::u16string_view aExtension( rElementName.subView( nIndex+1 ));
+            std::u16string_view aUIElementName( rElementName.subView( 0, nIndex ));
 
-            if (!aUIElementName.isEmpty() &&
-                ( aExtension.equalsIgnoreAsciiCase("xml")))
+            if (!aUIElementName.empty() &&
+                ( o3tl::equalsIgnoreAsciiCase(aExtension, u"xml")))
             {
                 aUIElementData.aResourceURL = aResURLPrefix + aUIElementName;
                 aUIElementData.aName        = rElementName;
@@ -829,7 +834,6 @@ ModuleUIConfigurationManager::ModuleUIConfigurationManager(
     , m_aXMLPostfix( ".xml" )
     , m_aPropUIName( "UIName" )
     , m_xContext( xContext )
-    , m_aListenerContainer( m_mutex )
 {
     // Make sure we have a default initialized entry for every layer and user interface element type!
     // The following code depends on this!
@@ -897,7 +901,14 @@ void SAL_CALL ModuleUIConfigurationManager::dispose()
     Reference< XComponent > xThis(this);
 
     css::lang::EventObject aEvent( xThis );
-    m_aListenerContainer.disposeAndClear( aEvent );
+    {
+        std::unique_lock aGuard(m_mutex);
+        m_aEventListeners.disposeAndClear( aGuard, aEvent );
+    }
+    {
+        std::unique_lock aGuard(m_mutex);
+        m_aConfigListeners.disposeAndClear( aGuard, aEvent );
+    }
 
     /* SAFE AREA ----------------------------------------------------------------------------------------------- */
     SolarMutexClearableGuard aGuard;
@@ -934,13 +945,15 @@ void SAL_CALL ModuleUIConfigurationManager::addEventListener( const Reference< X
             throw DisposedException();
     }
 
-    m_aListenerContainer.addInterface( cppu::UnoType<XEventListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aEventListeners.addInterface( aGuard, xListener );
 }
 
 void SAL_CALL ModuleUIConfigurationManager::removeEventListener( const Reference< XEventListener >& xListener )
 {
     /* SAFE AREA ----------------------------------------------------------------------------------------------- */
-    m_aListenerContainer.removeInterface( cppu::UnoType<XEventListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aEventListeners.removeInterface( aGuard, xListener );
 }
 
 // XUIConfiguration
@@ -954,13 +967,15 @@ void SAL_CALL ModuleUIConfigurationManager::addConfigurationListener( const Refe
             throw DisposedException();
     }
 
-    m_aListenerContainer.addInterface( cppu::UnoType<ui::XUIConfigurationListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aConfigListeners.addInterface( aGuard, xListener );
 }
 
 void SAL_CALL ModuleUIConfigurationManager::removeConfigurationListener( const Reference< css::ui::XUIConfigurationListener >& xListener )
 {
     /* SAFE AREA ----------------------------------------------------------------------------------------------- */
-    m_aListenerContainer.removeInterface( cppu::UnoType<ui::XUIConfigurationListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aConfigListeners.removeInterface( aGuard, xListener );
 }
 
 // XUIConfigurationManager
@@ -1408,6 +1423,11 @@ Reference< XInterface > SAL_CALL ModuleUIConfigurationManager::getImageManager()
     return Reference< XInterface >( static_cast<cppu::OWeakObject*>(m_xModuleImageManager.get()), UNO_QUERY );
 }
 
+Reference< ui::XAcceleratorConfiguration > SAL_CALL ModuleUIConfigurationManager::createShortCutManager()
+{
+    return ui::ModuleAcceleratorConfiguration::createWithModuleIdentifier(m_xContext, m_aModuleIdentifier);
+}
+
 Reference< ui::XAcceleratorConfiguration > SAL_CALL ModuleUIConfigurationManager::getShortCutManager()
 {
     SolarMutexGuard g;
@@ -1610,33 +1630,22 @@ sal_Bool SAL_CALL ModuleUIConfigurationManager::isReadOnly()
 
 void ModuleUIConfigurationManager::implts_notifyContainerListener( const ui::ConfigurationEvent& aEvent, NotifyOp eOp )
 {
-    comphelper::OInterfaceContainerHelper2* pContainer = m_aListenerContainer.getContainer( cppu::UnoType<css::ui::XUIConfigurationListener>::get());
-    if ( pContainer == nullptr )
-        return;
-
-    comphelper::OInterfaceIteratorHelper2 pIterator( *pContainer );
-    while ( pIterator.hasMoreElements() )
+    std::unique_lock aGuard(m_mutex);
+    using ListenerMethodType = void (SAL_CALL css::ui::XUIConfigurationListener::*)(const ui::ConfigurationEvent&);
+    ListenerMethodType aListenerMethod {};
+    switch ( eOp )
     {
-        try
-        {
-            switch ( eOp )
-            {
-                case NotifyOp_Replace:
-                    static_cast< css::ui::XUIConfigurationListener*>(pIterator.next())->elementReplaced( aEvent );
-                    break;
-                case NotifyOp_Insert:
-                    static_cast< css::ui::XUIConfigurationListener*>(pIterator.next())->elementInserted( aEvent );
-                    break;
-                case NotifyOp_Remove:
-                    static_cast< css::ui::XUIConfigurationListener*>(pIterator.next())->elementRemoved( aEvent );
-                    break;
-            }
-        }
-        catch( const css::uno::RuntimeException& )
-        {
-            pIterator.remove();
-        }
+        case NotifyOp_Replace:
+            aListenerMethod = &css::ui::XUIConfigurationListener::elementReplaced;
+            break;
+        case NotifyOp_Insert:
+            aListenerMethod = &css::ui::XUIConfigurationListener::elementInserted;
+            break;
+        case NotifyOp_Remove:
+            aListenerMethod = &css::ui::XUIConfigurationListener::elementRemoved;
+            break;
     }
+    m_aConfigListeners.notifyEach(aGuard, aListenerMethod, aEvent);
 }
 
 }

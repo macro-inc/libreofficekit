@@ -26,8 +26,6 @@
 #include "webdavprovider.hxx"
 #include "ContentProperties.hxx"
 
-#include <sal/log.hxx>
-
 using namespace com::sun::star;
 using namespace http_dav_ucp;
 
@@ -88,13 +86,13 @@ ContentProperties::ContentProperties( const DAVResource& rResource )
 
         (*m_xProps)[ OUString( "Title" ) ]
             = PropertyValue(
-                uno::makeAny( aURI.GetPathBaseNameUnescaped() ), true );
+                uno::Any( aURI.GetPathBaseNameUnescaped() ), true );
     }
     catch ( DAVException const & )
     {
         (*m_xProps)[ OUString( "Title" ) ]
             = PropertyValue(
-                uno::makeAny(
+                uno::Any(
                     OUString( "*** unknown ***" ) ),
                 true );
     }
@@ -115,11 +113,11 @@ ContentProperties::ContentProperties(
   m_bTrailingSlash( false )
 {
     (*m_xProps)[ OUString( "Title" ) ]
-        = PropertyValue( uno::makeAny( rTitle ), true );
+        = PropertyValue( uno::Any( rTitle ), true );
     (*m_xProps)[ OUString( "IsFolder" ) ]
-        = PropertyValue( uno::makeAny( bFolder ), true );
+        = PropertyValue( uno::Any( bFolder ), true );
     (*m_xProps)[ OUString( "IsDocument" ) ]
-        = PropertyValue( uno::makeAny( bool( !bFolder ) ), true );
+        = PropertyValue( uno::Any( bool( !bFolder ) ), true );
 }
 
 
@@ -128,7 +126,7 @@ ContentProperties::ContentProperties( const OUString & rTitle )
   m_bTrailingSlash( false )
 {
     (*m_xProps)[ OUString( "Title" ) ]
-        = PropertyValue( uno::makeAny( rTitle ), true );
+        = PropertyValue( uno::Any( rTitle ), true );
 }
 
 
@@ -385,7 +383,7 @@ void ContentProperties::addProperty( const OUString & rName,
         DateTimeHelper::convert( aValue, aDate );
 
         (*m_xProps)[ OUString( "DateCreated" ) ]
-            = PropertyValue( uno::makeAny( aDate ), true );
+            = PropertyValue( uno::Any( aDate ), true );
     }
     //  else if ( rName.equals( DAVProperties::DISPLAYNAME ) )
     //  {
@@ -400,7 +398,7 @@ void ContentProperties::addProperty( const OUString & rName,
         rValue >>= aValue;
 
         (*m_xProps)[ OUString( "Size" ) ]
-            = PropertyValue( uno::makeAny( aValue.toInt64() ), true );
+            = PropertyValue( uno::Any( aValue.toInt64() ), true );
     }
     else if ( rName.equalsIgnoreAsciiCase( "Content-Length" ) )
     {
@@ -412,7 +410,7 @@ void ContentProperties::addProperty( const OUString & rName,
         rValue >>= aValue;
 
         (*m_xProps)[ OUString( "Size" ) ]
-            = PropertyValue( uno::makeAny( aValue.toInt64() ), true );
+            = PropertyValue( uno::Any( aValue.toInt64() ), true );
     }
     else if ( rName == DAVProperties::GETCONTENTTYPE )
     {
@@ -441,7 +439,7 @@ void ContentProperties::addProperty( const OUString & rName,
         DateTimeHelper::convert( aValue, aDate );
 
         (*m_xProps)[ OUString( "DateModified" ) ]
-            = PropertyValue( uno::makeAny( aDate ), true );
+            = PropertyValue( uno::Any( aDate ), true );
     }
     else if ( rName.equalsIgnoreAsciiCase( "Last-Modified" ) )
     {
@@ -455,7 +453,7 @@ void ContentProperties::addProperty( const OUString & rName,
         DateTimeHelper::convert( aValue, aDate );
 
         (*m_xProps)[ OUString( "DateModified" ) ]
-            = PropertyValue( uno::makeAny( aDate ), true );
+            = PropertyValue( uno::Any( aDate ), true );
     }
     //  else if ( rName.equals( DAVProperties::LOCKDISCOVERY ) )
     //  {
@@ -470,11 +468,11 @@ void ContentProperties::addProperty( const OUString & rName,
             aValue.equalsIgnoreAsciiCase( "collection" );
 
         (*m_xProps)[ OUString( "IsFolder" ) ]
-            = PropertyValue( uno::makeAny( bFolder ), true );
+            = PropertyValue( uno::Any( bFolder ), true );
         (*m_xProps)[ OUString( "IsDocument" ) ]
-            = PropertyValue( uno::makeAny( bool( !bFolder ) ), true );
+            = PropertyValue( uno::Any( bool( !bFolder ) ), true );
         (*m_xProps)[ OUString( "ContentType" ) ]
-            = PropertyValue( uno::makeAny( bFolder
+            = PropertyValue( uno::Any( bFolder
                 ? OUString( WEBDAV_COLLECTION_TYPE )
                 : OUString( WEBDAV_CONTENT_TYPE ) ), true );
     }

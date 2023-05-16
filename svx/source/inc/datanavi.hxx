@@ -20,6 +20,7 @@
 #define INCLUDED_SVX_SOURCE_INC_DATANAVI_HXX
 
 #include <config_options.h>
+#include <o3tl/sorted_vector.hxx>
 #include <vcl/builderpage.hxx>
 #include <vcl/idle.hxx>
 #include <vcl/transfer.hxx>
@@ -184,8 +185,11 @@ namespace svxform
 
         weld::Container* m_pParent;
         std::unique_ptr<weld::Toolbar> m_xToolBox;
+        std::unique_ptr<weld::Menu> m_xMenu;
         std::unique_ptr<weld::TreeView> m_xItemList;
         std::unique_ptr<weld::TreeIter> m_xScratchIter;
+
+        o3tl::sorted_vector<OString> m_aRemovedMenuEntries;
 
         DataTreeDropTarget m_aDropHelper;
 
@@ -220,6 +224,8 @@ namespace svxform
 
         void                        DeleteAndClearTree();
 
+        void                        SetMenuEntrySensitive(const OString& rIdent, bool bSensitive);
+
     public:
         XFormsPage(weld::Container* pParent, DataNavigatorWindow* _pNaviWin, DataGroupType _eGroup);
         virtual ~XFormsPage() override;
@@ -230,7 +236,8 @@ namespace svxform
         OUString             LoadInstance(const css::uno::Sequence< css::beans::PropertyValue >& _xPropSeq);
 
         bool                 DoMenuAction(std::string_view rMenuID);
-        void                 EnableMenuItems(weld::Menu* pMenu);
+        void                 EnableMenuItems();
+        void                 SelectFirstEntry();
 
         const OUString&      GetInstanceName() const { return m_sInstanceName; }
         const OUString&      GetInstanceURL() const { return m_sInstanceURL; }
@@ -364,7 +371,6 @@ namespace svxform
         std::unique_ptr<weld::Entry> m_xDefaultED;
         std::unique_ptr<weld::Button> m_xDefaultBtn;
         std::unique_ptr<weld::Widget> m_xSettingsFrame;
-        std::unique_ptr<weld::Label> m_xDataTypeFT;
         std::unique_ptr<weld::ComboBox> m_xDataTypeLB;
         std::unique_ptr<weld::CheckButton> m_xRequiredCB;
         std::unique_ptr<weld::Button> m_xRequiredBtn;
@@ -419,7 +425,7 @@ namespace svxform
 
     public:
         AddConditionDialog(weld::Window* pParent,
-            const OUString& _rPropertyName, const css::uno::Reference< css::beans::XPropertySet >& _rBinding);
+            OUString _aPropertyName, const css::uno::Reference< css::beans::XPropertySet >& _rBinding);
         virtual ~AddConditionDialog() override;
 
         const css::uno::Reference< css::xforms::XFormsUIHelper1 >& GetUIHelper() const { return m_xUIHelper; }
@@ -547,7 +553,6 @@ namespace svxform
         OUString                m_sAllFilterName;
 
         std::unique_ptr<weld::Entry> m_xNameED;
-        std::unique_ptr<weld::Label> m_xURLFT;
         std::unique_ptr<SvtURLBox> m_xURLED;
         std::unique_ptr<weld::Button> m_xFilePickerBtn;
         std::unique_ptr<weld::CheckButton> m_xLinkInstanceCB;

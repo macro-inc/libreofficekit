@@ -27,6 +27,7 @@
 #include <com/sun/star/lang/Locale.hpp>
 
 #include <string_view>
+#include <utility>
 #include <vector>
 
 struct IsoLanguageCountryEntry;
@@ -120,7 +121,7 @@ public:
     // TODO: refactor to LanguageTag, used only in
     // i18npool/source/isolang/inunx.cxx to convert Unix locale string
 
-    static LanguageType convertUnxByteStringToLanguage( const OString& rString );
+    static LanguageType convertUnxByteStringToLanguage( std::string_view rString );
 
 
     static LanguageType resolveSystemLanguageByScriptType( LanguageType nLang, sal_Int16 nType );
@@ -221,7 +222,7 @@ public:
         OUString        maBcp47;
         LanguageType    mnLang;
 
-        LanguagetagMapping( const OUString & rBcp47, LanguageType nLang ) : maBcp47(rBcp47), mnLang(nLang) {}
+        LanguagetagMapping( OUString aBcp47, LanguageType nLang ) : maBcp47(std::move(aBcp47)), mnLang(nLang) {}
     };
 
     /** @internal - Obtain a list of known locales (i.e. those that have a
@@ -245,7 +246,7 @@ public:
                 const css::lang::Locale & rLocale );
 
         friend LanguageType MsLangId::convertUnxByteStringToLanguage(
-                const OString& rString );
+                std::string_view rString );
 
 
         /** Convert a Locale to a LanguageType with handling of an empty
@@ -291,11 +292,12 @@ public:
 
         /** Convert a LanguageType to a Locale. */
         I18NLANGTAG_DLLPRIVATE static css::lang::Locale convertLanguageToLocale(
-                LanguageType nLang );
+                LanguageType nLang, bool bIgnoreOverride );
 
         /** Used by convertLanguageToLocale(LanguageType,bool) and
             getLocale(IsoLanguageCountryEntry*) and
-            getLocale(IsoLanguageScriptCountryEntry)
+            getLocale(IsoLanguageScriptCountryEntry*) and
+            getLocale(Bcp47CountryEntry*)
 
             @param  bIgnoreOverride
                     If bIgnoreOverride==true, a matching entry is used even if

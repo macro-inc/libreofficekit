@@ -26,14 +26,15 @@
 #include <sal/log.hxx>
 #include <tools/debug.hxx>
 
+#include <vcl/dialoghelper.hxx>
 #include <vcl/event.hxx>
-#include <vcl/menu.hxx>
 #include <vcl/timer.hxx>
 #include <vcl/svapp.hxx>
 
 #include <splitwin.hxx>
 #include <workwin.hxx>
 #include <sfx2/dockwin.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <memory>
 #include <vector>
@@ -233,23 +234,23 @@ SfxSplitWindow::SfxSplitWindow( vcl::Window* pParent, SfxChildAlignment eAl,
         if ( aWinData.startsWith("V") )
         {
             sal_Int32 nIdx{ 0 };
-            pEmptyWin->nState = static_cast<sal_uInt16>(aWinData.getToken( 1, ',', nIdx ).toInt32());
+            pEmptyWin->nState = static_cast<sal_uInt16>(o3tl::toInt32(o3tl::getToken(aWinData, 1, ',', nIdx )));
             if ( pEmptyWin->nState & 2 )
                 pEmptyWin->bFadeIn = true;
             bPinned = true; // always assume pinned - floating mode not used anymore
 
-            const sal_Int32 nCount{ aWinData.getToken(0, ',', nIdx).toInt32() };
+            const sal_Int32 nCount{ o3tl::toInt32(o3tl::getToken(aWinData, 0, ',', nIdx)) };
             for ( sal_Int32 n=0; n<nCount; ++n )
             {
                 std::unique_ptr<SfxDock_Impl> pDock(new SfxDock_Impl);
                 pDock->pWin = nullptr;
                 pDock->bNewLine = false;
                 pDock->bHide = true;
-                pDock->nType = static_cast<sal_uInt16>(aWinData.getToken(0, ',', nIdx).toInt32());
+                pDock->nType = static_cast<sal_uInt16>(o3tl::toInt32(o3tl::getToken(aWinData, 0, ',', nIdx)));
                 if ( !pDock->nType )
                 {
                     // could mean NewLine
-                    pDock->nType = static_cast<sal_uInt16>(aWinData.getToken(0, ',', nIdx).toInt32());
+                    pDock->nType = static_cast<sal_uInt16>(o3tl::toInt32(o3tl::getToken(aWinData, 0, ',', nIdx)));
                     if ( !pDock->nType )
                     {
                         // Read error
@@ -325,7 +326,7 @@ void SfxSplitWindow::SaveConfig_Impl()
 
     const OUString aWindowId{ "SplitWindow" + OUString::number(static_cast<sal_Int32>(GetAlign())) };
     SvtViewOptions aWinOpt( EViewType::Window, aWindowId );
-    aWinOpt.SetUserItem( USERITEM_NAME, makeAny( aWinData.makeStringAndClear() ) );
+    aWinOpt.SetUserItem( USERITEM_NAME, Any( aWinData.makeStringAndClear() ) );
 }
 
 
@@ -934,7 +935,7 @@ IMPL_LINK( SfxSplitWindow, TimerHdl, Timer*, pTimer, void)
         {
             pEmptyWin->bEndAutoHide = false;
             if ( !Application::IsInModalMode() &&
-                  !PopupMenu::IsInExecute() &&
+                  !vcl::IsInPopupMenuExecute() &&
                   !pEmptyWin->bSplit && !HasChildPathFocus( true ) )
             {
                 // While a modal dialog or a popup menu is open or while the

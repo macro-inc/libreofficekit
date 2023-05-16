@@ -49,6 +49,10 @@ namespace drawinglayer::primitive2d
             bool                                    mbBackground;
             /// flag for image (OBJ_GRAF)
             bool                                    mbIsImage;
+            /// anchor structure element (Writer)
+            sal_Int32 m_nAnchorStructureElementId;
+            /// for Annot structure element, the ids of the annotations
+            ::std::vector<sal_Int32> m_AnnotIds;
 
         public:
             /// constructor
@@ -56,12 +60,17 @@ namespace drawinglayer::primitive2d
                 const vcl::PDFWriter::StructElement& rStructureElement,
                 bool bBackground,
                 bool bIsImage,
-                Primitive2DContainer&& aChildren);
+                Primitive2DContainer&& aChildren,
+                sal_Int32 nAnchorStructureElementId = -1,
+                ::std::vector<sal_Int32> const* pAnnotIds = nullptr);
 
             /// data read access
             const vcl::PDFWriter::StructElement& getStructureElement() const { return maStructureElement; }
             bool isBackground() const { return mbBackground; }
             bool isImage() const { return mbIsImage; }
+            bool isTaggedSdrObject() const;
+            sal_Int32 GetAnchorStructureElementId() const { return m_nAnchorStructureElementId; }
+            ::std::vector<sal_Int32> GetAnnotIds() const { return m_AnnotIds; }
 
             /// compare operator
             virtual bool operator==(const BasePrimitive2D& rPrimitive) const override;

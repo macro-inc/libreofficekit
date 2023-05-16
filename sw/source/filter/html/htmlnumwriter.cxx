@@ -37,7 +37,7 @@ void SwHTMLWriter::FillNextNumInfo()
 {
     m_pNextNumRuleInfo = nullptr;
 
-    SwNodeOffset nPos = m_pCurrentPam->GetPoint()->nNode.GetIndex() + 1;
+    SwNodeOffset nPos = m_pCurrentPam->GetPoint()->GetNodeIndex() + 1;
 
     bool bTable = false;
     do
@@ -99,7 +99,7 @@ Writer& OutHTML_NumberBulletListStart( SwHTMLWriter& rWrt,
     {
         // If the list only consists of non-numbered text nodes, then don't start the list.
         bool bAtLeastOneNumbered = false;
-        SwNodeOffset nPos = rWrt.m_pCurrentPam->GetPoint()->nNode.GetIndex() + 1;
+        SwNodeOffset nPos = rWrt.m_pCurrentPam->GetPoint()->GetNodeIndex() + 1;
         SwNumRule* pNumRule = nullptr;
         while (true)
         {
@@ -150,7 +150,7 @@ Writer& OutHTML_NumberBulletListStart( SwHTMLWriter& rWrt,
                 if( rInfo.GetDepth() > 1 )
                 {
                     SwNodeOffset nPos =
-                        rWrt.m_pCurrentPam->GetPoint()->nNode.GetIndex() + 1;
+                        rWrt.m_pCurrentPam->GetPoint()->GetNodeIndex() + 1;
                     do
                     {
                         const SwNode* pNd = rWrt.m_pDoc->GetNodes()[nPos];
@@ -286,9 +286,9 @@ Writer& OutHTML_NumberBulletListStart( SwHTMLWriter& rWrt,
             sal_uInt16 nStartVal = rNumFormat.GetStart();
             if( bStartValue && 1 == nStartVal && i == rInfo.GetDepth()-1 )
             {
-                if ( rWrt.m_pCurrentPam->GetNode().GetTextNode()->GetNum() )
+                if ( rWrt.m_pCurrentPam->GetPointNode().GetTextNode()->GetNum() )
                 {
-                    nStartVal = static_cast< sal_uInt16 >( rWrt.m_pCurrentPam->GetNode()
+                    nStartVal = static_cast< sal_uInt16 >( rWrt.m_pCurrentPam->GetPointNode()
                                 .GetTextNode()->GetNumberVector()[i] );
                 }
                 else
@@ -327,7 +327,7 @@ Writer& OutHTML_NumberBulletListEnd( SwHTMLWriter& rWrt,
     if (!rInfo.IsNumbered())
     {
         oAtLeastOneNumbered = false;
-        SwNodeOffset nPos = rWrt.m_pCurrentPam->GetPoint()->nNode.GetIndex() - 1;
+        SwNodeOffset nPos = rWrt.m_pCurrentPam->GetPoint()->GetNodeIndex() - 1;
         SwNumRule* pNumRule = nullptr;
         while (true)
         {
@@ -361,7 +361,7 @@ Writer& OutHTML_NumberBulletListEnd( SwHTMLWriter& rWrt,
     if ((bListEnd && bPrevIsNumbered) || (!bListEnd && rNextInfo.IsNumbered()))
     {
         HTMLOutFuncs::Out_AsciiTag(
-            rWrt.Strm(), OStringConcatenation(rWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_li),
+            rWrt.Strm(), Concat2View(rWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_li),
             false);
     }
 
@@ -398,11 +398,11 @@ Writer& OutHTML_NumberBulletListEnd( SwHTMLWriter& rWrt,
             aTag = OOO_STRING_SVTOOLS_HTML_unorderlist;
         else
             aTag = OOO_STRING_SVTOOLS_HTML_orderlist;
-        HTMLOutFuncs::Out_AsciiTag( rWrt.Strm(), OStringConcatenation(rWrt.GetNamespace() + aTag), false );
+        HTMLOutFuncs::Out_AsciiTag( rWrt.Strm(), Concat2View(rWrt.GetNamespace() + aTag), false );
         if (rWrt.mbXHTML && (nNextDepth != 0 || i != 1))
         {
             HTMLOutFuncs::Out_AsciiTag(
-                rWrt.Strm(), OStringConcatenation(rWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_li),
+                rWrt.Strm(), Concat2View(rWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_li),
                 /*bOn=*/false);
         }
         rWrt.m_bLFPossible = true;

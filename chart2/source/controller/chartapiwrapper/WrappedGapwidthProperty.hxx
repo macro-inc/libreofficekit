@@ -32,9 +32,9 @@ class WrappedBarPositionProperty_Base : public WrappedDefaultProperty
 public:
     WrappedBarPositionProperty_Base(
               const OUString& rOuterName
-            , const OUString& rInnerSequencePropertyName
+            , OUString aInnerSequencePropertyName
             , sal_Int32 nDefaultValue
-            , const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact );
+            , std::shared_ptr<Chart2ModelContact> spChart2ModelContact );
     virtual ~WrappedBarPositionProperty_Base() override;
 
     virtual void setPropertyValue( const css::uno::Any& rOuterValue, const css::uno::Reference< css::beans::XPropertySet >& xInnerPropertySet ) const override;
@@ -43,7 +43,7 @@ public:
 
     void setDimensionAndAxisIndex( sal_Int32 nDimensionIndex, sal_Int32 nAxisIndex );
 
-protected:
+private:
     sal_Int32 m_nDimensionIndex;
     sal_Int32 m_nAxisIndex;
     std::shared_ptr< Chart2ModelContact >   m_spChart2ModelContact;

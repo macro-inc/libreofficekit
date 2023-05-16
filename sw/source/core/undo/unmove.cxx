@@ -32,11 +32,11 @@ SwUndoMove::SwUndoMove( const SwPaM& rRange, const SwPosition& rMvPos )
     , m_nDestStartNode(0)
     , m_nDestEndNode(0)
     , m_nInsPosNode(0)
-    , m_nMoveDestNode(rMvPos.nNode.GetIndex())
+    , m_nMoveDestNode(rMvPos.GetNodeIndex())
     , m_nDestStartContent(0)
     , m_nDestEndContent(0)
     , m_nInsPosContent(0)
-    , m_nMoveDestContent(rMvPos.nContent.GetIndex())
+    , m_nMoveDestContent(rMvPos.GetContentIndex())
     , m_bJoinNext(false)
     , m_bMoveRange(false)
     , m_bMoveRedlines(false)
@@ -71,7 +71,7 @@ SwUndoMove::SwUndoMove( const SwPaM& rRange, const SwPosition& rMvPos )
             m_pHistory->CopyFormatAttr( *pEndTextNd->GetpSwAttrSet(), m_nEndNode );
     }
 
-    pTextNd = rMvPos.nNode.GetNode().GetTextNode();
+    pTextNd = rMvPos.GetNode().GetTextNode();
     if (nullptr != pTextNd)
     {
         m_pHistory->Add( pTextNd->GetTextColl(), m_nMoveDestNode, SwNodeType::Text );
@@ -92,7 +92,7 @@ SwUndoMove::SwUndoMove( const SwPaM& rRange, const SwPosition& rMvPos )
 }
 
 SwUndoMove::SwUndoMove( SwDoc& rDoc, const SwNodeRange& rRg,
-                        const SwNodeIndex& rMvPos )
+                        const SwNode& rMvPos )
     : SwUndo(SwUndoId::MOVE, &rDoc)
     , m_nDestStartNode(0)
     , m_nDestEndNode(0)
@@ -122,11 +122,8 @@ SwUndoMove::SwUndoMove( SwDoc& rDoc, const SwNodeRange& rRg,
         SwPosition aPtPos( rRg.aEnd );
         SwContentNode* pCNd = rRg.aEnd.GetNode().GetContentNode();
         if( pCNd )
-            aPtPos.nContent.Assign( pCNd, pCNd->Len() );
+            aPtPos.SetContent( pCNd->Len() );
         SwPosition aMkPos( rRg.aStart );
-        pCNd = aMkPos.nNode.GetNode().GetContentNode();
-        if( nullptr != pCNd )
-            aMkPos.nContent.Assign( pCNd, 0 );
 
         DelContentIndex( aMkPos, aPtPos, DelContentType::Ftn );
 
@@ -137,8 +134,8 @@ SwUndoMove::SwUndoMove( SwDoc& rDoc, const SwNodeRange& rRg,
     m_nFootnoteStart = 0;
 }
 
-void SwUndoMove::SetDestRange( const SwNodeIndex& rStt,
-                                const SwNodeIndex& rEnd,
+void SwUndoMove::SetDestRange( const SwNode& rStt,
+                                const SwNode& rEnd,
                                 const SwNodeIndex& rInsPos )
 {
     m_nDestStartNode = rStt.GetIndex();
@@ -168,7 +165,7 @@ void SwUndoMove::UndoImpl(::sw::UndoRedoContext & rContext)
             SwNodeRange aRg( aIdx, aIdx );
             aRg.aEnd = m_nDestEndNode;
             aIdx = m_nInsPosNode;
-            bool bSuccess = pDoc->getIDocumentContentOperations().MoveNodeRange( aRg, aIdx,
+            bool bSuccess = pDoc->getIDocumentContentOperations().MoveNodeRange( aRg, aIdx.GetNode(),
                     SwMoveFlags::DEFAULT );
             if (!bSuccess)
                 break;
@@ -184,8 +181,8 @@ void SwUndoMove::UndoImpl(::sw::UndoRedoContext & rContext)
                 RemoveIdxFromRange( aPam, false );
 
             SwPosition aPos( *pDoc->GetNodes()[ m_nInsPosNode] );
-            SwContentNode* pCNd = aPos.nNode.GetNode().GetContentNode();
-            aPos.nContent.Assign( pCNd, m_nInsPosContent );
+            SwContentNode* pCNd = aPos.GetNode().GetContentNode();
+            aPos.SetContent( m_nInsPosContent );
 
             if( pCNd->HasSwAttrSet() )
                 pCNd->ResetAllAttr();
@@ -202,8 +199,8 @@ void SwUndoMove::UndoImpl(::sw::UndoRedoContext & rContext)
 
             aPam.Exchange();
             aPam.DeleteMark();
-            if( aPam.GetNode().IsContentNode() )
-                aPam.GetNode().GetContentNode()->ResetAllAttr();
+            if( aPam.GetPointNode().IsContentNode() )
+                aPam.GetPointNode().GetContentNode()->ResetAllAttr();
             // the Pam will be dropped now
         }
 
@@ -211,8 +208,8 @@ void SwUndoMove::UndoImpl(::sw::UndoRedoContext & rContext)
         if( m_bJoinNext )
         {
             {
-                RemoveIdxRel( aIdx.GetIndex() + 1, SwPosition( aIdx,
-                        SwIndex(pTextNd, pTextNd->GetText().getLength())));
+                RemoveIdxRel( aIdx.GetIndex() + 1,
+                        SwPosition( aIdx, pTextNd, pTextNd->GetText().getLength()) );
             }
             // Are there any Pams in the next TextNode?
             pTextNd->JoinNext();
@@ -246,8 +243,8 @@ void SwUndoMove::RedoImpl(::sw::UndoRedoContext & rContext)
     if( m_bMoveRange )
     {
         // only a move with SwRange
-        SwNodeRange aRg( rNds, m_nSttNode, rNds, m_nEndNode );
-        rDoc.getIDocumentContentOperations().MoveNodeRange( aRg, aIdx, m_bMoveRedlines
+        SwNodeRange aRg( rNds, m_nSttNode, m_nEndNode );
+        rDoc.getIDocumentContentOperations().MoveNodeRange( aRg, aIdx.GetNode(), m_bMoveRedlines
                 ? SwMoveFlags::REDLINES
                 : SwMoveFlags::DEFAULT );
     }
@@ -255,13 +252,12 @@ void SwUndoMove::RedoImpl(::sw::UndoRedoContext & rContext)
     {
         SwPaM aPam(*rPam.GetPoint());
         SetPaM( aPam );
-        SwPosition aMvPos( aIdx, SwIndex( aIdx.GetNode().GetContentNode(),
-                                        m_nMoveDestContent ));
+        SwPosition aMvPos( aIdx, aIdx.GetNode().GetContentNode(), m_nMoveDestContent );
 
         DelFootnote( aPam );
         RemoveIdxFromRange( aPam, false );
 
-        aIdx = aPam.Start()->nNode;
+        aIdx = aPam.Start()->GetNode();
         bool bJoinText = aIdx.GetNode().IsTextNode();
 
         --aIdx;
@@ -275,8 +271,8 @@ void SwUndoMove::RedoImpl(::sw::UndoRedoContext & rContext)
             if( pTextNd && pTextNd->CanJoinNext() )
             {
                 {
-                    RemoveIdxRel( aIdx.GetIndex() + 1, SwPosition( aIdx,
-                            SwIndex(pTextNd, pTextNd->GetText().getLength())));
+                    RemoveIdxRel( aIdx.GetIndex() + 1,
+                        SwPosition( *pTextNd, pTextNd->GetText().getLength()) );
                 }
                 pTextNd->JoinNext();
             }
@@ -293,7 +289,7 @@ void SwUndoMove::DelFootnote( const SwPaM& rRange )
     SwDoc& rDoc = rRange.GetDoc();
     SwNodeOffset nContentStt = rDoc.GetNodes().GetEndOfAutotext().GetIndex();
     if( m_nMoveDestNode < nContentStt &&
-        rRange.GetPoint()->nNode.GetIndex() >= nContentStt )
+        rRange.GetPoint()->GetNodeIndex() >= nContentStt )
     {
         // delete all footnotes since they are undesired there
         DelContentIndex( *rRange.GetMark(), *rRange.GetPoint(),

@@ -52,6 +52,7 @@ class VCL_DLLPUBLIC GenPspGraphics final : public SalGraphicsAutoDelegateToImpl
 
     rtl::Reference<FreetypeFontInstance>
                             m_pFreetypeFont[ MAX_FALLBACK ];
+
 public:
                             GenPspGraphics();
     virtual                ~GenPspGraphics() override;
@@ -59,18 +60,13 @@ public:
     void                    Init( psp::JobData* pJob, psp::PrinterGfx* pGfx );
 
     // helper methods
-    static const void *     DoGetEmbedFontData(psp::fontID aFont, tools::Long* pDataLen);
-    static void             DoFreeEmbedFontData( const void* pData, tools::Long nLen );
+    static FontAttributes   Info2FontAttributes(const psp::FastPrintFontInfo&);
 
-    // helper methods for sharing with X11SalGraphics
-    static void             DoGetGlyphWidths( psp::fontID aFont,
-                                              bool bVertical,
-                                              std::vector< sal_Int32 >& rWidths,
-                                              Ucs2UIntMap& rUnicodeEnc );
-
-    static FontAttributes Info2FontAttributes( const psp::FastPrintFontInfo& );
-    static void             AnnounceFonts( vcl::font::PhysicalFontCollection*,
-                                           const psp::FastPrintFontInfo& );
+    // helper methods for sharing with FreeTypeTextRenderImpl
+    static void             GetDevFontListHelper(vcl::font::PhysicalFontCollection*);
+    static bool             AddTempDevFontHelper(vcl::font::PhysicalFontCollection* pFontCollection,
+                                                 std::u16string_view rFileURL,
+                                                 const OUString& rFontName);
 
     // override all pure virtual methods
     virtual SalGraphicsImpl* GetImpl() const override
@@ -91,23 +87,7 @@ public:
     virtual bool            AddTempDevFont( vcl::font::PhysicalFontCollection*,
                                             const OUString& rFileURL,
                                             const OUString& rFontName ) override;
-    static bool             AddTempDevFontHelper( vcl::font::PhysicalFontCollection* pFontCollection,
-                                                  const OUString& rFileURL,
-                                                  const OUString& rFontName);
 
-    virtual bool            CreateFontSubset( const OUString& rToFile,
-                                              const vcl::font::PhysicalFontFace*,
-                                              const sal_GlyphId* pGlyphIDs,
-                                              const sal_uInt8* pEncoding,
-                                              sal_Int32* pWidths,
-                                              int nGlyphs,
-                                              FontSubsetInfo& rInfo ) override;
-    virtual const void*     GetEmbedFontData(const vcl::font::PhysicalFontFace*, tools::Long* pDataLen) override;
-    virtual void            FreeEmbedFontData( const void* pData, tools::Long nDataLen ) override;
-    virtual void            GetGlyphWidths( const vcl::font::PhysicalFontFace*,
-                                            bool bVertical,
-                                            std::vector< sal_Int32 >& rWidths,
-                                            Ucs2UIntMap& rUnicodeEnc ) override;
     virtual std::unique_ptr<GenericSalLayout>
                             GetTextLayout(int nFallbackLevel) override;
     virtual void            DrawTextLayout( const GenericSalLayout& ) override;

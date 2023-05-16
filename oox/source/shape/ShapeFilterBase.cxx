@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <oox/shape/ShapeFilterBase.hxx>
 #include <oox/drawingml/chart/chartconverter.hxx>
 #include <oox/drawingml/themefragmenthandler.hxx>
@@ -34,7 +36,12 @@ using namespace ::com::sun::star;
 
 ShapeFilterBase::ShapeFilterBase( const uno::Reference< uno::XComponentContext >& rxContext ) :
     XmlFilterBase( rxContext ),
+#if ENABLE_WASM_STRIP_CHART
+    // WASM_CHART change
+    mxChartConv( )
+#else
     mxChartConv( std::make_shared<::oox::drawingml::chart::ChartConverter>() )
+#endif
 {
 }
 
@@ -45,6 +52,11 @@ ShapeFilterBase::~ShapeFilterBase()
 const ::oox::drawingml::Theme* ShapeFilterBase::getCurrentTheme() const
 {
     return mpTheme.get();
+}
+
+std::shared_ptr<::oox::drawingml::Theme> ShapeFilterBase::getCurrentThemePtr() const
+{
+    return mpTheme;
 }
 
 void ShapeFilterBase::setCurrentTheme(const ::oox::drawingml::ThemePtr& pTheme)
@@ -118,29 +130,6 @@ GraphicHelper* ShapeFilterBase::implCreateGraphicHelper() const
         mpTheme->getClrScheme().getColor( nToken, nColor );
 
     return nColor;
-}
-
-void ShapeFilterBase::importTheme()
-{
-    drawingml::ThemePtr pTheme = std::make_shared<drawingml::Theme>();
-    uno::Reference<beans::XPropertySet> xPropSet(getModel(), uno::UNO_QUERY_THROW);
-    uno::Sequence<beans::PropertyValue> aGrabBag;
-    xPropSet->getPropertyValue("InteropGrabBag") >>= aGrabBag;
-
-    for (const auto& rProp : std::as_const(aGrabBag))
-    {
-        if (rProp.Name == "OOXTheme")
-        {
-            uno::Reference<xml::sax::XFastSAXSerializable> xDoc;
-            if (rProp.Value >>= xDoc)
-            {
-                rtl::Reference<core::FragmentHandler> xFragmentHandler(
-                    new drawingml::ThemeFragmentHandler(*this, OUString(), *pTheme));
-                importFragment(xFragmentHandler, xDoc);
-                setCurrentTheme(pTheme);
-            }
-        }
-    }
 }
 
 }

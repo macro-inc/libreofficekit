@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -12,7 +14,7 @@ from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
 
 class findSimilarities(UITestCase):
     def test_find_similarities(self):
-        with self.ui_test.load_file(get_url_for_data_file("findReplace.odt")) as writer_doc:
+        with self.ui_test.load_file(get_url_for_data_file("findReplace.odt")):
             xWriterDoc = self.xUITest.getTopFocusWindow()
             xWriterEdit = xWriterDoc.getChild("writer_edit")
             #verify: we are on page 1
@@ -23,9 +25,13 @@ class findSimilarities(UITestCase):
                 searchterm = xDialog.getChild("searchterm")
                 searchterm.executeAction("TYPE", mkPropertyValues({"TEXT":"seco"}))  #seco
                 # check similarities, button similarities, set values = 1; close dialog with OK
+
                 similarity = xDialog.getChild("similarity")
+                if get_state_as_dict(similarity)['Selected'] == 'false':
+                    similarity.executeAction("CLICK", tuple())
+
                 similaritybtn = xDialog.getChild("similaritybtn")
-                similarity.executeAction("CLICK", tuple())
+
                 with self.ui_test.execute_blocking_action(similaritybtn.executeAction, args=('CLICK', ())) as dialog:
                     otherfld = dialog.getChild("otherfld")
                     longerfld = dialog.getChild("longerfld")

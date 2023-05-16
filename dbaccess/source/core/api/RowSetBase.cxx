@@ -34,7 +34,7 @@
 #include <comphelper/seqstream.hxx>
 #include <connectivity/dbexception.hxx>
 #include <o3tl/safeint.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace dbaccess;
 using namespace connectivity;
@@ -94,7 +94,7 @@ ORowSetBase::ORowSetBase( const Reference<XComponentContext>& _rContext, ::cppu:
 {
     sal_Int32 nRBT  = PropertyAttribute::READONLY   | PropertyAttribute::BOUND      | PropertyAttribute::TRANSIENT;
 
-    registerPropertyNoMember( PROPERTY_ROWCOUNT,        PROPERTY_ID_ROWCOUNT,        nRBT, cppu::UnoType<sal_Int32>::get(), css::uno::makeAny<sal_Int32>(0) );
+    registerPropertyNoMember( PROPERTY_ROWCOUNT,        PROPERTY_ID_ROWCOUNT,        nRBT, cppu::UnoType<sal_Int32>::get(), css::uno::Any(sal_Int32(0)) );
     registerPropertyNoMember( PROPERTY_ISROWCOUNTFINAL, PROPERTY_ID_ISROWCOUNTFINAL, nRBT, cppu::UnoType<bool>::get(), css::uno::Any(false) );
 }
 
@@ -207,7 +207,7 @@ const ORowSetValue& ORowSetBase::impl_getValue(sal_Int32 columnIndex)
     if ( !bValidCurrentRow )
     {
         // currentrow is null when the clone moves the window
-        positionCache( MOVE_NONE );
+        positionCache( CursorMoveDirection::Current );
         m_aCurrentRow   = m_pCache->m_aMatrixIter;
         m_bIsInsertRow  = false;
         OSL_ENSURE(!m_aCurrentRow.isNull(),"ORowSetBase::getValue: we don't stand on a valid row! Row is null.");
@@ -338,7 +338,7 @@ Reference< css::io::XInputStream > SAL_CALL ORowSetBase::getBinaryStream( sal_In
     bool bValidCurrentRow = ( !m_aCurrentRow.isNull() && m_aCurrentRow != m_pCache->getEnd() && m_aCurrentRow->is() );
     if ( !bValidCurrentRow )
     {
-        positionCache( MOVE_NONE );
+        positionCache( CursorMoveDirection::Current );
         m_aCurrentRow   = m_pCache->m_aMatrixIter;
         m_bIsInsertRow  = false;
         OSL_ENSURE(!m_aCurrentRow.isNull(),"ORowSetBase::getBinaryStream: we don't stand on a valid row! Row is null.");
@@ -579,7 +579,7 @@ sal_Bool SAL_CALL ORowSetBase::next(  )
 
         ORowSetRow aOldValues = getOldRow(bWasNew);
 
-        positionCache( MOVE_FORWARD );
+        positionCache( CursorMoveDirection::Forward );
         bool bAfterLast = m_pCache->isAfterLast();
         bRet = m_pCache->next();
         doCancelModification( );
@@ -662,7 +662,7 @@ sal_Bool SAL_CALL ORowSetBase::isFirst(  )
     if ( impl_rowDeleted() )
         return ( m_nDeletedPosition == 1 );
 
-    positionCache( MOVE_NONE );
+    positionCache( CursorMoveDirection::Current );
     bool bIsFirst = m_pCache->isFirst();
 
     SAL_INFO("dbaccess", "ORowSetBase::isFirst() = " << bIsFirst << " Clone = " << m_bClone);
@@ -692,7 +692,7 @@ sal_Bool SAL_CALL ORowSetBase::isLast(  )
             return ( m_nDeletedPosition == impl_getRowCount() );
     }
 
-    positionCache( MOVE_NONE );
+    positionCache( CursorMoveDirection::Current );
     bool bIsLast = m_pCache->isLast();
 
     SAL_INFO("dbaccess", "ORowSetBase::isLast() = " << bIsLast << " Clone = " << m_bClone);
@@ -864,7 +864,7 @@ sal_Int32 ORowSetBase::impl_getRow()
         nPos = 0;
     else
     {
-        positionCache( MOVE_NONE );
+        positionCache( CursorMoveDirection::Current );
         nPos = m_pCache->getRow();
     }
     SAL_INFO("dbaccess", "ORowSetBase::impl_getRow() = " << nPos << " Clone = " << m_bClone);
@@ -944,7 +944,7 @@ sal_Bool SAL_CALL ORowSetBase::relative( sal_Int32 rows )
 
         ORowSetRow aOldValues = getOldRow(bWasNew);
 
-        positionCache( rows > 0 ? MOVE_FORWARD : MOVE_BACKWARD );
+        positionCache( rows > 0 ? CursorMoveDirection::Forward : CursorMoveDirection::Backward );
         bRet = m_pCache->relative(rows);
         doCancelModification( );
 
@@ -992,7 +992,7 @@ sal_Bool SAL_CALL ORowSetBase::previous(  )
 
         ORowSetRow aOldValues = getOldRow(bWasNew);
 
-        positionCache( MOVE_BACKWARD );
+        positionCache( CursorMoveDirection::Backward );
         bRet = m_pCache->previous();
         doCancelModification( );
 
@@ -1095,7 +1095,7 @@ void SAL_CALL ORowSetBase::refreshRow(  )
     {
         bool bWasNew = m_pCache->m_bNew || impl_rowDeleted();
         ORowSetRow aOldValues = getOldRow(bWasNew);
-        positionCache( MOVE_NONE );
+        positionCache( CursorMoveDirection::Current );
         m_pCache->refreshRow();
         firePropertyChange(aOldValues);
     }
@@ -1213,8 +1213,8 @@ bool ORowSetBase::isPropertyChangeNotificationEnabled() const
 
 void ORowSetBase::fireProperty( sal_Int32 _nProperty, bool _bNew, bool _bOld )
 {
-    Any aNew = css::uno::makeAny( _bNew );
-    Any aOld = css::uno::makeAny( _bOld );
+    Any aNew( _bNew );
+    Any aOld( _bOld );
     fire( &_nProperty, &aNew, &aOld, 1, false );
 }
 
@@ -1225,7 +1225,7 @@ void ORowSetBase::positionCache( CursorMoveDirection _ePrepareForDirection )
     bool bSuccess = false;
     if ( m_aBookmark.hasValue() )
     {
-        if (_ePrepareForDirection == MOVE_NONE_REFRESH ||
+        if (_ePrepareForDirection == CursorMoveDirection::CurrentRefresh ||
             (m_pCache->isAfterLast() != bool(isAfterLast())) || ( m_pCache->isBeforeFirst() != bool(isBeforeFirst()) ) ||
              m_pCache->compareBookmarks( m_aBookmark, m_pCache->getBookmark() ) != CompareBookmark::EQUAL )
             bSuccess = m_pCache->moveToBookmark( m_aBookmark );
@@ -1249,7 +1249,7 @@ void ORowSetBase::positionCache( CursorMoveDirection _ePrepareForDirection )
             OSL_ENSURE( m_nDeletedPosition >= 1, "ORowSetBase::positionCache: no bookmark, and no valid 'deleted position'!" );
             switch ( _ePrepareForDirection )
             {
-            case MOVE_FORWARD:
+            case CursorMoveDirection::Forward:
                 if ( m_nDeletedPosition > 1 )
                     bSuccess = m_pCache->absolute( m_nDeletedPosition - 1 );
                 else
@@ -1259,7 +1259,7 @@ void ORowSetBase::positionCache( CursorMoveDirection _ePrepareForDirection )
                 }
                 break;
 
-            case MOVE_BACKWARD:
+            case CursorMoveDirection::Backward:
                 if ( m_pCache->m_bRowCountFinal && ( m_nDeletedPosition == impl_getRowCount() ) )
                 {
                     m_pCache->afterLast();
@@ -1269,8 +1269,8 @@ void ORowSetBase::positionCache( CursorMoveDirection _ePrepareForDirection )
                     bSuccess = m_pCache->absolute( m_nDeletedPosition );
                 break;
 
-            case MOVE_NONE:
-            case MOVE_NONE_REFRESH:
+            case CursorMoveDirection::Current:
+            case CursorMoveDirection::CurrentRefresh:
                 bSuccess = false;   // will be asserted below
                 break;
             }
@@ -1324,7 +1324,7 @@ void ORowSetBase::onDeleteRow( const Any& _rBookmark )
     //OSL_ENSURE( m_aBookmark.hasValue(), "ORowSetBase::onDeleteRow: Bookmark isn't valid!" );
     if ( compareBookmarks( _rBookmark, m_aBookmark ) == CompareBookmark::EQUAL )
     {
-        positionCache( MOVE_NONE );
+        positionCache( CursorMoveDirection::Current );
         m_nDeletedPosition = m_pCache->getRow();
     }
 }
@@ -1358,12 +1358,6 @@ sal_Int32 ORowSetBase::impl_getRowCount() const
     return nRowCount;
 }
 
-struct ORowSetNotifierImpl
-{
-    std::vector<sal_Int32>    aChangedColumns;
-    ORowSetValueVector::Vector  aRow;
-};
-
 
 ORowSetNotifier::ORowSetNotifier( ORowSetBase* _pRowSet )
     :m_pRowSet( _pRowSet )
@@ -1383,14 +1377,12 @@ ORowSetNotifier::ORowSetNotifier( ORowSetBase* _pRowSet )
 }
 
 ORowSetNotifier::ORowSetNotifier( ORowSetBase* _pRowSet, ORowSetValueVector::Vector&& i_aRow )
-    :m_pImpl(new ORowSetNotifierImpl)
-    ,m_pRowSet( _pRowSet )
+    :m_pRowSet( _pRowSet )
     ,m_bWasNew( false )
     ,m_bWasModified( false )
 {
-
     OSL_ENSURE( m_pRowSet, "ORowSetNotifier::ORowSetNotifier: invalid row set. This will crash." );
-    m_pImpl->aRow = std::move(i_aRow); // yes, create a copy to store the old values
+    aRow = std::move(i_aRow); // yes, create a copy to store the old values
 }
 
 ORowSetNotifier::~ORowSetNotifier( )
@@ -1413,24 +1405,19 @@ void ORowSetNotifier::fire()
         m_pRowSet->fireProperty( PROPERTY_ID_ISNEW, false, true, ORowSetBase::GrantNotifierAccess() );
 }
 
-std::vector<sal_Int32>& ORowSetNotifier::getChangedColumns() const
+std::vector<sal_Int32>& ORowSetNotifier::getChangedColumns()
 {
-    OSL_ENSURE(m_pImpl, "Illegal CTor call, use the other one!");
-    return m_pImpl->aChangedColumns;
+    return aChangedColumns;
 }
 
 void ORowSetNotifier::firePropertyChange()
 {
-    OSL_ENSURE(m_pImpl, "Illegal CTor call, use the other one!");
-    if (m_pImpl)
+    for (auto const& changedColumn : aChangedColumns)
     {
-        for (auto const& changedColumn : m_pImpl->aChangedColumns)
-        {
-            m_pRowSet->firePropertyChange(changedColumn-1 ,m_pImpl->aRow[changedColumn-1], ORowSetBase::GrantNotifierAccess());
-        }
-        if ( !m_pImpl->aChangedColumns.empty() )
-            m_pRowSet->fireProperty(PROPERTY_ID_ISMODIFIED,true,false, ORowSetBase::GrantNotifierAccess());
+        m_pRowSet->firePropertyChange(changedColumn-1, aRow[changedColumn-1], ORowSetBase::GrantNotifierAccess());
     }
+    if ( !aChangedColumns.empty() )
+        m_pRowSet->fireProperty(PROPERTY_ID_ISMODIFIED,true,false, ORowSetBase::GrantNotifierAccess());
 }
 
 }   // namespace dbaccess

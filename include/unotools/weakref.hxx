@@ -29,11 +29,7 @@
 #include <cppuhelper/weakref.hxx>
 #include <cppuhelper/weak.hxx>
 #include <rtl/ref.hxx>
-
-namespace cppu
-{
-class OWeakObject;
-}
+#include <type_traits>
 
 namespace unotools
 {
@@ -46,7 +42,9 @@ namespace unotools
     behind it *is* thread-safe, so multiple threads can have their own
     WeakReferences to the same XWeak object.
 
-    @tparam interface_type type of interface
+    @tparam interface_type Must be a C++ implementation class type, not a UNO interface type.  (See
+    the C++20 requires-clause on the get member.  That clause is not put on the class as a whole to
+    avoid overly tight requirements on when interface_type needs to be complete.)
 */
 template <class interface_type>
 class SAL_WARN_UNUSED WeakReference : public com::sun::star::uno::WeakReferenceHelper
@@ -64,7 +62,7 @@ public:
         @param rRef another hard ref
     */
     WeakReference(const rtl::Reference<interface_type>& rRef)
-        : WeakReferenceHelper(rRef)
+        : WeakReferenceHelper(css::uno::Reference<css::uno::XWeak>(rRef))
     {
     }
 
@@ -82,7 +80,8 @@ public:
         @param rRef another hard ref
     */
     WeakReference(interface_type* pRef)
-        : WeakReferenceHelper(static_cast<cppu::OWeakObject*>(pRef))
+        : WeakReferenceHelper(
+              css::uno::Reference<css::uno::XWeak>(static_cast<cppu::OWeakObject*>(pRef)))
     {
     }
 
@@ -106,7 +105,8 @@ public:
 
     WeakReference& operator=(interface_type* pInt)
     {
-        WeakReferenceHelper::operator=(static_cast<::cppu::OWeakObject*>(pInt));
+        WeakReferenceHelper::operator=(
+            css::uno::Reference<css::uno::XWeak>(static_cast<::cppu::OWeakObject*>(pInt)));
         return *this;
     }
 
@@ -115,9 +115,17 @@ public:
          @return hard reference or null, if the weakly referenced interface has gone
     */
     rtl::Reference<interface_type> SAL_CALL get() const
+#if __cplusplus >= 202002L
+        requires(!cppu::detail::isUnoInterfaceType<interface_type>)
+#endif
     {
         css::uno::Reference<css::uno::XInterface> xInterface = WeakReferenceHelper::get();
-        return dynamic_cast<interface_type*>(xInterface.get());
+        // If XInterface is an ambiguous base of interface_type, we have to use dynamic_cast,
+        // otherwise we can use the faster static_cast.
+        if constexpr (std::is_convertible_v<interface_type*, css::uno::XInterface*>)
+            return static_cast<interface_type*>(xInterface.get());
+        else
+            return dynamic_cast<interface_type*>(xInterface.get());
     }
 
     /**  Gets a hard reference to the object.

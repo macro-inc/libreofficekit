@@ -77,22 +77,22 @@ void FuConstArc::Activate()
     {
         case SID_DRAW_ARC:
             aNewPointer = PointerStyle::DrawArc;
-            aObjKind = OBJ_CARC;
+            aObjKind = SdrObjKind::CircleArc;
             break;
 
         case SID_DRAW_PIE:
             aNewPointer = PointerStyle::DrawPie;
-            aObjKind = OBJ_SECT;
+            aObjKind = SdrObjKind::CircleSection;
             break;
 
         case SID_DRAW_CIRCLECUT:
             aNewPointer = PointerStyle::DrawCircleCut;
-            aObjKind = OBJ_CCUT;
+            aObjKind = SdrObjKind::CircleCut;
             break;
 
         default:
             aNewPointer = PointerStyle::Cross;
-            aObjKind = OBJ_CARC;
+            aObjKind = SdrObjKind::CircleArc;
             break;
     }
 
@@ -111,13 +111,13 @@ void FuConstArc::Deactivate()
 }
 
 // Create default drawing objects via keyboard
-SdrObjectUniquePtr FuConstArc::CreateDefaultObject(const sal_uInt16 nID, const tools::Rectangle& rRectangle)
+rtl::Reference<SdrObject> FuConstArc::CreateDefaultObject(const sal_uInt16 nID, const tools::Rectangle& rRectangle)
 {
     // case SID_DRAW_ARC:
     // case SID_DRAW_PIE:
     // case SID_DRAW_CIRCLECUT:
 
-    SdrObjectUniquePtr pObj(SdrObjFactory::MakeNewObject(
+    rtl::Reference<SdrObject> pObj(SdrObjFactory::MakeNewObject(
         *pDrDoc,
         pView->GetCurrentObjInventor(),
         pView->GetCurrentObjIdentifier()));

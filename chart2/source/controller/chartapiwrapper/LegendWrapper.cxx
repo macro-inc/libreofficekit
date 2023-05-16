@@ -26,7 +26,6 @@
 #include <com/sun/star/chart2/LegendPosition.hpp>
 #include <com/sun/star/chart/ChartLegendExpansion.hpp>
 #include <com/sun/star/chart2/RelativePosition.hpp>
-#include <com/sun/star/chart2/XDiagram.hpp>
 
 #include <CharacterProperties.hxx>
 #include <LinePropertiesHelper.hxx>
@@ -39,6 +38,7 @@
 #include "WrappedScaleTextProperties.hxx"
 
 #include <algorithm>
+#include <utility>
 
 using namespace ::com::sun::star;
 using ::com::sun::star::beans::Property;
@@ -261,8 +261,8 @@ struct StaticLegendWrapperPropertyArray : public rtl::StaticAggregate< Sequence<
 namespace chart::wrapper
 {
 
-LegendWrapper::LegendWrapper(const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact)
-    : m_spChart2ModelContact(spChart2ModelContact)
+LegendWrapper::LegendWrapper(std::shared_ptr<Chart2ModelContact> spChart2ModelContact)
+    : m_spChart2ModelContact(std::move(spChart2ModelContact))
     , m_aEventListenerContainer(m_aMutex)
 {
 }
@@ -370,7 +370,7 @@ awt::Size LegendWrapper::getCurrentSizeForReference()
 Reference< beans::XPropertySet > LegendWrapper::getInnerPropertySet()
 {
     Reference< beans::XPropertySet > xRet;
-    Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
+    rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
     if( xDiagram.is() )
         xRet.set( xDiagram->getLegend(), uno::UNO_QUERY );
     OSL_ENSURE(xRet.is(),"LegendWrapper::getInnerPropertySet() is NULL");

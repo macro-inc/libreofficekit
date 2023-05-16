@@ -21,26 +21,30 @@
 
 #include <drawinglayer/drawinglayerdllapi.h>
 #include <drawinglayer/primitive2d/CommonTypes.hxx>
+#include <drawinglayer/geometry/viewinformation2d.hxx>
+#include <drawinglayer/primitive2d/baseprimitive2d.hxx>
 #include <basegfx/range/b2drange.hxx>
-
-namespace drawinglayer::geometry
-{
-class ViewInformation2D;
-}
 
 namespace drawinglayer::primitive2d
 {
 /// get B2DRange from a given Primitive2DReference
-basegfx::B2DRange DRAWINGLAYER_DLLPUBLIC getB2DRangeFromPrimitive2DReference(
+basegfx::B2DRange DRAWINGLAYERCORE_DLLPUBLIC getB2DRangeFromPrimitive2DReference(
     const Primitive2DReference& rCandidate, const geometry::ViewInformation2D& aViewInformation);
 
 /** compare two Primitive2DReferences for equality, including trying to get implementations (BasePrimitive2D)
     and using compare operator
  */
-bool DRAWINGLAYER_DLLPUBLIC arePrimitive2DReferencesEqual(const Primitive2DReference& rA,
-                                                          const Primitive2DReference& rB);
+bool DRAWINGLAYERCORE_DLLPUBLIC arePrimitive2DReferencesEqual(const Primitive2DReference& rA,
+                                                              const Primitive2DReference& rB);
 
-OUString DRAWINGLAYER_DLLPUBLIC idToString(sal_uInt32 nId);
+/** compare two Primitive2DReferences for equality, including trying to get implementations (BasePrimitive2D)
+    and using compare operator
+ */
+bool DRAWINGLAYERCORE_DLLPUBLIC
+arePrimitive2DReferencesEqual(const css::uno::Reference<css::graphic::XPrimitive2D>& rA,
+                              const css::uno::Reference<css::graphic::XPrimitive2D>& rB);
+
+OUString DRAWINGLAYERCORE_DLLPUBLIC idToString(sal_uInt32 nId);
 
 } // end of namespace drawinglayer::primitive2d
 

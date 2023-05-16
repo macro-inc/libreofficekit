@@ -155,6 +155,7 @@ public:
     SAL_DLLPRIVATE void SetFactory_Impl( const SfxChildWinFactory* );
 };
 
+const int nCloseResponseToJustHide = -42;
 
 #define SFX_DECL_CHILDWINDOW(Class) \
     public  :   \
@@ -225,9 +226,9 @@ public:
             static_cast<SfxDockingWindow*>(GetWindow())->FillInfo( aInfo );  \
             return aInfo; }
 
-bool GetPosSizeFromString( const OUString& rStr, Point& rPos, Size& rSize );
+bool GetPosSizeFromString( std::u16string_view rStr, Point& rPos, Size& rSize );
 
-bool GetSplitSizeFromString( const OUString& rStr, Size& rSize );
+bool GetSplitSizeFromString( std::u16string_view rStr, Size& rSize );
 
 #endif
 

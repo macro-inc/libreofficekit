@@ -31,6 +31,7 @@
 #include <vcl/opengl/OpenGLContext.hxx>
 #endif
 #include <unx/geninst.h>
+#include <o3tl/string_view.hxx>
 
 // SalYieldMutex
 
@@ -52,7 +53,6 @@ SalGenericInstance::~SalGenericInstance()
 OUString SalGenericInstance::getOSVersion()
 {
     OUString aKernelVer = "unknown";
-
 #if defined(LINUX)
     FILE* pVersion = fopen( "/proc/version", "r" );
     if ( pVersion )
@@ -62,17 +62,16 @@ OUString SalGenericInstance::getOSVersion()
         {
             aKernelVer = OUString::createFromAscii( aVerBuffer );
             // "Linux version 3.16.7-29-desktop ..."
-            OUString aVers = aKernelVer.getToken( 2, ' ' );
+            std::u16string_view aVers = o3tl::getToken(aKernelVer, 2, ' ' );
             // "3.16.7-29-desktop ..."
-            sal_Int32 nTooDetailed = aVers.indexOf( '.', 2);
+            size_t nTooDetailed = aVers.find( '.', 2);
             if (nTooDetailed < 1 || nTooDetailed > 8)
                 aKernelVer = "Linux (misparsed version)";
             else // "3.16.7-29-desktop ..."
-                aKernelVer = OUString::Concat("Linux ") + aVers.subView(0, nTooDetailed);
+                aKernelVer = OUString::Concat("Linux ") + aVers.substr(0, nTooDetailed);
         }
         fclose( pVersion );
     }
-    return aKernelVer;
 #elif defined(__FreeBSD__)
     struct utsname stName;
     if ( uname( &stName ) != 0 )
@@ -87,11 +86,14 @@ OUString SalGenericInstance::getOSVersion()
         if ( c == ' ' || c == '-' || ( c == '.' && nDots++ > 0 ) )
             break;
     }
-    return OUString::createFromAscii( stName.sysname ) + " " +
-        aKernelVer.copy( 0, nIndex );
-#else
-    return aKernelVer;
+    aKernelVer = OUString::createFromAscii(stName.sysname) + " " + aKernelVer.copy(0, nIndex);
+#elif defined(EMSCRIPTEN)
+#define str(s) #s
+#define xstr(s) str(s)
+    aKernelVer = "Emscripten " xstr(__EMSCRIPTEN_major__)
+                 "." xstr(__EMSCRIPTEN_minor__) "." xstr(__EMSCRIPTEN_tiny__);
 #endif
+    return aKernelVer;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

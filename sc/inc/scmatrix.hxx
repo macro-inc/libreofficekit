@@ -65,9 +65,8 @@ struct ScMatrixValue
     bool GetBoolean() const         { return fVal != 0.0; }
 
     ScMatrixValue() : fVal(0.0), nType(ScMatValType::Empty) {}
-
-    ScMatrixValue(const ScMatrixValue& r) :
-        fVal(r.fVal), aStr(r.aStr), nType(r.nType) {}
+    ScMatrixValue(const ScMatrixValue& r) = default;
+    ScMatrixValue& operator= (const ScMatrixValue& r) = default;
 
     bool operator== (const ScMatrixValue& r) const
     {
@@ -90,17 +89,6 @@ struct ScMatrixValue
     bool operator!= (const ScMatrixValue& r) const
     {
         return !operator==(r);
-    }
-
-    ScMatrixValue& operator= (const ScMatrixValue& r)
-    {
-        if (this == &r)
-            return *this;
-
-        nType = r.nType;
-        fVal = r.fVal;
-        aStr = r.aStr;
-        return *this;
     }
 };
 
@@ -130,6 +118,7 @@ public:
     typedef std::function<void(size_t, size_t, bool)> BoolOpFunction;
     typedef std::function<void(size_t, size_t, svl::SharedString)> StringOpFunction;
     typedef std::function<void(size_t, size_t)> EmptyOpFunction;
+    typedef std::function<double(double, double)> CalculateOpFunction;
 
     /**
      * When adding all numerical matrix elements for a scalar result such as
@@ -421,6 +410,10 @@ public:
 
     void MatConcat(SCSIZE nMaxCol, SCSIZE nMaxRow, const ScMatrixRef& xMat1, const ScMatrixRef& xMat2,
             SvNumberFormatter& rFormatter, svl::SharedStringPool& rPool) ;
+
+    /** Apply binary operation to values from two input matrices, storing result into this matrix. */
+    void ExecuteBinaryOp(SCSIZE nMaxCol, SCSIZE nMaxRow, const ScMatrix& rInputMat1, const ScMatrix& rInputMat2,
+            ScInterpreter* pInterpreter, CalculateOpFunction op);
 
 #if DEBUG_MATRIX
     void Dump() const;

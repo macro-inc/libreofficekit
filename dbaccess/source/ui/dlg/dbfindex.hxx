@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <utility>
 #include <vcl/weld.hxx>
 #include <deque>
 
@@ -34,7 +35,7 @@ private:
 
 public:
     OTableIndex() { }
-    explicit OTableIndex( const OUString& rFileName ) : aIndexFileName( rFileName ) { }
+    explicit OTableIndex( OUString aFileName ) : aIndexFileName(std::move( aFileName )) { }
 
     const OUString& GetIndexFileName() const { return aIndexFileName; }
 };
@@ -53,7 +54,7 @@ private:
     TableIndexList aIndexList;
 
 public:
-    explicit OTableInfo( const OUString& rName ) : aTableName(rName) { }
+    explicit OTableInfo( OUString aName ) : aTableName(std::move(aName)) { }
 
     void WriteInfFile( const OUString& rDSN ) const;
 };
@@ -63,7 +64,6 @@ typedef std::deque< OTableInfo >   TableInfoList;
 // IndexDialog
 class ODbaseIndexDialog : public weld::GenericDialogController
 {
-protected:
     OUString            m_aDSN;
     TableInfoList       m_aTableInfoList;
     TableIndexList      m_aFreeIndexList;
@@ -87,6 +87,7 @@ protected:
     DECL_LINK( OKClickHdl, weld::Button&, void );
     DECL_LINK( OnListEntrySelected, weld::TreeView&, void );
 
+protected:
     void        Init();
     void        SetCtrls();
 
@@ -101,7 +102,7 @@ protected:
     void checkButtons();
 
 public:
-    ODbaseIndexDialog(weld::Window * pParent, const OUString& rDataSrcName);
+    ODbaseIndexDialog(weld::Window * pParent, OUString aDataSrcName);
     virtual ~ODbaseIndexDialog() override;
 };
 

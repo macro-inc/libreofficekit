@@ -29,7 +29,6 @@
 
 #include <svx/dialogs.hrc>
 #include <svx/svxids.hrc>
-#include <unotools/resmgr.hxx>
 
 #include <treeopt.hrc>
 #include <helpids.h>
@@ -92,17 +91,17 @@
 #include <sfx2/viewfrm.hxx>
 #include <svl/flagitem.hxx>
 #include <svl/intitem.hxx>
-#include <svl/languageoptions.hxx>
 #include <svl/cjkoptions.hxx>
 #include <svl/ctloptions.hxx>
 #include <svx/databaseregistrationui.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/configmgr.hxx>
 #include <unotools/moduleoptions.hxx>
 #include <unotools/optionsdlg.hxx>
 #include <unotools/viewoptions.hxx>
+#include <utility>
 #include <vcl/help.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weldutils.hxx>
@@ -534,7 +533,7 @@ OfaTreeOptionsDialog::~OfaTreeOptionsDialog()
         // if Child (has parent), then OptionsPageInfo
         if (xTreeLB->get_iter_depth(*xEntry))
         {
-            OptionsPageInfo *pPageInfo = reinterpret_cast<OptionsPageInfo*>(xTreeLB->get_id(*xEntry).toInt64());
+            OptionsPageInfo *pPageInfo = weld::fromId<OptionsPageInfo*>(xTreeLB->get_id(*xEntry));
             if(pPageInfo->m_xPage)
             {
                 pPageInfo->m_xPage->FillUserData();
@@ -570,7 +569,7 @@ OfaTreeOptionsDialog::~OfaTreeOptionsDialog()
     {
         if (!xTreeLB->get_iter_depth(*xEntry))
         {
-            OptionsGroupInfo* pGroupInfo = reinterpret_cast<OptionsGroupInfo*>(xTreeLB->get_id(*xEntry).toInt64());
+            OptionsGroupInfo* pGroupInfo = weld::fromId<OptionsGroupInfo*>(xTreeLB->get_id(*xEntry));
             delete pGroupInfo;
         }
         bEntry = xTreeLB->iter_next(*xEntry);
@@ -587,7 +586,7 @@ OptionsPageInfo* OfaTreeOptionsDialog::AddTabPage(
     xTreeLB->iter_nth_sibling(*xParent, nGroup);
 
     OptionsPageInfo* pPageInfo = new OptionsPageInfo( nId );
-    OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pPageInfo)));
+    OUString sId(weld::toId(pPageInfo));
     xTreeLB->insert(xParent.get(), -1, &rPageName, &sId, nullptr, nullptr, false, nullptr);
     return pPageInfo;
 }
@@ -600,7 +599,7 @@ sal_uInt16  OfaTreeOptionsDialog::AddGroup(const OUString& rGroupName,
 {
     OptionsGroupInfo* pInfo =
         new OptionsGroupInfo( pCreateShell, pCreateModule, nDialogId );
-    OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pInfo)));
+    OUString sId(weld::toId(pInfo));
     xTreeLB->append(sId, rGroupName);
 
     sal_uInt16 nRet = 0;
@@ -625,13 +624,13 @@ void OfaTreeOptionsDialog::ResetCurrentPageFromConfig()
     if (!(xCurrentPageEntry && xTreeLB->get_iter_depth(*xCurrentPageEntry)))
         return;
 
-    OptionsPageInfo* pPageInfo = reinterpret_cast<OptionsPageInfo*>(xTreeLB->get_id(*xCurrentPageEntry).toInt64());
+    OptionsPageInfo* pPageInfo = weld::fromId<OptionsPageInfo*>(xTreeLB->get_id(*xCurrentPageEntry));
     if (pPageInfo->m_xPage)
     {
         std::unique_ptr<weld::TreeIter> xParent = xTreeLB->make_iterator(xCurrentPageEntry.get());
         xTreeLB->iter_parent(*xParent);
         OptionsGroupInfo* pGroupInfo =
-            reinterpret_cast<OptionsGroupInfo*>(xTreeLB->get_id(*xParent).toInt64());
+            weld::fromId<OptionsGroupInfo*>(xTreeLB->get_id(*xParent));
         pPageInfo->m_xPage->Reset( &*pGroupInfo->m_pInItemSet );
     }
     else if ( pPageInfo->m_xExtPage )
@@ -651,13 +650,13 @@ void OfaTreeOptionsDialog::ApplyOptions()
     {
         if (xTreeLB->get_iter_depth(*xEntry))
         {
-            OptionsPageInfo* pPageInfo = reinterpret_cast<OptionsPageInfo*>(xTreeLB->get_id(*xEntry).toInt64());
+            OptionsPageInfo* pPageInfo = weld::fromId<OptionsPageInfo*>(xTreeLB->get_id(*xEntry));
             if ( pPageInfo->m_xPage && !pPageInfo->m_xPage->HasExchangeSupport() )
             {
                 std::unique_ptr<weld::TreeIter> xParent = xTreeLB->make_iterator(xEntry.get());
                 xTreeLB->iter_parent(*xParent);
                 OptionsGroupInfo* pGroupInfo =
-                    reinterpret_cast<OptionsGroupInfo*>(xTreeLB->get_id(*xParent).toInt64());
+                    weld::fromId<OptionsGroupInfo*>(xTreeLB->get_id(*xParent));
                 pPageInfo->m_xPage->FillItemSet(pGroupInfo->m_pOutItemSet.get());
             }
 
@@ -681,7 +680,7 @@ IMPL_LINK_NOARG(OfaTreeOptionsDialog, HelpHdl_Impl, weld::Widget&, bool)
     Help* pHelp = Application::GetHelp();
     if (pHelp && xCurrentPageEntry && xTreeLB->get_iter_depth(*xCurrentPageEntry))
     {
-        OptionsPageInfo* pPageInfo = reinterpret_cast<OptionsPageInfo*>(xTreeLB->get_id(*xCurrentPageEntry).toInt64());
+        OptionsPageInfo* pPageInfo = weld::fromId<OptionsPageInfo*>(xTreeLB->get_id(*xCurrentPageEntry));
         if (pPageInfo->m_xPage)
         {
             OString sHelpId(pPageInfo->m_xPage->GetHelpId());
@@ -700,13 +699,13 @@ IMPL_LINK(OfaTreeOptionsDialog, ApplyHdl_Impl, weld::Button&, rButton, void)
 
     if (xCurrentPageEntry && xTreeLB->get_iter_depth(*xCurrentPageEntry))
     {
-        OptionsPageInfo* pPageInfo = reinterpret_cast<OptionsPageInfo*>(xTreeLB->get_id(*xCurrentPageEntry).toInt64());
+        OptionsPageInfo* pPageInfo = weld::fromId<OptionsPageInfo*>(xTreeLB->get_id(*xCurrentPageEntry));
         if ( pPageInfo->m_xPage )
         {
             std::unique_ptr<weld::TreeIter> xParent = xTreeLB->make_iterator(xCurrentPageEntry.get());
             xTreeLB->iter_parent(*xParent);
 
-            pGroupInfo = reinterpret_cast<OptionsGroupInfo*>(xTreeLB->get_id(*xParent).toInt64());
+            pGroupInfo = weld::fromId<OptionsGroupInfo*>(xTreeLB->get_id(*xParent));
             if ( RID_SVXPAGE_COLOR != pPageInfo->m_nPageId
                 && pPageInfo->m_xPage->HasExchangeSupport() )
             {
@@ -778,7 +777,7 @@ void OfaTreeOptionsDialog::ApplyItemSets()
     {
         if (!xTreeLB->get_iter_depth(*xEntry))
         {
-            OptionsGroupInfo* pGroupInfo = reinterpret_cast<OptionsGroupInfo*>(xTreeLB->get_id(*xEntry).toInt64());
+            OptionsGroupInfo* pGroupInfo = weld::fromId<OptionsGroupInfo*>(xTreeLB->get_id(*xEntry));
             if(pGroupInfo->m_pOutItemSet)
             {
                 if(pGroupInfo->m_pShell)
@@ -854,7 +853,7 @@ void OfaTreeOptionsDialog::ActivateLastSelection()
             // restore only selection of a leaf
             if (xTreeLB->get_iter_depth(*xTemp) && xTreeLB->get_id(*xTemp).toInt64())
             {
-                OptionsPageInfo* pPageInfo = reinterpret_cast<OptionsPageInfo*>(xTreeLB->get_id(*xTemp).toInt64());
+                OptionsPageInfo* pPageInfo = weld::fromId<OptionsPageInfo*>(xTreeLB->get_id(*xTemp));
                 OUString sPageURL = pPageInfo->m_sPageURL;
                 if ( bMustExpand )
                 {
@@ -927,14 +926,14 @@ void OfaTreeOptionsDialog::SelectHdl_Impl()
 
     BuilderPage* pNewPage = nullptr;
     OptionsPageInfo* pOptPageInfo = (xCurrentPageEntry && xTreeLB->get_iter_depth(*xCurrentPageEntry))
-        ? reinterpret_cast<OptionsPageInfo*>(xTreeLB->get_id(*xCurrentPageEntry).toInt64()) : nullptr;
+        ? weld::fromId<OptionsPageInfo*>(xTreeLB->get_id(*xCurrentPageEntry)) : nullptr;
 
     if (pOptPageInfo && pOptPageInfo->m_xPage && pOptPageInfo->m_xPage->IsVisible())
     {
         std::unique_ptr<weld::TreeIter> xCurParent(xTreeLB->make_iterator(xCurrentPageEntry.get()));
         xTreeLB->iter_parent(*xCurParent);
 
-        OptionsGroupInfo* pGroupInfo = reinterpret_cast<OptionsGroupInfo*>(xTreeLB->get_id(*xCurParent).toInt64());
+        OptionsGroupInfo* pGroupInfo = weld::fromId<OptionsGroupInfo*>(xTreeLB->get_id(*xCurParent));
         DeactivateRC nLeave = DeactivateRC::LeavePage;
         if ( RID_SVXPAGE_COLOR != pOptPageInfo->m_nPageId && pOptPageInfo->m_xPage->HasExchangeSupport() )
            nLeave = pOptPageInfo->m_xPage->DeactivatePage( pGroupInfo->m_pOutItemSet.get() );
@@ -955,8 +954,8 @@ void OfaTreeOptionsDialog::SelectHdl_Impl()
         pOptPageInfo->m_xExtPage->DeactivatePage();
     }
 
-    OptionsPageInfo *pPageInfo = reinterpret_cast<OptionsPageInfo*>(xTreeLB->get_id(*xEntry).toInt64());
-    OptionsGroupInfo* pGroupInfo = reinterpret_cast<OptionsGroupInfo*>(xTreeLB->get_id(*xParent).toInt64());
+    OptionsPageInfo *pPageInfo = weld::fromId<OptionsPageInfo*>(xTreeLB->get_id(*xEntry));
+    OptionsGroupInfo* pGroupInfo = weld::fromId<OptionsGroupInfo*>(xTreeLB->get_id(*xParent));
     if(!pPageInfo->m_xPage && pPageInfo->m_nPageId > 0)
     {
         InitItemSets(*pGroupInfo);
@@ -1050,18 +1049,18 @@ std::optional<SfxItemSet> OfaTreeOptionsDialog::CreateItemSet( sal_uInt16 nId )
                     SID_ATTR_YEAR2000, SID_ATTR_YEAR2000> );
 
             SfxItemSetFixed<SID_ATTR_QUICKLAUNCHER, SID_ATTR_QUICKLAUNCHER> aOptSet( SfxGetpApp()->GetPool() );
-            SfxGetpApp()->GetOptions(aOptSet);
+            SfxApplication::GetOptions(aOptSet);
             pRet->Put(aOptSet);
 
             SfxViewFrame* pViewFrame = SfxViewFrame::Current();
             if ( pViewFrame )
             {
-                const SfxPoolItem* pItem = nullptr;
+                const SfxUInt16Item* pItem = nullptr;
                 SfxDispatcher* pDispatch = pViewFrame->GetDispatcher();
 
                 // miscellaneous - Year2000
                 if( SfxItemState::DEFAULT <= pDispatch->QueryState( SID_ATTR_YEAR2000, pItem ) )
-                    pRet->Put( SfxUInt16Item( SID_ATTR_YEAR2000, static_cast<const SfxUInt16Item*>(pItem)->GetValue() ) );
+                    pRet->Put( SfxUInt16Item( SID_ATTR_YEAR2000, pItem->GetValue() ) );
                 else
                     pRet->Put( SfxUInt16Item( SID_ATTR_YEAR2000, officecfg::Office::Common::DateFormat::TwoDigitYear::get() ) );
             }
@@ -1106,28 +1105,17 @@ std::optional<SfxItemSet> OfaTreeOptionsDialog::CreateItemSet( sal_uInt16 nId )
             SfxViewFrame* pViewFrame = SfxViewFrame::Current();
             if ( pViewFrame )
             {
-                const SfxPoolItem* pItem = nullptr;
+                const SvxLanguageItem* pLangItem = nullptr;
                 SfxDispatcher* pDispatch = pViewFrame->GetDispatcher();
-                if(SfxItemState::DEFAULT <= pDispatch->QueryState(SID_ATTR_LANGUAGE, pItem))
-                    pRet->Put(
-                        SvxLanguageItem(
-                            (static_cast<const SvxLanguageItem*>(pItem)
-                             ->GetLanguage()),
-                            SID_ATTR_LANGUAGE));
-                if(SfxItemState::DEFAULT <= pDispatch->QueryState(SID_ATTR_CHAR_CJK_LANGUAGE, pItem))
-                    pRet->Put(
-                        SvxLanguageItem(
-                            (static_cast<const SvxLanguageItem*>(pItem)
-                             ->GetLanguage()),
-                            SID_ATTR_CHAR_CJK_LANGUAGE));
-                if(SfxItemState::DEFAULT <= pDispatch->QueryState(SID_ATTR_CHAR_CTL_LANGUAGE, pItem))
-                    pRet->Put(
-                        SvxLanguageItem(
-                            (static_cast<const SvxLanguageItem*>(pItem)
-                             ->GetLanguage()),
-                            SID_ATTR_CHAR_CTL_LANGUAGE));
+                if(SfxItemState::DEFAULT <= pDispatch->QueryState(SID_ATTR_LANGUAGE, pLangItem))
+                    pRet->Put(*pLangItem, SID_ATTR_LANGUAGE);
+                if(SfxItemState::DEFAULT <= pDispatch->QueryState(SID_ATTR_CHAR_CJK_LANGUAGE, pLangItem))
+                    pRet->Put(*pLangItem, SID_ATTR_CHAR_CJK_LANGUAGE);
+                if(SfxItemState::DEFAULT <= pDispatch->QueryState(SID_ATTR_CHAR_CTL_LANGUAGE, pLangItem))
+                    pRet->Put(*pLangItem, SID_ATTR_CHAR_CTL_LANGUAGE);
 
                 pRet->Put(aHyphen);
+                const SfxPoolItem* pItem = nullptr;
                 if(SfxItemState::DEFAULT <= pDispatch->QueryState(SID_AUTOSPELL_CHECK, pItem))
                 {
                     pRet->Put(std::unique_ptr<SfxPoolItem>(pItem->Clone()));
@@ -1153,7 +1141,7 @@ std::optional<SfxItemSet> OfaTreeOptionsDialog::CreateItemSet( sal_uInt16 nId )
                                 SID_SAVEREL_INET, SID_SAVEREL_FSYS,
                                 SID_INET_NOPROXY, SID_INET_FTP_PROXY_PORT,
                                 SID_SECURE_URL, SID_SECURE_URL> );
-                SfxGetpApp()->GetOptions(*pRet);
+                SfxApplication::GetOptions(*pRet);
         break;
         case SID_FILTER_DLG:
             pRet.emplace(
@@ -1163,7 +1151,7 @@ std::optional<SfxItemSet> OfaTreeOptionsDialog::CreateItemSet( sal_uInt16 nId )
                     SID_ATTR_DOCINFO, SID_ATTR_AUTOSAVEMINUTE,
                     SID_SAVEREL_INET, SID_SAVEREL_FSYS,
                     SID_ATTR_PRETTYPRINTING, SID_ATTR_PRETTYPRINTING> );
-            SfxGetpApp()->GetOptions(*pRet);
+            SfxApplication::GetOptions(*pRet);
             break;
 
         case SID_SB_STARBASEOPTIONS:
@@ -1192,7 +1180,6 @@ void OfaTreeOptionsDialog::ApplyItemSet( sal_uInt16 nId, const SfxItemSet& rSet 
         {
             std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
 
-            const SfxPoolItem* pItem = nullptr;
             SfxItemSetFixed<SID_ATTR_QUICKLAUNCHER, SID_ATTR_QUICKLAUNCHER> aOptSet(SfxGetpApp()->GetPool());
             aOptSet.Put(rSet);
             if(aOptSet.Count())
@@ -1202,26 +1189,26 @@ void OfaTreeOptionsDialog::ApplyItemSet( sal_uInt16 nId, const SfxItemSet& rSet 
 
 //          evaluate Year2000
             sal_uInt16 nY2K = USHRT_MAX;
-            if( SfxItemState::SET == rSet.GetItemState( SID_ATTR_YEAR2000, false, &pItem ) )
-                nY2K = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+            const SfxUInt16Item* pYearItem = rSet.GetItemIfSet( SID_ATTR_YEAR2000, false );
+            if( pYearItem )
+                nY2K = pYearItem->GetValue();
             if( USHRT_MAX != nY2K )
             {
                 if ( pViewFrame )
                 {
                     SfxDispatcher* pDispatch = pViewFrame->GetDispatcher();
                     pDispatch->ExecuteList(SID_ATTR_YEAR2000,
-                            SfxCallMode::ASYNCHRON, { pItem });
+                            SfxCallMode::ASYNCHRON, { pYearItem });
                 }
                 officecfg::Office::Common::DateFormat::TwoDigitYear::set(nY2K, batch);
             }
 
 //          evaluate print
-            if(SfxItemState::SET == rSet.GetItemState(SID_PRINTER_NOTFOUND_WARN, false, &pItem))
-                officecfg::Office::Common::Print::Warning::NotFound::set(static_cast<const SfxBoolItem*>(pItem)->GetValue(), batch);
+            if(const SfxBoolItem* pWarnItem = rSet.GetItemIfSet(SID_PRINTER_NOTFOUND_WARN, false))
+                officecfg::Office::Common::Print::Warning::NotFound::set(pWarnItem->GetValue(), batch);
 
-            if(SfxItemState::SET == rSet.GetItemState(SID_PRINTER_CHANGESTODOC, false, &pItem))
+            if(const SfxFlagItem* pFlag = rSet.GetItemIfSet(SID_PRINTER_CHANGESTODOC, false))
             {
-                const SfxFlagItem* pFlag = static_cast<const SfxFlagItem*>(pItem);
                 bool bPaperSizeWarning = bool(static_cast<SfxPrinterChangeFlags>(pFlag->GetValue()) &  SfxPrinterChangeFlags::CHG_SIZE);
                 officecfg::Office::Common::Print::Warning::PaperSize::set(bPaperSizeWarning, batch);
                 bool bPaperOrientationWarning = bool(static_cast<SfxPrinterChangeFlags>(pFlag->GetValue()) & SfxPrinterChangeFlags::CHG_ORIENTATION);
@@ -1273,10 +1260,8 @@ void OfaTreeOptionsDialog::ApplyLanguageOptions(const SfxItemSet& rSet)
 
     Reference< XComponentContext >  xContext( ::comphelper::getProcessComponentContext() );
     Reference< XLinguProperties >  xProp = LinguProperties::create( xContext );
-    if ( SfxItemState::SET == rSet.GetItemState(SID_ATTR_HYPHENREGION, false, &pItem ) )
+    if ( const SfxHyphenRegionItem* pHyphenItem = rSet.GetItemIfSet(SID_ATTR_HYPHENREGION, false ) )
     {
-        const SfxHyphenRegionItem* pHyphenItem = static_cast<const SfxHyphenRegionItem*>(pItem);
-
         xProp->setHyphMinLeading( static_cast<sal_Int16>(pHyphenItem->GetMinLead()) );
         xProp->setHyphMinTrailing( static_cast<sal_Int16>(pHyphenItem->GetMinTrail()) );
         bSaveSpellCheck = true;
@@ -1374,7 +1359,7 @@ void OfaTreeOptionsDialog::Initialize( const Reference< XFrame >& _xFrame )
     {
         setGroupName(u"ProductName", CuiResId(SID_GENERAL_OPTIONS_RES[0].first));
         nGroup = AddGroup(CuiResId(SID_GENERAL_OPTIONS_RES[0].first), nullptr, nullptr, SID_GENERAL_OPTIONS );
-        const sal_uInt16 nEnd = static_cast<sal_uInt16>(SAL_N_ELEMENTS(SID_GENERAL_OPTIONS_RES));
+        const sal_uInt16 nEnd = static_cast<sal_uInt16>(std::size(SID_GENERAL_OPTIONS_RES));
 
         for (sal_uInt16 i = 1; i < nEnd; ++i)
         {
@@ -1414,7 +1399,7 @@ void OfaTreeOptionsDialog::Initialize( const Reference< XFrame >& _xFrame )
     {
         setGroupName( u"LoadSave", CuiResId(SID_FILTER_DLG_RES[0].first) );
         nGroup = AddGroup( CuiResId(SID_FILTER_DLG_RES[0].first), nullptr, nullptr, SID_FILTER_DLG );
-        for ( size_t i = 1; i < SAL_N_ELEMENTS(SID_FILTER_DLG_RES); ++i )
+        for ( size_t i = 1; i < std::size(SID_FILTER_DLG_RES); ++i )
         {
             nPageId = static_cast<sal_uInt16>(SID_FILTER_DLG_RES[i].second);
             if ( !lcl_isOptionHidden( nPageId, aOptionsDlgOpt ) )
@@ -1428,11 +1413,19 @@ void OfaTreeOptionsDialog::Initialize( const Reference< XFrame >& _xFrame )
     {
         setGroupName(u"LanguageSettings", CuiResId(SID_LANGUAGE_OPTIONS_RES[0].first));
         nGroup = AddGroup(CuiResId(SID_LANGUAGE_OPTIONS_RES[0].first), nullptr, nullptr, SID_LANGUAGE_OPTIONS );
-        for (size_t i = 1; i < SAL_N_ELEMENTS(SID_LANGUAGE_OPTIONS_RES); ++i)
+        for (size_t i = 1; i < std::size(SID_LANGUAGE_OPTIONS_RES); ++i)
         {
             nPageId = static_cast<sal_uInt16>(SID_LANGUAGE_OPTIONS_RES[i].second);
             if ( lcl_isOptionHidden( nPageId, aOptionsDlgOpt ) )
                 continue;
+
+            // Disable DeepL translation settings, if experimental mode is not enabled
+            if( RID_SVXPAGE_DEEPL_OPTIONS == nPageId )
+            {
+                if( ! officecfg::Office::Common::Misc::ExperimentalMode::get() )
+                    continue;
+            }
+
             if ( ( RID_SVXPAGE_JSEARCH_OPTIONS != nPageId || SvtCJKOptions::IsJapaneseFindEnabled() ) &&
                  ( RID_SVXPAGE_ASIAN_LAYOUT != nPageId    || SvtCJKOptions::IsAsianTypographyEnabled() ) &&
                  ( RID_SVXPAGE_OPTIONS_CTL != nPageId     || aCTLLanguageOptions.IsCTLFontEnabled() ) )
@@ -1460,7 +1453,7 @@ void OfaTreeOptionsDialog::Initialize( const Reference< XFrame >& _xFrame )
                 else
                     setGroupName( u"Writer", CuiResId(SID_SW_EDITOPTIONS_RES[0].first) );
                 nGroup = AddGroup(CuiResId(SID_SW_EDITOPTIONS_RES[0].first), pSwMod, pSwMod, SID_SW_EDITOPTIONS );
-                for ( size_t i = 1; i < SAL_N_ELEMENTS(SID_SW_EDITOPTIONS_RES); ++i )
+                for ( size_t i = 1; i < std::size(SID_SW_EDITOPTIONS_RES); ++i )
                 {
                     nPageId = static_cast<sal_uInt16>(SID_SW_EDITOPTIONS_RES[i].second);
                     if ( lcl_isOptionHidden( nPageId, aOptionsDlgOpt ) )
@@ -1479,7 +1472,7 @@ void OfaTreeOptionsDialog::Initialize( const Reference< XFrame >& _xFrame )
             if ( !lcl_isOptionHidden( SID_SW_ONLINEOPTIONS, aOptionsDlgOpt ) )
             {
                 nGroup = AddGroup(CuiResId(SID_SW_ONLINEOPTIONS_RES[0].first), pSwMod, pSwMod, SID_SW_ONLINEOPTIONS );
-                for( size_t i = 1; i < SAL_N_ELEMENTS(SID_SW_ONLINEOPTIONS_RES); ++i )
+                for( size_t i = 1; i < std::size(SID_SW_ONLINEOPTIONS_RES); ++i )
                 {
                     nPageId = static_cast<sal_uInt16>(SID_SW_ONLINEOPTIONS_RES[i].second);
                     if ( !lcl_isOptionHidden( nPageId, aOptionsDlgOpt ) )
@@ -1502,7 +1495,7 @@ void OfaTreeOptionsDialog::Initialize( const Reference< XFrame >& _xFrame )
                 SfxModule* pScMod = SfxApplication::GetModule( SfxToolsModule::Calc );
                 setGroupName( u"Calc", CuiResId(SID_SC_EDITOPTIONS_RES[0].first) );
                 nGroup = AddGroup( CuiResId(SID_SC_EDITOPTIONS_RES[0].first), pScMod, pScMod, SID_SC_EDITOPTIONS );
-                const sal_uInt16 nCount = static_cast<sal_uInt16>(SAL_N_ELEMENTS(SID_SC_EDITOPTIONS_RES));
+                const sal_uInt16 nCount = static_cast<sal_uInt16>(std::size(SID_SC_EDITOPTIONS_RES));
                 for ( sal_uInt16 i = 1; i < nCount; ++i )
                 {
                     nPageId = static_cast<sal_uInt16>(SID_SC_EDITOPTIONS_RES[i].second);
@@ -1525,7 +1518,7 @@ void OfaTreeOptionsDialog::Initialize( const Reference< XFrame >& _xFrame )
             {
                 setGroupName( u"Impress", CuiResId(SID_SD_EDITOPTIONS_RES[0].first) );
                 nGroup = AddGroup( CuiResId(SID_SD_EDITOPTIONS_RES[0].first), pSdMod, pSdMod, SID_SD_EDITOPTIONS );
-                const sal_uInt16 nCount = static_cast<sal_uInt16>(SAL_N_ELEMENTS(SID_SD_EDITOPTIONS_RES));
+                const sal_uInt16 nCount = static_cast<sal_uInt16>(std::size(SID_SD_EDITOPTIONS_RES));
                 for ( sal_uInt16 i = 1; i < nCount; ++i )
                 {
                     nPageId = static_cast<sal_uInt16>(SID_SD_EDITOPTIONS_RES[i].second);
@@ -1547,7 +1540,7 @@ void OfaTreeOptionsDialog::Initialize( const Reference< XFrame >& _xFrame )
             {
                 setGroupName( u"Draw", CuiResId(SID_SD_GRAPHIC_OPTIONS_RES[0].first) );
                 nGroup = AddGroup( CuiResId(SID_SD_GRAPHIC_OPTIONS_RES[0].first), pSdMod, pSdMod, SID_SD_GRAPHIC_OPTIONS );
-                const sal_uInt16 nCount = static_cast<sal_uInt16>(SAL_N_ELEMENTS(SID_SD_GRAPHIC_OPTIONS_RES));
+                const sal_uInt16 nCount = static_cast<sal_uInt16>(std::size(SID_SD_GRAPHIC_OPTIONS_RES));
                 for ( sal_uInt16 i = 1; i < nCount; ++i )
                 {
                     nPageId = static_cast<sal_uInt16>(SID_SD_GRAPHIC_OPTIONS_RES[i].second);
@@ -1570,7 +1563,7 @@ void OfaTreeOptionsDialog::Initialize( const Reference< XFrame >& _xFrame )
                 SfxModule* pSmMod = SfxApplication::GetModule(SfxToolsModule::Math);
                 setGroupName( u"Math", CuiResId(SID_SM_EDITOPTIONS_RES[0].first) );
                 nGroup = AddGroup(CuiResId(SID_SM_EDITOPTIONS_RES[0].first), pSmMod, pSmMod, SID_SM_EDITOPTIONS );
-                for ( size_t i = 1; i < SAL_N_ELEMENTS(SID_SM_EDITOPTIONS_RES); ++i )
+                for ( size_t i = 1; i < std::size(SID_SM_EDITOPTIONS_RES); ++i )
                 {
                     nPageId = static_cast<sal_uInt16>(SID_SM_EDITOPTIONS_RES[i].second);
                     if ( !lcl_isOptionHidden( nPageId, aOptionsDlgOpt ) )
@@ -1589,7 +1582,7 @@ void OfaTreeOptionsDialog::Initialize( const Reference< XFrame >& _xFrame )
     {
         setGroupName( u"Base", CuiResId(SID_SB_STARBASEOPTIONS_RES[0].first) );
         nGroup = AddGroup( CuiResId(SID_SB_STARBASEOPTIONS_RES[0].first), nullptr, nullptr, SID_SB_STARBASEOPTIONS );
-        for ( size_t i = 1; i < SAL_N_ELEMENTS(SID_SB_STARBASEOPTIONS_RES); ++i )
+        for ( size_t i = 1; i < std::size(SID_SB_STARBASEOPTIONS_RES); ++i )
         {
             nPageId = static_cast<sal_uInt16>(SID_SB_STARBASEOPTIONS_RES[i].second);
             if ( !lcl_isOptionHidden( nPageId, aOptionsDlgOpt ) )
@@ -1602,7 +1595,7 @@ void OfaTreeOptionsDialog::Initialize( const Reference< XFrame >& _xFrame )
     {
         setGroupName( u"Charts", CuiResId(SID_SCH_EDITOPTIONS_RES[0].first) );
         nGroup = AddGroup( CuiResId(SID_SCH_EDITOPTIONS_RES[0].first), nullptr, nullptr, SID_SCH_EDITOPTIONS );
-        for ( size_t i = 1; i < SAL_N_ELEMENTS(SID_SCH_EDITOPTIONS_RES); ++i )
+        for ( size_t i = 1; i < std::size(SID_SCH_EDITOPTIONS_RES); ++i )
         {
             nPageId = static_cast<sal_uInt16>(SID_SCH_EDITOPTIONS_RES[i].second);
             if ( !lcl_isOptionHidden( nPageId, aOptionsDlgOpt ) )
@@ -1617,7 +1610,7 @@ void OfaTreeOptionsDialog::Initialize( const Reference< XFrame >& _xFrame )
     setGroupName(u"Internet", CuiResId(SID_INET_DLG_RES[0].first));
     nGroup = AddGroup(CuiResId(SID_INET_DLG_RES[0].first), nullptr, nullptr, SID_INET_DLG );
 
-    for ( size_t i = 1; i < SAL_N_ELEMENTS(SID_INET_DLG_RES); ++i )
+    for ( size_t i = 1; i < std::size(SID_INET_DLG_RES); ++i )
     {
         nPageId = static_cast<sal_uInt16>(SID_INET_DLG_RES[i].second);
         if ( lcl_isOptionHidden( nPageId, aOptionsDlgOpt ) )
@@ -1633,27 +1626,27 @@ void OfaTreeOptionsDialog::Initialize( const Reference< XFrame >& _xFrame )
 
 static bool isNodeActive( OptionsNode const * pNode, Module* pModule )
 {
-    if ( pNode )
+    if ( !pNode )
+        return false;
+
+    // Node for all modules active?
+    if ( pNode->m_bAllModules )
+        return true;
+
+    // OOo-Nodes (Writer, Calc, Impress...) are active if node is already inserted
+    if ( !getGroupName( pNode->m_sId, false ).isEmpty() )
+        return true;
+
+    // no module -> not active
+    if ( !pModule )
+        return false;
+
+    // search node in active module
+    if ( pModule->m_bActive )
     {
-        // Node for all modules active?
-        if ( pNode->m_bAllModules )
-            return true;
-
-        // OOo-Nodes (Writer, Calc, Impress...) are active if node is already inserted
-        if ( !getGroupName( pNode->m_sId, false ).isEmpty() )
-            return true;
-
-        // no module -> not active
-        if ( !pModule )
-            return false;
-
-        // search node in active module
-        if ( pModule->m_bActive )
-        {
-            for (auto const& j : pModule->m_aNodeList)
-                if ( j->m_sId == pNode->m_sId )
-                    return true;
-        }
+        for (auto const& j : pModule->m_aNodeList)
+            if ( j->m_sId == pNode->m_sId )
+                return true;
     }
     return false;
 }
@@ -1974,11 +1967,11 @@ short OfaTreeOptionsDialog::run()
 
 // class ExtensionsTabPage -----------------------------------------------
 ExtensionsTabPage::ExtensionsTabPage(
-    weld::Container* pParent, const OUString& rPageURL,
-    const OUString& rEvtHdl, const Reference< awt::XContainerWindowProvider >& rProvider )
+    weld::Container* pParent, OUString aPageURL,
+    OUString aEvtHdl, const Reference< awt::XContainerWindowProvider >& rProvider )
     : m_pContainer(pParent)
-    , m_sPageURL(rPageURL)
-    , m_sEventHdl(rEvtHdl)
+    , m_sPageURL(std::move(aPageURL))
+    , m_sEventHdl(std::move(aEvtHdl))
     , m_xWinProvider(rProvider)
 {
 }

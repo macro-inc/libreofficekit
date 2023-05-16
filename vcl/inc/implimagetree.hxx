@@ -37,6 +37,10 @@ namespace com::sun::star::container {
     class XNameAccess;
 }
 
+namespace com::sun::star::io {
+    class XInputStream;
+}
+
 struct ImageRequestParameters
 {
     OUString msName;
@@ -47,10 +51,10 @@ struct ImageRequestParameters
     bool mbWriteImageToCache;
     sal_Int32 mnScalePercentage;
 
-    ImageRequestParameters(const OUString & rName, const OUString & rStyle, BitmapEx& rBitmap, bool bLocalized,
+    ImageRequestParameters(OUString aName, OUString aStyle, BitmapEx& rBitmap, bool bLocalized,
                            ImageLoadFlags eFlags, sal_Int32 nScalePercentage)
-        : msName(rName)
-        , msStyle(rStyle)
+        : msName(std::move(aName))
+        , msStyle(std::move(aStyle))
         , mrBitmap(rBitmap)
         , mbLocalized(bLocalized)
         , meFlags(eFlags)
@@ -70,6 +74,9 @@ public:
 
     OUString getImageUrl(
         OUString const & name, OUString const & style, OUString const & lang);
+
+    css::uno::Reference<css::io::XInputStream> getImageXInputStream(OUString const & rName,
+        OUString const & rStyle, OUString const & rLang);
 
     std::shared_ptr<SvMemoryStream> getImageStream(
         OUString const & rName, OUString const & rStyle, OUString const & rLang);
@@ -103,11 +110,15 @@ private:
         IconLinkHash maLinkHash;
 
         IconSet()
-        {}
+        {
+            maLinkHash.reserve(50);
+        }
 
-        IconSet(const OUString & rURL)
-            : maURL(rURL)
-        {}
+        IconSet(OUString aURL)
+            : maURL(std::move(aURL))
+        {
+            maLinkHash.reserve(50);
+        }
     };
 
     /// Remember all the (used) icon styles and individual icons in them.

@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include "docxexport.hxx"
 #include "docxexportfilter.hxx"
 #include "docxattributeoutput.hxx"
@@ -90,7 +92,7 @@
 #include <o3tl/any.hxx>
 #include <sal/log.hxx>
 #include <unotools/ucbstreamhelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace sax_fastparser;
 using namespace ::comphelper;
@@ -160,8 +162,8 @@ void DocxExport::AppendBookmarks( const SwTextNode& rNode, sal_Int32 nCurrentPos
     {
         for ( IMark* pMark : aMarks )
         {
-            const sal_Int32 nStart = pMark->GetMarkStart().nContent.GetIndex();
-            const sal_Int32 nEnd = pMark->GetMarkEnd().nContent.GetIndex();
+            const sal_Int32 nStart = pMark->GetMarkStart().GetContentIndex();
+            const sal_Int32 nEnd = pMark->GetMarkEnd().GetContentIndex();
 
             if ( nStart == nCurrentPos )
                 aStarts.push_back( pMark->GetName() );
@@ -198,8 +200,8 @@ void DocxExport::AppendAnnotationMarks( const SwWW8AttrIter& rAttrs, sal_Int32 n
     {
         for ( IMark* pMark : aMarks )
         {
-            const sal_Int32 nStart = pMark->GetMarkStart().nContent.GetIndex();
-            const sal_Int32 nEnd = pMark->GetMarkEnd().nContent.GetIndex();
+            const sal_Int32 nStart = pMark->GetMarkStart().GetContentIndex();
+            const sal_Int32 nEnd = pMark->GetMarkEnd().GetContentIndex();
 
             if ( nStart == nCurrentPos )
                 aStarts.push_back( pMark->GetName() );
@@ -261,6 +263,10 @@ void DocxExport::WriteHeadersFooters( sal_uInt8 nHeadFootFlags,
     // Turn ON flag for 'Writing Headers \ Footers'
     m_pAttrOutput->SetWritingHeaderFooter( true );
 
+    const bool bPrevSectionHadHeader = m_bHasHdr;
+    const bool bPrevSectionHadFooter = m_bHasFtr;
+    m_bHasHdr = m_bHasFtr = false;
+
     // headers
     if ( nHeadFootFlags & nsHdFtFlags::WW8_HEADER_EVEN )
         WriteHeaderFooter( &rLeftHeaderFormat, true, "even" );
@@ -268,22 +274,19 @@ void DocxExport::WriteHeadersFooters( sal_uInt8 nHeadFootFlags,
     {
         if ( nHeadFootFlags & nsHdFtFlags::WW8_HEADER_ODD )
             WriteHeaderFooter( &rFormat, true, "even" );
-        else if ( m_bHasHdr && nBreakCode == 2 )
+        else if (bPrevSectionHadHeader && nBreakCode == 2)
             WriteHeaderFooter( nullptr, true, "even" );
     }
 
     if ( nHeadFootFlags & nsHdFtFlags::WW8_HEADER_ODD )
         WriteHeaderFooter( &rFormat, true, "default" );
+    else if (bPrevSectionHadHeader && nBreakCode == 2) // 2: nextPage
+        WriteHeaderFooter(nullptr, true, "default");
 
     if ( nHeadFootFlags & nsHdFtFlags::WW8_HEADER_FIRST )
         WriteHeaderFooter( &rFirstPageFormat, true, "first" );
-
-    if( (nHeadFootFlags & (nsHdFtFlags::WW8_HEADER_EVEN
-                         | nsHdFtFlags::WW8_HEADER_ODD
-                         | nsHdFtFlags::WW8_HEADER_FIRST)) == 0
-            && m_bHasHdr && nBreakCode == 2 ) // 2: nexPage
-        WriteHeaderFooter( nullptr, true, "default" );
-
+    else if (bPrevSectionHadHeader && nBreakCode == 2)
+        WriteHeaderFooter(nullptr, true, "first");
 
     // footers
     if ( nHeadFootFlags & nsHdFtFlags::WW8_FOOTER_EVEN )
@@ -292,21 +295,19 @@ void DocxExport::WriteHeadersFooters( sal_uInt8 nHeadFootFlags,
     {
         if ( nHeadFootFlags & nsHdFtFlags::WW8_FOOTER_ODD )
            WriteHeaderFooter( &rFormat, false, "even" );
-        else if ( m_bHasFtr && nBreakCode == 2 )
+        else if (bPrevSectionHadFooter && nBreakCode == 2)
             WriteHeaderFooter( nullptr, false, "even");
     }
 
     if ( nHeadFootFlags & nsHdFtFlags::WW8_FOOTER_ODD )
         WriteHeaderFooter( &rFormat, false, "default" );
+    else if (bPrevSectionHadFooter && nBreakCode == 2)
+        WriteHeaderFooter(nullptr, false, "default");
 
     if ( nHeadFootFlags & nsHdFtFlags::WW8_FOOTER_FIRST )
         WriteHeaderFooter( &rFirstPageFormat, false, "first" );
-
-    if( (nHeadFootFlags & (nsHdFtFlags::WW8_FOOTER_EVEN
-                         | nsHdFtFlags::WW8_FOOTER_ODD
-                         | nsHdFtFlags::WW8_FOOTER_FIRST)) == 0
-            && m_bHasFtr && nBreakCode == 2 ) // 2: nexPage
-        WriteHeaderFooter( nullptr, false, "default");
+    else if (bPrevSectionHadFooter && nBreakCode == 2)
+        WriteHeaderFooter(nullptr, false, "first");
 
     // Turn OFF flag for 'Writing Headers \ Footers'
     m_pAttrOutput->SetWritingHeaderFooter( false );
@@ -385,6 +386,10 @@ OString DocxExport::OutputChart( uno::Reference< frame::XModel > const & xModel,
         m_rFilter.openFragmentStreamWithSerializer( aFileName,
             "application/vnd.openxmlformats-officedocument.drawingml.chart+xml" );
 
+#if !ENABLE_WASM_STRIP_CHART
+    // WASM_CHART change
+    // TODO: With Chart extracted this cannot really happen since
+    // no Chart could've been added at all
     oox::drawingml::ChartExport aChartExport(XML_w, pChartFS, xModel, &m_rFilter, oox::drawingml::DOCUMENT_DOCX);
     css::uno::Reference<css::util::XModifiable> xModifiable(xModel, css::uno::UNO_QUERY);
     const bool bOldModified = xModifiable && xModifiable->isModified();
@@ -393,6 +398,10 @@ OString DocxExport::OutputChart( uno::Reference< frame::XModel > const & xModel,
         // tdf#134973: the model could get modified: e.g., calling XChartDocument::getSubTitle(),
         // which creates the object if absent, and sets the modified state.
         xModifiable->setModified(bOldModified);
+#else
+    (void)xModel;
+#endif
+    pChartFS->endDocument();
     return OUStringToOString( sId, RTL_TEXTENCODING_UTF8 );
 }
 
@@ -489,6 +498,8 @@ std::pair<OString, OString> DocxExport::WriteActiveXObject(const uno::Reference<
                                                               sXMLFileName.subView(sBinaryFileName.indexOf("/") + 1)),
                                        RTL_TEXTENCODING_UTF8);
 
+    pActiveXFS->endDocument();
+
     return std::pair<OString, OString>(sXMLId, sName);
 }
 
@@ -515,8 +526,10 @@ ErrCode DocxExport::ExportDocument_Impl()
     // init sections
     m_pSections.reset(new MSWordSections( *this ));
 
+    auto& rGraphicExportCache = oox::drawingml::GraphicExportCache::get();
+
     // Make sure images are counted from one, even when exporting multiple documents.
-    oox::drawingml::DrawingML::ResetCounters();
+    rGraphicExportCache.push();
 
     WriteMainText();
 
@@ -538,11 +551,14 @@ ErrCode DocxExport::ExportDocument_Impl()
 
     WriteEmbeddings();
 
-    WriteVBA();
+    if (m_bDocm)
+        WriteVBA();
 
     m_aLinkedTextboxesHelper.clear();   //final cleanup
     m_pStyles.reset();
     m_pSections.reset();
+
+    rGraphicExportCache.pop();
 
     return ERRCODE_NONE;
 }
@@ -611,7 +627,7 @@ void DocxExport::OutputLinkedOLE( const OUString& )
     // Nothing to implement here: WW8 only
 }
 
-sal_uLong DocxExport::ReplaceCr( sal_uInt8 )
+sal_uInt64 DocxExport::ReplaceCr( sal_uInt8 )
 {
     // Completely unused for Docx export... only here for code sharing
     // purpose with binary export
@@ -663,6 +679,8 @@ void DocxExport::InitStyles()
 
     // switch the serializer back
     m_pAttrOutput->SetSerializer( m_pDocumentFS );
+
+    pStylesFS->endDocument();
 }
 
 void DocxExport::WriteFootnotesEndnotes()
@@ -692,6 +710,8 @@ void DocxExport::WriteFootnotesEndnotes()
         m_pVMLExport->SetFS(m_pDocumentFS);
         m_pSdrExport->setSerializer( m_pDocumentFS );
         m_pAttrOutput->SetSerializer( m_pDocumentFS );
+
+        pFootnotesFS->endDocument();
     }
 
     if ( !m_pAttrOutput->HasEndnotes() )
@@ -720,6 +740,8 @@ void DocxExport::WriteFootnotesEndnotes()
     m_pVMLExport->SetFS(m_pDocumentFS);
     m_pSdrExport->setSerializer( m_pDocumentFS );
     m_pAttrOutput->SetSerializer( m_pDocumentFS );
+
+    pEndnotesFS->endDocument();
 }
 
 void DocxExport::WritePostitFields()
@@ -737,11 +759,12 @@ void DocxExport::WritePostitFields()
 
     pPostitFS->startElementNS( XML_w, XML_comments, MainXmlNamespaces());
     m_pAttrOutput->SetSerializer( pPostitFS );
-    const auto eHasResolved = m_pAttrOutput->WritePostitFields();
+    const auto eHasProperties = m_pAttrOutput->WritePostitFields();
     m_pAttrOutput->SetSerializer( m_pDocumentFS );
     pPostitFS->endElementNS( XML_w, XML_comments );
+    pPostitFS->endDocument();
 
-    if (eHasResolved != DocxAttributeOutput::hasResolved::yes)
+    if (eHasProperties != DocxAttributeOutput::hasProperties::yes)
         return;
 
     m_rFilter.addRelation(m_pDocumentFS->getOutputStream(),
@@ -760,6 +783,7 @@ void DocxExport::WritePostitFields()
     m_pAttrOutput->WritePostItFieldsResolved();
     m_pAttrOutput->SetSerializer(m_pDocumentFS);
     pPostitFS->endElementNS(XML_w15, XML_commentsEx);
+    pPostitFS->endDocument();
 }
 
 void DocxExport::WriteNumbering()
@@ -798,6 +822,8 @@ void DocxExport::WriteNumbering()
     // switch the serializer back
     m_pDrawingML->SetFS( m_pDocumentFS );
     m_pAttrOutput->SetSerializer( m_pDocumentFS );
+
+    pNumberingFS->endDocument();
 }
 
 void DocxExport::WriteHeaderFooter( const SwFormat* pFormat, bool bHeader, const char* pType )
@@ -870,6 +896,8 @@ void DocxExport::WriteHeaderFooter( const SwFormat* pFormat, bool bHeader, const
     m_pDocumentFS->singleElementNS( XML_w, nReference,
             FSNS( XML_w, XML_type ), pType,
             FSNS( XML_r, XML_id ), aRelId );
+
+    pFS->endDocument();
 }
 
 void DocxExport::WriteFonts()
@@ -896,6 +924,8 @@ void DocxExport::WriteFonts()
     m_pAttrOutput->SetSerializer( m_pDocumentFS );
 
     pFS->endElementNS( XML_w, XML_fonts );
+
+    pFS->endDocument();
 }
 
 void DocxExport::WriteProperties( )
@@ -1159,11 +1189,15 @@ void DocxExport::WriteSettings()
 
     // Hyphenation details set depending on default style
     SwTextFormatColl* pColl = m_rDoc.getIDocumentStylePoolAccess().GetTextCollFromPool(RES_POOLCOLL_STANDARD, /*bRegardLanguage=*/false);
-    const SfxPoolItem* pItem;
-    if (pColl && SfxItemState::SET == pColl->GetItemState(RES_PARATR_HYPHENZONE, false, &pItem))
+    const SvxHyphenZoneItem* pZoneItem;
+    if (pColl && (pZoneItem = pColl->GetItemIfSet(RES_PARATR_HYPHENZONE, false)))
     {
-        if (static_cast<const SvxHyphenZoneItem*>(pItem)->IsNoCapsHyphenation())
+        if (pZoneItem->IsNoCapsHyphenation())
             pFS->singleElementNS(XML_w, XML_doNotHyphenateCaps);
+
+        if ( sal_Int16 nHyphenZone = pZoneItem->GetTextHyphenZone() )
+            pFS->singleElementNS(XML_w, XML_hyphenationZone, FSNS(XML_w, XML_val),
+                                         OString::number(nHyphenZone));
     }
 
     // Even and Odd Headers
@@ -1417,6 +1451,8 @@ void DocxExport::WriteSettings()
 
     // finish settings.xml
     pFS->endElementNS( XML_w, XML_settings );
+
+    pFS->endDocument();
 }
 
 void DocxExport::WriteTheme()
@@ -1534,7 +1570,7 @@ void DocxExport::WriteGlossary()
         gId = gId.copy(3); //"rId" only save the numeric value
 
         PropertySet aProps(xOutputStream);
-        aProps.setAnyProperty( PROP_RelId, uno::makeAny( gId.toInt32() ));
+        aProps.setAnyProperty( PROP_RelId, uno::Any( gId.toInt32() ));
         m_rFilter.addRelation(xOutputStream, gType, gTarget, bExternal);
         if (!xDom)
             continue; // External relation, no stream to write
@@ -1584,7 +1620,7 @@ static void lcl_UpdateXmlValues(const SdtData& sdtData, const uno::Reference<css
     uno::Sequence<uno::Any> aArgs{
     // XSLT transformation stylesheet:
     //  - write all elements as is
-    //  - but if element mathes sdtData.xpath, replace it's text content by sdtData.xpath
+    //  - but if element matches sdtData.xpath, replace its text content by sdtData.xpath
     uno::Any(beans::NamedValue("StylesheetText", uno::Any(OUString("<?xml version=\"1.0\" encoding=\"UTF-8\"?> \
 <xsl:stylesheet\
     xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\
@@ -1621,14 +1657,13 @@ void DocxExport::WriteCustomXml()
     uno::Reference< beans::XPropertySet > xPropSet( m_rDoc.GetDocShell()->GetBaseModel(), uno::UNO_QUERY_THROW );
 
     uno::Reference< beans::XPropertySetInfo > xPropSetInfo = xPropSet->getPropertySetInfo();
-    static constexpr OUStringLiteral aName = u"" UNO_NAME_MISC_OBJ_INTEROPGRABBAG;
-    if ( !xPropSetInfo->hasPropertyByName( aName ) )
+    if ( !xPropSetInfo->hasPropertyByName( UNO_NAME_MISC_OBJ_INTEROPGRABBAG ) )
         return;
 
     uno::Sequence<uno::Reference<xml::dom::XDocument> > customXmlDomlist;
     uno::Sequence<uno::Reference<xml::dom::XDocument> > customXmlDomPropslist;
     uno::Sequence< beans::PropertyValue > propList;
-    xPropSet->getPropertyValue( aName ) >>= propList;
+    xPropSet->getPropertyValue( UNO_NAME_MISC_OBJ_INTEROPGRABBAG ) >>= propList;
     auto pProp = std::find_if(std::cbegin(propList), std::cend(propList),
         [](const beans::PropertyValue& rProp) { return rProp.Name == "OOXCustomXml"; });
     if (pProp != std::cend(propList))
@@ -1647,7 +1682,7 @@ void DocxExport::WriteCustomXml()
         {
             m_rFilter.addRelation( m_pDocumentFS->getOutputStream(),
                     oox::getRelationship(Relationship::CUSTOMXML),
-                    OUStringConcatenation("../customXml/item"+OUString::number(j+1)+".xml" ));
+                    Concat2View("../customXml/item"+OUString::number(j+1)+".xml" ));
 
             uno::Reference< xml::sax::XSAXSerializable > serializer( customXmlDom, uno::UNO_QUERY );
             uno::Reference< xml::sax::XWriter > writer = xml::sax::Writer::create( comphelper::getProcessComponentContext() );
@@ -1714,7 +1749,7 @@ void DocxExport::WriteCustomXml()
             m_rFilter.addRelation( GetFilter().openFragmentStream( "customXml/item"+OUString::number(j+1)+".xml",
                     "application/xml" ) ,
                     oox::getRelationship(Relationship::CUSTOMXMLPROPS),
-                    OUStringConcatenation("itemProps"+OUString::number(j+1)+".xml" ));
+                    Concat2View("itemProps"+OUString::number(j+1)+".xml" ));
         }
     }
 }
@@ -1883,7 +1918,7 @@ void DocxExport::WriteMainText()
     // body
     m_pDocumentFS->startElementNS(XML_w, XML_body);
 
-    m_pCurPam->GetPoint()->nNode = m_rDoc.GetNodes().GetEndOfContent().StartOfSectionNode()->GetIndex();
+    m_pCurPam->GetPoint()->Assign(*m_rDoc.GetNodes().GetEndOfContent().StartOfSectionNode());
 
     // the text
     WriteText();
@@ -1949,6 +1984,13 @@ sal_Int32 DocxExport::WriteOutliner(const OutlinerParaObject& rParaObj, sal_uInt
         OUString aStr( rEditObj.GetText( n ));
         sal_Int32 nCurrentPos = 0;
         const sal_Int32 nEnd = aStr.getLength();
+
+        // Write paragraph properties.
+        AttrOutput().StartParagraphProperties();
+        aAttrIter.OutParaAttr(/*bCharAttr=*/false);
+        SfxItemSet aParagraphMarkerProperties(m_rDoc.GetAttrPool());
+        AttrOutput().EndParagraphProperties(aParagraphMarkerProperties, nullptr, nullptr, nullptr);
+
         do {
             AttrOutput().StartRun( nullptr, 0 );
             const sal_Int32 nNextAttr = std::min(aAttrIter.WhereNext(), nEnd);
@@ -1976,7 +2018,7 @@ sal_Int32 DocxExport::WriteOutliner(const OutlinerParaObject& rParaObj, sal_uInt
             AttrOutput().EndRun( nullptr, 0, -1 );
 
         } while( nCurrentPos < nEnd );
-//        aAttrIter.OutParaAttr(false);
+
         AttrOutput().EndParagraph( ww8::WW8TableNodeInfoInner::Pointer_t());
     }
     return nParaId;
@@ -2106,6 +2148,7 @@ DocxExport::DocxExport(DocxExportFilter& rFilter, SwDoc& rDocument,
 
 DocxExport::~DocxExport()
 {
+    m_pDocumentFS->endDocument();
 }
 
 DocxSettingsData::DocxSettingsData()

@@ -19,6 +19,7 @@
 
 #include "xmlTable.hxx"
 #include "xmlfilter.hxx"
+#include <utility>
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/ProgressBarHelper.hxx>
 #include "xmlEnums.hxx"
@@ -29,9 +30,7 @@
 #include <com/sun/star/container/XNameContainer.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <comphelper/propertysequence.hxx>
-#include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
-#include <sal/log.hxx>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace dbaxml
 {
@@ -42,11 +41,11 @@ namespace dbaxml
 
 OXMLTable::OXMLTable( ODBFilter& _rImport
                 ,const uno::Reference< XFastAttributeList > & _xAttrList
-                ,const uno::Reference< css::container::XNameAccess >& _xParentContainer
+                ,uno::Reference< css::container::XNameAccess > _xParentContainer
                 ,const OUString& _sServiceName
                 )
     :SvXMLImportContext( _rImport )
-    ,m_xParentContainer(_xParentContainer)
+    ,m_xParentContainer(std::move(_xParentContainer))
     ,m_bApplyFilter(false)
     ,m_bApplyOrder(false)
 {
@@ -143,12 +142,12 @@ void OXMLTable::setProperties(uno::Reference< XPropertySet > & _xProp )
     {
         if ( _xProp.is() )
         {
-            _xProp->setPropertyValue(PROPERTY_APPLYFILTER,makeAny(m_bApplyFilter));
-            _xProp->setPropertyValue(PROPERTY_FILTER,makeAny(m_sFilterStatement));
+            _xProp->setPropertyValue(PROPERTY_APPLYFILTER,Any(m_bApplyFilter));
+            _xProp->setPropertyValue(PROPERTY_FILTER,Any(m_sFilterStatement));
 
             if ( _xProp->getPropertySetInfo()->hasPropertyByName(PROPERTY_APPLYORDER) )
-                _xProp->setPropertyValue(PROPERTY_APPLYORDER,makeAny(m_bApplyOrder));
-            _xProp->setPropertyValue(PROPERTY_ORDER,makeAny(m_sOrderStatement));
+                _xProp->setPropertyValue(PROPERTY_APPLYORDER,Any(m_bApplyOrder));
+            _xProp->setPropertyValue(PROPERTY_ORDER,Any(m_sOrderStatement));
         }
     }
     catch(Exception&)
@@ -182,7 +181,7 @@ void OXMLTable::endFastElement(sal_Int32 )
                 }
             }
 
-            xNameContainer->insertByName(m_sName,makeAny(m_xTable));
+            xNameContainer->insertByName(m_sName,Any(m_xTable));
         }
     }
     catch(Exception&)

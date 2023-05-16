@@ -18,7 +18,7 @@
  */
 
 #include <com/sun/star/embed/EmbedStates.hpp>
-#include <comphelper/multiinterfacecontainer2.hxx>
+#include <comphelper/multiinterfacecontainer3.hxx>
 
 #include <intercept.hxx>
 #include <docholder.hxx>
@@ -35,11 +35,11 @@ constexpr OUStringLiteral IU5 = u".uno:SaveAs";
 const uno::Sequence< OUString > Interceptor::m_aInterceptedURL{ IU0, IU1, IU2, IU3, IU4, IU5 };
 
 class StatusChangeListenerContainer
-    : public comphelper::OMultiTypeInterfaceContainerHelperVar2<OUString>
+    : public comphelper::OMultiTypeInterfaceContainerHelperVar3<frame::XStatusListener, OUString>
 {
 public:
     explicit StatusChangeListenerContainer(osl::Mutex& aMutex)
-        :  comphelper::OMultiTypeInterfaceContainerHelperVar2<OUString>(aMutex)
+        :  comphelper::OMultiTypeInterfaceContainerHelperVar3<frame::XStatusListener, OUString>(aMutex)
     {
     }
 };
@@ -250,12 +250,12 @@ uno::Sequence< uno::Reference< frame::XDispatch > > SAL_CALL
 Interceptor::queryDispatches(
     const uno::Sequence<frame::DispatchDescriptor >& Requests )
 {
-    uno::Sequence< uno::Reference< frame::XDispatch > > aRet;
     osl::MutexGuard aGuard(m_aMutex);
-    if(m_xSlaveDispatchProvider.is())
-        aRet = m_xSlaveDispatchProvider->queryDispatches(Requests);
-    else
-        aRet.realloc(Requests.getLength());
+    typedef uno::Sequence<uno::Reference<frame::XDispatch>> DispatchSeq;
+    DispatchSeq aRet = m_xSlaveDispatchProvider.is()
+        ? m_xSlaveDispatchProvider->queryDispatches(Requests)
+        : DispatchSeq(Requests.getLength());
+
     auto aRetRange = asNonConstRange(aRet);
     for(sal_Int32 i = 0; i < Requests.getLength(); ++i)
         if(m_aInterceptedURL[0] == Requests[i].FeatureURL.Complete)

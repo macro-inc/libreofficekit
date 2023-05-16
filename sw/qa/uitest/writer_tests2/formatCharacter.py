@@ -1,8 +1,11 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
 
 from uitest.framework import UITestCase
 from uitest.uihelper.common import get_state_as_dict
@@ -14,50 +17,58 @@ from uitest.uihelper.common import select_by_text
 class formatCharacter(UITestCase):
 
    def test_format_character_tab_font(self):
-        with self.ui_test.create_doc_in_start_center("writer") as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
+        with self.ui_test.create_doc_in_start_center("writer"):
 
             with self.ui_test.execute_dialog_through_command(".uno:FontDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
                 select_pos(xTabs, "0")
 
-                xSizeFont = xDialog.getChild("westsizelb-cjk")
-                xSizeFontEast = xDialog.getChild("eastsizelb")
-                xSizeFontCTL = xDialog.getChild("ctlsizelb")
-                xLangFont = xDialog.getChild("westlanglb-cjk")
-                xLangFontEast = xDialog.getChild("eastlanglb")
-                xLangFontCTL = xDialog.getChild("ctllanglb")
-
+                # xNoteBook = xDialog.getChild("nbWestern") //western notebook is always active
+                xSizeFont = xDialog.getChild("cbWestSize")
+                xLangFont = xDialog.getChild("cbWestLanguage")
                 xSizeFont.executeAction("TYPE", mkPropertyValues({"KEYCODE":"CTRL+A"}))
-                xSizeFont.executeAction("TYPE", mkPropertyValues({"TEXT":"18"}))    #set font size 18
+                xSizeFont.executeAction("TYPE", mkPropertyValues({"TEXT":"18"}))
+                #set font size 18
+                select_pos(xLangFont, "0")
+
+                xNoteBook = xDialog.getChild("nbCJKCTL")
+                select_pos(xNoteBook, "0")
+                xSizeFontEast = xDialog.getChild("cbCJKSize")
+                xLangFontEast = xDialog.getChild("cbCJKLanguage")
                 xSizeFontEast.executeAction("TYPE", mkPropertyValues({"KEYCODE":"CTRL+A"}))
                 xSizeFontEast.executeAction("TYPE", mkPropertyValues({"TEXT":"18"}))    #set font size 18
+                select_pos(xLangFontEast, "0")
+
+                select_pos(xNoteBook, "1")
+                xSizeFontCTL = xDialog.getChild("cbCTLSize")
+                xLangFontCTL = xDialog.getChild("cbCTLLanguage")
                 xSizeFontCTL.executeAction("TYPE", mkPropertyValues({"KEYCODE":"CTRL+A"}))
                 xSizeFontCTL.executeAction("TYPE", mkPropertyValues({"TEXT":"18"}))    #set font size 18
-                select_pos(xLangFont, "0")
-                select_pos(xLangFontEast, "0")
                 select_pos(xLangFontCTL, "0")
 
             with self.ui_test.execute_dialog_through_command(".uno:FontDialog", close_button="cancel") as xDialog:
-                xSizeFont = xDialog.getChild("westsizelb-cjk")
-                xSizeFontEast = xDialog.getChild("eastsizelb")
-                xSizeFontCTL = xDialog.getChild("ctlsizelb")
-                xLangFont = xDialog.getChild("westlanglb-cjk")
-                xLangFontEast = xDialog.getChild("eastlanglb")
-                xLangFontCTL = xDialog.getChild("ctllanglb")
-
+                xSizeFont = xDialog.getChild("cbWestSize")
                 self.assertEqual(get_state_as_dict(xSizeFont)["Text"], "18 pt")
-                self.assertEqual(get_state_as_dict(xSizeFontEast)["Text"], "18 pt")
-                self.assertEqual(get_state_as_dict(xSizeFontCTL)["Text"], "18 pt") #check font size
+                xLangFont = xDialog.getChild("cbWestLanguage")
                 self.assertEqual(get_state_as_dict(xLangFont)["Text"], "[None]")
-                self.assertEqual(get_state_as_dict(xLangFontEast)["SelectEntryText"], "[None]")
-                self.assertEqual(get_state_as_dict(xLangFontCTL)["SelectEntryText"], "[None]")
+
+                xNoteBook = xDialog.getChild("nbCJKCTL")
+                select_pos(xNoteBook, "0")
+                xSizeFontEast = xDialog.getChild("cbCJKSize")
+                self.assertEqual(get_state_as_dict(xSizeFontEast)["Text"], "18 pt")
+                xLangFontEast = xDialog.getChild("cbCJKLanguage")
+                self.assertEqual(get_state_as_dict(xLangFontEast)["Text"], "[None]")
+
+                select_pos(xNoteBook, "1")
+                xSizeFontCTL = xDialog.getChild("cbCTLSize")
+                self.assertEqual(get_state_as_dict(xSizeFontCTL)["Text"], "18 pt")
+                xLangFontCTL = xDialog.getChild("cbCTLLanguage")
+                self.assertEqual(get_state_as_dict(xLangFontCTL)["Text"], "[None]")
 
 
 
    def test_format_character_tab_font_effects(self):
-        with self.ui_test.create_doc_in_start_center("writer") as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
+        with self.ui_test.create_doc_in_start_center("writer"):
 
             with self.ui_test.execute_dialog_through_command(".uno:FontDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
@@ -108,7 +119,6 @@ class formatCharacter(UITestCase):
 
    def test_format_character_tab_hyperlink(self):
         with self.ui_test.create_doc_in_start_center("writer") as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
 
             with self.ui_test.execute_dialog_through_command(".uno:FontDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
@@ -147,8 +157,7 @@ class formatCharacter(UITestCase):
 
 
    def test_format_character_tab_asian_layout(self):
-        with self.ui_test.create_doc_in_start_center("writer") as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
+        with self.ui_test.create_doc_in_start_center("writer"):
 
             with self.ui_test.execute_dialog_through_command(".uno:FontDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
@@ -166,8 +175,7 @@ class formatCharacter(UITestCase):
                 self.assertEqual(get_state_as_dict(xTwolines)["Selected"], "true")
 
    def test_format_character_tab_position(self):
-        with self.ui_test.create_doc_in_start_center("writer") as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
+        with self.ui_test.create_doc_in_start_center("writer"):
 
             with self.ui_test.execute_dialog_through_command(".uno:FontDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
@@ -211,8 +219,7 @@ class formatCharacter(UITestCase):
 
 
    def test_format_character_tab_position_scalewidthsb(self):
-        with self.ui_test.create_doc_in_start_center("writer") as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
+        with self.ui_test.create_doc_in_start_center("writer"):
 
             with self.ui_test.execute_dialog_through_command(".uno:FontDialog") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")

@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <MutexContainer.hxx>
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/component.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/frame/XTerminateListener.hpp>
@@ -27,6 +27,7 @@
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/ui/dialogs/XAsynchronousExecutableDialog.hpp>
+#include <rtl/ref.hxx>
 
 #include "dlg_CreationWizard.hxx"
 #include <tools/link.hxx>
@@ -39,8 +40,9 @@ class VclWindowEvent;
 
 namespace chart
 {
+class ChartModel;
 
-class CreationWizardUnoDlg : public MutexContainer
+class CreationWizardUnoDlg final : public cppu::BaseMutex
                             , public ::cppu::OComponentHelper
                             , public css::ui::dialogs::XAsynchronousExecutableDialog
                             , public css::lang::XServiceInfo
@@ -51,7 +53,7 @@ class CreationWizardUnoDlg : public MutexContainer
 public:
     CreationWizardUnoDlg() = delete;
 
-    CreationWizardUnoDlg( const css::uno::Reference< css::uno::XComponentContext >& xContext );
+    CreationWizardUnoDlg( css::uno::Reference< css::uno::XComponentContext > xContext );
     virtual ~CreationWizardUnoDlg() override;
 
     // XInterface
@@ -101,7 +103,7 @@ private:
     DECL_STATIC_LINK(CreationWizardUnoDlg, InstallLOKNotifierHdl, void*, vcl::ILibreOfficeKitNotifier*);
 
 private:
-    css::uno::Reference< css::frame::XModel >            m_xChartModel;
+    rtl::Reference< ::chart::ChartModel     >            m_xChartModel;
     css::uno::Reference< css::uno::XComponentContext>    m_xCC;
     css::uno::Reference< css::awt::XWindow >             m_xParentWindow;
 

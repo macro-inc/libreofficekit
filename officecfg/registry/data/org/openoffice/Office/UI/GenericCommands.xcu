@@ -2855,6 +2855,9 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">Move Up</value>
         </prop>
+        <prop oor:name="TooltipLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Move selected paragraphs up one paragraph</value>
+        </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
         </prop>
@@ -2871,6 +2874,9 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">Move Down</value>
         </prop>
+        <prop oor:name="TooltipLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Move selected paragraphs down one paragraph</value>
+        </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
         </prop>
@@ -2886,6 +2892,9 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
       <node oor:name=".uno:OutlineLeft" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">Promote</value>
+        </prop>
+        <prop oor:name="TooltipLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Promote outline level of selected list paragraphs</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
@@ -2919,6 +2928,9 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
       <node oor:name=".uno:OutlineRight" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">Demote</value>
+        </prop>
+        <prop oor:name="TooltipLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Demote outline level of selected list paragraphs</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
@@ -3209,7 +3221,13 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
       </node>
       <node oor:name=".uno:InsertObject" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
+          <value xml:lang="en-US">Insert OLE Object</value>
+        </prop>
+        <prop oor:name="ContextLabel" oor:type="xs:string">
           <value xml:lang="en-US">~OLE Object...</value>
+        </prop>
+        <prop oor:name="TooltipLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Open dialog to insert OLE object</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
@@ -3388,7 +3406,10 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
       </node>
       <node oor:name=".uno:ObjectMenue" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
-          <value xml:lang="en-US">Ob~ject</value>
+          <value xml:lang="en-US">OLE Ob~ject</value>
+        </prop>
+        <prop oor:name="TooltipLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Menu for editing or saving OLE objects</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
@@ -3665,7 +3686,7 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
       </node>
       <node oor:name=".uno:FormatObjectMenu" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
-          <value xml:lang="en-US">~Object and Shape</value>
+          <value xml:lang="en-US">Text B~ox and Shape</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
@@ -4031,6 +4052,22 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
           <value>1</value>
         </prop>
       </node>
+      <node oor:name=".uno:MergeCells" oor:op="replace">
+        <prop oor:name="Label" oor:type="xs:string">
+          <value xml:lang="en-US">Merge Cells</value>
+        </prop>
+        <prop oor:name="Properties" oor:type="xs:int">
+          <value>1</value>
+        </prop>
+      </node>
+      <node oor:name=".uno:SplitCell" oor:op="replace">
+        <prop oor:name="Label" oor:type="xs:string">
+          <value xml:lang="en-US">Split Cells...</value>
+        </prop>
+        <prop oor:name="Properties" oor:type="xs:int">
+          <value>1</value>
+        </prop>
+      </node>
       <node oor:name=".uno:Substract" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">~Subtract</value>
@@ -4106,6 +4143,9 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
       <node oor:name=".uno:LineEndStyle" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">Arrow Style</value>
+        </prop>
+        <prop oor:name="TooltipLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Select start and end arrowheads for lines.</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
@@ -4192,20 +4232,6 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
-        </prop>
-      </node>
-      <node oor:name=".uno:EmojiControl" oor:op="replace">
-        <prop oor:name="Label" oor:type="xs:string">
-          <value xml:lang="en-US">Emoji</value>
-        </prop>
-        <prop oor:name="TooltipLabel" oor:type="xs:string">
-          <value xml:lang="en-US">Insert Emoji</value>
-        </prop>
-        <prop oor:name="Properties" oor:type="xs:int">
-          <value>1</value>
-        </prop>
-        <prop oor:name="IsExperimental" oor:type="xs:boolean">
-          <value>true</value>
         </prop>
       </node>
       <node oor:name=".uno:TransformRotationX" oor:op="replace">
@@ -4991,6 +5017,20 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
           <value>9</value>
         </prop>
       </node>
+      <node oor:name=".uno:AccessibilityCheckOnline" oor:op="replace">
+        <prop oor:name="Label" oor:type="xs:string">
+          <value xml:lang="en-US">Automatic Accessibility Checking</value>
+        </prop>
+        <prop oor:name="ContextLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Automatic A~ccessibility Checking</value>
+        </prop>
+        <prop oor:name="TooltipLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Toggle Automatic Accessibility Checking</value>
+        </prop>
+        <prop oor:name="Properties" oor:type="xs:int">
+          <value>1</value>
+        </prop>
+      </node>
       <node oor:name=".uno:HideSpellMark" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">Do Not Mark Errors</value>
@@ -5434,11 +5474,8 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
         <prop oor:name="TooltipLabel" oor:type="xs:string">
           <value xml:lang="en-US">Open Clip Art and Media Gallery</value>
         </prop>
-        <prop oor:name="TargetURL" oor:type="xs:string">
-          <value>.uno:Sidebar.GalleryDeck</value>
-        </prop>
         <prop oor:name="Properties" oor:type="xs:int">
-          <value>9</value>
+          <value>1</value>
         </prop>
       </node>
       <node oor:name=".uno:SearchDialog" oor:op="replace">
@@ -6661,6 +6698,11 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
           <value xml:lang="en-US">Character Font Effects...</value>
         </prop>
       </node>
+      <node oor:name=".uno:FontPositionDialog" oor:op="replace">
+        <prop oor:name="Label" oor:type="xs:string">
+          <value xml:lang="en-US">Character Font Position...</value>
+        </prop>
+      </node>
       <node oor:name=".uno:FormatMenu" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">F~ormat</value>
@@ -6668,7 +6710,7 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
       </node>
       <node oor:name=".uno:ObjectMenu" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
-          <value xml:lang="en-US">~Object</value>
+          <value xml:lang="en-US">~OLE Object</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
@@ -6865,10 +6907,13 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
       </node>
       <node oor:name=".uno:AnchorMenu" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
-          <value xml:lang="en-US">Change Anchor</value>
+          <value xml:lang="en-US">Anchor Menu</value>
         </prop>
         <prop oor:name="ContextLabel" oor:type="xs:string">
           <value xml:lang="en-US">Anc~hor</value>
+        </prop>
+        <prop oor:name="TooltipLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Select anchor for object</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
@@ -7012,6 +7057,34 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
           <value>1</value>
         </prop>
       </node>
+      <node oor:name=".uno:DeleteColumns" oor:op="replace">
+        <prop oor:name="Label" oor:type="xs:string">
+          <value xml:lang="en-US">Delete Columns</value>
+        </prop>
+        <prop oor:name="ContextLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Delete ~Columns</value>
+        </prop>
+        <prop oor:name="TooltipLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Delete selected columns</value>
+        </prop>
+        <prop oor:name="Properties" oor:type="xs:int">
+          <value>1</value>
+        </prop>
+      </node>
+      <node oor:name=".uno:DeleteRows" oor:op="replace">
+        <prop oor:name="Label" oor:type="xs:string">
+          <value xml:lang="en-US">Delete Rows</value>
+        </prop>
+        <prop oor:name="ContextLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Delete ~Rows</value>
+        </prop>
+        <prop oor:name="TooltipLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Delete selected rows</value>
+        </prop>
+        <prop oor:name="Properties" oor:type="xs:int">
+          <value>1</value>
+        </prop>
+      </node>
       <node oor:name=".uno:ManageLanguage" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">Manage Language</value>
@@ -7144,6 +7217,9 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">Name...</value>
         </prop>
+        <prop oor:name="TooltipLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Give a label to identify an object</value>
+        </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
         </prop>
@@ -7151,6 +7227,9 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
       <node oor:name=".uno:ObjectTitleDescription" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">Description...</value>
+        </prop>
+        <prop oor:name="TooltipLabel" oor:type="xs:string">
+          <value xml:lang="en-US">Add descriptions of non-text content (for accessibility)</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>
@@ -7378,6 +7457,14 @@ bit 3 (0x8): #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON 8
       <node oor:name=".uno:GraphicSizeCheck" oor:op="replace">
         <prop oor:name="Label" oor:type="xs:string">
           <value xml:lang="en-US">Graphic Size Check...</value>
+        </prop>
+        <prop oor:name="Properties" oor:type="xs:int">
+          <value>1</value>
+        </prop>
+      </node>
+      <node oor:name=".uno:ThemeDialog" oor:op="replace">
+        <prop oor:name="Label" oor:type="xs:string">
+          <value xml:lang="en-US">Theme...</value>
         </prop>
         <prop oor:name="Properties" oor:type="xs:int">
           <value>1</value>

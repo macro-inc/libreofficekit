@@ -20,7 +20,6 @@
 #include <cellform.hxx>
 
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <svl/sharedstring.hxx>
 
 #include <formulacell.hxx>
@@ -35,12 +34,12 @@ OUString ScCellFormat::GetString( const ScRefCellValue& rCell, sal_uInt32 nForma
 {
     *ppColor = nullptr;
 
-    switch (rCell.meType)
+    switch (rCell.getType())
     {
         case CELLTYPE_STRING:
         {
             OUString str;
-            rFormatter.GetOutputString(rCell.mpString->getString(), nFormat, str, ppColor, bUseStarFormat);
+            rFormatter.GetOutputString(rCell.getSharedString()->getString(), nFormat, str, ppColor, bUseStarFormat);
             return str;
         }
         case CELLTYPE_EDIT:
@@ -51,7 +50,7 @@ OUString ScCellFormat::GetString( const ScRefCellValue& rCell, sal_uInt32 nForma
         }
         case CELLTYPE_VALUE:
         {
-            const double & nValue = rCell.mfValue;
+            const double nValue = rCell.getDouble();
             if (!bNullVals && nValue == 0.0)
                 return OUString();
             else
@@ -63,7 +62,7 @@ OUString ScCellFormat::GetString( const ScRefCellValue& rCell, sal_uInt32 nForma
         }
         case CELLTYPE_FORMULA:
         {
-            ScFormulaCell*  pFCell = rCell.mpFormula;
+            ScFormulaCell*  pFCell = rCell.getFormula();
             if ( bFormula )
             {
                 return pFCell->GetFormula();
@@ -129,11 +128,11 @@ OUString ScCellFormat::GetString(
 
 OUString ScCellFormat::GetInputString(
     const ScRefCellValue& rCell, sal_uInt32 nFormat, SvNumberFormatter& rFormatter, const ScDocument& rDoc,
-    const svl::SharedString** pShared, bool bFiltering )
+    const svl::SharedString** pShared, bool bFiltering, bool bForceSystemLocale )
 {
     if(pShared != nullptr)
         *pShared = nullptr;
-    switch (rCell.meType)
+    switch (rCell.getType())
     {
         case CELLTYPE_STRING:
         case CELLTYPE_EDIT:
@@ -141,18 +140,21 @@ OUString ScCellFormat::GetInputString(
         case CELLTYPE_VALUE:
         {
             OUString str;
-            rFormatter.GetInputLineString(rCell.mfValue, nFormat, str, bFiltering);
+            rFormatter.GetInputLineString(rCell.getDouble(), nFormat, str, bFiltering, bForceSystemLocale);
             return str;
         }
         break;
         case CELLTYPE_FORMULA:
         {
-            OUString str;
-            ScFormulaCell* pFC = rCell.mpFormula;
+            std::optional<OUString> str;
+            ScFormulaCell* pFC = rCell.getFormula();
             if (pFC->IsEmptyDisplayedAsString())
                 ; // empty
             else if (pFC->IsValue())
-                rFormatter.GetInputLineString(pFC->GetValue(), nFormat, str, bFiltering);
+            {
+                str.emplace();
+                rFormatter.GetInputLineString(pFC->GetValue(), nFormat, *str, bFiltering, bForceSystemLocale);
+            }
             else
             {
                 const svl::SharedString& shared = pFC->GetString();
@@ -167,19 +169,19 @@ OUString ScCellFormat::GetInputString(
             const FormulaError nErrCode = pFC->GetErrCode();
             if (nErrCode != FormulaError::NONE)
             {
-                str.clear();
+                str.reset();
                 if( pShared != nullptr )
                     *pShared = nullptr;
             }
 
-            return str;
+            return str ? std::move(*str) : svl::SharedString::EMPTY_STRING;
         }
         case CELLTYPE_NONE:
             if( pShared != nullptr )
                 *pShared = &svl::SharedString::getEmptyString();
-            return OUString();
+            return svl::SharedString::EMPTY_STRING;
         default:
-            return OUString();
+            return svl::SharedString::EMPTY_STRING;
     }
 }
 
@@ -188,11 +190,11 @@ OUString ScCellFormat::GetOutputString( ScDocument& rDoc, const ScAddress& rPos,
     if (rCell.isEmpty())
         return OUString();
 
-    if (rCell.meType == CELLTYPE_EDIT)
+    if (rCell.getType() == CELLTYPE_EDIT)
     {
         //  GetString converts line breaks into spaces in EditCell,
         //  but here we need the line breaks
-        const EditTextObject* pData = rCell.mpEditText;
+        const EditTextObject* pData = rCell.getEditText();
         if (pData)
         {
             ScFieldEditEngine& rEngine = rDoc.GetEditEngine();

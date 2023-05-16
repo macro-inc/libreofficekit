@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <vcl/dockwin.hxx>
 #include <vcl/timer.hxx>
 #include <vcl/virdev.hxx>
 #include <vcl/weld.hxx>
@@ -22,6 +21,7 @@
 class ScCheckListMenuControl;
 class ScViewData;
 struct ScCheckListMember;
+struct ImplSVEvent;
 
 struct ScCheckListMember
 {
@@ -36,6 +36,7 @@ struct ScCheckListMember
     OUString                 maRealName;
     double                   mnValue; // number value of filter condition
     bool                     mbVisible;
+    bool                     mbHiddenByOtherFilter;
     bool                     mbDate;
     bool                     mbLeaf;
     bool                     mbValue; // true if the filter condition is value
@@ -123,22 +124,21 @@ public:
     };
 
     ScCheckListMenuControl(weld::Widget* pParent, ScViewData& rViewData,
-                           bool bTreeMode, int nWidth,
-                           vcl::ILibreOfficeKitNotifier* pNotifier);
+                           bool bTreeMode, int nWidth, bool bIsMultiField = false);
     ~ScCheckListMenuControl();
 
     void addMenuItem(const OUString& rText, Action* pAction);
     void addSeparator();
-    ScListSubMenuControl* addSubMenuItem(const OUString& rText, bool bEnabled, bool bCheckList);
-    void resizeToFitMenuItems();
+    ScListSubMenuControl* addSubMenuItem(const OUString& rText, bool bEnabled, bool bColorMenu);
 
     void selectMenuItem(size_t nPos, bool bSubMenuTimer);
     void queueLaunchSubMenu(size_t nPos, ScListSubMenuControl* pMenu);
 
     void setMemberSize(size_t n);
-    void addDateMember(const OUString& rName, double nVal, bool bVisible);
-    void addMember(const OUString& rName, const double nVal, bool bVisible,
+    void addDateMember(const OUString& rName, double nVal, bool bVisible, bool bHiddenByOtherFilter);
+    void addMember(const OUString& rName, const double nVal, bool bVisible, bool bHiddenByOtherFilter,
                    bool bValue = false);
+    void clearMembers();
     size_t initMembers(int nMaxMemberWidth = -1);
     void setConfig(const Config& rConfig);
 
@@ -173,6 +173,7 @@ public:
 
     void setOKAction(Action* p);
     void setPopupEndAction(Action* p);
+    void setFieldChangedAction(Action* p);
 
     int GetTextWidth(const OUString& rsName) const;
     int IncreaseWindowWidthToFitText(int nMaxTextWidth);
@@ -183,9 +184,10 @@ public:
      */
     void terminateAllPopupMenus();
 
-    sal_Int32 ExecuteMenu(weld::Menu& rMenu);
-
     void endSubMenu(ScListSubMenuControl& rSubMenu);
+
+    void addFields(const std::vector<OUString>& aFields);
+    tools::Long getField();
 private:
 
     std::vector<MenuItemData>         maMenuItems;
@@ -207,7 +209,7 @@ private:
     int GetCheckedEntryCount() const;
     void CheckAllChildren(const weld::TreeIter& rEntry, bool bCheck);
 
-    void setSelectedMenuItem(size_t nPos, bool bSubMenuTimer);
+    void setSelectedMenuItem(size_t nPos);
 
     std::unique_ptr<weld::TreeIter> FindEntry(const weld::TreeIter* pParent, std::u16string_view sNode);
 
@@ -236,6 +238,8 @@ private:
 
     DECL_LINK(PopupModeEndHdl, weld::Popover&, void);
 
+    DECL_LINK(ComboChangedHdl, weld::ComboBox&, void);
+
     DECL_LINK(EdModifyHdl, weld::Entry&, void);
     DECL_LINK(EdActivateHdl, weld::Entry&, bool);
 
@@ -252,6 +256,10 @@ private:
 
     DECL_LINK(SetDropdownPosHdl, void*, void);
 
+    DECL_LINK(CommandHdl, const CommandEvent&, bool);
+
+    void ResizeToRequest();
+
     void DropPendingEvents();
 
 private:
@@ -261,6 +269,8 @@ private:
     std::unique_ptr<weld::TreeView> mxMenu;
     std::unique_ptr<weld::TreeIter> mxScratchIter;
     std::unique_ptr<weld::Widget> mxNonMenu;
+    std::unique_ptr<weld::Label> mxFieldsComboLabel;
+    std::unique_ptr<weld::ComboBox> mxFieldsCombo;
     std::unique_ptr<weld::Entry> mxEdSearch;
     std::unique_ptr<weld::Widget> mxBox;
     std::unique_ptr<weld::TreeView> mxListChecks;
@@ -274,6 +284,7 @@ private:
     std::unique_ptr<weld::Box> mxButtonBox;
     std::unique_ptr<weld::Button> mxBtnOk;
     std::unique_ptr<weld::Button> mxBtnCancel;
+    std::unique_ptr<weld::Menu> mxContextMenu;
 
     ScopedVclPtr<VirtualDevice> mxDropDown;
 
@@ -284,11 +295,13 @@ private:
     std::unique_ptr<ExtendedData> mxExtendedData;
     std::unique_ptr<Action>       mxOKAction;
     std::unique_ptr<Action>       mxPopupEndAction;
+    std::unique_ptr<Action>       mxFieldChangedAction;
 
     Config maConfig;
     Size maAllocatedSize;
     int mnCheckWidthReq; /// matching width request for mxChecks
     int mnWndWidth;  /// whole window width.
+    int mnCheckListVisibleRows;
     TriState mePrevToggleAllState;
 
     size_t  mnSelectedMenu;
@@ -297,7 +310,6 @@ private:
 
     ImplSVEvent* mnAsyncPostPopdownId;
     ImplSVEvent* mnAsyncSetDropdownPosId;
-    vcl::ILibreOfficeKitNotifier* mpNotifier;
 
     bool mbHasDates;
     bool mbIsPoppedUp;
@@ -319,12 +331,14 @@ private:
 
     SubMenuItemData   maOpenTimer;
     SubMenuItemData   maCloseTimer;
+
+    bool mbIsMultiField;
 };
 
 class ScListSubMenuControl final
 {
 public:
-    ScListSubMenuControl(weld::Widget* pParent, ScCheckListMenuControl& rParentControl, bool bCheckList, vcl::ILibreOfficeKitNotifier* pNotifier);
+    ScListSubMenuControl(weld::Widget* pParent, ScCheckListMenuControl& rParentControl, bool bColorMenu);
 
     void setPopupStartAction(ScCheckListMenuControl::Action* p);
 
@@ -335,11 +349,12 @@ public:
     void EndPopupMode();
 
     void addMenuItem(const OUString& rText, ScCheckListMenuControl::Action* pAction);
-    void addMenuCheckItem(const OUString& rText, bool bActive, VirtualDevice& rImage, ScCheckListMenuControl::Action* pAction);
+    // nMenu of 0 for background color, nMenu of 1 for text color
+    void addMenuColorItem(const OUString& rText, bool bActive, VirtualDevice& rImage,
+                          int nMenu, ScCheckListMenuControl::Action* pAction);
+    void addSeparator();
     void clearMenuItems();
     void resizeToFitMenuItems();
-
-    void setSelectedMenuItem(size_t nPos);
 
     ScViewData& GetViewData() const { return mrParentControl.GetViewData(); }
     ScCheckListMenuControl::ExtendedData* getExtendedData() { return mrParentControl.getExtendedData(); }
@@ -356,17 +371,23 @@ private:
     std::unique_ptr<weld::Popover> mxPopover;
     std::unique_ptr<weld::Container> mxContainer;
     std::unique_ptr<weld::TreeView> mxMenu;
+    std::unique_ptr<weld::TreeView> mxBackColorMenu;
+    std::unique_ptr<weld::TreeView> mxTextColorMenu;
     std::unique_ptr<weld::TreeIter> mxScratchIter;
     std::unique_ptr<ScCheckListMenuControl::Action> mxPopupStartAction;
     std::vector<ScCheckListMenuControl::MenuItemData> maMenuItems;
     ScCheckListMenuControl& mrParentControl;
-    vcl::ILibreOfficeKitNotifier* mpNotifier;
+    int mnBackColorMenuPrefHeight;
+    int mnTextColorMenuPrefHeight;
+    bool mbColorMenu;
 
     DECL_LINK(RowActivatedHdl, weld::TreeView& rMEvt, bool);
-    DECL_LINK(CheckToggledHdl, const weld::TreeView::iter_col&, void);
+    DECL_LINK(ColorSelChangedHdl, weld::TreeView&, void);
     DECL_LINK(MenuKeyInputHdl, const KeyEvent&, bool);
 
-    void executeMenuItem(size_t nPos);
+    void SetupMenu(weld::TreeView& rMenu);
+
+    void executeMenuItem(ScCheckListMenuControl::Action* pAction);
     void addItem(ScCheckListMenuControl::Action* pAction);
 };
 

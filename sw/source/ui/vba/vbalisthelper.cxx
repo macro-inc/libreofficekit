@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 #include "vbalisthelper.hxx"
+#include <utility>
 #include <vbahelper/vbahelper.hxx>
 #include <sal/log.hxx>
 #include <ooo/vba/word/WdListGalleryType.hpp>
@@ -47,7 +48,7 @@ constexpr OUStringLiteral CHAR_DIAMOND = u"\u2726";
 constexpr OUStringLiteral CHAR_ARROW = u"\u27A2";
 constexpr OUStringLiteral CHAR_CHECK_MARK = u"\u2713";
 
-SwVbaListHelper::SwVbaListHelper( const css::uno::Reference< css::text::XTextDocument >& xTextDoc, sal_Int32 nGalleryType, sal_Int32 nTemplateType ) : mxTextDocument( xTextDoc ), mnGalleryType( nGalleryType ), mnTemplateType( nTemplateType )
+SwVbaListHelper::SwVbaListHelper( css::uno::Reference< css::text::XTextDocument > xTextDoc, sal_Int32 nGalleryType, sal_Int32 nTemplateType ) : mxTextDocument(std::move( xTextDoc )), mnGalleryType( nGalleryType ), mnTemplateType( nTemplateType )
 {
     Init();
 }
@@ -94,12 +95,12 @@ void SwVbaListHelper::Init()
         uno::Reference< lang::XMultiServiceFactory > xDocMSF( mxTextDocument, uno::UNO_QUERY_THROW );
         mxStyleProps.set( xDocMSF->createInstance("com.sun.star.style.NumberingStyle"), uno::UNO_QUERY_THROW );
         // insert this style into style family, or the property NumberingRules doesn't exist.
-        mxStyleFamily->insertByName( msStyleName, uno::makeAny( mxStyleProps ) );
+        mxStyleFamily->insertByName( msStyleName, uno::Any( mxStyleProps ) );
         mxStyleProps->getPropertyValue("NumberingRules") >>= mxNumberingRules;
 
         CreateListTemplate();
 
-        mxStyleProps->setPropertyValue("NumberingRules", uno::makeAny( mxNumberingRules ) );
+        mxStyleProps->setPropertyValue("NumberingRules", uno::Any( mxNumberingRules ) );
     }
 }
 
@@ -135,8 +136,8 @@ void SwVbaListHelper::CreateBulletListTemplate()
     sal_Int32 nLevel = 0;
     uno::Sequence< beans::PropertyValue > aPropertyValues;
     mxNumberingRules->getByIndex( nLevel ) >>= aPropertyValues;
-    setOrAppendPropertyValue( aPropertyValues, UNO_NAME_CHAR_STYLE_NAME, uno::makeAny( OUString( "Bullet Symbols" ) ) );
-    setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::makeAny( sal_Int16(style::NumberingType::CHAR_SPECIAL) ) );
+    setOrAppendPropertyValue( aPropertyValues, UNO_NAME_CHAR_STYLE_NAME, uno::Any( OUString( "Bullet Symbols" ) ) );
+    setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::Any( sal_Int16(style::NumberingType::CHAR_SPECIAL) ) );
 
     OUString aBulletChar;
     switch( mnTemplateType )
@@ -182,9 +183,9 @@ void SwVbaListHelper::CreateBulletListTemplate()
             throw css::uno::RuntimeException();
         }
     }
-    setOrAppendPropertyValue( aPropertyValues, UNO_NAME_BULLET_CHAR, uno::makeAny( aBulletChar ) );
+    setOrAppendPropertyValue( aPropertyValues, UNO_NAME_BULLET_CHAR, uno::Any( aBulletChar ) );
 
-    mxNumberingRules->replaceByIndex( nLevel, uno::makeAny( aPropertyValues ) );
+    mxNumberingRules->replaceByIndex( nLevel, uno::Any( aPropertyValues ) );
 }
 
 void SwVbaListHelper::CreateNumberListTemplate()
@@ -246,10 +247,10 @@ void SwVbaListHelper::CreateNumberListTemplate()
             throw css::uno::RuntimeException();
         }
     }
-    setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::makeAny( nNumberingType ) );
-    setOrAppendPropertyValue( aPropertyValues, UNO_NAME_SUFFIX, uno::makeAny( sSuffix ) );
+    setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::Any( nNumberingType ) );
+    setOrAppendPropertyValue( aPropertyValues, UNO_NAME_SUFFIX, uno::Any( sSuffix ) );
 
-    mxNumberingRules->replaceByIndex( nLevel, uno::makeAny( aPropertyValues ) );
+    mxNumberingRules->replaceByIndex( nLevel, uno::Any( aPropertyValues ) );
 }
 
 void SwVbaListHelper::CreateOutlineNumberListTemplate()
@@ -369,10 +370,10 @@ void SwVbaListHelper::CreateOutlineNumberForType1()
                 break;
             }
         }
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::makeAny( nNumberingType ) );
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PREFIX, uno::makeAny( sPrefix ) );
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_SUFFIX, uno::makeAny( sSuffix ) );
-        mxNumberingRules->replaceByIndex( nLevel, uno::makeAny( aPropertyValues ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::Any( nNumberingType ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PREFIX, uno::Any( sPrefix ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_SUFFIX, uno::Any( sSuffix ) );
+        mxNumberingRules->replaceByIndex( nLevel, uno::Any( aPropertyValues ) );
     }
 }
 
@@ -385,14 +386,14 @@ void SwVbaListHelper::CreateOutlineNumberForType2()
     for( sal_Int32 nLevel = 0; nLevel < LIST_LEVEL_COUNT; nLevel++ )
     {
         mxNumberingRules->getByIndex( nLevel ) >>= aPropertyValues;
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::makeAny( sal_Int16(style::NumberingType::ARABIC) ) );
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_SUFFIX, uno::makeAny( sSuffix ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::Any( sal_Int16(style::NumberingType::ARABIC) ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_SUFFIX, uno::Any( sSuffix ) );
         if( nLevel != 0 )
         {
             nParentNumbering = sal_Int16( nLevel - 1 );
-            setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PARENT_NUMBERING, uno::makeAny( nParentNumbering ) );
+            setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PARENT_NUMBERING, uno::Any( nParentNumbering ) );
         }
-        mxNumberingRules->replaceByIndex( nLevel, uno::makeAny( aPropertyValues ) );
+        mxNumberingRules->replaceByIndex( nLevel, uno::Any( aPropertyValues ) );
     }
 }
 
@@ -404,8 +405,8 @@ void SwVbaListHelper::CreateOutlineNumberForType3()
     for( sal_Int32 nLevel = 0; nLevel < LIST_LEVEL_COUNT; nLevel++ )
     {
         mxNumberingRules->getByIndex( nLevel ) >>= aPropertyValues;
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::makeAny( sal_Int16(style::NumberingType::CHAR_SPECIAL) ) );
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_CHAR_STYLE_NAME, uno::makeAny( OUString("Bullet Symbols") ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::Any( sal_Int16(style::NumberingType::CHAR_SPECIAL) ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_CHAR_STYLE_NAME, uno::Any( OUString("Bullet Symbols") ) );
         switch( nLevel )
         {
             case 0:
@@ -438,8 +439,8 @@ void SwVbaListHelper::CreateOutlineNumberForType3()
                 break;
             }
         }
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_BULLET_CHAR, uno::makeAny( aBulletChar ) );
-        mxNumberingRules->replaceByIndex( nLevel, uno::makeAny( aPropertyValues ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_BULLET_CHAR, uno::Any( aBulletChar ) );
+        mxNumberingRules->replaceByIndex( nLevel, uno::Any( aPropertyValues ) );
     }
 }
 
@@ -467,7 +468,7 @@ void SwVbaListHelper::CreateOutlineNumberForType4()
                 nNumberingType = style::NumberingType::ARABIC;
                 sPrefix.clear();
                 sSuffix = ".";
-                setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PARENT_NUMBERING, uno::makeAny( sal_Int16(0) ) );
+                setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PARENT_NUMBERING, uno::Any( sal_Int16(0) ) );
                 break;
             }
             case 2:
@@ -520,10 +521,10 @@ void SwVbaListHelper::CreateOutlineNumberForType4()
                 break;
             }
         }
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::makeAny( nNumberingType ) );
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PREFIX, uno::makeAny( sPrefix ) );
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_SUFFIX, uno::makeAny( sSuffix ) );
-        mxNumberingRules->replaceByIndex( nLevel, uno::makeAny( aPropertyValues ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::Any( nNumberingType ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PREFIX, uno::Any( sPrefix ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_SUFFIX, uno::Any( sSuffix ) );
+        mxNumberingRules->replaceByIndex( nLevel, uno::Any( aPropertyValues ) );
     }
 }
 
@@ -535,13 +536,13 @@ void SwVbaListHelper::CreateOutlineNumberForType5()
     for( sal_Int32 nLevel = 0; nLevel < LIST_LEVEL_COUNT; nLevel++ )
     {
         mxNumberingRules->getByIndex( nLevel ) >>= aPropertyValues;
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::makeAny( sal_Int16(style::NumberingType::ARABIC) ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::Any( sal_Int16(style::NumberingType::ARABIC) ) );
         if( nLevel != 0 )
         {
             nParentNumbering = sal_Int16( nLevel - 1 );
-            setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PARENT_NUMBERING, uno::makeAny( nParentNumbering ) );
+            setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PARENT_NUMBERING, uno::Any( nParentNumbering ) );
         }
-        mxNumberingRules->replaceByIndex( nLevel, uno::makeAny( aPropertyValues ) );
+        mxNumberingRules->replaceByIndex( nLevel, uno::Any( aPropertyValues ) );
     }
 }
 
@@ -621,10 +622,10 @@ void SwVbaListHelper::CreateOutlineNumberForType6()
                 break;
             }
         }
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::makeAny( nNumberingType ) );
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PREFIX, uno::makeAny( sPrefix ) );
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_SUFFIX, uno::makeAny( sSuffix ) );
-        mxNumberingRules->replaceByIndex( nLevel, uno::makeAny( aPropertyValues ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::Any( nNumberingType ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PREFIX, uno::Any( sPrefix ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_SUFFIX, uno::Any( sSuffix ) );
+        mxNumberingRules->replaceByIndex( nLevel, uno::Any( aPropertyValues ) );
     }
 }
 
@@ -635,9 +636,9 @@ void SwVbaListHelper::CreateOutlineNumberForType7()
     for( sal_Int32 nLevel = 0; nLevel < LIST_LEVEL_COUNT; nLevel++ )
     {
         mxNumberingRules->getByIndex( nLevel ) >>= aPropertyValues;
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::makeAny( sal_Int16(style::NumberingType::ARABIC) ) );
-        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PREFIX, uno::makeAny( OUString("Chapter ") ) );
-        mxNumberingRules->replaceByIndex( nLevel, uno::makeAny( aPropertyValues ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_NUMBERING_TYPE, uno::Any( sal_Int16(style::NumberingType::ARABIC) ) );
+        setOrAppendPropertyValue( aPropertyValues, UNO_NAME_PREFIX, uno::Any( OUString("Chapter ") ) );
+        mxNumberingRules->replaceByIndex( nLevel, uno::Any( aPropertyValues ) );
     }
 }
 
@@ -653,8 +654,8 @@ void SwVbaListHelper::setPropertyValueWithNameAndLevel( sal_Int32 nLevel, const 
     uno::Sequence< beans::PropertyValue > aPropertyValues;
     mxNumberingRules->getByIndex( nLevel ) >>= aPropertyValues;
     setOrAppendPropertyValue( aPropertyValues, sName, aValue );
-    mxNumberingRules->replaceByIndex( nLevel, uno::makeAny( aPropertyValues ) );
-    mxStyleProps->setPropertyValue("NumberingRules", uno::makeAny( mxNumberingRules ) );
+    mxNumberingRules->replaceByIndex( nLevel, uno::Any( aPropertyValues ) );
+    mxStyleProps->setPropertyValue("NumberingRules", uno::Any( mxNumberingRules ) );
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

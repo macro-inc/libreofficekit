@@ -145,7 +145,7 @@ SbiParser::SbiParser( StarBASIC* pb, SbModule* pm )
 
     rTypeArray = new SbxArray; // array for user defined types
     rEnumArray = new SbxArray; // array for Enum types
-    bVBASupportOn = pm->IsVBACompat();
+    bVBASupportOn = pm->IsVBASupport();
     if ( bVBASupportOn )
         EnableCompatibility();
 
@@ -818,9 +818,9 @@ void SbiParser::Option()
                     }
                     // if the module setting is different
                     // reset it to what the Option tells us
-                    if ( bVBASupportOn != aGen.GetModule().IsVBACompat() )
+                    if ( bVBASupportOn != aGen.GetModule().IsVBASupport() )
                     {
-                        aGen.GetModule().SetVBACompat( bVBASupportOn );
+                        aGen.GetModule().SetVBASupport( bVBASupportOn );
                     }
                     break;
                 }
@@ -849,6 +849,15 @@ static void addNumericConst(SbiSymPool& rPool, const OUString& pSym, double nVal
 
 void SbiParser::AddConstants()
 {
+    // tdf#153543 - shell constants
+    // See https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/shell-constants
+    addNumericConst(aPublics, "vbHide", 0);
+    addNumericConst(aPublics, "vbNormalFocus", 1);
+    addNumericConst(aPublics, "vbMinimizedFocus", 2);
+    addNumericConst(aPublics, "vbMaximizedFocus", 3);
+    addNumericConst(aPublics, "vbNormalNoFocus", 4);
+    addNumericConst(aPublics, "vbMinimizedNoFocus", 6);
+
     // tdf#131563 - add vba color constants
     // See https://docs.microsoft.com/en-us/office/vba/language/reference/user-interface-help/color-constants
     addNumericConst(aPublics, "vbBlack", 0x0);

@@ -132,7 +132,7 @@ void ScRTFExport::WriteRow( SCTAB nTab, SCROW nRow )
     }
     rStrm.WriteCharPtr( OOO_STRING_SVTOOLS_RTF_PARD ).WriteCharPtr( OOO_STRING_SVTOOLS_RTF_PLAIN ).WriteCharPtr( OOO_STRING_SVTOOLS_RTF_INTBL ).WriteCharPtr( SAL_NEWLINE_STRING );
 
-    sal_uLong nStrmPos = rStrm.Tell();
+    sal_uInt64 nStrmPos = rStrm.Tell();
     for ( nCol = aRange.aStart.Col(); nCol <= nEndCol; nCol++ )
     {
         WriteCell( nTab, nRow, nCol );
@@ -160,7 +160,7 @@ void ScRTFExport::WriteCell( SCTAB nTab, SCROW nRow, SCCOL nCol )
     OUString aContent;
     ScAddress aPos(nCol, nRow, nTab);
     ScRefCellValue aCell(*pDoc, aPos);
-    switch (aCell.meType)
+    switch (aCell.getType())
     {
         case CELLTYPE_NONE:
             bValueData = false;
@@ -168,7 +168,7 @@ void ScRTFExport::WriteCell( SCTAB nTab, SCROW nRow, SCCOL nCol )
         case CELLTYPE_EDIT:
         {
             bValueData = false;
-            const EditTextObject* pObj = aCell.mpEditText;
+            const EditTextObject* pObj = aCell.getEditText();
             EditEngine& rEngine = GetEditEngine();
             rEngine.SetText(*pObj);
             aContent = rEngine.GetText(); // LineFeed in between paragraphs!

@@ -84,7 +84,7 @@ struct SAL_WARN_UNUSED SC_DLLPUBLIC ScSetStringParam
 
     /**
      * When true, treat input with a leading apostrophe as an escape character
-     * for a numeric value content, to treat the numeric value as a text. When
+     * for all content, to treat also numeric value as a text. When
      * false, the whole string input including the leading apostrophe will be
      * entered literally as string.
      */
@@ -153,7 +153,7 @@ public:
     static OUString  SC_DLLPUBLIC GetQuotedToken(const OUString &rIn, sal_Int32 nToken, const OUString& rQuotedPairs,
                                         sal_Unicode cTok,  sal_Int32& rIndex );
 
-    static bool SC_DLLPUBLIC isMultiline( const OUString& rStr );
+    static bool SC_DLLPUBLIC isMultiline( std::u16string_view rStr );
 
     static ScInputStringType parseInputString(
         SvNumberFormatter& rFormatter, const OUString& rStr, LanguageType eLang );

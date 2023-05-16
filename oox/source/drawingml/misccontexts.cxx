@@ -27,6 +27,7 @@
 #include <oox/token/tokens.hxx>
 #include <vcl/GraphicExternalLink.hxx>
 #include <vcl/graph.hxx>
+#include <unordered_map>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -36,19 +37,25 @@ using ::oox::core::ContextHandlerRef;
 
 namespace oox::drawingml {
 
-SolidFillContext::SolidFillContext( ContextHandler2Helper const & rParent,
-        FillProperties& rFillProps ) :
-    ColorContext( rParent, rFillProps.maFillColor )
+SolidFillContext::SolidFillContext(ContextHandler2Helper const & rParent, FillProperties& rFillProps, model::SolidFill* pSolidFill)
+    : ColorContext(rParent, rFillProps.maFillColor, pSolidFill ? &pSolidFill->maColorDefinition : nullptr)
 {
 }
 
-GradientFillContext::GradientFillContext( ContextHandler2Helper const & rParent,
-        const AttributeList& rAttribs, GradientFillProperties& rGradientProps ) :
-    ContextHandler2( rParent ),
-    mrGradientProps( rGradientProps )
+SolidFillContext::~SolidFillContext()
+{}
+
+GradientFillContext::GradientFillContext(ContextHandler2Helper const & rParent,
+        const AttributeList& rAttribs, GradientFillProperties& rGradientProps, model::GradientFill* pGradientFill)
+    : ContextHandler2(rParent)
+    , mpGradientFill(pGradientFill)
+    , mrGradientProps(rGradientProps)
 {
+    auto oRotateWithShape = rAttribs.getBool(XML_rotWithShape);
     mrGradientProps.moShadeFlip = rAttribs.getToken( XML_flip );
-    mrGradientProps.moRotateWithShape = rAttribs.getBool( XML_rotWithShape );
+    mrGradientProps.moRotateWithShape = oRotateWithShape;
+    if (mpGradientFill && oRotateWithShape)
+        mpGradientFill->mbRotateWithShape = *oRotateWithShape;
 }
 
 ContextHandlerRef GradientFillContext::onCreateContext(
@@ -60,64 +67,196 @@ ContextHandlerRef GradientFillContext::onCreateContext(
             return this;    // for gs elements
 
         case A_TOKEN( gs ):
-            if( rAttribs.hasAttribute( XML_pos ) )
+            if (rAttribs.hasAttribute(XML_pos))
             {
-                double fPosition = getLimitedValue< double >( rAttribs.getDouble( XML_pos, 0.0 ) / 100000.0, 0.0, 1.0 );
-                auto aElement = mrGradientProps.maGradientStops.emplace( fPosition, Color() );
-                return new ColorContext( *this, aElement->second );
+                double fPosition = getLimitedValue<double>(rAttribs.getDouble(XML_pos, 0.0) / 100000.0, 0.0, 1.0);
+                auto aElement = mrGradientProps.maGradientStops.emplace(fPosition, Color());
+
+                model::ColorDefinition* pColorDefinition = nullptr;
+                if (mpGradientFill)
+                {
+                    model::GradientStop& rStop = mpGradientFill->maGradientStops.emplace_back();
+                    rStop.mfPosition = fPosition;
+                    pColorDefinition = &rStop.maColor;
+                }
+
+                return new ColorContext(*this, aElement->second, pColorDefinition);
             }
         break;
 
         case A_TOKEN( lin ):
-            mrGradientProps.moShadeAngle = rAttribs.getInteger( XML_ang );
-            mrGradientProps.moShadeScaled = rAttribs.getBool( XML_scaled );
+        {
+            mrGradientProps.moShadeAngle = rAttribs.getInteger(XML_ang);
+            mrGradientProps.moShadeScaled = rAttribs.getBool(XML_scaled);
+
+            if (mpGradientFill)
+            {
+                mpGradientFill->meGradientType = model::GradientType::Linear;
+                mpGradientFill->maLinearGradient.mnAngle = rAttribs.getInteger(XML_ang, 0);
+                mpGradientFill->maLinearGradient.mbScaled = rAttribs.getBool(XML_scaled, false);
+            }
+        }
         break;
 
         case A_TOKEN( path ):
+        {
             // always set a path type, this disables linear gradient in conversion
-            mrGradientProps.moGradientPath = rAttribs.getToken( XML_path, XML_rect );
+            sal_Int32 nToken = rAttribs.getToken(XML_path, XML_rect);
+            mrGradientProps.moGradientPath = nToken;
+            if (mpGradientFill)
+            {
+                switch (nToken)
+                {
+                    case XML_rect:
+                        mpGradientFill->meGradientType = model::GradientType::Rectangle;
+                        break;
+                    case XML_circle:
+                        mpGradientFill->meGradientType = model::GradientType::Circle;
+                        break;
+                    case XML_shape:
+                        mpGradientFill->meGradientType = model::GradientType::Shape;
+                        break;
+                    default:
+                        break;
+                }
+            }
             return this;    // for fillToRect element
-
+        }
         case A_TOKEN( fillToRect ):
+        {
             mrGradientProps.moFillToRect = GetRelativeRect( rAttribs.getFastAttributeList() );
+            if (mpGradientFill)
+                fillRelativeRectangle(mpGradientFill->maFillToRectangle, rAttribs.getFastAttributeList());
+        }
         break;
 
         case A_TOKEN( tileRect ):
-            mrGradientProps.moTileRect = GetRelativeRect( rAttribs.getFastAttributeList() );
+            mrGradientProps.moTileRect = GetRelativeRect(rAttribs.getFastAttributeList());
+            if (mpGradientFill)
+                fillRelativeRectangle(mpGradientFill->maTileRectangle, rAttribs.getFastAttributeList());
         break;
     }
     return nullptr;
 }
 
-PatternFillContext::PatternFillContext( ContextHandler2Helper const & rParent,
-        const AttributeList& rAttribs, PatternFillProperties& rPatternProps ) :
-    ContextHandler2( rParent ),
-    mrPatternProps( rPatternProps )
+
+namespace
 {
-    mrPatternProps.moPattPreset = rAttribs.getToken( XML_prst );
+
+std::unordered_map<sal_Int32, model::PatternPreset> constPatternPresetMap =
+{
+    { XML_pct5, model::PatternPreset::Percent_5 },
+    { XML_pct10, model::PatternPreset::Percent_10 },
+    { XML_pct20, model::PatternPreset::Percent_20 },
+    { XML_pct25, model::PatternPreset::Percent_25 },
+    { XML_pct30, model::PatternPreset::Percent_30 },
+    { XML_pct40, model::PatternPreset::Percent_40 },
+    { XML_pct50, model::PatternPreset::Percent_50 },
+    { XML_pct60, model::PatternPreset::Percent_60 },
+    { XML_pct70, model::PatternPreset::Percent_70 },
+    { XML_pct75, model::PatternPreset::Percent_75 },
+    { XML_pct80, model::PatternPreset::Percent_80 },
+    { XML_pct90, model::PatternPreset::Percent_90 },
+    { XML_horz, model::PatternPreset::Horizontal },
+    { XML_vert, model::PatternPreset::Vertical },
+    { XML_ltHorz, model::PatternPreset::LightHorizontal },
+    { XML_ltVert, model::PatternPreset::LightVertical },
+    { XML_dkHorz, model::PatternPreset::DarkHorizontal },
+    { XML_dkVert, model::PatternPreset::DarkVertical },
+    { XML_narHorz, model::PatternPreset::NarrowHorizontal },
+    { XML_narVert, model::PatternPreset::NarrowVertical },
+    { XML_dashHorz, model::PatternPreset::DashedHorizontal },
+    { XML_dashVert, model::PatternPreset::DashedVertical },
+    { XML_cross, model::PatternPreset::Cross },
+    { XML_dnDiag, model::PatternPreset::DownwardDiagonal },
+    { XML_upDiag, model::PatternPreset::UpwardDiagonal },
+    { XML_ltDnDiag, model::PatternPreset::LightDownwardDiagonal },
+    { XML_ltUpDiag, model::PatternPreset::LightUpwardDiagonal },
+    { XML_dkDnDiag, model::PatternPreset::DarkDownwardDiagonal },
+    { XML_dkUpDiag, model::PatternPreset::DarkUpwardDiagonal },
+    { XML_wdDnDiag, model::PatternPreset::WideDownwardDiagonal },
+    { XML_wdUpDiag, model::PatternPreset::WideUpwardDiagonal },
+    { XML_dashDnDiag, model::PatternPreset::DashedDownwardDiagonal },
+    { XML_dashUpDiag, model::PatternPreset::DashedUpwardDiagonal },
+    { XML_diagCross, model::PatternPreset::DiagonalCross },
+    { XML_smCheck, model::PatternPreset::SmallCheckerBoard },
+    { XML_lgCheck, model::PatternPreset::LargeCheckerBoard },
+    { XML_smGrid, model::PatternPreset::SmallGrid },
+    { XML_lgGrid, model::PatternPreset::LargeGrid },
+    { XML_dotGrid, model::PatternPreset::DottedGrid },
+    { XML_smConfetti, model::PatternPreset::SmallConfetti },
+    { XML_lgConfetti, model::PatternPreset::LargeConfetti },
+    { XML_horzBrick, model::PatternPreset::HorizontalBrick },
+    { XML_diagBrick, model::PatternPreset::DiagonalBrick },
+    { XML_solidDmnd, model::PatternPreset::SolidDiamond },
+    { XML_openDmnd, model::PatternPreset::OpenDiamond },
+    { XML_dotDmnd, model::PatternPreset::DottedDiamond },
+    { XML_plaid, model::PatternPreset::Plaid },
+    { XML_sphere, model::PatternPreset::Sphere },
+    { XML_weave, model::PatternPreset::Weave },
+    { XML_divot, model::PatternPreset::Divot },
+    { XML_shingle, model::PatternPreset::Shingle },
+    { XML_wave, model::PatternPreset::Wave },
+    { XML_trellis, model::PatternPreset::Trellis },
+    { XML_zigZag, model::PatternPreset::ZigZag }
+};
+
+} // end anonymous namespace
+PatternFillContext::PatternFillContext(ContextHandler2Helper const & rParent,
+        const AttributeList& rAttribs, PatternFillProperties& rPatternProps, model::PatternFill* pPatternFill)
+    : ContextHandler2(rParent)
+    , mpPatternFill(pPatternFill)
+    , mrPatternProps(rPatternProps)
+{
+    mrPatternProps.moPattPreset = rAttribs.getToken(XML_prst);
+
+    if (mpPatternFill)
+    {
+        sal_Int32 nToken = rAttribs.getToken(XML_prst, XML_TOKEN_INVALID);
+
+        auto aIterator = constPatternPresetMap.find(nToken);
+        if (aIterator != constPatternPresetMap.end())
+        {
+            auto const& aPair = *aIterator;
+            model::PatternPreset ePatternPreset = aPair.second;
+            mpPatternFill->mePatternPreset = ePatternPreset;
+        }
+    }
 }
 
 ContextHandlerRef PatternFillContext::onCreateContext(
         sal_Int32 nElement, const AttributeList& )
 {
+    model::ColorDefinition* pColorDefinition = nullptr;
     switch( nElement )
     {
         case A_TOKEN( bgClr ):
-            return new ColorContext( *this, mrPatternProps.maPattBgColor );
+            if (mpPatternFill)
+                pColorDefinition = &mpPatternFill->maBackgroundColor;
+            return new ColorContext(*this, mrPatternProps.maPattBgColor, pColorDefinition);
         case A_TOKEN( fgClr ):
-            return new ColorContext( *this, mrPatternProps.maPattFgColor );
+            if (mpPatternFill)
+                pColorDefinition = &mpPatternFill->maForegroundColor;
+            return new ColorContext(*this, mrPatternProps.maPattFgColor, pColorDefinition);
     }
     return nullptr;
 }
 
 ColorChangeContext::ColorChangeContext( ContextHandler2Helper const & rParent,
-        const AttributeList& rAttribs, BlipFillProperties& rBlipProps ) :
-    ContextHandler2( rParent ),
-    mrBlipProps( rBlipProps )
+        const AttributeList& rAttribs, BlipFillProperties& rBlipProps, model::BlipFill* pBlipFill)
+    : ContextHandler2(rParent)
+    , mpBlipFill(pBlipFill)
+    , mrBlipProps(rBlipProps)
 {
     mrBlipProps.maColorChangeFrom.setUnused();
     mrBlipProps.maColorChangeTo.setUnused();
     mbUseAlpha = rAttribs.getBool( XML_useA, true );
+    if (mpBlipFill)
+    {
+        auto& rEffect = mpBlipFill->maBlipEffects.emplace_back();
+        rEffect.meType = model::BlipEffectType::ColorChange;
+        rEffect.mbUseAlpha = mbUseAlpha;
+    }
 }
 
 ColorChangeContext::~ColorChangeContext()
@@ -129,27 +268,44 @@ ColorChangeContext::~ColorChangeContext()
 ContextHandlerRef ColorChangeContext::onCreateContext(
         sal_Int32 nElement, const AttributeList& )
 {
-    switch( nElement )
+    model::ColorDefinition* pColorDefinition = nullptr;
+    switch (nElement)
     {
-        case A_TOKEN( clrFrom ):
-            return new ColorContext( *this, mrBlipProps.maColorChangeFrom );
-        case A_TOKEN( clrTo ):
-            return new ColorContext( *this, mrBlipProps.maColorChangeTo );
+        case A_TOKEN(clrFrom):
+            if (mpBlipFill)
+            {
+                auto& rEffect = mpBlipFill->maBlipEffects.back();
+                pColorDefinition = &rEffect.getColorFrom();
+            }
+            return new ColorContext(*this, mrBlipProps.maColorChangeFrom, pColorDefinition);
+        case A_TOKEN(clrTo):
+            if (mpBlipFill)
+            {
+                auto& rEffect = mpBlipFill->maBlipEffects.back();
+                pColorDefinition = &rEffect.getColorTo();
+            }
+            return new ColorContext(*this, mrBlipProps.maColorChangeTo, pColorDefinition);
     }
     return nullptr;
 }
 
-BlipContext::BlipContext( ContextHandler2Helper const & rParent,
-        const AttributeList& rAttribs, BlipFillProperties& rBlipProps ) :
-    ContextHandler2( rParent ),
-    mrBlipProps( rBlipProps )
+BlipContext::BlipContext(ContextHandler2Helper const & rParent, const AttributeList& rAttribs,
+        BlipFillProperties& rBlipProps, model::BlipFill* pBlipFill)
+    : ContextHandler2(rParent)
+    , mpBlipFill(pBlipFill)
+    , mrBlipProps(rBlipProps)
 {
     if( rAttribs.hasAttribute( R_TOKEN( embed ) ) )
     {
         // internal picture URL
-        OUString aFragmentPath = getFragmentPathFromRelId( rAttribs.getString( R_TOKEN( embed ), OUString() ) );
+        OUString aFragmentPath = getFragmentPathFromRelId( rAttribs.getStringDefaulted( R_TOKEN( embed )) );
         if (!aFragmentPath.isEmpty())
-            mrBlipProps.mxFillGraphic = getFilter().getGraphicHelper().importEmbeddedGraphic( aFragmentPath );
+        {
+            auto xGraphic = getFilter().getGraphicHelper().importEmbeddedGraphic(aFragmentPath);
+            mrBlipProps.mxFillGraphic = xGraphic;
+            if (mpBlipFill)
+                mpBlipFill->mxGraphic = xGraphic;
+        }
     }
     else if( rAttribs.hasAttribute( R_TOKEN( link ) ) )
     {
@@ -158,11 +314,14 @@ BlipContext::BlipContext( ContextHandler2Helper const & rParent,
         // we will embed this link, this is better than just doing nothing...
         // TODO: import this graphic as real link, but this requires some
         // code rework.
-        OUString aRelId = rAttribs.getString( R_TOKEN( link ), OUString() );
+        OUString aRelId = rAttribs.getStringDefaulted( R_TOKEN( link ));
         OUString aTargetLink = getFilter().getAbsoluteUrl( getRelations().getExternalTargetFromRelId( aRelId ) );
         GraphicExternalLink aLink(aTargetLink);
         Graphic aGraphic(aLink);
-        mrBlipProps.mxFillGraphic = aGraphic.GetXGraphic();
+        auto xGraphic = aGraphic.GetXGraphic();
+        mrBlipProps.mxFillGraphic = xGraphic;
+        if (mpBlipFill)
+            mpBlipFill->mxGraphic = xGraphic;
     }
 }
 
@@ -172,13 +331,37 @@ ContextHandlerRef BlipContext::onCreateContext(
     switch( nElement )
     {
         case A_TOKEN( biLevel ):
+        {
+            sal_Int32 nTreshold = rAttribs.getInteger(XML_thresh, 0);
+
+            mrBlipProps.moBiLevelThreshold = nTreshold;
+            mrBlipProps.moColorEffect = getBaseToken(nElement);
+
+            if (mpBlipFill)
+            {
+                auto& rEffect = mpBlipFill->maBlipEffects.emplace_back();
+                rEffect.meType = model::BlipEffectType::BiLevel;
+                rEffect.mnThreshold = nTreshold;
+            }
+        }
+        break;
+
         case A_TOKEN( grayscl ):
+        {
             mrBlipProps.moColorEffect = getBaseToken( nElement );
+            if (mpBlipFill)
+            {
+                auto& rEffect = mpBlipFill->maBlipEffects.emplace_back();
+                rEffect.meType = model::BlipEffectType::Grayscale;
+            }
+        }
         break;
 
         case A_TOKEN( clrChange ):
-            return new ColorChangeContext( *this, rAttribs, mrBlipProps );
-
+        {
+            return new ColorChangeContext(*this, rAttribs, mrBlipProps, mpBlipFill);
+        }
+        break;
         case A_TOKEN( duotone ):
             return new DuotoneContext( *this, mrBlipProps );
 
@@ -186,11 +369,29 @@ ContextHandlerRef BlipContext::onCreateContext(
             return new BlipExtensionContext( *this, mrBlipProps );
 
         case A_TOKEN( lum ):
+        {
             mrBlipProps.moBrightness = rAttribs.getInteger( XML_bright );
             mrBlipProps.moContrast = rAttribs.getInteger( XML_contrast );
+
+            if (mpBlipFill)
+            {
+                auto& rEffect = mpBlipFill->maBlipEffects.emplace_back();
+                rEffect.meType = model::BlipEffectType::Luminance;
+                rEffect.mnBrightness = rAttribs.getInteger(XML_bright, 0);
+                rEffect.mnContrast = rAttribs.getInteger(XML_contrast, 0);
+            }
+        }
         break;
         case A_TOKEN( alphaModFix ):
+        {
             mrBlipProps.moAlphaModFix = rAttribs.getInteger(XML_amt);
+            if (mpBlipFill)
+            {
+                auto& rEffect = mpBlipFill->maBlipEffects.emplace_back();
+                rEffect.meType = model::BlipEffectType::AlphaModulateFixed;
+                rEffect.mnAmount = rAttribs.getInteger(XML_amt, 100 * 1000);
+            }
+        }
         break;
     }
     return nullptr;
@@ -214,16 +415,19 @@ DuotoneContext::~DuotoneContext()
         sal_Int32 /*nElement*/, const AttributeList& /*rAttribs*/ )
 {
     if( mnColorIndex < 2 )
-        return new ColorValueContext( *this, mrBlipProps.maDuotoneColors[mnColorIndex++] );
+        return new ColorValueContext(*this, mrBlipProps.maDuotoneColors[mnColorIndex++], nullptr);
     return nullptr;
 }
 
-BlipFillContext::BlipFillContext( ContextHandler2Helper const & rParent,
-        const AttributeList& rAttribs, BlipFillProperties& rBlipProps ) :
-    ContextHandler2( rParent ),
-    mrBlipProps( rBlipProps )
+BlipFillContext::BlipFillContext(ContextHandler2Helper const & rParent, const AttributeList& rAttribs,
+        BlipFillProperties& rBlipProps, model::BlipFill* pBlipFill)
+    : ContextHandler2( rParent )
+    , mpBlipFill(pBlipFill)
+    , mrBlipProps(rBlipProps)
 {
     mrBlipProps.moRotateWithShape = rAttribs.getBool( XML_rotWithShape );
+    if (mpBlipFill)
+        mpBlipFill->mbRotateWithShape = rAttribs.getBool(XML_rotWithShape, false);
 }
 
 ContextHandlerRef BlipFillContext::onCreateContext(
@@ -232,13 +436,19 @@ ContextHandlerRef BlipFillContext::onCreateContext(
     switch( nElement )
     {
         case A_TOKEN( blip ):
-            return new BlipContext( *this, rAttribs, mrBlipProps );
+            return new BlipContext(*this, rAttribs, mrBlipProps, mpBlipFill);
 
         case A_TOKEN( srcRect ):
+        {
             mrBlipProps.moClipRect = GetRelativeRect( rAttribs.getFastAttributeList() );
+
+            if (mpBlipFill)
+                fillRelativeRectangle(mpBlipFill->maClipRectangle, rAttribs.getFastAttributeList());
+        }
         break;
 
         case A_TOKEN( tile ):
+        {
             mrBlipProps.moBitmapMode = getBaseToken( nElement );
             mrBlipProps.moTileOffsetX = rAttribs.getInteger( XML_tx );
             mrBlipProps.moTileOffsetY = rAttribs.getInteger( XML_ty );
@@ -246,14 +456,46 @@ ContextHandlerRef BlipFillContext::onCreateContext(
             mrBlipProps.moTileScaleY = rAttribs.getInteger( XML_sy );
             mrBlipProps.moTileAlign = rAttribs.getToken( XML_algn );
             mrBlipProps.moTileFlip = rAttribs.getToken( XML_flip );
+
+            if (mpBlipFill)
+            {
+                mpBlipFill->meMode = model::BitmapMode::Tile;
+                mpBlipFill->mnTileOffsetX = rAttribs.getInteger(XML_tx, 0);
+                mpBlipFill->mnTileOffsetY = rAttribs.getInteger(XML_ty, 0);
+                mpBlipFill->mnTileScaleX = rAttribs.getInteger(XML_sx, 0);
+                mpBlipFill->mnTileScaleY = rAttribs.getInteger(XML_sy, 0);
+
+                switch (rAttribs.getToken(XML_flip, XML_none))
+                {
+                    case XML_x: mpBlipFill->meTileFlipMode = model::FlipMode::X; break;
+                    case XML_y: mpBlipFill->meTileFlipMode = model::FlipMode::Y; break;
+                    case XML_xy: mpBlipFill->meTileFlipMode = model::FlipMode::XY; break;
+                    default:
+                    case XML_none: mpBlipFill->meTileFlipMode = model::FlipMode::None; break;
+                }
+                mpBlipFill->meTileAlignment = convertToRectangleAlignment(rAttribs.getToken(XML_algn, XML_TOKEN_INVALID));
+            }
+        }
         break;
 
         case A_TOKEN( stretch ):
+        {
             mrBlipProps.moBitmapMode = getBaseToken( nElement );
+            if (mpBlipFill)
+            {
+                mpBlipFill->meMode = model::BitmapMode::Stretch;
+            }
             return this;    // for fillRect element
+        }
+        break;
 
         case A_TOKEN( fillRect ):
+        {
             mrBlipProps.moFillRect = GetRelativeRect( rAttribs.getFastAttributeList() );
+
+            if (mpBlipFill)
+                fillRelativeRectangle(mpBlipFill->maFillRectangle, rAttribs.getFastAttributeList());
+        }
         break;
     }
     return nullptr;
@@ -268,21 +510,76 @@ FillPropertiesContext::FillPropertiesContext( ContextHandler2Helper const & rPar
 ContextHandlerRef FillPropertiesContext::onCreateContext(
         sal_Int32 nElement, const AttributeList& rAttribs )
 {
-    return createFillContext( *this, nElement, rAttribs, mrFillProps );
+    return createFillContext(*this, nElement, rAttribs, mrFillProps, &maFillStyle);
 }
 
 ContextHandlerRef FillPropertiesContext::createFillContext(
         ContextHandler2Helper const & rParent, sal_Int32 nElement,
-        const AttributeList& rAttribs, FillProperties& rFillProps )
+        const AttributeList& rAttribs, FillProperties& rFillProps,
+        model::FillStyle* pFillStyle)
 {
     switch( nElement )
     {
-        case A_TOKEN( noFill ):     { rFillProps.moFillType = getBaseToken( nElement ); return nullptr; };
-        case A_TOKEN( solidFill ):  { rFillProps.moFillType = getBaseToken( nElement ); return new SolidFillContext( rParent, rFillProps ); };
-        case A_TOKEN( gradFill ):   { rFillProps.moFillType = getBaseToken( nElement ); return new GradientFillContext( rParent, rAttribs, rFillProps.maGradientProps ); };
-        case A_TOKEN( pattFill ):   { rFillProps.moFillType = getBaseToken( nElement ); return new PatternFillContext( rParent, rAttribs, rFillProps.maPatternProps ); };
-        case A_TOKEN( blipFill ):   { rFillProps.moFillType = getBaseToken( nElement ); return new BlipFillContext( rParent, rAttribs, rFillProps.maBlipProps ); };
-        case A_TOKEN( grpFill ):    { rFillProps.moFillType = getBaseToken( nElement ); return nullptr; };    // TODO
+        case A_TOKEN( noFill ):
+        {
+            rFillProps.moFillType = getBaseToken(nElement);
+            if (pFillStyle)
+            {
+                pFillStyle->mpFill = std::make_shared<model::NoFill>();
+            }
+            return nullptr;
+        }
+        case A_TOKEN( solidFill ):
+        {
+            rFillProps.moFillType = getBaseToken(nElement);
+            model::SolidFill* pSolidFill = nullptr;
+            if (pFillStyle)
+            {
+                pFillStyle->mpFill = std::make_shared<model::SolidFill>();
+                pSolidFill = static_cast<model::SolidFill*>(pFillStyle->mpFill.get());
+            }
+            return new SolidFillContext(rParent, rFillProps, pSolidFill);
+        }
+        case A_TOKEN( gradFill ):
+        {
+            rFillProps.moFillType = getBaseToken(nElement);
+            model::GradientFill* pGradientFill = nullptr;
+            if (pFillStyle)
+            {
+                pFillStyle->mpFill = std::make_shared<model::GradientFill>();
+                pGradientFill = static_cast<model::GradientFill*>(pFillStyle->mpFill.get());
+            }
+            return new GradientFillContext(rParent, rAttribs, rFillProps.maGradientProps, pGradientFill);
+        }
+        case A_TOKEN( pattFill ):
+        {
+            rFillProps.moFillType = getBaseToken( nElement );
+            model::PatternFill* pPatternFill = nullptr;
+            if (pFillStyle)
+            {
+                auto pFill = std::make_shared<model::PatternFill>();
+                pPatternFill = pFill.get();
+                pFillStyle->mpFill = pFill;
+            }
+            return new PatternFillContext(rParent, rAttribs, rFillProps.maPatternProps, pPatternFill);
+        }
+        case A_TOKEN( blipFill ):
+        {
+            rFillProps.moFillType = getBaseToken( nElement );
+            model::BlipFill* pBlipFill = nullptr;
+            if (pFillStyle)
+            {
+                pFillStyle->mpFill = std::make_unique<model::BlipFill>();
+                pBlipFill = static_cast<model::BlipFill*>(pFillStyle->mpFill.get());
+            }
+            return new BlipFillContext( rParent, rAttribs, rFillProps.maBlipProps, pBlipFill);
+        }
+        case A_TOKEN( grpFill ):
+        {
+            // TODO
+            rFillProps.moFillType = getBaseToken( nElement );
+            return nullptr;
+        };
     }
     return nullptr;
 }
@@ -340,7 +637,7 @@ ContextHandlerRef ArtisticEffectContext::onCreateContext(
     {
         if( rAttribs.hasAttribute( R_TOKEN( embed ) ) )
         {
-            OUString aFragmentPath = getFragmentPathFromRelId( rAttribs.getString( R_TOKEN( embed ), OUString() ) );
+            OUString aFragmentPath = getFragmentPathFromRelId( rAttribs.getStringDefaulted( R_TOKEN( embed )) );
             if( !aFragmentPath.isEmpty() )
             {
                 getFilter().importBinaryData( maEffect.mrOleObjectInfo.maEmbeddedData, aFragmentPath );

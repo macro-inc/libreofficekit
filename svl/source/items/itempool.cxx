@@ -29,7 +29,6 @@
 #include <svl/hint.hxx>
 #include <svl/itemset.hxx>
 
-#include <items_helper.hxx>
 #include <poolio.hxx>
 
 #include <cassert>
@@ -86,6 +85,73 @@ do { \
 #define CHECK_SLOTS() do {} while (false)
 #endif
 
+/// clear array of PoolItem variants
+/// after all PoolItems are deleted
+/// or all ref counts are decreased
+void SfxPoolItemArray_Impl::clear()
+{
+    maPoolItemSet.clear();
+    maSortablePoolItems.clear();
+}
+
+sal_uInt16 SfxItemPool::GetFirstWhich() const
+{
+    return pImpl->mnStart;
+}
+
+sal_uInt16 SfxItemPool::GetLastWhich() const
+{
+    return pImpl->mnEnd;
+}
+
+bool SfxItemPool::IsInRange( sal_uInt16 nWhich ) const
+{
+    return nWhich >= pImpl->mnStart && nWhich <= pImpl->mnEnd;
+}
+
+sal_uInt16 SfxItemPool::GetIndex_Impl(sal_uInt16 nWhich) const
+{
+    if (nWhich < pImpl->mnStart || nWhich > pImpl->mnEnd)
+    {
+        assert(false && "missing bounds check before use");
+        return 0;
+    }
+    return nWhich - pImpl->mnStart;
+}
+
+sal_uInt16 SfxItemPool::GetSize_Impl() const
+{
+    return pImpl->mnEnd - pImpl->mnStart + 1;
+}
+
+
+bool SfxItemPool::CheckItemInPool(const SfxPoolItem *pItem) const
+{
+    DBG_ASSERT( pItem, "no 0-Pointer Surrogate" );
+    DBG_ASSERT( !IsInvalidItem(pItem), "no Invalid-Item Surrogate" );
+    DBG_ASSERT( !IsPoolDefaultItem(pItem), "no Pool-Default-Item Surrogate" );
+
+    if ( !IsInRange(pItem->Which()) )
+    {
+        if ( pImpl->mpSecondary )
+            return pImpl->mpSecondary->CheckItemInPool( pItem );
+        SAL_WARN( "svl.items", "unknown Which-Id - don't ask me for surrogates, with ID/pos " << pItem->Which());
+    }
+
+    // Pointer on static or pool-default attribute?
+    if( IsStaticDefaultItem(pItem) || IsPoolDefaultItem(pItem) )
+        return true;
+
+    SfxPoolItemArray_Impl& rItemArr = pImpl->maPoolItemArrays[GetIndex_Impl(pItem->Which())];
+
+    for ( auto p : rItemArr )
+    {
+        if ( p == pItem )
+            return true;
+    }
+    SAL_WARN( "svl.items", "Item not in the pool, with ID/pos " << pItem->Which());
+    return false;
+}
 
 const SfxPoolItem* SfxItemPool::GetPoolDefaultItem( sal_uInt16 nWhich ) const
 {
@@ -167,6 +233,24 @@ SfxItemPool::SfxItemPool
 
     if ( pDefaults )
         SetDefaults(pDefaults);
+
+#ifdef DBG_UTIL
+    if (pItemInfos)
+    {
+        auto p = pItemInfos;
+        auto nWhich = nStartWhich;
+        while (nWhich <= nEndWhich)
+        {
+            if (p->_nSID == nWhich)
+            {
+                SAL_WARN("svl.items", "No point mapping a SID to itself, just put a 0 here in the SfxItemInfo array, at index " << (p - pItemInfos));
+                assert(false);
+            }
+            ++p;
+            ++nWhich;
+        }
+    }
+#endif
 }
 
 
@@ -233,7 +317,7 @@ void SfxItemPool::SetDefaults( std::vector<SfxPoolItem*>* pDefaults )
         for ( sal_uInt16 n = 0; n <= pImpl->mnEnd - pImpl->mnStart; ++n )
         {
             assert(  ((*pImpl->mpStaticDefaults)[n]->Which() == n + pImpl->mnStart)
-                        && "static defaults not sorted" );
+                        && "items ids in pool-ranges and in static-defaults do not match" );
             (*pImpl->mpStaticDefaults)[n]->SetKind(SfxItemKind::StaticDefault);
             DBG_ASSERT( pImpl->maPoolItemArrays[n].empty(), "defaults with setitems with items?!" );
         }
@@ -607,13 +691,19 @@ const SfxPoolItem& SfxItemPool::PutImpl( const SfxPoolItem& rItem, sal_uInt16 nW
             if (pFoundItem)
                 assert(*pFoundItem == rItem);
         }
+        else if(rItem.HasLookup())
+        {
+            auto it = rItem.Lookup(rItemArr.begin(), rItemArr.end());
+            if( it != rItemArr.end())
+                pFoundItem = *it;
+        }
         else
         {
-            for (auto itr = rItemArr.begin(); itr != rItemArr.end(); ++itr)
+            for (auto it = rItemArr.begin(); it != rItemArr.end(); ++it)
             {
-                if (**itr == rItem)
+                if (**it == rItem)
                 {
-                    pFoundItem = *itr;
+                    pFoundItem = *it;
                     break;
                 }
             }
@@ -632,7 +722,10 @@ const SfxPoolItem& SfxItemPool::PutImpl( const SfxPoolItem& rItem, sal_uInt16 nW
     SfxPoolItem* pNewItem;
     if (bPassingOwnership)
     {
-        assert(!dynamic_cast<const SfxItemSet*>(&rItem) && "can't pass ownership of SfxItem, they need to be cloned to the master pool");
+#ifndef NDEBUG
+        if (auto pSetItem = dynamic_cast<const SfxSetItem*>(&rItem))
+            assert(pSetItem->GetItemSet().GetPool() == pImpl->mpMaster && "can't pass ownership of SfxSetItem, unless they have been cloned to the master pool");
+#endif
         pNewItem = const_cast<SfxPoolItem*>(&rItem);
     }
     else

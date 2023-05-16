@@ -18,9 +18,7 @@
  */
 
 #include <libxml/xmlwriter.h>
-
 #include <fmtftn.hxx>
-
 #include <doc.hxx>
 #include <DocumentContentOperationsManager.hxx>
 #include <IDocumentStylePoolAccess.hxx>
@@ -43,6 +41,7 @@
 #include <vcl/svapp.hxx>
 #include <unotextrange.hxx>
 #include <osl/diagnose.h>
+#include <unofootnote.hxx>
 
 namespace {
     /// Get a sorted list of the used footnote reference numbers.
@@ -134,6 +133,9 @@ SwFormatFootnote::SwFormatFootnote( bool bEndNote )
 {
 }
 
+void SwFormatFootnote::SetXFootnote(rtl::Reference<SwXFootnote> const& xNote)
+{ m_wXFootnote = xNote.get(); }
+
 bool SwFormatFootnote::operator==( const SfxPoolItem& rAttr ) const
 {
     assert(SfxPoolItem::operator==(rAttr));
@@ -160,7 +162,7 @@ void SwFormatFootnote::SwClientNotify(const SwModify&, const SfxHint& rHint)
     auto pLegacy = static_cast<const sw::LegacyModifyHint*>(&rHint);
     CallSwClientNotify(rHint);
     if(RES_REMOVE_UNO_OBJECT == pLegacy->GetWhich())
-        SetXFootnote(css::uno::Reference<css::text::XFootnote>(nullptr));
+        SetXFootnote(nullptr);
 }
 
 void SwFormatFootnote::InvalidateFootnote()
@@ -272,8 +274,8 @@ uno::Reference<text::XTextRange> SwFormatFootnote::getAnchor(SwDoc& rDoc) const
         return uno::Reference<text::XTextRange>();
     SwPaM aPam(m_pTextAttr->GetTextNode(), m_pTextAttr->GetStart());
     aPam.SetMark();
-    ++aPam.GetMark()->nContent;
-    const uno::Reference<text::XTextRange> xRet =
+    aPam.GetMark()->AdjustContent(+1);
+    const rtl::Reference<SwXTextRange> xRet =
         SwXTextRange::CreateXTextRange(rDoc, *aPam.Start(), aPam.End());
     return xRet;
 }
@@ -296,16 +298,9 @@ void SwTextFootnote::SetStartNode( const SwNodeIndex *pNewNode, bool bDelNode )
 {
     if( pNewNode )
     {
-        if ( !m_pStartNode )
-        {
-            m_pStartNode.reset(new SwNodeIndex(*pNewNode));
-        }
-        else
-        {
-            *m_pStartNode = *pNewNode;
-        }
+        m_oStartNode = *pNewNode;
     }
-    else if ( m_pStartNode )
+    else if ( m_oStartNode )
     {
         // need to do 2 things:
         // 1) unregister footnotes at their pages
@@ -321,7 +316,7 @@ void SwTextFootnote::SetStartNode( const SwNodeIndex *pNewNode, bool bDelNode )
             //             attribute isn't anchored in the TextNode yet.
             //             If it is deleted (e.g. Insert File with footnote
             //             inside fly frame), the content must also be deleted.
-            pDoc = &m_pStartNode->GetNodes().GetDoc();
+            pDoc = &m_oStartNode->GetNodes().GetDoc();
         }
 
         // If called from ~SwDoc(), must not delete the footnote nodes,
@@ -332,7 +327,7 @@ void SwTextFootnote::SetStartNode( const SwNodeIndex *pNewNode, bool bDelNode )
             {
                 // 2) delete the section for the footnote nodes
                 // it's possible that the Inserts have already been deleted (how???)
-                pDoc->getIDocumentContentOperations().DeleteSection( &m_pStartNode->GetNode() );
+                pDoc->getIDocumentContentOperations().DeleteSection( &m_oStartNode->GetNode() );
             }
             else
                 // If the nodes are not deleted, their frames must be removed
@@ -340,7 +335,7 @@ void SwTextFootnote::SetStartNode( const SwNodeIndex *pNewNode, bool bDelNode )
                 // them (particularly not Undo)
                 DelFrames( nullptr );
         }
-        m_pStartNode.reset();
+        m_oStartNode.reset();
 
         // remove the footnote from the SwDoc's array
         for( size_t n = 0; n < pDoc->GetFootnoteIdxs().size(); ++n )
@@ -350,8 +345,7 @@ void SwTextFootnote::SetStartNode( const SwNodeIndex *pNewNode, bool bDelNode )
                 // if necessary, update following footnotes
                 if( !pDoc->IsInDtor() && n < pDoc->GetFootnoteIdxs().size() )
                 {
-                    SwNodeIndex aTmp( pDoc->GetFootnoteIdxs()[n]->GetTextNode() );
-                    pDoc->GetFootnoteIdxs().UpdateFootnote( aTmp );
+                    pDoc->GetFootnoteIdxs().UpdateFootnote( pDoc->GetFootnoteIdxs()[n]->GetTextNode() );
                 }
                 break;
             }
@@ -378,11 +372,11 @@ void SwTextFootnote::InvalidateNumberInLayout()
     SwNodes &rNodes = m_pTextNode->GetDoc().GetNodes();
     const sw::LegacyModifyHint aHint(nullptr, &GetFootnote());
     m_pTextNode->TriggerNodeUpdate(aHint);
-    if ( m_pStartNode )
+    if ( m_oStartNode )
     {
         // must iterate over all TextNodes because of footnotes on other pages
-        SwNodeOffset nSttIdx = m_pStartNode->GetIndex() + 1;
-        SwNodeOffset nEndIdx = m_pStartNode->GetNode().EndOfSectionIndex();
+        SwNodeOffset nSttIdx = m_oStartNode->GetIndex() + 1;
+        SwNodeOffset nEndIdx = m_oStartNode->GetNode().EndOfSectionIndex();
         for( ; nSttIdx < nEndIdx; ++nSttIdx )
         {
             SwNode* pNd;
@@ -396,21 +390,21 @@ void SwTextFootnote::CopyFootnote(
     SwTextFootnote & rDest,
     SwTextNode & rDestNode ) const
 {
-    if (m_pStartNode && !rDest.GetStartNode())
+    if (m_oStartNode && !rDest.GetStartNode())
     {
         // dest missing node section? create it here!
         // (happens in SwTextNode::CopyText if pDest == this)
         rDest.MakeNewTextSection( rDestNode.GetNodes() );
     }
-    if (m_pStartNode && rDest.GetStartNode())
+    if (m_oStartNode && rDest.GetStartNode())
     {
         // footnotes not necessarily in same document!
         SwDoc& rDstDoc = rDestNode.GetDoc();
         SwNodes &rDstNodes = rDstDoc.GetNodes();
 
         // copy only the content of the section
-        SwNodeRange aRg( *m_pStartNode, SwNodeOffset(1),
-                    *m_pStartNode->GetNode().EndOfSectionNode() );
+        SwNodeRange aRg( m_oStartNode->GetNode(), SwNodeOffset(1),
+                    *m_oStartNode->GetNode().EndOfSectionNode() );
 
         // insert at the end of rDest, i.e., the nodes are appended.
         // nDestLen contains number of ContentNodes in rDest _before_ copy.
@@ -418,7 +412,7 @@ void SwTextFootnote::CopyFootnote(
         SwNodeIndex aEnd( *aStart.GetNode().EndOfSectionNode() );
         SwNodeOffset nDestLen = aEnd.GetIndex() - aStart.GetIndex() - 1;
 
-        m_pTextNode->GetDoc().GetDocumentContentOperationsManager().CopyWithFlyInFly(aRg, aEnd);
+        m_pTextNode->GetDoc().GetDocumentContentOperationsManager().CopyWithFlyInFly(aRg, aEnd.GetNode());
 
         // in case the destination section was not empty, delete the old nodes
         // before:   Src: SxxxE,  Dst: SnE
@@ -438,7 +432,7 @@ void SwTextFootnote::CopyFootnote(
 /// create a new nodes-array section for the footnote
 void SwTextFootnote::MakeNewTextSection( SwNodes& rNodes )
 {
-    if ( m_pStartNode )
+    if ( m_oStartNode )
         return;
 
     // set the footnote style on the SwTextNode
@@ -461,9 +455,9 @@ void SwTextFootnote::MakeNewTextSection( SwNodes& rNodes )
     if( nullptr == pFormatColl )
         pFormatColl = rNodes.GetDoc().getIDocumentStylePoolAccess().GetTextCollFromPool( nPoolId );
 
-    SwStartNode* pSttNd = rNodes.MakeTextSection( SwNodeIndex( rNodes.GetEndOfInserts() ),
+    SwStartNode* pSttNd = rNodes.MakeTextSection( rNodes.GetEndOfInserts(),
                                         SwFootnoteStartNode, pFormatColl );
-    m_pStartNode.reset(new SwNodeIndex(*pSttNd));
+    m_oStartNode = *pSttNd;
 }
 
 void SwTextFootnote::DelFrames(SwRootFrame const*const pRoot)
@@ -494,10 +488,10 @@ void SwTextFootnote::DelFrames(SwRootFrame const*const pRoot)
     }
     //JP 13.05.97: if the layout is deleted before the footnotes are deleted,
     //             try to delete the footnote's frames by another way
-    if ( bFrameFnd || !m_pStartNode )
+    if ( bFrameFnd || !m_oStartNode )
         return;
 
-    SwNodeIndex aIdx( *m_pStartNode );
+    SwNodeIndex aIdx( *m_oStartNode );
     SwContentNode* pCNd = m_pTextNode->GetNodes().GoNext( &aIdx );
     if( !pCNd )
         return;
@@ -572,10 +566,8 @@ void SwTextFootnote::SetUniqueSeqRefNo( SwDoc& rDoc )
 
 void SwTextFootnote::CheckCondColl()
 {
-//FEATURE::CONDCOLL
     if( GetStartNode() )
         static_cast<SwStartNode&>(GetStartNode()->GetNode()).CheckSectionCondColl();
-//FEATURE::CONDCOLL
 }
 
 void SwTextFootnote::dumpAsXml(xmlTextWriterPtr pWriter) const
@@ -583,11 +575,11 @@ void SwTextFootnote::dumpAsXml(xmlTextWriterPtr pWriter) const
     (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwTextFootnote"));
     SwTextAttr::dumpAsXml(pWriter);
 
-    if (m_pStartNode)
+    if (m_oStartNode)
     {
-        (void)xmlTextWriterStartElement(pWriter, BAD_CAST("m_pStartNode"));
+        (void)xmlTextWriterStartElement(pWriter, BAD_CAST("m_oStartNode"));
         (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("index"),
-                                    BAD_CAST(OString::number(sal_Int32(m_pStartNode->GetIndex())).getStr()));
+                                    BAD_CAST(OString::number(sal_Int32(m_oStartNode->GetIndex())).getStr()));
         (void)xmlTextWriterEndElement(pWriter);
     }
     if (m_pTextNode)

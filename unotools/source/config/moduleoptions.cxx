@@ -28,6 +28,7 @@
 #include <comphelper/sequence.hxx>
 #include <osl/diagnose.h>
 #include <o3tl/enumarray.hxx>
+#include <o3tl/string_view.hxx>
 #include <com/sun/star/uno/Any.hxx>
 #include <com/sun/star/uno/Sequence.hxx>
 #include <com/sun/star/beans/PropertyValue.hpp>
@@ -762,9 +763,9 @@ namespace {
     //global
     std::weak_ptr<SvtModuleOptions_Impl> g_pModuleOptions;
 
-osl::Mutex& impl_GetOwnStaticMutex()
+std::mutex& impl_GetOwnStaticMutex()
 {
-    static osl::Mutex s_Mutex;
+    static std::mutex s_Mutex;
     return s_Mutex;
 }
 }
@@ -785,13 +786,14 @@ SvtModuleOptions::SvtModuleOptions()
         return;
 
     // take the mutex, so we don't accidentally create more than one
-    ::osl::MutexGuard aGuard( impl_GetOwnStaticMutex() );
+    std::unique_lock aGuard( impl_GetOwnStaticMutex() );
 
     m_pImpl = g_pModuleOptions.lock();
     if( !m_pImpl )
     {
         m_pImpl = std::make_shared<SvtModuleOptions_Impl>();
         g_pModuleOptions = m_pImpl;
+        aGuard.unlock(); // because holdConfigItem will call this constructor
         ItemHolder1::holdConfigItem(EItem::ModuleOptions);
     }
 }
@@ -823,32 +825,32 @@ const OUString & SvtModuleOptions::GetFactoryName( EFactory eFactory ) const
 
 OUString SvtModuleOptions::GetFactoryStandardTemplate( EFactory eFactory ) const
 {
-    ::osl::MutexGuard aGuard( impl_GetOwnStaticMutex() );
+    std::unique_lock aGuard( impl_GetOwnStaticMutex() );
     return m_pImpl->GetFactoryStandardTemplate( eFactory );
 }
 
 OUString SvtModuleOptions::GetFactoryEmptyDocumentURL( EFactory eFactory ) const
 {
-    ::osl::MutexGuard aGuard( impl_GetOwnStaticMutex() );
+    std::unique_lock aGuard( impl_GetOwnStaticMutex() );
     return SvtModuleOptions_Impl::GetFactoryEmptyDocumentURL( eFactory );
 }
 
 OUString SvtModuleOptions::GetFactoryDefaultFilter( EFactory eFactory ) const
 {
-    ::osl::MutexGuard aGuard( impl_GetOwnStaticMutex() );
+    std::unique_lock aGuard( impl_GetOwnStaticMutex() );
     return m_pImpl->GetFactoryDefaultFilter( eFactory );
 }
 
 bool SvtModuleOptions::IsDefaultFilterReadonly( EFactory eFactory   ) const
 {
-    ::osl::MutexGuard aGuard( impl_GetOwnStaticMutex() );
+    std::unique_lock aGuard( impl_GetOwnStaticMutex() );
     m_pImpl->MakeReadonlyStatesAvailable();
     return m_pImpl->IsDefaultFilterReadonly( eFactory );
 }
 
 sal_Int32 SvtModuleOptions::GetFactoryIcon( EFactory eFactory ) const
 {
-    ::osl::MutexGuard aGuard( impl_GetOwnStaticMutex() );
+    std::unique_lock aGuard( impl_GetOwnStaticMutex() );
     return m_pImpl->GetFactoryIcon( eFactory );
 }
 
@@ -862,14 +864,14 @@ bool SvtModuleOptions::ClassifyFactoryByName( std::u16string_view sName    ,
 void SvtModuleOptions::SetFactoryStandardTemplate(       EFactory         eFactory   ,
                                                    const OUString& sTemplate  )
 {
-    ::osl::MutexGuard aGuard( impl_GetOwnStaticMutex() );
+    std::unique_lock aGuard( impl_GetOwnStaticMutex() );
     m_pImpl->SetFactoryStandardTemplate( eFactory, sTemplate );
 }
 
 void SvtModuleOptions::SetFactoryDefaultFilter(       EFactory         eFactory,
                                                 const OUString& sFilter )
 {
-    ::osl::MutexGuard aGuard( impl_GetOwnStaticMutex() );
+    std::unique_lock aGuard( impl_GetOwnStaticMutex() );
     m_pImpl->SetFactoryDefaultFilter( eFactory, sFilter );
 }
 
@@ -899,7 +901,7 @@ bool SvtModuleOptions::IsDraw() const
 
 bool SvtModuleOptions::IsWriter() const
 {
-    ::osl::MutexGuard aGuard( impl_GetOwnStaticMutex() );
+    std::unique_lock aGuard( impl_GetOwnStaticMutex() );
     return m_pImpl->IsModuleInstalled( EModule::WRITER );
 }
 
@@ -937,27 +939,27 @@ OUString SvtModuleOptions::GetModuleName( EModule eModule ) const
     return OUString();
 }
 
-SvtModuleOptions::EFactory SvtModuleOptions::ClassifyFactoryByShortName(const OUString& sName)
+SvtModuleOptions::EFactory SvtModuleOptions::ClassifyFactoryByShortName(std::u16string_view sName)
 {
-    if ( sName == "swriter" )
+    if ( sName == u"swriter" )
         return EFactory::WRITER;
-    if (sName.equalsIgnoreAsciiCase("swriter/Web")) // sometimes they are registered for swriter/web :-(
+    if (o3tl::equalsIgnoreAsciiCase(sName, u"swriter/Web")) // sometimes they are registered for swriter/web :-(
         return EFactory::WRITERWEB;
-    if (sName.equalsIgnoreAsciiCase("swriter/GlobalDocument")) // sometimes they are registered for swriter/globaldocument :-(
+    if (o3tl::equalsIgnoreAsciiCase(sName, u"swriter/GlobalDocument")) // sometimes they are registered for swriter/globaldocument :-(
         return EFactory::WRITERGLOBAL;
-    if ( sName == "scalc" )
+    if ( sName == u"scalc" )
         return EFactory::CALC;
-    if ( sName == "sdraw" )
+    if ( sName == u"sdraw" )
         return EFactory::DRAW;
-    if ( sName == "simpress" )
+    if ( sName == u"simpress" )
         return EFactory::IMPRESS;
-    if ( sName == "schart" )
+    if ( sName == u"schart" )
         return EFactory::CHART;
-    if ( sName == "smath" )
+    if ( sName == u"smath" )
         return EFactory::MATH;
-    if ( sName == "sbasic" )
+    if ( sName == u"sbasic" )
         return EFactory::BASIC;
-    if ( sName == "sdatabase" )
+    if ( sName == u"sdatabase" )
         return EFactory::DATABASE;
 
     return EFactory::UNKNOWN_FACTORY;
@@ -1086,7 +1088,7 @@ SvtModuleOptions::EFactory SvtModuleOptions::ClassifyFactoryByModel(const css::u
 
 css::uno::Sequence < OUString > SvtModuleOptions::GetAllServiceNames()
 {
-    ::osl::MutexGuard aGuard( impl_GetOwnStaticMutex() );
+    std::unique_lock aGuard( impl_GetOwnStaticMutex() );
     return m_pImpl->GetAllServiceNames();
 }
 

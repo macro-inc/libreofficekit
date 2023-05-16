@@ -22,7 +22,7 @@
 
 #include <sot/storage.hxx>
 #include <sfx2/docfile.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <editeng/fontitem.hxx>
 #include <editeng/eeitem.hxx>
 #include <osl/diagnose.h>
@@ -90,13 +90,13 @@ void Writer_Impl::RemoveFontList( SwDoc& rDoc )
 
 void Writer_Impl::InsertBkmk(const ::sw::mark::IMark& rBkmk)
 {
-    SwNodeOffset nNd = rBkmk.GetMarkPos().nNode.GetIndex();
+    SwNodeOffset nNd = rBkmk.GetMarkPos().GetNodeIndex();
 
     aBkmkNodePos.emplace( nNd, &rBkmk );
 
-    if(rBkmk.IsExpanded() && rBkmk.GetOtherMarkPos().nNode != nNd)
+    if(rBkmk.IsExpanded() && rBkmk.GetOtherMarkPos().GetNodeIndex() != nNd)
     {
-        nNd = rBkmk.GetOtherMarkPos().nNode.GetIndex();
+        nNd = rBkmk.GetOtherMarkPos().GetNodeIndex();
         aBkmkNodePos.emplace( nNd, &rBkmk );
     }
 }
@@ -206,8 +206,7 @@ Writer::NewUnoCursor(SwDoc & rDoc, SwNodeOffset const nStartIdx, SwNodeOffset co
     if (!pCNode)
         pCNode = SwNodes::GoPrevious(&aStt);
     assert(pCNode && "No more ContentNode at StartPos");
-    pCNode->MakeEndIndex( &pNew->GetPoint()->nContent );
-    pNew->GetPoint()->nNode = aStt;
+    pNew->GetPoint()->AssignEndIndex( *pCNode );
     return pNew;
 }
 
@@ -463,15 +462,15 @@ bool Writer::GetBookmarks(const SwContentNode& rNd, sal_Int32 nStt,
             {
                 const ::sw::mark::IMark& rBkmk = *(it->second);
                 sal_Int32 nContent;
-                if( rBkmk.GetMarkPos().nNode == nNd &&
-                    (nContent = rBkmk.GetMarkPos().nContent.GetIndex() ) >= nStt &&
+                if( rBkmk.GetMarkPos().GetNode() == rNd &&
+                    (nContent = rBkmk.GetMarkPos().GetContentIndex() ) >= nStt &&
                     nContent < nEnd )
                 {
                     rArr.push_back( &rBkmk );
                 }
-                else if( rBkmk.IsExpanded() && nNd ==
-                        rBkmk.GetOtherMarkPos().nNode.GetIndex() && (nContent =
-                        rBkmk.GetOtherMarkPos().nContent.GetIndex() ) >= nStt &&
+                else if( rBkmk.IsExpanded() &&
+                        (rNd == rBkmk.GetOtherMarkPos().GetNode()) &&
+                        (nContent = rBkmk.GetOtherMarkPos().GetContentIndex()) >= nStt &&
                         nContent < nEnd )
                 {
                     rArr.push_back( &rBkmk );

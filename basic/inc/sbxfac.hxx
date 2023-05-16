@@ -19,16 +19,13 @@
 
 #pragma once
 
+#include <basic/sbxcore.hxx>
 #include <rtl/ustring.hxx>
-
-class SbxBase;
-class SbxObject;
 
 class SbxFactory
 {
 public:
     virtual ~SbxFactory();
-    SbxFactory() {}
     virtual SbxBaseRef Create(sal_uInt16 nSbxId, sal_uInt32);
     virtual SbxObjectRef CreateObject(const OUString&);
 };

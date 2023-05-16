@@ -19,6 +19,10 @@
 
 #pragma once
 
+#include <sal/config.h>
+
+#include <rtl/ustring.hxx>
+
 #include "hwplib.h"
 
 /**
@@ -34,7 +38,7 @@ DLLEXPORT int hcharconv(hchar ch, hchar *dest, int codeType) ;
 DLLEXPORT int   kssm_hangul_to_ucs2(hchar ch, hchar *dest) ;
 DLLEXPORT hchar ksc5601_han_to_ucs2 (hchar);
 DLLEXPORT hchar ksc5601_sym_to_ucs2 (hchar);
-DLLEXPORT hchar_string hstr2ucsstr(hchar const* hstr);
+DLLEXPORT OUString hstr2OUString(hchar const* hstr);
 /**
  * 한컴스트링을 완성형스트링으로 변환한다.
  */
@@ -56,17 +60,15 @@ DLLEXPORT ::std::string urltounix(const char *src);
 #ifdef _WIN32
 DLLEXPORT ::std::string urltowin(const char *src);
 #endif
-/**
- *  Transfer integer to string following format
- */
-DLLEXPORT char* Int2Str(int value, const char *format, char *buf);
 
 /**
  * color인덱스 값과 음영값을 조합하여 스타오피스의 color로 변환
  */
-DLLEXPORT char *hcolor2str(uchar color, uchar shade, char *buf, bool bIsChar = false);
+DLLEXPORT OUString hcolor2str(uchar color, uchar shade, bool bIsChar = false);
+DLLEXPORT OUString rgb2str(unsigned char red, unsigned char green, unsigned char blue);
+DLLEXPORT OUString rgb2str(int32_t rgb);
 
-DLLEXPORT char *base64_encode_string( const uchar *buf, unsigned int len );
-DLLEXPORT double calcAngle(int x1, int y1, int x2, int y2);
+DLLEXPORT OUString base64_encode_string( const uchar *buf, unsigned int len );
+DLLEXPORT double calcAngle(double x1, double y1, double x2, double y2);
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

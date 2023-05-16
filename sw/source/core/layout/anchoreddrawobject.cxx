@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <dcontact.hxx>
 #include <rootfrm.hxx>
 #include <pagefrm.hxx>
@@ -30,6 +32,7 @@
 #include <tools/fract.hxx>
 #include <DocumentSettingManager.hxx>
 #include <IDocumentState.hxx>
+#include <IDocumentLayoutAccess.hxx>
 #include <txtfly.hxx>
 #include <viewimp.hxx>
 #include <textboxhelper.hxx>
@@ -123,11 +126,13 @@ SwPosNotify::~SwPosNotify() COVERITY_NOEXCEPT_FALSE
         }
     }
     // tdf#101464 notify SwAccessibleMap about new drawing object position
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if (mpOldPageFrame && mpOldPageFrame->getRootFrame()->IsAnyShellAccessible())
     {
         mpOldPageFrame->getRootFrame()->GetCurrShell()->Imp()->MoveAccessible(
                 nullptr, mpAnchoredDrawObj->GetDrawObj(), maOldObjRect);
     }
+#endif
 }
 
 // --> #i32795#
@@ -512,6 +517,13 @@ void SwAnchoredDrawObject::SetDrawObjAnchor()
         DrawObj()->SetAnchorPos( aNewAnchorPos );
         // correct object position, caused by setting new anchor position
         DrawObj()->Move( aMove );
+        // Sync textbox if it wasn't done at move
+        if ( SwTextBoxHelper::isTextBox(&GetFrameFormat(), RES_DRAWFRMFMT) && GetFrameFormat().GetDoc() &&
+            GetFrameFormat().GetDoc()->getIDocumentLayoutAccess().GetCurrentViewShell() &&
+            GetFrameFormat().GetDoc()->getIDocumentLayoutAccess().GetCurrentViewShell()->IsInConstructor())
+        {
+            SwTextBoxHelper::changeAnchor(&GetFrameFormat(), GetFrameFormat().FindRealSdrObject());
+        }
         // --> #i70122# - missing invalidation
         InvalidateObjRectWithSpaces();
     }
@@ -737,7 +749,7 @@ SwRect SwAnchoredDrawObject::GetObjBoundRect() const
                     // Shape has relative size and also a textbox, update its text area as well.
                     uno::Reference<drawing::XShape> xShape(pObject->getUnoShape(), uno::UNO_QUERY);
                     SwTextBoxHelper::syncProperty(pFrameFormat, RES_FRM_SIZE, MID_FRMSIZE_SIZE,
-                                                  uno::makeAny(xShape->getSize()));
+                                                  uno::Any(xShape->getSize()));
                 }
             }
 

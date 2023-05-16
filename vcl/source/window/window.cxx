@@ -23,7 +23,7 @@
 #include <sal/log.hxx>
 
 #include <sal/types.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/salgtype.hxx>
 #include <vcl/event.hxx>
 #include <vcl/help.hxx>
@@ -260,7 +260,7 @@ void Window::dispose()
                 pTempWin = pTempWin->mpWindowImpl->mpNext;
             }
             OSL_FAIL( aTempStr.getStr() );
-            Application::Abort(OStringToOUString(aTempStr.makeStringAndClear(), RTL_TEXTENCODING_UTF8));   // abort in debug builds, this must be fixed!
+            Application::Abort(OStringToOUString(aTempStr, RTL_TEXTENCODING_UTF8));
         }
 
         if (mpWindowImpl->mpFrameData != nullptr)
@@ -283,7 +283,6 @@ void Window::dispose()
                     ") with live SystemWindows destroyed: " +
                     aErrorStr;
                 OSL_FAIL(aTempStr.getStr());
-                // abort in debug builds, must be fixed!
                 Application::Abort(OStringToOUString(aTempStr, RTL_TEXTENCODING_UTF8));
             }
         }
@@ -306,7 +305,7 @@ void Window::dispose()
                 ") with live SystemWindows destroyed: " +
                 aErrorStr;
             OSL_FAIL( aTempStr.getStr() );
-            Application::Abort(OStringToOUString(aTempStr, RTL_TEXTENCODING_UTF8));   // abort in debug builds, this must be fixed!
+            Application::Abort(OStringToOUString(aTempStr, RTL_TEXTENCODING_UTF8));
         }
 
         if ( mpWindowImpl->mpFirstOverlap )
@@ -321,7 +320,7 @@ void Window::dispose()
                 pTempWin = pTempWin->mpWindowImpl->mpNext;
             }
             OSL_FAIL( aTempStr.getStr() );
-            Application::Abort(OStringToOUString(aTempStr.makeStringAndClear(), RTL_TEXTENCODING_UTF8));   // abort in debug builds, this must be fixed!
+            Application::Abort(OStringToOUString(aTempStr, RTL_TEXTENCODING_UTF8));
         }
 
         vcl::Window* pMyParent = GetParent();
@@ -341,7 +340,7 @@ void Window::dispose()
                 lcl_createWindowInfo(this) +
                 ") still in TaskPanelList!";
             OSL_FAIL( aTempStr.getStr() );
-            Application::Abort(OStringToOUString(aTempStr, RTL_TEXTENCODING_UTF8));   // abort in debug builds, this must be fixed!
+            Application::Abort(OStringToOUString(aTempStr, RTL_TEXTENCODING_UTF8));
         }
     }
 #endif
@@ -400,7 +399,7 @@ void Window::dispose()
         OUString aTempStr = "Window (" + GetText() +
                 ") with focused child window destroyed ! THIS WILL LEAD TO CRASHES AND MUST BE FIXED !";
         SAL_WARN( "vcl", aTempStr );
-        Application::Abort(aTempStr);   // abort in debug build version, this must be fixed!
+        Application::Abort(aTempStr);
 #endif
     }
 
@@ -572,7 +571,7 @@ Window::~Window()
 
 ::OutputDevice* Window::GetOutDev()
 {
-    return mpWindowImpl->mxOutDev.get();
+    return mpWindowImpl ? mpWindowImpl->mxOutDev.get() : nullptr;
 }
 
 Color WindowOutputDevice::GetBackgroundColor() const
@@ -591,6 +590,8 @@ WindowImpl::WindowImpl( vcl::Window& rWindow, WindowType nType )
 {
     mxOutDev = VclPtr<vcl::WindowOutputDevice>::Create(rWindow);
     maZoom                              = Fraction( 1, 1 );
+    mfPartialScrollX                    = 0.0;
+    mfPartialScrollY                    = 0.0;
     maWinRegion                         = vcl::Region(true);
     maWinClipRegion                     = vcl::Region(true);
     mpWinData                           = nullptr;                      // Extra Window Data, that we don't need for all windows
@@ -1153,7 +1154,7 @@ void Window::ImplInit( vcl::Window* pParent, WinBits nStyle, SystemParentData* p
 
     if (!utl::ConfigManager::IsFuzzing())
     {
-        const StyleSettings& rStyleSettings = mpWindowImpl->mxOutDev->mxSettings->GetStyleSettings();
+        const StyleSettings& rStyleSettings = mpWindowImpl->mxOutDev->moSettings->GetStyleSettings();
         mpWindowImpl->mxOutDev->maFont = rStyleSettings.GetAppFont();
 
         if ( nStyle & WB_3DLOOK )
@@ -1354,7 +1355,7 @@ void Window::ImplInitResolutionSettings()
 
         // setup the scale factor for HiDPI displays
         GetOutDev()->mnDPIScalePercentage = CountDPIScaleFactor(mpWindowImpl->mpFrameData->mnDPIY);
-        const StyleSettings& rStyleSettings = GetOutDev()->mxSettings->GetStyleSettings();
+        const StyleSettings& rStyleSettings = GetOutDev()->moSettings->GetStyleSettings();
         SetPointFont(*GetOutDev(), rStyleSettings.GetAppFont());
     }
     else if ( mpWindowImpl->mpParent )
@@ -1817,14 +1818,14 @@ void Window::KeyInput( const KeyEvent& rKEvt )
             return;
     }
 
-    NotifyEvent aNEvt( MouseNotifyEvent::KEYINPUT, this, &rKEvt );
+    NotifyEvent aNEvt( NotifyEventType::KEYINPUT, this, &rKEvt );
     if ( !CompatNotify( aNEvt ) )
         mpWindowImpl->mbKeyInput = true;
 }
 
 void Window::KeyUp( const KeyEvent& rKEvt )
 {
-    NotifyEvent aNEvt( MouseNotifyEvent::KEYUP, this, &rKEvt );
+    NotifyEvent aNEvt( NotifyEventType::KEYUP, this, &rKEvt );
     if ( !CompatNotify( aNEvt ) )
         mpWindowImpl->mbKeyUp = true;
 }
@@ -1851,13 +1852,13 @@ void Window::GetFocus()
             return;
     }
 
-    NotifyEvent aNEvt( MouseNotifyEvent::GETFOCUS, this );
+    NotifyEvent aNEvt( NotifyEventType::GETFOCUS, this );
     CompatNotify( aNEvt );
 }
 
 void Window::LoseFocus()
 {
-    NotifyEvent aNEvt( MouseNotifyEvent::LOSEFOCUS, this );
+    NotifyEvent aNEvt( NotifyEventType::LOSEFOCUS, this );
     CompatNotify( aNEvt );
 }
 
@@ -1927,7 +1928,7 @@ void Window::Command( const CommandEvent& rCEvt )
 {
     CallEventListeners( VclEventId::WindowCommand, const_cast<CommandEvent *>(&rCEvt) );
 
-    NotifyEvent aNEvt( MouseNotifyEvent::COMMAND, this, &rCEvt );
+    NotifyEvent aNEvt( NotifyEventType::COMMAND, this, &rCEvt );
     if ( !CompatNotify( aNEvt ) )
         mpWindowImpl->mbCommand = true;
 }
@@ -2719,7 +2720,7 @@ void Window::setPosSizePixel( tools::Long nX, tools::Long nY,
         }
         if( !comphelper::LibreOfficeKit::isActive() &&
             !(nFlags & PosSizeFlags::X) && bHasValidSize &&
-            pWindow->mpWindowImpl->mpFrame->maGeometry.nWidth )
+            pWindow->mpWindowImpl->mpFrame->maGeometry.width() )
         {
             // RTL: make sure the old right aligned position is not changed
             // system windows will always grow to the right
@@ -2733,13 +2734,13 @@ void Window::setPosSizePixel( tools::Long nX, tools::Long nY,
                         pWinParent->mpWindowImpl->mpFrame->GetUnmirroredGeometry();
                     tools::Long myWidth = nOldWidth;
                     if( !myWidth )
-                        myWidth = aSysGeometry.nWidth;
+                        myWidth = aSysGeometry.width();
                     if( !myWidth )
                         myWidth = nWidth;
                     nFlags |= PosSizeFlags::X;
                     nSysFlags |= SAL_FRAME_POSSIZE_X;
-                    nX = aParentSysGeometry.nX - aSysGeometry.nLeftDecoration + aParentSysGeometry.nWidth
-                        - myWidth - 1 - aSysGeometry.nX;
+                    nX = aParentSysGeometry.x() - aSysGeometry.leftDecoration() + aParentSysGeometry.width()
+                        - myWidth - 1 - aSysGeometry.x();
                 }
             }
         }
@@ -2860,8 +2861,8 @@ Point Window::OutputToAbsoluteScreenPixel( const Point& rPos ) const
     // relative to the screen
     Point p = OutputToScreenPixel( rPos );
     SalFrameGeometry g = mpWindowImpl->mpFrame->GetGeometry();
-    p.AdjustX(g.nX );
-    p.AdjustY(g.nY );
+    p.AdjustX(g.x() );
+    p.AdjustY(g.y() );
     return p;
 }
 
@@ -2870,8 +2871,8 @@ Point Window::AbsoluteScreenToOutputPixel( const Point& rPos ) const
     // relative to the screen
     Point p = ScreenToOutputPixel( rPos );
     SalFrameGeometry g = mpWindowImpl->mpFrame->GetGeometry();
-    p.AdjustX( -(g.nX) );
-    p.AdjustY( -(g.nY) );
+    p.AdjustX( -(g.x()) );
+    p.AdjustY( -(g.y()) );
     return p;
 }
 
@@ -2883,13 +2884,13 @@ tools::Rectangle Window::ImplOutputToUnmirroredAbsoluteScreenPixel( const tools:
 
     Point p1 = rRect.TopRight();
     p1 = OutputToScreenPixel(p1);
-    p1.setX( g.nX+g.nWidth-p1.X() );
-    p1.AdjustY(g.nY );
+    p1.setX( g.x()+g.width()-p1.X() );
+    p1.AdjustY(g.y() );
 
     Point p2 = rRect.BottomLeft();
     p2 = OutputToScreenPixel(p2);
-    p2.setX( g.nX+g.nWidth-p2.X() );
-    p2.AdjustY(g.nY );
+    p2.setX( g.x()+g.width()-p2.X() );
+    p2.AdjustY(g.y() );
 
     return tools::Rectangle( p1, p2 );
 }
@@ -2900,13 +2901,13 @@ tools::Rectangle Window::ImplUnmirroredAbsoluteScreenToOutputPixel( const tools:
     SalFrameGeometry g = mpWindowImpl->mpFrame->GetUnmirroredGeometry();
 
     Point p1 = rRect.TopRight();
-    p1.AdjustY(-g.nY );
-    p1.setX( g.nX+g.nWidth-p1.X() );
+    p1.AdjustY(-g.y() );
+    p1.setX( g.x()+g.width()-p1.X() );
     p1 = ScreenToOutputPixel(p1);
 
     Point p2 = rRect.BottomLeft();
-    p2.AdjustY(-g.nY);
-    p2.setX( g.nX+g.nWidth-p2.X() );
+    p2.AdjustY(-g.y());
+    p2.setX( g.x()+g.width()-p2.X() );
     p2 = ScreenToOutputPixel(p2);
 
     return tools::Rectangle( p1, p2 );
@@ -2927,16 +2928,16 @@ tools::Rectangle Window::ImplGetWindowExtentsRelative(const vcl::Window *pRelati
     const vcl::Window *pWin = mpWindowImpl->mpBorderWindow ? mpWindowImpl->mpBorderWindow : this;
 
     Point aPos( pWin->OutputToScreenPixel( Point(0,0) ) );
-    aPos.AdjustX(g.nX );
-    aPos.AdjustY(g.nY );
+    aPos.AdjustX(g.x() );
+    aPos.AdjustY(g.y() );
     Size aSize ( pWin->GetSizePixel() );
     // #104088# do not add decoration to the workwindow to be compatible to java accessibility api
     if( mpWindowImpl->mbFrame || (mpWindowImpl->mpBorderWindow && mpWindowImpl->mpBorderWindow->mpWindowImpl->mbFrame && GetType() != WindowType::WORKWINDOW) )
     {
-        aPos.AdjustX( -sal_Int32(g.nLeftDecoration) );
-        aPos.AdjustY( -sal_Int32(g.nTopDecoration) );
-        aSize.AdjustWidth(g.nLeftDecoration + g.nRightDecoration );
-        aSize.AdjustHeight(g.nTopDecoration + g.nBottomDecoration );
+        aPos.AdjustX( -sal_Int32(g.leftDecoration()) );
+        aPos.AdjustY( -sal_Int32(g.topDecoration()) );
+        aSize.AdjustWidth(g.leftDecoration() + g.rightDecoration() );
+        aSize.AdjustHeight(g.topDecoration() + g.bottomDecoration() );
     }
     if( pRelativeWindow )
     {
@@ -3397,6 +3398,14 @@ void Window::DumpAsPropertyTree(tools::JsonWriter& rJsonWriter)
         }
     }
 
+    vcl::Window* pAccLabelFor = getAccessibleRelationLabelFor();
+    if (pAccLabelFor)
+        rJsonWriter.put("labelFor", pAccLabelFor->get_id());
+
+    vcl::Window* pAccLabelledBy = GetAccessibleRelationLabeledBy();
+    if (pAccLabelledBy)
+        rJsonWriter.put("labelledBy", pAccLabelledBy->get_id());
+
     mpWindowImpl->maDumpAsPropertyTreeHdl.Call(rJsonWriter);
 }
 
@@ -3590,7 +3599,7 @@ bool Window::IsScrollable() const
 
 void Window::ImplMirrorFramePos( Point &pt ) const
 {
-    pt.setX( mpWindowImpl->mpFrame->maGeometry.nWidth-1-pt.X() );
+    pt.setX( mpWindowImpl->mpFrame->maGeometry.width()-1-pt.X() );
 }
 
 // frame based modal counter (dialogs are not modal to the whole application anymore)
@@ -3690,7 +3699,7 @@ void Window::EnableNativeWidget( bool bEnable )
 
         // send datachanged event to allow for internal changes required for NWF
         // like clipmode, transparency, etc.
-        DataChangedEvent aDCEvt( DataChangedEventType::SETTINGS, GetOutDev()->mxSettings.get(), AllSettingsFlags::STYLE );
+        DataChangedEvent aDCEvt( DataChangedEventType::SETTINGS, &*GetOutDev()->moSettings, AllSettingsFlags::STYLE );
         CompatDataChanged( aDCEvt );
 
         // sometimes the borderwindow is queried, so keep it in sync

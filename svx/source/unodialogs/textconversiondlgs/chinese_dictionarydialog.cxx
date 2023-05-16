@@ -30,6 +30,7 @@
 #include <o3tl/safeint.hxx>
 #include <unotools/lingucfg.hxx>
 #include <unotools/linguprops.hxx>
+#include <utility>
 #include <osl/diagnose.h>
 
 namespace textconversiondlgs
@@ -147,7 +148,7 @@ void DictionaryList::refillFromDictionary( sal_Int32 nTextConversionOptions )
         m_xControl->set_text(*m_xIter, pEntry->m_aTerm, 0);
         m_xControl->set_text(*m_xIter, pEntry->m_aMapping, 1);
         m_xControl->set_text(*m_xIter, getPropertyTypeName(pEntry->m_nConversionPropertyType), 2);
-        m_xControl->set_id(*m_xIter, OUString::number(reinterpret_cast<sal_Int64>(pEntry)));
+        m_xControl->set_id(*m_xIter, weld::toId(pEntry));
     }
 }
 
@@ -163,7 +164,7 @@ DictionaryEntry* DictionaryList::getFirstSelectedEntry() const
 DictionaryEntry* DictionaryList::getEntryOnPos(sal_Int32 nPos) const
 {
     OUString sLBEntry = m_xControl->get_id(nPos);
-    return reinterpret_cast<DictionaryEntry*>(sLBEntry.toInt64());
+    return weld::fromId<DictionaryEntry*>(sLBEntry);
 }
 
 DictionaryEntry* DictionaryList::getTermEntry( std::u16string_view rTerm ) const
@@ -194,7 +195,7 @@ void DictionaryList::addEntry(const OUString& rTerm, const OUString& rMapping,
     m_xControl->set_text(*m_xIter, pEntry->m_aTerm, 0);
     m_xControl->set_text(*m_xIter, pEntry->m_aMapping, 1);
     m_xControl->set_text(*m_xIter, getPropertyTypeName(pEntry->m_nConversionPropertyType), 2);
-    m_xControl->set_id(*m_xIter, OUString::number(reinterpret_cast<sal_Int64>(pEntry)));
+    m_xControl->set_id(*m_xIter, weld::toId(pEntry));
     m_xControl->select(*m_xIter);
 }
 
@@ -231,11 +232,11 @@ int DictionaryList::deleteEntries( std::u16string_view rTerm )
     return nPos;
 }
 
-DictionaryEntry::DictionaryEntry( const OUString& rTerm, const OUString& rMapping
+DictionaryEntry::DictionaryEntry( OUString aTerm, OUString aMapping
                     , sal_Int16 nConversionPropertyType
                     , bool bNewEntry )
-        : m_aTerm( rTerm )
-        , m_aMapping( rMapping )
+        : m_aTerm(std::move( aTerm ))
+        , m_aMapping(std::move( aMapping ))
         , m_nConversionPropertyType( nConversionPropertyType )
         , m_bNewEntry( bNewEntry )
 {
@@ -301,11 +302,8 @@ ChineseDictionaryDialog::ChineseDictionaryDialog(weld::Window* pParent)
     , m_xRB_To_Simplified(m_xBuilder->weld_radio_button("tradtosimple"))
     , m_xRB_To_Traditional(m_xBuilder->weld_radio_button("simpletotrad"))
     , m_xCB_Reverse(m_xBuilder->weld_check_button("reverse"))
-    , m_xFT_Term(m_xBuilder->weld_label("termft"))
     , m_xED_Term(m_xBuilder->weld_entry("term"))
-    , m_xFT_Mapping(m_xBuilder->weld_label("mappingft"))
     , m_xED_Mapping(m_xBuilder->weld_entry("mapping"))
-    , m_xFT_Property(m_xBuilder->weld_label("propertyft"))
     , m_xLB_Property(m_xBuilder->weld_combo_box("property"))
     , m_xCT_DictionaryToSimplified(new DictionaryList(m_xBuilder->weld_tree_view("tradtosimpleview")))
     , m_xCT_DictionaryToTraditional(new DictionaryList(m_xBuilder->weld_tree_view("simpletotradview")))

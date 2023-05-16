@@ -55,7 +55,7 @@
 #include <svx/svxids.hrc>
 #include <vcl/EnumContext.hxx>
 #include <svx/sidebar/ContextChangeEventMultiplexer.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sfx2/sidebar/SidebarController.hxx>
 
 using namespace ::sd::slidesorter;
@@ -172,8 +172,7 @@ void SlideSorterViewShell::Initialize()
         *this,
         mpContentWindow,
         mpHorizontalScrollBar,
-        mpVerticalScrollBar,
-        mpScrollBarBox);
+        mpVerticalScrollBar);
     mpView = &mpSlideSorter->GetView();
 
     doShow();

@@ -24,12 +24,13 @@
 #include <drawinglayer/primitive3d/transformprimitive3d.hxx>
 #include <drawinglayer/primitive3d/polygonprimitive3d.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <drawinglayer/primitive3d/polypolygonprimitive3d.hxx>
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <drawinglayer/primitive3d/drawinglayer_primitivetypes3d.hxx>
 #include <rtl/ref.hxx>
+#include <utility>
 
 
 using namespace com::sun::star;
@@ -154,7 +155,7 @@ namespace drawinglayer::processor3d
                             a2DHairline.transform(getObjectTransformation());
                             mpPrimitive2DSequence->push_back(
                                 new primitive2d::PolygonHairlinePrimitive2D(
-                                    a2DHairline,
+                                    std::move(a2DHairline),
                                     basegfx::BColor()));
                         }
                     }
@@ -185,7 +186,7 @@ namespace drawinglayer::processor3d
                             a2DFill.transform(getObjectTransformation());
                             mpPrimitive2DSequence->push_back(
                                 new primitive2d::PolyPolygonColorPrimitive2D(
-                                    a2DFill,
+                                    std::move(a2DFill),
                                     basegfx::BColor()));
                         }
                     }
@@ -202,13 +203,13 @@ namespace drawinglayer::processor3d
 
         Shadow3DExtractingProcessor::Shadow3DExtractingProcessor(
             const geometry::ViewInformation3D& rViewInformation,
-            const basegfx::B2DHomMatrix& rObjectTransformation,
+            basegfx::B2DHomMatrix aObjectTransformation,
             const basegfx::B3DVector& rLightNormal,
             double fShadowSlant,
             const basegfx::B3DRange& rContained3DRange)
         :   BaseProcessor3D(rViewInformation),
             mpPrimitive2DSequence(&maPrimitive2DSequence),
-            maObjectTransformation(rObjectTransformation),
+            maObjectTransformation(std::move(aObjectTransformation)),
             maLightNormal(rLightNormal),
             mfLightPlaneScalar(0.0),
             mbShadowProjectionIsValid(false),
