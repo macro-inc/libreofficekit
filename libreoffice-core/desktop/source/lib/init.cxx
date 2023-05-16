@@ -2658,6 +2658,19 @@ static LibreOfficeKitDocument* lo_documentLoadWithOptions(LibreOfficeKit* pThis,
 
         LibLODocument_Impl* pDocument = new LibLODocument_Impl(xComponent, nThisDocumentId);
 
+        const OUString aReadOnly = extractParameter(aOptions, u"ReadOnly");
+
+        if (!aReadOnly.isEmpty()) {
+            if(aReadOnly == "1"){
+                ITiledRenderable* pDoc = getTiledRenderable(pDocument);
+                if (!pDoc) {
+                    SetLastExceptionMsg("Document doesn't support tiled rendering");
+                    return nullptr;
+                }
+                pDoc->setReadOnly();
+            }
+        }
+
         // After loading the document, its initial view is the "current" view.
         if (pLib->mpCallback)
         {

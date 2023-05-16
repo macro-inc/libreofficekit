@@ -297,6 +297,11 @@ void SwXTextDocument::gotoOutline(tools::JsonWriter& rJsonWriter, int idx)
     rJsonWriter.put("destRect", destRect.SVRect().toString());
 }
 
+void SwXTextDocument::setReadOnly()
+{
+    m_pDocShell->GetObjectShell()->SetReadOnly();
+}
+
 void SwXTextDocument::createTable(int row, int col)
 {
     SwWrtShell* mrSh = m_pDocShell->GetWrtShell();

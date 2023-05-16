@@ -381,6 +381,11 @@ public:
     {
     }
 
+    /// Used to set a document to read only as part of it's loading process
+    virtual void setReadOnly()
+    {
+    }
+
     /// Used to create tables
     virtual void createTable(int /*row*/, int /*col*/)
     {

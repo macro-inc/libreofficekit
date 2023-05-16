@@ -467,6 +467,9 @@ public:
     /// @see vcl::ITiledRenderable::gotoOutline().
     void gotoOutline(tools::JsonWriter& rJsonWriter, int idx) override;
 
+    /// @see vcl::ITiledRenderable::setReadOnly().
+    void setReadOnly() override;
+
     /// @see vcl::ITiledRenderable::createTable().
     void createTable(int row, int col) override;
 
